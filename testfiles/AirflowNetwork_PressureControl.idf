@@ -1,14 +1,15 @@
-! EMSAirflowNetworkOpeningControlByHumidity.idf
-!
-!
-!
-! Basic file description:  file based on HybridVentilationControl.idf but modified to use EMS to control opening based on relative humidity.
-!                          1 story building divided into 3 interior conditioned zones and 1 unconditioned zone over the
+!-Generator IDFEditor 1.34
+!-Option OriginalOrderTop UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+! AirflowNetwork_PressureControl.idf
+! Basic file description:  1 story building divided into 3 interior conditioned zones and 1 unconditioned zone over the
 !                          conditioned zones. Roof with no plenum. No ground contact with floor.
 !                          Outdoor air is modulated based on occupancy and floor area.
 !
-! Highlights:              This file shows a basic example of using the EMS to control window openings in AirflowNetwork.
-!                          The window opening control is based on the humidity level in the zone.
+! Highlights:              This file performs zone pressure control by varying relief flow rate in an OA mixer. It also 
+!                          provides forced ventilation during system on period and natural ventilation during system off 
+!                          period calculated by the AirflowNetwork model.
 !
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -23,13 +24,12 @@
 !
 ! Run Control:             No zone or system sizing, design day simulation.
 !
-! Building: This file is a slight extension of HybridVentilationControl.idf to use EMS
-!           Single floor rectangular L-shaped building 40 ft south wall, 40 ft west wall, zone height 10 feet.
+! Building: Single floor rectangular L-shaped building 40 ft south wall, 40 ft west wall, zone height 10 feet.
 !           There is a single window in West Zone's south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The ceilings consist of 1 in dense insulation
 !           and 3/4" gypsum drywall. A unconditioned attic zone is over three conditioned zones with height 3 feet.
 !           The roof is a built up roof with 1/2 in stone over 3/8 in felt supported by 2 in heavy weight concrete.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approxomately 0.07.!
 !
 !           There is a duct system with about 10% supply leaks and 5% return leaks.
 !           Supply ducts are located in the attic zone and return ducts are exposed to outdoors.
@@ -60,8 +60,8 @@
 ! Conditioned Zone Description Details:
 !
 !       (0,12.192,0)                 (9.144,12.192,0)
-!           _______        _________________
-!          |       ********                 |
+!           ________________________________
+!          |                                |
 !          |                                |
 !          |                                |
 !          |                                |
@@ -69,16 +69,16 @@
 !          |                                |
 !          |                                |
 !          |             (6.096,6.096,0)    |
-!          |_____________   ________________|____________ (12.192,6.069,0)
-!          | (0,6.096,0) ###    |    (9.144,6.096,0)     |
+!          |________________________________|____________ (12.192,6.069,0)
+!          | (0,6.096,0)        |    (9.144,6.096,0)     |
 !          |                    |                        |
 !          |                    |                        |
-!          |                    #                        *
-!          |     Resistive      #         East           *    window = *
-!          |                    #                        *    door = #
+!          |                    |                        |
+!          |       West         |         East           |    window = *
 !          |                    |                        |
 !          |                    |                        |
-!          |_____********_______|________________________|
+!          |                    |                        |
+!          |___**************___|________________________|
 !
 !      (0,0,0)             (6.069,0,0)               (12.192,0,0)
 !
@@ -148,6 +148,12 @@
 
   Output:DebuggingData,0,0;
 
+  ZoneCapacitanceMultiplier:ResearchSpecial,
+    1.0,                     !- Temperature Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    1.0,                     !- Carbon Dioxide Capacity Multiplier
+    ;                        !- Generic Contaminant Capacity Multiplier
+
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
@@ -158,9 +164,9 @@
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
-    1,                       !- Begin Day of Month
-    12,                      !- End Month
-    31,                      !- End Day of Month
+    14,                      !- Begin Day of Month
+    1,                       !- End Month
+    14,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -168,7 +174,18 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-!-   ===========  ALL OBJECTS IN CLASS: LOCATION ===========
+  RunPeriod,
+    ,                        !- Name
+    7,                       !- Begin Month
+    7,                       !- Begin Day of Month
+    7,                       !- End Month
+    7,                       !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    No;                      !- Use Weather File Snow Indicators
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -1203,59 +1220,11 @@
     3.500,6.096000,0.0,  !- X,Y,Z ==> Vertex 3 {m}
     3.500,6.096000,2.0;  !- X,Y,Z ==> Vertex 4 {m}
 
-  FenestrationSurface:Detailed,
-    Zn001:Wall004:Door001,   !- Name
-    DOOR,                    !- Surface Type
-    DOOR-CON,                !- Construction Name
-    Zn001:Wall004,           !- Building Surface Name
-    Zn002:Wall004:Door001,   !- Outside Boundary Condition Object
-    0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
-    ,                        !- Frame and Divider Name
-    1.0,                     !- Multiplier
-    4,                       !- Number of Vertices
-    6.096000,2.5,2.000000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,2.5,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,3.5,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,3.5,2.000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  FenestrationSurface:Detailed,
-    Zn002:Wall004:Door001,   !- Name
-    DOOR,                    !- Surface Type
-    DOOR-CON,                !- Construction Name
-    Zn002:Wall004,           !- Building Surface Name
-    Zn001:Wall004:Door001,   !- Outside Boundary Condition Object
-    0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
-    ,                        !- Frame and Divider Name
-    1.0,                     !- Multiplier
-    4,                       !- Number of Vertices
-    6.096000,3.5,2.000000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,3.5,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,2.5,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,2.5,2.000000;  !- X,Y,Z ==> Vertex 4 {m}
-
-  FenestrationSurface:Detailed,
-    Zn002:Wall003:Win001,    !- Name
-    Window,                  !- Surface Type
-    ELECTRO-CON-LIGHT,       !- Construction Name
-    Zn002:Wall003,           !- Building Surface Name
-    ,                        !- Outside Boundary Condition Object
-    0.5000000,               !- View Factor to Ground
-    ,                        !- Shading Control Name
-    TestFrameAndDivider,     !- Frame and Divider Name
-    1.0,                     !- Multiplier
-    4,                       !- Number of Vertices
-    12.19200,0.5,2.5,  !- X,Y,Z ==> Vertex 1 {m}
-    12.19200,0.5,0.5,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,5.5,0.5,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,5.5,2.5;  !- X,Y,Z ==> Vertex 4 {m}
-
   WindowProperty:ShadingControl,
     WIN-CONTROL-GLARE,       !- Name
     SwitchableGlazing,       !- Shading Type
     ELECTRO-CON-DARK,        !- Construction with Shading Name
-    ONIFHIGHGLARE,           !- Shading Control Type
+    OnIfHighGlare,           !- Shading Control Type
     ,                        !- Schedule Name
     0.0,                     !- Setpoint {W/m2, W or deg C}
     No,                      !- Shading Control Is Scheduled
@@ -1312,12 +1281,6 @@
     On/Off,                  !- Name
     0,                       !- Lower Limit Value
     1,                       !- Upper Limit Value
-    DISCRETE;                !- Numeric Type
-
-  ScheduleTypeLimits,
-    Hybrid Control Mode Type,!- Name
-    0,                       !- Lower Limit Value
-    4,                       !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
   Schedule:Compact,
@@ -1494,35 +1457,11 @@
     Until: 24:00,1.0;        !- Field 7
 
   Schedule:Compact,
-    Hybrid Control Mode Schedule,  !- Name
-    Hybrid Control Mode Type,!- Schedule Type Limits Name
+    On,            !- Name
+    Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,0;          !- Field 3
-
-  Schedule:Compact,
-    Outdoor air Schedule,    !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until:  7:00,2.0,        !- Field 3
-    Until: 17:00,2.0,        !- Field 5
-    Until: 24:00,2.0;        !- Field 7
-
-  Schedule:Compact,
-    Seasonal Relative Humidity Sch,  !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,20.0,       !- Field 3
-    Through: 10/31,          !- Field 5
-    For: AllDays,            !- Field 6
-    Until: 7:00,70.0,        !- Field 7
-    Until: 17:00,50.0,       !- Field 9
-    Until: 24:00,70.0,       !- Field 11
-    Through: 12/31,          !- Field 13
-    For: AllDays,            !- Field 14
-    Until: 24:00,20.0;       !- Field 15
+    Until: 24:00,1.0;        !- Field 3
 
   People,
     West Zone People,        !- Name
@@ -1770,21 +1709,6 @@
     Heating Coil Air Inlet Node,  !- Node 1 Name
     Air Loop Outlet Node;    !- Node 2 Name
 
-  AvailabilityManager:HybridVentilation,
-    Hybrid ventilation controller 1,  !- Name
-    Typical Terminal Reheat 1,  !- HVAC Air Loop Name
-    NORTH ZONE,              !- Control Zone Name
-    Hybrid Control Mode Schedule,  !- Ventilation Control Mode Schedule Name
-    Yes,                     !- Use Weather File Rain Indicators
-    40.0,                    !- Maximum Wind Speed {m/s}
-    15.0,                    !- Minimum Outdoor Temperature {C}
-    35.0,                    !- Maximum Outdoor Temperature {C}
-    20000.0,                 !- Minimum Outdoor Enthalpy {J/kg}
-    30000.0,                 !- Maximum Outdoor Enthalpy {J/kg}
-    15.0,                    !- Minimum Outdoor Dewpoint {C}
-    30.0,                    !- Maximum Outdoor Dewpoint {C}
-    Outdoor air Schedule;    !- Minimum Outdoor Ventilation Air Schedule Name
-
   BranchList,
     Air Loop Branches,       !- Name
     Air Loop Main Branch;    !- Branch 1 Name
@@ -1855,10 +1779,10 @@
   AirflowNetwork:SimulationControl,
     AriflowNetwork_All,      !- Name
     MultizoneWithDistribution,  !- AirflowNetwork Control
-    Input,                   !- Wind Pressure Coefficient Type
+    INPUT,                   !- Wind Pressure Coefficient Type
     Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
-    LowRise,                 !- Building Type
+    LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
     ZeroNodePressures,       !- Initialization Type
     1.0E-05,                 !- Relative Airflow Convergence Tolerance {dimensionless}
@@ -1880,8 +1804,8 @@
 
   AirflowNetwork:MultiZone:Zone,
     EAST ZONE,               !- Zone Name
-    Temperature,             !- Ventilation Control Mode
-    WindowVentSched,         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    NoVent,                  !- Ventilation Control Mode
+    ,                        !- Ventilation Control Zone Temperature Setpoint Schedule Name
     1.0,                     !- Minimum Venting Open Factor {dimensionless}
     0.0,                     !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor {deltaC}
     100.0,                   !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor {deltaC}
@@ -1917,7 +1841,7 @@
 
   AirflowNetwork:MultiZone:Surface,
     Zn001:Wall001:Win001,    !- Surface Name
-    WiOpen1,                 !- Leakage Component Name
+    CRcri,                   !- Leakage Component Name
     SFacade,                 !- External Node Name
     0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
@@ -1935,13 +1859,7 @@
 
   AirflowNetwork:MultiZone:Surface,
     Zn001:Wall003:Door001,   !- Surface Name
-    DrOpen,                  !- Leakage Component Name
-    ,                        !- External Node Name
-    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
-
-  AirflowNetwork:MultiZone:Surface,
-    Zn001:Wall004:Door001,   !- Surface Name
-    DrOpen,                  !- Leakage Component Name
+    CRcri,                   !- Leakage Component Name
     ,                        !- External Node Name
     0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
@@ -1956,12 +1874,6 @@
     CRcri,                   !- Leakage Component Name
     ,                        !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
-
-  AirflowNetwork:MultiZone:Surface,
-    Zn002:Wall003:Win001,    !- Surface Name
-    WiOpen1,                 !- Leakage Component Name
-    EFacade,                 !- External Node Name
-    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
     Zn002:Wall002,           !- Surface Name
@@ -2001,7 +1913,7 @@
 
   AirflowNetwork:MultiZone:Surface,
     Zn003:Wall002:Win001,    !- Surface Name
-    WiOpen1,                 !- Leakage Component Name
+    CRcri,                   !- Leakage Component Name
     NFacade,                 !- External Node Name
     0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
@@ -2034,41 +1946,6 @@
     CR-1,                    !- Leakage Component Name
     Horizontal,              !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
-
-  AirflowNetwork:MultiZone:Component:DetailedOpening,
-    WiOpen1,                 !- Name
-    0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
-    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-    NonPivoted,              !- Type of Rectangular Large Vertical Opening (LVO)
-    0.0,                     !- Extra Crack Length or Height of Pivoting Axis {m}
-    2,                       !- Number of Sets of Opening Factor Data
-    0.0,                     !- Opening Factor 1 {dimensionless}
-    0.5,                     !- Discharge Coefficient for Opening Factor 1 {dimensionless}
-    0.0,                     !- Width Factor for Opening Factor 1 {dimensionless}
-    1.0,                     !- Height Factor for Opening Factor 1 {dimensionless}
-    0.0,                     !- Start Height Factor for Opening Factor 1 {dimensionless}
-    1.0,                     !- Opening Factor 2 {dimensionless}
-    0.6,                     !- Discharge Coefficient for Opening Factor 2 {dimensionless}
-    1.0,                     !- Width Factor for Opening Factor 2 {dimensionless}
-    1.0,                     !- Height Factor for Opening Factor 2 {dimensionless}
-    0.0,                     !- Start Height Factor for Opening Factor 2 {dimensionless}
-    0,                       !- Opening Factor 3 {dimensionless}
-    0,                       !- Discharge Coefficient for Opening Factor 3 {dimensionless}
-    0,                       !- Width Factor for Opening Factor 3 {dimensionless}
-    0,                       !- Height Factor for Opening Factor 3 {dimensionless}
-    0,                       !- Start Height Factor for Opening Factor 3 {dimensionless}
-    0,                       !- Opening Factor 4 {dimensionless}
-    0,                       !- Discharge Coefficient for Opening Factor 4 {dimensionless}
-    0,                       !- Width Factor for Opening Factor 4 {dimensionless}
-    0,                       !- Height Factor for Opening Factor 4 {dimensionless}
-    0;                       !- Start Height Factor for Opening Factor 4 {dimensionless}
-
-  AirflowNetwork:MultiZone:Component:SimpleOpening,
-    DrOpen,                  !- Name
-    0.001,                   !- Air Mass Flow Coefficient When Opening is Closed {kg/s-m}
-    0.667,                   !- Air Mass Flow Exponent When Opening is Closed {dimensionless}
-    0.0001,                  !- Minimum Density Difference for Two-Way Flow {kg/m3}
-    0.55;                    !- Discharge Coefficient {dimensionless}
 
   AirflowNetwork:MultiZone:ReferenceCrackConditions,
     ReferenceCrackConditions,!- Name
@@ -2583,6 +2460,16 @@
     0.1,                     !- Air Path Length {m}
     0.44;                    !- Air Path Hydraulic Diameter {m}
 
+  AirflowNetwork:Distribution:Component:Leak,
+    OAFlow,          !- Name
+    0.025,                  !- Air Mass Flow Coefficient {kg/s}
+    0.65;                    !- Air Mass Flow Exponent {dimensionless}
+
+  AirflowNetwork:Distribution:Component:Leak,
+    OAFlow1,          !- Name
+    0.025,                  !- Air Mass Flow Coefficient {kg/s}
+    0.65;                    !- Air Mass Flow Exponent {dimensionless}
+
   AirflowNetwork:Distribution:Linkage,
     Main Link 1,             !- Name
     EquipmentInletNode,      !- Node 1 Name
@@ -2755,6 +2642,18 @@
     ZoneConnectionDuct;      !- Component Name
 
   AirflowNetwork:Distribution:Linkage,
+    OASystemFanLink,         !- Name
+    OA Inlet Node,           !- Node 1 Name
+    OA System Node,          !- Node 2 Name
+    OA Fan;                  !- Component Name
+
+  AirflowNetwork:Distribution:Linkage,
+    OASystemReliefLink,      !- Name
+    OA System Node,          !- Node 1 Name
+    OA Inlet Node,           !- Node 2 Name
+    Relief Fan;              !- Component Name
+
+  AirflowNetwork:Distribution:Linkage,
     OAMixerOutletLink,       !- Name
     OA System Node,          !- Node 1 Name
     FanInletNode,            !- Node 2 Name
@@ -2825,6 +2724,37 @@
     Zone3SupplyNode,         !- Node 1 Name
     ATTIC ZONE,              !- Node 2 Name
     ZoneSupplyELR3;          !- Component Name
+
+  AirflowNetwork:ZoneControl:PressureController,
+    PressureController,      !- Name
+    NORTH ZONE,              !- Control Zone Name
+    AirflowNetwork:Distribution:Component:ReliefAirFlow, !- Control Object Type
+    Relief Fan,              !- Control Object Name
+    ,                        !- Pressure Control Availability Schedule Name
+    Pressure Setpoint Schedule; !- Pressure Setpoint Schedule Name
+
+  Schedule:Compact,
+    Pressure Setpoint Schedule,   !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,3.0,        !- Field 3
+    Through: 9/30,           !- Field 4
+    For: AllDays,            !- Field 5
+    Until: 24:00,6.5,        !- Field 6
+    Through: 12/31,          !- Field 7
+    For: AllDays,            !- Field 8
+    Until: 24:00,3.0;        !- Field 9
+
+  AirflowNetwork:Distribution:Component:OutdoorAirFlow,
+    OA Fan,                  !- Name
+    0.001,                   !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
+    0.667;                   !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off {dimensionless}
+
+  AirflowNetwork:Distribution:Component:ReliefAirFlow,
+    Relief Fan,              !- Name
+    0.001,                   !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
+    0.667;                   !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off {dimensionless}
 
   AvailabilityManagerAssignmentList,
     Reheat System 1 Avail List,  !- Name
@@ -2914,7 +2844,7 @@
 
   Fan:ZoneExhaust,
     Zone3 Exhaust Fan,       !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    On,    !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     500,                     !- Pressure Rise {Pa}
     0.01,                    !- Maximum Flow Rate {m3/s}
@@ -2993,11 +2923,6 @@
     Dual Zone Control Type Sched,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     Setpoints;               !- Control 1 Name
-
-  ZoneControl:Humidistat,
-    Zone 3 Humidistat,       !- Name
-    NORTH ZONE,              !- Zone Name
-    Seasonal Relative Humidity Sch;  !- Humidifying Relative Humidity Setpoint Schedule Name
 
   ThermostatSetpoint:DualSetpoint,
     Setpoints,               !- Name
@@ -3082,35 +3007,47 @@
     Mixed Air Node,          !- Air Inlet Node Name
     Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Output:Variable,Zn001:Wall001:Win001,AFN Surface Venting Window or Door Opening Factor,Timestep;
+  Output:Variable,*,AFN Node Temperature,timestep;
 
-  Output:Variable,*,AFN Node Temperature,timestep,ReportSch;
+  Output:Variable,*,AFN Distribution Sensible Heat Loss Energy,timestep;
 
-  Output:Variable,*,AFN Distribution Sensible Heat Loss Energy,timestep,ReportSch;
+  Output:Variable,*,AFN Distribution Sensible Heat Gain Energy,timestep;
 
-  Output:Variable,*,AFN Distribution Sensible Heat Gain Energy,timestep,ReportSch;
+  Output:Variable,*,AFN Zone Infiltration Sensible Heat Loss Energy,timestep;
 
-  Output:Variable,*,AFN Zone Infiltration Sensible Heat Loss Energy,timestep,ReportSch;
+  Output:Variable,*,AFN Zone Infiltration Sensible Heat Gain Energy,timestep;
 
-  Output:Variable,*,AFN Zone Infiltration Sensible Heat Gain Energy,timestep,ReportSch;
+  Output:Variable,Zn003:Wall003,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
 
-  Output:Variable,Zn003:Wall002:Win001,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
+  Output:Variable,Zn003:Wall003,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
 
-  Output:Variable,Zn003:Wall002:Win001,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
+  Output:Variable,*,Heating Coil Gas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep,ReportSch;
+  Output:Variable,*,Cooling Coil Electric Power,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep,ReportSch;
+  Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,*,Zone Air Temperature,timestep,ReportSch;
+  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep,ReportSch;
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep,ReportSch;
+  Output:Variable,SupplyFanLink,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
+  
+  Output:Variable,SupplyFanLink,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
 
-  Output:Variable,*,Availability Manager Hybrid Ventilation Control Status,timestep,ReportSch;
+  Output:Variable,OASystemFanLink,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
+ 
+  Output:Variable,OASystemFanLink,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
 
-  Output:Variable,*,Availability Manager Hybrid Ventilation Control Mode,TimeStep,ReportSch;
+  Output:Variable,OASystemInletLink,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
+
+  Output:Variable,OASystemInletLink,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
+
+  Output:Variable,OASystemReliefLink,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
+
+  Output:Variable,OASystemReliefLink,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
+
+  Output:Variable,NORTH ZONE,AFN Node Total Pressure,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -3145,37 +3082,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
-  Output:Variable,Zone 1 Node,System Node Relative Humidity,timestep;
-
-  EnergyManagementSystem:Sensor,
-    ZoneRH,                  !- Name
-    Zone 1 Node,             !- Output:Variable or Output:Meter Index Key Name
-    System Node Relative Humidity;  !- Output:Variable or Output:Meter Name
-
-  EnergyManagementSystem:Actuator,
-    MyOpenFactor,            !- Name
-    Zn001:Wall001:Win001,    !- Actuated Component Unique Name
-    AirFlow Network Window/Door Opening,  !- Actuated Component Type
-    Venting Opening Factor;  !- Actuated Component Control Type
-
-  EnergyManagementSystem:ProgramCallingManager,
-    RH Controlled Open Factor,  !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-    RH_OpeningController;    !- Program Name 1
-
-  EnergyManagementSystem:Program,
-    RH_OpeningController,    !- Name
-    IF ZoneRH < 25,          !- Program Line 1
-    SET MyOpenFactor = 0.0,  !- Program Line 2
-    ELSEIF ZoneRH > 60,      !- <none>
-    SET MyOpenFactor = 1.0,  !- <none>
-    ELSE,                    !- <none>
-    SET MyOpenFactor = (ZoneRH - 25) / (60 - 25),  !- <none>
-    ENDIF;                   !- <none>
-
-  Output:EnergyManagementSystem,
-    Verbose,                 !- Actuator Availability Dictionary Reporting
-    Verbose,                 !- Internal Variable Availability Dictionary Reporting
-    Verbose;                 !- EMS Runtime Language Debug Output Level
 

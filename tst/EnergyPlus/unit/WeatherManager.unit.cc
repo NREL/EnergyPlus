@@ -125,14 +125,14 @@ TEST_F(EnergyPlusFixture, SkyTempTest )
 		"    -6.00,                   !- Time Zone {hr}",
 		"    190;                     !- Elevation {m}",
 	});
-	
+
 	ASSERT_FALSE(process_idf(idf_objects));
 	Array2D< Real64 > TomorrowSkyTemp; // Sky temperature
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 	TomorrowSkyTemp.allocate( DataGlobals::NumOfTimeStepInHour, 24 );
 	TomorrowSkyTemp = 0.0;
-	
+
 	//Febuary 27
 	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 58, 3);
 	EXPECT_NEAR(2.27, TomorrowSkyTemp(1,1), .001);
@@ -172,5 +172,56 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 	Latitude = -40.0;
 	CalcWaterMainsTemp();
 	EXPECT_NEAR(WaterMainsTemp, 19.3799, 0.0001);
+}
+
+TEST_F( EnergyPlusFixture, JGDate_Test )
+{
+	// used http://aa.usno.navy.mil/data/docs/JulianDate.php
+	//
+	int julianDate;
+	int gregorianYear;
+	int gregorianMonth;
+	int gregorianDay;
+
+	gregorianYear = 2016;  // when test was made
+	gregorianMonth = 5;
+	gregorianDay = 25;
+	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 2457534, julianDate );
+	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 2016, gregorianYear );
+	EXPECT_EQ( 5, gregorianMonth );
+	EXPECT_EQ( 25, gregorianDay );
+
+	gregorianYear = 2015;  // a year before when test was made
+	gregorianMonth = 5;
+	gregorianDay = 25;
+	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 2457168, julianDate );
+	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 2015, gregorianYear );
+	EXPECT_EQ( 5, gregorianMonth );
+	EXPECT_EQ( 25, gregorianDay );
+
+	gregorianYear = 1966; // a fine date in history
+	gregorianMonth = 7;
+	gregorianDay = 16;
+	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 2439323, julianDate );
+	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 1966, gregorianYear );
+	EXPECT_EQ( 7, gregorianMonth );
+	EXPECT_EQ( 16, gregorianDay );
+
+	gregorianYear = 2000;  //complex leap year
+	gregorianMonth = 12;
+	gregorianDay = 31;
+	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 2451910, julianDate );
+	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
+	EXPECT_EQ( 2000, gregorianYear );
+	EXPECT_EQ( 12, gregorianMonth );
+	EXPECT_EQ( 31, gregorianDay );
+
 }
 

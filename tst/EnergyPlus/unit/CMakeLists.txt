@@ -25,12 +25,14 @@ set( test_src
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
   CrossVentMgr.unit.cc
+  CurveManager.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DesiccantDehumidifiers.unit.cc
+  DisplacementVentMgr.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EconomicTariff.unit.cc
@@ -49,6 +51,7 @@ set( test_src
   General.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
@@ -69,18 +72,19 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
-  PlantHeatExchangerFluidToFluid.unit.cc
-  PlantPipingSystemsManager.unit.cc
-  PlantUtilities.unit.cc
-  Pumps.unit.cc
-  PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  PlantHeatExchangerFluidToFluid.unit.cc
+  PlantPipingSystemsManager.unit.cc
+  PlantUtilities.unit.cc
+  Pumps.unit.cc
+  PurchasedAirManager.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
