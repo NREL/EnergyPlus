@@ -58,6 +58,7 @@
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
+#include <ChillerElectricEIR.hh>
 #include <ChillerReformulatedEIR.hh>
 #include <CurveManager.hh>
 #include <DataPrecisionGlobals.hh>
@@ -391,7 +392,28 @@ namespace FaultsManager {
 			{ auto const SELECT_CASE_VAR( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType );
 				
 				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+				
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerElectricEIR::GetInputEIR ) {
+						ChillerElectricEIR::GetElectricEIRChillerInput();
+						ChillerElectricEIR::GetInputEIR = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					if ( FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerElectricEIR::ElectricEIRChiller ) != 1 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						for ( int ChillerNum = 1; ChillerNum <= ChillerElectricEIR::NumElectricEIRChillers; ++ChillerNum ) {
+							if ( SameString( ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).Name, FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName ) ) {
+								ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerSWTFlag = true;
+								ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+								break;
+							}
+						}
+					}
+					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
 					// Read in chiller is not done yet
 					if ( ChillerReformulatedEIR::GetInputREIR ) {
