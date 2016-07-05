@@ -4100,8 +4100,8 @@ namespace DaylightingManager {
 		cCurrentModuleObject = "Daylighting:Controls";
 		TotDaylightingDetailed = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotDaylightingDetailed > 0 ) {
-			GetInputIlluminanceMap(ErrorsFound);
 			GetDaylightingParametersDetaild(TotDaylightingDetailed, ErrorsFound);
+			GetInputIlluminanceMap( ErrorsFound );
 			GetLightWellData( ErrorsFound );
 			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );
 			DayltgSetupAdjZoneListsAndPointers();
@@ -4290,7 +4290,7 @@ namespace DaylightingManager {
 
 	}
 
-	void 
+	void
 	GetInputIlluminanceMap(
 		bool & ErrorsFound
 	)
