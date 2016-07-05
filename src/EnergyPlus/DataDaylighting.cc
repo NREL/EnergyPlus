@@ -118,6 +118,7 @@ namespace DataDaylighting {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotIllumMaps( 0 );
+	int TotRefPoints( 0 );
 	bool mapResultsToReport( false ); // used when only partial hour has "sun up"
 	bool mapResultsReported( false ); // when no map results are ever reported this will still be false
 	char MapColSep; // Character for separating map columns (tab, space, comma)
@@ -129,6 +130,7 @@ namespace DataDaylighting {
 	Array1D< ZoneDaylightCalc > ZoneDaylight;
 	Array1D< IllumMapData > IllumMap;
 	Array1D< MapCalcData > IllumMapCalc;
+	Array1D< RefPointData > DaylRefPt;
 
 } // DataDaylighting
 

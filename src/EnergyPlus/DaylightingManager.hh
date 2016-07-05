@@ -400,6 +400,12 @@ namespace DaylightingManager {
 	);
 
 	void
+	GetInputDayliteRefPt(
+		bool & ErrorsFound
+	);
+
+
+	void
 	CheckTDDsAndLightShelvesInDaylitZones();
 
 	void

@@ -84,6 +84,7 @@ namespace DataDaylighting {
 	// Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
 	extern int const MaxRefPoints; // Maximum number of daylighting reference points, 2
 	extern int const MaxMapRefPoints; // Maximum number of Illuminance Map Ref Points
+	extern int TotRefPoints; // number of Daylighting:ReferencePoint objects found
 
 	extern int const NotInOrAdjZoneExtWin; // Exterior window is not in a Daylighting:Detailed zone
 	// or in an adjacent zone with a shared interior window
@@ -330,10 +331,29 @@ namespace DataDaylighting {
 
 	};
 
+	struct RefPointData
+	{
+		std::string Name; // Map name
+		int Zone;  // Pointer to zone being referenced
+		Real64 x;  // x coordinate
+		Real64 y;  // y coordinate
+		Real64 z;  // z coordinate
+
+		// Default Constructor
+		RefPointData() :
+			Zone( 0 ),
+			x( 0.0 ),
+			y( 0.0 ),
+			z( 0.0 )
+		{}
+
+	};
+
 	// Object Data
 	extern Array1D< ZoneDaylightCalc > ZoneDaylight;
 	extern Array1D< IllumMapData > IllumMap;
 	extern Array1D< MapCalcData > IllumMapCalc;
+	extern Array1D< RefPointData > DaylRefPt;
 
 } // DataDaylighting
 

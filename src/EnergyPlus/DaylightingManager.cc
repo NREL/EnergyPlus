@@ -4296,7 +4296,7 @@ namespace DaylightingManager {
 	)
 	{
 		// Perform the GetInput function for the Output:IlluminanceMap
-		// Glazer - June 2016
+		// Glazer - June 2016 (moved from GetDaylightingParametersDetaild)
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
@@ -4976,6 +4976,41 @@ namespace DaylightingManager {
 			}
 		}
 
+	}
+
+	void
+	GetInputDayliteRefPt(
+		bool & ErrorsFound
+	){
+		// Perform GetInput function for the Daylgihting:ReferencePoint object
+		// Glazer - July 2016
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::FindItemInList;
+
+		int RefPtNum = 0;
+		int IOStat;
+		int NumAlpha;
+		int NumNumber;
+
+		cCurrentModuleObject = "Daylighting:ReferencePoint";
+		TotRefPoints = GetNumObjectsFound( cCurrentModuleObject );
+		DaylRefPt.allocate( TotRefPoints );
+		if ( TotRefPoints > 0 ){
+			for ( RefPtNum = 1; RefPtNum <= TotRefPoints; ++RefPtNum ){
+				GetObjectItem( cCurrentModuleObject, RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				DaylRefPt( RefPtNum ).Name = cAlphaArgs( 1 );
+				DaylRefPt( RefPtNum ).Zone = FindItemInList( cAlphaArgs( 2 ), Zone );
+				if ( DaylRefPt( RefPtNum ).Zone == 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
+					ErrorsFound = true;
+				}
+				DaylRefPt( RefPtNum ).x = rNumericArgs( 1 );
+				DaylRefPt( RefPtNum ).y = rNumericArgs( 2 );
+				DaylRefPt( RefPtNum ).z = rNumericArgs( 3 );
+			}
+		}
 	}
 
 	void
