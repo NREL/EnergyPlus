@@ -58,7 +58,9 @@
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
+#include <ChillerAbsorption.hh>
 #include <ChillerElectricEIR.hh>
+#include <ChillerIndirectAbsorption.hh>
 #include <ChillerReformulatedEIR.hh>
 #include <CurveManager.hh>
 #include <DataPrecisionGlobals.hh>
@@ -519,7 +521,47 @@ namespace FaultsManager {
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerAbsorption::GetInput ) {
+						ChillerAbsorption::GetBLASTAbsorberInput();
+						ChillerAbsorption::GetInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					if ( FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerAbsorption::BLASTAbsorber ) <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						for ( int ChillerNum = 1; ChillerNum <= ChillerAbsorption::NumBLASTAbsorbers; ++ChillerNum ) {
+							if ( SameString( ChillerAbsorption::BLASTAbsorber( ChillerNum ).Name, FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName ) ) {
+								ChillerAbsorption::BLASTAbsorber( ChillerNum ).FaultyChillerSWTFlag = true;
+								ChillerAbsorption::BLASTAbsorber( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+								break;
+							}
+						}
+					}
+					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerIndirectAbsorption::GetInput ) {
+						ChillerIndirectAbsorption::GetIndirectAbsorberInput();
+						ChillerIndirectAbsorption::GetInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					if ( FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerIndirectAbsorption::IndirectAbsorber ) <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						for ( int ChillerNum = 1; ChillerNum <= ChillerIndirectAbsorption::NumIndirectAbsorbers; ++ChillerNum ) {
+							if ( SameString( ChillerIndirectAbsorption::IndirectAbsorber( ChillerNum ).Name, FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName ) ) {
+								ChillerIndirectAbsorption::IndirectAbsorber( ChillerNum ).FaultyChillerSWTFlag = true;
+								ChillerIndirectAbsorption::IndirectAbsorber( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+								break;
+							}
+						}
+					}
+					
 				}
 			}
 			

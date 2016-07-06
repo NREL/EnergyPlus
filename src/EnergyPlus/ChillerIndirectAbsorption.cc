@@ -77,6 +77,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -157,6 +158,8 @@ namespace ChillerIndirectAbsorption {
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
 	Real64 EnergyLossToEnvironment( 0.0 ); // J - piping energy loss from generator outlet to pump inlet
 	Real64 ChillerONOFFCyclingFrac( 0.0 ); // fraction of time chiller is on
+	
+	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -224,7 +227,6 @@ namespace ChillerIndirectAbsorption {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 		int ChillNum; // Chiller number pointer
 
 		if ( CompIndex != 0 ) {
@@ -1409,7 +1411,7 @@ namespace ChillerIndirectAbsorption {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         R. Raustad (FSEC)
 		//       DATE WRITTEN   May 2008
-		//       MODIFIED       na
+		//       MODIFIED       Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1424,8 +1426,6 @@ namespace ChillerIndirectAbsorption {
 
 		// Using/Aliasing
 		using namespace FluidProperties;
-		using General::TrimSigDigits;
-		using General::RoundSigDigits;
 		using DataPlant::DeltaTempTol;
 		using DataPlant::PlantLoop;
 		using DataPlant::CompSetPtBasedSchemeType;
@@ -1435,10 +1435,15 @@ namespace ChillerIndirectAbsorption {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::DoWeathSim;
 		using DataGlobals::WarmupFlag;
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::OutBaroPress;
+		using FaultsManager::FaultsChillerSWTSensor;
+		using General::TrimSigDigits;
+		using General::RoundSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -1588,6 +1593,19 @@ namespace ChillerIndirectAbsorption {
 		LoopSideNum = IndirectAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+			int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( IndirectAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset ));
+			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
 
 		if ( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr > 0 ) {
 			CapacityfAbsorberTemp = CurveValue( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr, TempCondIn );
@@ -1662,6 +1680,20 @@ namespace ChillerIndirectAbsorption {
 					ShowRecurringWarningErrorAtEnd( "CalcIndirectAbsorberModel: Name=\"" + IndirectAbsorber( ChillNum ).Name + "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.", IndirectAbsorber( ChillNum ).ErrCount2 );
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( IndirectAbsorber( ChillNum ).FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				//PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				//PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				//ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -1713,6 +1745,17 @@ namespace ChillerIndirectAbsorption {
 					QEvaporator = EvapMassFlowRate * CpFluid * EvapDeltaTemp;
 				}
 			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 			// Checks QEvaporator on the basis of the machine limits.
 			if ( QEvaporator > std::abs( MyLoad ) ) {
 				if ( EvapMassFlowRate > MassFlowTolerance ) {
