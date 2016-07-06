@@ -207,14 +207,38 @@
 
 #include <fstream>
 #include <algorithm>
+#include <EnergyPlus/DisplayRoutines.hh>
 
 struct InputProcessorCache;
 std::unique_ptr<EnergyPlus::InputProcessorCache> EnergyPlus::EnergyPlusFixture::m_idd_cache = nullptr;
+json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth, json::parse_event_t event, json &parsed,
+									   unsigned line_num, unsigned line_index) -> bool {
+	EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
+	return true;
+};
 
 namespace EnergyPlus {
 
+	void EnergyPlusFixture::SetUpTestCase() {
+//		call_back = [](int depth, json::parse_event_t event, json &parsed,
+//									 unsigned line_num, unsigned line_index) -> bool {
+//			InputProcessor::state.traverse(event, parsed, line_num, line_index);
+//			return true;
+//		};
+		bool errors_found = false;
+		process_idd("", errors_found);
+		if ( errors_found ) {
+			std::cout << "JSON Schema not found" << std::endl;
+			return;
+		}
+		InputProcessor::idf_parser.initialize(InputProcessor::schema);
+//		InputProcessor::state.initialize(InputProcessor::schema);
+	}
+
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
+//		InputProcessor::idf_parser.initialize(InputProcessor::schema);
+		InputProcessor::state.initialize(InputProcessor::schema);
 
 		show_message();
 
@@ -225,7 +249,7 @@ namespace EnergyPlus {
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
-		// InputProcessor::echo_stream = this->echo_stream.get();
+		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -336,7 +360,7 @@ namespace EnergyPlus {
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
-		// InputProcessor::clear_state();
+		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
 		MixedAir::clear_state();
@@ -397,29 +421,30 @@ namespace EnergyPlus {
 		ZoneTempPredictorCorrector::clear_state();
 	}
 
-	void EnergyPlusFixture::setup_cache()
-	{
-		// if ( ! m_idd_cache ) {
-		// 	static auto errors_found = false;
-		// 	static auto const idd = "";
-		// 	InputProcessor::clear_state();
-		// 	process_idd( idd, errors_found );
-		// 	if ( errors_found ) {
-		// 		InputProcessor::clear_state();
-		// 		return;
-		// 	}
-		// 	m_idd_cache = std::unique_ptr< InputProcessorCache >( new InputProcessorCache );
-		// 	InputProcessor::clear_state();
-		// }
-	}
+//	void EnergyPlusFixture::setup_cache()
+//	{
+//
+//		// if ( ! m_idd_cache ) {
+//		// 	static auto errors_found = false;
+//		// 	static auto const idd = "";
+//		// 	InputProcessor::clear_state();
+//		// 	process_idd( idd, errors_found );
+//		// 	if ( errors_found ) {
+//		// 		InputProcessor::clear_state();
+//		// 		return;
+//		// 	}
+//		// 	m_idd_cache = std::unique_ptr< InputProcessorCache >( new InputProcessorCache );
+//		// 	InputProcessor::clear_state();
+//		// }
+//	}
 
-	void EnergyPlusFixture::use_cached_idd()
-	{
-		setup_cache();
-		if ( m_idd_cache ) {
-			m_idd_cache->use_cached_namespace_variables();
-		}
-	}
+//	void EnergyPlusFixture::use_cached_idd()
+//	{
+//		setup_cache();
+//		if ( m_idd_cache ) {
+//			m_idd_cache->use_cached_namespace_variables();
+//		}
+//	}
 
 	std::string EnergyPlusFixture::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {
 		std::ostringstream compare_text;
@@ -520,44 +545,67 @@ namespace EnergyPlus {
 	}
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
-		InputProcessor IP;
-		std::ifstream ifs("FULL_SCHEMA_modified.json", std::ifstream::in);
-		if ( ! ifs.is_open() ) {
-			perror( "ifs" );
-			return false;
-		}
+		InputProcessor::jdf = InputProcessor::idf_parser.decode(idf_snippet, InputProcessor::schema);
 
-		IP.schema = json::parse(ifs);
-		IP.idf_parser.initialize(IP.schema);
-		InputProcessor::jdf = IP.idf_parser.decode(idf_snippet, IP.schema);
-      if (InputProcessor::jdf.find("Building") == InputProcessor::jdf.end()) {
-         InputProcessor::jdf["Building"] = {
-               {
-                                 "Bldg",
-                                 {
-                                       {"north_axis", 0.0},
-                                       {"terrain", "Suburbs"},
-                                       {"loads_convergence_tolerance_value", 0.04},
-                                       {"temperature_convergence_tolerance_value", 0.4000},
-                                       {"solar_distribution", "FullExterior"},
-                                       {"maximum_number_of_warmup_days", 25},
-                                       {"minimum_number_of_warmup_days", 6}
-                                 }
-               }
-         };
-      }
-      if (InputProcessor::jdf.find("GlobalGeometryRules") == InputProcessor::jdf.end()) {
-         InputProcessor::jdf["GlobalGeometryRules"] = {
-               {
-                     "",
-                     {
-                           {"starting_vertex_position", "UpperLeftCorner"},
-                           {"vertex_entry_direction", "Counterclockwise"},
-                           {"coordinate_system", "Relative"}
-                     }
-               }
-         };
-      }
+		if (InputProcessor::jdf.find("Building") == InputProcessor::jdf.end()) {
+			InputProcessor::jdf["Building"] = {
+					{
+							"Bldg",
+							{
+									{"north_axis", 0.0},
+									{"terrain", "Suburbs"},
+									{"loads_convergence_tolerance_value", 0.04},
+									{"temperature_convergence_tolerance_value", 0.4000},
+									{"solar_distribution", "FullExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+							}
+					}
+			};
+		}
+		if (InputProcessor::jdf.find("GlobalGeometryRules") == InputProcessor::jdf.end()) {
+			InputProcessor::jdf["GlobalGeometryRules"] = {
+					{
+							"",
+							{
+									{"starting_vertex_position", "UpperLeftCorner"},
+									{"vertex_entry_direction", "Counterclockwise"},
+									{"coordinate_system", "Relative"},
+									{"daylighting_reference_point_coordinate_system", "Relative"},
+									{"rectangular_surface_coordinate_system", "Relative"}
+							}
+					}
+			};
+		}
+//		int EchoInputFile = 0;
+//		std::string outputAuditFileName = "eplus.audit";
+//		int write_stat = -1;
+//		EchoInputFile = GetNewUnitNumber();
+//		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFileName, flags ); write_stat = flags.ios(); }
+//		if ( write_stat != 0 ) {
+//			EnergyPlus::DisplayString( "Could not open (write) "+ outputAuditFileName + " ." );
+//			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
+//		}
+//		InputProcessor::echo_stream = gio::out_stream( EchoInputFile );
+
+
+
+
+//		{ IOFlags flags; gio::inquire( outputIperrFileName, flags ); FileExists = flags.exists(); }
+//		if ( FileExists ) {
+//			CacheIPErrorFile = GetNewUnitNumber();
+//			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); read_stat = flags.ios(); }
+//			if ( read_stat != 0 ) {
+//				ShowFatalError( "EnergyPlus: Could not open file "+outputIperrFileName+" for input (read)." );
+//			}
+//			{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
+//		}
+//		CacheIPErrorFile = GetNewUnitNumber();
+//		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); write_stat = flags.ios(); }
+//		if ( write_stat != 0 ) {
+//			DisplayString( "Could not open (write) "+outputIperrFileName );
+//			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
+//		}
 
 		DataIPShortCuts::cAlphaFieldNames.allocate( 10000 );
 		DataIPShortCuts::cAlphaArgs.allocate( 10000 );
@@ -565,15 +613,6 @@ namespace EnergyPlus {
 		DataIPShortCuts::cNumericFieldNames.allocate( 10000 );
 		DataIPShortCuts::rNumericArgs.dimension( 10000, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( 10000, false );
-//		InputProcessor::state.initialize(IP.schema);
-//		json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed,
-//																					unsigned line_num, unsigned line_index) -> bool {
-//			InputProcessor::state.traverse(event, parsed, line_num, line_index);
-//			return true;
-//		};
-//		json::parse(InputProcessor::jdf.dump(2), cb);
-//		int errors = InputProcessor::state.print_errors();
-//		std::cout << errors << std::endl;
 
 		return true;
 //		if ( idf_snippet.empty() ) {
