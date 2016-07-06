@@ -140,7 +140,8 @@ namespace HeatBalanceMovableInsulation {
 		// (I)BLAST legacy routine OMVINS
 
 		// USE STATEMENTS:
-		// na
+		using DataHeatBalance::WindowGlass;
+		using DataHeatBalance::GlassEquivalentLayer;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -155,6 +156,7 @@ namespace HeatBalanceMovableInsulation {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
+		int MaterialGroupNum; // Group number for material type
 
 		// FLOW:
 		MovInsulSchedVal = GetCurrentScheduleValue( Surface( SurfNum ).SchedMovInsulExt );
@@ -177,8 +179,12 @@ namespace HeatBalanceMovableInsulation {
 
 			HMovInsul = 1.0 / ( MovInsulSchedVal * Material( Surface( SurfNum ).MaterialMovInsulExt ).Resistance );
 			RoughIndexMovInsul = Material( Surface( SurfNum ).MaterialMovInsulExt ).Roughness;
-			AbsExt = max( 0.0, 1.0 - Material( Surface( SurfNum ).MaterialMovInsulExt ).Trans - Material( Surface( SurfNum ).MaterialMovInsulExt ).ReflectSolBeamFront );
-
+			MaterialGroupNum = Material( Surface( SurfNum ).MaterialMovInsulExt ).Group;
+			if ( ( MaterialGroupNum == WindowGlass ) || ( MaterialGroupNum == GlassEquivalentLayer ) ) {
+				AbsExt = max( 0.0, 1.0 - Material( Surface( SurfNum ).MaterialMovInsulExt ).Trans - Material( Surface( SurfNum ).MaterialMovInsulExt ).ReflectSolBeamFront );
+			} else {
+				AbsExt = Material( Surface( SurfNum ).MaterialMovInsulExt ).AbsorpSolar;
+			}
 		}
 
 	}
