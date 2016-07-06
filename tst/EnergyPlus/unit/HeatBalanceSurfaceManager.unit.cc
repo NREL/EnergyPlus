@@ -56,90 +56,94 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+// EnergyPlus::HeatBalanceSurfaceManager Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
+
 // EnergyPlus Headers
-#include <DataAirLoop.hh>
-#include <DataPrecisionGlobals.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+
+using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
 namespace EnergyPlus {
 
-namespace DataAirLoop {
-
-	// MODULE INFORMATION:
-	//       AUTHOR         Fred Buhl
-	//       DATE WRITTEN   November 2003
-	//       MODIFIED       L. Gu, Jan. 24, 2007. Add more variables to get information on OnOff fan operation
-	//       RE-ENGINEERED  na
-
-	// PURPOSE OF THIS MODULE:
-	// This data-only module contains type definitions and variables
-	// associated with HVAC air loops (AirLoopHVAC objects).
-
-	// REFERENCES:
-	// na
-
-	// OTHER NOTES:
-	// na
-
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
-
-	// MODULE PARAMETER DEFINITIONS:
-
-	// DERIVED TYPE DEFINITIONS:
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
-
-	int NumOASystems( 0 ); // Number of Outdoor Air Systems
-	int LoopFanOperationMode( 0 ); // OnOff fan operation mode
-	Real64 LoopSystemOnMassFlowrate( 0.0 ); // Loop mass flow rate during on cycle using an OnOff fan
-	Real64 LoopSystemOffMassFlowrate( 0.0 ); // Loop mass flow rate during off cycle using an OnOff fan
-	Real64 LoopOnOffFanPartLoadRatio( 0.0 ); // OnOff fan part load ratio
-	Real64 LoopHeatingCoilMaxRTF( 0.0 ); // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
-	Real64 LoopOnOffFanRTF( 0.0 ); // OnOff fan run time fraction in an HVAC Air Loop
-	Real64 LoopDXCoilRTF( 0.0 ); // OnOff fan run time fraction in an HVAC Air Loop
-	Real64 LoopCompCycRatio( 0.0 ); // Loop compressor cycling ratio for multispeed heat pump
-	bool AirLoopInputsFilled( false ); // Set to TRUE after first pass through air loop
-
-	// Object Data
-	Array1D< AirLoopZoneEquipConnectData > AirToZoneNodeInfo;
-	Array1D< AirLoopOutsideAirConnectData > AirToOANodeInfo;
-	Array1D< DefinePriAirSysAvailMgrs > PriAirSysAvailMgr;
-	Array1D< AirLooptoZoneData > AirLoopZoneInfo;
-	Array1D< AirLoopControlData > AirLoopControlInfo;
-	Array1D< AirLoopFlowData > AirLoopFlow;
-	Array1D< OutsideAirSysProps > OutsideAirSys;
-
-	// Clears the global data in DataAirLoop.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 	{
-		NumOASystems = 0;
-		LoopFanOperationMode = 0;
-		LoopSystemOnMassFlowrate = 0.0;
-		LoopSystemOffMassFlowrate = 0.0;
-		LoopOnOffFanPartLoadRatio = 0.0;
-		LoopHeatingCoilMaxRTF = 0.0;
-		LoopOnOffFanRTF = 0.0;
-		LoopDXCoilRTF = 0.0;
-		LoopCompCycRatio = 0.0;
-		AirLoopInputsFilled = false;
-		AirToZoneNodeInfo.deallocate();
-		AirToOANodeInfo.deallocate();
-		PriAirSysAvailMgr.deallocate();
-		AirLoopZoneInfo.deallocate();
-		AirLoopControlInfo.deallocate();
-		AirLoopFlow.deallocate();
-		OutsideAirSys.deallocate();
+
+		int SurfNum; // Surface number DO loop counter
+		int ZoneNum; // Zone number the current surface is attached to
+		int ConstrNum; // Construction index for the current surface
+		Real64 HMovInsul; // "Convection" coefficient of movable insulation
+		Real64 TempExt; // Exterior temperature boundary condition
+		bool ErrorFlag; // Movable insulation error flag
+
+		SurfNum = 1;
+		ZoneNum = 1;
+		ConstrNum = 1;
+		HMovInsul = 1.0;
+		TempExt = 23.0;
+		ErrorFlag = false;
+		
+		DataHeatBalance::Construct.allocate( ConstrNum );
+		DataHeatBalance::Construct( ConstrNum ).Name = "TestConstruct";
+		DataHeatBalance::Construct( ConstrNum ).CTFCross( 0 ) = 0.0;
+		DataHeatBalance::Construct( ConstrNum ).CTFOutside( 0 ) = 1.0;
+		DataHeatBalance::Construct( ConstrNum ).SourceSinkPresent = true;
+		DataHeatBalance::Material.allocate( 1 );
+		DataHeatBalance::Material( 1 ).Name = "TestMaterial";
+		
+		
+		DataHeatBalSurface::HcExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HcExtSurf( SurfNum ) = 1.0;
+		DataHeatBalSurface::HAirExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HAirExtSurf( SurfNum ) = 1.0;
+		DataHeatBalSurface::HSkyExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HSkyExtSurf( SurfNum ) = 1.0;
+		DataHeatBalSurface::HGrdExtSurf.allocate( SurfNum );
+		DataHeatBalSurface::HGrdExtSurf( SurfNum ) = 1.0;
+		
+		DataHeatBalSurface::CTFConstOutPart.allocate( SurfNum );
+		DataHeatBalSurface::CTFConstOutPart( SurfNum ) = 1.0;
+		DataHeatBalSurface::QRadSWOutAbs.allocate( SurfNum );
+		DataHeatBalSurface::QRadSWOutAbs( SurfNum ) = 1.0;
+		DataHeatBalSurface::TempSurfIn.allocate( SurfNum );
+		DataHeatBalSurface::TempSurfIn( SurfNum ) = 1.0;
+		DataHeatBalSurface::QRadSWOutMvIns.allocate( SurfNum );
+		DataHeatBalSurface::QRadSWOutMvIns( SurfNum ) = 1.0;
+		
+		DataHeatBalSurface::TH.allocate(2,2,1);
+		DataSurfaces::Surface.allocate( SurfNum );
+		DataSurfaces::Surface( SurfNum ).Class = 1;
+		DataSurfaces::Surface( SurfNum ).Area = 10.0;
+		DataSurfaces::Surface( SurfNum ).MaterialMovInsulExt = 1;
+		
+		DataEnvironment::SkyTemp = 23.0;
+		DataEnvironment::OutDryBulbTemp	= 23.0;
+
+		DataHeatBalSurface::QdotRadOutRep.allocate( SurfNum );
+		DataHeatBalSurface::QdotRadOutRepPerArea.allocate( SurfNum );
+		DataHeatBalSurface::QRadOutReport.allocate( SurfNum );
+		DataGlobals::TimeStepZoneSec = 900.0;
+		
+		CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag );
+
+		std::string const error_string = delimited_string( {
+			"   ** Severe  ** Exterior movable insulation is not valid with embedded sources/sinks",
+			"   **   ~~~   ** Construction TestConstruct contains an internal source or sink but also uses",
+			"   **   ~~~   ** exterior movable insulation TestMaterial for a surface with that construction.",
+			"   **   ~~~   ** This is not currently allowed because the heat balance equations do not currently accommodate this combination.",
+		} );
+
+		EXPECT_TRUE( ErrorFlag );
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
 	}
 
-} // DataAirLoop
-
-} // EnergyPlus
+}
