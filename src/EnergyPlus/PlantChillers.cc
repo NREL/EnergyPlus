@@ -5671,6 +5671,19 @@ namespace PlantChillers {
 
 		//*********************************
 
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( GTChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
+			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
+
 		//Calculate chiller performance from this set of performance equations.
 		//  from BLAST...Z=(TECONDW-ADJTC(1))/ADJTC(2)-(TLCHLRW-ADJTC(3))
 		DeltaTemp = ( TempCondIn - TempCondInDesign ) / TempRiseRat - ( TempEvapOut - TempEvapOutDesign );
@@ -5761,6 +5774,20 @@ namespace PlantChillers {
 
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( GTChiller( ChillerNum ).Base.FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				// ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+			
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5831,6 +5858,16 @@ namespace PlantChillers {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 			// Checks QEvaporator on the basis of the machine limits.
