@@ -7549,17 +7549,22 @@ namespace WaterThermalTanks {
 				Tank.MaxCapacity = HeatPump.BackupElementCapacity;
 				Tank.MinCapacity = HeatPump.BackupElementCapacity;
 
-				// Check to see if the tank drifts below set point if no heating happens.
+				// Check to see if the tank meets set point if no heating happens.
 				if ( NewTankTemp > SetPointTemp ) {
 
-					// HPWH is now in heating mode
+					// HPWH is now in floating mode
 					HeatPump.Mode = FloatMode;
 
-					// Reset the water heater's mode (call above may have changed modes)
-					Tank.Mode = HeatPump.SaveWHMode;
+				} else {
 
-					HPPartLoadRatio = 0.0;
+					// HPWH remains in heating mode
+					HPPartLoadRatio = 1.0;
+
 				}
+
+				// Reset the water heater's mode (call above may have changed modes)
+				Tank.Mode = HeatPump.SaveWHMode;
+
 			}
 		} else {
 			assert( HeatPump.Mode == FloatMode );
