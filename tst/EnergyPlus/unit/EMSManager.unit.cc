@@ -64,6 +64,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EMSManager.hh>
+#include <CurveManager.hh>
 #include <DataRuntimeLanguage.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -826,6 +827,258 @@ TEST_F( EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS ) {
 
 }
 
+TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
+		// test to demonstrate accurate function calls.
+
+		std::string const idf_objects = delimited_string( {
+
+			"Curve:Quadratic,",
+			"  TestCurve,       !- Name",
+			"  0.8,             !- Coefficient1 Constant",
+			"  0.2,             !- Coefficient2 x",
+			"  0.0,             !- Coefficient3 x**2",
+			"  0.5,             !- Minimum Value of x",
+			"  1.5;             !- Maximum Value of x",
+
+			"EnergyManagementSystem:ProgramCallingManager,",
+			"Test inside HVAC system iteration Loop,",
+			"InsideHVACSystemIterationLoop,",
+			"Test_InsideHVACSystemIterationLoop;",
+
+			"EnergyManagementSystem:Program,",
+			"Test_InsideHVACSystemIterationLoop,",
+			"set Var1 = @Round 2.1,",
+			"set Var2 = @Mod 7 3,",
+			"set Var3 = @Sin 0.0,",
+			"set Var4 = @Cos 0.0,",
+			"set Var5 = @ArcCos 0.0,",
+			"set Var6 = @ArcSin 0.0,",
+			"set Var7 = @DegToRad 0.0,",
+			"set Var8 = @RadToDeg 0.0,",
+			"set Var9 = @Exp 0.0,",
+			"set Var10 = @Ln 0.0,",
+			"set Var11 = @Max 0.0 1.0,",
+			"set Var12 = @Min 0.0 1.0,",
+			"set Var13 = @Abs 0.0,",
+			"set Var14 = @RANDOMUNIFORM 0.0 1.0,",
+			"set Var15 = @RANDOMNORMAL 0.0 1.0 2.0 3.0,",
+			"set Var16 = @SEEDRANDOM 0.0,",
+			"set Var17 = @RhoAirFnPbTdbW 0.0 1.0 2.0,",
+			"set Var18 = @CpAirFnWTdb 0.0 1.0,",
+			"set Var19 = @HfgAirFnWTdb 0.0 1.0,",
+			"set Var20 = @HgAirFnWTdb 0.0 1.0,",
+			"set Var21 = @TdpFnTdbTwbPb 0.0 1.0 2.0,",
+			"set Var22 = @TdpFnWPb 0.0 1.0,",
+			"set Var23 = @HFnTdbW 0.0 1.0,",
+			"set Var24 = @HFnTdbRhPb 0.0 1.0 2.0,",
+			"set Var25 = @TdbFnHW 0.0 1.0,",
+			"set Var26 = @RhovFnTdbRh 0.0 1.0,",
+			"set Var27 = @RhovFnTdbRhLBnd0C 0.0 1.0,",
+			"set Var28 = @RhovFnTdbWPb 0.0 1.0 2.0,",
+			"set Var29 = @RhFnTdbRhov 0.0 1.0,",
+			"set Var30 = @RhFnTdbRhovLBnd0C 0.0 1.0,",
+			"set Var31 = @RhFnTdbWPb 0.0 1.0 2.0,",
+			"set Var32 = @TwbFnTdbWPb 0.0 1.0 2.0,",
+			"set Var33 = @VFnTdbWPb 0.0 1.0 2.0,",
+			"set Var34 = @WFnTdpPb 0.0 1.0,",
+			"set Var35 = @WFnTdbH 0.0 1.0,",
+			"set Var36 = @WFnTdbTwbPb 0.0 1.0 2.0,",
+			"set Var37 = @WFnTdbRhPb 0.0 1.0 2.0,", // this looks suspicious
+			"set Var38 = @PsatFnTemp 0.0,",
+			"set Var39 = @TsatFnHPb 0.0 1.0,",
+			"set Var40 = @CpCW 0.0,",
+			"set Var41 = @CpHW 0.0,",
+			"set Var42 = @RhoH2O 0.0,",
+			"set Var43 = @SEVEREWARNEP 0.0,",
+			"set Var44 = @WARNEP 0.0,",
+			"set Var45 = @TRENDVALUE 0.0 1.0,",
+			"set Var46 = @TRENDAVERAGE 0.0 1.0,",
+			"set Var47 = @TRENDMAX 0.0 1.0,",
+			"set Var48 = @TRENDMIN 0.0 1.0,",
+			"set Var49 = @TRENDDIRECTION 0.0 1.0,",
+			"set Var50 = @TRENDSUM 0.0 1.0,",
+			"set Var51 = @CURVEVALUE 1 0.75;",
+
+//			"set Var52 = @TsatFnPb 0.0,", // not public in PsycRoutines so not available to EMS (commented out at line 2397 of RuntimeLanguageProcessor.cc)
+//			"set Var53 = @FATALHALTEP 0.0,", // terminates program, not unit test friendly
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		CheckIfAnyEMS(); // get EMS input
+		EMSManager::FinishProcessingUserInput = true;
+		bool ErrorsFound(false);
+		CurveManager::GetCurveInputData( ErrorsFound ); // process curve for use with EMS
+		EXPECT_FALSE( ErrorsFound );
+
+		bool anyRan;
+		EMSManager::ManageEMS( DataGlobals::emsCallFromHVACIterationLoop, anyRan );
+		EXPECT_TRUE( anyRan );
+
+		int index( 0 );
+		int offset( 24 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 1 ).Operator, FuncRound );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 1 ).NumOperands, 1 );
+//		EXPECT_EQ( size( DataRuntimeLanguage::ErlExpression( 1 ).Operand ), 1 ); // why doesn't this compile? ... Array1D< ErlValueType > Operand
+		index = 1 + offset;
+		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR1" );
+//		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( 25 ).Value, 2.0 ); // why doesn't this compile? same issue as above ... ErlValueType Value
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 2 ).Operator, FuncMod );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 2 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 3 ).Operator, FuncSin );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 3 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 4 ).Operator, FuncCos );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 4 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 5 ).Operator, FuncArcCos );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 5 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 6 ).Operator, FuncArcSin );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 6 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 7 ).Operator, FuncDegToRad );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 7 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 8 ).Operator, FuncRadToDeg );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 8 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 9 ).Operator, FuncExp );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 9 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 10 ).Operator, FuncLn );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 10 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 11 ).Operator, FuncMax );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 11 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 12 ).Operator, FuncMin );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 12 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 13 ).Operator, FuncABS );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 13 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).Operator, FuncRandU );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).Operator, FuncRandG );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).NumOperands, 4 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).Operator, FuncRandSeed );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).Operator, FuncRhoAirFnPbTdbW );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 18 ).Operator, FuncCpAirFnWTdb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 18 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 19 ).Operator, FuncHfgAirFnWTdb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 19 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 20 ).Operator, FuncHgAirFnWTdb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 20 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 21 ).Operator, FuncTdpFnTdbTwbPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 21 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 22 ).Operator, FuncTdpFnWPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 22 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 23 ).Operator, FuncHFnTdbW );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 23 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 24 ).Operator, FuncHFnTdbRhPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 24 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).Operator, FuncTdbFnHW );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 26 ).Operator, FuncRhovFnTdbRh );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 26 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).Operator, FuncRhovFnTdbRhLBnd0C ); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).Operator, FuncRhovFnTdbWPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 29 ).Operator, FuncRhFnTdbRhov );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 29 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 30 ).Operator, FuncRhFnTdbRhovLBnd0C ); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 30 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 31 ).Operator, FuncRhFnTdbWPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 31 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 32 ).Operator, FuncTwbFnTdbWPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 32 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 33 ).Operator, FuncVFnTdbWPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 33 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 34 ).Operator, FuncWFnTdpPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 34 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 35 ).Operator, FuncWFnTdbH );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 35 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 36 ).Operator, FuncWFnTdbTwbPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 36 ).NumOperands, 3 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 37 ).Operator, FuncWFnTdbRhPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 37 ).NumOperands, 4 ); // why is this 4?
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 38 ).Operator, FuncPsatFnTemp );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 38 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 39 ).Operator, FuncTsatFnHPb );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 39 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 40 ).Operator, FuncCpCW );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 40 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 41 ).Operator, FuncCpHW );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 41 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 42 ).Operator, FuncRhoH2O );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 42 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 43 ).Operator, FuncSevereWarnEp );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 43 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 44 ).Operator, FuncWarnEp );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 44 ).NumOperands, 1 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).Operator, FuncTrendValue );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).Operator, FuncTrendAverage );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).Operator, FuncTrendMax );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).Operator, FuncTrendMin );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).Operator, FuncTrendDirection );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).Operator, FuncTrendSum );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).NumOperands, 2 );
+
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operator, FuncCurveValue );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).NumOperands, 6 );
+
+//		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 52 ).Operator, FuncTsatFnPb ); // not public in PsycRoutines so not available to EMS (commented out at line 2397 of RuntimeLanguageProcessor.cc)
+//		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 53 ).Operator, FuncFatalHaltEp ); // terminates program, not unit test friendly
+
+}
 
 
 
