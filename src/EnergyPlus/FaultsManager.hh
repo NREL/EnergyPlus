@@ -336,7 +336,9 @@ namespace FaultsManager {
 			TowerName( "" ),
 			UAReductionFactor( 1.0 )
 		{}
-			
+		
+		public:
+			Real64 CalFaultyTowerFoulingFactor();
 	};
 	
 	// Object Data

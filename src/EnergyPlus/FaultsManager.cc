@@ -396,7 +396,7 @@ namespace FaultsManager {
 					CondenserLoopTowers::GetInput = false;
 				}
 				// Check the tower name and tower type
-				if ( FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower ) != 1 ) {
+				if ( FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower ) <= 0 ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 					ErrorsFound = true;
 				} else {
@@ -478,7 +478,7 @@ namespace FaultsManager {
 					CondenserLoopTowers::GetInput = false;
 				}
 				// Check the tower name and tower type
-				if ( FindItemInList( FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName, CondenserLoopTowers::SimpleTower ) != 1 ) {
+				if ( FindItemInList( FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName, CondenserLoopTowers::SimpleTower ) <= 0 ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 					ErrorsFound = true;
 				} else {
@@ -564,7 +564,7 @@ namespace FaultsManager {
 						ChillerReformulatedEIR::GetInputREIR = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					if ( FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller ) != 1 ) {
+					if ( FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller ) <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
@@ -603,7 +603,7 @@ namespace FaultsManager {
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
 
 			// Check whether the specified fan exists in the fan list
-			if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
+			if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) <= 0 ) {
 				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 				ErrorsFound = true;
 			}
@@ -948,6 +948,65 @@ namespace FaultsManager {
 		OffsetAct = FaultFac * this->Offset;
 
 		return OffsetAct;
+	}
+
+	Real64
+	FaultPropertiesTowerFouling::CalFaultyTowerFoulingFactor()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Jul. 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To calculate the dynamic tower fouling factor based on the fault availability schedule and severity schedule.
+		// Fouling factor is the ratio between the UA value at fouling case and that at fault free case
+
+		// METHODOLOGY EMPLOYED:
+		// NA
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using ScheduleManager::GetCurrentScheduleValue;
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FaultFac( 0.0 ); // fault modification factor
+		Real64 UAReductionFactorAct( 1.0 ); // actual UA Reduction Factor, ratio between the UA value at fouling case and that at fault free case
+
+		// FLOW
+		
+		// Check fault availability schedules
+		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
+		
+			// Check fault severity schedules 
+			if ( this->SeveritySchedPtr >= 0 ) {
+				FaultFac = GetCurrentScheduleValue( this->SeveritySchedPtr );
+			} else {
+				FaultFac = 1.0;
+			}
+		}
+		
+		// The more severe the fouling fault is, the less the UAReductionFactor is
+		if( FaultFac > 1.0 ) UAReductionFactorAct = this->UAReductionFactor / FaultFac;
+
+		return UAReductionFactorAct;
 	}
 
 	void
