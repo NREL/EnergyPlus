@@ -2785,7 +2785,6 @@ namespace SingleDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int AirLoopNum; // Index to air loop
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		Real64 OAMassFlow; // outside air mass flow rate (kg/s)
 
