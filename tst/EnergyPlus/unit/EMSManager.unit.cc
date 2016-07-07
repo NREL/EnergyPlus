@@ -870,10 +870,10 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 			"set Var21 = @TdpFnTdbTwbPb 30.0 16.0 101325.0,",
 			"set Var22 = @TdpFnWPb 0.01 101325.0,",
 			"set Var23 = @HFnTdbW 30.0 0.01,",
-			"set Var24 = @HFnTdbRhPb 30.0 50.0 101325.0,",
+			"set Var24 = @HFnTdbRhPb 30.0 0.5 101325.0,",
 			"set Var25 = @TdbFnHW 30000.0 0.01,",
-			"set Var26 = @RhovFnTdbRh 30.0 50.0,",
-			"set Var27 = @RhovFnTdbRhLBnd0C 30.0 50.0,",
+			"set Var26 = @RhovFnTdbRh 30.0 0.5,",
+			"set Var27 = @RhovFnTdbRhLBnd0C 30.0 0.5,",
 			"set Var28 = @RhovFnTdbWPb 30.0 0.01 101325.0,",
 			"set Var29 = @RhFnTdbRhov 30.0 0.01,",
 			"set Var30 = @RhFnTdbRhovLBnd0C 30.0 0.01,",
@@ -1060,7 +1060,7 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 24 ).NumOperands, 3 );
 		index = 24 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR24" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 337636585.56644875, 0.00000001 ); // HFnTdbRhPb 30.0 0.5 101325.0 =
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 64177.426349195, 0.00000001 ); // HFnTdbRhPb 30.0 0.5 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).Operator, FuncTdbFnHW );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).NumOperands, 2 );
@@ -1072,13 +1072,13 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 26 ).NumOperands, 2 );
 		index = 26 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR26" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.517417152, 0.00000001 ); // RhovFnTdbRh 30.0 0.5 =
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.015174171, 0.00000001 ); // RhovFnTdbRh 30.0 0.5 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).Operator, FuncRhovFnTdbRhLBnd0C ); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).NumOperands, 2 );
 		index = 27 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR27" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.515624038, 0.00000001 ); // RhovFnTdbRhLBnd0C 30.0 0.5 =
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.015156240, 0.00000001 ); // RhovFnTdbRhLBnd0C 30.0 0.5 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).Operator, FuncRhovFnTdbWPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).NumOperands, 3 );
