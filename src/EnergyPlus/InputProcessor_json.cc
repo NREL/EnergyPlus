@@ -992,6 +992,38 @@ InputProcessor::clear_state()
 //	echo_stream = nullptr;
 }
 
+	void
+	InputProcessor::ProcessInput()
+	{
+		int write_stat;
+		int read_stat;
+		bool FileExists;
+
+		EchoInputFile = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFileName, flags ); write_stat = flags.ios(); }
+		if ( write_stat != 0 ) {
+			DisplayString( "Could not open (write) "+ outputAuditFileName + " ." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
+		}
+		echo_stream = gio::out_stream( EchoInputFile );
+
+		{ IOFlags flags; gio::inquire( outputIperrFileName, flags ); FileExists = flags.exists(); }
+		if ( FileExists ) {
+			CacheIPErrorFile = GetNewUnitNumber();
+			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); read_stat = flags.ios(); }
+			if ( read_stat != 0 ) {
+				ShowFatalError( "EnergyPlus: Could not open file "+outputIperrFileName+" for input (read)." );
+			}
+			{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
+		}
+		CacheIPErrorFile = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); write_stat = flags.ios(); }
+		if ( write_stat != 0 ) {
+			DisplayString( "Could not open (write) "+outputIperrFileName );
+			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
+		}
+	}
+
 /* Totally unused ProcessInput() and other input processing and validation stuff ? */
 /*
 void

@@ -428,8 +428,9 @@ public:
 	static void
 	clear_state();
 
-//	void
-//	ProcessInput();
+	static
+	void
+	ProcessInput();
 
 //	void
 //	ProcessDataDicFile(
