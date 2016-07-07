@@ -887,6 +887,18 @@ namespace DataSurfaces {
 		void
 		SetWindSpeedAt( Real64 const fac );
 
+    double
+    getInsideAirTemperature( const int t_SurfNum );
+
+    double
+    getInsideIR( const int t_SurfNum );
+
+    double
+    getOutsideAirTemperature( const int t_SurfNum );
+
+    double
+    getOutsideIR( const int t_SurfNum );
+
 	private: // Methods
 
 		// Computed Shape Category

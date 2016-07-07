@@ -274,6 +274,15 @@ namespace WindowManager {
 		Real64 & SurfOutsideTemp // Outside surface temperature (C)
 	);
 
+  void
+  CalcWindowHeatBalanceInternalRoutines(
+    int const SurfNum, // Surface number
+    Real64 const HextConvCoeff, // Outside air film conductance coefficient
+    Real64 & SurfInsideTemp, // Inside window surface temperature
+    Real64 & SurfOutsideTemp // Outside surface temperature (C)
+  );
+
+
 	//****************************************************************************
 
 	void

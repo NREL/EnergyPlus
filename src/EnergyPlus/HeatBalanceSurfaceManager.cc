@@ -5305,11 +5305,11 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 			auto & zone( Zone( ZoneNum ) );
 			if ( surface.ExtBoundCond == SurfNum && surface.Class != SurfaceClass_Window ) {
-				//CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
-				// Surface is a partition
-				if ( surface.HeatTransferAlgorithm == HeatTransferModel_CTF || surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) { // Regular CTF Surface and/or EMPD surface
+			    //CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
+			    // Surface is a partition
+			    if ( surface.HeatTransferAlgorithm == HeatTransferModel_CTF || surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) { // Regular CTF Surface and/or EMPD surface
 
-					if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
+			        if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 						CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), TH22, MAT_zone, TempSurfInSat );
 					}
 					//Pre-calculate a few terms

@@ -548,6 +548,8 @@ SET( SRC
   WindowEquivalentLayer.hh
   WindowManager.cc
   WindowManager.hh
+  WindowManagerExterior.cc
+  WindowManagerExterior.hh
   ZoneAirLoopEquipmentManager.cc
   ZoneAirLoopEquipmentManager.hh
   ZoneContaminantPredictorCorrector.cc

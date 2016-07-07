@@ -91,6 +91,8 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 
+#include "WindowManagerExterior.hh"
+
 namespace EnergyPlus {
 
 namespace WindowManager {
@@ -2105,8 +2107,30 @@ namespace WindowManager {
 	// Window Thermal Calculation Subroutines
 	//***********************************************************************************
 
+  void
+  CalcWindowHeatBalance(
+    int const SurfNum, // Surface number
+		Real64 const HextConvCoeff, // Outside air film conductance coefficient
+		Real64 & SurfInsideTemp, // Inside window surface temperature
+		Real64 & SurfOutsideTemp // Outside surface temperature (C)
+  ) 
+  {
+    // SUBROUTINE INFORMATION:
+		//       AUTHOR         S. Vidanovic
+		//       DATE WRITTEN   June 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+    //
+    // PURPOSE OF THIS SUBROUTINE:
+    // Subroutine to direct wheter to use exterior or interior window routines
+    if( KickOffSizing || KickOffSimulation ) return;
+
+    // CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+    CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+  }
+
 	void
-	CalcWindowHeatBalance(
+	CalcWindowHeatBalanceInternalRoutines(
 		int const SurfNum, // Surface number
 		Real64 const HextConvCoeff, // Outside air film conductance coefficient
 		Real64 & SurfInsideTemp, // Inside window surface temperature
@@ -2246,8 +2270,6 @@ namespace WindowManager {
 
 		//CurrentThermalAlgorithm = -1
 
-		if ( KickOffSizing || KickOffSimulation ) return;
-
 		// Shorthand refernces
 		auto & window( SurfaceWindow( SurfNum ) );
 		auto & surface( Surface( SurfNum ) );
@@ -2257,7 +2279,8 @@ namespace WindowManager {
 			temp = 0;
 
 			//Simon: Complex fenestration state works only with tarcog
-			CalcComplexWindowThermal( SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition );
+			CalcComplexWindowThermal( SurfNum, temp, HextConvCoeff, SurfInsideTemp, 
+        SurfOutsideTemp, SurfOutsideEmiss, noCondition );
 
 			ConstrNum = surface.Construction;
 			TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
@@ -2614,7 +2637,8 @@ namespace WindowManager {
 				// The IR radiance of this window's "exterior" surround is the IR radiance
 				// from surfaces and high-temp radiant sources in the adjacent zone
 
-				Outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
+				Outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + 
+					QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
 
@@ -2628,7 +2652,9 @@ namespace WindowManager {
 					tout = surface.OutDryBulbTemp + TKelvin;
 				}
 				Ebout = sigma * pow_4( tout );
-				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout;
+				Outir = surface.ViewFactorSkyIR * 
+					( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + 
+					surface.ViewFactorGroundIR * Ebout;
 
 			}
 
@@ -2741,8 +2767,8 @@ namespace WindowManager {
 		QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;
 
 	}
-
-	//****************************************************************************
+  
+  //****************************************************************************
 
 	void
 	WindowHeatBalanceEquations( int const SurfNum ) // Surface number
