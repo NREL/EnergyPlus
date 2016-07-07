@@ -577,6 +577,7 @@ namespace EnergyPlus {
 					}
 			};
 		}
+		InputProcessor::ProcessInput();
 //		int EchoInputFile = 0;
 //		std::string outputAuditFileName = "eplus.audit";
 //		int write_stat = -1;

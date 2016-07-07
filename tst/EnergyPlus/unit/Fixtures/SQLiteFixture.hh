@@ -72,7 +72,7 @@ namespace EnergyPlus {
 	{
 
 	protected:
-		static void SetUpTestCase() { }
+		static void SetUpTestCase() { EnergyPlusFixture::SetUpTestCase(); }
 		static void TearDownTestCase() { }
 
 		std::unique_ptr<SQLite> sqlite_test;
