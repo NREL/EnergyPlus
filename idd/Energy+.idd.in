@@ -79245,7 +79245,6 @@ FaultModel:Fouling:CoolingTower,
        \type choice
        \key CoolingTower:SingleSpeed
        \key CoolingTower:TwoSpeed
-       \key CoolingTower:VariableSpeed
        \key CoolingTower:VariableSpeed:MERKEL
    A5, \field Cooling Tower Object Name
        \note Enter the name of the cooling tower affected

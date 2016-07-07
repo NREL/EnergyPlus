@@ -403,14 +403,21 @@ namespace FaultsManager {
 				// Link the tower with the fault model
 					for ( int TowerNum = 1; TowerNum <= CondenserLoopTowers::NumSimpleTowers; ++TowerNum ) {
 						if ( SameString( CondenserLoopTowers::SimpleTower( TowerNum ).Name, FaultsTowerFouling( jFault_TowerFouling ).TowerName ) ) {
-							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTFlag = true;
-							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTIndex = jFault_TowerFouling;
+							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = true;
+							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingIndex = jFault_TowerFouling;
 							
 							// Check the faulty tower type
 							if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsTowerFouling( jFault_TowerFouling ).TowerType )) {
-								ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type is updated. " );
+								ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type in the fault model is updated. " );
 								FaultsTowerFouling( jFault_TowerFouling ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
-							} 
+							}
+							
+							// Check the tower model
+							// Performance Input Method should be UFactorTimesAreaAndDesignWaterFlowRate to apply the fault model
+							if ( CondenserLoopTowers::SimpleTower( TowerNum ).PerformanceInputMethod_Num != CondenserLoopTowers::PIM_UFactor ) {
+								ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaFieldNames( 5 ) + ". Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. " + "The tower fouling fault model will not be applied to the tower. " );
+								CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = false;
+							}
 							
 							break;
 						}
@@ -1003,7 +1010,7 @@ namespace FaultsManager {
 			}
 		}
 		
-		// The more severe the fouling fault is, the less the UAReductionFactor is
+		// The more severe the fouling fault is (i.e., larger FaultFac), the less the UAReductionFactor is
 		if( FaultFac > 1.0 ) UAReductionFactorAct = this->UAReductionFactor / FaultFac;
 
 		return UAReductionFactorAct;
