@@ -32396,13 +32396,13 @@ ZoneControl:ContaminantController,
        \min-fields 4
   A1 , \field Name
        \required-field
-  A2 , \field Controlled Zone Name
+  A2 , \field Zone Name
        \required-field
        \type object-list
        \object-list ZoneNames
   A3 , \field Carbon Dioxide Control Availability Schedule Name
        \note Availability schedule name for CO2 controller. Schedule value > 0 means the CO2
-       \note controller is enabled. If this field is blank, then CO2  controller is always enabled.
+       \note controller is enabled. If this field is blank, then CO2 controller is always enabled.
        \type object-list
        \object-list ScheduleNames
   A4 , \field Carbon Dioxide Setpoint Schedule Name
@@ -71315,11 +71315,11 @@ AvailabilityManager:HybridVentilation,
        \object-list HVACTemplateSystems
        \note If this field is left blank, hybrid ventilation managers will be
        \note simulated for zone equipment control
-  A3 , \field Controlled Zone Name
+  A3 , \field Control Zone Name
        \required-field
        \type object-list
        \object-list ZoneNames
-       \note the controlled zone name should be a zone where a thermostat or humidistat is located
+       \note the zone name should be a zone where a thermostat or humidistat is located
        \note served by an air primary loop.
   A4 , \field Ventilation Control Mode Schedule Name
        \required-field
