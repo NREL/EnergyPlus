@@ -5770,10 +5770,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             auto const &jdf_object = jdf_objects.value();
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
-                if (!obj.key().empty()) {
-                    AddRecordToOutputVariableStructure(obj.key(), fields.at("variable_name"));
+                if (!fields.at("key_value").empty()) {
+                    InputProcessor::AddRecordToOutputVariableStructure(fields.at("key_value"), fields.at("variable_name"));
                 } else {
-                    AddRecordToOutputVariableStructure("*", fields.at("variable_name"));
+                    InputProcessor::AddRecordToOutputVariableStructure("*", fields.at("variable_name"));
                 }
             }
         }
@@ -5787,10 +5787,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                 //TODO: Might be incorrect
                 for (auto const &extensions : fields["extensions"]) {
                     if (!obj.key().empty()) {
-                        AddRecordToOutputVariableStructure(extensions.at("key_name"),
+                        InputProcessor::AddRecordToOutputVariableStructure(extensions.at("key_name"),
                                                            extensions.at("output_variable_or_meter_name"));
                     } else {
-                        AddRecordToOutputVariableStructure("*", extensions.at("output_variable_or_meter_name"));
+                        InputProcessor::AddRecordToOutputVariableStructure("*", extensions.at("output_variable_or_meter_name"));
                     }
                 }
             }
@@ -5805,10 +5805,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                 //TODO: Might be incorrect
                 for (auto const &extensions : fields["extensions"]) {
                     if (!obj.key().empty()) {
-                        AddRecordToOutputVariableStructure(extensions.at("key_name"),
+                        InputProcessor::AddRecordToOutputVariableStructure(extensions.at("key_name"),
                                                            extensions.at("output_variable_or_meter_name"));
                     } else {
-                        AddRecordToOutputVariableStructure("*", extensions.at("output_variable_or_meter_name"));
+                        InputProcessor::AddRecordToOutputVariableStructure("*", extensions.at("output_variable_or_meter_name"));
                     }
                 }
             }
@@ -5820,10 +5820,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
                 if (!fields.at("output_variable_or_output_meter_index_key_name").empty()) {
-                    AddRecordToOutputVariableStructure(fields.at("output_variable_or_output_meter_index_key_name"),
+                    InputProcessor::AddRecordToOutputVariableStructure(fields.at("output_variable_or_output_meter_index_key_name"),
                                                        fields.at("output_variable_or_output_meter_name"));
                 } else {
-                    AddRecordToOutputVariableStructure("*", fields.at("output_variable_or_output_meter_name"));
+                    InputProcessor::AddRecordToOutputVariableStructure("*", fields.at("output_variable_or_output_meter_name"));
                 }
             }
         }
@@ -5833,7 +5833,7 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             auto const &jdf_object = jdf_objects.value();
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 // TODO: Might be wrong...
-                AddRecordToOutputVariableStructure("*", obj.key());
+                InputProcessor::AddRecordToOutputVariableStructure("*", obj.key());
             }
         }
 
@@ -5843,9 +5843,9 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
                 if (!obj.key().empty()) {
-                    AddRecordToOutputVariableStructure(obj.key(), fields.at("key_value"));
+                    InputProcessor::AddRecordToOutputVariableStructure(obj.key(), fields.at("key_value"));
                 } else {
-                    AddRecordToOutputVariableStructure("*", fields.at("key_value"));
+                    InputProcessor::AddRecordToOutputVariableStructure("*", fields.at("key_value"));
                 }
             }
         }
@@ -5855,7 +5855,7 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             auto const &jdf_object = jdf_objects.value();
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
-                AddRecordToOutputVariableStructure("*", fields.at("variable_or_meter_name"));
+                InputProcessor::AddRecordToOutputVariableStructure("*", fields.at("variable_or_meter_name"));
             }
         }
 
@@ -5864,7 +5864,7 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             auto const &jdf_object = jdf_objects.value();
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
-                AddRecordToOutputVariableStructure("*", fields.at("variable_or_meter_or_ems_variable_or_field_name"));
+                InputProcessor::AddRecordToOutputVariableStructure("*", fields.at("variable_or_meter_or_ems_variable_or_field_name"));
             }
         }
 
@@ -5876,10 +5876,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                 auto const report_name = MakeUPPERCase(fields.at("report_name"));
                 if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                     for (Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1) {
-                        AddVariablesForMonthlyReport(MonthlyNamedReports(Loop1));
+                        InputProcessor::AddVariablesForMonthlyReport(MonthlyNamedReports(Loop1));
                     }
                 } else {
-                    AddVariablesForMonthlyReport(report_name);
+                   InputProcessor::AddVariablesForMonthlyReport(report_name);
                 }
             }
         }

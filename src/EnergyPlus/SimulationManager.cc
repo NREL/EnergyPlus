@@ -2500,7 +2500,7 @@ namespace SimulationManager {
 		FluidIndex_EthyleneGlycol = FindGlycol( "EthyleneGlycol" );
 		FluidIndex_PropoleneGlycol = FindGlycol( "PropoleneGlycol" );
 
-		// PreScanReportingVariables();
+		InputProcessor::PreScanReportingVariables();
 
 	}
 

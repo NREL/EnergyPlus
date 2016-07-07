@@ -1262,9 +1262,11 @@ public:
 //	void
 //	ParametricObjectsCheck();
 
+	static
 	void
 	PreScanReportingVariables();
 
+	static
 	void
 	AddVariablesForMonthlyReport( std::string const & reportName );
 
@@ -1277,12 +1279,14 @@ public:
 //		int const StartPointer
 //	);
 
+	static
 	void
 	AddRecordToOutputVariableStructure(
 		std::string const & KeyValue,
 		std::string const & VariableName
 	);
 
+	static
 	void
 	ReAllocateAndPreserveOutputVariablesForSimulation();
 
