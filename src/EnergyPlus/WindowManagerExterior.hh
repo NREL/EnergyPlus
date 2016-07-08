@@ -62,6 +62,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
+#include "TarIGUSolidLayer.hpp"
+#include "TarIGUGapLayer.hpp"
+#include "TarEnvironment.hpp"
+#include "TarIGU.hpp"
+
 namespace EnergyPlus {
 
   namespace WindowManager {
@@ -72,6 +77,24 @@ namespace EnergyPlus {
       Real64 & SurfInsideTemp, // Inside window surface temperature
       Real64 & SurfOutsideTemp // Outside surface temperature (C)
     );
+
+    std::shared_ptr< Tarcog::CTarIGUSolidLayer > getSolidLayer(
+      const EnergyPlus::DataSurfaces::SurfaceData &surface,
+      const EnergyPlus::DataHeatBalance::MaterialProperties &material, 
+      const int t_Index, const int t_SurfNum );
+
+    std::shared_ptr< Tarcog::CTarIGUGapLayer > getGapLayer(
+      const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+
+    std::shared_ptr< Tarcog::CTarEnvironment > getIndoor(
+      const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
+
+    std::shared_ptr< Tarcog::CTarEnvironment > getOutdoor(
+      const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum,
+      const double t_Hext );
+
+    std::shared_ptr< Tarcog::CTarIGU > getIGU(
+      const EnergyPlus::DataSurfaces::SurfaceData &surface );
 
   }
 

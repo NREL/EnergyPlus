@@ -106,7 +106,7 @@ namespace DataSurfaces {
 	using namespace DataPrecisionGlobals;
 	using namespace DataVectorTypes;
 	using namespace DataBSDFWindow;
-  //using namespace DataHeatBalance;
+  using namespace DataHeatBalance;
   using namespace DataHeatBalFanSys;
   using namespace DataZoneEquipment;
   using namespace DataLoopNode;
@@ -691,7 +691,7 @@ namespace DataSurfaces {
 			}
 		}
 
-    double SurfaceData::getInsideAirTemperature( const int t_SurfNum )
+    double SurfaceData::getInsideAirTemperature( const int t_SurfNum ) const
     {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
@@ -748,7 +748,7 @@ namespace DataSurfaces {
       return RefAirTemp;
     }
 
-    double SurfaceData::getInsideIR( const int t_SurfNum )
+    double SurfaceData::getInsideIR( const int t_SurfNum ) const
     {
       auto & window( SurfaceWindow( t_SurfNum ) );
       double value = window.IRfromParentZone + QHTRadSysSurf( t_SurfNum ) + QHWBaseboardSurf( t_SurfNum ) +
@@ -756,7 +756,7 @@ namespace DataSurfaces {
       return value;
     }
 
-    double SurfaceData::getOutsideAirTemperature( const int t_SurfNum )
+    double SurfaceData::getOutsideAirTemperature( const int t_SurfNum ) const
     {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
@@ -790,8 +790,16 @@ namespace DataSurfaces {
       return temperature;
     }
 
-    double SurfaceData::getOutsideIR( const int t_SurfNum )
+    double SurfaceData::getOutsideIR( const int t_SurfNum ) const
     {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Calculates outside infrared radiation
       double value = 0;
       if( ExtBoundCond > 0 ) {
         value = SurfaceWindow( ExtBoundCond ).IRfromParentZone + QHTRadSysSurf( ExtBoundCond ) +
@@ -805,6 +813,20 @@ namespace DataSurfaces {
           ViewFactorGroundIR * value;
       }
       return value;
+    }
+
+    double SurfaceData::getSWIncident( const int t_SurfNum ) const 
+    {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Return total short wave incident to the surface
+      
+      return QRadSWOutIncident( t_SurfNum ) + QS( Zone );
     }
 
 		// Computed Shape Category

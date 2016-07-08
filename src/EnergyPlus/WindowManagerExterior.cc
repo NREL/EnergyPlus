@@ -77,9 +77,13 @@
 #include "TarSurface.hpp"
 #include "TarcogSystem.hpp"
 #include "FenestrationCommon.hpp"
+#include "GasProperties.hpp"
+#include "GasData.hpp"
+#include "GasItem.hpp"
 
 using namespace std;
 using namespace Tarcog;
+using namespace Gases;
 using namespace FenestrationCommon;
 
 
@@ -93,72 +97,53 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
+    /////////////////////////////////////////////////////////////////////////////////////////
     void CalcWindowHeatBalanceExternalRoutines(
         int const SurfNum, // Surface number
         Real64 const HextConvCoeff, // Outside air film conductance coefficient
         Real64 & SurfInsideTemp, // Inside window surface temperature
         Real64 & SurfOutsideTemp // Outside surface temperature (C)
       ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Main wrapper routine to pick-up data from EnergyPlus and then call Windows-CalcEngine routines
+      // to obtain results
+
       auto & window( SurfaceWindow( SurfNum ) );
       auto & surface( Surface( SurfNum ) );
       int ConstrNum = surface.Construction;
       auto & construction( Construct( ConstrNum ) );
 
-      // Create indoor environment
-      tin = surface.getInsideAirTemperature( SurfNum ) + KelvinConv;
-      double pressure = OutBaroPress; // Pascals
-      double hcin = HConvIn( SurfNum );
+      shared_ptr< CTarEnvironment > Indoor = getIndoor( surface, SurfNum );
+      shared_ptr< CTarEnvironment > Outdoor = getOutdoor( surface, SurfNum, HextConvCoeff );
+      shared_ptr< CTarIGU > aIGU = getIGU( surface );
 
-      Rmir = surface.getInsideIR( SurfNum );
-
-      shared_ptr< CTarEnvironment > Indoor = make_shared< CTarIndoorEnvironment >( tin, pressure );
-      Indoor->setHCoeffModel( BoundaryConditionsCoeffModel::CalculateH, hcin );
-      Indoor->setEnvironmentIR( Rmir );
-
-      // Create outdoor environment
-      tout = surface.getOutsideAirTemperature( SurfNum ) + KelvinConv;
-      Outir = surface.getOutsideIR( SurfNum );
-      double dirSolRad = QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone );
-      double tSky = SkyTempKelvin;
-      double airSpeed = 0;
-      if( surface.ExtWind ) {
-        airSpeed = surface.WindSpeed;
-      }
-      double fclr = 1 - CloudFraction;
-      AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;
-      shared_ptr< CTarEnvironment > Outdoor = make_shared< CTarOutdoorEnvironment >( tout, pressure, 
-        airSpeed, dirSolRad, airDirection, tSky, SkyModel::AllSpecified, fclr );
-      Outdoor->setHCoeffModel( BoundaryConditionsCoeffModel::HcPrescribed, HextConvCoeff );
-      Outdoor->setEnvironmentIR( Outir );
-      
-      // Create IGU
-      int tilt = surface.Tilt;
-      double height = surface.Height;
-      double width = surface.Width;
-
-      shared_ptr< CTarIGU > aIGU = make_shared< CTarIGU >( surface.Width, surface.Height, surface.Tilt );
-
-      // pick-up all layers and put them in IGU
+      // pick-up all layers and put them in IGU (this includes gap layers as well)
       int TotLay = construction.TotLayers;
-      shared_ptr< CTarIGUSolidLayer > aSolidLayer = nullptr;
+      int SolidLayerIndex = 0;
       for( int i = 0; i < TotLay; ++i ) {
         int LayPtr = construction.LayerPoint( i + 1 );
         auto & material( Material( LayPtr ) );
-        shared_ptr< CTarSurface > frontSurface = make_shared< CTarSurface >( material.AbsorpThermalFront, material.TransThermal );
-        shared_ptr< CTarSurface > backSurface = make_shared< CTarSurface >( material.AbsorpThermalBack, material.TransThermal );
-        aSolidLayer = make_shared< CTarIGUSolidLayer >( material.Thickness, material.Conductivity, frontSurface, backSurface );
-        if( dirSolRad > 0 ) {
-          double absCoeff = QRadSWwinAbs( i + 1, SurfNum ) / dirSolRad;
-          aSolidLayer->setSolarAbsorptance( absCoeff );
+        shared_ptr< CBaseIGUTarcogLayer > aLayer = nullptr;
+        if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ) {
+          ++SolidLayerIndex;
+          aLayer = getSolidLayer( surface, material, SolidLayerIndex, SurfNum );
+        } else if( material.Group == WindowGas || material.Group == WindowGasMixture ) {
+          aLayer = getGapLayer( material );
         }
-        aIGU->addLayer( aSolidLayer );
+        aIGU->addLayer( aLayer );
       }
 
       shared_ptr< CTarcogSystem > aSystem = make_shared< CTarcogSystem >( aIGU, Indoor, Outdoor );
       aSystem->solve();
-      vector< shared_ptr < CBaseIGUTarcogLayer > > aLayers = aSystem->getLayers();
+      vector< shared_ptr < CTarIGUSolidLayer > > aLayers = aSystem->getSolidLayers();
       int i = 1;
-      for( shared_ptr< CBaseIGUTarcogLayer > aLayer : aLayers ) {
+      for( shared_ptr< CTarIGUSolidLayer > aLayer : aLayers ) {
         double aTemp = 0;
         for( Side aSide : EnumSide() ) {
           aTemp = aLayer->getTemperature( aSide );
@@ -185,6 +170,134 @@ namespace EnergyPlus {
         FenLaySurfTempFront( k, SurfNum ) = thetas( 2 * k - 1 ) - KelvinConv;
         FenLaySurfTempBack( k, SurfNum ) = thetas( 2 * k ) - KelvinConv;
       }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CTarIGUSolidLayer > getSolidLayer( const SurfaceData &surface, const MaterialProperties &material, 
+      const int t_Index, const int t_SurfNum ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Creates solid layer object from material properties in EnergyPlus
+      shared_ptr< CTarSurface > frontSurface = make_shared< CTarSurface >( material.AbsorpThermalFront, material.TransThermal );
+      shared_ptr< CTarSurface > backSurface = make_shared< CTarSurface >( material.AbsorpThermalBack, material.TransThermal );
+      shared_ptr< CTarIGUSolidLayer > aSolidLayer =
+        make_shared< CTarIGUSolidLayer >( material.Thickness, material.Conductivity, frontSurface, backSurface );
+      // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
+      double swRadiation = surface.getSWIncident( t_SurfNum );
+      if( swRadiation > 0 ) {
+        double absCoeff = QRadSWwinAbs( t_Index, t_SurfNum ) / swRadiation;
+        aSolidLayer->setSolarAbsorptance( absCoeff );
+      }
+      return aSolidLayer;
+    }
+
+    shared_ptr< CTarIGUGapLayer > getGapLayer( const MaterialProperties &material ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Creates gap layer object from material properties in EnergyPlus
+      const double pres = 1e5; // Old code uses this constant pressure
+      double thickness = material.Thickness;
+      int numGases = material.NumberOfGasesInMixture;
+      const double vacuumCoeff = 1.4; //Load vacuum coefficient once it is implemented (Simon).
+      string gasName = material.Name;
+      shared_ptr< CGas > aGas = make_shared< CGas >();
+      for( int i = 1; i <= numGases; ++i ) {        
+        double wght = material.GasWght( i );
+        double fract = material.GasFract( i );
+        vector< double > gcon;
+        vector< double > gvis;
+        vector< double > gcp;
+        for( int j = 1; j <= 3; ++j ) {
+          gcon.push_back( material.GasCon( j, i ) );
+          gvis.push_back( material.GasCon( j, i ) );
+          gcp.push_back( material.GasCon( j, i ) );
+        }
+        shared_ptr< CIntCoeff > aCon = make_shared< CIntCoeff >( gcon[ 0 ], gcon[ 1 ], gcon[ 2 ] );
+        shared_ptr< CIntCoeff > aCp = make_shared< CIntCoeff >( gcp[ 0 ], gcp[ 1 ], gcp[ 2 ] );
+        shared_ptr< CIntCoeff > aVis = make_shared< CIntCoeff >( gvis[ 0 ], gvis[ 1 ], gvis[ 2 ] );
+        shared_ptr< CGasData > aData = make_shared< CGasData >( gasName, wght, vacuumCoeff, aCp, aCon, aVis );
+        shared_ptr< CGasItem > aGasItem = make_shared< CGasItem >( fract, aData );
+        aGas->addGasItem( aGasItem );
+      }
+      shared_ptr< CTarIGUGapLayer > aLayer = make_shared< CTarIGUGapLayer >( thickness, pres, aGas );
+      return aLayer;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CTarEnvironment > getIndoor( const SurfaceData &surface, const int t_SurfNum ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Creates indoor environment object from surface properties in EnergyPlus
+      double tin = surface.getInsideAirTemperature( t_SurfNum ) + KelvinConv;
+      double hcin = HConvIn( t_SurfNum );
+
+      double IR = surface.getInsideIR( t_SurfNum );
+
+      shared_ptr< CTarEnvironment > Indoor = make_shared< CTarIndoorEnvironment >( tin, OutBaroPress );
+      Indoor->setHCoeffModel( BoundaryConditionsCoeffModel::CalculateH, hcin );
+      Indoor->setEnvironmentIR( IR );
+      return Indoor;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CTarEnvironment > getOutdoor( const SurfaceData &surface, const int t_SurfNum, const double t_Hext ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Creates outdoor environment object from surface properties in EnergyPlus
+      double tout = surface.getOutsideAirTemperature( t_SurfNum ) + KelvinConv;
+      double IR = surface.getOutsideIR( t_SurfNum );
+      // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
+      double swRadiation = surface.getSWIncident( t_SurfNum );
+      double tSky = SkyTempKelvin;
+      double airSpeed = 0;
+      if( surface.ExtWind ) {
+        airSpeed = surface.WindSpeed;
+      }
+      double fclr = 1 - CloudFraction;
+      AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;
+      shared_ptr< CTarEnvironment > Outdoor = make_shared< CTarOutdoorEnvironment >( tout, OutBaroPress,
+        airSpeed, swRadiation, airDirection, tSky, SkyModel::AllSpecified, fclr );
+      Outdoor->setHCoeffModel( BoundaryConditionsCoeffModel::HcPrescribed, t_Hext );
+      Outdoor->setEnvironmentIR( IR );
+      return Outdoor;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CTarIGU > getIGU( const SurfaceData &surface ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Creates IGU object from surface properties in EnergyPlus
+      int tilt = surface.Tilt;
+      double height = surface.Height;
+      double width = surface.Width;
+
+      shared_ptr< CTarIGU > aIGU = make_shared< CTarIGU >( surface.Width, surface.Height, surface.Tilt );
+      return aIGU;
     }
 
   }

@@ -888,16 +888,19 @@ namespace DataSurfaces {
 		SetWindSpeedAt( Real64 const fac );
 
     double
-    getInsideAirTemperature( const int t_SurfNum );
+    getInsideAirTemperature( const int t_SurfNum ) const;
 
     double
-    getInsideIR( const int t_SurfNum );
+    getInsideIR( const int t_SurfNum ) const;
 
     double
-    getOutsideAirTemperature( const int t_SurfNum );
+    getOutsideAirTemperature( const int t_SurfNum ) const;
 
     double
-    getOutsideIR( const int t_SurfNum );
+    getOutsideIR( const int t_SurfNum ) const;
+
+    double
+    getSWIncident( const int t_SurfNum ) const;
 
 	private: // Methods
 
