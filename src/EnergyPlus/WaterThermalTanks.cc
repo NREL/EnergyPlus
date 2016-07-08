@@ -817,22 +817,9 @@ namespace WaterThermalTanks {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages GetInput processing and program termination
 
-		// METHODOLOGY EMPLOYED:
-		// Calls "Get" routines to read in data.
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetWaterThermalTankInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // true if errors detected in GetUnitarySystemInputData
 
-		// Flow
 		GetWaterThermalTankInputData( ErrorsFound );
 
 		if( ErrorsFound ) {
@@ -856,7 +843,6 @@ namespace WaterThermalTanks {
 		//                      B. Griffith, Feb. 2008 extensions for autosizing water heaters
 		//                      BG Mar 2009.  Trap for bad heater height input for stratefied water heater CR7718
 		//						B. Shen 12/2014, add air-source variable-speed heat pump water heating
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Gets the water heater, HPWH, and/or desuperheater heating coil input from the input file.
@@ -864,7 +850,6 @@ namespace WaterThermalTanks {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// Using/Aliasing
 		using DataGlobals::NumOfZones;
 		using DataGlobals::AutoCalculate;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -932,19 +917,9 @@ namespace WaterThermalTanks {
 		using RefrigeratedCase::CheckRefrigerationInput;
 		using GlobalNames::VerifyUniqueCoilName;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetWaterThermalTankInput: " );
 		static std::string const RoutineNameNoColon( "GetWaterThermalTankInput" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterThermalTankNum; // Index to WATER HEATER:*
 		int WHsizingNum; // Index to Water Heater:Sizing, for the IDF objects--not data storage
 		int NodeNum; // Index to a stratified thermal node
