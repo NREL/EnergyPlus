@@ -891,24 +891,75 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 			"set Var42 = @RhoH2O 20.0,",
 			"set Var43 = @SEVEREWARNEP 0.0,",
 			"set Var44 = @WARNEP 0.0,",
-			"set Var45 = @TRENDVALUE 0.5 1.5,",
-			"set Var46 = @TRENDAVERAGE 0.5 1.5,",
-			"set Var47 = @TRENDMAX 0.5 1.5,",
-			"set Var48 = @TRENDMIN 0.5 1.5,",
-			"set Var49 = @TRENDDIRECTION 0.5 1.5,",
-			"set Var50 = @TRENDSUM 0.5 1.5,",
+			"set Var45 = @TRENDVALUE Variable_Trend1 1,",
+			"set Var46 = @TRENDAVERAGE Variable_Trend2 4,",
+			"set Var47 = @TRENDMAX Variable_Trend3 4,",
+			"set Var48 = @TRENDMIN Variable_Trend4 4,",
+			"set Var49 = @TRENDDIRECTION Variable_Trend5 4,",
+			"set Var50 = @TRENDSUM Variable_Trend6 4,",
 			"set Var51 = @CURVEVALUE 1 0.75,",
 			"set absNum = -3.1,",
-			"set Var53 = @Abs absNum;",  // -3.1 does not work, (-3.1) does not work, "set absNum = -3.1" and use @Abs absNum does work if EMS "set absNum" line of code occurs before this line
+			"set Var53 = @Abs absNum,",  // -3.1 does not work, (-3.1) does not work, "set absNum = -3.1" and use @Abs absNum does work if EMS "set absNum" line of code occurs before this line
+			"Run Test_Trend_Variables;"
 
 //			"set Var54 = @TsatFnPb 0.0,", // not public in PsycRoutines so not available to EMS (commented out at line 2397 of RuntimeLanguageProcessor.cc)
-//			"set Var55 = @FATALHALTEP 0.0,", // terminates program, not unit test friendly
+//			"set Var55 = @FATALHALTEP 0.0,", // terminates program, not unit test friendly (but it was also verified here that it halts program)
+
+			"EnergyManagementSystem:GlobalVariable,",
+			"  argTrendValue;       !- Erl Variable 1 Name",
+
+			"EnergyManagementSystem:TrendVariable,",
+			"  Variable_Trend1,     !- Name",
+			"  argTrendValue,       !- EMS Variable Name",
+			"  4;                   !- Number of Timesteps to be Logged",
+
+			"EnergyManagementSystem:TrendVariable,",
+			"  Variable_Trend2,     !- Name",
+			"  argTrendValue,       !- EMS Variable Name",
+			"  4;                   !- Number of Timesteps to be Logged",
+
+			"EnergyManagementSystem:TrendVariable,",
+			"  Variable_Trend3,     !- Name",
+			"  argTrendValue,       !- EMS Variable Name",
+			"  4;                   !- Number of Timesteps to be Logged",
+
+			"EnergyManagementSystem:TrendVariable,",
+			"  Variable_Trend4,     !- Name",
+			"  argTrendValue,       !- EMS Variable Name",
+			"  4;                   !- Number of Timesteps to be Logged",
+
+			"EnergyManagementSystem:TrendVariable,",
+			"  Variable_Trend5,     !- Name",
+			"  argTrendValue,       !- EMS Variable Name",
+			"  4;                   !- Number of Timesteps to be Logged",
+
+			"EnergyManagementSystem:TrendVariable,",
+			"  Variable_Trend6,     !- Name",
+			"  argTrendValue,       !- EMS Variable Name",
+			"  4;                   !- Number of Timesteps to be Logged",
+
+			"EnergyManagementSystem:Subroutine,",
+			"  Test_Trend_Variables,                             !- Name",
+			"  Set TrendVal = @TrendValue Variable_Trend1 1,     !- Program Line 1",
+			"  SET argTrendValue = TrendVal,                     !- Program Line 2",
+			"  Set TrendVal = @TrendAverage Variable_Trend2 4,   !- Program Line 3",
+			"  SET argTrendAvg = TrendVal,                       !- Program Line 4",
+			"  Set TrendVal = @TrendMax Variable_Trend3 4,       !- Program Line 5",
+			"  SET argTrendMax = TrendVal,                       !- Program Line 6",
+			"  Set TrendVal = @TrendMin Variable_Trend4 4,       !- Program Line 7",
+			"  SET argTrendMin = TrendVal,                       !- Program Line 8",
+			"  Set TrendVal = @TrendDirection Variable_Trend5 4, !- Program Line 9",
+			"  SET argTrendDirection = TrendVal,                 !- Program Line 10",
+			"  Set TrendVal = @TrendSum Variable_Trend6 4,       !- Program Line 11",
+			"  SET argTrendSum = TrendVal;                       !- Program Line 12",
 
 		} );
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
-		CheckIfAnyEMS(); // get EMS input
+		DataGlobals::TimeStepZone = 0.25;
+
+		EMSManager::CheckIfAnyEMS(); // get EMS input
 		EMSManager::FinishProcessingUserInput = true;
 		bool ErrorsFound(false);
 		CurveManager::GetCurveInputData( ErrorsFound ); // process curve for use with EMS
@@ -918,8 +969,18 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		EMSManager::ManageEMS( DataGlobals::emsCallFromHVACIterationLoop, anyRan );
 		EXPECT_TRUE( anyRan );
 
+		for ( int i = 1; i <= 6; ++i ) {
+			DataRuntimeLanguage::TrendVariable( i ).TrendValARR( 1 ) = 1.1; // initialize history for trend variables
+			DataRuntimeLanguage::TrendVariable( i ).TrendValARR( 2 ) = 2.2;
+			DataRuntimeLanguage::TrendVariable( i ).TrendValARR( 3 ) = 3.3;
+			DataRuntimeLanguage::TrendVariable( i ).TrendValARR( 4 ) = 4.4;
+		}
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromHVACIterationLoop, anyRan );
+		EXPECT_TRUE( anyRan );
+
 		int index( 0 );
-		int offset( 24 ); // first 24 values in ErlExpression are key words.
+		int offset( 25 ); // first 24 values in ErlExpression() are key words + 1 EMS global variable
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 1 ).Operator, FuncRound );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 1 ).NumOperands, 1 );
 //		EXPECT_EQ( size( DataRuntimeLanguage::ErlExpression( 1 ).Operand ), 1 ); // why doesn't this compile? ... Array1D< ErlValueType > Operand
@@ -1180,41 +1241,42 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		index = 44 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR44" );
 
+		// all trend variables hold 4 values: 1.1, 2.2, 3.3, 4.4
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).Operator, FuncTrendValue );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).NumOperands, 2 );
 		index = 45 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR45" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0, 0.00000001 ); // TrendValue 0.5 1.5 = ???
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.1, 0.00000001 ); // TrendValue Variable_Trend1 1
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).Operator, FuncTrendAverage );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).NumOperands, 2 );
 		index = 46 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR46" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0, 0.00000001 ); // TrendAverage 0.5 1.5 = ???
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.75, 0.00000001 ); // TrendAverage Variable_Trend2 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).Operator, FuncTrendMax );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).NumOperands, 2 );
 		index = 47 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR47" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0, 0.00000001 ); // TrendMax 0.5 1.5 = ???
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 4.4, 0.00000001 ); // TrendMax Variable_Trend3 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).Operator, FuncTrendMin );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).NumOperands, 2 );
 		index = 48 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR48" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0, 0.00000001 ); // TrendMin 0.5 1.5 = ???
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.1, 0.00000001 ); // TrendMin Variable_Trend4 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).Operator, FuncTrendDirection );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).NumOperands, 2 );
 		index = 49 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR49" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0, 0.00000001 ); // TrendDirection 0.5 1.5 = ???
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, -4.4, 0.00000001 ); // TrendDirection Variable_Trend5 4 (-1.1 per 0.25 hrs = -4.4/hr)
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).Operator, FuncTrendSum );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).NumOperands, 2 );
 		index = 50 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR50" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0, 0.00000001 ); // TrendSum 0.5 1.5 = ???
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 11.0, 0.00000001 ); // TrendSum Variable_Trend6 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operator, FuncCurveValue );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).NumOperands, 6 );
@@ -1223,7 +1285,7 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.95, 0.00000001 ); // CurveValue 0.75 = 0.95
 
 
-		// test other functions as needed to verify results
+		// test these functions as needed to verify results
 
 		// test ABS using negative number
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 53 ).Operator, FuncABS );
@@ -1237,6 +1299,3 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 //		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 55 ).Operator, FuncFatalHaltEp ); // terminates program, not unit test friendly
 
 }
-
-
-
