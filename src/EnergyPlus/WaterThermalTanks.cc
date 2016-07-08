@@ -813,8 +813,6 @@ namespace WaterThermalTanks {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   July 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 		//
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages GetInput processing and program termination
@@ -2074,7 +2072,7 @@ namespace WaterThermalTanks {
 						}
 						if ( DXCoilAirOutletNodeNum != HPWHCoilOutletNodeNum ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
-							ShowContinueError( "Heat pump water heater coil outlet node name not does not match next connected component." );
+							ShowContinueError( "Heat pump water heater coil outlet node name does not match next connected component." );
 							if( DXCoilAirOutletNodeNum != 0 ) {
 								ShowContinueError( "Coil outlet node name = " + DataLoopNode::NodeID( DXCoilAirOutletNodeNum ) );
 							}

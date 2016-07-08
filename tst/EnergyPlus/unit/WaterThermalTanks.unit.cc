@@ -1215,7 +1215,6 @@ TEST_F( EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
-//	HeatBalanceManager::GetZoneData( ErrorsFound );
 	ASSERT_FALSE( ErrorsFound );
 	EXPECT_TRUE( WaterThermalTanks::GetWaterThermalTankInputData( ErrorsFound ) );
 	ASSERT_TRUE( ErrorsFound );
