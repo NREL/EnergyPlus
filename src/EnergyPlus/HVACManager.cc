@@ -2753,7 +2753,7 @@ namespace HVACManager {
 
 			if (abs(Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate - Fan( FanNum ).OutletAirMassFlowRate) > SmallMassFlow) {
 				++Fan( FanNum ).FanOutletVsNodeFlowNotMatchingIter;
-				if ( Fan( FanNum ).FanInletVsNodeFlowNotMatchingIter == 1 ) {
+				if ( Fan( FanNum ).FanOutletVsNodeFlowNotMatchingIter == 1 ) {
 					ShowSevereError(Fan(FanNum).FanType + ", Name: " + Fan(FanNum).FanName + ": Fan outlet mass flow rate (" + RoundSigDigits(Fan( FanNum ).OutletAirMassFlowRate, 4) + ") does not match outlet node mass flow rate (" + RoundSigDigits(Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate, 4) + ").");
 					ShowContinueErrorTimeStamp( "" );
 				} else {
