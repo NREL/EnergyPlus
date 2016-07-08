@@ -21199,7 +21199,7 @@ Daylighting:ReferencePoint,
        \required-field
        \type object-list
        \object-list ZoneNames
-  N1, \field X-Coordinate of Reference Point
+  N1,  \field X-Coordinate of Reference Point
        \units m
        \required-field
        \type real
