@@ -146,8 +146,8 @@ namespace HVACVariableRefrigerantFlow {
 	extern Array1D_bool MyVRFCondFlag; // used to reset timer counter
 	extern Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 	extern int NumVRFCond; // total number of VRF condensers (All VRF Algorithm Types)
-	extern int NumVRFCond_SysCurve; // total number of VRF condensers with VRF Algorithm Type 1 
-	extern int NumVRFCond_FluidTCtrl; // total number of VRF condensers with VRF Algorithm Type 2 
+	extern int NumVRFCond_SysCurve; // total number of VRF condensers with VRF Algorithm Type 1
+	extern int NumVRFCond_FluidTCtrl; // total number of VRF condensers with VRF Algorithm Type 2
 	extern int NumVRFTU; // total number of VRF terminal units
 	extern int NumVRFTULists; // The number of VRF TU lists
 	extern Real64 CompOnMassFlow; // Supply air mass flow rate w/ compressor ON
@@ -271,7 +271,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CompressorSizeRatio; // ratio of min compressor size to total capacity
 		int NumCompressors; // number of compressors in VRF condenser
 		Real64 MaxOATCCHeater; // maximum outdoor air dry-bulb temp for crankcase heater operation (C)
-		//begin variables used for Defrost 
+		//begin variables used for Defrost
 		int DefrostEIRPtr; // index to defrost EIR curve
 		Real64 DefrostFraction; // defrost time period fraction (hr)
 		int DefrostStrategy; // Type of defrost (reversecycle or resistive)
@@ -280,7 +280,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 DefrostPower; // power used during defrost (W)
 		Real64 DefrostConsumption; // energy used during defrost (J)
 		Real64 MaxOATDefrost; // maximum outdoor air dry-bulb temp for defrost operation (C)
-		//end variables used for Defrost 
+		//end variables used for Defrost
 		int CondenserType; // condenser type, evap- or air-cooled
 		int CondenserNodeNum; // condenser inlet node number
 		bool SkipCondenserNodeNumCheck; // used to check for duplicate node names
@@ -609,20 +609,20 @@ namespace HVACVariableRefrigerantFlow {
 			EvaporatingTemp( 6.0 ),
 			EvapTempFixed( 0.0 ),
 			HROUHexRatio( 0.0 ),
-			IUEvaporatingTemp( 6.0 ), 
+			IUEvaporatingTemp( 6.0 ),
 			IUCondensingTemp( 44.0 ),
 			IUEvapTempLow( 4.0 ),
 			IUEvapTempHigh( 15.0 ),
-			IUCondTempLow( 42.0 ), 
+			IUCondTempLow( 42.0 ),
 			IUCondTempHigh( 46.0 ),
 			IUCondHeatRate( 0.0 ),
 			IUEvapHeatRate( 0.0 ),
-			Ncomp( 0.0 ), 
+			Ncomp( 0.0 ),
 			NcompCooling( 0.0 ),
 			NcompHeating( 0.0 ),
 			OUEvapTempLow( -30.0 ),
 			OUEvapTempHigh( 20.0 ),
-			OUCondTempLow( 30.0 ), 
+			OUCondTempLow( 30.0 ),
 			OUCondTempHigh( 96.0 ),
 			OUAirFlowRate( 0.0 ),
 			OUAirFlowRatePerCapcity( 0.0 ),
@@ -638,14 +638,14 @@ namespace HVACVariableRefrigerantFlow {
 			RateBFOUCond( 0.21900 ),
 			RefPipDiaSuc( 0.0 ),
 			RefPipDiaDis( 0.0 ),
-			RefPipLen( 0.0 ),   
+			RefPipLen( 0.0 ),
 			RefPipEquLen( 0.0 ),
-			RefPipHei( 0.0 ),   
+			RefPipHei( 0.0 ),
 			RefPipInsThi( 0.0 ),
 			RefPipInsCon( 0.0 ),
 			SH( 0.0 ),
 			SC( 0.0 ),
-			SCHE( 0.0 ), 
+			SCHE( 0.0 ),
 			SHLow( 0.0 ),
 			SCLow( 0.0 ),
 			SHHigh( 0.0 ),
@@ -657,7 +657,7 @@ namespace HVACVariableRefrigerantFlow {
 		
 			// Begin of Methods for New VRF Model: Fluid Temperature Control
 			//******************************************************************************
-			void 
+			void
 			CalcVRFCondenser_FluidTCtrl();
 			
 			void
@@ -721,7 +721,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRFOU_TeModification(
 				Real64 const Te_up, // Upper bound of Te during iteration, i.e., Te before reduction [C]
 				Real64 const Te_low, // Lower bound of Te during iteration, i.e., the given suction temperature Te' [C]
-				Real64 const Pipe_h_IU_in, // Piping Loss Algorithm Parameter: enthalpy of IU at inlet [kJ/kg]  
+				Real64 const Pipe_h_IU_in, // Piping Loss Algorithm Parameter: enthalpy of IU at inlet [kJ/kg]
 				Real64 const OutdoorDryBulb, // outdoor dry-bulb temperature [C]
 				Real64 & Te_update, // Updated Te that can generate the required Tsuction [C]
 				Real64 & Pe_update, // Piping Loss Algorithm Parameter: evaporating pressure assumed for iterations [Pa]
@@ -763,14 +763,14 @@ namespace HVACVariableRefrigerantFlow {
 	
 			void
 			VRFHR_OU_HR_Mode(
-				Real64 const h_IU_evap_in, // enthalpy of IU evaporator at inlet [kJ/kg] 
-				Real64 const h_comp_out, // enthalpy of refrigerant at compressor outlet [kJ/kg] 
+				Real64 const h_IU_evap_in, // enthalpy of IU evaporator at inlet [kJ/kg]
+				Real64 const h_comp_out, // enthalpy of refrigerant at compressor outlet [kJ/kg]
 				Real64 const Q_c_TU_PL, // IU evaporator load, including piping loss [W]
 				Real64 const Q_h_TU_PL, // IU condenser load, including piping loss [W]
 				Real64 const Tdischarge, // VRF Compressor discharge refrigerant temperature [C]
 				Real64 & Tsuction, // VRF compressor suction refrigerant temperature [C]
 				Real64 & Te_update, // updated evaporating temperature, only updated when Tsuction is updated [C]
-				Real64 & h_comp_in, // enthalpy of refrigerant at compressor inlet [kJ/kg] 
+				Real64 & h_comp_in, // enthalpy of refrigerant at compressor inlet [kJ/kg]
 				Real64 & h_IU_PLc_out, // enthalpy of refrigerant at the outlet of IU evaporator side main pipe [kJ/kg]
 				Real64 & Pipe_Q_c, // IU evaporator side piping loss [W]
 				Real64 & Q_c_OU, // OU evaporator load [W]
@@ -1012,15 +1012,15 @@ namespace HVACVariableRefrigerantFlow {
 
 		public:
 			
-			// Methods for New VRF Model: Fluid Temperature Control 
+			// Methods for New VRF Model: Fluid Temperature Control
 			//******************************************************************************
 			// Note: the argument VRFTUNum should be removed later in the deeper OO re-factor. Now this argument may be used by other functions that are not member functions of this class.
 			
 			void
-			CalcVRFIUVariableTeTc( 
+			CalcVRFIUVariableTeTc(
 				int const VRFTUNum, // Index to VRF terminal unit
 				Real64 & EvapTemp, // evaporating temperature
-				Real64 & CondTemp  // condensing temperature 
+				Real64 & CondTemp  // condensing temperature
 			);
 				
 			void
@@ -1045,7 +1045,7 @@ namespace HVACVariableRefrigerantFlow {
 			Real64
 			CalVRFTUAirFlowRate_FluidTCtrl(
 				int const VRFTUNum, // Index to VRF terminal unit
-				Real64 PartLoadRatio, // part load ratio of the coil 
+				Real64 PartLoadRatio, // part load ratio of the coil
 				bool FirstHVACIteration // FirstHVACIteration flag
 			);
 	
@@ -1247,27 +1247,27 @@ namespace HVACVariableRefrigerantFlow {
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 
-	// Begin of Methods for New VRF Model: Fluid Temperature Control 
+	// Begin of Methods for New VRF Model: Fluid Temperature Control
 	//******************************************************************************
 	Real64
 	VRFTUAirFlowResidual_FluidTCtrl(
-		Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU 
+		Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU
 		Array1< Real64 > const & Par // par(1) = VRFTUNum
 	);
 		
 	Real64
 	VRFOUTeResidual_FluidTCtrl(
-		Real64 const Te, // outdoor unit evaporating temperature 
+		Real64 const Te, // outdoor unit evaporating temperature
 		Array1< Real64 > const & Par // par(1) = VRFTUNum
 	);
 	
-	Real64 
-	CompResidual_FluidTCtrl( 
+	Real64
+	CompResidual_FluidTCtrl(
 		Real64 const T_suc, // Compressor suction temperature Te' [C]
 		Array1< Real64 > const & Par // parameters
 	);
 	
-	// End of Methods for New VRF Model: Fluid Temperature Control 
+	// End of Methods for New VRF Model: Fluid Temperature Control
 	//******************************************************************************
 
 } // HVACVariableRefrigerantFlow

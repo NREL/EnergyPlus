@@ -758,7 +758,7 @@ namespace DXCoils {
 			SC( 0.0 ),
 			ActualSH( 0.0 ),
 			ActualSC( 0.0 ),
-			RateBFVRFIUEvap( 0.0592 ), 
+			RateBFVRFIUEvap( 0.0592 ),
 			RateBFVRFIUCond( 0.1360 )
 		{}
 

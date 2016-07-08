@@ -5077,7 +5077,7 @@ namespace DXCoils {
 
 			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
 			DXCoil( DXCoilNum ).SC = Numbers( 2 );
-			//@@ DXCoil( DXCoilNum ).RateBFVRFIUCond = 0.136; 
+			//@@ DXCoil( DXCoilNum ).RateBFVRFIUCond = 0.136;
 
 			int indexSCCurve = GetCurveIndex( Alphas( 5 ) ); // convert curve name to index number
 			// Verify curve name and type
@@ -15436,7 +15436,7 @@ Label50: ;
 			C1Tcond = DXCoil( CoilIndex ).C1Tc;
 			C2Tcond = DXCoil( CoilIndex ).C2Tc;
 			C3Tcond = DXCoil( CoilIndex ).C3Tc;
-			BF = DXCoil( CoilIndex ).RateBFVRFIUCond; 
+			BF = DXCoil( CoilIndex ).RateBFVRFIUCond;
 			
 			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );

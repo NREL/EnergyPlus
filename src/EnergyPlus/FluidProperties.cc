@@ -4503,7 +4503,7 @@ namespace FluidProperties {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Performs iterations to calculate the refrigerant temperature corresponding to the given 
+		// Performs iterations to calculate the refrigerant temperature corresponding to the given
 		// enthalpy and pressure.  Works only in superheated region.
 
 		// METHODOLOGY EMPLOYED:
@@ -4606,7 +4606,7 @@ namespace FluidProperties {
 		for ( Temp = TempLow; Temp <= TempUp; Temp++ ){
 			EnthalpyCheck = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
 			
-			if( EnthalpyCheck > Enthalpy )  break; 
+			if( EnthalpyCheck > Enthalpy )  break;
 		}
 		ReturnValue = Temp;
 
