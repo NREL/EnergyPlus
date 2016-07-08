@@ -3003,27 +3003,15 @@ namespace PackagedTerminalHeatPump {
 
 				if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
 
-<<<<<<< HEAD
-					SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndex, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
+					SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 
-					PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).NumOfSpeeds;
+					PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NumOfSpeeds;
 
 					for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedHeating; ++Iter ) {
-						PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndex ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
+						PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
 						PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxHeatAirVolFlow * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter );
 						PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxHeatAirMassFlow * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter );
 					}
-=======
-				SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
-
-				PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NumOfSpeeds;
-
-				MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NormSpedLevel );
-				for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedHeating; ++Iter ) {
-					PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
-					PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirMassFlowRate( Iter ) * MulSpeedFlowScale;
-					PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
->>>>>>> develop
 				}
 				// intialize idle flow
 
