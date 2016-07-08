@@ -2496,7 +2496,7 @@ namespace LowTempRadiantSystem {
 					} else {
 						if ( OpMode == ClgHtg || OpMode == HtgOnly ) {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow \nObject=" + CFloRadSys( RadSysNum ).Name );
+							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" + CFloRadSys( RadSysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -2520,7 +2520,7 @@ namespace LowTempRadiantSystem {
 					} else {
 						if ( OpMode == ClgHtg || OpMode == ClgOnly ) {
 							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow \n Object=" + CFloRadSys( RadSysNum ).Name );
+							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" + CFloRadSys( RadSysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -2547,7 +2547,7 @@ namespace LowTempRadiantSystem {
 								"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes, "User-Specified Maximum Water Flow [m3/s]", WaterVolFlowMaxUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxDes - WaterVolFlowMaxUser ) / WaterVolFlowMaxUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
 										CFloRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Water Flow of " + RoundSigDigits( WaterVolFlowMaxUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Water Flow of " + RoundSigDigits(WaterVolFlowMaxDes, 5 ) + " [m3/s]" );
@@ -2587,7 +2587,7 @@ namespace LowTempRadiantSystem {
 								"User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " + CFloRadSys( RadSysNum ).Name + "\"." );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " + CFloRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Hydronic Tubing Length of " + RoundSigDigits( TubeLengthUser, 5 ) + " [m]" );
 									ShowContinueError( "differs from Design Size Hydronic Tubing Length of " + RoundSigDigits( TubeLengthDes, 5 ) + " [m]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
