@@ -860,9 +860,9 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 			"set Var11 = @Max 0.5 1.5,",
 			"set Var12 = @Min 0.5 1.5,",
 			"set Var13 = @Abs 1.3,",  // -3.1 does not work, (-3.1) does not work, "set absNum = -3.1" and use @Abs absNum does work if EMS line of code occurs before this line
-			"set Var14 = @RANDOMUNIFORM 0.0 1.0,",
-			"set Var15 = @RANDOMNORMAL 0.0 1.0 2.0 3.0,",
-			"set Var16 = @SEEDRANDOM 0.0,",
+			"set Var14 = @SEEDRANDOM 2.65,",
+			"set Var15 = @RANDOMUNIFORM 0.0 1.0,",
+			"set Var16 = @RANDOMNORMAL 1.5 0.5 0.75 2.25,", // negative number does not get processed correctly
 			"set Var17 = @RhoAirFnPbTdbW 101325.0 30.0 0.01,",
 			"set Var18 = @CpAirFnWTdb 0.01 30.0,",
 			"set Var19 = @HfgAirFnWTdb 0.01 30.0,",
@@ -976,310 +976,418 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 			DataRuntimeLanguage::TrendVariable( i ).TrendValARR( 4 ) = 4.4;
 		}
 
-		EMSManager::ManageEMS( DataGlobals::emsCallFromHVACIterationLoop, anyRan );
+		EMSManager::ManageEMS( DataGlobals::emsCallFromHVACIterationLoop, anyRan ); // process trend functions again using above data
 		EXPECT_TRUE( anyRan );
 
 		int index( 0 );
 		int offset( 25 ); // first 24 values in ErlExpression() are key words + 1 EMS global variable
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 1 ).Operator, FuncRound );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 1 ).NumOperands, 1 );
-//		EXPECT_EQ( size( DataRuntimeLanguage::ErlExpression( 1 ).Operand ), 1 ); // why doesn't this compile? ... Array1D< ErlValueType > Operand
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 1 ).Operand.size(), 1 );
 		index = 1 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR1" );
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.0 ); // round(2.1)
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 2 ).Operator, FuncMod );
-		EXPECT_EQ( DataRuntimeLanguage::ErlExpression(2).NumOperands, 2);
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 2 ).NumOperands, 2);
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 2 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 2 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 2 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR2" );
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.0 ); // mod( 7, 3 )
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 3 ).Operator, FuncSin );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 3 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 3 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 3 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 3 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR3" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.70710678, 0.00000001 ); // Sin(45) or Sin(0.7854) = 0.707107
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 4 ).Operator, FuncCos );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 4 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 4 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 4 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 4 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR4" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.70710678, 0.00000001 ); // Cos(45) or Cos(0.7854) = 0.707107
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 5 ).Operator, FuncArcCos );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 5 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 5 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 5 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 5 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR5" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.78539816, 0.00000001 ); // ArcCos(Cos(45)) = 0.7854 rad
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 6 ).Operator, FuncArcSin );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 6 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 6 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 6 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 6 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR6" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.78539816, 0.00000001 ); // ArcSin(Sin(45)) = 0.7854 rad
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 7 ).Operator, FuncDegToRad );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 7 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 7 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 7 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 7 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR7" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.78539816, 0.00000001 ); // DegToRad(45) = 0.7854 rad
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 8 ).Operator, FuncRadToDeg );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 8 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 8 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 8 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 8 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR8" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 45.0, 0.0000001 ); // RadToDeg(0.7854 rad) = 45 deg
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 9 ).Operator, FuncExp );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 9 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 9 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 9 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 9 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR9" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.718281828, 0.00000001 ); // e^1 = 2.71828
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 10 ).Operator, FuncLn );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 10 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 10 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 10 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 10 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR10" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.69314718, 0.00000001 ); // e^1 = 0.693147
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 11 ).Operator, FuncMax );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 11 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 11 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 11 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 11 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR11" );
-		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.5 ); // max(1.5, 0.5) = 1.5
+		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.5 ); // max(0.5, 1.5) = 1.5
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 12 ).Operator, FuncMin );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 12 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 12 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 12 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 12 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR12" );
-		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.5 ); // min(1.5, 0.5) = 0.5
+		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.5 ); // min(0.5, 1.5) = 0.5
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 13 ).Operator, FuncABS );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 13 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 13 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 13 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 13 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR13" );
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.3 ); // abs(1.3) = 1.3
 
-		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).Operator, FuncRandU );
-		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).Operator, FuncRandSeed );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 14 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR14" );
+		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.0 ); // @SeedRandom( 2.65 )
 
-		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).Operator, FuncRandG );
-		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).NumOperands, 4 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).Operator, FuncRandU );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 15 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR15" );
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.148876574, 0.00000001 ); // @RANDOMUNIFORM 0.0 1.0
 
-		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).Operator, FuncRandSeed );
-		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).Operator, FuncRandG );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).NumOperands, 4 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).Operand.size(), 4 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).Operand( 4 ).Type, 1 ); // argument was passed to EMS function
 		index = 16 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR16" );
+		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.30797328, 0.00000001 ); // @RANDOMNORMAL 1.5 0.5 0.75 2.25 (mean, std, min, max)
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).Operator, FuncRhoAirFnPbTdbW );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
 		index = 17 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR17" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.146173145, 0.00000001 ); // RhoAirFnPbTdbW 101325.0 30.0 0.01 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 18 ).Operator, FuncCpAirFnWTdb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 18 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 18 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 18 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 18 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR18" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1023.42949999999, 0.00000001 ); // CpAirFnWTdb 0.01 30.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 19 ).Operator, FuncHfgAirFnWTdb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 19 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 19 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 19 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 19 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR19" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2431308.50000000, 0.00000001 ); // HfgAirFnWTdb 0.01 30.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 20 ).Operator, FuncHgAirFnWTdb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 20 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 20 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 20 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 20 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR20" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2556708.50000000, 0.00000001 ); // HgAirFnWTdb 0.01 30.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 21 ).Operator, FuncTdpFnTdbTwbPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 21 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 21 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 21 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
 		index = 21 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR21" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 5.573987554, 0.00000001 ); // TdpFnTdbTwbPb 30.0 16.0 101325 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 22 ).Operator, FuncTdpFnWPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 22 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 22 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 22 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 22 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR22" ); // verified at sugartech site as 14.0439
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 14.044515576, 0.00000001 ); // TdpFnWPb 0.01 101325 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 23 ).Operator, FuncHFnTdbW );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 23 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 23 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 23 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 23 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR23" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 55712.28500000, 0.00000001 ); // HFnTdbW 30.0 0.01 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 24 ).Operator, FuncHFnTdbRhPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 24 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 24 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 24 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
 		index = 24 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR24" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 64177.426349195, 0.00000001 ); // HFnTdbRhPb 30.0 0.5 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).Operator, FuncTdbFnHW );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 25 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 25 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR25" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 4.876349567, 0.00000001 ); // TdbFnHW 30000.0 0.01 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 26 ).Operator, FuncRhovFnTdbRh );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 26 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 26 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 26 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 26 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR26" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.015174171, 0.00000001 ); // RhovFnTdbRh 30.0 0.5 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).Operator, FuncRhovFnTdbRhLBnd0C ); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 27 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 27 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR27" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.015156240, 0.00000001 ); // RhovFnTdbRhLBnd0C 30.0 0.5 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).Operator, FuncRhovFnTdbWPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 28 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 28 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR28" ); // http://www.gribble.org/cycling/air_density.html 30 C db, 1013.25 hPa, 16 C dp = 0.011565 g/m3
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.011459487, 0.00000001 ); // RhovFnTdbWPb 30.0 0.01 101325.0 = ** this and previous 2 numbers seem very different **
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 29 ).Operator, FuncRhFnTdbRhov );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 29 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 29 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 29 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 29 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR29" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.3295072808, 0.00000001 ); // RhFnTdbRhov 30.0 0.01 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 30 ).Operator, FuncRhFnTdbRhovLBnd0C ); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 30 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 30 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 30 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 30 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR30" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.3298971165, 0.00000001 ); // RhFnTdbRhovLBnd0C 30.0 0.01 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 31 ).Operator, FuncRhFnTdbWPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 31 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 31 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 31 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
 		index = 31 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR31" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.377598442, 0.00000001 ); // RhFnTdbWPb 30.0 0.01 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 32 ).Operator, FuncTwbFnTdbWPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 32 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 32 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 32 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
 		index = 32 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR32" ); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 19.589790661, 0.00000001 ); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 33 ).Operator, FuncVFnTdbWPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 33 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 33 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 33 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
 		index = 33 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR33" ); // http://www.sugartech.co.za/psychro/ 30 C db, 14.043895 dp = 0.8432375 m3/kg
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.873152783, 0.00000001 ); // VFnTdbWPb 30.0 0.01 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 34 ).Operator, FuncWFnTdpPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 34 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 34 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 34 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 34 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR34" ); // verified at sugartech site as 0.011366881 kg/kg
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0113664167, 0.00000001 ); // WFnTdpPb 16.0 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 35 ).Operator, FuncWFnTdbH );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 35 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 35 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 35 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 35 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR35" ); // http://www.sugartech.co.za/psychro/ 20 C db, 0.42830288 C dp, 30000 H = 0.00389466 kg/kg
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.00390178711, 0.00000001 ); // WFnTdbH 20.0 30000.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 36 ).Operator, FuncWFnTdbTwbPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 36 ).NumOperands, 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 36 ).Operand.size(), 3 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 36 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
 		index = 36 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR36" ); // http://www.sugartech.co.za/psychro/ 30 C db, 16 C wb = 0.00559757 kg/kg
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.005624362, 0.00000001 ); // WFnTdbTwbPb 30.0 16.0 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 37 ).Operator, FuncWFnTdbRhPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 37 ).NumOperands, 4 ); // why is this 4?
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 37 ).Operand.size(), 4 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 37 ).Operand( 3 ).Type, 1 ); // argument was passed to EMS function
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 37 ).Operand( 4 ).Type, 0 ); // 4th argument not passed to EMS function
 		index = 37 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR37" ); // http://www.sugartech.co.za/psychro/ 30 C db, 50% rh = 0.01331149 kg/kg
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.0133109528, 0.00000001 ); // WFnTdbRhPb 30.0 0.5 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 38 ).Operator, FuncPsatFnTemp );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 38 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 38 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 38 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 38 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR38" ); // http://www.sugartech.co.za/psychro/ 30 C db, 100% rh = 42.46019 mbar = 4246.019 Pa
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 4246.030243592, 0.00000001 ); // PsatFnTemp 30.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 39 ).Operator, FuncTsatFnHPb );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 39 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 39 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 39 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 39 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR39" ); // http://www.sugartech.co.za/psychro/ 10.303 C db gives H = 29999.9999
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 10.318382617, 0.00000001 ); // TsatFnHPb 30000.0 101325.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 40 ).Operator, FuncCpCW );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 40 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 40 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 40 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 40 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR40" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 4180.0, 0.00000001 ); // CpCW 30.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 41 ).Operator, FuncCpHW );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 41 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 41 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 41 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 41 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR41" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 4180.0, 0.00000001 ); // CpHW 60.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 42 ).Operator, FuncRhoH2O );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 42 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 42 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 42 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 42 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR42" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 998.2331862652, 0.00000001 ); // RhoH2O 60.0 =
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 43 ).Operator, FuncSevereWarnEp );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 43 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 43 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 43 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 43 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR43" );
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 44 ).Operator, FuncWarnEp );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 44 ).NumOperands, 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 44 ).Operand.size(), 1 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 44 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 44 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR44" );
 
 		// all trend variables hold 4 values: 1.1, 2.2, 3.3, 4.4
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).Operator, FuncTrendValue );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 45 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 45 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR45" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.1, 0.00000001 ); // TrendValue Variable_Trend1 1
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).Operator, FuncTrendAverage );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 46 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 46 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR46" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.75, 0.00000001 ); // TrendAverage Variable_Trend2 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).Operator, FuncTrendMax );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 47 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 47 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR47" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 4.4, 0.00000001 ); // TrendMax Variable_Trend3 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).Operator, FuncTrendMin );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 48 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 48 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR48" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.1, 0.00000001 ); // TrendMin Variable_Trend4 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).Operator, FuncTrendDirection );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 49 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 49 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR49" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, -4.4, 0.00000001 ); // TrendDirection Variable_Trend5 4 (-1.1 per 0.25 hrs = -4.4/hr)
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).Operator, FuncTrendSum );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).NumOperands, 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).Operand.size(), 2 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 50 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 50 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR50" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 11.0, 0.00000001 ); // TrendSum Variable_Trend6 4
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operator, FuncCurveValue );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).NumOperands, 6 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operand.size(), 6 );
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operand( 3 ).Type, 0 ); // 3rd argument not passed to EMS function
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operand( 4 ).Type, 0 ); // 4th argument not passed to EMS function
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operand( 5 ).Type, 0 ); // 5th argument not passed to EMS function
+		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 51 ).Operand( 6 ).Type, 0 ); // 6th argument not passed to EMS function
 		index = 51 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR51" );
 		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.95, 0.00000001 ); // CurveValue 0.75 = 0.95
