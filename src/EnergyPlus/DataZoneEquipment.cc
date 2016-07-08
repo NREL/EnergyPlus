@@ -151,6 +151,8 @@ namespace DataZoneEquipment {
 	namespace {
 		bool GetZoneEquipmentDataErrorsFound( false );
 		int GetZoneEquipmentDataFound( 0 );
+		bool GetSupplyAirPathErrorsFound( false );
+		bool GetReturnAirPathErrorsFound( false );
 	}
 
 	int NumSupplyAirPaths( 0 );
@@ -188,6 +190,8 @@ namespace DataZoneEquipment {
 		ZoneEquipSimulatedOnce = false ;
 		NumOfZoneEquipLists = 0 ; // The Number of Zone Equipment List objects
 		GetZoneEquipmentDataErrorsFound = false;
+		GetSupplyAirPathErrorsFound = false;
+		GetReturnAirPathErrorsFound = false;
 		GetZoneEquipmentDataFound = 0;
 		ZoneEquipAvail.deallocate();
 		CrossMixingReportFlag.deallocate();
@@ -1453,6 +1457,257 @@ namespace DataZoneEquipment {
 
 		return OAVolumeFlowRate;
 	}
+
+	void
+	GetSupplyAirPath()
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl LBNL
+		//       DATE WRITTEN   July 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Reads in supply air path data
+
+		// METHODOLOGY EMPLOYED:
+		// Uses EnergyPlus input functions and methods
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::VerifyName;
+		using NodeInputManager::GetOnlySingleNode;
+		using namespace DataLoopNode;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetSupplyAirPath: " ); // include trailing blank space
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlphas( 0 );
+		int NumNums( 0 );
+		int NumParams( 0 );
+		int PathNum( 0 );
+		int IOStat( 0 );
+		int Counter( 0 );
+		int CompNum( 0 );
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+		std::string CurrentModuleObject; // Object type for getting and error messages
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray;
+		Array1D< Real64 > NumArray;
+
+		if ( !allocated( SupplyAirPath ) ) {
+			// Look for and read in the air supply path
+			// component (splitters) information for each zone
+			NumSupplyAirPaths = GetNumObjectsFound( "AirLoopHVAC:SupplyPath" );
+			SupplyAirPath.allocate( NumSupplyAirPaths );
+		}
+		GetObjectDefMaxArgs( "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums );
+		AlphArray.allocate( NumAlphas );
+		NumArray.dimension( NumNums, 0.0 );
+		cAlphaFields.allocate( NumAlphas );
+		cNumericFields.allocate( NumNums );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
+
+		CurrentModuleObject = "AirLoopHVAC:SupplyPath";
+		for ( PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum ) {
+			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
+				cAlphaFields, cNumericFields );
+			IsNotOK = false;
+			IsBlank = false;
+			VerifyName( AlphArray( 1 ), SupplyAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			if ( IsNotOK ) {
+				GetSupplyAirPathErrorsFound = true;
+				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+			}
+			SupplyAirPath( PathNum ).Name = AlphArray( 1 );
+			SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
+
+			SupplyAirPath( PathNum ).InletNodeNum = GetOnlySingleNode( AlphArray( 2 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), 
+				NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+
+			SupplyAirPath( PathNum ).ComponentType.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+			SupplyAirPath( PathNum ).ComponentType_Num.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+			SupplyAirPath( PathNum ).ComponentType_Num = 0;
+			SupplyAirPath( PathNum ).ComponentName.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+			SupplyAirPath( PathNum ).ComponentIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+			SupplyAirPath( PathNum ).SplitterIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+			SupplyAirPath( PathNum ).PlenumIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+
+			Counter = 3;
+
+			for ( CompNum = 1; CompNum <= SupplyAirPath( PathNum ).NumOfComponents; ++CompNum ) {
+
+				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) ) {
+
+					SupplyAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
+					SupplyAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
+					ValidateComponent( SupplyAirPath( PathNum ).ComponentType( CompNum ), SupplyAirPath( PathNum ).ComponentName( CompNum ), 
+						IsNotOK, CurrentModuleObject );
+					if ( IsNotOK ) {
+						ShowContinueError( "In " + CurrentModuleObject + " = " + SupplyAirPath( PathNum ).Name );
+						GetSupplyAirPathErrorsFound = true;
+					}
+					SupplyAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
+					SupplyAirPath( PathNum ).SplitterIndex( CompNum ) = 0;
+					SupplyAirPath( PathNum ).PlenumIndex( CompNum ) = 0;
+					if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSplitter_Type;
+					if ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSupplyPlenum_Type;
+
+				}
+				else {
+					ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + SupplyAirPath( PathNum ).Name + "\"" );
+					ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
+					ShowContinueError( "Must be \"AirLoopHVAC:ZoneSplitter\" or \"AirLoopHVAC:SupplyPlenum\"" );
+					GetSupplyAirPathErrorsFound = true;
+				}
+
+				Counter += 2;
+			}
+		} // end loop over supply air paths
+		AlphArray.deallocate();
+		NumArray.deallocate();
+		cAlphaFields.deallocate();
+		cNumericFields.deallocate();
+		lAlphaBlanks.deallocate();
+		lNumericBlanks.deallocate();
+		if ( GetSupplyAirPathErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in getting Supply Air Path input." );
+		}
+	} // end of GetSupplyAirPath
+
+	void
+		GetReturnAirPath()
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl LBNL
+		//       DATE WRITTEN   July 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Reads in supply air path data
+
+		// METHODOLOGY EMPLOYED:
+		// Uses EnergyPlus input functions and methods
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::VerifyName;
+		using NodeInputManager::GetOnlySingleNode;
+		using namespace DataLoopNode;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetReturnAirPath: " ); // include trailing blank space
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlphas( 0 );
+		int NumNums( 0 );
+		int NumParams( 0 );
+		int PathNum( 0 );
+		int IOStat( 0 );
+		int Counter( 0 );
+		int CompNum( 0 );
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+		std::string CurrentModuleObject; // Object type for getting and error messages
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray;
+		Array1D< Real64 > NumArray;
+		if ( !allocated( ReturnAirPath ) ) {
+			// Look for and read in the air return path
+			// component (splitters) information for each zone
+			NumReturnAirPaths = GetNumObjectsFound( "AirLoopHVAC:ReturnPath" );
+			ReturnAirPath.allocate( NumReturnAirPaths );
+		}
+		GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums );
+		AlphArray.allocate( NumAlphas );
+		NumArray.dimension( NumNums, 0.0 );
+		cAlphaFields.allocate( NumAlphas );
+		cNumericFields.allocate( NumNums );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
+		CurrentModuleObject = "AirLoopHVAC:ReturnPath";
+
+		for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
+			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, 
+				cAlphaFields, cNumericFields ); //  data for one zone
+			IsNotOK = false;
+			IsBlank = false;
+			VerifyName( AlphArray( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			if ( IsNotOK ) {
+				GetReturnAirPathErrorsFound = true;
+				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+			}
+			ReturnAirPath( PathNum ).Name = AlphArray( 1 );
+			ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
+
+			ReturnAirPath( PathNum ).OutletNodeNum = GetOnlySingleNode( AlphArray( 2 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, 
+				AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+
+			ReturnAirPath( PathNum ).ComponentType.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+			ReturnAirPath( PathNum ).ComponentType_Num.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+			ReturnAirPath( PathNum ).ComponentType_Num = 0;
+			ReturnAirPath( PathNum ).ComponentName.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+			ReturnAirPath( PathNum ).ComponentIndex.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+
+			Counter = 3;
+
+			for ( CompNum = 1; CompNum <= ReturnAirPath( PathNum ).NumOfComponents; ++CompNum ) {
+
+				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ) {
+
+					ReturnAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
+					ReturnAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
+					ReturnAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
+					ValidateComponent( ReturnAirPath( PathNum ).ComponentType( CompNum ), ReturnAirPath( PathNum ).ComponentName( CompNum ), IsNotOK, 
+						CurrentModuleObject );
+					if ( IsNotOK ) {
+						ShowContinueError( "In " + CurrentModuleObject + " = " + ReturnAirPath( PathNum ).Name );
+						GetReturnAirPathErrorsFound = true;
+					}
+					if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
+					if ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
+				}
+				else {
+					ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + ReturnAirPath( PathNum ).Name + "\"" );
+					ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
+					ShowContinueError( "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"" );
+					GetReturnAirPathErrorsFound = true;
+				}
+
+				Counter += 2;
+
+			}
+		} // end loop over return air paths
+		AlphArray.deallocate();
+		NumArray.deallocate();
+		cAlphaFields.deallocate();
+		cNumericFields.deallocate();
+		lAlphaBlanks.deallocate();
+		lNumericBlanks.deallocate();
+		if ( GetReturnAirPathErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in getting Return Air Path input." );
+		}
+	} // end of GetReturnAirPath
 
 } // DataZoneEquipment
 
