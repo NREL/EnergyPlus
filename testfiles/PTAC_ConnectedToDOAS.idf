@@ -2905,48 +2905,48 @@ ThermostatSetpoint:DualSetpoint,
 
 AirTerminal:SingleDuct:Mixer,
     SPACE1-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type
-    SPACE1-1 PTAC,       !- ZoneHVAC Terminal Unit Name
-    SPACE1-1 PTAC Inlet, !- Terminal Unit Outlet Node Name
-    SPACE1-1 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name
-    InletSide;                                   !- Terminal Unit Connection Type
+    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Unit Object Type
+    SPACE1-1 PTAC,       !- ZoneHVAC Unit Object Name
+    SPACE1-1 PTAC Inlet, !- Mixer Outlet Node Name
+    SPACE1-1 Air Terminal Mixer Primary Inlet,   !- Mixer Primary Air Inlet Node Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                   !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type
-    SPACE2-1 PTAC,       !- ZoneHVAC Terminal Unit Name
-    SPACE2-1 PTAC Inlet, !- Terminal Unit Outlet Node Name
-    SPACE2-1 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name
-    SPACE2-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name
-    InletSide;                                   !- Terminal Unit Connection Type
+    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Unit Object Type
+    SPACE2-1 PTAC,       !- ZoneHVAC Unit Object Name
+    SPACE2-1 PTAC Inlet, !- Mixer Outlet Node Name
+    SPACE2-1 Air Terminal Mixer Primary Inlet,   !- Mixer Primary Air Inlet Node Name
+    SPACE2-1 Air Terminal Mixer Secondary Inlet, !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                   !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type
-    SPACE3-1 PTAC,       !- ZoneHVAC Terminal Unit Name
-    SPACE3-1 PTAC Inlet, !- Terminal Unit Outlet Node Name
-    SPACE3-1 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name
-    SPACE3-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name
-    InletSide;                                   !- Terminal Unit Connection Type
+    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Unit Object Type
+    SPACE3-1 PTAC,       !- ZoneHVAC Unit Object Name
+    SPACE3-1 PTAC Inlet, !- Mixer Outlet Node Name
+    SPACE3-1 Air Terminal Mixer Primary Inlet,   !- Mixer Primary Air Inlet Node Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet, !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                   !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC Terminal Unit Object Type
-    SPACE4-1 PTAC,           !- ZoneHVAC Terminal Unit Name
-    SPACE4-1 Supply Inlet,   !- Terminal Unit Outlet Node Name
-    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE4-1 PTAC Outlet,    !- Terminal Unit Secondary Air Inlet Node Name
-    SupplySide;              !- Terminal Unit Connection Type
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC Unit Object Type
+    SPACE4-1 PTAC,           !- ZoneHVAC Unit Object Name
+    SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name
+    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE4-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
+    SupplySide;              !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC Terminal Unit Object Type
-    SPACE5-1 PTAC,           !- ZoneHVAC Terminal Unit Name
-    SPACE5-1 Supply Inlet,   !- Terminal Unit Outlet Node Name
-    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE5-1 PTAC Outlet,    !- Terminal Unit Secondary Air Inlet Node Name
-    SupplySide;              !- Terminal Unit Connection Type
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC Unit Object Type
+    SPACE5-1 PTAC,           !- ZoneHVAC Unit Object Name
+    SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name
+    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE5-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
+    SupplySide;              !- Mixer Connection Type
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 

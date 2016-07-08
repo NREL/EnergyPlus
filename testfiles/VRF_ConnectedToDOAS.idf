@@ -2932,48 +2932,48 @@ Sizing:System,
 
 AirTerminal:SingleDuct:Mixer,
     SPACE1-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Terminal Unit Object Type
-    TU1,                         !- ZoneHVAC Terminal Unit Name
-    TU1 Inlet Node,              !- Terminal Unit Outlet Node Name
-    SPACE1-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name
-    InletSide;                                    !- Terminal Unit Connection Type
+    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
+    TU1,                         !- ZoneHVAC Unit Object Name
+    TU1 Inlet Node,              !- Mixer Outlet Node Name
+    SPACE1-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                    !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Terminal Unit Object Type
-    TU2,                         !- ZoneHVAC Terminal Unit Name
-    TU2 Inlet Node,              !- Terminal Unit Outlet Node Name
-    SPACE2-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name
-    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name
-    InletSide;                                    !- Terminal Unit Connection Type
+    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
+    TU2,                         !- ZoneHVAC Unit Object Name
+    TU2 Inlet Node,              !- Mixer Outlet Node Name
+    SPACE2-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                    !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Terminal Unit Object Type
-    TU3,                         !- ZoneHVAC Terminal Unit Name
-    TU3 Inlet Node,              !- Terminal Unit Outlet Node Name
-    SPACE3-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name
-    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name
-    InletSide;                                    !- Terminal Unit Connection Type
+    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
+    TU3,                         !- ZoneHVAC Unit Object Name
+    TU3 Inlet Node,              !- Mixer Outlet Node Name
+    SPACE3-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                    !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,   !- Name
-    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Terminal Unit Object Type
-    TU4,                          !- ZoneHVAC Terminal Unit Name
-    TU4 Outlet Node,              !- Terminal Unit Outlet Node Name
-    SPACE4-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name
-    SPACE4-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name
-    SupplySide;                                   !- Terminal Unit Connection Type
+    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
+    TU4,                          !- ZoneHVAC Unit Object Name
+    TU4 Outlet Node,              !- Mixer Outlet Node Name
+    SPACE4-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    SPACE4-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    SupplySide;                                   !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,   !- Name
-    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Terminal Unit Object Type
-    TU5,                          !- ZoneHVAC Terminal Unit Name
-    TU5 Outlet Node,              !- Terminal Unit Outlet Node Name
-    SPACE5-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name
-    SPACE5-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name
-    SupplySide;                                   !- Terminal Unit Connection Type
+    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
+    TU5,                          !- ZoneHVAC Unit Object Name
+    TU5 Outlet Node,              !- Mixer Outlet Node Name
+    SPACE5-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    SPACE5-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    SupplySide;                                   !- Mixer Connection Type
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
