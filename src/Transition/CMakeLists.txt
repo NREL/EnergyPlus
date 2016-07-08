@@ -5,8 +5,6 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-#configure_file( CreateNewIDFUsingRulesV8_3_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_3_0.f90" )
-#configure_file( IDDAssignV8_3_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_3_0.f90" )
 
 # first create a static library of shared stuff
 SET(LIB_SRC
@@ -53,6 +51,7 @@ list( APPEND VERSIONS 8_2_0 )
 list( APPEND VERSIONS 8_3_0 )
 list( APPEND VERSIONS 8_4_0 )
 list( APPEND VERSIONS 8_5_0 )
+list( APPEND VERSIONS 8_6_0 )
 
 if(APPLE)
   if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
@@ -119,7 +118,7 @@ FOREACH( i RANGE 1 ${end} )
   if( "${i}" GREATER "22" )
     install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
   endif()
-  
+
 ENDFOREACH()
 
 # then install all the support files
