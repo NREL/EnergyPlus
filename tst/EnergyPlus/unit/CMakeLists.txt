@@ -55,6 +55,7 @@ set( test_src
   HeatBalFiniteDiffManager.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
+  HighTempRadiantSystem.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
