@@ -4100,6 +4100,7 @@ namespace DaylightingManager {
 		cCurrentModuleObject = "Daylighting:Controls";
 		TotDaylightingDetailed = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotDaylightingDetailed > 0 ) {
+			GetInputDayliteRefPt( ErrorsFound );
 			GetDaylightingParametersDetaild(TotDaylightingDetailed, ErrorsFound);
 			GetInputIlluminanceMap( ErrorsFound );
 			GetLightWellData( ErrorsFound );
@@ -4982,7 +4983,7 @@ namespace DaylightingManager {
 	GetInputDayliteRefPt(
 		bool & ErrorsFound
 	){
-		// Perform GetInput function for the Daylgihting:ReferencePoint object
+		// Perform GetInput function for the Daylighting:ReferencePoint object
 		// Glazer - July 2016
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
