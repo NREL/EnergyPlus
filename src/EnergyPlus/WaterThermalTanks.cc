@@ -811,6 +811,31 @@ namespace WaterThermalTanks {
 	{
 
 		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad, FSEC
+		//       DATE WRITTEN   July 2016
+		//
+		// PURPOSE OF THIS SUBROUTINE:
+		// Manages GetInput processing and program termination
+
+		static std::string const RoutineName( "GetWaterThermalTankInput: " ); // include trailing blank space
+		static bool ErrorsFound( false ); // true if errors detected in GetUnitarySystemInputData
+
+		GetWaterThermalTankInputData( ErrorsFound );
+
+		if( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in getting thermal storage input. Preceding condition(s) causes termination." );
+		}
+
+		return ErrorsFound;
+	}
+
+	bool
+	GetWaterThermalTankInputData(
+		bool & ErrorsFound
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher and Brandon Anderson
 		//       DATE WRITTEN   May 2000
 		//       MODIFIED       R. Raustad, June 2005, added HPWH and desuperheater water heating coils
@@ -818,7 +843,6 @@ namespace WaterThermalTanks {
 		//                      B. Griffith, Feb. 2008 extensions for autosizing water heaters
 		//                      BG Mar 2009.  Trap for bad heater height input for stratefied water heater CR7718
 		//						B. Shen 12/2014, add air-source variable-speed heat pump water heating
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Gets the water heater, HPWH, and/or desuperheater heating coil input from the input file.
@@ -826,7 +850,6 @@ namespace WaterThermalTanks {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// Using/Aliasing
 		using DataGlobals::NumOfZones;
 		using DataGlobals::AutoCalculate;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -845,6 +868,7 @@ namespace WaterThermalTanks {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using FluidProperties::GetDensityGlycol;
 		using DataLoopNode::Node; // ,NodeConnectionType_Internal
+		using DataLoopNode::NodeID;
 		using DataLoopNode::NodeType_Air;
 		using DataLoopNode::NodeType_Water;
 		using DataLoopNode::NodeConnectionType_Inlet;
@@ -867,6 +891,7 @@ namespace WaterThermalTanks {
 		using VariableSpeedCoils::GetCoilIndexVariableSpeed;
 		using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
 		using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
+		using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
 		using VariableSpeedCoils::GetVSCoilPLFFPLR;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using General::TrimSigDigits;
@@ -876,6 +901,8 @@ namespace WaterThermalTanks {
 		using Fans::GetFanType;
 		using Fans::GetFanIndex;
 		using Fans::GetFanVolFlow;
+		using Fans::GetFanInletNode;
+		using Fans::GetFanOutletNode;
 		using DataSizing::AutoSize;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipList;
@@ -890,19 +917,9 @@ namespace WaterThermalTanks {
 		using RefrigeratedCase::CheckRefrigerationInput;
 		using GlobalNames::VerifyUniqueCoilName;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetWaterThermalTankInput: " );
 		static std::string const RoutineNameNoColon( "GetWaterThermalTankInput" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterThermalTankNum; // Index to WATER HEATER:*
 		int WHsizingNum; // Index to Water Heater:Sizing, for the IDF objects--not data storage
 		int NodeNum; // Index to a stratified thermal node
@@ -920,7 +937,6 @@ namespace WaterThermalTanks {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool IsValid; // Flag for validating PLF curve, OutsideAirNode
-		static bool ErrorsFound( false ); // Flag for any error found during GetWaterThermalTankInput
 		static std::string FanInletNode; // Used to set up comp set
 		static std::string FanOutletNode; // Used to set up comp set
 		static std::string CoilInletNode; // Used to set up comp set
@@ -1839,6 +1855,34 @@ namespace WaterThermalTanks {
 							}
 						}
 					}
+					// check that required node names are present
+					if ( HPWH.InletAirConfiguration == AmbientTempSchedule || HPWH.InletAirConfiguration == AmbientTempZone ) {
+						if ( HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+							ShowContinueError( "When " + hpwhAlphaFieldNames[ 6 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 6 + nAlphaOffset ] + "\"." );
+							ShowContinueError( hpwhAlphaFieldNames[ 7 + nAlphaOffset ] + " and " + hpwhAlphaFieldNames[ 8 + nAlphaOffset ] + " must be specified." );
+							ErrorsFound = true;
+						}
+					} else if ( HPWH.InletAirConfiguration == AmbientTempOutsideAir ) {
+						if ( HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0 ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+							ShowContinueError( "When " + hpwhAlphaFieldNames[ 6 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 6 + nAlphaOffset ] + "\"." );
+							ShowContinueError( hpwhAlphaFieldNames[ 9 + nAlphaOffset ] + " and " + hpwhAlphaFieldNames[ 10 + nAlphaOffset ] + " must be specified." );
+							ErrorsFound = true;
+						}
+					} else if ( HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+						if ( HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 || HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0 ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+							ShowContinueError( "When " + hpwhAlphaFieldNames[ 6 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 6 + nAlphaOffset ] + "\"." );
+							if( HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 ) {
+								ShowContinueError( hpwhAlphaFieldNames[ 7 + nAlphaOffset ] + " and " + hpwhAlphaFieldNames[ 8 + nAlphaOffset ] + " must be specified." );
+							}
+							if( HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0 ) {
+								ShowContinueError( hpwhAlphaFieldNames[ 9 + nAlphaOffset ] + " and " + hpwhAlphaFieldNames[ 10 + nAlphaOffset ] + " must be specified." );
+							}
+							ErrorsFound = true;
+						}
+					}
 
 					// check that the HPWH inlet and outlet nodes are in the same zone (ZoneHVAC:EquipmentConnections) when
 					// Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
@@ -1923,8 +1967,99 @@ namespace WaterThermalTanks {
 						}
 					}
 
+					// check that fan outlet node is indeed correct
+					errFlag = false;
+					int FanOutletNodeNum = GetFanOutletNode( HPWH.FanType, HPWH.FanName, errFlag );
+					if ( errFlag ) {
+						ShowContinueError( "...occurs in unit=\"" + HPWH.Name + "\"." );
+						ErrorsFound = true;
+					}
+					if ( FanOutletNodeNum != HPWH.FanOutletNode ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+						ShowContinueError( "Heat pump water heater fan outlet node name does not match next connected component." );
+						if ( FanOutletNodeNum != 0 ) {
+							ShowContinueError( "Fan outlet node name = " + DataLoopNode::NodeID( FanOutletNodeNum ) );
+						}
+						if ( HPWH.FanOutletNode != 0 ) {
+							ShowContinueError( "Expected fan outlet node name = " + DataLoopNode::NodeID( HPWH.FanOutletNode ) );
+						}
+						ErrorsFound = true;
+					}
+
+					errFlag = false;
+					int FanInletNodeNum = GetFanInletNode( HPWH.FanType, HPWH.FanName, errFlag );
+					if ( errFlag ) {
+						ShowContinueError( "...occurs in unit=\"" + HPWH.Name + "\"." );
+						ErrorsFound = true;
+					}
+					int HPWHFanInletNodeNum( 0 );
+					if ( HPWH.InletAirMixerNode != 0 ) {
+						HPWHFanInletNodeNum = HPWH.InletAirMixerNode;
+					} else {
+						if( HPWH.InletAirConfiguration == AmbientTempOutsideAir ) {
+							HPWHFanInletNodeNum = HPWH.OutsideAirNode;
+						} else {
+							HPWHFanInletNodeNum = HPWH.HeatPumpAirInletNode;
+						}
+					}
+					if ( HPWH.FanPlacement == BlowThru ) {
+						if ( FanInletNodeNum != HPWHFanInletNodeNum ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+							ShowContinueError( "Heat pump water heater fan inlet node name does not match previous connected component." );
+							if ( FanOutletNodeNum != 0 ) {
+								ShowContinueError( "Fan inlet node name = " + DataLoopNode::NodeID( FanInletNodeNum ) );
+							}
+							if ( HPWH.FanOutletNode != 0 ) {
+								ShowContinueError( "Expected fan inlet node name = " + DataLoopNode::NodeID( HPWHFanInletNodeNum ) );
+							}
+							ErrorsFound = true;
+						}
+					}
+
+					int DXCoilAirOutletNodeNum( 0 );
+					if ( ( HPWH.DXCoilNum > 0 ) && ( bIsVScoil ) ) {
+						DXCoilAirOutletNodeNum = GetCoilOutletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+					} else if ( HPWH.DXCoilNum > 0 ) {
+						DXCoilAirOutletNodeNum = DXCoil( HPWH.DXCoilNum ).AirOutNode;
+					}
+					if ( HPWH.FanPlacement == DrawThru ) {
+						if ( FanInletNodeNum != DXCoilAirOutletNodeNum ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+							ShowContinueError( "Heat pump water heater fan inlet node name does not match previous connected component." );
+							if ( FanInletNodeNum != 0 ) {
+								ShowContinueError( "Fan inlet node name = " + DataLoopNode::NodeID( FanInletNodeNum ) );
+							}
+							if ( DXCoilAirOutletNodeNum != 0 ) {
+								ShowContinueError( "Expected fan inlet node name = " + DataLoopNode::NodeID( DXCoilAirOutletNodeNum ) );
+							}
+							ErrorsFound = true;
+						}
+					} else if ( HPWH.FanPlacement == BlowThru ) {
+						int HPWHCoilOutletNodeNum( 0 );
+						if ( HPWH.OutletAirSplitterNode != 0 ) {
+							HPWHCoilOutletNodeNum = HPWH.OutletAirSplitterNode;
+						} else {
+							if( HPWH.InletAirConfiguration == AmbientTempOutsideAir ) {
+								HPWHCoilOutletNodeNum = HPWH.ExhaustAirNode;
+							} else {
+								HPWHCoilOutletNodeNum = HPWH.HeatPumpAirOutletNode;
+							}
+						}
+						if ( DXCoilAirOutletNodeNum != HPWHCoilOutletNodeNum ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+							ShowContinueError( "Heat pump water heater coil outlet node name does not match next connected component." );
+							if( DXCoilAirOutletNodeNum != 0 ) {
+								ShowContinueError( "Coil outlet node name = " + DataLoopNode::NodeID( DXCoilAirOutletNodeNum ) );
+							}
+							if( HPWHCoilOutletNodeNum != 0 ) {
+								ShowContinueError( "Expected coil outlet node name = " + DataLoopNode::NodeID( HPWHCoilOutletNodeNum ) );
+							}
+							ErrorsFound = true;
+						}
+					}
+
 					// set the max mass flow rate for outdoor fans
-					Node( HPWH.FanOutletNode ).MassFlowRateMax = HPWH.OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
+					if ( HPWH.FanOutletNode > 0 ) Node( HPWH.FanOutletNode ).MassFlowRateMax = HPWH.OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 
 					if ( HPWH.FanPlacement == BlowThru ) {
 						if ( HPWH.InletAirMixerNode > 0 ) {
@@ -2023,10 +2158,6 @@ namespace WaterThermalTanks {
 					HPWH.ControlSensor2Weight = 1.0 - HPWH.ControlSensor1Weight;
 
 				} // DO HPWaterHeaterNum = 1, NumHeatPumpWaterHeater
-
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
-				}
 
 			} //IF (NumHeatPumpWaterHeater > 0) THEN
 
@@ -2369,11 +2500,15 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).UseEffectiveness = 1.0; // Default for stand-alone mode
 					}
 
-					if ( ( rNumericArgs( 19 ) > 1 ) || ( rNumericArgs( 19 ) < 0 ) ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
-						ErrorsFound = true;
+					if ( NumNums > 18 ) {
+						if ( ( rNumericArgs( 19 ) > 1 ) || ( rNumericArgs( 19 ) <= 0 ) ) {
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
+							ErrorsFound = true;
+						}
+						WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 19 );
+					} else {
+						WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = 1.0;
 					}
-					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 19 );
 
 					// If no plant nodes are connected, simulate in stand-alone mode.
 					if ( cAlphaArgs( 14 ).empty() && cAlphaArgs( 15 ).empty() && cAlphaArgs( 16 ).empty() && cAlphaArgs( 17 ).empty() ) {
@@ -2458,10 +2593,6 @@ namespace WaterThermalTanks {
 					}
 
 				} // WaterThermalTankNum
-
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
-				}
 
 			}
 
@@ -2862,6 +2993,10 @@ namespace WaterThermalTanks {
 					}
 
 					if ( NumNums > 25 ) {
+						if ( ( rNumericArgs( 26 ) > 1 ) || ( rNumericArgs( 26 ) <= 0 ) ) {
+							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
+							ErrorsFound = true;
+						}
 						WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 26 );
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = 1.0;
@@ -3008,10 +3143,6 @@ namespace WaterThermalTanks {
 
 				} // WaterThermalTankNum
 
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
-				}
-
 			}
 
 			//!!=======   Get Chilled Water :MIXED ===================================================================================
@@ -3148,8 +3279,8 @@ namespace WaterThermalTanks {
 					}
 					WaterThermalTank( WaterThermalTankNum ).UseEffectiveness = rNumericArgs( 6 );
 
-					if ( ( rNumericArgs( 8 ) > 1 ) || ( rNumericArgs( 8 ) < 0 ) ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (0 to 1)" );
+					if ( ( rNumericArgs( 8 ) > 1 ) || ( rNumericArgs( 8 ) <= 0 ) ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
 						ErrorsFound = true;
 					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 8 );
@@ -3226,10 +3357,6 @@ namespace WaterThermalTanks {
 					}
 
 				} // WaterThermalTankNum
-
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
-				}
 
 			}
 
@@ -3409,6 +3536,10 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					}
 
+					if ( ( rNumericArgs( 13 ) > 1 ) || ( rNumericArgs( 13 ) <= 0 ) ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Source Side Effectiveness is out of bounds (>0 to 1)" );
+						ErrorsFound = true;
+					}
 					WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness = rNumericArgs( 13 );
 
 					WaterThermalTank( WaterThermalTankNum ).SourceInletHeight = rNumericArgs( 14 );
@@ -3529,10 +3660,6 @@ namespace WaterThermalTanks {
 					SetupStratifiedNodes( WaterThermalTankNum );
 
 				} // WaterThermalTankNum
-
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
-				}
 
 			}
 			//!  end stratified chilled water storage
@@ -3887,10 +4014,6 @@ namespace WaterThermalTanks {
 
 				} // DO HPWaterHeaterNum = 1, NumHeatPumpWaterHeater
 
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
-				}
-
 			}
 
 			// Get water heater sizing input.
@@ -4033,10 +4156,6 @@ namespace WaterThermalTanks {
 					} //found water heater num okay
 				} // loop over sizing objects
 
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
-				}
-
 			} // any water heater sizing objects
 
 			//now check that if water heater fields were autosized, that there was also a sizing object for that water heater
@@ -4057,9 +4176,6 @@ namespace WaterThermalTanks {
 					}
 				}
 
-				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in water heater input. Preceding condition causes termination." );
-				}
 			}
 
 			//!   now do calls to TestCompSet for tanks, depending on nodes and heat pump water heater
@@ -4216,10 +4332,6 @@ namespace WaterThermalTanks {
 							}
 						}
 
-						if ( ErrorsFound ) {
-							ShowFatalError( "Errors found in getting water heater input. Preceding condition causes termination." );
-						}
-
 					} else if ( ( WaterThermalTank( WaterThermalTankNum ).TypeNum == MixedChilledWaterStorage ) || ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedChilledWaterStorage ) ) {
 						// CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
 						SetupOutputVariable( "Chilled Water Thermal Storage Tank Temperature [C]", WaterThermalTank( WaterThermalTankNum ).TankTempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
@@ -4265,9 +4377,6 @@ namespace WaterThermalTanks {
 							}
 						}
 
-						if ( ErrorsFound ) {
-							ShowFatalError( "Errors found in getting chilled water tank input. Preceding condition causes termination." );
-						}
 					}
 
 					// set up internal gains if tank is in a thermal zone
@@ -4796,13 +4905,7 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).StandAlone ) {
 				SizeStandAloneWaterHeater( WaterThermalTankNum );
 			}
-
-			CalcStandardRatings( WaterThermalTankNum );
 			SetLoopIndexFlag( WaterThermalTankNum ) = false;
-		}
-
-		if ( WaterThermalTank( WaterThermalTankNum ).StandAlone && ( ! AlreadyRated( WaterThermalTankNum ) ) ) {
-			CalcStandardRatings( WaterThermalTankNum );
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag( WaterThermalTankNum ) && ! SetLoopIndexFlag( WaterThermalTankNum ) ) {
@@ -5134,10 +5237,10 @@ namespace WaterThermalTanks {
 				//     autosize info must be calculated in GetWaterThermalTankInputFlag for use in StandardRating procedure
 				//       (called at end of GetWaterThermalTankInputFlag)
 				//     report autosizing information here (must be done after GetWaterThermalTankInputFlag is complete)
-				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized ) {
+				if ( HPWaterHeater( HPNum ).WaterFlowRateAutoSized && ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Condenser water flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingWaterFlowRate );
 				}
-				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized ) {
+				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized && ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
 				}
 				DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
@@ -5145,7 +5248,7 @@ namespace WaterThermalTanks {
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = DataNonZoneNonAirloopValue;
 				}
-				MyHPSizeFlag( HPNum ) = false;
+				if ( PlantFirstSizesOkayToReport || !AnyPlantInModel || AlreadyRated( WaterThermalTankNum ) ) MyHPSizeFlag( HPNum ) = false;
 			}
 
 			HPAirInletNode = HPWaterHeater( HPNum ).HeatPumpAirInletNode;
@@ -5320,6 +5423,17 @@ namespace WaterThermalTanks {
 			}
 
 		} //  IF(WaterThermalTank(WaterThermalTankNum)%HeatPumpNum .GT. 0)THEN
+
+		// calling CalcStandardRatings early bypasses fan sizing since DataNonZoneNonAirloopValue has not been set yet
+		if ( !AlreadyRated( WaterThermalTankNum ) ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) {
+				AlreadyRated( WaterThermalTankNum ) = true;
+			} else {
+				if ( !AnyPlantInModel || PlantFirstSizesOkayToReport || WaterThermalTank( WaterThermalTankNum ).MaxCapacity > 0.0 || WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
+					CalcStandardRatings( WaterThermalTankNum );
+				}
+			}
+		}
 
 	}
 
@@ -10123,6 +10237,7 @@ namespace WaterThermalTanks {
 					MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( WaterThermalTank( WaterThermalTankNum ).TankTemp );
 					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat );
 
+					// ?? why is HPWH condenser inlet node temp reset inside the for loop? shouldn't it chnage with the tank temp throughout these iterations?
 					if ( HPWaterHeater(HPNum).TypeNum == TypeOf_HeatPumpWtrHeaterPumped ){
 						// set the condenser inlet node mass flow rate and temperature
 						Node( HPWaterHeater( HPNum ).CondWaterInletNode ).MassFlowRate = MdotWater;
@@ -10194,13 +10309,23 @@ namespace WaterThermalTanks {
 						bIsVSCoil = false;
 						//       simulate the HPWH coil/fan to find heating capacity
 						if (HPWaterHeater(HPNum).FanPlacement == BlowThru) {
+							if( FirstTimeFlag ) { // first time DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and reset water inlet temp. If already sized, no harm.
+								SimulateFanComponents( HPWaterHeater( HPNum ).FanName, true, HPWaterHeater( HPNum ).FanNum );
+								SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+								Node( HPWaterHeater( HPNum ).CondWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+							}
+							// ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy. PLR=1 here.
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
-							//         CALL SimDXCoil(HPWaterHeater(HPNum)%DXCoilName, CompOp,  .TRUE.,PartLoadRatio, HPWaterHeater(HPNum)%DXCoilNum,FanOpMode)
 							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
 							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
 						} else {
-							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
+							if( FirstTimeFlag ) { // first time DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and reset water inlet temp. If already sized, no harm.
+								SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
+								Node( HPWaterHeater( HPNum ).CondWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+							}
+							// ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy. PLR=1 here.
+							SimDXCoil( HPWaterHeater( HPNum ).DXCoilName, 1, true, HPWaterHeater( HPNum ).DXCoilNum, CycFanCycCoil, 1.0 );
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
 							SimDXCoil(HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, CycFanCycCoil, 1.0);
 							SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);

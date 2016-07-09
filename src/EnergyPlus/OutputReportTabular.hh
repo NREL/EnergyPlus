@@ -182,6 +182,9 @@ namespace OutputReportTabular {
 	extern bool displayAdaptiveComfort;
 	extern bool displaySourceEnergyEndUseSummary;
 	extern bool displayZoneComponentLoadSummary;
+	extern bool displayLifeCycleCostReport;
+	extern bool displayTariffReport;
+	extern bool displayEconomicResultSummary;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -237,6 +240,8 @@ namespace OutputReportTabular {
 	extern Real64 gatherElecSurplusSold;
 	extern int meterNumElecStorage;
 	extern Real64 gatherElecStorage;
+	extern int meterNumPowerConversion;
+	extern Real64 gatherPowerConversion;
 	// for on site thermal source components on BEPS report
 	extern int meterNumWaterHeatRecovery;
 	extern Real64 gatherWaterHeatRecovery;
@@ -649,7 +654,7 @@ namespace OutputReportTabular {
 
 
 	void
-	GetInputTabularPredefined();
+	GetInputOutputTableSummaryReports();
 
 	bool
 	isCompLoadRepReq();
@@ -952,6 +957,13 @@ namespace OutputReportTabular {
 		std::string const & stringInWithSI,
 		int & unitConvIndex,
 		std::string & stringOutWithIP
+	);
+
+	void
+	LookupJtokWH(
+		std::string const & stringInWithJ,
+		int & unitConvIndex,
+		std::string & stringOutWithKWH
 	);
 
 	Real64

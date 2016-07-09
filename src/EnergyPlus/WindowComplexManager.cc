@@ -3770,6 +3770,7 @@ namespace WindowComplexManager {
 				NetIRHeatGainGlass = ShadeArea * ( emis( 2 * ngllayer ) * TauShIR / ShGlReflFacIR ) * ( sigma * pow_4( theta( 2 * ngllayer ) ) - rmir );
 				ConvHeatGainFrZoneSideOfShade = ShadeArea * hcin * ( theta( nglfacep ) - tind );
 				WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatFlowNatural + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
+				WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 				// store components for reporting
 				WinGainConvGlazShadGapToZoneRep( SurfNum ) = ConvHeatFlowNatural; // result is in [W]
 				WinGainConvShadeToZoneRep( SurfNum ) = ConvHeatGainFrZoneSideOfShade;
@@ -3781,6 +3782,7 @@ namespace WindowComplexManager {
 				NetIRHeatGainGlass = Surface( SurfNum ).Area * emis( 2 * nlayer ) * ( sigma * pow_4( theta( 2 * nlayer ) ) - rmir );
 				ConvHeatGainFrZoneSideOfGlass = Surface( SurfNum ).Area * hcin * ( theta( 2 * nlayer ) - tind );
 				WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
+				WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 				// store components for reporting
 				WinGainConvGlazToZoneRep( SurfNum ) = ConvHeatGainFrZoneSideOfGlass;
 				WinGainIRGlazToZoneRep( SurfNum ) = NetIRHeatGainGlass;
@@ -3823,6 +3825,7 @@ namespace WindowComplexManager {
 					if ( SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_IndoorAir ) {
 						SurfaceWindow( SurfNum ).ConvHeatGainToZoneAir = ConvHeatGainToZoneAir;
 						WinHeatGain( SurfNum ) += ConvHeatGainToZoneAir;
+						WinHeatTransfer( SurfNum ) += ConvHeatGainToZoneAir;
 					} else {
 						SurfaceWindow( SurfNum ).RetHeatGainToZoneAir = ConvHeatGainToZoneAir;
 					}
@@ -3851,6 +3854,7 @@ namespace WindowComplexManager {
 			//                             Construct(ConstrNumSh)%TransDiff)
 			//END IF
 			WinHeatGain( SurfNum ) -= QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
+			WinHeatTransfer( SurfNum ) -= QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
 			WinLossSWZoneToOutWinRep( SurfNum ) = QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
 
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn ) {

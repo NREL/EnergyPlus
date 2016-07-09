@@ -198,6 +198,21 @@ namespace PurchasedAirManager {
 
 	// Functions
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitPurchasedAirMyOneTimeFlag( true );
+		bool InitPurchasedAirZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		Array1D_bool InitPurchasedAirMyEnvrnFlag;
+		Array1D_bool InitPurchasedAirMySizeFlag;
+		Array1D_bool InitPurchasedAirOneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
+
+	}
+
+
 	void
 	SimPurchasedAir(
 		std::string const & PurchAirName,
@@ -831,12 +846,7 @@ namespace PurchasedAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static Array1D_bool MyEnvrnFlag;
-		static Array1D_bool MySizeFlag;
-		static Array1D_bool OneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
 		//      LOGICAL :: ErrorsFound = .FALSE.   ! If errors detected in input
 		bool UnitOn; // simple checks for error
 		bool CoolOn; // simple checks for error
@@ -847,21 +857,21 @@ namespace PurchasedAirManager {
 		bool UseReturnNode; // simple checks for error
 
 		// Do the Begin Simulation initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitPurchasedAirMyOneTimeFlag ) {
 
-			MyEnvrnFlag.allocate( NumPurchAir );
-			MySizeFlag.allocate( NumPurchAir );
-			OneTimeUnitInitsDone.allocate( NumPurchAir );
-			MyEnvrnFlag = true;
-			MySizeFlag = true;
-			OneTimeUnitInitsDone = false;
-			MyOneTimeFlag = false;
+			InitPurchasedAirMyEnvrnFlag.allocate( NumPurchAir );
+			InitPurchasedAirMySizeFlag.allocate( NumPurchAir );
+			InitPurchasedAirOneTimeUnitInitsDone.allocate( NumPurchAir );
+			InitPurchasedAirMyEnvrnFlag = true;
+			InitPurchasedAirMySizeFlag = true;
+			InitPurchasedAirOneTimeUnitInitsDone = false;
+			InitPurchasedAirMyOneTimeFlag = false;
 
 		}
 
 		// need to check all units to see if they are on Zone Equipment List or issue warning
-		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
-			ZoneEquipmentListChecked = true;
+		if ( !InitPurchasedAirZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
+			InitPurchasedAirZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumPurchAir; ++Loop ) {
 				if ( CheckZoneEquipmentList( PurchAir( Loop ).cObjectName, PurchAir( Loop ).Name ) ) continue;
 				ShowSevereError( "InitPurchasedAir: " + PurchAir( Loop ).cObjectName + " = " + PurchAir( Loop ).Name + " is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
@@ -869,8 +879,8 @@ namespace PurchasedAirManager {
 		}
 
 		// one time inits for each unit - links PurchAirNum with static input data from ControlledZoneNum and ActualZoneNum
-		if ( ! OneTimeUnitInitsDone( PurchAirNum ) ) {
-			OneTimeUnitInitsDone( PurchAirNum ) = true;
+		if ( !InitPurchasedAirOneTimeUnitInitsDone( PurchAirNum ) ) {
+			InitPurchasedAirOneTimeUnitInitsDone( PurchAirNum ) = true;
 
 			// Is the supply node really a zone inlet node?
 			// this check has to be done here because of SimPurchasedAir passing in ControlledZoneNum
@@ -924,15 +934,15 @@ namespace PurchasedAirManager {
 			}
 		}
 
-		if ( ! SysSizingCalc && MySizeFlag( PurchAirNum ) ) {
+		if ( !SysSizingCalc && InitPurchasedAirMySizeFlag( PurchAirNum ) ) {
 
 			SizePurchasedAir( PurchAirNum );
 
-			MySizeFlag( PurchAirNum ) = false;
+			InitPurchasedAirMySizeFlag( PurchAirNum ) = false;
 		}
 
 		// Do the Begin Environment initializations
-		if ( BeginEnvrnFlag && MyEnvrnFlag( PurchAirNum ) ) {
+		if ( BeginEnvrnFlag && InitPurchasedAirMyEnvrnFlag( PurchAirNum ) ) {
 
 			if ( ( PurchAir( PurchAirNum ).HeatingLimit == LimitFlowRate ) || ( PurchAir( PurchAirNum ).HeatingLimit == LimitFlowRateAndCapacity ) ) {
 				PurchAir( PurchAirNum ).MaxHeatMassFlowRate = StdRhoAir * PurchAir( PurchAirNum ).MaxHeatVolFlowRate;
@@ -944,11 +954,11 @@ namespace PurchasedAirManager {
 			} else {
 				PurchAir( PurchAirNum ).MaxCoolMassFlowRate = 0.0;
 			}
-			MyEnvrnFlag( PurchAirNum ) = false;
+			InitPurchasedAirMyEnvrnFlag( PurchAirNum ) = false;
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( PurchAirNum ) = true;
+			InitPurchasedAirMyEnvrnFlag( PurchAirNum ) = true;
 		}
 
 		// These initializations are done every iteration
@@ -2905,8 +2915,16 @@ namespace PurchasedAirManager {
 	clear_state()
 	{
 		NumPurchAir = 0;
+		GetPurchAirInputFlag = true;
+		CheckEquipName.deallocate();
 		PurchAir.deallocate();
 		PurchAirNumericFields.deallocate();
+		// from anonymous namespace
+		InitPurchasedAirMyOneTimeFlag = true ;
+		InitPurchasedAirZoneEquipmentListChecked =  false ; // True after the Zone Equipment List has been checked for items
+		InitPurchasedAirMyEnvrnFlag.deallocate();
+		InitPurchasedAirMySizeFlag.deallocate();
+		InitPurchasedAirOneTimeUnitInitsDone.deallocate(); // True if one-time inits for PurchAirNum are completed
 	}
 
 } // PurchasedAirManager

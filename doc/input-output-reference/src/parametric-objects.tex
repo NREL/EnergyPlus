@@ -1,0 +1,399 @@
+\chapter{Parametric Objects}\label{parametric-objects}
+
+\section{Group -- Parametrics}\label{group-parametrics}
+
+In order to assess a group of alternatives, the Parametric objects can be used in a single file as an alternative of maintaining a group of files with small differences. Updating portions of the multiple files that do not change between permutations becomes tedious and error prone and may lead to incorrect conclusions concerning the energy savings of specific measures. The ParametricPreprocessor.exe program (described in the AuxiliaryPrograms document) interprets the following objects in a single file and creates the group of files automatically. The objects in the group are:
+
+\begin{itemize}
+\item
+  Parametric:SetValueForRun
+\item
+  Parametric:Logic
+\item
+  Parametric:RunControl
+\item
+  Parametric:FileNameSuffix
+\end{itemize}
+
+A simple example of part of an IDF file is shown below:
+
+\begin{lstlisting}
+
+  Parametric:SetValueForRun,
+      $insDepth,                  !- Parameter Name
+      0.0508,                     !- Value 1
+      0.0762,                     !- Value 2
+      0.1016,                     !- Value 3
+      0.1270;                     !- Value 4
+
+
+    Material,
+      IN1,                     !- Name
+      VeryRough,               !- Roughness
+      = $insDepth,              !- Thickness {m}
+      2.3000000E-02,           !- Conductivity {W/m-K}
+      24.00000,                !- Density {kg/m3}
+      1590.000,                !- Specific Heat {J/kg-K}
+      0.9000000,               !- Thermal Absorptance
+      0.5000000,               !- Solar Absorptance
+      0.5000000;               !- Visible Absorptance
+\end{lstlisting}
+
+In this example, the parameter \$insDepth is used in the Material object to describe the thickness of the material, in this case insulation.~ For the first simulation, \$insDepth is set to 0.0508 (2 inches) shown as the first value in the Parametric:SetValueForRun object. This value is then substituted in where ever the \$insDepth is shown in the file, in this example, in the Material object. The simulation would use this first value and produce a set of results based on this insulation thickness. The second simulation would use the second value of the Parametric:SetValueForRun object of 0.0762 (3 inches) for the thickness of the insulation described in the Material object. This would then be simulated with a second set of results. This would be repeated a third time with 0.1015 (4 inches) and 0.1270 (5 inches) of insulation.
+
+A new IDF file is created for each of these simulations and is named the original name of the file plus either a number or a user defined suffix (if Parametric:FileNameSuffix is used). Looking at how these created IDF files show the substituted values can help understand problems that may occur.
+
+The `` = \$insDepth'' is a simple substation but could also be a more complex expression involving operators and predefined functions such as
+
+~ = \$insDepth * 1.1 + 0.0004 * SQRT(12)
+
+Many sets of simulations can be defined just using different Parametric:SetValueForRun objects but for more advanced sets of parametric runs, the Parametric:Logic object can be used to perform additional calculations, logical operations, and to exclude entire objects in the file. The Parametric:RunControl allows individual runs to be performed or not. The Parametric:FileNameSuffix object controls the naming of the resulting sets of output files.
+
+\subsection{Expressions}\label{expressions}
+
+Expressions can occur anywhere in the IDF file as a field value if the expression begins with an equals sign ( = ) and can also occur in assignment statements in the Parametric:Logic object. The operators include: +, -, *, /, \^{} (exponent), \&\& (and), \textbar{}\textbar{} (or), = = , \textgreater{}, \textless{}, \textless{} = , \textgreater{} = ,~ \textless{}\textgreater{}, and //. These are computed using standard operator precedence rules. The parenthesis are used to execute sub-expressions with higher precedence. Some built in functions, such as ABS, ACOS, ASIN, ATAN, COS, EXP, INT, LEN, LOG, MOD, NOT, SIN, SQRT, TAN are supported in expressions. Theses built in functions all take a single argument.
+
+\subsection{Processing Order}\label{processing-order}
+
+The order that the parameters are processed is important to understand their values. Like other objects in EnergyPlus, the order that they occur in the file is not important.~ The order of evaluation is:
+
+1)~~~~Parameter values are based on Parametric:SetValueForRun
+
+2)~~~~All lines of the Parametric:Logic object are evaluated
+
+3)~~~~All embedded expressions in the file are evaluated
+
+\subsection{Parametric:SetValueForRun}\label{parametricsetvalueforrun}
+
+The core parametric object is Parametric:SetValueForRun which sets the parameters value to different values depending on which run is being simulated.
+
+For example
+
+\begin{lstlisting}
+
+Parametric:SetValueForRun
+    $ConstructionToUse,  !- Parameter Name
+    TiltUpConcreteWall,  !- Value for run 1
+    BlockWall,           !- Value for run 2
+    SteelFrameWall,      !- Value for run 3
+    WoodFrameWall;       !- Value for run 4
+
+
+  Parametric:SetValueForRun
+    $WallRValue,           !- Parameter Name
+    5,                     !- Value for run 1
+    8,                     !- Value for run 2
+    11,                    !- Value for run 3
+    17;                    !- Value for run 4
+\end{lstlisting}
+
+Using Parametric:SetValueForRun, the value is set based on the which run number is currently being simulated. Multiple objects can be used and a set of parameter values would be defined for a given simulation. For example, the 3rd simulation would assign the ``Value 3'' value, 11, to the parameter \$WallRValue and the ``Value 3'' value, ``SteelFrameWall'' to \$ConstructionToUse. Since many Parametric:SetValueForRun objects can be used at once, all of the~ 3rd values would be assigned to the appropriate parameters. In IDF Editor, this object will appear as a table of values with each row being all the parameter values for a specific simulation and each column belonging to a specific parameter.
+
+\subsubsection{Inputs}\label{inputs-030}
+
+\paragraph{Field: Parameter Name}\label{field-parameter-name}
+
+The name of the parameter. It must begin with the dollar sign character, and the second character must be a letter. The parameter name, unlike a typical EnergyPlus name, cannot contain spaces or any characters other than letters and numerals.
+
+\paragraph{Field: Value for run n}\label{field-value-for-run-n}
+
+The value that should be substituted for the parameter on the n-th simulation. If multiple Parametric:SetValueForRun objects exist and they have different number of fields, the last field value will be used for the remaining field values. This means that to set all values the same, only the first value needed to be entered.
+
+\subsection{Parametric:Logic}\label{parametriclogic}
+
+The approach of using parameters and expressions, by itself, is very flexible and allows for many possible parametric simulations but it does not allow for objects to be included for some parametric cases and not others. For example, you might want an overhang on a window in some parametric runs and not others. The Parametric:Logic object can help in that scenario.
+
+A single Parametric:Logic object is allowed per file. It has a freeform syntax including IF and SELECT blocks with each field in the object representing a single ``line'' of code. Essentially, this logic object looks like simple programming code.
+
+\begin{lstlisting}
+
+Parametric:Logic,
+    Main,                            !- name
+    IF $insDepth < 0.1,              !- parametric logic line 1
+       DISABLE “MaterialWallBoard”,  !- parametric logic line 2
+       DISABLE “MaterialExtFinish”,  !- parametric logic line 3
+    ENDIF;                           !- parametric logic line 4
+\end{lstlisting}
+
+In addition, lines could contain assignment statements in the form of
+
+parameter~ = expression such as the second control line in the following example.
+
+\begin{lstlisting}
+
+Parametric:Logic,
+    Main,                              !- name
+    PARAMETER $THICKNESS,              !- parametric logic line 1
+    $THICKNESS = 0.01 * $CMDEPTH,      !- parametric logic line 2
+    IF $THICKNESS > 0.5,               !- parametric logic line 3
+       DISABLE “MaterialWallBoard”,    !- parametric logic line 4
+       DISABLE “MaterialExtFinish”,    !- parametric logic line 5
+    ENDIF;                             !- parametric logic line 6
+\end{lstlisting}
+
+The statements include PARAMETER, IF, ELSE, ELSEIF, ENDIF, SELECT, CASE, DEFAULT, ENDSELECT, ENABLE, DISABLE, and REMARK. Nested IF and SELECT statements are allowed.~ All objects are enabled until they are specifically disabled using the DISABLE statement and could be later re-enabled with ENABLE. An object that is named with the DISABLE statement would not appear in that simulation run.
+
+The PARAMETER statement declares the name of the parameter. It is necessary that every parameter used in the Parametric:Logic object be initialized using the PARAMETER statement unless the parametes are created using the Parametric:SetValueForRun object. Requiring explicit parameter declaration reduces errors in software programming. Parameter names would not be case sensitive.
+
+The DISABLE and ENABLE commands can have one or two arguments. If a second argument is present it is the kind of object.
+
+\begin{lstlisting}
+DISABLE “MaterialWallBoard” “Material”,    !- parametric control line 4
+\end{lstlisting}
+
+The following sections describe each type of statement in more detail.
+
+\subsubsection{Inputs}\label{inputs-1-027}
+
+\paragraph{IF ENDIF Block}\label{if-endif-block}
+
+As previously shown, the simplest IF block is in the form of
+
+\begin{lstlisting}
+
+IF <conditional-expression>
+    <true-block-of-statements>
+  ENDIF
+\end{lstlisting}
+
+The \textless{}conditional-expression\textgreater{} usually contains a logical comparison operator such as:
+
+\begin{itemize}
+\item
+  ~ = = equal
+\item
+  ~ \textgreater{} greater than
+\item
+  ~ \textless{} less than
+\item
+  ~ \textless{} = less than or equal to
+\item
+  ~ \textgreater{} = greater than or equal to
+\item
+  ~ \textless{}\textgreater{} not equal to
+\end{itemize}
+
+The \textless{}true-block-of-statements\textgreater{} can contain other statements including other lines of IF and ENDIF. These statement are only executed when the \textless{}conditional-expression\textgreater{} evaluates to true. If the \textless{}conditional-expression\textgreater{} is false, none of the statements before the ENDIF are executed and instead execution begins again with the statement after the ENDIF statement.
+
+\paragraph{IF ELSE~ ENDIF Block}\label{if-else-endif-block}
+
+Another form of the IF block can contain the ELSE statement:
+
+\begin{lstlisting}
+
+IF <conditional-expression>
+    <true-block-of-statements>
+  ELSE
+    <false-block-of-statements>
+  ENDIF
+\end{lstlisting}
+
+Like the simpler IF ENDIF form the \textless{}conditional-expression\textgreater{} is computed and the \textless{}true-block-of-statements\textgreater{} are executed if it is true. The additional feature of this form is that if the \textless{}conditional-expression\textgreater{} is false, the \textless{}false-block-of-statements\textgreater{} is executed instead of the \textless{}true-block-of-statements\textgreater{}.
+
+\paragraph{IF ELSEIF ELSE ENDIF Block}\label{if-elseif-else-endif-block}
+
+The most complex form of the IF block contains both ELSEIF statement (or statements)~ and the ELSE statement:
+
+\begin{lstlisting}
+
+IF <conditional-expression-1>
+    <true-block-of-statements-1>
+  ELSEIF <conditional-expression-2>
+    <true-block-of-statements-2>
+  ELSEIF <conditional-expression-2>
+    <true-block-of-statements-2>
+  ELSE
+    <false-block-of-statements>
+  ENDIF
+\end{lstlisting}
+
+This form allows more complex logic to be expressed. If the \textless{}conditional-expression-1\textgreater{} is true then \textless{}true-block-of-statements-1\textgreater{} executed and when that is complete, execution resumes after the ENDIF statement. If \textless{}conditional-expression-1\textgreater{} is false then the ELSEIF \textless{}conditional-expression-2\textgreater{} is evaluated and if that is true then \textless{}true-block-of-statement-2\textgreater{} is executed. On the other hand, if \textless{}conditional-expression-2\textgreater{} is~ false, then the next ELSEIF conditional expression is evaluated following the same patter if another ELSEIF is present, otherwise, the \textless{}false-block-of-statements\textgreater{} after the ELSE are executed. Another way of thinking of this block is that the conditional expressions are evaluated from the top to the bottom until one is found to be true and then the associated block of statements are executed. If none of the conditional expressions is true, the \textless{}false-block-of-statements\textgreater{} are executed.
+
+\paragraph{SELECT CASE DEFAULT ENDSELECT Block}\label{select-case-default-endselect-block}
+
+The SELECT block is related to the IF block but is for the specific case of trying to match a variable with several specific values. The form of the SELECT block is:
+
+\begin{lstlisting}
+
+SELECT <expression>
+  CASE <constant-1>
+    <case-block-of-statements-1>
+  CASE <constant-2>
+    <case-block-of-statements-2>
+  CASE <constant-3>
+    <case-block-of-statements-3>
+  DEFAULT
+    <default-block-of-statements>
+  ENDSELECT
+\end{lstlisting}
+
+With any number of CASE statements. The \textless{}expression\textgreater{} is evaluated and compared to the constants with each CASE statement. If a match is found the corresponding \textless{}case-block-of-statements\textgreater{} are executed otherwise if no match if found the \textless{}default-block-of-statements\textgreater{} is excecuted. One one matching CASE statement for each SELECT block is executed. An example of how this works is shown below:
+
+\begin{lstlisting}
+
+Parametric:SetValueForRun,
+    $EndMonth,
+    2;
+
+
+  Parametric:Logic,
+    Main2,
+    PARAMETER $EndDay,
+    SELECT $EndMonth,
+     CASE 1,
+      $EndDay = 31,
+     CASE 2,
+      $EndDay = 28,
+     CASE 3,
+      $EndDay = 31,
+     CASE 4,
+      $EndDay = 30,
+     CASE 5,
+      $EndDay = 31,
+     CASE 6,
+      $EndDay = 30,
+     CASE 7,
+      $EndDay = 31,
+     CASE 8,
+      $EndDay = 31,
+     CASE 9,
+      $EndDay = 30,
+     CASE 10,
+      $EndDay = 31,
+     CASE 11,
+      $EndDay = 30,
+     CASE 12,
+      $EndDay = 31,
+     DEFAULT,
+      $EndDay = 30,
+     ENDSELECT;
+\end{lstlisting}
+
+With this example the \$EndDay value would be set to 28.
+
+\paragraph{ENABLE DISABLE}\label{enable-disable}
+
+The ENABLE and DISABLE statements specifically are for removing (and not removing) other objects that appear in the EnergyPlus IDF file. It has two syntaxes:
+
+\begin{lstlisting}
+
+DISABLE <objectname>
+\end{lstlisting}
+
+and
+
+\begin{lstlisting}
+
+DISABLE <objectname>, <kind-of-object>
+\end{lstlisting}
+
+The DISABLE statement removes the object identified with either \textless{}objectname\textgreater{} or the combination of \textless{}objectname\textgreater{} and \textless{}kind-of-object\textgreater{} if the \textless{}objectname\textgreater{} is not unique in the EnergyPlus input file. By default, all objects are enabled in the input file. Objects need to be specifically disabled using the DISABLE statement. After an object is disabled in can later be re-enabled with the ENABLE statement which has similar syntax.
+
+\begin{lstlisting}
+
+DISABLE <objectname>
+\end{lstlisting}
+
+and
+
+\begin{lstlisting}
+
+DISABLE <objectname>, <kind-of-object>
+\end{lstlisting}
+
+\begin{lstlisting}
+
+  Parametric:Logic,
+      Main,
+      DISABLE  "SOUTH WALL OVERHANG";
+
+
+    Shading:Zone:Detailed,
+      SOUTH WALL OVERHANG,     !- Name
+      ZONE SURFACE SOUTH,      !- Base Surface Name
+      SCH 2,                   !- Transmittance Schedule Name
+      4,                       !- Number of Vertices
+      0.0,-1.0,3.0,  !- X,Y,Z = = > Vertex 1 {m}
+      0.0,0.0,3.0,  !- X,Y,Z = = > Vertex 2 {m}
+      4.0,0.0,3.0,  !- X,Y,Z = = > Vertex 3 {m}
+      4.0,-1.0,3.0;  !- X,Y,Z = = > Vertex 4 {m}
+\end{lstlisting}
+
+An object that is named with the DISABLE statement would not appear in that simulation run.
+
+\paragraph{REMARK}\label{remark}
+
+The REMARK statement is simply a way to include a comment in the Parametric:Logic fields. The text that follows the REMARK statement is ignored.
+
+\paragraph{OBJECT DEFINITION}\label{object-definition}
+
+The definition of the Parametric:Logic object is shown below:
+
+\paragraph{Field: Name}\label{field-name-029}
+
+The name of the Parametric:Logic object.
+
+\paragraph{Field: Parametric Logic Line n}\label{field-parametric-logic-line-n}
+
+The line that contains one statement in one of the following forms:
+
+\begin{itemize}
+\item
+  \textless{}parameter\textgreater{} = \textless{}expression\textgreater{}
+\item
+  PARAMETER \textless{}parameter\textgreater{}
+\item
+  IF \textless{}expression\textgreater{}
+\item
+  ELSEIF \textless{}expression\textgreater{}
+\item
+  ELSE
+\item
+  ENDIF
+\item
+  SELECT \textless{}expression\textgreater{}
+\item
+  CASE \textless{}constant\textgreater{}
+\item
+  DEFAULT
+\item
+  ENDSELECT
+\item
+  ENABLE \textless{}constant\textgreater{}
+\item
+  ENABLE \textless{}constant\textgreater{} \textless{}constant\textgreater{}
+\item
+  DISABLE \textless{}constant\textgreater{}
+\item
+  DISABLE \textless{}constant\textgreater{} \textless{}constant\textgreater{}
+\item
+  REMARK \textless{}text to ignore\textgreater{}
+\end{itemize}
+
+\subsection{Parametric:RunControl}\label{parametricruncontrol}
+
+The following Parametric:RunControl object controls which runs are simulated. The series of entries indicate if the run should be performed or not. This object is optional and if it is not included all runs are performed.
+
+\subsubsection{Inputs}\label{inputs-2-025}
+
+\paragraph{Field: Name}\label{field-name-1-026}
+
+The name of the optional Parametric:RunControl object.
+
+\paragraph{Field: Perform run n}\label{field-perform-run-n}
+
+The value of the field can be either a yes or no.~ It cannot contain a parameter.
+
+\subsection{Parametric:FileNameSuffix}\label{parametricfilenamesuffix}
+
+The file name of the IDF files that are created for each run and the output files for each run are based on the name of the file plus a ``suffix''. The suffixes can be defined using the Parametric:FileNameSuffix object or if the object is missing will default to the run number.
+
+\subsubsection{Inputs}\label{inputs-3-023}
+
+\paragraph{Field: Name}\label{field-name-2-024}
+
+The name of the optional Parametric:FileNameSuffix object.
+
+\paragraph{Field: Suffix for file name in run n}\label{field-suffix-for-file-name-in-run-n}
+
+The value of the field is added to the IDF file name to create the resulting IDF file and output files.~ It cannot contain a parameter.

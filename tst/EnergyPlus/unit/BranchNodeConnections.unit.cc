@@ -75,6 +75,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -100,6 +101,17 @@ using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
+	TEST_F( EnergyPlusFixture, BranchNodeErrorCheck_SingleNode ) {
+		bool errFlag = false;
+		RegisterNodeConnection( 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag );
+		bool ErrorsFound = false;
+
+		CheckNodeConnections( ErrorsFound );
+
+		EXPECT_FALSE( errFlag ); //Node should register without error
+		EXPECT_FALSE( ErrorsFound ); //Node check should not fail on Check 10 -- zone node name must be unique
+	}
+
 	TEST_F( EnergyPlusFixture, BranchNodeErrorCheck11Test ) {
 		bool errFlag = false; 
 		RegisterNodeConnection(1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
@@ -118,6 +130,7 @@ namespace EnergyPlus {
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 		EXPECT_TRUE( ErrorsFound ); //Node check will fail on Check 11 -- zone node name must be unique
 	}
+
 	TEST_F( EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure )
 	{
 		// AUTHOR: R. Raustad, FSEC
@@ -1109,6 +1122,7 @@ namespace EnergyPlus {
 		GetProjectData( );
 		OutputReportPredefined::SetPredefinedTables( );
 		SetPreConstructionInputParameters( ); //establish array bounds for constructions early
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput( );
 		BeginSimFlag = true;
 		BeginEnvrnFlag = true;
@@ -2112,6 +2126,7 @@ namespace EnergyPlus {
 		GetProjectData( );
 		OutputReportPredefined::SetPredefinedTables( );
 		SetPreConstructionInputParameters( ); //establish array bounds for constructions early
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput( );
 		BeginSimFlag = true;
 		BeginEnvrnFlag = true;

@@ -700,7 +700,7 @@ namespace SingleDuct {
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
-			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction []", Sys( SysNum ).ZoneMinAirFrac, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction []", Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
 			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]", Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of Sys Loop
@@ -1140,6 +1140,7 @@ namespace SingleDuct {
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
+			SetupOutputVariable( "Zone Air Terminal Minimum Air Flow Fraction []", Sys( SysNum ).ZoneMinAirFracReport, "System", "Average", Sys( SysNum ).SysName );
 			SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]", Sys( SysNum ).OutdoorAirFlowRate, "System", "Average", Sys( SysNum ).SysName );
 
 		} // end Number of Sys Loop
@@ -1999,8 +2000,13 @@ namespace SingleDuct {
 		// apply limit based on min stop
 		MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac ) );
 		if ( IsAutoSize ) {
-			Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
-			ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
+			if( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
+				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
+			} else {
+				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = 0.0;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]", 0.0 );
+			}
 		} else { // Hard size with sizing data
 			if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat > 0.0 && MaxAirVolFlowRateDuringReheatDes > 0.0 ) {
 				MaxAirVolFlowRateDuringReheatUser = Sys( SysNum ).MaxAirVolFlowRateDuringReheat;
@@ -2398,7 +2404,7 @@ namespace SingleDuct {
 		// the massflow rate for cooling is determined to meet the entire load.  Then
 		// if the massflow is below the minimum or greater than the Max it is set to either the Min
 		// or the Max as specified for the VAV model.
-		if ( ( QTotLoad < 0.0 ) && ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( TempControlType( ZoneNum ) != SingleHeatingSetPoint ) ) {
+		if ( ( QTotLoad < 0.0 ) && ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( TempControlType( ZoneNum ) != SingleHeatingSetPoint ) && ( GetCurrentScheduleValue( Sys( SysNum ).SchedPtr ) > 0.0 ) ) {
 			// Calculate the flow required for cooling
 			CpAirSysIn = PsyCpAirFnWTdb( SysInlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirTemp );
 			DeltaTemp = CpAirSysIn * SysInlet( SysNum ).AirTemp - CpAirZn * ZoneTemp;
@@ -2436,7 +2442,7 @@ namespace SingleDuct {
 				}
 			}
 
-		} else if ( ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( QTotLoad >= 0.0 || TempControlType( ZoneNum ) == SingleHeatingSetPoint ) ) {
+		} else if ( ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( QTotLoad >= 0.0 || TempControlType( ZoneNum ) == SingleHeatingSetPoint ) && ( GetCurrentScheduleValue( Sys( SysNum ).SchedPtr ) > 0.0 ) ) {
 			//     IF (Sys(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. SysInlet(SysNum)%AirMassFlowRateMinAvail <= SmallMassFlow) THEN
 			// special case for heating: reverse action and damper allowed to close - set the minimum flow rate to a small but nonzero value
 			//       MassFlow = 0.01d0*SysInlet(SysNum)%AirMassFlowRateMaxAvail
@@ -2502,10 +2508,13 @@ namespace SingleDuct {
 
 		if ( MassFlow == 0.0 ) {
 			Sys( SysNum ).DamperPosition = 0.0;
+			Sys( SysNum ).ZoneMinAirFracReport = 0.0;
 		} else if ( ( MassFlow > 0.0 ) && ( MassFlow < Sys( SysNum ).AirMassFlowRateMax ) ) {
 			Sys( SysNum ).DamperPosition = MassFlow / Sys( SysNum ).AirMassFlowRateMax;
+			Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 		} else if ( MassFlow == Sys( SysNum ).AirMassFlowRateMax ) {
 			Sys( SysNum ).DamperPosition = 1.0;
+			Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 		}
 
 		//Need to make sure that the damper outlets are passed to the coil inlet
@@ -2648,10 +2657,13 @@ namespace SingleDuct {
 				// Recalculate the Damper Position.
 				if ( MassFlow == 0.0 ) {
 					Sys( SysNum ).DamperPosition = 0.0;
+					Sys( SysNum ).ZoneMinAirFracReport = 0.0;
 				} else if ( ( MassFlow > 0.0 ) && ( MassFlow < Sys( SysNum ).AirMassFlowRateMax ) ) {
 					Sys( SysNum ).DamperPosition = MassFlow / Sys( SysNum ).AirMassFlowRateMax;
+					Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 				} else if ( MassFlow == Sys( SysNum ).AirMassFlowRateMax ) {
 					Sys( SysNum ).DamperPosition = 1.0;
+					Sys( SysNum ).ZoneMinAirFracReport = Sys( SysNum ).ZoneMinAirFrac;
 				}
 
 			} else if ( SELECT_CASE_var == HCoilType_SteamAirHeating ) { // ! COIL:STEAM:AIRHEATING

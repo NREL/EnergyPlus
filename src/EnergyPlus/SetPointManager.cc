@@ -529,6 +529,22 @@ namespace SetPointManager {
 	void
 	GetSetPointManagerInputs()
 	{
+		// wrapper for GetInput to allow unit testing when fatal inputs are detected
+		static bool ErrorsFound( false );
+		static std::string const RoutineName( "GetSetPointManagerInputs: " ); // include trailing blank space
+
+		GetSetPointManagerInputData( ErrorsFound );
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+		}
+
+	}
+
+	void
+	GetSetPointManagerInputData( 
+		bool & ErrorsFound )
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
@@ -617,7 +633,6 @@ namespace SetPointManager {
 		int ZoneNum; // loop index for zone nodes
 		int NumNodes;
 		Array1D_int NodeNums;
-		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool NodeListError( false );
@@ -1585,17 +1600,25 @@ namespace SetPointManager {
 
 			Found = FindNumberInList( MixedAirSetPtMgr( SetPtMgrNum ).RefNode, MixedAirSetPtMgr( SetPtMgrNum ).CtrlNodes, MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes );
 			if ( Found > 0 ) {
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 				if ( MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes > 1 ) {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as one of the nodes in SetPoint NodeList" );
 				} else {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as the SetPoint Node" );
 				}
 				ShowContinueError( "Reference Node Name=\"" + NodeID( MixedAirSetPtMgr( SetPtMgrNum ).RefNode ) + "\"." );
+				ErrorsFound = true;
 			}
 
 			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs;
+
+			if ( NumAlphas > 7 ) {
+				MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilInNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilOutNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				if ( NumNums == 1 ) {
+					MixedAirSetPtMgr( SetPtMgrNum ).MinCoolCoilOutTemp = rNumericArgs( 1 );
+				}
+			}
 
 			if ( ! NodeListError ) {
 				AllSetPtMgr( AllSetPtMgrNum ).CtrlNodes.allocate( NumNodesCtrld );
@@ -1696,14 +1719,14 @@ namespace SetPointManager {
 
 			Found = FindNumberInList( OAPretreatSetPtMgr( SetPtMgrNum ).RefNode, OAPretreatSetPtMgr( SetPtMgrNum ).CtrlNodes, OAPretreatSetPtMgr( SetPtMgrNum ).NumCtrlNodes );
 			if ( Found > 0 ) {
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 				if ( OAPretreatSetPtMgr( SetPtMgrNum ).NumCtrlNodes > 1 ) {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as one of the nodes in SetPoint NodeList" );
 				} else {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", reference node." );
 					ShowContinueError( "..Reference Node is the same as the SetPoint Node" );
 				}
 				ShowContinueError( "Reference Node Name=\"" + NodeID( OAPretreatSetPtMgr( SetPtMgrNum ).RefNode ) + "\"." );
+				ErrorsFound = true;
 			}
 
 			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs + NumMixedAirSetPtMgrs;
@@ -2650,10 +2673,6 @@ namespace SetPointManager {
 
 		}
 
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
-		}
-
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
 			SetupOutputVariable( "Setpoint Manager Warmest Temperature Critical Zone Number []", WarmestSetPtMgrTempFlow( SetPtMgrNum ).CritZoneNum, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
 			SetupOutputVariable( "Setpoint Manager Warmest Temperature Turndown Flow Fraction []", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Turndown, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
@@ -3052,10 +3071,6 @@ namespace SetPointManager {
 		cNumericFieldNames.deallocate();
 		rNumericArgs.deallocate();
 		lNumericFieldBlanks.deallocate();
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
-		}
 
 	}
 
@@ -5312,10 +5327,19 @@ namespace SetPointManager {
 		int FanInNode; // supply fan inlet node number
 		int FanOutNode; // supply fan outlet node number
 		int RefNode; // setpoint reference node number
+		int CoolCoilInNode; // Cooling coil inlet node number
+		int CoolCoilOutNode; // Cooling coil outlet node number
+		Real64 MinTemp; // Minimum temperature at cooling coil outlet node
+		Real64 dtFan; // Temperature difference across a fan
+		Real64 dtCoolCoil; // Temperature difference across a coolig coil
 
 		FanInNode = this->FanInNode;
 		FanOutNode = this->FanOutNode;
 		RefNode = this->RefNode;
+		CoolCoilInNode = this->CoolCoilInNode;
+		CoolCoilOutNode = this->CoolCoilOutNode;
+		MinTemp = this->MinCoolCoilOutTemp;
+		this->FreezeCheckEnable = false;
 
 		if ( ! SysSizingCalc && this->MySetPointCheckFlag ) {
 
@@ -5342,6 +5366,22 @@ namespace SetPointManager {
 		}
 
 		this->SetPt = Node( RefNode ).TempSetPoint - ( Node( FanOutNode ).Temp - Node( FanInNode ).Temp );
+		if ( CoolCoilInNode > 0 && CoolCoilOutNode > 0 ) {
+			dtFan = Node( FanOutNode ).Temp - Node( FanInNode ).Temp;
+			dtCoolCoil = Node( CoolCoilInNode ).Temp - Node( CoolCoilOutNode ).Temp;
+			if ( dtCoolCoil > 0.0 && MinTemp > OutDryBulbTemp ) {
+				this->FreezeCheckEnable = true;
+				if ( Node( RefNode ).Temp == Node( CoolCoilOutNode ).Temp ) { // blow through
+					this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) - dtFan + dtCoolCoil;
+				} else { // draw through
+					if ( RefNode != CoolCoilOutNode ) { // Ref node is outlet node
+						this->SetPt = max( Node( RefNode ).TempSetPoint - dtFan, MinTemp ) + dtCoolCoil;
+					} else {
+						this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) + dtCoolCoil;
+					}
+				}
+			}
+		}
 
 	}
 
@@ -8298,6 +8338,117 @@ namespace SetPointManager {
 		Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( NumSchTESSetPtMgrs ).SetPt;
 
 	}   // end of SetUpNewScheduledTESSetPtMgr
+
+	bool
+	GetCoilFreezingCheckFlag( int const MixedAirSPMNum )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Nov. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Get freezing check status
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		bool FeezigCheckFlag;
+
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CtrldNodeNum;
+
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs( );
+			GetInputFlag = false;
+		}
+
+		FeezigCheckFlag = false;
+
+		for ( CtrldNodeNum = 1; CtrldNodeNum <= MixedAirSetPtMgr( MixedAirSPMNum ).NumCtrlNodes; ++CtrldNodeNum ) {
+			if ( MixedAirSetPtMgr( MixedAirSPMNum ).FreezeCheckEnable ) {
+				FeezigCheckFlag = true;
+				break;
+			}
+		}
+
+		return FeezigCheckFlag;
+	}  // End of GetCoilFreezingCheckFlag
+
+	int
+	GetMixedAirNumWithCoilFreezingCheck( int const MixedAirNode )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Nov. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Loop over all the MixedAir setpoint Managers to find coil freezing check flag
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		int MixedAirSPMNum;
+
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int SetPtMgrNum;
+		int CtrldNodeNum;
+
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs( );
+			GetInputFlag = false;
+		}
+
+		MixedAirSPMNum = 0;
+
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum ) {
+
+			for ( CtrldNodeNum = 1; CtrldNodeNum <= MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrldNodeNum ) {
+				if ( MixedAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrldNodeNum ) == MixedAirNode ) {
+					if ( MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilInNode > 0 && MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilOutNode > 0 ) {
+						MixedAirSPMNum = CtrldNodeNum;
+						break;
+					}
+				}
+			}
+		}
+
+		return MixedAirSPMNum;
+	}  // End of GetMixedAirNumWithCoilFreezingCheck(
+
 
 } // SetPointManager
 

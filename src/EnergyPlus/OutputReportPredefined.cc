@@ -2242,6 +2242,22 @@ namespace OutputReportPredefined {
 		tableEntry( numTableEntry ).indexColumn = columnIndex;
 	}
 
+	std::string
+	RetrievePreDefTableEntry(
+		int const columnIndex,
+		std::string const & objName
+		)
+	{
+		for ( int iTableEntry = 1; iTableEntry <= numTableEntry; ++iTableEntry ) {
+			if ( tableEntry( iTableEntry ).indexColumn == columnIndex && tableEntry( iTableEntry ).objectName == objName ){
+				return trimmed( left_justified(tableEntry( iTableEntry ).charEntry) );
+				break;
+			}
+		}
+		return "NOT FOUND";
+	}
+
+
 	void
 	incrementTableEntry()
 	{

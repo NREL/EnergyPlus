@@ -139,6 +139,17 @@ namespace CrossVentMgr {
 	Real64 const CrecFlow1( 0.415 ); // First correlation constant for the recirculation flow rate
 	Real64 const CrecFlow2( 0.466 ); // Second correlation constant for the recirculation flow rate
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this module should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitUCSDCV_MyOneTimeFlag( true );
+		Array1D_bool InitUCSDCV_MyEnvrnFlag;
+	}
+
+
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Functions
@@ -238,22 +249,19 @@ namespace CrossVentMgr {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static bool MyOneTimeFlag( true );
-		static Array1D_bool MyEnvrnFlag;
-
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.dimension( NumOfZones, true );
-			MyOneTimeFlag = false;
+		if ( InitUCSDCV_MyOneTimeFlag ) {
+			InitUCSDCV_MyEnvrnFlag.dimension( NumOfZones, true );
+			InitUCSDCV_MyOneTimeFlag = false;
 		}
 
 		// Do the begin environment initializations
-		if ( BeginEnvrnFlag && MyEnvrnFlag( ZoneNum ) ) {
-			MyEnvrnFlag( ZoneNum ) = false;
+		if ( BeginEnvrnFlag && InitUCSDCV_MyEnvrnFlag( ZoneNum ) ) {
+			InitUCSDCV_MyEnvrnFlag( ZoneNum ) = false;
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( ZoneNum ) = true;
+			InitUCSDCV_MyEnvrnFlag( ZoneNum ) = true;
 		}
 
 	}
@@ -487,8 +495,6 @@ namespace CrossVentMgr {
 		int Ctd; // counter
 		int Ctd2; // counter
 		int OPtr; // counter
-		static Real64 Aroom; // Room area cross section
-		static Real64 Wroom; // Room width
 		Real64 Uin; // Inflow air velocity [m/s]
 		Real64 CosPhi; // Angle (in degrees) between the wind and the outward normal of the dominant surface
 		Real64 SurfNorm; // Outward normal of surface
@@ -503,10 +509,10 @@ namespace CrossVentMgr {
 		Real64 ZZ_Wall;
 		Real64 ActiveSurfNum;
 		int NSides; // Number of sides in surface
-		static int CompNum( 0 ); // AirflowNetwork Component number
-		static int TypeNum( 0 ); // Airflownetwork Type Number within a component
-		static int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
-		static int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
+		Real64 Wroom; // Room width
+		Real64 Aroom; // Room area cross section
+		int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
+		int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 
 		RecInflowRatio( ZoneNum ) = 0.0;
 
@@ -569,11 +575,10 @@ namespace CrossVentMgr {
 
 		// Calculate the opening area for all apertures
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
-			CompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
-			TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
-			if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_DOP ) {
+			int cCompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
+			if ( AirflowNetworkCompData( cCompNum ).CompTypeNum == CompTypeNum_DOP ) {
 				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height * MultizoneSurfaceData( Ctd ).OpenFactor;
-			} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) {
+			} else if ( AirflowNetworkCompData( cCompNum ).CompTypeNum == CompTypeNum_SCR ) {
 				CVJetRecFlows( Ctd, ZoneNum ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height;
 			} else {
 				ShowSevereError( "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model" );
@@ -760,7 +765,8 @@ namespace CrossVentMgr {
 			}
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
 			if ( CVJetRecFlows( Ctd, ZoneNum ).Uin != 0 ) {
-				CVJetRecFlows( Ctd, ZoneNum ).Vjet = CVJetRecFlows( Ctd, ZoneNum ).Uin * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) * 6.3 * std::log( Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ) ) / Dstar( ZoneNum );
+				Real64 dstarexp = max( Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ), 1.0 );
+				CVJetRecFlows( Ctd, ZoneNum ).Vjet = CVJetRecFlows( Ctd, ZoneNum ).Uin * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) * 6.3 * std::log( dstarexp ) / Dstar( ZoneNum );
 				CVJetRecFlows( Ctd, ZoneNum ).Yjet = Cjet1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Cjet2;
 				CVJetRecFlows( Ctd, ZoneNum ).Yrec = Crec1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area / Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + Crec2;
 				CVJetRecFlows( Ctd, ZoneNum ).YQrec = CrecFlow1 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area * Aroom ) * CVJetRecFlows( Ctd, ZoneNum ).Vjet / CVJetRecFlows( Ctd, ZoneNum ).Uin + CrecFlow2;
@@ -1013,6 +1019,19 @@ namespace CrossVentMgr {
 		}
 		//============================================================================================================
 
+	}
+
+	// Clears the global data in MixedAir.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		HAT_J =  0.0 ;
+		HA_J =  0.0 ;
+		HAT_R = 0.0 ;
+		HA_R = 0.0 ;
+		InitUCSDCV_MyOneTimeFlag =  true ;
+		InitUCSDCV_MyEnvrnFlag.deallocate();
 	}
 
 } // CrossVentMgr

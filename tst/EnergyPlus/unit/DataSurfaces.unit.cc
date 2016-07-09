@@ -210,7 +210,7 @@ TEST( SurfaceTest, Plane )
 		SurfaceData s;
 		s.Vertex.dimension( 3 );
 		s.Vertex = { Vector(1,1,1), Vector(-1,1,0), Vector(2,0,3) };
-		s.Shape = Triangle;
+		s.Shape = SurfaceShape::Triangle;
 		s.set_computed_geometry();
 
 		EXPECT_DOUBLE_EQ( -1.0, s.plane.x );
@@ -222,7 +222,7 @@ TEST( SurfaceTest, Plane )
 		SurfaceData s;
 		s.Vertex.dimension( 3 );
 		s.Vertex = { Vector(2,1,-1), Vector(0,-2,0), Vector(1,-1,2) };
-		s.Shape = Triangle;
+		s.Shape = SurfaceShape::Triangle;
 		s.set_computed_geometry();
 
 		EXPECT_DOUBLE_EQ( -7.0, s.plane.x );
@@ -239,7 +239,7 @@ TEST( SurfaceTest, Surface2D )
 		SurfaceData s;
 		s.Vertex.dimension( 4 );
 		s.Vertex = { Vector(0,0,0), Vector(1,0,0), Vector(1,1,0), Vector(0,1,0) };
-		s.Shape = Rectangle;
+		s.Shape = SurfaceShape::Rectangle;
 		s.set_computed_geometry();
 
 		Surface2D const & s2d( s.surface2d );
