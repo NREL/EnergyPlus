@@ -325,7 +325,13 @@ namespace Fans {
 			MinTempLimitSchedNum( 0 ),
 			BalancedFractSchedNum( 0 ),
 			UnbalancedOutletMassFlowRate( 0.0 ),
-			BalancedOutletMassFlowRate( 0.0 )
+			BalancedOutletMassFlowRate( 0.0 ),
+			FanInletVsNodeFlowNotMatchingIter( 0 ),
+			FanOutletVsNodeFlowNotMatchingIter( 0 ),
+			FanInletVsFanOutletFlowNotMatchingIter( 0 ),
+			FanInletVsNodeFlowNotMatchingIndex( 0 ),
+			FanOutletVsNodeFlowNotMatchingIndex( 0 ),
+			FanInletVsFanOutletFlowNotMatchingIndex( 0 )
 		{}
 
 	};
