@@ -14263,7 +14263,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 114;
+		UnitConvSize = 115;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14379,6 +14379,7 @@ Label900: ;
 		UnitConv( 112 ).siName = "RAD";
 		UnitConv( 113 ).siName = "REV/MIN";
 		UnitConv( 114 ).siName = "NM";
+		UnitConv( 115 ).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14494,6 +14495,7 @@ Label900: ;
 		UnitConv( 112 ).ipName = "rad";
 		UnitConv( 113 ).ipName = "rev/min";
 		UnitConv( 114 ).ipName = "lbf-ft";
+		UnitConv( 115 ).ipName = "Btu/W-h";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14609,6 +14611,7 @@ Label900: ;
 		UnitConv( 112 ).mult = 1.0;
 		UnitConv( 113 ).mult = 1.0;
 		UnitConv( 114 ).mult = 0.737562149277;
+		UnitConv( 115 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14831,8 +14834,8 @@ Label900: ;
 
 		unitConvIndex = selectedConv;
 
-		// Add warning if units not found. Exclude stirngs without square brackets, or Rating metrics that are inheirently IP (e.g. SEER, IEER, EER, IPLV)
-		if (unitConvIndex == 0 && ! noBrackets && unitSIOnly != "BTU/W-H") {
+		// Add warning if units not found.
+		if (unitConvIndex == 0 && ! noBrackets) {
 			ShowWarningError("Unable to find a unit conversion from " + stringInWithSI + " into IP units");
 			ShowContinueError("Applying default conversion factor of 1.0");
 		}
@@ -14914,7 +14917,7 @@ Label900: ;
 		} else if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
 			ConvertIP = ( SIvalue * UnitConv( unitConvIndex ).mult ) + UnitConv( unitConvIndex ).offset;
 		} else {
-			ConvertIP = 0.0;
+			ConvertIP = SIvalue;
 		}
 		return ConvertIP;
 	}
@@ -14963,10 +14966,12 @@ Label900: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
 
-		if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
+		if ( unitConvIndex == 0 ) {
+			ConvertIPdelta = SIvalue;
+		} else if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
 			ConvertIPdelta = SIvalue * UnitConv( unitConvIndex ).mult;
 		} else {
-			ConvertIPdelta = 0.0;
+			ConvertIPdelta = SIvalue;
 		}
 		return ConvertIPdelta;
 	}
@@ -15085,7 +15090,9 @@ Label900: ;
 		if ( found != 0 ) {
 			getSpecificUnitMultiplier = UnitConv( found ).mult;
 		} else {
-			getSpecificUnitMultiplier = 0.0;
+			ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+			ShowContinueError("Applying default conversion factor of 1.0");
+			getSpecificUnitMultiplier = 1.0;
 		}
 		return getSpecificUnitMultiplier;
 	}
@@ -15142,7 +15149,9 @@ Label900: ;
 		if ( mult != 0 ) {
 			getSpecificUnitDivider = 1 / mult;
 		} else {
-			getSpecificUnitDivider = 0.0;
+			ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+			ShowContinueError("Applying default conversion factor of 1.0");
+			getSpecificUnitDivider = 1.0;
 		}
 		return getSpecificUnitDivider;
 	}
