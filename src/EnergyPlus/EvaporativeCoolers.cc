@@ -3753,6 +3753,7 @@ namespace EvaporativeCoolers {
 		using DataSizing::AutoSize;
 		using DataEnvironment::StdRhoAir;
 		using Fans::GetFanVolFlow;
+		using General::TrimSigDigits;
 
 		// Locals
 		static Array1D_bool MySizeFlag;
@@ -3813,9 +3814,21 @@ namespace EvaporativeCoolers {
 
 		if ( MyFanFlag( UnitNum ) ) {
 			if ( ZoneEvapUnit( UnitNum ).ActualFanVolFlowRate != AutoSize ) {
+
+				if ( ZoneEvapUnit( UnitNum ).ActualFanVolFlowRate < ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate ) {
+					ShowSevereError( "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit( UnitNum ).Name );
+					ShowContinueError( "...unit fan volumetric flow rate less than evaporative cooler unit design supply air flow rate." );
+					ShowContinueError( "...fan volumetric flow rate = " + TrimSigDigits( ZoneEvapUnit( UnitNum ).ActualFanVolFlowRate, 5 ) + " m3/s." );
+					ShowContinueError( "...evap cooler unit volumetric flow rate = " + TrimSigDigits( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate, 5 ) + " m3/s." );
+					ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate = ZoneEvapUnit( UnitNum ).ActualFanVolFlowRate;
+					ShowContinueError( "...evaporative cooler unit design supply air flow rate will match fan flow rate and simulation continues." );
+					MyEnvrnFlag( UnitNum ) = true; // re-initialize to set mass flow rate and max mass flow rate
+				}
+
 				if ( ZoneEvapUnit( UnitNum ).ActualFanVolFlowRate > 0.0 ) {
 					ZoneEvapUnit( UnitNum ).DesignFanSpeedRatio = ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate / ZoneEvapUnit( UnitNum ).ActualFanVolFlowRate;
 				}
+
 				MyFanFlag( UnitNum ) = false;
 			} else {
 				GetFanVolFlow( ZoneEvapUnit( UnitNum ).FanIndex, ZoneEvapUnit( UnitNum ).ActualFanVolFlowRate );
