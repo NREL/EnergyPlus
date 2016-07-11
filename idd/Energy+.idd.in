@@ -61795,12 +61795,16 @@ Chiller:CombustionTurbine,
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
-  N50; \field Condenser Heat Recovery Relative Capacity Fraction
+  N50, \field Condenser Heat Recovery Relative Capacity Fraction
        \note This optional field is the fraction of total rejected heat that can be recovered at full load.
        \note Also used to autosize Design Heat Recovery Water Flow Rate as a fraction of Design Condenser Water Flow Rate.
        \type real
        \minimum 0.0
-       \maximum 1.0  
+       \maximum 1.0
+  N51; \field Turbine Engine Efficiency
+       \note This optional field is the nominal turbine engine efficiency and is used when Gas Turbine Engine Capacity is set to Autosize
+       \default 0.35
+       \type real
 
 ChillerHeater:Absorption:DirectFired,
   \min-fields 35
@@ -62231,27 +62235,27 @@ HeatPump:WaterToWater:EquationFit:Heating,
    A5,  \field Load Side Outlet Node Name
         \required-field
         \type node
-   N1,  \field Rated Load Side Flow Rate
+   N1,  \field Reference Load Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
         \autosizable
-   N2,  \field Rated Source Side Flow Rate
+   N2,  \field Reference Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
         \autosizable
-   N3,  \field Rated Heating Capacity
+   N3,  \field Reference Heating Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
         \autosizable
-   N4,  \field Rated Heating Power Consumption
+   N4,  \field Reference Heating Power Consumption
         \required-field
         \type real
         \minimum> 0.0
@@ -62287,11 +62291,12 @@ HeatPump:WaterToWater:EquationFit:Heating,
    N14, \field Heating Compressor Power Coefficient 5
         \required-field
         \type real
-   N15, \field Nominal Coefficient of Performance
-        \note This optional field is used to autosize Rated Heating Power Consumption
-        \note COP = Rated Heating Capacity / Rated Heating Power Consumption
+   N15, \field Reference Coefficient of Performance
+        \note This optional field is used to autosize Reference Heating Power Consumption
+        \note COP = Reference Heating Capacity / Reference Heating Power Consumption
         \type real
         \minimum> 0.0
+        \default 7.5
    N16; \field  Sizing Factor
         \note Multiplies the autosized capacity and flow rates
         \type real
@@ -62315,27 +62320,27 @@ HeatPump:WaterToWater:EquationFit:Cooling,
    A5,  \field Load Side Outlet Node Name
         \required-field
         \type node
-   N1,  \field Rated Load Side Flow Rate
+   N1,  \field Reference Load Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
         \autosizable
-   N2,  \field Rated Source Side Flow Rate
+   N2,  \field Reference Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
         \autosizable
-   N3,  \field Rated Cooling Capacity
+   N3,  \field Reference Cooling Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
         \autosizable
-   N4,  \field Rated Cooling Power Consumption
+   N4,  \field Reference Cooling Power Consumption
         \required-field
         \type real
         \minimum> 0.0
@@ -62371,11 +62376,12 @@ HeatPump:WaterToWater:EquationFit:Cooling,
    N14, \field Cooling Compressor Power Coefficient 5
         \required-field
         \type real
-   N15, \field Nominal Coefficient of Performance
-        \note This optional field is used to autosize Rated Cooling Power Consumption
+   N15, \field Reference Coefficient of Performance
+        \note This optional field is used to autosize Reference Cooling Power Consumption
         \note COP = Rated Cooling Capacity / Rated Cooling Power Consumption
         \type real
         \minimum> 0.0
+        \default 8.0
    N16; \field  Sizing Factor
         \note Multiplies the autosized capacity and flow rates
         \type real

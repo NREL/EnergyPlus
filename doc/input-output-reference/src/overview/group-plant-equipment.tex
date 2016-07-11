@@ -2771,7 +2771,7 @@ This numeric field contains the second (exponential) coefficient for the overall
 
 \paragraph{Field: Gas Turbine Engine Capacity}\label{field-gas-turbine-engine-capacity}
 
-This numeric field contains the capacity of the gas turbine engine in watts.
+This numeric field contains the capacity of the gas turbine engine in watts.  This field is autosizable.  When autosized the field below called Turbine Engine Effciency can be used to scale the resulting size. 
 
 \paragraph{Field: Maximum Exhaust Flow per Unit of Power Output}\label{field-maximum-exhaust-flow-per-unit-of-power-output-1-000}
 
@@ -2832,6 +2832,10 @@ This alpha field contains the name of the basin heater operating schedule. This 
 \paragraph{Field: Condenser Heat Recovery Relative Capacity Fraction}\label{field-heat-recovery-fraction}
 
 This field is optional. It can be used to describe the physical size of the heat recovery portion of a split bundle condenser section. This fraction describes the relative capacity of the heat recovery bundle of a split condenser compared to the nominal, full load heat rejection rate of the chiller. This fraction will be applied to the full heat rejection when operating at nominal capacity and nominal COP to model a capacity limit for the heat rejection. If this field is not entered then the capacity fraction is set to 1.0.
+
+\paragraph{Field: Turbine Engine Efficiency}\label{field-engine-efficiency}
+
+This field is optional.  It can be used to scale the size of Gas Turbine Engine Capacity.  the default is 0.35.
 
 An example of this statement in an IDF is:
 
@@ -4455,7 +4459,7 @@ Five fields are used to decribe the coefficients for the Cooling Compressor Powe
 
 \paragraph{Field: Nominal Coefficient of Performance}\label{field-cooling-nom-COP}
 
-This field is required if the Design Cooling Power Consumption is set to autosize.  The nominal COP is defined by the Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and is non-dimensional.  This field is only used for sizing; if the Design Cooling Power Consumption is set to a fixed value then COP of the component during simulation will be determined by the ratio of Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and not by the value in this field.
+This field is required if the Design Cooling Power Consumption is set to autosize.  The nominal COP is defined by the Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and is non-dimensional.  This field is only used for sizing; if the Design Cooling Power Consumption is set to a fixed value then COP of the component during simulation will be determined by the ratio of Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and not by the value in this field. This COP does not include power for fluid circulation pumps, it is just the heat pump itself.
 
 \paragraph{Field: Sizing Factor}\label{field-cooling-siz-fac}
 

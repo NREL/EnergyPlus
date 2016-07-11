@@ -4,6 +4,8 @@ Plant Equipment Autosizing Gaps
 **B. Griffith, Energy Archmage Company, for SEI/TRANE**
 
  - first draft 6/20/2016
+ - second draft 7/5/2016, with changes from review.
+ - third draft 7/11/2016, add new input field for turbine eff
  
  ## Justification for New Feature ##
  
@@ -11,7 +13,7 @@ Plant Equipment Autosizing Gaps
  
  ## E-mail and  Conference Call Conclusions ##
  
- N/A
+ Discussed and approved during sizing subgroup conference call on 6-22-2016.  Use "Reference" instead of "Rated" to rename fields in heat pump objects.  
  
  ## Overview ##
  
@@ -37,6 +39,8 @@ The project will not modify the simulation models beyond sizing calculations.  I
  
 Calculations for the design heat recovery flow rate for the two chillers will be added to their respective sizing routines.  A new input field will be added to each to allow scaling the flow rate and capacity of heat recovery section relative to the condenser, as is already being done for other chillers.  
 
+The combustion turbine chiller will add a new field for turbine efficiency for scalable Gas Turbine Engine Capacity when autosizing. 
+
 The equation fit water to water heat pumps will be modified to add a new sizing routine to calculate sizes for the four main design values, flow rates.  New input for a nominal COP will be added to scale design power from design capacity, because the models as formulated have no input for efficiency, effectiveness, COP, etc.  New Sizing factor fields will be added to scale each component as a fraction of the overall loop sizing result.
 
 The implementation will follow current code practice in the affected modules; no significant refactoring is planned.
@@ -51,39 +55,40 @@ Draft I/O ref changes have been made in the document source file called "group-p
 
 ###HeatPump:WaterToWater:EquationFit:Cooling
 
-####1.22.16.1.6 Field: Design Load Side Flow Rate
+####1.22.16.1.6 Field: Reference Load Side Flow Rate
 This numeric field contains the design volume flow rate on the load side of the heat pump in
 m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This
 field is autosizable.
 
-####1.22.16.1.7 Field: Design Source Side Flow Rate
+####1.22.16.1.7 Field: Reference Source Side Flow Rate
 This numeric field contains the design volume flow rate on the source side of the heat pump in
 m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This
 field is autosizable.
 
-####1.22.16.1.8 Field: Design Cooling Capacity
+####1.22.16.1.8 Field: Reference Cooling Capacity
 This numeric field contains the design cooling capacity of the heat pump in W. This corresponds
 to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
-####1.22.16.1.9 Field: Design Cooling Power Consumption
+
+####1.22.16.1.9 Field: Reference Cooling Power Consumption
 
 This numeric field is the design electric power consumption for cooling, in W. This corresponds
 to the electic power use at the Design Cooling Capacity. This field is autosizable. When autosized,
-the field called Nominal Coefficient of Performance must be used.
+the field called Reference Coefficient of Performance must be used.
 
-####1.22.16.1.12 Field: Nominal Coefficient of Performance
-This field is required if the Design Cooling Power Consumption is set to autosize. The nominal
-COP is defined by the Design Cooling Capacity divided by the corresponding Design Cooling Power
-Consumption and is non-dimensional. This field is only used for sizing; if the Design Cooling
+####1.22.16.1.12 Field: Reference Coefficient of Performance
+This field is required if the Reference Cooling Power Consumption is set to autosize. The nominal
+COP is defined by the Reference Cooling Capacity divided by the corresponding Reference Cooling Power
+Consumption and is non-dimensional. This field is only used for sizing; if the Reference Cooling
 Power Consumption is set to a fixed value then COP of the component during simulation will be
-determined by the ratio of Design Cooling Capacity divided by the corresponding Design Cooling
+determined by the ratio of Reference Cooling Capacity divided by the corresponding Reference Cooling
 Power Consumption and not by the value in this field.
 
 ####1.22.16.1.13 Field: Sizing Factor
 This optional numeric field allows the user to specify a sizing factor for this component. The
 sizing factor is used when the component design inputs are autosized: the autosizing calculations
 are performed as usual and the results are multiplied by the sizing factor. For this component
-the inputs that would be altered by the sizing factor are: Design Load Side Flow Rate, Design
-Source Side Flow Rate, Design Cooling Capacity, and Design Cooling Power Consumption. The
+the inputs that would be altered by the sizing factor are: Reference Load Side Flow Rate, Reference
+Source Side Flow Rate, Reference Cooling Capacity, and Reference Cooling Power Consumption. The
 Sizing Factor allows the user to size a component to meet part of the plant loop’s design load while
 continuing to use the autosizing feature. For example if there are two heat pumps on the supply
 side, each one could be sized to be half of the design load.
@@ -92,36 +97,39 @@ side, each one could be sized to be half of the design load.
 ###HeatPump:WaterToWater:EquationFit:Heating
 Changed and new input fields
 
-####1.22.17.1.6 Field: Design Load Side Flow Rate
+####1.22.17.1.6 Field: Reference Load Side Flow Rate
 This numeric field contains the design volume flow rate on the load side of the heat pump in
 m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This
 field is autosizable.
-####1.22.17.1.7 Field: Design Source Side Flow Rate
+
+####1.22.17.1.7 Field: Reference Source Side Flow Rate
 This numeric field contains the design volume flow rate on the source side of the heat pump in
 m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This
 field is autosizable.
-####1.22.17.1.8 Field: Design Heating Capacity
+
+####1.22.17.1.8 Field: Reference Heating Capacity
 This numeric field contains the design heating capacity of the heat pump in W. This corresponds
 to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
-####1.22.17.1.9 Field: Design Heating Power Consumption
+
+####1.22.17.1.9 Field: Reference Heating Power Consumption
 This numeric field contains the design electric power consumption for heating, in W. This
 corresponds to the electic power use at the Design Heating Capacity. This field is autosizable.
-When autosized, the field called Nominal Coefficient of Performance must be used.
+When autosized, the field called Reference Coefficient of Performance must be used.
 
-####1.22.17.1.12 Field: Nominal Coefficient of Performance
-This field is required if the Design Heating Power Consumption is set to autosize. The nominal
-COP is defined by the Design Heating Capacity divided by the corresponding Design Heating Power
-Consumption and is non-dimensional. This field is only used for sizing; if the Design Heating
+####1.22.17.1.12 Field: Reference Coefficient of Performance
+This field is required if the Reference Heating Power Consumption is set to autosize. The nominal
+COP is defined by the Reference Heating Capacity divided by the corresponding Reference Heating Power
+Consumption and is non-dimensional. This field is only used for sizing; if the Reference Heating
 Power Consumption is set to a fixed value then COP of the component during simulation will be
-determined by the ratio of Design Heating Capacity divided by the corresponding Design Heating
+determined by the ratio of Reference Heating Capacity divided by the corresponding Reference Heating
 Power Consumption and not by the value in this field.
 
 ####1.22.17.1.13 Field: Sizing Factor
 This optional numeric field allows the user to specify a sizing factor for this component. The
 sizing factor is used when the component design inputs are autosized: the autosizing calculations
 are performed as usual and the results are multiplied by the sizing factor. For this component
-the inputs that would be altered by the sizing factor are: Design Load Side Flow Rate, Design
-Source Side Flow Rate, Design Heating Capacity, and Design Heating Power Consumption. The
+the inputs that would be altered by the sizing factor are: Reference Load Side Flow Rate, Reference
+Source Side Flow Rate, Reference Heating Capacity, and Reference Heating Power Consumption. The
 Sizing Factor allows the user to size a component to meet part of the plant loop’s design load while
 continuing to use the autosizing feature. For example if there are two heat pumps on the supply
 side, each one could be sized to be half of the design load.
@@ -143,6 +151,13 @@ bundle of a split condenser compared to the nominal, full load heat rejection ra
 This fraction will be applied to the full heat rejection when operating at nominal capacity and
 nominal COP to model a capacity limit for the heat rejection. If this field is not entered then the
 capacity fraction is set to 1.0.
+
+
+####1.22.10.1.71 Field: Turbine Engine Efficiency
+
+This optional field is the nominal turbine engine efficiency and is used when Gas Turbine Engine Capacity 
+is set to Autosize. Default of 0.35.
+
 
 ###Chiller:EngineDriven
 
@@ -176,7 +191,7 @@ Sizing calculation documentation will be expanded to include these new autosize 
  
 ## Example File and Transition Changes ##
  
-Planning to change some existing field names to use the word "Design" instead of "Rated" in the simple equation fit water to water heat pump models.  For the EnergyPlus team, these will just get picked up by the IDD change and not really require Transition coding.  
+Planning to change some existing field names to use the word "Reference" instead of "Rated" in the simple equation fit water to water heat pump models.  For the EnergyPlus team, these will just get picked up by the IDD change and not really require Transition coding.  
  
  
 ## References ##
