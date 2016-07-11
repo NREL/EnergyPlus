@@ -1,5 +1,5 @@
-!IDD_Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}
-!IDD_BUILD ${CMAKE_VERSION_BUILD}
+!IDD_Version 8.5.0
+!IDD_BUILD c87e61b44b
 ! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
 ! The IDD defines the syntax and data model for each type of input "Object."
@@ -381,7 +381,7 @@ Version,
       \format singleLine
   A1 ; \field Version Identifier
       \required-field
-      \default ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}
+      \default 8.5
 
 SimulationControl,
       \unique-object
@@ -19458,7 +19458,6 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key ElectricLoadCenter:Inverter:LookUpTable
       \key ElectricLoadCenter:Storage:Battery
       \key ElectricLoadCenter:Storage:Simple
-      \key ElectricLoadCenter:Storage:Converter
       \key Pipe:Indoor
       \key Refrigeration:Case
       \key Refrigeration:CompressorRack
@@ -19512,7 +19511,6 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key ElectricLoadCenter:Inverter:LookUpTable
       \key ElectricLoadCenter:Storage:Battery
       \key ElectricLoadCenter:Storage:Simple
-      \key ElectricLoadCenter:Storage:Converter
       \key Pipe:Indoor
       \key Refrigeration:Case
       \key Refrigeration:CompressorRack
@@ -19565,7 +19563,6 @@ RoomAir:Node:AirflowNetwork:InternalGains,
       \key ElectricLoadCenter:Inverter:LookUpTable
       \key ElectricLoadCenter:Storage:Battery
       \key ElectricLoadCenter:Storage:Simple
-      \key ElectricLoadCenter:Storage:Converter
       \key Pipe:Indoor
       \key Refrigeration:Case
       \key Refrigeration:CompressorRack
@@ -20108,10 +20105,6 @@ Lights,
        \maximum 1.0
        \default 1.0
   A5 , \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20197,10 +20190,6 @@ ElectricEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20280,10 +20269,6 @@ GasEquipment,
        \note converted from a natural gas CO2 emission rate of 117 lbs CO2 per million Btu.
        \note The maximum value assumes to be 10 times of the recommended value.
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20351,10 +20336,6 @@ HotWaterEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -20421,10 +20402,6 @@ SteamEquipment,
        \maximum 1.0
        \default 0
   A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -23824,43 +23801,6 @@ AirflowNetwork:MultiZone:WindPressureCoefficientValues,
       \units dimensionless
       \note Enter the WPC Value corresponding to the 36th wind direction.
 
-AirflowNetwork:ZoneControl:PressureController,
-      \memo This object is used to control a zone to a specified indoor pressure 
-      \memo using the AirflowNetwork model. The specified pressure setpoint is used
-      \memo to control the zone exhaust fan flow rate in a controlled zone or 
-      \memo the relief air flow rate in an air loop.
-      \unique-object
- A1 , \field Name
-      \required-field
-      \reference AirflowNetworkZoneControlPressureControllerNames
- A2 , \field Control Zone Name
-      \required-field
-      \type object-list
-      \object-list ZoneNames
- A3 , \field Control Object Type
-      \required-field
-      \type choice
-      \key AirflowNetwork:MultiZone:Component:ZoneExhaustFan
-      \key AirflowNetwork:Distribution:Component:ReliefAirFlow
-      \note The current selection is AirflowNetwork:MultiZone:Component:ZoneExhaustFan 
-      \note or AirflowNetwork:Distribution:Component:ReliefAirFlow.
- A4 , \field Control Object Name
-      \note Control names are names of individual control objects 
-      \required-field
-      \type object-list
-      \object-list AFNReliefAirFlowNames
-      \object-list FansZoneExhaust
- A5 , \field Pressure Control Availability Schedule Name
-      \note Availability schedule name for pressure controller. Schedule value > 0 means the 
-      \note pressure controller is enabled. If this field is blank, then pressure controller is 
-      \note always enabled.
-      \type object-list
-      \object-list ScheduleNames
- A6 ; \field Pressure Setpoint Schedule Name
-      \required-field
-      \type object-list
-      \object-list ScheduleNames
-
 AirflowNetwork:Distribution:Node,
       \min-fields 4
       \memo This object represents an air distribution node in the AirflowNetwork model.
@@ -24148,73 +24088,6 @@ AirflowNetwork:Distribution:Component:ConstantPressureDrop,
       \minimum> 0.0
       \note Enter the pressure drop across this component.
 
-AirflowNetwork:Distribution:Component:OutdoorAirFlow,
-      \min-fields 3
-      \memo This object includes the outdoor air flow rate set by the Controller:OutdoorAir
-      \memo object in the airflow network. 
-      \unique-object
- A1 , \field Name
-      \required-field
-      \reference AFNOutdoorAirFlowNames
- N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
-      \required-field
-      \type real
-      \units kg/s
-      \minimum> 0
-      \note Enter the air mass flow coefficient at the conditions defined
-      \note in the Reference Crack Conditions object.
-      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
-      \note equation:
-      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor air flow rate.
- N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
-      \units dimensionless
-      \type real
-      \minimum 0.5
-      \maximum 1.0
-      \default 0.65
-      \note Enter the exponent used in the following equation:
-      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor air flow rate.
- A2 ; \field Reference Crack Conditions
-      \type object-list
-      \object-list ReferenceCrackConditions
-      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
-      \note the air mass flow coefficient entered above.
-
-AirflowNetwork:Distribution:Component:ReliefAirFlow,
-      \min-fields 3
-      \memo This object allows variation of air flow rate to perform pressure. 
-      \unique-object
- A1 , \field Name
-      \required-field
-      \reference AFNReliefAirFlowNames
- N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
-      \required-field
-      \type real
-      \units kg/s
-      \minimum> 0
-      \note Enter the air mass flow coefficient at the conditions defined
-      \note in the Reference Crack Conditions object.
-      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
-      \note equation:
-      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor air flow rate.
- N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
-      \units dimensionless
-      \type real
-      \minimum 0.5
-      \maximum 1.0
-      \default 0.65
-      \note Enter the exponent used in the following equation:
-      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-      \note Used only when no outdoor air flow rate.
- A2 ; \field Reference Crack Conditions
-      \type object-list
-      \object-list ReferenceCrackConditions
-      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
-      \note the air mass flow coefficient entered above.
-
 AirflowNetwork:Distribution:Linkage,
       \min-fields 4
       \memo This object defines the connection between two nodes and a component.
@@ -24397,10 +24270,6 @@ Exterior:Lights,
        \key ScheduleNameOnly
        \key AstronomicalClock
   A4 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24438,10 +24307,6 @@ Exterior:FuelEquipment,
        \minimum 0
        \ip-units W
   A4 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -24467,10 +24332,6 @@ Exterior:WaterEquipment,
        \type real
        \minimum 0
   A4 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
        \default General
@@ -32396,13 +32257,13 @@ ZoneControl:ContaminantController,
        \min-fields 4
   A1 , \field Name
        \required-field
-  A2 , \field Zone Name
+  A2 , \field Controlled Zone Name
        \required-field
        \type object-list
        \object-list ZoneNames
   A3 , \field Carbon Dioxide Control Availability Schedule Name
        \note Availability schedule name for CO2 controller. Schedule value > 0 means the CO2
-       \note controller is enabled. If this field is blank, then CO2 controller is always enabled.
+       \note controller is enabled. If this field is blank, then CO2  controller is always enabled.
        \type object-list
        \object-list ScheduleNames
   A4 , \field Carbon Dioxide Setpoint Schedule Name
@@ -57020,7 +56881,6 @@ Branch,
         \required-field
         \reference Branches
    N1, \field Maximum Flow Rate
-        \deprecated
         \default 0
         \units m3/s
         \minimum 0
@@ -61835,7 +61695,7 @@ ChillerHeater:Absorption:DirectFired,
           \required-field
           \type node
   A5   ,  \field Condenser Outlet Node Name
-          \note Not required if air-cooled 
+          \required-field
           \type node
   A6   ,  \field Hot Water Inlet Node Name
           \required-field
@@ -61902,7 +61762,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiVariateCurves
+            \object-list BiquadraticCurves
             \object-list BiVariateTables
   A9   ,  \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -61911,7 +61771,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiVariateCurves
+            \object-list BiquadraticCurves
             \object-list BiVariateTables
   A10  ,  \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -61928,7 +61788,7 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list BiVariateCurves
+            \object-list BiquadraticCurves
             \object-list BiVariateTables
   A12  ,  \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the electricity to the chiller as the load on
@@ -62047,7 +61907,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \required-field
        \type node
   A5 , \field Condenser Outlet Node Name
-       \note Not required if air-cooled 
+       \required-field
        \type node
   A6 , \field Hot Water Inlet Node Name
        \required-field
@@ -62114,7 +61974,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiVariateCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
   A9 , \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -62123,7 +61983,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiVariateCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
   A10, \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -62140,7 +62000,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list BiVariateCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
   A12, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the electricity to the chiller as the load on
@@ -66149,7 +66009,7 @@ WaterHeater:Mixed,
        \type node
   N19, \field Source Side Effectiveness
        \type real
-       \minimum> 0.0
+       \minimum 0.0
        \maximum 1.0
        \default 1.0
   N20, \field Use Side Design Flow Rate
@@ -66428,7 +66288,7 @@ WaterHeater:Stratified,
        \type node
   N26, \field Source Side Effectiveness
        \type real
-       \minimum> 0.0
+       \minimum 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of
@@ -67316,7 +67176,7 @@ ThermalStorage:ChilledWater:Mixed,
        \type node
   N8, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum> 0.0
+       \minimum 0.0
        \maximum 1.0
        \default 1.0
   A12, \field Source Side Availability Schedule Name
@@ -67450,7 +67310,7 @@ ThermalStorage:ChilledWater:Stratified,
        \type node
   N13, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum> 0.0
+       \minimum 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of
@@ -71315,11 +71175,11 @@ AvailabilityManager:HybridVentilation,
        \object-list HVACTemplateSystems
        \note If this field is left blank, hybrid ventilation managers will be
        \note simulated for zone equipment control
-  A3 , \field Control Zone Name
+  A3 , \field Controlled Zone Name
        \required-field
        \type object-list
        \object-list ZoneNames
-       \note the zone name should be a zone where a thermostat or humidistat is located
+       \note the controlled zone name should be a zone where a thermostat or humidistat is located
        \note served by an air primary loop.
   A4 , \field Ventilation Control Mode Schedule Name
        \required-field
@@ -88183,9 +88043,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88277,9 +88134,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88371,9 +88225,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88465,9 +88316,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88559,9 +88407,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88653,9 +88498,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88747,9 +88589,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88841,9 +88680,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -88935,9 +88771,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89029,9 +88862,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89123,9 +88953,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89217,9 +89044,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89311,9 +89135,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89405,9 +89226,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89499,9 +89317,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89594,9 +89409,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89688,9 +89500,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89782,9 +89591,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89876,9 +89682,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -89970,9 +89773,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90064,9 +89864,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90158,9 +89955,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90252,9 +90046,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90346,9 +90137,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90440,9 +90228,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90534,9 +90319,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90628,9 +90410,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90722,9 +90501,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90816,9 +90592,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -90910,9 +90683,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91005,9 +90775,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91099,9 +90866,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91193,9 +90957,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91287,9 +91048,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91381,9 +91139,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91475,9 +91230,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91569,9 +91321,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91663,9 +91412,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91757,9 +91503,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91851,9 +91594,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -91945,9 +91685,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92039,9 +91776,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92133,9 +91867,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92227,9 +91958,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92321,9 +92049,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92416,9 +92141,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92510,9 +92232,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92604,9 +92323,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92698,9 +92414,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92792,9 +92505,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92886,9 +92596,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -92980,9 +92687,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93074,9 +92778,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93168,9 +92869,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93262,9 +92960,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93356,9 +93051,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93450,9 +93142,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93544,9 +93233,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93638,9 +93324,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93732,9 +93415,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93827,9 +93507,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -93921,9 +93598,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94015,9 +93689,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94109,9 +93780,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94203,9 +93871,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94297,9 +93962,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94391,9 +94053,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94485,9 +94144,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94579,9 +94235,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94673,9 +94326,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94767,9 +94417,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94861,9 +94508,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -94955,9 +94599,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95049,9 +94690,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95143,9 +94781,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95238,9 +94873,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95332,9 +94964,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95426,9 +95055,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95520,9 +95146,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95614,9 +95237,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95708,9 +95328,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95802,9 +95419,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
@@ -95896,9 +95510,6 @@ Output:Table:SummaryReports,
        \key Standard62.1Summary
        \key EnergyMeters
        \key LEEDSummary
-       \key LifeCycleCostReport
-       \key TariffReport
-       \key EconomicResultSummary
        \key ZoneCoolingSummaryMonthly
        \key ZoneHeatingSummaryMonthly
        \key ZoneElectricSummaryMonthly
