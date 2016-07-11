@@ -2836,7 +2836,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 RhoAir; // air density at InNode
 		Real64 PartLoadFrac; // compressor part load fraction
 		Real64 CoilMaxVolFlowRate; // water or steam max volumetric water flow rate
-		bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		static bool ZoneEquipmentListNotChecked( true ); // False after the Zone Equipment List has been checked for items
 		int Loop;
 		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
 		static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time
@@ -2970,14 +2970,16 @@ namespace PackagedTerminalHeatPump {
 			MyPlantScanFlag( PTUnitNum ) = false;
 		}
 
-		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
-			ZoneEquipmentListChecked = true;
-			for ( Loop = 1; Loop <= NumPTUs; ++Loop ) {
-				if ( CheckZoneEquipmentList( PTUnit( Loop ).UnitType, PTUnit( Loop ).Name, CtrlZoneNum ) ) {
-					// save the ZoneEquipConfig index for this unit
-					PTUnit( Loop ).CtrlZoneNum = CtrlZoneNum;
-				} else {
-					ShowSevereError( "InitPTHP: Packaged Terminal Unit=[" + PTUnit( Loop ).UnitType + ',' + PTUnit( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+		if ( ZoneEquipmentListNotChecked ) {
+			if( ZoneEquipInputsFilled ) {
+				ZoneEquipmentListNotChecked = false;
+				for ( Loop = 1; Loop <= NumPTUs; ++Loop ) {
+					if ( CheckZoneEquipmentList( PTUnit( Loop ).UnitType, PTUnit( Loop ).Name, CtrlZoneNum ) ) {
+						// save the ZoneEquipConfig index for this unit
+						PTUnit( Loop ).CtrlZoneNum = CtrlZoneNum;
+					} else {
+						ShowSevereError( "InitPTHP: Packaged Terminal Unit=[" + PTUnit( Loop ).UnitType + ',' + PTUnit( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+					}
 				}
 			}
 		}
