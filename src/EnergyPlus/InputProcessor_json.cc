@@ -279,7 +279,6 @@ void IdfParser::add_missing_field_value(std::string &field_name, json &root, jso
             else extensible[field_name] = "";
         }
     }
-
 }
 
 json IdfParser::parse_number(std::string const &idf, size_t &index, bool &success) {
@@ -3040,7 +3039,7 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             std::string const field = alphas_fields[i];
             if (field == "name") {
                 Alphas(i + 1) = MakeUPPERCase(obj.key());
-                if (present(AlphaBlank)) AlphaBlank()(i + 1) = obj.key().empty();
+                if (present(AlphaBlank)) AlphaBlank()(i + 1) = obj.key().empty();  // TODO is this what should be done? unit tests for the original input processor are needed
                 if (present(AlphaFieldNames)) AlphaFieldNames()(i + 1) = field;
                 NumAlphas++;
                 continue;
@@ -3061,11 +3060,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                 if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
                 NumAlphas++;
             } else {
-                Alphas(i + 1) = "";
+                Alphas(i + 1) = "";  // this might be completely redundant bc this has already been taken care of during the input processing
                 if (present(AlphaBlank)) AlphaBlank()(i + 1) = true;
             }
             if (present(AlphaFieldNames)) AlphaFieldNames()(i + 1) = field;
-            // TODO else also set obj.key() as alphafieldnames?
         }
 
         if (object_in_schema->at("legacy_idd")["alphas"].find("extensions") !=
@@ -3081,15 +3079,15 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                         if (extension_obj[field].is_string()) {
                             std::string const val = extension_obj[field];
                             Alphas(alphas_index + 1) = MakeUPPERCase(val);
+							if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = val.empty();
                         } else {
-                            double val = extension_obj[field];
+                            double val = extension_obj[field]; // TODO is this reachable?
                             std::stringstream ss;
                             ss << val;
                             Alphas(alphas_index + 1) = ss.str();
 //							Alphas(alphas_index + 1) = std::to_string(val);
+							if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = false;
                         }
-//						if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
-                        if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = false;
                         NumAlphas++;
                     } else {
                         Alphas(alphas_index + 1) = "";
@@ -3101,37 +3099,22 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             }
         }
 
-//			for (int i = alphas_fields.size(); i < alphas_fields.size() + alphas_extensions.size(); ++i) {
-//				std::string const field = alphas_extensions[i];
-//				auto it = obj.value().find(field);
-//				if (it != obj.value().end()) {
-//					auto const val = it.value().get<std::string>();
-//					Alphas(i + 1) = MakeUPPERCase(val);
-//					if (present(AlphaBlank)) AlphaBlank()(i + 1) = val.empty();
-//					NumAlphas++;
-//				} else {
-//					Alphas(i + 1) = "";
-//					if (present(AlphaBlank)) AlphaBlank()(i + 1) = true;
-//				}
-//				if (present(AlphaFieldNames)) AlphaFieldNames()(i + 1) = field;
-//				// TODO else also set obj.key() as alphafieldnames?
-//			}
-//		}
-
         auto const &numerics_fields = object_in_schema->at("legacy_idd")["numerics"]["fields"];
         for (int i = 0; i < numerics_fields.size(); ++i) {
             std::string const field = numerics_fields[i];
             auto it = obj.value().find(field);
             if (it != obj.value().end()) {
-                if (!it.value().is_string()) Numbers(i + 1) = it.value().get<double>();
-                else {
+                if (!it.value().is_string()) {
+					Numbers(i + 1) = it.value().get<double>();
+					if (present(NumBlank)) NumBlank()(i + 1) = false;
+				} else {
                     if (it.value().get<std::string>().empty()) {
                         Numbers(i + 1) = 0;
                     } else {
                         Numbers(i + 1) = -99999; // autosize and autocalculate
                     }
+					if (present(NumBlank)) NumBlank()(i + 1) = it.value().get<std::string>().empty();
                 }
-                if (present(NumBlank)) NumBlank()(i + 1) = false;
                 NumNumbers++;
             } else {
                 // TODO What to do if a numeric field is left blank?
@@ -3144,28 +3127,27 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                             if (!default_val.is_string()) Numbers(i + 1) = default_val.get<double>();
                             else Numbers(i + 1) = -99999;  // autosize and autocalculate
                         } else {
-                            Numbers(i + 1) = 0;
+                            Numbers(i + 1) = 0; // TODO this might not be ok at all, unit tests needed.
                         }
                     } else {
                         std::cout << "field " << field << " not found in object " << Object << std::endl;
                     }
                 } else if (object_in_schema->find("properties") != object_in_schema->end()) {
                     if (object_in_schema->at("properties")[field].find("default") !=
-                        object_in_schema->at("properties")[field].end()) {
+                        		object_in_schema->at("properties")[field].end()) {
                         Numbers(i + 1) = object_in_schema->at("properties")[field]["default"].get<double>();
                     } else {
                         Numbers(i + 1) = 0;
                     }
                 }
-//			Numbers( i + 1 ) = -99999;
-                if (present(NumBlank)) NumBlank()(i + 1) = true;
+                if (present(NumBlank)) NumBlank()(i + 1) = true; // TODO AHHH IS IT CONSIDERED BLANK STILL? unit tests needed
             }
             if (present(NumericFieldNames)) NumericFieldNames()(i + 1) = field;
         }
 
 
         if (object_in_schema->at("legacy_idd")["numerics"].find("extensions") !=
-            object_in_schema->at("legacy_idd")["numerics"].end()) {
+					object_in_schema->at("legacy_idd")["numerics"].end()) {
             auto const &numerics_extensions = object_in_schema->at("legacy_idd")["numerics"]["extensions"];
             auto const extensions = obj.value()["extensions"];
             int numerics_index = numerics_fields.size();
@@ -3175,10 +3157,17 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                     std::string const field = numerics_extensions[i];
                     if (extension_obj.find(field) != extension_obj.end()) {
                         auto const val = extension_obj[field];
-                        if (!val.is_string()) Numbers(numerics_index + 1) = val.get<double>();
-                        else Numbers(numerics_index + 1) = -99999;  // autosize and autocalculate
-                        if (present(NumBlank))
-                            NumBlank()(numerics_index + 1) = false;
+                        if (!val.is_string()) {
+							Numbers(numerics_index + 1) = val.get<double>();
+							if (present(NumBlank)) NumBlank()(numerics_index + 1) = false;
+						} else {
+							if (val.get<std::string>().empty()) {
+								Numbers(numerics_index + 1) = 0; // TODO once again we don't even know if this is correct behavior
+							} else { // autosize and autocalculate
+								Numbers(numerics_index + 1) = -99999;
+							}
+							if (present(NumBlank)) NumBlank()(numerics_index + 1) = val.get<std::string>().empty();
+						}
                         NumNumbers++;
                     } else {
                         auto const pattern_props = object_in_schema->find("patternProperties");
@@ -3205,13 +3194,12 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                         } else if (object_in_schema->find("properties") != object_in_schema->end()) {
                             if (object_in_schema->at("properties")[field].find("default") !=
                                 object_in_schema->at("properties")[field].end()) {
-                                Numbers(numerics_index + 1) = object_in_schema->at(
-                                        "properties")[field]["default"].get<double>();
+                                Numbers(numerics_index + 1) = object_in_schema->at("properties")[field]["default"].get<double>();
                             } else {
                                 Numbers(numerics_index + 1) = 0;
                             }
                         }
-                        if (present(NumBlank)) NumBlank()(numerics_index + 1) = true;
+                        if (present(NumBlank)) NumBlank()(numerics_index + 1) = true; // TODO same issue, we don't know if this is correct
                     }
                     if (present(NumericFieldNames)) NumericFieldNames()(numerics_index + 1) = field;
                     numerics_index++;
