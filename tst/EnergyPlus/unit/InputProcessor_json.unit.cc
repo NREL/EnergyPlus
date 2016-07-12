@@ -1638,6 +1638,189 @@ namespace EnergyPlus {
         EXPECT_EQ(1, IOStatus);
     }
 
+	TEST_F( InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults )
+	{
+		std::string const idf_objects = delimited_string({
+																 "Version,8.3;",
+																 " Curve:Biquadratic,",
+																 "  HPACCOOLEIRFT Speed, !- Name",
+																 "  0.632475E+00, !- Coefficient1 Constant",
+																 "  -0.121321E-01, !- Coefficient2 x",
+																 "  0.507773E-03, !- Coefficient3 x**2",
+																 "  0.155377E-01, !- Coefficient4 y",
+																 "  0.272840E-03, !- Coefficient5 y**2",
+																 "  -0.679201E-03, !- Coefficient6 x*y",
+																 "  12.77778, !- Minimum Value of x",
+																 "  23.88889, !- Maximum Value of x",
+																 "  23.88889, !- Minimum Value of y",
+																 "  46.11111, !- Maximum Value of y",
+																 "  , !- Minimum Curve Output",
+																 "  , !- Maximum Curve Output",
+																 "  , !- Input Unit Type for X",
+																 "  Temperature, !- Input Unit Type for Y",
+																 "  Dimensionless;           !- Output Unit Type",
+														 });
+		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
+		// expect Dimensionless to be inserted for Input Unit Type for X, blank field with a default. Expect true for it's alphaBlank value
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquadratic_objects = GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLEIRFT SPEED", "DIMENSIONLESS", "TEMPERATURE", "DIMENSIONLESS", } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Input Unit Type for X", "Input Unit Type for Y", "Output Unit Type", } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 12, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Coefficient1 Constant", "Coefficient2 x", "Coefficient3 x**2", "Coefficient4 y", "Coefficient5 y**2", "Coefficient6 x*y",
+																	   "Minimum Value of x", "Maximum Value of x", "Minimum Value of y", "Maximum Value of y", "Minimum Curve Output", "Maximum Curve Output" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.632475E+00, -0.121321E-01 , 0.507773E-03, 0.155377E-01 , 0.272840E-03,
+																  -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0, } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, true, true } ), lNumericBlanks ) );
+
+		EXPECT_EQ( 1, IOStatus );
+
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon )
+	{
+		std::string const idf_objects = delimited_string({
+																 "Version,8.3;",
+																 " Curve:Biquadratic,",
+																 "  HPACCOOLEIRFT Speed, !- Name",
+																 "  0.632475E+00, !- Coefficient1 Constant",
+																 "  -0.121321E-01, !- Coefficient2 x",
+																 "  0.507773E-03, !- Coefficient3 x**2",
+																 "  0.155377E-01, !- Coefficient4 y",
+																 "  0.272840E-03, !- Coefficient5 y**2",
+																 "  -0.679201E-03, !- Coefficient6 x*y",
+																 "  12.77778, !- Minimum Value of x",
+																 "  23.88889, !- Maximum Value of x",
+																 "  23.88889, !- Minimum Value of y",
+																 "  46.11111; !- Maximum Value of y",
+														 });
+		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
+		// expect "" to be inserted for the missing alpha fields due to the truncation, blank field with a default. Expect true for it's alphaBlank value
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquadratic_objects = GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLEIRFT SPEED", "", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Input Unit Type for X", "Input Unit Type for Y", "Output Unit Type", } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 10, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Coefficient1 Constant", "Coefficient2 x", "Coefficient3 x**2", "Coefficient4 y", "Coefficient5 y**2", "Coefficient6 x*y",
+																	   "Minimum Value of x", "Maximum Value of x", "Minimum Value of y", "Maximum Value of y", "Minimum Curve Output", "Maximum Curve Output" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.632475E+00, -0.121321E-01 , 0.507773E-03, 0.155377E-01 , 0.272840E-03,
+																  -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, true, true } ), lNumericBlanks ) );
+
+		EXPECT_EQ( 1, IOStatus );
+
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_autosize )
+	{
+		std::string const idf_objects = delimited_string({
+																 "Version,8.3;",
+																 "Humidifier:Steam:Gas,",
+																 "  Main Gas Humidifier,     !- Name",
+																 "  ,                        !- Availability Schedule Name",
+																 "  ,                !- Rated Capacity {m3/s}",
+																 "  autosize,                !- Rated Gas Use Rate {W}",
+																 "  ,                    !- Thermal Efficiency {-} ",
+																 "  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
+																 "  0,                       !- Rated Fan Power {W}",
+																 "  ,                       !- Auxiliary Electric Power {W}",
+																 "  Mixed Air Node 1,        !- Air Inlet Node Name",
+																 "  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
+																 "  ,                        !- Water Storage Tank Name",
+																 "  ;                        !- InletWaterTemperatureOption",
+														 });
+
+		// Expect the alpha field Inlet Water Temp to be filled in with it's default value
+		// Expect Rated Capacity to be filled in with ZERO, not with the autosize value of -99999. Expect
+		// Auxiliary Electric Power to be filled in with .80 (it's default value)
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
+
+		int NumGasSteamHums = GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, NumGasSteamHums );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumAlphas, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "FIXEDINLETWATERTEMPERATURE" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 5, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, false, true, false, true, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
