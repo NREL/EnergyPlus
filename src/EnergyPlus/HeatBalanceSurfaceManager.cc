@@ -4523,11 +4523,14 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 	int ZoneNum; // Zone number the current surface is attached to
 	int OPtr;
 	Real64 RhoVaporSat; // Local temporary saturated vapor density for checking
+	bool MovInsulErrorFlag; // Movable Insulation error flag
 
 	// FUNCTION DEFINITIONS:
 	// na
 
 	// FLOW:
+	MovInsulErrorFlag = false;
+	
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 		// Need to transfer any source/sink for a surface to the local array.  Note that
 		// the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
@@ -4725,7 +4728,10 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			}
 
 			// Call the outside surface temp calculation and pass the necessary terms
-			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt );
+			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
+				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+			}
 
 			// This ends the calculations for this surface and goes on to the next SurfNum
 
@@ -4765,7 +4771,9 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 					CalcExteriorVentedCavity( SurfNum );
 				}
 
-				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt );
+				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+				
 			} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) {
 				if ( Surface( SurfNum ).ExtCavityPresent ) {
 					CalcExteriorVentedCavity( SurfNum );
@@ -4870,7 +4878,11 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 			}
 
-			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt );
+			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
+				
+				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+			}
 
 		} else { // for interior or other zone surfaces
 
@@ -4985,8 +4997,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalance::HAirFD;
 	using DataMoistureBalanceEMPD::MoistEMPDNew;
 	using DataMoistureBalanceEMPD::MoistEMPDFlux;
-	using DataAirflowNetwork::SimulateAirflowNetwork;
-	using DataAirflowNetwork::AirflowNetworkControlSimple;
 
 	using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 	using WindowManager::CalcWindowHeatBalance;
@@ -5421,7 +5431,15 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 					} else { // Movable insulation present
 
-						if ( construct.SourceSinkPresent && calcHeatBalanceInsideSurfFirstTime ) ShowSevereError( "Movable insulation is not valid with embedded sources/sinks" );
+						if ( construct.SourceSinkPresent ) {
+							
+						    ShowSevereError( "Interior movable insulation is not valid with embedded sources/sinks" );
+							ShowContinueError( "Construction " + construct.Name + " contains an internal source or sink but also uses" );
+							ShowContinueError( "interior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulInt ).Name + " for a surface with that construction." );
+							ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accommodate this combination." );
+							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
+							
+						}
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );
 
@@ -5585,129 +5603,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			}
 
 			if ( ( TH12 > MaxSurfaceTempLimit ) || ( TH12 < MinSurfaceTempLimit ) ) {
-				if ( WarmupFlag ) ++WarmupSurfTemp;
-				if ( ! WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings ) {
-					if ( TH12 < MinSurfaceTempLimit ) {
-						if ( surface.LowTempErrCount == 0 ) {
-							ShowSevereMessage( "Temperature (low) out of bounds [" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
-							ShowContinueErrorTimeStamp( "" );
-							if ( ! zone.TempOutOfBoundsReported ) {
-								ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
-								if ( zone.FloorArea > 0.0 ) {
-									ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
-								} else {
-									ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains, 3 ) + "] W" );
-								}
-								if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-									ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
-									ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
-								} else {
-									ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
-								}
-								if ( zone.IsControlled ) {
-									ShowContinueError( "...Zone is part of HVAC controlled system." );
-								} else {
-									ShowContinueError( "...Zone is not part of HVAC controlled system." );
-								}
-								zone.TempOutOfBoundsReported = true;
-							}
-							ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.LowTempErrCount, TH12, TH12, _, "C", "C" );
-						} else {
-							ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.LowTempErrCount, TH12, TH12, _, "C", "C" );
-						}
-					} else {
-						if ( surface.HighTempErrCount == 0 ) {
-							ShowSevereMessage( "Temperature (high) out of bounds (" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
-							ShowContinueErrorTimeStamp( "" );
-							if ( ! zone.TempOutOfBoundsReported ) {
-								ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
-								if ( zone.FloorArea > 0.0 ) {
-									ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
-								} else {
-									ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains, 3 ) + "] W" );
-								}
-								if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-									ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
-									ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
-								} else {
-									ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
-								}
-								if ( zone.IsControlled ) {
-									ShowContinueError( "...Zone is part of HVAC controlled system." );
-								} else {
-									ShowContinueError( "...Zone is not part of HVAC controlled system." );
-								}
-								zone.TempOutOfBoundsReported = true;
-							}
-							ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.HighTempErrCount, TH12, TH12, _, "C", "C" );
-						} else {
-							ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.HighTempErrCount, TH12, TH12, _, "C", "C" );
-						}
-					}
-					if ( zone.EnforcedReciprocity ) {
-						if ( WarmupSurfTemp > 3 ) {
-							ShowSevereError( "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity" );
-							ShowContinueError( " and is having temperature out of bounds errors. Please correct zone geometry and rerun." );
-							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
-						}
-					} else if ( WarmupSurfTemp > 10 ) {
-						ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
-					}
-				}
+				TestSurfTempCalcHeatBalanceInsideSurf( TH12, surface, zone, WarmupSurfTemp );
 			}
-			if ( ( TH12 > MaxSurfaceTempLimitBeforeFatal ) || ( TH12 < MinSurfaceTempLimitBeforeFatal ) ) {
-				if ( ! WarmupFlag ) {
-					if ( TH12 < MinSurfaceTempLimitBeforeFatal ) {
-						ShowSevereError( "Temperature (low) out of bounds [" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
-						ShowContinueErrorTimeStamp( "" );
-						if ( ! zone.TempOutOfBoundsReported ) {
-							ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
-							if ( zone.FloorArea > 0.0 ) {
-								ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
-							} else {
-								ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W" );
-							}
-							if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-								ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
-								ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
-							} else {
-								ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
-							}
-							if ( zone.IsControlled ) {
-								ShowContinueError( "...Zone is part of HVAC controlled system." );
-							} else {
-								ShowContinueError( "...Zone is not part of HVAC controlled system." );
-							}
-							zone.TempOutOfBoundsReported = true;
-						}
-						ShowFatalError( "Program terminates due to preceding condition." );
-					} else {
-						ShowSevereError( "Temperature (high) out of bounds [" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
-						ShowContinueErrorTimeStamp( "" );
-						if ( ! zone.TempOutOfBoundsReported ) {
-							ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
-							if ( zone.FloorArea > 0.0 ) {
-								ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
-							} else {
-								ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W" );
-							}
-							if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-								ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
-								ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
-							} else {
-								ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
-							}
-							if ( zone.IsControlled ) {
-								ShowContinueError( "...Zone is part of HVAC controlled system." );
-							} else {
-								ShowContinueError( "...Zone is not part of HVAC controlled system." );
-							}
-							zone.TempOutOfBoundsReported = true;
-						}
-						ShowFatalError( "Program terminates due to preceding condition." );
-					}
-				}
-			}
+
 		} // ...end of loop over all surfaces for inside heat balances
 
 		// Interzone surface updating: interzone surfaces have other side temperatures
@@ -5885,12 +5783,159 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 }
 
 void
+TestSurfTempCalcHeatBalanceInsideSurf(
+	Real64 TH12,
+	SurfaceData & surface,
+	ZoneData & zone,
+	int WarmupSurfTemp
+){
+	using DataAirflowNetwork::SimulateAirflowNetwork;
+	using DataAirflowNetwork::AirflowNetworkControlSimple;
+	using General::RoundSigDigits;
+
+
+	if ( ( TH12 > MaxSurfaceTempLimit ) || ( TH12 < MinSurfaceTempLimit ) ) {
+		if ( WarmupFlag ) ++WarmupSurfTemp;
+		if ( !WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings ) {
+			if ( TH12 < MinSurfaceTempLimit ) {
+				if ( surface.LowTempErrCount == 0 ) {
+					ShowSevereMessage( "Temperature (low) out of bounds [" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
+					ShowContinueErrorTimeStamp( "" );
+					if ( !zone.TempOutOfBoundsReported ) {
+						ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
+						if ( zone.FloorArea > 0.0 ) {
+							ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
+						} else {
+							ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains, 3 ) + "] W" );
+						}
+						if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
+							ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
+							ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
+						} else {
+							ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
+						}
+						if ( zone.IsControlled ) {
+							ShowContinueError( "...Zone is part of HVAC controlled system." );
+						} else {
+							ShowContinueError( "...Zone is not part of HVAC controlled system." );
+						}
+						zone.TempOutOfBoundsReported = true;
+					}
+					ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.LowTempErrCount, TH12, TH12, _, "C", "C" );
+				} else {
+					ShowRecurringSevereErrorAtEnd( "Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.LowTempErrCount, TH12, TH12, _, "C", "C" );
+				}
+			} else {
+				if ( surface.HighTempErrCount == 0 ) {
+					ShowSevereMessage( "Temperature (high) out of bounds (" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
+					ShowContinueErrorTimeStamp( "" );
+					if ( !zone.TempOutOfBoundsReported ) {
+						ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
+						if ( zone.FloorArea > 0.0 ) {
+							ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
+						} else {
+							ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains, 3 ) + "] W" );
+						}
+						if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
+							ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
+							ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
+						} else {
+							ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
+						}
+						if ( zone.IsControlled ) {
+							ShowContinueError( "...Zone is part of HVAC controlled system." );
+						} else {
+							ShowContinueError( "...Zone is not part of HVAC controlled system." );
+						}
+						zone.TempOutOfBoundsReported = true;
+					}
+					ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.HighTempErrCount, TH12, TH12, _, "C", "C" );
+				} else {
+					ShowRecurringSevereErrorAtEnd( "Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name, surface.HighTempErrCount, TH12, TH12, _, "C", "C" );
+				}
+			}
+			if ( zone.EnforcedReciprocity ) {
+				if ( WarmupSurfTemp > 3 ) {
+					ShowSevereError( "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity" );
+					ShowContinueError( " and is having temperature out of bounds errors. Please correct zone geometry and rerun." );
+					ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
+				}
+			} else if ( WarmupSurfTemp > 10 ) {
+				ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
+			}
+		}
+	}
+	if ( ( TH12 > MaxSurfaceTempLimitBeforeFatal ) || ( TH12 < MinSurfaceTempLimitBeforeFatal ) ) {
+		if ( !WarmupFlag ) {
+			if ( TH12 < MinSurfaceTempLimitBeforeFatal ) {
+				ShowSevereError( "Temperature (low) out of bounds [" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
+				ShowContinueErrorTimeStamp( "" );
+				if ( !zone.TempOutOfBoundsReported ) {
+					ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
+					if ( zone.FloorArea > 0.0 ) {
+						ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
+					} else {
+						ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W" );
+					}
+					if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
+						ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
+						ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
+					} else {
+						ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
+					}
+					if ( zone.IsControlled ) {
+						ShowContinueError( "...Zone is part of HVAC controlled system." );
+					} else {
+						ShowContinueError( "...Zone is not part of HVAC controlled system." );
+					}
+					zone.TempOutOfBoundsReported = true;
+				}
+				ShowFatalError( "Program terminates due to preceding condition." );
+			} else {
+				ShowSevereError( "Temperature (high) out of bounds [" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
+				ShowContinueErrorTimeStamp( "" );
+				if ( !zone.TempOutOfBoundsReported ) {
+					ShowContinueError( "Zone=\"" + zone.Name + "\", Diagnostic Details:" );
+					if ( zone.FloorArea > 0.0 ) {
+						ShowContinueError( "...Internal Heat Gain [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W/m2" );
+					} else {
+						ShowContinueError( "...Internal Heat Gain (no floor) [" + RoundSigDigits( zone.InternalHeatGains / zone.FloorArea, 3 ) + "] W" );
+					}
+					if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
+						ShowContinueError( "...Infiltration/Ventilation [" + RoundSigDigits( zone.NominalInfilVent, 3 ) + "] m3/s" );
+						ShowContinueError( "...Mixing/Cross Mixing [" + RoundSigDigits( zone.NominalMixing, 3 ) + "] m3/s" );
+					} else {
+						ShowContinueError( "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available." );
+					}
+					if ( zone.IsControlled ) {
+						ShowContinueError( "...Zone is part of HVAC controlled system." );
+					} else {
+						ShowContinueError( "...Zone is not part of HVAC controlled system." );
+					}
+					zone.TempOutOfBoundsReported = true;
+				}
+				ShowFatalError( "Program terminates due to preceding condition." );
+			}
+		} else{
+			if ( TH12 < -10000. || TH12 > 10000. ) {
+				ShowSevereError( "CalcHeatBalanceInsideSurf: The temperature of " + RoundSigDigits( TH12, 2 ) + " C for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
+				ShowContinueError( "..is very far out of bounds during warmup. This may be an indication of a malformed zone." );
+				ShowContinueErrorTimeStamp( "" );
+				ShowFatalError( "Program terminates due to preceding condition." );
+			}
+		}
+	}
+}
+
+
+void
 CalcOutsideSurfTemp(
 	int const SurfNum, // Surface number DO loop counter
 	int const ZoneNum, // Zone number the current surface is attached to
 	int const ConstrNum, // Construction index for the current surface
 	Real64 const HMovInsul, // "Convection" coefficient of movable insulation
-	Real64 const TempExt // Exterior temperature boundary condition
+	Real64 const TempExt, // Exterior temperature boundary condition
+	bool & ErrorFlag // Error flag for movable insulation problem
 )
 {
 
@@ -6064,7 +6109,12 @@ CalcOutsideSurfTemp(
 
 		if ( MovInsulPresent ) {
 			// Note: if movable insulation is ever added back in correctly, the heat balance equations above must be fixed
-			ShowFatalError( "Movable insulation is not allowed on a radiant system surface at this time" );
+			ShowSevereError( "Exterior movable insulation is not valid with embedded sources/sinks" );
+			ShowContinueError( "Construction " + construct.Name + " contains an internal source or sink but also uses" );
+			ShowContinueError( "exterior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulExt ).Name + " for a surface with that construction." );
+			ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accommodate this combination." );
+			ErrorFlag = true;
+			return;
 
 		} else {
 			Real64 const RadSysDiv( 1.0 / ( construct.CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) ) );

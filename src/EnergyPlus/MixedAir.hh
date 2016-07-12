@@ -259,8 +259,8 @@ namespace MixedAir {
 		int EconomizerOASchedPtr; // schedule to modify outdoor air flow
 		std::string MinOAflowSch; // Name of the Minimum fraction of Design/Mixed Mass of air
 		std::string MaxOAflowSch; // Name of the Maximum fraction of Design/Mixed Mass of air
-		int MinOAflowSchPtr; // Index to the minimum outside air schedule
-		int MaxOAflowSchPtr; // Index to the minimum outside air schedule
+		int MinOAflowSchPtr; // Index to the Minimum Fraction of Outdoor Air Schedule
+		int MaxOAflowSchPtr; // Index to the Maximum Fraction of Outdoor Air Schedule
 		//   Economizer Status, which is currently following the EconomizerOperationFlag, might be something like "Economizer status
 		//   indicates when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded).
 		//   While this status signal indicates favorable conditions for economizer operation, it does not guarantee that the air-side
@@ -282,6 +282,8 @@ namespace MixedAir {
 		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
 		int MixedAirSPMNum; // index of mixed air setpoint manager
 		bool CoolCoilFreezeCheck; // if true, cooling coil freezing is prevented by recalculating the amount of OA
+		bool EconoActive; // if true economizer is active
+		bool HighHumCtrlActive; // if true high humidity control is active
 
 		// Default Constructor
 		OAControllerProps() :
@@ -344,8 +346,36 @@ namespace MixedAir {
 			DemandLimitFlowRate( 0.0 ),
 			MaxOAFracBySetPoint( 0 ),
 			MixedAirSPMNum( 0 ),
-			CoolCoilFreezeCheck( false )
+			CoolCoilFreezeCheck( false ),
+			EconoActive( false ),
+			HighHumCtrlActive( false )
 		{}
+
+		void
+		CalcOAController(
+			int const AirLoopNum
+		);
+
+		void
+		CalcOAEconomizer(
+			int const AirLoopNum,
+			Real64 const OutAirMinFrac,
+			Real64 & OASignal,
+			bool & HighHumidityOperationFlag
+		);
+
+		void
+		SizeOAController();
+
+		void
+		UpdateOAController();
+
+		void
+		Checksetpoints(
+			Real64 const OutAirMinFrac, // Local variable used to calculate min OA fraction
+			Real64 & OutAirSignal, // Used to set OA mass flow rate
+			bool & EconomizerOperationFlag // logical used to show economizer status
+		);
 
 	};
 
@@ -365,9 +395,9 @@ namespace MixedAir {
 		Real64 ZoneMaxOAFraction; // Zone maximum outdoor air fraction
 		Array1D< Real64 > ZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for each zone
 		Array1D< Real64 > ZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for each zone
-		Array1D< Real64 > ZoneOAFlow; // OA Flow Rate (m3/s/zone) for each zone
-		Array1D< Real64 > ZoneOAACH; // OA ACH (m3/s/volume) for each zone
-		Array1D_int Zone; // Zones requiring mechanical ventilation
+		Array1D< Real64 > ZoneOAFlowRate; // OA Flow Rate (m3/s/zone) for each zone
+		Array1D< Real64 > ZoneOAACHRate; // OA ACH (m3/s/volume) for each zone
+		Array1D_int VentMechZone; // Zones requiring mechanical ventilation
 		Array1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object
 		// for each zone in zone list
 		Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
@@ -409,6 +439,12 @@ namespace MixedAir {
 			CO2GainErrorCount( 0 ),
 			CO2GainErrorIndex( 0 )
 		{}
+
+		void
+		CalcMechVentController(
+			Real64 & SysSA,
+			Real64 & MechVentOutsideAirFlow
+		);
 
 	};
 
@@ -603,12 +639,6 @@ namespace MixedAir {
 	//******************************************************************************
 
 	void
-	CalcOAController(
-		int const OAControllerNum,
-		int const AirLoopNum
-	);
-
-	void
 	CalcOAMixer( int const OAMixerNum );
 
 	// End of Calculation/Simulation Section of the Module
@@ -617,9 +647,6 @@ namespace MixedAir {
 	// Beginning Sizing Section of the Module
 	//******************************************************************************
 
-	void
-	SizeOAController( int const OAControllerNum );
-
 	// End of Sizing Section of the Module
 	//******************************************************************************
 
@@ -627,16 +654,10 @@ namespace MixedAir {
 	//******************************************************************************
 
 	void
-	UpdateOAController( int const OAControllerNum );
-
-	void
 	UpdateOAMixer( int const OAMixerNum );
 
 	void
 	ReportOAMixer( int const OAMixerNum ); // unused1208
-
-	void
-	ReportOAController( int const OAControllerNum ); // unused1208
 
 	// End of Sizing Section of the Module
 	//******************************************************************************
@@ -708,50 +729,12 @@ namespace MixedAir {
 	CheckControllerLists( bool & ErrFound );
 
 	void
-	SetOAControllerData(
-		int const OACtrlNum, // Number of OA Controller
-		bool & ErrorsFound, // Set to true if certain errors found
-		Optional_string Name = _, // Name of Controller
-		Optional_string ControllerType = _, // Controller Type
-		Optional_int ControllerType_Num = _, // Parameter equivalent of Controller Type
-		Optional_string LockoutType = _, // Lock out type
-		Optional_bool FixedMin = _, // Fixed Minimum or Proportional Minimum
-		Optional< Real64 > TempLim = _, // Temperature Limit
-		Optional< Real64 > TempLowLim = _, // Temperature Lower Limit
-		Optional< Real64 > EnthLim = _, // Enthalpy Limit
-		Optional< Real64 > DPTempLim = _, // Dew Point Temperature Limit
-		Optional_int EnthalpyCurvePtr = _, // Electronic Enthalpy Limit Curve Index
-		Optional< Real64 > MaxOA = _, // Maximum outside air flow (m3/sec)
-		Optional< Real64 > MinOA = _, // Minimum outside air flow (m3/sec)
-		Optional_string EconoType = _, // EconoType = No Economizer,Differential Enthalpy, Differential Dry bulb,
-		Optional_int MixNode = _, // Controlled node (mixed air node)
-		Optional_int OANode = _, // Actuated node (outside air node)
-		Optional_int InletNode = _, // Inlet Air Node for into Mixer  (BTG Nov 2004)
-		Optional_int RelNode = _, // Relief Air Node Number
-		Optional_int RetNode = _, // Return Air Node Number
-		Optional_int HumidistatZoneNum = _, // Zone number where humidistat is located
-		Optional< Real64 > HighRHOAFlowRatio = _, // Ratio of outside air flow to maximum outside air flow rate for high RH
-		Optional_bool ModifyDuringHighOAMoisture = _, // TRUE if modify air flow is allowed during high OA humrat conditions
-		Optional_int NodeNumofHumidistatZone = _, // actual node number of controlled zone
-		Optional_int EconomizerOASchedPtr = _, // Time of day schedule for increasing outdoor air
-		Optional_string BypassType = _ // ActivateBypassAtMinOAFlow, SetOAFlowRate
-	);
-
-	void
 	CheckOAControllerName(
 		std::string const & OAControllerName, // proposed name
 		int const NumCurrentOAControllers, // Count on number of controllers
 		bool & IsNotOK, // Pass through to VerifyName
 		bool & IsBlank, // Pass through to VerifyName
 		std::string const & SourceID // Pass through to VerifyName
-	);
-
-	void
-	Checksetpoints(
-		int const OAControllerNum, // index to OA controller
-		Real64 const OutAirMinFrac, // Local variable used to calculate min OA fraction
-		Real64 & OutAirSignal, // Used to set OA mass flow rate
-		bool & EconomizerOperationFlag // logical used to show economizer status
 	);
 
 	int

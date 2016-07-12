@@ -9486,6 +9486,7 @@ namespace OutputReportTabular {
 		static Array1D< Real64 > zstWallArea( 4 );
 		static Array1D< Real64 > zstUndWallArea( 4 );
 		static Array1D< Real64 > zstWindowArea( 4 );
+		static Array1D< Real64 > zstOpeningArea( 4 );
 		static Array1D< Real64 > zstLight( 4 );
 		static Array1D< Real64 > zstPeople( 4 );
 		static Array1D< Real64 > zstPlug( 4 );
@@ -9495,6 +9496,7 @@ namespace OutputReportTabular {
 		zstWallArea = 0.0;
 		zstUndWallArea = 0.0;
 		zstWindowArea = 0.0;
+		zstOpeningArea = 0.0;
 		zstLight = 0.0;
 		zstPeople  = 0.0;
 		zstPlug = 0.0;
@@ -9505,6 +9507,14 @@ namespace OutputReportTabular {
 		Real64 TotalWallArea;
 		Real64 TotalWindowArea;
 		Real64 TotalAboveGroundWallArea;
+
+		Array1D< Real64> zoneOpeningArea;
+		zoneOpeningArea.allocate( NumOfZones );
+		zoneOpeningArea = 0.0;
+
+		Array1D< Real64> zoneGlassArea;
+		zoneGlassArea.allocate( NumOfZones );
+		zoneGlassArea = 0.0;
 
 		// all arrays are in the format: (row, columnm)
 		if ( displayTabularVeriSum ) {
@@ -9708,6 +9718,8 @@ namespace OutputReportTabular {
 								windowAreaW += curArea * mult;
 								if ( isConditioned ) windowAreaWcond += curArea * mult;
 							}
+							zoneOpeningArea( zonePt ) += curArea * Surface( iSurf ).Multiplier; // total window opening area for each zone (glass plus frame area)
+							zoneGlassArea( zonePt ) += Surface( iSurf ).GrossArea * Surface( iSurf ).Multiplier;
 							if ( DetailedWWR ) {
 								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Window," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
@@ -9895,10 +9907,10 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			columnHead.allocate( 11 );
-			columnWidth.allocate( 11 );
+			columnHead.allocate( 12 );
+			columnWidth.allocate( 12 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 11, NumOfZones + 4 );
+			tableBody.allocate( 12, NumOfZones + 4 );
 
 			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
@@ -9908,9 +9920,10 @@ namespace OutputReportTabular {
 			columnHead( 6 ) = "Above Ground Gross Wall Area " + m2_unitName;
 			columnHead( 7 ) = "Underground Gross Wall Area " + m2_unitName;
 			columnHead( 8 ) = "Window Glass Area " + m2_unitName;
-			columnHead( 9 ) = "Lighting " + Wm2_unitName;
-			columnHead( 10 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
-			columnHead( 11 ) = "Plug and Process " + Wm2_unitName;
+			columnHead( 9 ) = "Opening Area " + m2_unitName;
+			columnHead( 10 ) = "Lighting " + Wm2_unitName;
+			columnHead( 11 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
+			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
 
 			rowHead = "";
 
@@ -9952,7 +9965,8 @@ namespace OutputReportTabular {
 				tableBody( 5, iZone ) = RealToStr( mult, 2 );
 				tableBody( 6, iZone ) = RealToStr( Zone( iZone ).ExtGrossWallArea * m2_unitConv, 2 );
 				tableBody( 7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
-				tableBody( 8, iZone) = RealToStr(Zone(iZone).ExtWindowArea * m2_unitConv, 2);
+				tableBody( 8, iZone ) = RealToStr( zoneGlassArea(iZone) * m2_unitConv, 2 );
+				tableBody( 9, iZone ) = RealToStr( zoneOpeningArea(iZone) * m2_unitConv, 2 );
 				// lighting density
 				totLightPower = 0.0;
 				for ( iLight = 1; iLight <= TotLights; ++iLight ) {
@@ -9961,7 +9975,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( 9, iZone ) = RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 );
+					tableBody( 10, iZone ) = RealToStr( Wm2_unitConv * totLightPower / Zone( iZone ).FloorArea, 4 );
 				}
 				// people density
 				totNumPeople = 0.0;
@@ -9971,7 +9985,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( totNumPeople > 0 ) {
-					tableBody( 10, iZone ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 );
+					tableBody( 11, iZone ) = RealToStr( Zone( iZone ).FloorArea * m2_unitConv / totNumPeople, 2 );
 				}
 				// plug and process density
 				totPlugProcess = 0.0;
@@ -9996,7 +10010,7 @@ namespace OutputReportTabular {
 					}
 				}
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
-					tableBody( 11, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
+					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
@@ -10004,7 +10018,8 @@ namespace OutputReportTabular {
 					zstVolume( grandTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( grandTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( grandTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( grandTotal ) += mult * zoneGlassArea( iZone );
+					zstOpeningArea( grandTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( grandTotal ) += mult * totLightPower;
 					zstPeople( grandTotal ) += mult * totNumPeople;
 					zstPlug( grandTotal ) += mult * totPlugProcess;
@@ -10013,7 +10028,8 @@ namespace OutputReportTabular {
 					zstVolume( notpartTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( notpartTotal ) += mult * zoneGlassArea( iZone );
+					zstOpeningArea( notpartTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
 					zstPlug( notpartTotal ) += mult * totPlugProcess;
@@ -10023,7 +10039,8 @@ namespace OutputReportTabular {
 					zstVolume( condTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( condTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( condTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( condTotal ) += mult * zoneGlassArea( iZone );
+					zstOpeningArea( condTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( condTotal ) += mult * totLightPower;
 					zstPeople( condTotal ) += mult * totNumPeople;
 					zstPlug( condTotal ) += mult * totPlugProcess;
@@ -10032,7 +10049,8 @@ namespace OutputReportTabular {
 					zstVolume( uncondTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( uncondTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( uncondTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( uncondTotal ) += mult * zoneGlassArea( iZone );
+					zstOpeningArea( uncondTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( uncondTotal ) += mult * totLightPower;
 					zstPeople( uncondTotal ) += mult * totNumPeople;
 					zstPlug( uncondTotal ) += mult * totPlugProcess;
@@ -10041,7 +10059,8 @@ namespace OutputReportTabular {
 					zstVolume( notpartTotal ) += mult * Zone( iZone ).Volume;
 					zstWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossWallArea;
 					zstUndWallArea( notpartTotal ) += mult * Zone( iZone ).ExtGrossGroundWallArea;
-					zstWindowArea( notpartTotal ) += mult * Zone( iZone ).ExtWindowArea;
+					zstWindowArea( notpartTotal ) += mult * zoneGlassArea( iZone );
+					zstOpeningArea( notpartTotal ) += mult * zoneOpeningArea( iZone );
 					zstLight( notpartTotal ) += mult * totLightPower;
 					zstPeople( notpartTotal ) += mult * totNumPeople;
 					zstPlug( notpartTotal ) += mult * totPlugProcess;
@@ -10053,12 +10072,13 @@ namespace OutputReportTabular {
 				tableBody( 6, NumOfZones + iTotal ) = RealToStr( zstWallArea( iTotal ) * m2_unitConv, 2 );
 				tableBody( 7, NumOfZones + iTotal) = RealToStr( zstUndWallArea( iTotal ) * m2_unitConv, 2);
 				tableBody( 8, NumOfZones + iTotal) = RealToStr( zstWindowArea( iTotal ) * m2_unitConv, 2);
+				tableBody( 9, NumOfZones + iTotal ) = RealToStr( zstOpeningArea( iTotal ) * m2_unitConv, 2 );
 				if ( zstArea( iTotal ) != 0 ) {
-					tableBody( 9, NumOfZones + iTotal ) = RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
-					tableBody( 11, NumOfZones + iTotal ) = RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
+					tableBody( 10, NumOfZones + iTotal ) = RealToStr( zstLight( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
+					tableBody( 12, NumOfZones + iTotal ) = RealToStr( zstPlug( iTotal ) * Wm2_unitConv / zstArea( iTotal ), 4 );
 				}
 				if ( zstPeople( iTotal ) != 0 ) {
-					tableBody( 10, NumOfZones + iTotal ) = RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 );
+					tableBody( 11, NumOfZones + iTotal ) = RealToStr( zstArea( iTotal ) * m2_unitConv / zstPeople( iTotal ), 2 );
 				}
 			}
 			PreDefTableEntry( pdchLeedSutSpArea, "Totals", zstArea( grandTotal ), 2 );
@@ -14243,7 +14263,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 95;
+		UnitConvSize = 115;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14340,6 +14360,26 @@ Label900: ;
 		UnitConv( 93 ).siName = "MJ/m2";
 		UnitConv( 94 ).siName = "MJ/m2";
 		UnitConv( 95 ).siName = "Invalid/Undefined";
+		UnitConv( 96 ).siName = "";
+		UnitConv( 97 ).siName = "W/C";
+		UnitConv( 98 ).siName = "DAY";
+		UnitConv( 99 ).siName = "MIN";
+		UnitConv( 100 ).siName = "HR/WK";
+		UnitConv( 101 ).siName = "$";
+		UnitConv( 102 ).siName = "$/UNIT ENERGY";
+		UnitConv( 103 ).siName = "KW";
+		UnitConv( 104 ).siName = "KGWATER/KGDRYAIR";
+		UnitConv( 105 ).siName = " ";
+		UnitConv( 106 ).siName = "AH";
+		UnitConv( 107 ).siName = "CLO";
+		UnitConv( 108 ).siName = "J/KG-K";
+		UnitConv( 109 ).siName = "J/KGWATER";
+		UnitConv( 110 ).siName = "KGWATER/S";
+		UnitConv( 111 ).siName = "PPM";
+		UnitConv( 112 ).siName = "RAD";
+		UnitConv( 113 ).siName = "REV/MIN";
+		UnitConv( 114 ).siName = "NM";
+		UnitConv( 115 ).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14436,6 +14476,26 @@ Label900: ;
 		UnitConv( 93 ).ipName = "kBtu/ft2";
 		UnitConv( 94 ).ipName = "kWh/m2";
 		UnitConv( 95 ).ipName = "Invalid/Undefined";
+		UnitConv( 96 ).ipName = "";
+		UnitConv( 97 ).ipName = "Btu/h-F";
+		UnitConv( 98 ).ipName = "day";
+		UnitConv( 99 ).ipName = "min";
+		UnitConv( 100 ).ipName = "hr/wk";
+		UnitConv( 101 ).ipName = "$";
+		UnitConv( 102 ).ipName = "$/unit energy";
+		UnitConv( 103 ).ipName = "kW";
+		UnitConv( 104 ).ipName = "lbWater/lbDryAir";
+		UnitConv( 105 ).ipName = " ";
+		UnitConv( 106 ).ipName = "Ah";
+		UnitConv( 107 ).ipName = "clo";
+		UnitConv( 108 ).ipName = "Btu/lbm-R";
+		UnitConv( 109 ).ipName = "Btu/lbWater";
+		UnitConv( 110 ).ipName = "lbWater/s";
+		UnitConv( 111 ).ipName = "ppm";
+		UnitConv( 112 ).ipName = "rad";
+		UnitConv( 113 ).ipName = "rev/min";
+		UnitConv( 114 ).ipName = "lbf-ft";
+		UnitConv( 115 ).ipName = "Btu/W-h";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14532,6 +14592,26 @@ Label900: ;
 		UnitConv( 93 ).mult = 0.94708628903179 / 10.764961;
 		UnitConv( 94 ).mult = 0.27777777777778;
 		UnitConv( 95 ).mult = 1.0;
+		UnitConv( 96 ).mult = 1.0;
+		UnitConv( 97 ).mult = 1.8987;
+		UnitConv( 98 ).mult = 1.0;
+		UnitConv( 99 ).mult = 1.0;
+		UnitConv( 100 ).mult = 1.0;
+		UnitConv( 101 ).mult = 1.0;
+		UnitConv( 102 ).mult = 1.0;
+		UnitConv( 103 ).mult = 1.0;
+		UnitConv( 104 ).mult = 1.0;
+		UnitConv( 105 ).mult = 1.0;
+		UnitConv( 106 ).mult = 1.0;
+		UnitConv( 107 ).mult = 1.0;
+		UnitConv( 108 ).mult = 0.000238845896627;
+		UnitConv( 109 ).mult = 0.0000004302105;
+		UnitConv( 110 ).mult = 2.2046;
+		UnitConv( 111 ).mult = 1.0;
+		UnitConv( 112 ).mult = 1.0;
+		UnitConv( 113 ).mult = 1.0;
+		UnitConv( 114 ).mult = 0.737562149277;
+		UnitConv( 115 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14640,7 +14720,7 @@ Label900: ;
 		std::string::size_type const posLBrac = index( inString, '[' ); // left bracket
 		std::string::size_type const posRBrac = index( inString, ']' ); // right bracket
 		//extract the substring with the units
-		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			outUnit = inString.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 		}
 		return outUnit;
@@ -14683,11 +14763,13 @@ Label900: ;
 		std::string::size_type posRBrac = index( stringInUpper, ']' ); // right bracket
 		std::string::size_type posLParen = index( stringInUpper, '(' ); // left parenthesis
 		std::string::size_type posRParen = index( stringInUpper, ')' ); // right parenthesis
+		bool noBrackets = true;
 		//extract the substring with the units
-		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 			modeInString = misBrac;
-		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 2 ) ) {
+			noBrackets = false;
+		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
 			modeInString = misParen;
 		} else {
@@ -14749,7 +14831,14 @@ Label900: ;
 		// For debugging only
 		//CALL  ShowWarningError('LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
 		//IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // IntToStr(foundConv) )
+
 		unitConvIndex = selectedConv;
+
+		// Add warning if units not found.
+		if (unitConvIndex == 0 && ! noBrackets) {
+			ShowWarningError("Unable to find a unit conversion from " + stringInWithSI + " into IP units");
+			ShowContinueError("Applying default conversion factor of 1.0");
+		}
 	}
 
 
@@ -14828,7 +14917,7 @@ Label900: ;
 		} else if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
 			ConvertIP = ( SIvalue * UnitConv( unitConvIndex ).mult ) + UnitConv( unitConvIndex ).offset;
 		} else {
-			ConvertIP = 0.0;
+			ConvertIP = SIvalue;
 		}
 		return ConvertIP;
 	}
@@ -14877,10 +14966,12 @@ Label900: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
 
-		if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
+		if ( unitConvIndex == 0 ) {
+			ConvertIPdelta = SIvalue;
+		} else if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
 			ConvertIPdelta = SIvalue * UnitConv( unitConvIndex ).mult;
 		} else {
-			ConvertIPdelta = 0.0;
+			ConvertIPdelta = SIvalue;
 		}
 		return ConvertIPdelta;
 	}
@@ -14933,7 +15024,7 @@ Label900: ;
 			offset = UnitConv( unitConvIndex ).offset;
 			IPunit = UnitConv( unitConvIndex ).ipName;
 		} else {
-			multiplier = 0.0;
+			multiplier = 1.0;
 			offset = 0.0;
 			IPunit = "";
 		}
@@ -14999,7 +15090,9 @@ Label900: ;
 		if ( found != 0 ) {
 			getSpecificUnitMultiplier = UnitConv( found ).mult;
 		} else {
-			getSpecificUnitMultiplier = 0.0;
+			ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+			ShowContinueError("Applying default conversion factor of 1.0");
+			getSpecificUnitMultiplier = 1.0;
 		}
 		return getSpecificUnitMultiplier;
 	}
@@ -15056,7 +15149,9 @@ Label900: ;
 		if ( mult != 0 ) {
 			getSpecificUnitDivider = 1 / mult;
 		} else {
-			getSpecificUnitDivider = 0.0;
+			ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+			ShowContinueError("Applying default conversion factor of 1.0");
+			getSpecificUnitDivider = 1.0;
 		}
 		return getSpecificUnitDivider;
 	}

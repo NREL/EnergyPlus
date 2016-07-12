@@ -4,13 +4,12 @@
 
 EnergyPlus can model refrigerated case equipment consisting of a compressor rack, multiple refrigerated cases and walk-in coolers, secondary loop equipment, and~ optional heat reclaim air and water heating coils. The refrigerated case equipment models perform four major functions:
 
-n~calculate the electric consumption of refrigerated cases and walk-in coolers connected to a compressor rack
-
-n~determine the impact of refrigerated cases and walk-in coolers on zone cooling and dehumidification loads (i.e., case credits), including the effects of HVAC duct configuration
-
-n~calculate the electric consumption and COP of the compressor rack, and the electric and water (if applicable) consumption related to cooling the compressor rack's condenser.
-
-n~determine the total amount of heat rejected by the compressor rack's condenser and store this information for use by waste heat recovery models (e.g., using Desuperheater heating coil (object: Coil:Heating:Desuperheater) as an air reheat coil for high humidity control in a supermarket)
+\begin{itemize}
+  \item calculate the electric consumption of refrigerated cases and walk-in coolers connected to a compressor rack
+  \item determine the impact of refrigerated cases and walk-in coolers on zone cooling and dehumidification loads (i.e., case credits), including the effects of HVAC duct configuration
+  \item calculate the electric consumption and COP of the compressor rack, and the electric and water (if applicable) consumption related to cooling the compressor rack's condenser.
+  \item determine the total amount of heat rejected by the compressor rack's condenser and store this information for use by waste heat recovery models (e.g., using Desuperheater heating coil (object: Coil:Heating:Desuperheater) as an air reheat coil for high humidity control in a supermarket)
+\end{itemize}
 
 The case and walk-in models account for nearly all performance aspects of typical supermarket refrigeration equipment. Refrigerated case and walk-in performance are based on the combined effects of evaporator load, fan operation, lighting, defrost type, and anti-sweat heater operation. Optional air and water heating coils can be modeled to reclaim available waste heat (superheat) from the compressor rack.
 
@@ -32,13 +31,12 @@ A detailed refrigeration system object models compressor and condenser performan
 
 Four classes of secondary refrigeration loops can be modeled:
 
-n~a separate water loop is used to remove heat rejected by the condenser,
-
-n~a lower-temperature refrigeration system rejects heat to a higher-temperature refrigeration system via a cascade condenser,
-
-n~a fluid, such as a brine or glycol solution, is cooled in a secondary evaporator and is then circulated to chill the refrigerated cases and walk-ins, and
-
-n~a refrigerant, such as CO\(_{2}\), is partially evaporated in the refrigerated cases and walk-ins in a liquid-overfeed circuit, and then condensed in a secondary evaporator.
+\begin{itemize}
+  \item a separate water loop is used to remove heat rejected by the condenser,
+  \item a lower-temperature refrigeration system rejects heat to a higher-temperature refrigeration system via a cascade condenser,
+  \item a fluid, such as a brine or glycol solution, is cooled in a secondary evaporator and is then circulated to chill the refrigerated cases and walk-ins, and
+  \item a refrigerant, such as CO\(_{2}\), is partially evaporated in the refrigerated cases and walk-ins in a liquid-overfeed circuit, and then condensed in a secondary evaporator.
+\end{itemize}
 
 The first two classes of secondary loops are modeled using Refrigeration:System objects with Refrigeration:Condenser:WaterCooled and Refrigeration:Condenser:Cascade objects, respectively.~ Figure~\ref{fig:typical-detailed-refrigeration-system} shows how cascade condensers and secondary evaporators are treated as a refrigeration load on a primary detailed system. The second two classes are modeled with a Refrigeration:SecondarySystem object described later in this section.
 
@@ -1885,25 +1883,23 @@ Flow\(_{Needed}\) = Flow rate needed to meet the loop refrigeration load, , outp
 
 The needed flow rate is used to determine the number of pumps required and the total pumping power, which produces a new estimate for the total load. A few iterations converge upon the final secondary loop load for each time step.~ The total load on the heat exchanger is therefore the sum of the refrigeration loads, any pipe heat gains, and the portion of the pump power that is absorbed by the circulating fluid.
 
-\subsection{\texorpdfstring{Transcritical CO\(_{2}\) Refrigeration System}{Transcritical CO\_\{2\} Refrigeration System}}\label{transcritical-coux5f2-refrigeration-system}
+\subsection{Transcritical CO\(_{2}\) Refrigeration System}\label{transcritical-co2-refrigeration-system}
 
 The Refrigeration:TranscriticalSystem object allows users to model detailed transcritical carbon dioxide (CO\(_{2}\)) booster refrigeration systems used in supermarkets.~ The object allows for modeling either a single stage system with medium-temperature loads or a two stage system with both medium- and low-temperature loads.
 
 The input objects required to model a detailed transcritical CO\(_{2}\) refrigeration system include the following:
 
-n~One Refrigeration:TranscriticalSystem object,
-
-n~At least one refrigeration load object which may include any combination of the following:
-
-n~Refrigeration:Case,
-
-n~Refrigeration:WalkIn,
-
-n~Refrigeration:CaseAndWalkInList (may include both cases and/or walk-in cooler names),
-
-n~At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
-
-n~One Refrigeration:GasCooler:AirCooled object,
+\begin{itemize}
+  \item One Refrigeration:TranscriticalSystem object,
+  \item At least one refrigeration load object which may include any combination of the following:
+  \begin{itemize}
+    \item Refrigeration:Case,
+    \item Refrigeration:WalkIn,
+    \item Refrigeration:CaseAndWalkInList (may include both cases and/or walk-in cooler names),
+  \end{itemize}
+  \item At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
+  \item One Refrigeration:GasCooler:AirCooled object,
+\end{itemize}
 
 Output variables are available to describe the total heat exchange between all the refrigeration objects and the zones containing these objects.
 
@@ -1917,7 +1913,7 @@ The Refrigeration:TranscriticalSystem object coordinates the energy flows betwee
 
 The inputs for the refrigeration system object, in addition to the names of the other refrigeration objects described above, include a name for this system, the minimum condensing temperature, and the refrigeration system working fluid.~ Optional input fields are also provided for users seeking to keep track of refrigerant inventory and suction pipe heat gains.
 
-\subsubsection{\texorpdfstring{Transcritical CO\(_{2}\) Refrigeration Cycles}{Transcritical CO\_\{2\} Refrigeration Cycles}}\label{transcritical-coux5f2-refrigeration-cycles}
+\subsubsection{\texorpdfstring{Transcritical CO\(_{2}\) Refrigeration Cycles}{Transcritical CO\_\{2\} Refrigeration Cycles}}\label{transcritical-co2-refrigeration-cycles}
 
 Transcritical CO\(_{2}\) refrigeration cycles are characterized by a subcritical evaporation process and a supercritical ``gas cooling'' process.~ In the subcritical evaporation process which occurs in the evaporator, the CO\(_{2}\) changes phase from a liquid and vapor mixture to a superheated vapor.~ In doing so, the CO\(_{2}\) absorbs heat, thereby creating the cooling effect.~ This process is similar to the evaporation process in a standard vapor-compression refrigeration cycle.
 
