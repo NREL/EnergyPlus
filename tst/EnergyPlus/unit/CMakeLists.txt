@@ -34,6 +34,7 @@ set( test_src
   DesiccantDehumidifiers.unit.cc
   DisplacementVentMgr.unit.cc
   DOASEffectOnZoneSizing.unit.cc
+  DOASToMultAH.unit.cc
   DXCoils.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc

@@ -1587,7 +1587,7 @@ namespace DataZoneEquipment {
 	} // end of GetSupplyAirPath
 
 	void
-		GetReturnAirPath()
+	GetReturnAirPath()
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Fred Buhl LBNL
