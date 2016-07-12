@@ -1123,8 +1123,6 @@ namespace ChillerElectricEIR {
 		//  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		//  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		//  na
 
 		// Using/Aliasing
 		using namespace DataSizing;
@@ -1133,7 +1131,6 @@ namespace ChillerElectricEIR {
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
-		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
 		using StandardRatings::CalcChillerIPLV;
@@ -1151,21 +1148,16 @@ namespace ChillerElectricEIR {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
+
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
 		std::string equipName;
 		Real64 rho;
 		Real64 Cp;
-		Real64 tmpNomCap; // local nominal capacity cooling power
-		Real64 tmpEvapVolFlowRate; // local evaporator design volume flow rate
-		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
+
 		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyFlag; // TRUE in order to calculate IPLV
-		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow for reporting
-		Real64 RefCapUser; // Hardsized reference capacity for reporting
-		Real64 CondVolFlowRateUser; // Hardsized condenser flow for reporting
 
 		if ( MyOneTimeFlag ) {
 			MyFlag.dimension( NumElectricEIRChillers, true );
@@ -1175,12 +1167,13 @@ namespace ChillerElectricEIR {
 		PltSizNum = 0;
 		PltSizCondNum = 0;
 		ErrorsFound = false;
-		tmpNomCap = ElectricEIRChiller( EIRChillNum ).RefCap;
-		tmpEvapVolFlowRate = ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate;
-		tmpCondVolFlowRate = ElectricEIRChiller( EIRChillNum ).CondVolFlowRate;
-		EvapVolFlowRateUser = 0.0;
-		RefCapUser = 0.0;
-		CondVolFlowRateUser = 0.0;
+		Real64 tmpNomCap = ElectricEIRChiller( EIRChillNum ).RefCap;
+		Real64 tmpEvapVolFlowRate = ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate;
+		Real64 tmpCondVolFlowRate = ElectricEIRChiller( EIRChillNum ).CondVolFlowRate;
+		Real64 tempHeatRecVolFlowRate = ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
+		Real64 EvapVolFlowRateUser( 0.0 );
+		Real64 RefCapUser ( 0.0 );
+		Real64 CondVolFlowRateUser( 0.0 );
 
 		if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
 			PltSizCondNum = PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
@@ -1241,7 +1234,7 @@ namespace ChillerElectricEIR {
 			}
 		}
 
-		RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).EvapInletNodeNum, tmpEvapVolFlowRate );
+		PlantUtilities::RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).EvapInletNodeNum, tmpEvapVolFlowRate );
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -1358,9 +1351,47 @@ namespace ChillerElectricEIR {
 		}
 
 		// save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-		RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).CondInletNodeNum, tmpCondVolFlowRate );
+		PlantUtilities::RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).CondInletNodeNum, tmpCondVolFlowRate );
 
-		// where is the heat recovery sizing? should be here but it is missing???
+		// now do heat recovery flow rate sizing if active
+		if ( ElectricEIRChiller( EIRChillNum ).HeatRecActive ) {
+			tempHeatRecVolFlowRate = tmpCondVolFlowRate * ElectricEIRChiller( EIRChillNum ).HeatRecCapacityFraction;
+			if ( ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) {
+
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate = tempHeatRecVolFlowRate;
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+							"Design Size Heat Recovery Water Flow Rate [m3/s]", tempHeatRecVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+							"Intial Design Size Heat Recovery Water Flow Rate [m3/s]", tempHeatRecVolFlowRate );
+					}
+				}
+			} else {
+				if ( ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate > 0.0 && tempHeatRecVolFlowRate > 0.0 ) {
+					Real64 nomHeatRecVolFlowRateUser = ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
+					if ( DataPlant::PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
+							"Design Size Heat Recovery Water Flow Rate [m3/s]", tempHeatRecVolFlowRate , "User-Specified Heat Recovery Water Flow Rate [m3/s]", nomHeatRecVolFlowRateUser );
+						if ( DataGlobals::DisplayExtraWarnings ){
+							if ( ( std::abs( tempHeatRecVolFlowRate - nomHeatRecVolFlowRateUser ) / nomHeatRecVolFlowRateUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+								ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + ElectricEIRChiller( EIRChillNum ).Name );
+								ShowContinueError( "User-Specified Heat Recovery Water Flow Rate of " + RoundSigDigits( nomHeatRecVolFlowRateUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Heat Recovery Water Flow Rate of " + RoundSigDigits( tempHeatRecVolFlowRate, 5 ) + " [m3/s]" );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+							}
+						}
+					}
+					tempHeatRecVolFlowRate = nomHeatRecVolFlowRateUser;
+				}
+			
+			}
+			PlantUtilities::RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).HeatRecInletNodeNum, tempHeatRecVolFlowRate );
+		} // Heat recovery active
+
 
 		if ( PlantFinalSizesOkayToReport ) {
 			if ( MyFlag( EIRChillNum ) ) {

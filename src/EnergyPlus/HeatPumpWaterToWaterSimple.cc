@@ -64,15 +64,19 @@
 #include <BranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
+#include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataSizing.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <OutputReportPredefined.hh>
 #include <PlantUtilities.hh>
+#include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -174,14 +178,16 @@ namespace HeatPumpWaterToWaterSimple {
 		std::string const & GSHPType, // Type of GSHP
 		int const GSHPTypeNum, // Type of GSHP in Plant equipment
 		std::string const & GSHPName, // User Specified Name of GSHP
-		int & GSHPNum, // Index of Equipment
+		int & CompIndex, // Index of Equipment
 		bool const FirstHVACIteration,
 		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
 		Real64 const MyLoad, // Loop demand component will meet
 		Real64 & MaxCap, // Maximum operating capacity of GSHP [W]
 		Real64 & MinCap, // Minimum operating capacity of GSHP [W]
 		Real64 & OptCap, // Optimal operating capacity of GSHP [W]
-		int const LoopNum // The calling loop number
+		int const LoopNum, // The calling loop number
+		bool const getCompSizFac, // true if calling to get component sizing factor
+		Real64 & sizingFac // component level sizing factor
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -193,58 +199,62 @@ namespace HeatPumpWaterToWaterSimple {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Water-to-Water Heat Pump Simple (Equation-Fit Model)
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using PlantUtilities::UpdateChillerComponentCondenserSide;
-		using namespace DataEnvironment;
-		using General::TrimSigDigits;
-		using DataPlant::TypeOf_HPWaterEFCooling;
-		using DataPlant::TypeOf_HPWaterEFHeating;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		//Get input from IDF
 		if ( GetInputFlag ) {
 			GetWatertoWaterHPInput();
 			GetInputFlag = false;
 		}
 
+		int GSHPNum( 0 );
+		if ( CompIndex == 0 ) {
+			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
+			if ( GSHPNum == 0 ) {
+				ShowFatalError( "SimHPWatertoWaterSimple: Specified heat pump not one of valid heat pumps. Heat pump = " + GSHPName );
+			}
+			CompIndex = GSHPNum;
+		} else {
+			GSHPNum = CompIndex;
+			if ( GSHPNum > NumGSHPs || GSHPNum < 1 ) {
+				ShowFatalError( "SimHPWatertoWaterSimple: Invalide component index pass = " + General::TrimSigDigits( GSHPNum ) + ", number of units = " + General::TrimSigDigits( NumGSHPs )+ ", entered unit name=" + GSHPName );
+			}
+			if ( GSHP( GSHPNum ).checkEquipName ) {
+				if ( GSHPName != GSHP( GSHPNum ).Name ) {
+					ShowFatalError( "SimHPWatertoWaterSimple: Invalid CompIndex passed=" + General::TrimSigDigits( GSHPNum ) + ", Unit name=" + GSHPName + ", stored Unit Name for that index=" + GSHP( GSHPNum ).Name );
+				}
+				GSHP( GSHPNum ).checkEquipName = false;
+			}
+		}
+
 		if ( InitLoopEquip ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP );
-			if ( GSHPNum != 0 ) { // if 0, fall through to next
-				if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
+			InitWatertoWaterHP( GSHPTypeNum, GSHPName, GSHPNum, FirstHVACIteration, MyLoad );
+			if( LoopNum == GSHP( GSHPNum ).LoadLoopNum ) {
+				if ( GSHPTypeNum == DataPlant::TypeOf_HPWaterEFCooling ) {
+					sizeCoolingWaterToWaterHP( GSHPNum );
 					MinCap = 0.0;
 					MaxCap = GSHP( GSHPNum ).RatedCapCool;
 					OptCap = GSHP( GSHPNum ).RatedCapCool;
-				} else if ( GSHPTypeNum == TypeOf_HPWaterEFHeating ) {
+				} else if ( GSHPTypeNum == DataPlant::TypeOf_HPWaterEFHeating ) {
+					sizeHeatingWaterToWaterHP( GSHPNum );
 					MinCap = 0.0;
 					MaxCap = GSHP( GSHPNum ).RatedCapHeat;
 					OptCap = GSHP( GSHPNum ).RatedCapHeat;
 				} else {
 					ShowFatalError( "SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + GSHPType );
 				}
-				return;
+			} else {
+				MinCap = 0.0;
+				MaxCap = 0.0;
+				OptCap = 0.0;
 			}
+			if ( getCompSizFac ) {
+				sizingFac = GSHP( GSHPNum ).sizFac;
+			}
+
+			return;
+
 		}
 
-		// Calculate Demand on heat pump
-		if ( GSHPTypeNum == TypeOf_HPWaterEFCooling ) {
+		if ( GSHPTypeNum == DataPlant::TypeOf_HPWaterEFCooling ) {
 			if ( GSHPNum != 0 ) {
 				if ( LoopNum == GSHP( GSHPNum ).LoadLoopNum ) { // chilled water loop
 
@@ -253,14 +263,14 @@ namespace HeatPumpWaterToWaterSimple {
 					UpdateGSHPRecords( GSHPNum );
 
 				} else if ( LoopNum == GSHP( GSHPNum ).SourceLoopNum ) { // condenser loop
-					UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, TypeOf_HPWaterEFCooling, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideInletTemp, GSHPReport( GSHPNum ).SourceSideOutletTemp, GSHPReport( GSHPNum ).SourceSideMassFlowRate, FirstHVACIteration );
+					PlantUtilities::UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, DataPlant::TypeOf_HPWaterEFCooling, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideInletTemp, GSHPReport( GSHPNum ).SourceSideOutletTemp, GSHPReport( GSHPNum ).SourceSideMassFlowRate, FirstHVACIteration );
 				} else {
 					ShowFatalError( "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + GSHPName );
 				}
 			} else {
 				ShowFatalError( "SimHPWatertoWaterSimple:: Invalid " + HPEqFitCooling + ", Requested Unit=" + GSHPName );
 			}
-		} else if ( GSHPTypeNum == TypeOf_HPWaterEFHeating ) {
+		} else if ( GSHPTypeNum == DataPlant::TypeOf_HPWaterEFHeating ) {
 			if ( GSHPNum != 0 ) {
 				if ( LoopNum == GSHP( GSHPNum ).LoadLoopNum ) { // chilled water loop
 
@@ -268,7 +278,7 @@ namespace HeatPumpWaterToWaterSimple {
 					CalcWatertoWaterHPHeating( GSHPNum, MyLoad );
 					UpdateGSHPRecords( GSHPNum );
 				} else if ( LoopNum == GSHP( GSHPNum ).SourceLoopNum ) { // condenser loop
-					UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, TypeOf_HPWaterEFHeating, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, - GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideInletTemp, GSHPReport( GSHPNum ).SourceSideOutletTemp, GSHPReport( GSHPNum ).SourceSideMassFlowRate, FirstHVACIteration );
+					PlantUtilities::UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, DataPlant::TypeOf_HPWaterEFHeating, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, - GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideInletTemp, GSHPReport( GSHPNum ).SourceSideOutletTemp, GSHPReport( GSHPNum ).SourceSideMassFlowRate, FirstHVACIteration );
 				} else {
 					ShowFatalError( "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + GSHPName );
 				}
@@ -331,7 +341,7 @@ namespace HeatPumpWaterToWaterSimple {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string AlphArray( 5 ); // character string data
-		Array1D< Real64 > NumArray( 15 ); // numeric data
+		Array1D< Real64 > NumArray( 17 ); // numeric data
 
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
@@ -358,7 +368,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks );
 			IsNotOK = false;
 			IsBlank = true;
 			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
@@ -370,9 +380,21 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowCool = NumArray( 1 );
+			if ( GSHP( GSHPNum ).RatedLoadVolFlowCool == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized = true;
+			}
 			GSHP( GSHPNum ).RatedSourceVolFlowCool = NumArray( 2 );
+			if ( GSHP( GSHPNum ).RatedSourceVolFlowCool == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedSourceVolFlowCoolWasAutoSized = true;
+			}
 			GSHP( GSHPNum ).RatedCapCool = NumArray( 3 );
+			if ( GSHP( GSHPNum ).RatedCapCool == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedCapCoolWasAutoSized = true;
+			}
 			GSHP( GSHPNum ).RatedPowerCool = NumArray( 4 );
+			if ( GSHP( GSHPNum ).RatedPowerCool == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedPowerCoolWasAutoSized = true;
+			}
 			GSHP( GSHPNum ).CoolCap1 = NumArray( 5 );
 			GSHP( GSHPNum ).CoolCap2 = NumArray( 6 );
 			GSHP( GSHPNum ).CoolCap3 = NumArray( 7 );
@@ -384,6 +406,27 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHP( GSHPNum ).CoolPower4 = NumArray( 13 );
 			GSHP( GSHPNum ).CoolPower5 = NumArray( 14 );
 
+			if ( NumNums > 14 ) {
+				if ( ! DataIPShortCuts::lNumericFieldBlanks( 15 ) ) {
+					GSHP( GSHPNum ).refCOP = NumArray( 15 );
+				} else {
+					GSHP( GSHPNum ).refCOP = 8.0; 
+				}
+			
+			} else {
+				GSHP( GSHPNum ).refCOP = 8.0;
+			}
+
+			if ( NumNums > 15 ) {
+				if ( ! DataIPShortCuts::lNumericFieldBlanks( 16 ) ) {
+					GSHP( GSHPNum ).sizFac = NumArray( 16 );
+				} else {
+					GSHP( GSHPNum ).sizFac = 1.0;
+				}
+			} else {
+				GSHP( GSHPNum ).sizFac = 1.0;
+			}
+
 			GSHP( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, HPEqFitCoolingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
 			GSHP( GSHPNum ).SourceSideOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, HPEqFitCoolingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
@@ -394,10 +437,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			// Test node sets
 			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Condenser Water Nodes" );
-			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Hot Water Nodes" );
-
-			// save the design source side flow rate for use by plant loop sizing algorithms
-			RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, 0.5 * GSHP( GSHPNum ).RatedSourceVolFlowCool );
+			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Chilled Water Nodes" );
 
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
 			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Cooling", _, "Plant" );
@@ -410,7 +450,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks );
 			IsNotOK = false;
 			IsBlank = true;
 			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
@@ -422,9 +462,22 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowHeat = NumArray( 1 );
+			if ( GSHP( GSHPNum ).RatedLoadVolFlowHeat == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized = true;
+			}
 			GSHP( GSHPNum ).RatedSourceVolFlowHeat = NumArray( 2 );
+			if ( GSHP( GSHPNum ).RatedSourceVolFlowHeat == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedSourceVolFlowHeatWasAutoSized = true;
+			}
 			GSHP( GSHPNum ).RatedCapHeat = NumArray( 3 );
+			if ( GSHP( GSHPNum ).RatedCapHeat == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedCapHeatWasAutoSized = true;
+			}
 			GSHP( GSHPNum ).RatedPowerHeat = NumArray( 4 );
+			if ( GSHP( GSHPNum ).RatedPowerHeat == DataSizing::AutoSize ) {
+				GSHP( GSHPNum ).ratedPowerHeatWasAutoSized = true;
+			}
+
 			GSHP( GSHPNum ).HeatCap1 = NumArray( 5 );
 			GSHP( GSHPNum ).HeatCap2 = NumArray( 6 );
 			GSHP( GSHPNum ).HeatCap3 = NumArray( 7 );
@@ -435,6 +488,27 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHP( GSHPNum ).HeatPower3 = NumArray( 12 );
 			GSHP( GSHPNum ).HeatPower4 = NumArray( 13 );
 			GSHP( GSHPNum ).HeatPower5 = NumArray( 14 );
+
+			if ( NumNums > 14 ) {
+				if ( ! DataIPShortCuts::lNumericFieldBlanks( 15 ) ) {
+					GSHP( GSHPNum ).refCOP = NumArray( 15 );
+				} else {
+					GSHP( GSHPNum ).refCOP = 7.5; 
+				}
+			
+			} else {
+				GSHP( GSHPNum ).refCOP = 7.5;
+			}
+
+			if ( NumNums > 15 ) {
+				if ( ! DataIPShortCuts::lNumericFieldBlanks( 16 ) ) {
+					GSHP( GSHPNum ).sizFac = NumArray( 16 );
+				} else {
+					GSHP( GSHPNum ).sizFac = 1.0;
+				}
+			} else {
+				GSHP( GSHPNum ).sizFac = 1.0;
+			}
 
 			GSHP( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, HPEqFitHeatingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
@@ -448,13 +522,14 @@ namespace HeatPumpWaterToWaterSimple {
 			TestCompSet( HPEqFitHeatingUC, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Condenser Water Nodes" );
 			TestCompSet( HPEqFitHeatingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Hot Water Nodes" );
 
-			// save the design source side flow rate for use by plant loop sizing algorithms
-			RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, 0.5 * GSHP( GSHPNum ).RatedSourceVolFlowHeat );
-
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Heating'
 			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
 			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+		}
+
+		if ( ErrorsFound ) {
+			ShowFatalError( "Errors found in processing input for Water to Water Heat Pumps" );
 		}
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
@@ -687,6 +762,330 @@ namespace HeatPumpWaterToWaterSimple {
 	}
 
 	void
+	sizeCoolingWaterToWaterHP( int const GSHPNum ) // GSHP Number
+	{
+		//do sizing related calculations and reporting for cooling heat pumps
+		bool errorsFound( false );
+		static std::string const RoutineName( "sizeCoolingWaterToWaterHP" );
+		Real64 tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowCool;
+		Real64 tmpSourceSideVolFlowRate = GSHP( GSHPNum ).RatedSourceVolFlowCool;
+		Real64 tmpCoolingCap = GSHP( GSHPNum ).RatedCapCool;
+		Real64 tmpPowerDraw= GSHP( GSHPNum ).RatedPowerCool;
+
+		int pltLoadSizNum = DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).PlantSizNum;
+		if ( pltLoadSizNum > 0 ) {
+			if ( DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow ) {
+				tmpLoadSideVolFlowRate = DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate;
+				if ( ! GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowCool;
+				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
+				Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
+				tmpCoolingCap = Cp * rho * DataSizing::PlantSizData( pltLoadSizNum ).DeltaT * DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate * GSHP( GSHPNum ).sizFac;
+				if ( ! GSHP( GSHPNum ).ratedCapCoolWasAutoSized ) tmpCoolingCap = GSHP( GSHPNum ).RatedCapCool;
+			} else {
+				if ( GSHP( GSHPNum ).ratedCapCoolWasAutoSized ) tmpCoolingCap = 0.0;
+				if ( GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) tmpLoadSideVolFlowRate = 0.0;
+			}
+			if ( DataPlant::PlantFirstSizesOkayToFinalize ) {
+				if ( GSHP( GSHPNum ).ratedCapCoolWasAutoSized ) {
+					GSHP( GSHPNum ).RatedCapCool = tmpCoolingCap;
+					if ( DataPlant::PlantFinalSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Nominal Capacity [W]", tmpCoolingCap );
+					}
+					if ( DataPlant::PlantFirstSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Initial Design Size Nominal Capacity [W]", tmpCoolingCap );
+					}
+				} else {
+					if ( GSHP( GSHPNum ).RatedCapCool > 0.0 && tmpCoolingCap > 0.0 ) {
+						Real64 nomCoolingCapUser = GSHP( GSHPNum ).RatedCapCool;
+						if ( DataPlant::PlantFinalSizesOkayToReport ) {
+							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Nominal Capacity [W]", tmpCoolingCap, "User-Specified Nominal Capacity [W]", nomCoolingCapUser );
+							if ( DataGlobals::DisplayExtraWarnings ) {
+								if ( ( std::abs( tmpCoolingCap - nomCoolingCapUser ) / nomCoolingCapUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+									ShowMessage( "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + General::RoundSigDigits( nomCoolingCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + General::RoundSigDigits( tmpCoolingCap, 2 ) + " [W]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+						tmpCoolingCap = nomCoolingCapUser;
+					}
+				}
+				if ( GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) {
+					GSHP( GSHPNum ).RatedLoadVolFlowCool = tmpLoadSideVolFlowRate;
+					if ( DataPlant::PlantFinalSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate );
+					}
+					if ( DataPlant::PlantFirstSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate );
+					}
+				} else {
+					if ( GSHP( GSHPNum ).RatedLoadVolFlowCool > 0.0 && tmpLoadSideVolFlowRate > 0.0 ) {
+						Real64 nomLoadSideVolFlowUser = GSHP( GSHPNum ).RatedLoadVolFlowCool;
+						if ( DataPlant::PlantFinalSizesOkayToReport ) {
+							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate, "User-Specified Load Side Volume Flow Rate [m3/s]", nomLoadSideVolFlowUser );
+							if ( DataGlobals::DisplayExtraWarnings ) {
+								if ( ( std::abs( tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser ) / nomLoadSideVolFlowUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+									ShowMessage( "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+									ShowContinueError( "User-Specified Load Side Volume Flow Rate of " + General::RoundSigDigits( nomLoadSideVolFlowUser, 2 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Load Side Volume Flow Rate of " + General::RoundSigDigits( tmpLoadSideVolFlowRate, 2 ) + " [m3/s]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+						tmpLoadSideVolFlowRate = nomLoadSideVolFlowUser;
+					}
+				}
+			}
+
+		} else { // did not find plant sizing to go with this.
+			
+			if ( GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize ) {
+				ShowSevereError( "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
+				ShowContinueError("Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + GSHP( GSHPNum ).Name );
+				errorsFound = true;
+			}
+			if ( ! GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling", GSHP( GSHPNum ).Name, "User-Specified Load Side Flow Rate [m3/s]", GSHP( GSHPNum ).RatedLoadVolFlowCool );
+			}
+		}
+		tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
+		if ( GSHP( GSHPNum ).ratedSourceVolFlowCoolWasAutoSized ) {
+			GSHP( GSHPNum ).RatedSourceVolFlowCool = tmpSourceSideVolFlowRate;
+			if ( DataPlant::PlantFinalSizesOkayToReport ) { 
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
+			}
+			if ( DataPlant::PlantFirstSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
+			}
+		} else {
+			if ( GSHP( GSHPNum ).RatedSourceVolFlowCool > 0.0 && tmpSourceSideVolFlowRate > 0 ) {
+				Real64 nomSourceSideVolFlowUser = GSHP( GSHPNum ).RatedSourceVolFlowCool;
+				if ( DataPlant::PlantFinalSizesOkayToReport ) {
+					ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate, "User-Specified Source Side Volume Flow Rate [m3/s]", nomSourceSideVolFlowUser );
+					if ( DataGlobals::DisplayExtraWarnings ){
+						if ( ( std::abs( tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser ) / nomSourceSideVolFlowUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+							ShowMessage( "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+							ShowContinueError( "User-Specified Source Side Volume Flow Rate of " + General::RoundSigDigits( nomSourceSideVolFlowUser, 2 ) + " [m3/s]" );
+							ShowContinueError( "differs from Design Size Source Side Volume Flow Rate of " + General::RoundSigDigits( tmpSourceSideVolFlowRate, 2 ) + " [m3/s]" );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+				}
+				tmpSourceSideVolFlowRate = nomSourceSideVolFlowUser;
+			}
+		}
+
+		if ( GSHP( GSHPNum ).ratedPowerCoolWasAutoSized ){
+			tmpPowerDraw = tmpCoolingCap / GSHP( GSHPNum ).refCOP;
+			GSHP( GSHPNum ).RatedPowerCool = tmpPowerDraw;
+			if ( DataPlant::PlantFinalSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Cooling Power Consumption [W]", tmpPowerDraw );
+			}
+			if ( DataPlant::PlantFirstSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Initial Design Size Cooling Power Consumption [W]", tmpPowerDraw );
+			}
+		} else {
+			if ( GSHP( GSHPNum ).RatedPowerCool > 0.0 && tmpPowerDraw > 0.0 ) {
+				Real64 nomPowerDrawUser = GSHP( GSHPNum ).RatedPowerCool;
+				if ( DataPlant::PlantFinalSizesOkayToReport ){
+					ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Cooling Power Consumption [W]", tmpPowerDraw, "User-Specified Cooling Power Consumption [W]", nomPowerDrawUser );
+					if ( DataGlobals::DisplayExtraWarnings ){
+						if ( ( std::abs( tmpPowerDraw - nomPowerDrawUser ) / nomPowerDrawUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+							ShowMessage( "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+							ShowContinueError( "User-Specified Cooling Power Consumption of " + General::RoundSigDigits( nomPowerDrawUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Cooling Power Consumption of " + General::RoundSigDigits( tmpPowerDraw, 2 ) + " [W]" );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+				}
+				tmpPowerDraw = nomPowerDrawUser;
+				GSHP( GSHPNum ).refCOP = tmpCoolingCap / tmpPowerDraw;
+			}
+		}
+
+		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).LoadSideInletNodeNum, tmpLoadSideVolFlowRate );
+		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, tmpSourceSideVolFlowRate );
+
+		if ( DataPlant::PlantFinalSizesOkayToReport ) {
+			//create predefined report
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchMechType, GSHP( GSHPNum ).Name, "HeatPump:WaterToWater:EquationFit:Cooling" );
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchMechNomEff, GSHP( GSHPNum ).Name, GSHP( GSHPNum ).refCOP );
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchMechNomCap, GSHP( GSHPNum ).Name, GSHP( GSHPNum ).RatedPowerCool );
+		}
+
+		if ( errorsFound ) {
+			ShowFatalError( "Preceding sizing errors cause program termination" );
+		}
+	}
+
+	void
+	sizeHeatingWaterToWaterHP( int const GSHPNum ) // GSHP Number
+	{
+		//do sizing related calculations and reporting for heating heat pumps
+		bool errorsFound( false );
+		static std::string const RoutineName( "sizeHeatingWaterToWaterHP" );
+		Real64 tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowHeat;
+		Real64 tmpSourceSideVolFlowRate = GSHP( GSHPNum ).RatedSourceVolFlowHeat;
+		Real64 tmpHeatingCap = GSHP( GSHPNum ).RatedCapHeat;
+		Real64 tmpPowerDraw= GSHP( GSHPNum ).RatedPowerHeat;
+
+		int pltLoadSizNum = DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).PlantSizNum;
+		if ( pltLoadSizNum > 0 ) {
+			if ( DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow ) {
+				tmpLoadSideVolFlowRate = DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate;
+				if ( ! GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized ) tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowHeat;
+
+				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
+				Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
+				tmpHeatingCap = Cp * rho * DataSizing::PlantSizData( pltLoadSizNum ).DeltaT * DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate * GSHP( GSHPNum ).sizFac;
+				if ( ! GSHP( GSHPNum ).ratedCapHeatWasAutoSized ) tmpHeatingCap = GSHP( GSHPNum ).RatedCapHeat;
+
+			} else {
+				if ( GSHP( GSHPNum ).ratedCapHeatWasAutoSized ) tmpHeatingCap = 0.0;
+				if ( GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized ) tmpLoadSideVolFlowRate = 0.0;
+			}
+			if ( DataPlant::PlantFirstSizesOkayToFinalize ) {
+				if ( GSHP( GSHPNum ).ratedCapHeatWasAutoSized ) {
+					GSHP( GSHPNum ).RatedCapHeat = tmpHeatingCap;
+					if ( DataPlant::PlantFinalSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Nominal Capacity [W]", tmpHeatingCap );
+					}
+					if ( DataPlant::PlantFirstSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Initial Design Size Nominal Capacity [W]", tmpHeatingCap );
+					}
+				} else {
+					if ( GSHP( GSHPNum ).RatedCapHeat > 0.0 && tmpHeatingCap > 0.0 ) {
+						Real64 nomHeatingCapUser = GSHP( GSHPNum ).RatedCapHeat;
+						if ( DataPlant::PlantFinalSizesOkayToReport ) {
+							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Nominal Capacity [W]", tmpHeatingCap, "User-Specified Nominal Capacity [W]", nomHeatingCapUser );
+							if ( DataGlobals::DisplayExtraWarnings ) {
+								if ( ( std::abs( tmpHeatingCap - nomHeatingCapUser ) / nomHeatingCapUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+									ShowMessage( "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+									ShowContinueError( "User-Specified Nominal Capacity of " + General::RoundSigDigits( nomHeatingCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + General::RoundSigDigits( tmpHeatingCap, 2 ) + " [W]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+						tmpHeatingCap = nomHeatingCapUser;
+					}
+				}
+				if ( GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized ) {
+					GSHP( GSHPNum ).RatedLoadVolFlowHeat = tmpLoadSideVolFlowRate;
+					if ( DataPlant::PlantFinalSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate );
+					}
+					if ( DataPlant::PlantFirstSizesOkayToReport ) {
+						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate );
+					}
+				} else {
+					if ( GSHP( GSHPNum ).RatedLoadVolFlowHeat > 0.0 && tmpLoadSideVolFlowRate > 0.0 ) {
+						Real64 nomLoadSideVolFlowUser = GSHP( GSHPNum ).RatedLoadVolFlowHeat;
+						if ( DataPlant::PlantFinalSizesOkayToReport ) {
+							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate, "User-Specified Load Side Volume Flow Rate [m3/s]", nomLoadSideVolFlowUser );
+							if ( DataGlobals::DisplayExtraWarnings ) {
+								if ( ( std::abs( tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser ) / nomLoadSideVolFlowUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+									ShowMessage( "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+									ShowContinueError( "User-Specified Load Side Volume Flow Rate of " + General::RoundSigDigits( nomLoadSideVolFlowUser, 2 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Load Side Volume Flow Rate of " + General::RoundSigDigits( tmpLoadSideVolFlowRate, 2 ) + " [m3/s]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+						tmpLoadSideVolFlowRate = nomLoadSideVolFlowUser;
+					}
+				}
+			}
+
+		} else { // did not find plant sizing to go with this.
+			if ( GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize ) {
+				ShowSevereError( "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
+				ShowContinueError("Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + GSHP( GSHPNum ).Name );
+				errorsFound = true;
+			}
+			if ( ! GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating", GSHP( GSHPNum ).Name, "User-Specified Load Side Flow Rate [m3/s]", GSHP( GSHPNum ).RatedLoadVolFlowHeat );
+			}
+		}
+		tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow
+		if ( GSHP( GSHPNum ).ratedSourceVolFlowHeatWasAutoSized ) {
+			GSHP( GSHPNum ).RatedSourceVolFlowHeat = tmpSourceSideVolFlowRate;
+			if ( DataPlant::PlantFinalSizesOkayToReport ) { 
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
+			}
+			if ( DataPlant::PlantFirstSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
+			}
+		} else {
+			if ( GSHP( GSHPNum ).RatedSourceVolFlowHeat > 0.0 && tmpSourceSideVolFlowRate > 0 ) {
+				Real64 nomSourceSideVolFlowUser = GSHP( GSHPNum ).RatedSourceVolFlowHeat;
+				if ( DataPlant::PlantFinalSizesOkayToReport ) {
+					ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate, "User-Specified Source Side Volume Flow Rate [m3/s]", nomSourceSideVolFlowUser );
+					if ( DataGlobals::DisplayExtraWarnings ){
+						if ( ( std::abs( tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser ) / nomSourceSideVolFlowUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+							ShowMessage( "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+							ShowContinueError( "User-Specified Source Side Volume Flow Rate of " + General::RoundSigDigits( nomSourceSideVolFlowUser, 2 ) + " [m3/s]" );
+							ShowContinueError( "differs from Design Size Source Side Volume Flow Rate of " + General::RoundSigDigits( tmpSourceSideVolFlowRate, 2 ) + " [m3/s]" );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+				}
+				tmpSourceSideVolFlowRate = nomSourceSideVolFlowUser;
+			}
+		}
+
+		if ( GSHP( GSHPNum ).ratedPowerHeatWasAutoSized ){
+			tmpPowerDraw = tmpHeatingCap / GSHP( GSHPNum ).refCOP;
+			GSHP( GSHPNum ).RatedPowerHeat = tmpPowerDraw;
+			if ( DataPlant::PlantFinalSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Heating Power Consumption [W]", tmpPowerDraw );
+			}
+			if ( DataPlant::PlantFirstSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Initial Design Size Heating Power Consumption [W]", tmpPowerDraw );
+			}
+		} else {
+			if ( GSHP( GSHPNum ).RatedPowerHeat > 0.0 && tmpPowerDraw > 0.0 ) {
+				Real64 nomPowerDrawUser = GSHP( GSHPNum ).RatedPowerHeat;
+				if ( DataPlant::PlantFinalSizesOkayToReport ){
+					ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Heating Power Consumption [W]", tmpPowerDraw, "User-Specified Heating Power Consumption [W]", nomPowerDrawUser );
+					if ( DataGlobals::DisplayExtraWarnings ){
+						if ( ( std::abs( tmpPowerDraw - nomPowerDrawUser ) / nomPowerDrawUser ) > DataSizing::AutoVsHardSizingThreshold ) {
+							ShowMessage( "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
+							ShowContinueError( "User-Specified Heating Power Consumption of " + General::RoundSigDigits( nomPowerDrawUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Heating Power Consumption of " + General::RoundSigDigits( tmpPowerDraw, 2 ) + " [W]" );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+				}
+				tmpPowerDraw = nomPowerDrawUser;
+				GSHP( GSHPNum ).refCOP = tmpHeatingCap / tmpPowerDraw;
+			}
+		}
+
+		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).LoadSideInletNodeNum, tmpLoadSideVolFlowRate );
+		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, tmpSourceSideVolFlowRate );
+
+		if ( DataPlant::PlantFinalSizesOkayToReport ) {
+			//create predefined report
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchMechType, GSHP( GSHPNum ).Name, "HeatPump:WaterToWater:EquationFit:Heating" );
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchMechNomEff, GSHP( GSHPNum ).Name, GSHP( GSHPNum ).refCOP );
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchMechNomCap, GSHP( GSHPNum ).Name, GSHP( GSHPNum ).RatedPowerHeat );
+		}
+		if ( errorsFound ) {
+			ShowFatalError( "Preceding sizing errors cause program termination" );
+		}
+	}
+
+	void
 	CalcWatertoWaterHPCooling(
 		int const GSHPNum, // GSHP Number
 		Real64 const MyLoad // Operating Load
@@ -803,6 +1202,7 @@ namespace HeatPumpWaterToWaterSimple {
 		func4 = ( SourceSideMassFlowRate / ( SourceSideVolFlowRateRated * rhoSourceSide ) );
 
 		QLoad = CoolCapRated * ( CoolCapCoeff1 + ( func1 * CoolCapCoeff2 ) + ( func2 * CoolCapCoeff3 ) + ( func3 * CoolCapCoeff4 ) + ( func4 * CoolCapCoeff5 ) );
+// this doesn't match eng ref, doc is missing CoolPowerRated
 		Power = CoolPowerRated * ( CoolPowerCoeff1 + ( func1 * CoolPowerCoeff2 ) + ( func2 * CoolPowerCoeff3 ) + ( func3 * CoolPowerCoeff4 ) + ( func4 * CoolPowerCoeff5 ) );
 
 		if ( ( QLoad <= 0.0 || Power <= 0.0 ) && ! WarmupFlag ) {
