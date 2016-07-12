@@ -222,8 +222,6 @@ namespace Pumps {
 		int ZoneNum; // index for zone surrounding pump
 		Real64 SkinLossRadFraction; // radiative split for skin losses to zone
 		bool LoopSolverOverwriteFlag; // loop solver overwrite for determining pump minimum flow rate
-		int PumpInVsPumpOutFlowNotMatchingIter; // counter for node flow warning messages
-		int PumpInVsPumpOutFlowNotMatchingIndex; // index for node flow warning messages
 
 		// Default Constructor
 		PumpSpecs() :
@@ -283,9 +281,7 @@ namespace Pumps {
 			HeatLossesToZone( false ),
 			ZoneNum( 0 ),
 			SkinLossRadFraction( 0.0 ),
-			LoopSolverOverwriteFlag( false ),
-			PumpInVsPumpOutFlowNotMatchingIter( 0 ),
-			PumpInVsPumpOutFlowNotMatchingIndex( 0 )
+			LoopSolverOverwriteFlag( false )
 		{}
 
 	};

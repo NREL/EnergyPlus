@@ -92,9 +92,6 @@ namespace HVACManager {
 	SimHVAC();
 
 	void
-	CheckMassBalances();
-
-	void
 	SimSelectedEquipment(
 		bool & SimAirLoops, // True when the air loops need to be (re)simulated
 		bool & SimZoneEquipment, // True when zone equipment components need to be (re)simulated

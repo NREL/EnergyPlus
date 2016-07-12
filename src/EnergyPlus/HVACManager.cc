@@ -72,7 +72,6 @@
 //#include <CoolTower.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
-#include <DataBranchAirLoopPlant.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -93,7 +92,6 @@
 #include <DisplayRoutines.hh>
 //#include <EarthTube.hh>
 #include <EMSManager.hh>
-#include <Fans.hh>
 #include <General.hh>
 #include <HVACStandAloneERV.hh>
 #include <IceThermalStorage.hh>
@@ -108,7 +106,6 @@
 #include <PlantUtilities.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
-#include <Pumps.hh>
 #include <RefrigeratedCase.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
@@ -517,8 +514,6 @@ namespace HVACManager {
 			UpdateNodeThermalHistory();
 
 			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan ); // EMS calling point
-
-			CheckMassBalances();
 
 			// This is where output processor data is updated for System Timestep reporting
 			if ( ! WarmupFlag ) {
@@ -2729,65 +2724,6 @@ namespace HVACManager {
 		}
 
 	}
-
-	void
-	CheckMassBalances()
-	{
-		using namespace Fans;
-		using namespace Pumps;
-		using General::RoundSigDigits;
-		using DataHVACGlobals::SmallMassFlow;  // Air
-		using DataBranchAirLoopPlant::MassFlowTolerance;  // Liquid
-
-		for (int FanNum = 1; FanNum <= NumFans; ++FanNum) {
-
-			if (abs(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate - Fan( FanNum ).InletAirMassFlowRate) > SmallMassFlow) {
-				++Fan( FanNum ).FanInletVsNodeFlowNotMatchingIter;
-				if ( Fan( FanNum ).FanInletVsNodeFlowNotMatchingIter == 1 ) {
-					ShowSevereError(Fan(FanNum).FanType + ", Name: " + Fan(FanNum).FanName + ": Fan inlet mass flow rate (" + RoundSigDigits(Fan( FanNum ).InletAirMassFlowRate, 4) + ") does not match inlet node mass flow rate (" + RoundSigDigits(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate, 4) + ").");
-					ShowContinueErrorTimeStamp( "" );
-				} else {
-					ShowRecurringWarningErrorAtEnd( Fan(FanNum).FanType + ", Name: " + Fan(FanNum).FanName + ": Fan inlet mass flow rate does not match error continues...", Fan( FanNum ).FanInletVsNodeFlowNotMatchingIndex, abs(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate - Fan( FanNum ).InletAirMassFlowRate), abs(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate - Fan( FanNum ).InletAirMassFlowRate) );
-				}
-			}
-
-			if (abs(Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate - Fan( FanNum ).OutletAirMassFlowRate) > SmallMassFlow) {
-				++Fan( FanNum ).FanOutletVsNodeFlowNotMatchingIter;
-				if ( Fan( FanNum ).FanOutletVsNodeFlowNotMatchingIter == 1 ) {
-					ShowSevereError(Fan(FanNum).FanType + ", Name: " + Fan(FanNum).FanName + ": Fan outlet mass flow rate (" + RoundSigDigits(Fan( FanNum ).OutletAirMassFlowRate, 4) + ") does not match outlet node mass flow rate (" + RoundSigDigits(Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate, 4) + ").");
-					ShowContinueErrorTimeStamp( "" );
-				} else {
-					ShowRecurringWarningErrorAtEnd( Fan(FanNum).FanType + ", Name: " + Fan(FanNum).FanName + ": Fan outlet mass flow rate does not match error continues...", Fan( FanNum ).FanOutletVsNodeFlowNotMatchingIndex, abs(Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate - Fan( FanNum ).OutletAirMassFlowRate), abs(Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate - Fan( FanNum ).OutletAirMassFlowRate) );
-				}
-			}
-
-			if (abs(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate - Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate) > SmallMassFlow) {
-				++Fan( FanNum ).FanInletVsFanOutletFlowNotMatchingIter;
-				if ( Fan( FanNum ).FanInletVsFanOutletFlowNotMatchingIter == 1 ) {
-					ShowSevereError( Fan( FanNum ).FanType + ", Name: " + Fan( FanNum ).FanName + ": Fan outlet node mass flow rate (" + RoundSigDigits( Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate, 4 ) + ") does not match fan inlet node mass flow rate (" + RoundSigDigits( Node( Fan( FanNum ).InletNodeNum ).MassFlowRate, 4 ) + ")." );
-					ShowContinueErrorTimeStamp( "" );
-				} else {
-					ShowRecurringWarningErrorAtEnd( Fan(FanNum).FanType + ", Name: " + Fan(FanNum).FanName + ": Fan outlet node mass flow rate does not match error continues...", Fan( FanNum ).FanInletVsFanOutletFlowNotMatchingIndex, abs(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate - Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate), abs(Node( Fan( FanNum ).InletNodeNum ).MassFlowRate - Node( Fan( FanNum ).OutletNodeNum ).MassFlowRate) );
-				}
-			}
-
-		}
-
-		for (int PumpNum = 1; PumpNum <= NumPumps; ++PumpNum) {
-			if (abs(Node( PumpEquip( PumpNum ).OutletNodeNum ).MassFlowRate - Node( PumpEquip( PumpNum ).InletNodeNum ).MassFlowRate) > MassFlowTolerance) {
-				++PumpEquip( PumpNum ).PumpInVsPumpOutFlowNotMatchingIter;
-				if ( PumpEquip( PumpNum ).PumpInVsPumpOutFlowNotMatchingIter == 1 ) {
-					ShowSevereError( cPumpTypes( PumpEquip( PumpNum ).PumpType ) + ", Name: " + PumpEquip( PumpNum ).Name + ": Pump outlet mass flow rate (" + RoundSigDigits( Node( PumpEquip( PumpNum ).OutletNodeNum ).MassFlowRate, 9 ) + ") does not match pump inlet node mass flow rate (" + RoundSigDigits( Node( PumpEquip( PumpNum ).InletNodeNum ).MassFlowRate, 9 ) + ")." );
-					ShowContinueErrorTimeStamp( "" );
-				} else {
-					ShowRecurringWarningErrorAtEnd( cPumpTypes( PumpEquip( PumpNum ).PumpType ) + ", Name: " + PumpEquip( PumpNum ).Name + ": Pump outlet mass flow rate does not match error continues...", PumpEquip( PumpNum ).PumpInVsPumpOutFlowNotMatchingIndex, abs(Node( PumpEquip( PumpNum ).OutletNodeNum ).MassFlowRate - Node( PumpEquip( PumpNum ).InletNodeNum ).MassFlowRate), abs(Node( PumpEquip( PumpNum ).OutletNodeNum ).MassFlowRate - Node( PumpEquip( PumpNum ).InletNodeNum ).MassFlowRate) );
-				}
-			}
-		}
-
-
-	}
-
 
 } // HVACManager
 

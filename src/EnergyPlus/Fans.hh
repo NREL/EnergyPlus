@@ -221,12 +221,6 @@ namespace Fans {
 		int BalancedFractSchedNum; // schedule index portion recirculated
 		Real64 UnbalancedOutletMassFlowRate;
 		Real64 BalancedOutletMassFlowRate;
-		int FanInletVsNodeFlowNotMatchingIter; // counter for node flow warning messages
-		int FanOutletVsNodeFlowNotMatchingIter; // counter for node flow warning messages
-		int FanInletVsFanOutletFlowNotMatchingIter; // counter for node flow warning messages
-		int FanInletVsNodeFlowNotMatchingIndex; // index for node flow warning messages
-		int FanOutletVsNodeFlowNotMatchingIndex; // index for node flow warning messages
-		int FanInletVsFanOutletFlowNotMatchingIndex; // index for node flow warning messages
 
 		// Default Constructor
 		FanEquipConditions() :
@@ -325,13 +319,7 @@ namespace Fans {
 			MinTempLimitSchedNum( 0 ),
 			BalancedFractSchedNum( 0 ),
 			UnbalancedOutletMassFlowRate( 0.0 ),
-			BalancedOutletMassFlowRate( 0.0 ),
-			FanInletVsNodeFlowNotMatchingIter( 0 ),
-			FanOutletVsNodeFlowNotMatchingIter( 0 ),
-			FanInletVsFanOutletFlowNotMatchingIter( 0 ),
-			FanInletVsNodeFlowNotMatchingIndex( 0 ),
-			FanOutletVsNodeFlowNotMatchingIndex( 0 ),
-			FanInletVsFanOutletFlowNotMatchingIndex( 0 )
+			BalancedOutletMassFlowRate( 0.0 )
 		{}
 
 	};
