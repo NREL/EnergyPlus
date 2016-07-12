@@ -63,46 +63,64 @@
 #include <General.hh>
 #include <DataZoneEquipment.hh>
 #include <MixedAir.hh>
+#include <SplitterComponent.hh>
+#include <MixerComponent.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
-using namespace EnergyPlus::MixedAir
+using namespace EnergyPlus::MixedAir;
+using namespace EnergyPlus::SplitterComponent;
+using namespace EnergyPlus::MixerComponent;
 
 namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, DOASToMultAH1 ) {
 	
 			std::string const idf_objects = delimited_string( {
-			" AirLoopHVAC:SupplyPath,",
-			" AHU Supply Air Path 1, !- Name",
-			" DOAS Outlet Node, !- Supply Air Path Inlet Node Name",
-			" AirLoopHVAC:ZoneSplitter, !- Component 1 Object Type",
-			" DOAS Supply Air Splitter 1; !- Component 1 Name",
-			" AirLoopHVAC:ReturnPath,",
-      " AHU Return Air Path 1, !- Name",
-      " DOAS Return Node, !- Return Air Path Outlet Node Name",
-      " AirLoopHVAC:ZoneMixer, !- Component 1 Object Type",
-      " DOAS Return Air Mixer 1; !- Component 1 Name",
+				" AirLoopHVAC:SupplyPath,",
+				" AHU Supply Air Path 1, !- Name",
+				" DOAS Outlet Node, !- Supply Air Path Inlet Node Name",
+				" AirLoopHVAC:ZoneSplitter, !- Component 1 Object Type",
+				" DOAS Supply Air Splitter 1; !- Component 1 Name",
+				" AirLoopHVAC:ReturnPath,",
+				" AHU Return Air Path 1, !- Name",
+				" DOAS Return Node, !- Return Air Path Outlet Node Name",
+				" AirLoopHVAC:ZoneMixer, !- Component 1 Object Type",
+				" DOAS Return Air Mixer 1; !- Component 1 Name",
+				" AirLoopHVAC:ZoneSplitter,",
+				" DOAS Supply Air Splitter 1, !- Name",
+				" DOAS Outlet Node, !- Inlet Node Name",
+				" AHU 1 Vent Air In Node, !- Outlet 1 Node Name",
+				" AHU 2 Vent Air In Node, !- Outlet 2 Node Name",
+				" AHU 3 Vent Air In Node; !- Outlet 3 Node Name",
+				" AirLoopHVAC:ZoneMixer,",
+				" DOAS Return Air Mixer 1, !- Name",
+				" DOAS Return Node, !- Outlet Node Name",
+				" AHU 1 Relief Air Node, !- Inlet 1 Node Name",
+				" AHU 2 Relief Air Node, !- Inlet 2 Node Name",
+				" AHU 3 Relief Air Node; !- Inlet 3 Node Name,"
 			
 		} );
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
 		
+		GetSplitterInput();
+		GetMixerInput();
 		GetSupplyAirPath();
 		GetReturnAirPath();
 		EXPECT_EQ( SupplyAirPath( 1 ).NumOfComponents, 1 );
-	  EXPECT_EQ( SupplyAirPath( 1 ).ComponentType_Num( 1 ), ZoneSplitter_Type);
-	  EXPECT_EQ( SupplyAirPath( 1 ).Name, "AHU Supply Air Path 1" );
-	  EXPECT_EQ( SupplyAirPath( 1 ).ComponentName( 1 ), "DOAS Supply Air Spltter 1" );
-	  EXPECT_GT( SupplyAirPath( 1 ).InletNodeNum, 0 );
-	  
-	  EXPECT_EQ( ReturnAirPath( 1 ).NumOfComponents, 1 );
-	  EXPECT_EQ( ReturnAirPath( 1 ).ComponentType_Num( 1 ), ZoneMixer_Type);
-	  EXPECT_EQ( ReturnAirPath( 1 ).Name, "AHU Return Air Path 1" );
-	  EXPECT_EQ( ReturnAirPath( 1 ).ComponentName( 1 ), "DOAS Return Air Mixer 1" );
-	  EXPECT_GT( ReturnAirPath( 1 ).InletNodeNum, 0 );
-	  
+		EXPECT_EQ( SupplyAirPath( 1 ).ComponentType_Num( 1 ), ZoneSplitter_Type);
+		EXPECT_EQ( SupplyAirPath( 1 ).Name, "AHU SUPPLY AIR PATH 1" );
+		EXPECT_EQ( SupplyAirPath( 1 ).ComponentName( 1 ), "DOAS SUPPLY AIR SPLITTER 1" );
+		EXPECT_GT( SupplyAirPath( 1 ).InletNodeNum, 0 );
+
+		EXPECT_EQ( ReturnAirPath( 1 ).NumOfComponents, 1 );
+		EXPECT_EQ( ReturnAirPath( 1 ).ComponentType_Num( 1 ), ZoneMixer_Type);
+		EXPECT_EQ( ReturnAirPath( 1 ).Name, "AHU RETURN AIR PATH 1" );
+		EXPECT_EQ( ReturnAirPath( 1 ).ComponentName( 1 ), "DOAS RETURN AIR MIXER 1" );
+		EXPECT_GT( ReturnAirPath( 1 ).OutletNodeNum, 0 );
+
 	}
 	
 }
