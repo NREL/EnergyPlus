@@ -276,6 +276,7 @@ namespace CoolingPanelSimple {
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using General::RoundSigDigits;
+		using General::TrimSigDigits;
 		using namespace DataIPShortCuts;
 
 		// Locals
@@ -549,8 +550,14 @@ namespace CoolingPanelSimple {
 				ErrorsFound = true;
 			}
 			if ( ( AllFracsSummed < ( MaxFraction - 0.01 ) ) && ( CoolingPanel( CoolingPanelNum ).FracRadiant > MinFraction ) ) { // User didn't distribute all of the | radiation warn that some will be lost
-				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
-				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
+				ShowSevereError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
+				ShowContinueError( "This would result in some of the radiant energy delivered by the high temp radiant heater being lost." );
+				ShowContinueError( "The sum of all radiation fractions to surfaces = " + TrimSigDigits( ( AllFracsSummed - CoolingPanel( CoolingPanelNum ).FracDistribPerson ), 5) );
+				ShowContinueError( "The radiant fraction to people = " + TrimSigDigits( CoolingPanel( CoolingPanelNum ).FracDistribPerson, 5) );
+				ShowContinueError( "So, all radiant fractions including surfaces and people = " + TrimSigDigits( AllFracsSummed, 5) );
+				ShowContinueError( "This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = " +  TrimSigDigits( ( 1.0 - AllFracsSummed ), 5) );
+				ShowContinueError( "Please check and correct this so that all radiant energy is accounted for in " + cCMO_CoolingPanel_Simple + " = " + cAlphaArgs( 1 ) );
+				ErrorsFound = true;
 			}
 		}
 
