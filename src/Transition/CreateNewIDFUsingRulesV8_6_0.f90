@@ -63,7 +63,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ! na
 
           ! DERIVED TYPE DEFINITIONS
-          ! na
+  TYPE DElightRefPtType
+    CHARACTER(len=MaxNameLength) :: RefPtName=blank
+    CHARACTER(len=MaxNameLength) :: ControlName=blank
+    CHARACTER(len=MaxNameLength) :: X=blank
+    CHARACTER(len=MaxNameLength) :: Y=blank
+    CHARACTER(len=MaxNameLength) :: Z=blank
+    CHARACTER(len=MaxNameLength) :: FracZone=blank
+    CHARACTER(len=MaxNameLength) :: IllumSetPt=blank
+    CHARACTER(len=MaxNameLength) :: ZoneName=blank  // find by searching Daylighting:DELight:Controls
+  END TYPE
+  TYPE (DElightRefPtType), DIMENSION(:), ALLOCATABLE :: DElightRefPt
 
           ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
   INTEGER IoS
@@ -790,6 +800,99 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDDO
 
               !! Changes for this version can go here
+
+               CASE('DAYLIGHTING:CONTROLS')
+                 nodiff=.false.
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
+                 OutArgs(2) = InArgs(1)
+                 OutArgs(3) = 'SplitFlux'
+                 OutArgs(4) = InArgs(20)
+                 IF (inArgs(13) == '1') THEN
+                   OutArgs(5) = 'Continuous'
+                 ELSEIF (inArgs(13) == '2') THEN
+                   OutArgs(5) = 'Stepped'
+                 ELSEIF (inArgs(13) == '2') THEN
+                   OutArgs(5) = 'ContinuousOff'
+                 ELSE
+                   OutArgs(5) = 'Continuous'
+                 ENDIF
+                 OutArgs(6:9) = InArgs(16:19)
+                 OutArgs(10) = TRIM(InArgs(1)) // '_DaylRefPt1'
+                 OutArgs(11:12) = InArgs(14:15)
+                 OutArgs(13) = ''
+                 OutArgs(14) = TRIM(InArgs(1)) // '_DaylRefPt1'
+                 OutArgs(15) = InArgs(9)
+                 OutArgs(16) = InArgs(11)
+                 IF (InArgs(2) == '2') THEN
+                   OutArgs(17) = TRIM(InArgs(1)) // '_DaylRefPt2'
+                   OutArgs(18) = InArgs(10)
+                   OutArgs(19) = InArgs(12)
+                   CurArgs = 19
+                 ELSE
+                   CurArgs = 16
+                 ENDIF
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! create new object Daylighting:ReferencePoint
+                 ObjectName='Daylighting:ReferencePoint'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt1'
+                 OutArgs(2) = InArgs(1)
+                 OutArgs(3:5) = InArgs(3:5)
+                 CurArgs = 5
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! create new object Daylighting:ReferencePoint
+                 IF (InArgs(2) == '2') THEN
+                   ObjectName='Daylighting:ReferencePoint'
+                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                   OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt2'
+                   OutArgs(2) = InArgs(1)
+                   OutArgs(3:5) = InArgs(6:8)
+                   CurArgs = 5
+                   CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 ENDIF
+
+                 Written = .true.
+
+              CASE('DAYLIGHTING:DELIGHT:CONTROLS')
+                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                 ObjectName='Daylighting:Controls'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:2) = InArgs(1:2)
+                 OutArgs(3) = 'DElight'
+                 OutArgs(4) = ''
+                 IF (inArgs(5) == '1') THEN
+                   OutArgs(5) = 'Continuous'
+                 ELSEIF (inArgs(5) == '2') THEN
+                   OutArgs(5) = 'Stepped'
+                 ELSEIF (inArgs(5) == '2') THEN
+                   OutArgs(5) = 'ContinuousOff'
+                 ELSE
+                   OutArgs(5) = 'Continuous'
+                 ENDIF
+                 OutArgs(6:9) = InArgs(4:7)
+                 OutArgs(10) = ''
+                 OutArgs(11) = '0'
+                 OutArgs(12) = ''
+                 OutArgs(13) = InArgs(8)
+
+                 OutArgs(14) = ''
+                 OutArgs(15) = ''
+                 OutArgs(16) = ''
+                 
+                 CurArgs = 16
+
+              CASE('DAYLIGHTING:DELIGHT:REFERENCEPOINT')
+                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                 ObjectName='Daylighting:ReferencePoint'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = InArgs(1)
+                 OutArgs(2) = ''
+                 OutArgs(3:5) = InArgs(3:5)
+                 CurArgs = 5
+                 
 
 
               CASE DEFAULT
