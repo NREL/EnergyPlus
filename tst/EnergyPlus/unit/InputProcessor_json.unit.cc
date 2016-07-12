@@ -97,7 +97,7 @@ namespace EnergyPlus {
                                                      "  Relative,",
                                                      "  Relative,",
                                                      "  Relative;\n\n"
-                                                             "Zone,",
+													 "Zone,",
                                                      "  Core_mid,",
                                                      "  0.000000,",
                                                      "  0.000000,",
@@ -1576,14 +1576,14 @@ namespace EnergyPlus {
         Array1D_string cNumericFields( NumNumbers );
         InputProcessor::GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "FIXEDINLETWATERTEMPERATURE" } ), Alphas ) );
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" } ), Alphas ) );
         EXPECT_TRUE( compare_containers( std::vector< std::string >( { "name", "availability_schedule_name", "thermal_efficiency_modifier_curve_name", "air_inlet_node_name", "air_outlet_node_name", "water_storage_tank_name", "inlet_water_temperature_option" } ), cAlphaFields ) );
         EXPECT_TRUE( compare_containers( std::vector< std::string >( { "rated_capacity", "rated_gas_use_rate", "thermal_efficiency", "rated_fan_power", "auxiliary_electric_power" } ), cNumericFields ) );
         EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), lNumericBlanks ) );
-        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, false } ), lAlphaBlanks ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
         EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
 //        EXPECT_EQ( 6, NumAlphas ); // TODO: Should be 6, why is it 7? Might be due to name field
-		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_EQ( 6, NumAlphas );
         EXPECT_EQ( 5, NumNumbers );
         EXPECT_EQ( 1, IOStatus );
     }
@@ -1749,12 +1749,12 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 1, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLEIRFT SPEED", "", "", "" } ), Alphas ) );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Input Unit Type for X", "Input Unit Type for Y", "Output Unit Type", } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "name", "input_unit_type_for_x", "input_unit_type_for_y", "output_unit_type", } ), cAlphaFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 10, NumNumbers );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Coefficient1 Constant", "Coefficient2 x", "Coefficient3 x**2", "Coefficient4 y", "Coefficient5 y**2", "Coefficient6 x*y",
-																	   "Minimum Value of x", "Maximum Value of x", "Minimum Value of y", "Maximum Value of y", "Minimum Curve Output", "Maximum Curve Output" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "coefficient1_constant", "coefficient2_x", "coefficient3_x_2", "coefficient4_y", "coefficient5_y_2", "coefficient6_x_y",
+																	   "minimum_value_of_x", "maximum_value_of_x", "minimum_value_of_y", "maximum_value_of_y", "minimum_curve_output", "maximum_curve_output" } ), cNumericFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.632475E+00, -0.121321E-01 , 0.507773E-03, 0.155377E-01 , 0.272840E-03,
 																  -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, true, true } ), lNumericBlanks ) );
@@ -1811,11 +1811,11 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 7, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "FIXEDINLETWATERTEMPERATURE" } ), Alphas ) );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "name", "availability_schedule_name", "thermal_efficiency_modifier_curve_name", "air_inlet_node_name", "air_outlet_node_name", "water_storage_tank_name", "inlet_water_temperature_option" } ), cAlphaFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 5, NumNumbers );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "rated_capacity", "rated_gas_use_rate", "thermal_efficiency", "rated_fan_power", "auxiliary_electric_power" } ), cNumericFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, false, true, false, true, true, true } ), lNumericBlanks ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
 		EXPECT_EQ( 1, IOStatus );
@@ -1858,11 +1858,11 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 2, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "", "", "", "", "" } ), Alphas ) );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "name", "availability_schedule_name", "thermal_efficiency_modifier_curve_name", "air_inlet_node_name", "air_outlet_node_name", "water_storage_tank_name", "inlet_water_temperature_option" } ), cAlphaFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 1, NumNumbers );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "rated_capacity", "rated_gas_use_rate", "thermal_efficiency", "rated_fan_power", "auxiliary_electric_power" } ), cNumericFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true, true, true } ), lNumericBlanks ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, 0, 0, 0, 0 } ), Numbers ) );
 		EXPECT_EQ( 1, IOStatus );
