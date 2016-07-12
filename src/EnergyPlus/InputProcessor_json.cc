@@ -277,6 +277,7 @@ void IdfParser::add_missing_field_value(std::string &field_name, json &root, jso
         } else {
             if (!ext_size) root[field_name] = "";
             else extensible[field_name] = "";
+          //  extensible[field_name] = "";
         }
     }
 }

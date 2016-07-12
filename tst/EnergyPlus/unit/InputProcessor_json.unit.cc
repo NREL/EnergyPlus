@@ -1667,14 +1667,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-		int num_curve_biquadratic_objects = GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, num_curve_biquadratic_objects );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+        InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -1684,7 +1684,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+        InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 
 		EXPECT_EQ( 4, NumAlphas );
@@ -1727,14 +1727,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-		int num_curve_biquadratic_objects = GetNumObjectsFound( CurrentModuleObject );
+		int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, num_curve_biquadratic_objects );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+        InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -1744,7 +1744,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+        InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 
 		EXPECT_EQ( 1, NumAlphas );
@@ -1790,14 +1790,14 @@ namespace EnergyPlus {
 
 		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
-		int NumGasSteamHums = GetNumObjectsFound( CurrentModuleObject );
+		int NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 1, NumGasSteamHums );
 
 		int TotalArgs = 0;
 		int NumAlphas = 0;
 		int NumNumbers = 0;
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+        InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
@@ -1807,7 +1807,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+        InputProcessor::GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 7, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "FIXEDINLETWATERTEMPERATURE" } ), Alphas ) );
