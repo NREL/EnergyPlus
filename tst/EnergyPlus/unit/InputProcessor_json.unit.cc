@@ -1663,7 +1663,7 @@ namespace EnergyPlus {
 		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
 		// expect Dimensionless to be inserted for Input Unit Type for X, blank field with a default. Expect true for it's alphaBlank value
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
@@ -1723,7 +1723,7 @@ namespace EnergyPlus {
 		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
 		// expect "" to be inserted for the missing alpha fields due to the truncation, blank field with a default. Expect true for it's alphaBlank value
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		std::string const CurrentModuleObject = "Curve:Biquadratic";
 
@@ -1786,7 +1786,7 @@ namespace EnergyPlus {
 		// Expect Rated Capacity to be filled in with ZERO, not with the autosize value of -99999. Expect
 		// Auxiliary Electric Power to be filled in with .80 (it's default value)
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
@@ -1818,6 +1818,53 @@ namespace EnergyPlus {
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, false, true, false, true, true, true } ), lNumericBlanks ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_truncated_autosize_fields )
+	{
+		std::string const idf_objects = delimited_string({
+																 "Version,8.3;",
+																 "Humidifier:Steam:Gas,",
+																 "  Main Gas Humidifier,     !- Name",
+																 "  ,                        !- Availability Schedule Name",
+																 "  autosize;                !- Rated Capacity {m3/s}",
+														 });
+
+		// Expect Rated Capacity to be filled in with the autosize value of -99999. Expect everything else to be empty string and 0
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
+
+		int NumGasSteamHums = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, NumGasSteamHums );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumAlphas, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 2, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "", "", "", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 1, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, 0, 0, 0, 0 } ), Numbers ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 
