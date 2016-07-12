@@ -21,6 +21,7 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK
 
     # COMPILER FLAGS
+    # ADD_CXX_DEFINITIONS("/arch:SSE2") # Enable SSE2 vectorization (default for both x86 and x64 apparently)
     ADD_CXX_DEFINITIONS("/nologo")
     ADD_CXX_DEFINITIONS("/EHsc")
     ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
@@ -89,6 +90,8 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
+    ADD_CXX_DEFINITIONS("-msse2") # Enable SSE2 vectorization
+    ADD_CXX_DEFINITIONS("-mfpmath=sse") # Enable scalar floating point instructions present in the SSE instruction set.
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     ADD_CXX_DEFINITIONS("-ffor-scope")
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
@@ -130,6 +133,7 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("/nologo") # Skip banner text
     ADD_CXX_DEFINITIONS("/Qstd=c++11") # Specify C++11 language
+    ADD_CXX_DEFINITIONS("/arch:SSE2") # Enable SSE2 vectorization
     ADD_CXX_DEFINITIONS("/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
     ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("/Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
@@ -176,6 +180,8 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-std=c++11") # Specify C++11 language
+    ADD_CXX_DEFINITIONS("-msse2") # Enable SSE2 vectorization
+    # ADD_CXX_DEFINITIONS("-mfpmath=sse") # Enable scalar floating point instructions present in the SSE instruction set.
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
 
