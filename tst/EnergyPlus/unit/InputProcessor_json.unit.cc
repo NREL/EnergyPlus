@@ -1868,6 +1868,93 @@ namespace EnergyPlus {
 		EXPECT_EQ( 1, IOStatus );
 	}
 
+	TEST_F( InputProcessorFixture, getObjectItem_unitary_system_input )
+	{
+		std::string const idf_objects = delimited_string({
+																 "AirLoopHVAC:UnitarySystem,",
+																 "  GasHeat DXAC Furnace 1, !- Name",
+																 "  Load,                   !- Control Type",
+																 "  East Zone,              !- Controlling Zone or Thermostat Location",
+																 "  None,                   !- Dehumidification Control Type",
+																 "  FanAndCoilAvailSched,   !- Availability Schedule Name",
+																 "  Zone Exhaust Node,         !- Air Inlet Node Name",
+																 "  Zone 2 Inlet Node,   !- Air Outlet Node Name",
+																 "  Fan:OnOff,              !- Supply Fan Object Type",
+																 "  Supply Fan 1,           !- Supply Fan Name",
+																 "  BlowThrough,            !- Fan Placement",
+																 "  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
+																 "  Coil:Heating:Gas,       !- Heating Coil Object Type",
+																 "  Furnace Heating Coil 1, !- Heating Coil Name",
+																 "  ,                       !- DX Heating Coil Sizing Ratio",
+																 "  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
+																 "  Furnace ACDXCoil 1,     !- Cooling Coil Name",
+																 "  ,                       !- Use DOAS DX Cooling Coil",
+																 "  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+																 "  ,                       !- Latent Load Control",
+																 "  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+																 "  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
+																 "  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
+																 "  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+																 "  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+																 "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+																 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+																 "  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation",
+																 "  1.6,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+																 "  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+																 "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+																 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+																 "  SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+																 "  1.6,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+																 "  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+																 "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+																 "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+																 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+																 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+																 "  80;                     !- Maximum Supply Air Temperature{ C }",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
+
+		int num_unitary_systems = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_unitary_systems );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumAlphas, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_unitary_systems, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 22, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "GASHEAT DXAC FURNACE 1", "LOAD", "EAST ZONE", "NONE", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "ZONE 2 INLET NODE",
+																	   "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:GAS", "FURNACE HEATING COIL 1",
+																	   "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:GAS",
+																	   "HUMIDISTAT REHEAT COIL 1", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "", "", "", "", ""} ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, true, true, false, false, false,
+																false, false, true, true, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 17, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true, false, true, true, true, false, true, true, true,
+																false, true, true, true, true, true, false, true, true, true,
+																true, true, true, true, true, true, true} ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0,
+																  1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0,
+																  0, 0, 0, 0, 0, 0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
