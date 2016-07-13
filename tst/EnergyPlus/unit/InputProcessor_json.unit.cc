@@ -2524,6 +2524,112 @@ namespace EnergyPlus {
 		EXPECT_EQ( 1, IOStatus );
 	}
 
+	TEST_F( InputProcessorFixture, getObjectItem_curve_biquadratic)
+	{
+		std::string const idf_objects = delimited_string({
+																 "Curve:Biquadratic,",
+																 "  CoolCapFT,        !- Name",
+																 "  0.942587793,            !- Coefficient1 Constant",
+																 "  0.009543347,            !- Coefficient2 x",
+																 "  0.000683770,            !- Coefficient3 x**2",
+																 "  -0.011042676,           !- Coefficient4 y",
+																 "  0.000005249,            !- Coefficient5 y**2",
+																 "  -0.000009720,           !- Coefficient6 x*y",
+																 "  12.77778,               !- Minimum Value of x",
+																 "  23.88889,               !- Maximum Value of x",
+																 "  18.0,                   !- Minimum Value of y",
+																 "  46.11111,               !- Maximum Value of y",
+																 "  ,                       !- Minimum Curve Output",
+																 "  ,                       !- Maximum Curve Output",
+																 "  Temperature,            !- Input Unit Type for X",
+																 "  Temperature,            !- Input Unit Type for Y",
+																 "  Dimensionless;          !- Output Unit Type",
+																 "  ",
+																 "Curve:Biquadratic,",
+																 "  COOLEIRFT,            !- Name",
+																 "  0.342414409,            !- Coefficient1 Constant",
+																 "  0.034885008,            !- Coefficient2 x",
+																 "  -0.000623700,           !- Coefficient3 x**2",
+																 "  0.004977216,            !- Coefficient4 y",
+																 "  0.000437951,            !- Coefficient5 y**2",
+																 "  -0.000728028,           !- Coefficient6 x*y",
+																 "  12.77778,               !- Minimum Value of x",
+																 "  23.88889,               !- Maximum Value of x",
+																 "  18.0,                   !- Minimum Value of y",
+																 "  46.11111,               !- Maximum Value of y",
+																 "  ,                       !- Minimum Curve Output",
+																 "  ,                       !- Maximum Curve Output",
+																 "  Temperature,            !- Input Unit Type for X",
+																 "  Temperature,            !- Input Unit Type for Y",
+																 "  Dimensionless;          !- Output Unit Type",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquad = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 2,  num_curve_biquad );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFT", "TEMPERATURE", "TEMPERATURE",
+																	   "DIMENSIONLESS" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 12, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.942587793, 0.009543347, 0.000683770, -0.011042676, 0.000005249,
+																  -0.000009720, 12.77778, 23.88889, 18.0, 46.11111,
+																  0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
+																false, false, false, false, true, true } ), lNumericBlanks ) );
+
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 4, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFT", "TEMPERATURE", "TEMPERATURE",
+																	   "DIMENSIONLESS" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 12, NumNumbers2 );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.342414409, 0.034885008, -0.000623700, 0.004977216, 0.000437951,
+																  -0.000728028, 12.77778, 23.88889, 18.0, 46.11111,
+																  0, 0 } ), Numbers2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
+																false, false, false, false, true, true } ), lNumericBlanks2 ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
