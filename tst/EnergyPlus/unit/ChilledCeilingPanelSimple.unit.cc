@@ -86,31 +86,32 @@ namespace EnergyPlus {
 		CoolingPanelNum = 1;
 		ZoneNum = 1;
 		
+		CoolingPanelSimple::CoolingPanel.allocate( 1 );
 		DataHeatBalFanSys::MAT.allocate( 1 );
 		DataHeatBalFanSys::MAT( 1 ) = 22.0;
 		DataHeatBalance::MRT.allocate( 1 );
 		DataHeatBalance::MRT( 1 ) = 20.0;
 		DataHeatBalance::Zone.allocate( 1 );
 		DataHeatBalance::Zone( 1 ).OutDryBulbTemp = 10.0;
-		DataHeatBalance::Zone( 1 ).OutDryBulbTemp = 5.0;
+		DataHeatBalance::Zone( 1 ).OutWetBulbTemp = 5.0;
 		
-		CoolingPanel( CoolingPanelNum ).ControlType = MATControl;
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::MATControl;
 		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
 		EXPECT_EQ( ControlTemp, 22.0 );
 
-		CoolingPanel( CoolingPanelNum ).ControlType = MRTControl;
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::MRTControl;
 		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
 		EXPECT_EQ( ControlTemp, 20.0 );
 
-		CoolingPanel( CoolingPanelNum ).ControlType = OperativeControl;
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::OperativeControl;
 		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
 		EXPECT_EQ( ControlTemp, 21.0 );
 
-		CoolingPanel( CoolingPanelNum ).ControlType = ODBControl;
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::ODBControl;
 		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
 		EXPECT_EQ( ControlTemp, 10.0 );
 
-		CoolingPanel( CoolingPanelNum ).ControlType = OWBControl;
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::OWBControl;
 		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
 		EXPECT_EQ( ControlTemp, 5.0 );
 				
