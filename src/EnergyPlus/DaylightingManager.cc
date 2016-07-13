@@ -4071,7 +4071,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TotDaylightingDetailed; // Total Daylighting:Detailed inputs
+		int TotDaylightingControls; // Total Daylighting:Controls inputs (splitflux or delight type)
 		int IntWin; // Interior window surface index
 		bool ErrorsFound; // Error flag
 		int SurfNum; // Surface counter (loop)
@@ -4098,10 +4098,10 @@ namespace DaylightingManager {
 
 		ErrorsFound = false;
 		cCurrentModuleObject = "Daylighting:Controls";
-		TotDaylightingDetailed = GetNumObjectsFound( cCurrentModuleObject );
-		if ( TotDaylightingDetailed > 0 ) {
+		TotDaylightingControls = GetNumObjectsFound( cCurrentModuleObject );
+		if ( TotDaylightingControls > 0 ) {
 			GetInputDayliteRefPt( ErrorsFound );
-			GetDaylightingParametersDetaild(TotDaylightingDetailed, ErrorsFound);
+			GetDaylightingControls(TotDaylightingControls, ErrorsFound);
 			GetInputIlluminanceMap( ErrorsFound );
 			GetLightWellData( ErrorsFound );
 			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );
@@ -4297,7 +4297,7 @@ namespace DaylightingManager {
 	)
 	{
 		// Perform the GetInput function for the Output:IlluminanceMap
-		// Glazer - June 2016 (moved from GetDaylightingParametersDetaild)
+		// Glazer - June 2016 (moved from GetDaylightingControls)
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
@@ -4340,7 +4340,7 @@ namespace DaylightingManager {
 		Real64 NewAspectRatio;
 		Array1D_bool ZoneMsgDone;
 
-		//*** NEED TO REFACTOR START (repeated in GetDaylightingParametersDetaild)
+		//*** NEED TO REFACTOR START (repeated in GetDaylightingControls)
 		CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
 		SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
 		// these are only for Building Rotation for Appendix G when using world coordinate system
@@ -4461,7 +4461,7 @@ namespace DaylightingManager {
 		for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
 			if (IllumMap(MapNum).Zone > 0) {
 				auto & zone(Zone(IllumMap(MapNum).Zone));
-				//*** NEED TO REFACTOR START (repeated in GetDaylightingParametersDetaild)
+				//*** NEED TO REFACTOR START (repeated in GetDaylightingControls)
 				// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
 				CosZoneRelNorth = std::cos(-zone.RelNorth * DegToRadians);
 				SinZoneRelNorth = std::sin(-zone.RelNorth * DegToRadians);
@@ -4603,7 +4603,7 @@ namespace DaylightingManager {
 		ZoneMsgDone.dimension(NumOfZones, false);
 		for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
 			if (IllumMap(MapNum).Zone == 0) continue;
-			if (ZoneDaylight(IllumMap(MapNum).Zone).DaylightType != DetailedDaylighting && !ZoneMsgDone(IllumMap(MapNum).Zone)) {
+			if (ZoneDaylight(IllumMap(MapNum).Zone).DaylightType != SplitFluxDaylighting && !ZoneMsgDone(IllumMap(MapNum).Zone)) {
 				ShowSevereError("Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" + Zone(IllumMap(MapNum).Zone).Name);
 				ErrorsFound = true;
 			}
@@ -4621,8 +4621,8 @@ namespace DaylightingManager {
 	}
 
 	void
-	GetDaylightingParametersDetaild(
-		int const TotDaylightingDetailed, // Total "simple" daylighting inputs
+	GetDaylightingControls(
+		int const TotDaylightingControls, // Total "simple" daylighting inputs
 		bool & ErrorsFound
 	)
 	{
@@ -4712,7 +4712,7 @@ namespace DaylightingManager {
 		CheckForGeometricTransform( doTransform, OldAspectRatio, NewAspectRatio );
 
 		cCurrentModuleObject = "Daylighting:Controls";
-		for ( Loop1 = 1; Loop1 <= TotDaylightingDetailed; ++Loop1 ) {
+		for ( Loop1 = 1; Loop1 <= TotDaylightingControls; ++Loop1 ) {
 			cAlphaArgs = "";
 			rNumericArgs = 0.0;
 			GetObjectItem( cCurrentModuleObject, Loop1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -4737,28 +4737,52 @@ namespace DaylightingManager {
 				ErrorsFound = true;
 				continue;
 			}
-			zone_daylight.DaylightType = DetailedDaylighting;
-			zone_daylight.TotalDaylRefPoints = rNumericArgs( 1 );
+			zone_daylight.DaylightType = SplitFluxDaylighting;
 
-			rLightLevel = GetDesignLightingLevelForZone( ZoneFound );
-			CheckLightsReplaceableMinMaxForZone( ZoneFound );
-
-			zone_daylight.DaylRefPtAbsCoord.allocate( 3, MaxRefPoints );
-			zone_daylight.DaylRefPtAbsCoord = 0.0;
-			zone_daylight.DaylRefPtInBounds.allocate( MaxRefPoints );
-			zone_daylight.DaylRefPtInBounds = true;
 			zone_daylight.FracZoneDaylit.allocate( MaxRefPoints );
 			zone_daylight.FracZoneDaylit = 0.0;
 			zone_daylight.IllumSetPoint.allocate( MaxRefPoints );
 			zone_daylight.IllumSetPoint = 0.0;
-			zone_daylight.RefPtPowerReductionFactor.allocate( MaxRefPoints );
-			zone_daylight.RefPtPowerReductionFactor = 1.0;
 			zone_daylight.DaylIllumAtRefPt.allocate( MaxRefPoints );
 			zone_daylight.DaylIllumAtRefPt = 0.0;
 			zone_daylight.GlareIndexAtRefPt.allocate( MaxRefPoints );
 			zone_daylight.GlareIndexAtRefPt = 0.0;
+
+
+			zone_daylight.LightControlType = rNumericArgs( 12 ); // Relies on IDD limits for verification
+			zone_daylight.ViewAzimuthForGlare = rNumericArgs( 13 );
+			zone_daylight.MaxGlareallowed = rNumericArgs( 14 );
+			zone_daylight.MinPowerFraction = rNumericArgs( 15 );
+			zone_daylight.MinLightFraction = rNumericArgs( 16 );
+			zone_daylight.LightControlSteps = rNumericArgs( 17 );
+			zone_daylight.LightControlProbability = rNumericArgs( 18 );
+
+
+			rLightLevel = GetDesignLightingLevelForZone( ZoneFound );
+			CheckLightsReplaceableMinMaxForZone( ZoneFound );
+
+			zone_daylight.TotalDaylRefPoints = rNumericArgs( 1 );
+			zone_daylight.DaylRefPtAbsCoord.allocate( 3, MaxRefPoints );
+			zone_daylight.DaylRefPtAbsCoord = 0.0;
+			zone_daylight.DaylRefPtInBounds.allocate( MaxRefPoints );
+			zone_daylight.DaylRefPtInBounds = true;
+			zone_daylight.RefPtPowerReductionFactor.allocate( MaxRefPoints );
+			zone_daylight.RefPtPowerReductionFactor = 1.0;
 			zone_daylight.BacLum.allocate( MaxRefPoints );
 			zone_daylight.BacLum = 0.0;
+
+			if ( !lAlphaFieldBlanks( 2 ) ) {
+				zone_daylight.AvailSchedNum = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( zone_daylight.AvailSchedNum == 0 ) {
+					ShowWarningError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) + ", occurs in " + cCurrentModuleObject + "object for " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) );
+					ShowContinueError( "Schedule was not found so controls will always be available, and the simulation continues." );
+					zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
+				}
+			} else {
+				zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
+			}
+
+
 
 			//added TH 12/2/2008
 			zone_daylight.TimeExceedingGlareIndexSPAtRefPt.allocate( MaxRefPoints );
@@ -4873,29 +4897,12 @@ namespace DaylightingManager {
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 1 ) + "\", trying to control " + RoundSigDigits( sum( zone_daylight.FracZoneDaylit ), 2 ) + " of the zone." );
 				ErrorsFound = true;
 			}
-			zone_daylight.LightControlType = rNumericArgs( 12 ); // Relies on IDD limits for verification
-			zone_daylight.ViewAzimuthForGlare = rNumericArgs( 13 );
-			zone_daylight.MaxGlareallowed = rNumericArgs( 14 );
-			zone_daylight.MinPowerFraction = rNumericArgs( 15 );
-			zone_daylight.MinLightFraction = rNumericArgs( 16 );
-			zone_daylight.LightControlSteps = rNumericArgs( 17 );
 			if ( zone_daylight.LightControlType == 2 && zone_daylight.LightControlSteps <= 0 ) {
 				ShowWarningError( "GetDetailedDaylighting: For Stepped Control, the number of steps must be > 0" );
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 1 ) + "\", will use 1" );
 				zone_daylight.LightControlSteps = 1;
 			}
-			zone_daylight.LightControlProbability = rNumericArgs( 18 );
 
-			if ( ! lAlphaFieldBlanks( 2 ) ) {
-				zone_daylight.AvailSchedNum = GetScheduleIndex( cAlphaArgs( 2 ) );
-				if ( zone_daylight.AvailSchedNum == 0 ) {
-					ShowWarningError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) + ", occurs in " + cCurrentModuleObject + "object for " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) );
-					ShowContinueError( "Schedule was not found so controls will always be available, and the simulation continues." );
-					zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
-				}
-			} else {
-				zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
-			}
 
 			if ( zone_daylight.TotalDaylRefPoints >= 1 ) {
 				refName = cAlphaArgs( 1 ) + " - REF 1";

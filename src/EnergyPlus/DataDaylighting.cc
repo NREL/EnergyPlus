@@ -106,7 +106,7 @@ namespace DataDaylighting {
 
 	// Parameters for "DaylightType"
 	int const NoDaylighting( 0 );
-	int const DetailedDaylighting( 1 );
+	int const SplitFluxDaylighting( 1 );
 	int const DElightDaylighting( 2 );
 	Array1D_string const DaylightTypes( 2, { "Daylighting:Controls", "Daylighting:DELight:Controls" } );
 

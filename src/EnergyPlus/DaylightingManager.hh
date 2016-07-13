@@ -394,8 +394,8 @@ namespace DaylightingManager {
 	);
 
 	void
-	GetDaylightingParametersDetaild(
-		int const TotDaylightingDetailed, // Total "simple" daylighting inputs
+	GetDaylightingControls(
+		int const TotDaylightingControls, // Total daylighting controls inputs 
 		bool & ErrorsFound
 	);
 

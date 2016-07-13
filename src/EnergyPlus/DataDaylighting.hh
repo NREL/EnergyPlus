@@ -97,7 +97,7 @@ namespace DataDaylighting {
 
 	// Parameters for "DaylightType"
 	extern int const NoDaylighting;
-	extern int const DetailedDaylighting;
+	extern int const SplitFluxDaylighting;
 	extern int const DElightDaylighting;
 	extern Array1D_string const DaylightTypes;
 
@@ -136,9 +136,12 @@ namespace DataDaylighting {
 	struct ZoneDaylightCalc
 	{
 		// Members
-		int DaylightType; // Type of Daylighting (1=Detailed, 2=DElight)
+		std::string Name; // Name of the daylighting:controls object
+		std::string ZoneName; //name of the zone where the daylighting:controls object is located
+		int zoneNumber; // index for the zone where the daylighting:controls object is located
+		int DaylightType; // Type of Daylighting (1=SplitFlux, 2=DElight)
 		int AvailSchedNum; // pointer to availability schedule if present
-		int TotalDaylRefPoints; // Number of detailed daylighting reference points in a zone (0,1 or 2)
+		int TotalDaylRefPoints; // Number of splitflux daylighting reference points in a zone (0,1 or 2)
 		int TotalDElightRefPts; // Number of DElight daylighting reference points in a zone (0,1 or 2) - RJH
 		Array2D< Real64 > DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
 		// in absolute coordinate system (m)
