@@ -327,6 +327,7 @@ namespace PoweredInductionUnits {
 		using namespace DataIPShortCuts;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
+		using Fans::GetFanAvailSchPtr;
 		using WaterCoils::GetCoilWaterInletNode;
 		using SteamCoils::GetCoilSteamInletNode;
 
@@ -443,6 +444,7 @@ namespace PoweredInductionUnits {
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
+			PIU( PIUNum ).FanAvailSchedPtr = GetFanAvailSchPtr( "PIU unit", PIU( PIUNum ).FanName, ErrorsFound );
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
 			if ( IsNotOK ) {
@@ -575,6 +577,7 @@ namespace PoweredInductionUnits {
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
+			PIU( PIUNum ).FanAvailSchedPtr = GetFanAvailSchPtr( "PIU unit", PIU( PIUNum ).FanName, ErrorsFound );
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
 			if ( IsNotOK ) {
@@ -1404,6 +1407,7 @@ namespace PoweredInductionUnits {
 			}
 		}
 		if ( GetCurrentScheduleValue( PIU( PIUNum ).SchedPtr ) <= 0.0 ) UnitOn = false;
+		if ( ( GetCurrentScheduleValue( PIU( PIUNum ).FanAvailSchedPtr ) <= 0.0 || DataHVACGlobals::TurnFansOff ) && ! DataHVACGlobals::TurnFansOn ) UnitOn = false;
 		if ( PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow ) PriOn = false;
 		// Set the mass flow rates
 		if ( UnitOn ) {

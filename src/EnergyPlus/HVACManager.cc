@@ -2749,7 +2749,7 @@ namespace HVACManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
 
-		if ( DataGlobals::WarmupFlag ) return;
+		if ( DataGlobals::WarmupFlag || DataGlobals::DoingSizing ) return;
 
 		// calculate end time of current time step to determine if error messages should be printed
 		CurrentEndTime = CurrentTime + SysTimeElapsed;
