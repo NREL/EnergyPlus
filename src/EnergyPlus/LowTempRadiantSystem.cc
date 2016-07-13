@@ -1930,6 +1930,7 @@ namespace LowTempRadiantSystem {
 			}
 
 		} else if ( SELECT_CASE_var == ConstantFlowSystem ) {
+			CFloRadSys( RadSysNum ).WaterMassFlowRate = 0.0;
 			// Initialize the appropriate node data
 			if ( CFloRadSys( RadSysNum ).HeatingSystem ) {
 				if ( CFloRadSys( RadSysNum ).VolFlowSchedPtr > 0 ) {
@@ -1940,11 +1941,11 @@ namespace LowTempRadiantSystem {
 				if ( CurrentFlowSchedule > 1.0 ) CurrentFlowSchedule = 1.0; // Do not allow more flow than design maximum
 				if ( CurrentFlowSchedule < 0.0 ) CurrentFlowSchedule = 0.0; // Do not allow negative flow
 
-				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate * CurrentFlowSchedule;
+				CFloRadSys( RadSysNum ).HotWaterMassFlowRate = CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate * CurrentFlowSchedule;
 
-				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
+				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).HotWaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
 
-				SetComponentFlowRate( CFloRadSys( RadSysNum ).WaterMassFlowRate, CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum );
+				if ( CFloRadSys( RadSysNum ).HotWaterInNode > 0 ) SetComponentFlowRate( CFloRadSys( RadSysNum ).HotWaterMassFlowRate, CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum );
 			}
 			if ( CFloRadSys( RadSysNum ).CoolingSystem ) {
 				if ( CFloRadSys( RadSysNum ).VolFlowSchedPtr > 0 ) {
@@ -1954,11 +1955,11 @@ namespace LowTempRadiantSystem {
 				}
 				if ( CurrentFlowSchedule > 1.0 ) CurrentFlowSchedule = 1.0; // Do not allow more flow than design maximum
 				if ( CurrentFlowSchedule < 0.0 ) CurrentFlowSchedule = 0.0; // Do not allow negative flow
-				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate * CurrentFlowSchedule;
+				CFloRadSys( RadSysNum ).ChWaterMassFlowRate = CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate * CurrentFlowSchedule;
 
-				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
+				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).ChWaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
 
-				SetComponentFlowRate( CFloRadSys( RadSysNum ).WaterMassFlowRate, CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, CFloRadSys( RadSysNum ).CWLoopNum, CFloRadSys( RadSysNum ).CWLoopSide, CFloRadSys( RadSysNum ).CWBranchNum, CFloRadSys( RadSysNum ).CWCompNum );
+				if ( CFloRadSys( RadSysNum ).ColdWaterInNode > 0 ) SetComponentFlowRate( CFloRadSys( RadSysNum ).ChWaterMassFlowRate, CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, CFloRadSys( RadSysNum ).CWLoopNum, CFloRadSys( RadSysNum ).CWLoopSide, CFloRadSys( RadSysNum ).CWBranchNum, CFloRadSys( RadSysNum ).CWCompNum );
 			}
 
 		} else if ( SELECT_CASE_var == ElectricSystem ) {
@@ -2495,7 +2496,7 @@ namespace LowTempRadiantSystem {
 					} else {
 						if ( OpMode == ClgHtg || OpMode == HtgOnly ) {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow \nObject=" + CFloRadSys( RadSysNum ).Name );
+							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" + CFloRadSys( RadSysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -2519,7 +2520,7 @@ namespace LowTempRadiantSystem {
 					} else {
 						if ( OpMode == ClgHtg || OpMode == ClgOnly ) {
 							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow \n Object=" + CFloRadSys( RadSysNum ).Name );
+							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" + CFloRadSys( RadSysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -2546,7 +2547,7 @@ namespace LowTempRadiantSystem {
 								"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes, "User-Specified Maximum Water Flow [m3/s]", WaterVolFlowMaxUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxDes - WaterVolFlowMaxUser ) / WaterVolFlowMaxUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
 										CFloRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Water Flow of " + RoundSigDigits( WaterVolFlowMaxUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Water Flow of " + RoundSigDigits(WaterVolFlowMaxDes, 5 ) + " [m3/s]" );
@@ -2586,7 +2587,7 @@ namespace LowTempRadiantSystem {
 								"User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " + CFloRadSys( RadSysNum ).Name + "\"." );
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " + CFloRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Hydronic Tubing Length of " + RoundSigDigits( TubeLengthUser, 5 ) + " [m]" );
 									ShowContinueError( "differs from Design Size Hydronic Tubing Length of " + RoundSigDigits( TubeLengthDes, 5 ) + " [m]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -3376,6 +3377,8 @@ namespace LowTempRadiantSystem {
 			if ( SetPointTemp < OffTempHeat ) { // HEATING MODE
 
 				OperatingMode = HeatingMode;
+				
+				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).HotWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).HeatingSystem ) {
 
@@ -3416,6 +3419,8 @@ namespace LowTempRadiantSystem {
 			} else if ( SetPointTemp > OffTempCool ) { // COOLING MODE
 
 				OperatingMode = CoolingMode;
+				
+				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).ChWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).CoolingSystem ) {
 

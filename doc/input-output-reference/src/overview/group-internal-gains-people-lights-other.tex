@@ -150,7 +150,7 @@ This field is only valid when the user selects ``surfaceweighted'' for the MRT c
 
 \paragraph{Field: Work Efficiency Schedule Name}\label{field-work-efficiency-schedule-name}
 
-This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero correspondsto all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts thethermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort..
+This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero corresponds to all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts the thermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort..
 
 \paragraph{Field: Clothing Insulation Calculation Method}\label{field-clothing-insulation-calculation-method}
 
@@ -406,11 +406,11 @@ These output variables are the total amount of heat gain for this People object 
 
 \paragraph{People Air Temperature {[}C{]}}\label{people-air-temperature-c}
 
-This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; othwesie, it is set to average zone air temperature.
+This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; otherwise, it is set to average zone air temperature.
 
 \paragraph{People Air Relative Humidity {[}\%{]}}\label{people-air-relative-humidity}
 
-This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Relative Humidity'' is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; othwesie, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
+This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Relative Humidity'' is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; otherwise, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
 
 \paragraph{\texorpdfstring{Zone People Occupant Count {[]}}{Zone People Occupant Count }}\label{zone-people-occupant-count}
 
@@ -674,8 +674,8 @@ An example IDF with an electric low temperature radiant system is shown below.
 
 \begin{lstlisting}
 ComfortViewFactorAngles,
-  South Zone Angle Factors,                                                                                                    !- name of angle factor list
-  Sourth Zone,          !- Zone Name
+  South Zone Angle Factors, !- name of angle factor list
+  South Zone,           !- Zone Name
   Zn001:Flr001,         !- Surface name 1
   0.75,                 !- Angle factor for surface 1
   Zn001:Wall001,        !- Surface name 2
@@ -900,7 +900,7 @@ Lights,
 
 \subsubsection{Outputs}\label{outputs-2-012}
 
-If daylighting controls are operating in the zone, all of the Lights objects with a Fraction Replaceble~ greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting.
+If daylighting controls are operating in the zone, all of the Lights objects with a Fraction Replaceable greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting.
 
 Lights objects have output variables for individual objects and for zone totals.
 
@@ -1051,7 +1051,7 @@ As described in the Lights Outputs, values for lights will show up on the follow
 \begin{longtable}[c]{>{\raggedright}p{3.0in}p{1.5in}p{1.5in}}
 \caption{Distribution of Lights to Meters \label{table:distribution-of-lights-to-meters}} \tabularnewline
 \toprule 
-Meter Name & Scope & Lights Specfics \tabularnewline
+Meter Name & Scope & Lights Specifics \tabularnewline
 \midrule
 \endfirsthead
 
@@ -2561,7 +2561,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Above Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-above-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Envionmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-below-operating-range-time-hr}
 
@@ -2571,7 +2571,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Below Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-below-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Envionmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-above-operating-range-time-hr}
 
@@ -2581,7 +2581,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Above Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-above-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Envionmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-below-operating-range-time-hr}
 
@@ -2591,7 +2591,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Below Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-below-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Envionmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \subsection{ZoneContaminantSourceAndSink:CarbonDioxide}\label{zonecontaminantsourceandsinkcarbondioxide}
 
@@ -2636,7 +2636,7 @@ HVAC,Average, Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{
 
 \paragraph{Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 
-This output is the net carbond dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
+This output is the net carbon dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
 
 \paragraph{Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{zone-contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 

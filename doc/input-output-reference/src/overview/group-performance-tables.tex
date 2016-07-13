@@ -34,27 +34,27 @@ A unique user assigned name for an instance of a performance table. When a table
 
 \paragraph{Field: Curve Type}\label{field-curve-type}
 
-The form of the polynomial equation used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, \emph{Quartic} and \emph{Exponent}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects). This input infers the polynomial order (or degree). This input also specifies the number of interpolation points if the next field, Interpolation Method is set to LagrangeInterpolationLinearExtrapolation. The number of interpolation points for Linear, Quadratic, Cubic, Quartic, and Exponent are set at 2, 3, 4, 5, and 4, respectively.
+The form of the polynomial equation used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, \emph{Quartic} and \emph{Exponent}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects). This input infers the polynomial order (or degree). This input also specifies the number of interpolation points if the next field, Interpolation Method is set to LagrangeInterpolationLinearExtrapolation. The number of interpolation points for Linear, Quadratic, Cubic, Quartic, BiQuadratic and QuadraticLinear are set at 2, 3, 4, 5, 6 and 6, respectively.
 
 \paragraph{Field: Interpolation Method}\label{field-interpolation-method}
 
-The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the tabular data is interpolated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid one independent variable equations above, the polynomial order is up to 5\(^{th}\) order. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If these fields are not entered, the limits of the tabular data are used. The minimum number of data pairs required for this choice are 2, 3, 4, 5, and 4 data pairs for linear, quadratic, cubic, quartic, and exponent curves, respectively. If insufficient data is provided, the regression analysis is not performed and the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnotics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
+The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the tabular data is interpolated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid one independent variable equations above, the polynomial order is up to 5\(^{th}\) order. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If these fields are not entered, the limits of the tabular data are used. The minimum number of data pairs required for this choice are 2, 3, 4, 5, 6 and 6 data pairs for Linear, Quadratic, Cubic, Quartic, BiQuadratic and QuadraticLinear curves, respectively. If insufficient data is provided, the regression analysis is not performed and the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
 
 \paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-000}
 
-The minimum allowable value of X. Values of X less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The minimum allowable value of X. Values of X less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Maximum Value of X}\label{field-maximum-value-of-x-000}
 
-The maximum allowable value of X. Values of X greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The maximum allowable value of X. Values of X greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Minimum Table Output}\label{field-minimum-table-output}
 
-The minimum allowable value of the table output. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The minimum allowable value of the table output. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X} and \emph{Maximum Value of X} determines the limit.
 
 \paragraph{Field: Maximum Table Output}\label{field-maximum-table-output}
 
-The maximum allowable value of the table output. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The maximum allowable value of the table output. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X} and \emph{Maximum Value of X} determines the limit.
 
 \paragraph{Field: Input Unit Type for X1}\label{field-input-unit-type-for-x1}
 
@@ -94,7 +94,7 @@ The normalization point for the data set. This field provides a method for autom
 
 \paragraph{Data Pairs}\label{data-pairs}
 
-The following inputs describe the data set. Data pairs are entered as X and Output pairs where X is the independent variable (i.e., x in the equation above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. Linear (1\(^{st}\) order), Quadratic (2\(^{nd}\) order), Cubic (3\(^{rd}\) order), Quartic (4\(^{th}\) order), and Exponent (nth order) polynomials require a minimum of 2, 3, 4, 5, and 4 data pairs, respectively. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
+The following inputs describe the data set. Data pairs are entered as X and Output pairs where X is the independent variable (i.e., x in the equation above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. Linear (1\(^{st}\) order), Quadratic (2\(^{nd}\) order), Cubic (3\(^{rd}\) order), Quartic (4\(^{th}\) order), BiQuadratic and QuadraticLinear polynomials require a minimum of 2, 3, 4, 5, 6 and 6 data pairs, respectively. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
 
 \paragraph{Field: X Value \#n}\label{field-x-value-n}
 
@@ -109,18 +109,18 @@ Following is an example input for a Table:OneIndependentVariable object:
 \begin{lstlisting}
 
 Table:OneIndependentVariable,
-  WindACCoolCapFFF,             !- Name
-  Linear,                                 !- Curve Type
-  EvaluateCurveToLimits,   !- Interpolation Type
-  0,                                           !- Minimum Value of X1,
-  1.5,                                       !- Maximum Value of X1,
-  0.8,                                       !- Minimum Table Output
-  1.1,                                       !- Maximum Table Output
-  Dimensionless,                   !- Input Unit Type for X1
-  Dimensionless,                   !- Output Unit Type
-  ,                                             !- Normalization Point
-  0,0.8,                                   !- X Value #1, Output Value #1
-  1.5,1.1;                               !- X Value #2, Output Value #2
+  WindACCoolCapFFF,            !- Name
+  Linear,                      !- Curve Type
+  EvaluateCurveToLimits,       !- Interpolation Type
+  0,                           !- Minimum Value of X1,
+  1.5,                         !- Maximum Value of X1,
+  0.8,                         !- Minimum Table Output
+  1.1,                         !- Maximum Table Output
+  Dimensionless,               !- Input Unit Type for X1
+  Dimensionless,               !- Output Unit Type
+  ,                            !- Normalization Point
+  0,0.8,                       !- X Value #1, Output Value #1
+  1.5,1.1;                     !- X Value #2, Output Value #2
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-022}
@@ -157,35 +157,35 @@ A unique user assigned name for an instance of a performance table. When a table
 
 \paragraph{Field: Curve Type}\label{field-curve-type-1}
 
-The form of the polynomial equation represented by the entered data. The only valid choices are \emph{BiQuadratic} and \emph{QuadraticLinear}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular equipment model (i.e., if this type of polynomial is allowed to be used as the curve type for specific input fields). A minimum of 6 data pairs are required when selecting \emph{EvaluateCurveToLimits} in the following field. This input also specifies the number of interpolation points if the next field, Interpolation Method is set to LagrangeInterpolationLinearExtrapolation. The number of interpolation points for BiQuadratic and QuadraticLinear are set at 6.
+The form of the polynomial equation represented by the entered data. The only valid choices are \emph{BiQuadratic} and \emph{QuadraticLinear}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular equipment model (i.e., if this type of polynomial is allowed to be used as the curve type for specific input fields). A minimum of 6 data pairs are required when selecting \emph{EvaluateCurveToLimits} in the following field. This input also specifies the number of interpolation points if the next field, Interpolation Method, is set to LagrangeInterpolationLinearExtrapolation.
 
 \paragraph{Field: Interpolation Method}\label{field-interpolation-method-1}
 
-The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation,} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When Lagrange\emph{InterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid equations above, the polynomial order is fixed at 2 which infers that 3 data points will be used for interpolation. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields (or the tabular data, whichever provide the larger range). If the following fields are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnotics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
+The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation,} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When Lagrange\emph{InterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid equations above, the polynomial order is fixed at 2 which infers that 3 data points will be used for interpolation. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If the following fields are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables).
 
 \paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-1-000}
 
-The minimum allowable value of X. Values of X less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The minimum allowable value of X. Values of X less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Maximum Value of X}\label{field-maximum-value-of-x-1-000}
 
-The maximum allowable value of X. Values of X greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The maximum allowable value of X. Values of X greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Minimum Value of Y}\label{field-minimum-value-of-y-000}
 
-The minimum allowable value of Y. Values of Y less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The minimum allowable value of Y. Values of Y less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Maximum Value of Y}\label{field-maximum-value-of-y-000}
 
-The maximum allowable value of Y. Values of Y greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The maximum allowable value of Y. Values of Y greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Minimum Table Output}\label{field-minimum-table-output-1}
 
-The minimum allowable value of the table output. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The minimum allowable value of the table output. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X and Y} and \emph{Maximum Value of X and Y} determines the limit.
 
 \paragraph{Field: Maximum Table Output}\label{field-maximum-table-output-1}
 
-The maximum allowable value of the table output. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+The maximum allowable value of the table output. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X and Y} and \emph{Maximum Value of X and Y} determines the limit.
 
 \paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-000}
 
@@ -263,37 +263,37 @@ Following is an example input for a Table:TwoIndependentVariable object:
 \begin{lstlisting}
 
 Table:TwoIndependentVariables,
-  CCOOLEIRFT,                         !- Name
+  CCOOLEIRFT,                        !- Name
   BiQuadratic,                       !- Curve Type
-  EvaluateCurveToLimits,   !- Interpolation Type
-  5.0,                                       !- Minimum Value of x,
-  60.0,                                     !- Maximum Value of x,
-  5.0,                                       !- Minimum Value of y,
-  70.0,                                     !- Maximum Value of y,
-  0.01,                                     !- Minimum Table Output
-  0.5,                                       !- Maximum Table Output
+  EvaluateCurveToLimits,             !- Interpolation Type
+  5.0,                               !- Minimum Value of x,
+  60.0,                              !- Maximum Value of x,
+  5.0,                               !- Minimum Value of y,
+  70.0,                              !- Maximum Value of y,
+  0.01,                              !- Minimum Table Output
+  0.5,                               !- Maximum Table Output
   Temperature,                       !- Input Unit Type for x
   Temperature,                       !- Input Unit Type for y
-  Dimensionless,                   !- Output Unit Type
+  Dimensionless,                     !- Output Unit Type
   0.258266502,                       !- Normalization Point
-  17.2222222,18.3333333,0.18275919, !-X Value #1,Y Value #1,Output #1
-  17.2222222,23.8888889,0.207383768,!-X Value #2,Y Value #2,Output #2
-  17.2222222,29.4444444,0.237525541,!-X Value #3,Y Value #3,Output #3
-  17.2222222,35,0.274217751,               !-X Value #4,Y Value #4,Output #4
-  17.2222222,40.5555556,0.318548624,!-X Value #5,Y Value #5,Output #5
-  17.2222222,46.1111111,0.374560389,!-X Value #6,Y Value #6,Output #6
-  19.4444444,18.3333333,0.172982816,!-X Value #7,Y Value #7,Output #7
-  19.4444444,23.8888889,0.19637691, !-X Value #8,Y Value #8,Output #8
-  19.4444444,29.4444444,0.224789822,!-X Value #9,Y Value #9,Output #9
-  19.4444444,35,0.258266502,               !-X Value #10,Y Value #10,Output #10
-  19.4444444,40.5555556,0.299896794,!-X Value #11,Y Value #11,Output #11
-  19.4444444,46.1111111,0.351242021,!-X Value #12,Y Value #12,Output #12
-  21.6666667,18.3333333,0.164081122,!-X Value #13,Y Value #13,Output #13
-  21.6666667,23.8888889,0.185603303,!-X Value #14,Y Value #14,Output #14
-  21.6666667,29.4444444,0.211709812,!-X Value #15,Y Value #15,Output #15
-  21.6666667,35,0.243492052,               !-X Value #16,Y Value #16,Output #16
-  21.6666667,40.5555556,0.281757875,!-X Value #17,Y Value #17,Output #17
-  21.6666667,46.1111111,0.331185659;!-X Value #18,Y Value #18,Output #18
+  17.2222222,18.3333333,0.18275919,  !-X Value #1,Y Value #1,Output #1
+  17.2222222,23.8888889,0.207383768, !-X Value #2,Y Value #2,Output #2
+  17.2222222,29.4444444,0.237525541, !-X Value #3,Y Value #3,Output #3
+  17.2222222,35,0.274217751,         !-X Value #4,Y Value #4,Output #4
+  17.2222222,40.5555556,0.318548624, !-X Value #5,Y Value #5,Output #5
+  17.2222222,46.1111111,0.374560389, !-X Value #6,Y Value #6,Output #6
+  19.4444444,18.3333333,0.172982816, !-X Value #7,Y Value #7,Output #7
+  19.4444444,23.8888889,0.19637691,  !-X Value #8,Y Value #8,Output #8
+  19.4444444,29.4444444,0.224789822, !-X Value #9,Y Value #9,Output #9
+  19.4444444,35,0.258266502,         !-X Value #10,Y Value #10,Output #10
+  19.4444444,40.5555556,0.299896794, !-X Value #11,Y Value #11,Output #11
+  19.4444444,46.1111111,0.351242021, !-X Value #12,Y Value #12,Output #12
+  21.6666667,18.3333333,0.164081122, !-X Value #13,Y Value #13,Output #13
+  21.6666667,23.8888889,0.185603303, !-X Value #14,Y Value #14,Output #14
+  21.6666667,29.4444444,0.211709812, !-X Value #15,Y Value #15,Output #15
+  21.6666667,35,0.243492052,         !-X Value #16,Y Value #16,Output #16
+  21.6666667,40.5555556,0.281757875, !-X Value #17,Y Value #17,Output #17
+  21.6666667,46.1111111,0.331185659; !-X Value #18,Y Value #18,Output #18
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-017}
@@ -333,7 +333,7 @@ A unique user assigned name for an instance of a lookup table. When a table is u
 
 \paragraph{Field: Interpolation Method}\label{field-interpolation-method-2}
 
-The method used to evaluate the lookup table. The choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation, and EvaluateCurveToLimits}. . When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the minimum/maximum value of x and output inputs are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, the lookup table is evaluated using Lagrange s form of the interpolating polynomial. The order of the polynomial is inferred to be one less than the input in the Number of Interpolation Points field below. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equation above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields (or the tabular data, whichever provide the larger range). If the minimum/maximum fields below are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnotics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables). A regression analysis may only be performed on lookup tables with one or two independent variables.
+The method used to evaluate the lookup table. The choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation, and EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the minimum/maximum value of x and output inputs are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, the lookup table is evaluated using Lagrange s form of the interpolating polynomial. The order of the polynomial is inferred to be one less than the input in the Number of Interpolation Points field below. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equation above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If the minimum/maximum fields below are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. Output:Diagnostics, DisplayAdvancedVariables). A regression analysis may only be performed on lookup tables with one or two independent variables.
 
 \paragraph{Field: Number of Interpolation Points}\label{field-number-of-interpolation-points}
 
@@ -409,51 +409,51 @@ The normalization point for the data set. This field provides a method for autom
 
 \paragraph{Field: Minimum Value of X1}\label{field-minimum-value-of-x1}
 
-The minimum allowable value of X1. Values of X1 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
+The minimum allowable value of X1. Values of X1 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Maximum Value of X1}\label{field-maximum-value-of-x1}
 
-The maximum allowable value of X1. Values of X1 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
+The maximum allowable value of X1. Values of X1 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Minimum Value of X2}\label{field-minimum-value-of-x2}
 
-The minimum allowable value of X2. Values of X2 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 1.
+The minimum allowable value of X2. Values of X2 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 1.
 
 \paragraph{Field: Maximum Value of X2}\label{field-maximum-value-of-x2}
 
-The maximum allowable value of X2. Values of X2 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 1.
+The maximum allowable value of X2. Values of X2 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 1.
 
 \paragraph{Field: Minimum Value of X3}\label{field-minimum-value-of-x3}
 
-The minimum allowable value of X3. Values of X3 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 2.
+The minimum allowable value of X3. Values of X3 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 2.
 
 \paragraph{Field: Maximum Value of X3}\label{field-maximum-value-of-x3}
 
-The maximum allowable value of X3. Values of X3 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 2.
+The maximum allowable value of X3. Values of X3 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 2.
 
 \paragraph{Field: Minimum Value of X4}\label{field-minimum-value-of-x4}
 
-The minimum allowable value of X4. Values of X4 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 3.
+The minimum allowable value of X4. Values of X4 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 3.
 
 \paragraph{Field: Maximum Value of X4}\label{field-maximum-value-of-x4}
 
-The maximum allowable value of X4. Values of X4 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 3.
+The maximum allowable value of X4. Values of X4 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 3.
 
 \paragraph{Field: Minimum Value of X5}\label{field-minimum-value-of-x5}
 
-The minimum allowable value of X5. Values of X5 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 4.
+The minimum allowable value of X5. Values of X5 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 4.
 
 \paragraph{Field: Maximum Value of X5}\label{field-maximum-value-of-x5}
 
-The maximum allowable value of X5. Values of X5 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 4.
+The maximum allowable value of X5. Values of X5 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 4.
 
 \paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-000}
 
-The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-000}
 
-The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This filed can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
 
 \paragraph{Field: Input Unit Type for X1}\label{field-input-unit-type-for-x1-1}
 
@@ -565,7 +565,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 \subsection{Data Input Format}\label{data-input-format}
 
-The following inputs describe the data set. These values may also be placed in an external file starting with Field \#1. If an external file name is entered above, the following fields are not used. Data are entered in a specific order according to the number and quantity of independent variables. The data input format is described here in 3 groups as Header, Independent Variable Values, and the Tabular Data. The header is always the first line in the data set and represents the number of independent varibles followed by the number of values for each independent variable. The independent variable values are listed next and represent the values of each independent variable on a separate line. These values are only listed once at the top of the data set and are listed in ascending order. The number of independent variables, the first number in the header, specifies how many lines, or rows, make up this section of tabular data. The remaining lines are repeated as many times as necessary to completely describe the tabular data. The values of independent variables 3 n are listed on a single line followed by a matrix of data that represent the table output corresponding to independent variables 1 and 2.
+The following inputs describe the data set. These values may also be placed in an external file starting with Field \#1. If an external file name is entered above, the following fields are not used. Data are entered in a specific order according to the number and quantity of independent variables. The data input format is described here in 3 groups as Header, Independent Variable Values, and the Tabular Data. The header is always the first line in the data set and represents the number of independent variables followed by the number of values for each independent variable. The independent variable values are listed next and represent the values of each independent variable on a separate line. These values are only listed once at the top of the data set and are listed in ascending order. The number of independent variables, the first number in the header, specifies how many lines, or rows, make up this section of tabular data. The remaining lines are repeated as many times as necessary to completely describe the tabular data. The values of independent variables 3 n are listed on a single line followed by a matrix of data that represent the table output corresponding to independent variables 1 and 2.
 
 \begin{itemize}
 \tightlist
@@ -599,7 +599,7 @@ Line 5: the n values for the fifth independent variable as specified in the head
 
 Line 1: the values of the 3\(^{rd}\) through nth independent variables
 
-Line 2 m (where m-1 equals the number of variables for the second independent variable): the tabular data corresponding to the 1\(^{st}\) independent variable (the number of inputs on this line equals the number of values for 1\(^{st}\) independent variable), the mth values for the 2\(^{nd}\) independent variable and corresponding to the values for the 3\(^{rd}\) nth independent variables (see Line 1 above for Tabular Data).
+Line 2 m (where m-1 equals the number of variables for the second independent variable): the tabular data corresponding to the 1\(^{st}\) independent variable (the number of inputs on this line equals the number of values for 1\(^{st}\) independent variable), the m\(^{th})\) values for the 2\(^{nd}\) independent variable and corresponding to the values for the 3\(^{rd}\) nth independent variables (see Line 1 above for Tabular Data).
 
 Three examples are provided here as this can be difficult to describe in text. This example assumes that the table data are listed in ascending order from lowest to highest.
 
@@ -745,33 +745,33 @@ Following is an example input for a Table:MultiVariableLookup object:
 \begin{lstlisting}
 
 Table:MultiVariableLookup,
-  HPACCoolCapFT,                       !- Name
+  HPACCoolCapFT,                   !- Name
   LagrangeinterpolationLinearExtrapolation,   !- Interpolation Method
-  3,                                               !- Number of Interpolation Points
-  BiQuadratic,                           !- Interpolation Type
+  3,                               !- Number of Interpolation Points
+  BiQuadratic,                     !- Interpolation Type
   SingleLineIndependentVariableWithMatrix, !- Table Data Format
-  ,                                                 !- External File Name
-  ASCENDING,                               !- X1 Sort Order
-  ASCENDING,                               !- X2 Sort Order
-  24999.9597049817,                 !- Normalization reference
-  12.77778,                                 !- Minimum Value of X1,
-  23.88889,                                 !- Maximum Value of X1,
-  18.0,                                         !- Minimum Value of X2,
-  46.11111,                                 !- Maximum Value of X2,
-  ,                                                 !- Minimum Value of X3
-  ,                                                 !- Maximum Value of X3
-  ,                                                 !- Minimum Value of X4
-  ,                                                 !- Maximum Value of X4
-  ,                                                 !- Minimum Value of X5
-  ,                                                 !- Maximum Value of X5
-  ,                                                 !- Minimum Table Output
-  ,                                                 !- Maximum Table Output
-  Temperature,                           !- Input Unit Type for X1
-  Temperature,                           !- Input Unit Type for X2
-  ,                                                 !- Input Unit Type for X3
-  ,                                                 !- Input Unit Type for X4
-  ,                                                 !- Input Unit Type for X5
-  Dimensionless,                       !- Output Unit Type
+  ,                                !- External File Name
+  ASCENDING,                       !- X1 Sort Order
+  ASCENDING,                       !- X2 Sort Order
+  24999.9597049817,                !- Normalization reference
+  12.77778,                        !- Minimum Value of X1,
+  23.88889,                        !- Maximum Value of X1,
+  18.0,                            !- Minimum Value of X2,
+  46.11111,                        !- Maximum Value of X2,
+  ,                                !- Minimum Value of X3
+  ,                                !- Maximum Value of X3
+  ,                                !- Minimum Value of X4
+  ,                                !- Maximum Value of X4
+  ,                                !- Minimum Value of X5
+  ,                                !- Maximum Value of X5
+  ,                                !- Minimum Table Output
+  ,                                !- Maximum Table Output
+  Temperature,                     !- Input Unit Type for X1
+  Temperature,                     !- Input Unit Type for X2
+  ,                                !- Input Unit Type for X3
+  ,                                !- Input Unit Type for X4
+  ,                                !- Input Unit Type for X5
+  Dimensionless,                   !- Output Unit Type
   2, 6, 7,
   12.77778, 15, 18, 19.44448943, 21, 23.88889,
   18, 24, 30, 35, 36, 41, 46.11111,
@@ -788,7 +788,7 @@ Table:MultiVariableLookup,
 
 \subsubsection{\texorpdfstring{Performance Curve Output Value {[]}}{Performance Curve Output Value }}\label{performance-curve-output-value-2}
 
-The current value of the lookup table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
+The current value of the lookup table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detailed reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
 
 \subsubsection{\texorpdfstring{Performance Curve Input Variable 1(-N) Value {[]}}{Performance Curve Input Variable 1(-N) Value }}\label{performance-curve-input-variable-1-n-value-000}
 
