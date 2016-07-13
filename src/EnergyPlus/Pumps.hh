@@ -222,8 +222,11 @@ namespace Pumps {
 		int ZoneNum; // index for zone surrounding pump
 		Real64 SkinLossRadFraction; // radiative split for skin losses to zone
 		bool LoopSolverOverwriteFlag; // loop solver overwrite for determining pump minimum flow rate
-		int PumpInVsPumpOutFlowNotMatchingIter; // counter for node flow warning messages
 		int PumpInVsPumpOutFlowNotMatchingIndex; // index for node flow warning messages
+		bool PrintNodeOutletToNodeInletMessage; // logical for printing node mass conservation warning
+		Real64 NodeFlowDiffLast; // difference between pump outlet and inlet node mass flow rate last iteration
+		std::string NodeInletToNodeOutletMessage; // stored message for printing when valid
+		std::string NodeInletToNodeOutletMessage2; // stored message for printing when valid
 
 		// Default Constructor
 		PumpSpecs() :
@@ -284,8 +287,9 @@ namespace Pumps {
 			ZoneNum( 0 ),
 			SkinLossRadFraction( 0.0 ),
 			LoopSolverOverwriteFlag( false ),
-			PumpInVsPumpOutFlowNotMatchingIter( 0 ),
-			PumpInVsPumpOutFlowNotMatchingIndex( 0 )
+			PumpInVsPumpOutFlowNotMatchingIndex( 0 ),
+			PrintNodeOutletToNodeInletMessage( false ),
+			NodeFlowDiffLast( 0.0 )
 		{}
 
 	};

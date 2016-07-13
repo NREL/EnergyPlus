@@ -277,8 +277,6 @@ namespace Fans {
 
 		LocalTurnFansOn = false;
 		LocalTurnFansOff = false;
-		// With the correct FanNum Initialize
-		InitFan( FanNum, FirstHVACIteration ); // Initialize all fan related parameters
 
 		if ( present( ZoneCompTurnFansOn ) && present( ZoneCompTurnFansOff ) ) {
 			// Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
@@ -291,6 +289,9 @@ namespace Fans {
 			LocalTurnFansOn = TurnFansOn;
 			LocalTurnFansOff = TurnFansOff;
 		}
+
+		// With the correct FanNum Initialize
+		InitFan( FanNum, FirstHVACIteration ); // Initialize all fan related parameters
 
 		// Calculate the Correct Fan Model with the current FanNum
 		if ( Fan( FanNum ).FanType_Num == FanType_SimpleConstVolume ) {
@@ -1119,6 +1120,10 @@ namespace Fans {
 				Fan( FanNum ).InletAirMassFlowRate = Fan( FanNum ).MassFlowRateMaxAvail;
 			}
 			if ( Fan( FanNum ).EMSMaxMassFlowOverrideOn ) Fan( FanNum ).InletAirMassFlowRate = min( Fan( FanNum ).EMSAirMassFlowValue, Fan( FanNum ).MassFlowRateMaxAvail );
+		}
+
+		if ( ( GetCurrentScheduleValue( Fan( FanNum ).AvailSchedPtrNum ) == 0.0 || LocalTurnFansOff ) && !LocalTurnFansOn ) {
+			Fan( FanNum ).InletAirMassFlowRate = 0.0;
 		}
 
 		//Then set the other conditions
