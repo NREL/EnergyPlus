@@ -249,6 +249,14 @@ namespace CoolingPanelSimple {
 	);
 
 	void
+	SetCoolingPanelControlTemp(
+		Real64 & ControlTemp,
+		int const CoolingPanelNum,
+		 int const ZoneNum
+	);
+
+	
+	void
 	UpdateCoolingPanel( int const CoolingPanelNum );
 
 	void

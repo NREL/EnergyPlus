@@ -1046,24 +1046,8 @@ namespace CoolingPanelSimple {
 			
 			if ( CoolingPanelOn ) {
 			
-				{ auto const SELECT_CASE_var( CoolingPanel( CoolingPanelNum ).ControlType );
-					if ( SELECT_CASE_var == MATControl ) {
-						ControlTemp = MAT( ZoneNum );
-					} else if ( SELECT_CASE_var == MRTControl ) {
-						ControlTemp = MRT( ZoneNum );
-					} else if ( SELECT_CASE_var == OperativeControl ) {
-						ControlTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
-					} else if ( SELECT_CASE_var == ODBControl ) {
-						ControlTemp = Zone( ZoneNum ).OutDryBulbTemp;
-					} else if ( SELECT_CASE_var == OWBControl ) {
-						ControlTemp = Zone( ZoneNum ).OutWetBulbTemp;
-					} else { // Should never get here
-						ControlTemp = MAT( ZoneNum );
-						ShowSevereError( "Illegal control type in cooling panel system: " + CoolingPanel( CoolingPanelNum ).EquipID );
-						ShowFatalError( "Preceding condition causes termination." );
-					}
-				}
-			
+				SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
+				
 				SetPointTemp = GetCurrentScheduleValue( CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr );
 				OffTempCool = SetPointTemp - 0.5 * CoolingPanel( CoolingPanelNum ).ColdThrottlRange;
 				FullOnTempCool = SetPointTemp + 0.5 * CoolingPanel( CoolingPanelNum ).ColdThrottlRange;
@@ -1149,6 +1133,68 @@ namespace CoolingPanelSimple {
 
 	}
 
+	void
+	SetCoolingPanelControlTemp(
+		Real64 & ControlTemp,
+		int const CoolingPanelNum,
+		int const ZoneNum
+	)
+	{
+	
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   July 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		
+		// METHODOLOGY EMPLOYED:
+		// This subroutine sets the control temperature for the simple cooling panel.
+		
+		// REFERENCES:
+		// na
+		
+		// Using/Aliasing
+		using DataHeatBalance::MRT;
+		using DataHeatBalance::Zone;
+		using DataHeatBalFanSys::MAT;
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		{ auto const SELECT_CASE_var( CoolingPanel( CoolingPanelNum ).ControlType );
+			if ( SELECT_CASE_var == MATControl ) {
+				ControlTemp = MAT( ZoneNum );
+			} else if ( SELECT_CASE_var == MRTControl ) {
+				ControlTemp = MRT( ZoneNum );
+			} else if ( SELECT_CASE_var == OperativeControl ) {
+				ControlTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+			} else if ( SELECT_CASE_var == ODBControl ) {
+				ControlTemp = Zone( ZoneNum ).OutDryBulbTemp;
+			} else if ( SELECT_CASE_var == OWBControl ) {
+				ControlTemp = Zone( ZoneNum ).OutWetBulbTemp;
+			} else { // Should never get here
+				ControlTemp = MAT( ZoneNum );
+				ShowSevereError( "Illegal control type in cooling panel system: " + CoolingPanel( CoolingPanelNum ).EquipID );
+				ShowFatalError( "Preceding condition causes termination." );
+			}
+		}
+
+		
+	}
+	
 	void
 	UpdateCoolingPanel( int const CoolingPanelNum )
 	{
