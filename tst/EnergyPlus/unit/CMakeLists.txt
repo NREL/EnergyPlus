@@ -52,6 +52,7 @@ set( test_src
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceIntRadExchange.unit.cc
+  HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
@@ -72,18 +73,19 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
-  PlantHeatExchangerFluidToFluid.unit.cc
-  PlantPipingSystemsManager.unit.cc
-  PlantUtilities.unit.cc
-  Pumps.unit.cc
-  PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  PlantHeatExchangerFluidToFluid.unit.cc
+  PlantPipingSystemsManager.unit.cc
+  PlantUtilities.unit.cc
+  Pumps.unit.cc
+  PurchasedAirManager.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc

@@ -758,6 +758,11 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow * StdRhoAir;
 			UnitarySystem( UnitarySysNum ).MaxHeatAirMassFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow * StdRhoAir;
 			UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirMassFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow * StdRhoAir;
+			UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = 0.0;
+			UnitarySystem( UnitarySysNum ).CompPartLoadRatio = 0.0;
+			UnitarySystem( UnitarySysNum ).CoolingCoilSensDemand = 0.0;
+			UnitarySystem( UnitarySysNum ).CoolingCoilLatentDemand = 0.0;
+			UnitarySystem( UnitarySysNum ).HeatingCoilSensDemand = 0.0;
 			UnitarySystem( UnitarySysNum ).SenLoadLoss = 0.0;
 			if ( UnitarySystem( UnitarySysNum ).Humidistat ) {
 				UnitarySystem( UnitarySysNum ).LatLoadLoss = 0.0;
