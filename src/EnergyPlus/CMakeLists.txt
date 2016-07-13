@@ -550,6 +550,8 @@ SET( SRC
   WindowManager.hh
   WindowManagerExterior.cc
   WindowManagerExterior.hh
+  WindowModel.cc
+  WindowModel.hh
   ZoneAirLoopEquipmentManager.cc
   ZoneAirLoopEquipmentManager.hh
   ZoneContaminantPredictorCorrector.cc

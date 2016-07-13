@@ -64,6 +64,7 @@
 #include "DataHeatBalance.hh"
 #include "DataHeatBalFanSys.hh"
 #include "DataGlobals.hh"
+#include "InputProcessor.hh"
 
 
 // Windows library headers
@@ -184,6 +185,10 @@ namespace EnergyPlus {
         FenLaySurfTempBack( k, SurfNum ) = thetas( 2 * k ) - KelvinConv;
       }
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    //  CWCELayerFactory
+    /////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////////////
     shared_ptr< CTarIGUSolidLayer > CWCELayerFactory::getSolidLayer( const SurfaceData &surface, const MaterialProperties &material,

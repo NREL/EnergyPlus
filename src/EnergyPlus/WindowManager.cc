@@ -61,6 +61,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -90,8 +91,8 @@
 #include <Vectors.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
-
-#include "WindowManagerExterior.hh"
+#include <WindowManagerExterior.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -263,6 +264,8 @@ namespace WindowManager {
 	Array1D< Real64 > rfvisPhi( 10, 0.0 ); // Glazing system visible front reflectance for each angle of incidence
 	Array1D< Real64 > rbvisPhi( 10, 0.0 ); // Glazing system visible back reflectance for each angle of incidence
 	Array1D< Real64 > CosPhiIndepVar( 10, 0.0 ); // Cos of incidence angles at 10-deg increments for curve fits
+
+  std::shared_ptr< CWindowModel > inExtWindowModel = nullptr; // Information about window model (interior or exterior)
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines
@@ -2124,9 +2127,12 @@ namespace WindowManager {
     // PURPOSE OF THIS SUBROUTINE:
     // Subroutine to direct wheter to use exterior or interior window routines
     if( KickOffSizing || KickOffSimulation ) return;
-
-    CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
-    // CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+    
+    if( inExtWindowModel->getWindowsModel() == WindowsModel::External ) {
+      CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+    } else {
+      CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+    }
   }
 
 	void
@@ -9044,6 +9050,13 @@ Label99999: ;
 	}
 
 	//*****************************************************************************************
+
+  void initWindowModel() {
+    const std::string objectName = "WindowsCalculationEngine";
+    inExtWindowModel = CWindowModel::WindowModelFactory( objectName );
+  }
+
+  //*****************************************************************************************
 
 } // WindowManager
 

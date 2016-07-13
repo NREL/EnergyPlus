@@ -110,6 +110,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -1149,6 +1150,8 @@ namespace HeatBalanceManager {
 			AlphaName( 1 ) = "NO";
 			AlphaName( 3 ) = "NO";
 		}
+
+    WindowManager::initWindowModel();
 
 		gio::write( OutputFileInits, Format_728 );
 		if ( Contaminant.SimulateContaminants && Contaminant.CO2Simulation ) {
