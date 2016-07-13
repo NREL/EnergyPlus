@@ -63,6 +63,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ! na
 
           ! DERIVED TYPE DEFINITIONS
+          
+  ! VARIABLES SUPPORTING DAYLIGHTING:DELIGHT:REFERENCEPOINT
   TYPE DElightRefPtType
     CHARACTER(len=MaxNameLength) :: RefPtName=blank
     CHARACTER(len=MaxNameLength) :: ControlName=blank
@@ -71,9 +73,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
     CHARACTER(len=MaxNameLength) :: Z=blank
     CHARACTER(len=MaxNameLength) :: FracZone=blank
     CHARACTER(len=MaxNameLength) :: IllumSetPt=blank
-    CHARACTER(len=MaxNameLength) :: ZoneName=blank  // find by searching Daylighting:DELight:Controls
+    CHARACTER(len=MaxNameLength) :: ZoneName=blank     ! found by searching Daylighting:DELight:Controls
   END TYPE
   TYPE (DElightRefPtType), DIMENSION(:), ALLOCATABLE :: DElightRefPt
+  INTEGER NumDElightRefPt
+  INTEGER iRefPt
 
           ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
   INTEGER IoS
@@ -252,6 +256,44 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               Write(DifLfn,fmta) '! Deleting: '//TRIM(IDFRecords(Num)%Name)//'="'//TRIM(IDFRecords(Num)%Alphas(1))//'".'
             ENDIF
           ENDDO
+
+          ! PREPROCESSING FOR DAYLIGHTING:DELIGHT:REFERENCEPOINT
+          !
+          IF (.NOT. ALLOCATED(DElightRefPt)) THEN
+            ! count number of Daylighting:DELight:ReferencePoint objects
+            NumDElightRefPt = 0 
+            DO Num=1,NumIDFRecords
+              IF (MakeUPPERCase(IDFRecords(Num)%Name) == 'DAYLIGHTING:DELIGHT:REFERENCEPOINT') THEN
+                NumDElightRefPt = NumDElightRefPt + 1
+              ENDIF
+            ENDDO
+            ALLOCATE(DElightRefPt(NumDElightRefPt))
+            ! read the Daylighting:DELight:ReferencePoint into the array
+            iRefPt = 0 
+            DO Num=1,NumIDFRecords
+              IF (MakeUPPERCase(IDFRecords(Num)%Name) == 'DAYLIGHTING:DELIGHT:REFERENCEPOINT') THEN
+                iRefPt = iRefPt + 1
+                DElightRefPt(iRefPt)%RefPtName = IDFRecords(Num)%Alphas(1)
+                DElightRefPt(iRefPt)%ControlName = IDFRecords(Num)%Alphas(2)
+                DElightRefPt(iRefPt)%X = IDFRecords(Num)%Numbers(1)
+                DElightRefPt(iRefPt)%Y = IDFRecords(Num)%Numbers(2)
+                DElightRefPt(iRefPt)%Z = IDFRecords(Num)%Numbers(3)
+                DElightRefPt(iRefPt)%FracZone = IDFRecords(Num)%Numbers(4)
+                DElightRefPt(iRefPt)%IllumSetPt = IDFRecords(Num)%Numbers(5)
+              ENDIF  
+            ENDDO
+            ! now read through the Daylighting:DELight:Controls and associate the zone with each reference point
+            DO Num=1,NumIDFRecords
+              IF (MakeUPPERCase(IDFRecords(Num)%Name) == 'DAYLIGHTING:DELIGHT:CONTROLS') THEN
+                DO iRefPt = 1,NumDElightRefPt
+                  IF (MakeUPPERCase(IDFRecords(Num)%Alphas(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
+                    DElightRefPt(iRefPt)%ZoneName = IDFRecords(Num)%Alphas(2)
+                  ENDIF
+                ENDDO
+              ENDIF
+            ENDDO
+          ENDIF
+
 
           DO Num=1,NumIDFRecords
 
@@ -812,7 +854,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(5) = 'Continuous'
                  ELSEIF (inArgs(13) == '2') THEN
                    OutArgs(5) = 'Stepped'
-                 ELSEIF (inArgs(13) == '2') THEN
+                 ELSEIF (inArgs(13) == '3') THEN
                    OutArgs(5) = 'ContinuousOff'
                  ELSE
                    OutArgs(5) = 'Continuous'
@@ -867,7 +909,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(5) = 'Continuous'
                  ELSEIF (inArgs(5) == '2') THEN
                    OutArgs(5) = 'Stepped'
-                 ELSEIF (inArgs(5) == '2') THEN
+                 ELSEIF (inArgs(5) == '3') THEN
                    OutArgs(5) = 'ContinuousOff'
                  ELSE
                    OutArgs(5) = 'Continuous'
@@ -877,23 +919,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(11) = '0'
                  OutArgs(12) = ''
                  OutArgs(13) = InArgs(8)
-
-                 OutArgs(14) = ''
-                 OutArgs(15) = ''
-                 OutArgs(16) = ''
-                 
-                 CurArgs = 16
+                 CurArgs = 13
+                 DO iRefPt = 1,NumDElightRefPt
+                   IF (MakeUPPERCase(InArgs(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
+                     OutArgs(CurArgs + 1) = DElightRefPt(iRefPt)%RefPtName
+                     OutArgs(CurArgs + 2) = DElightRefPt(iRefPt)%FracZone
+                     OutArgs(CurArgs + 3) = DElightRefPt(iRefPt)%IllumSetPt
+                     CurArgs = CurArgs + 3
+                   ENDIF
+                 ENDDO
 
               CASE('DAYLIGHTING:DELIGHT:REFERENCEPOINT')
                  CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
                  ObjectName='Daylighting:ReferencePoint'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  OutArgs(1) = InArgs(1)
-                 OutArgs(2) = ''
+                 DO iRefPt = 1,NumDElightRefPt
+                   IF (MakeUPPERCase(InArgs(2)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
+                     OutArgs(2) = DElightRefPt(iRefPt)%ZoneName
+                   ENDIF             
+                 ENDDO
                  OutArgs(3:5) = InArgs(3:5)
                  CurArgs = 5
-                 
-
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
