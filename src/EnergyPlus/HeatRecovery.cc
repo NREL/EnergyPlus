@@ -1458,11 +1458,6 @@ namespace HeatRecovery {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using DataHVACGlobals::SmallAirVolFlow;
-		using DataHVACGlobals::Main;
-		using DataHVACGlobals::Cooling;
-		using DataHVACGlobals::Heating;
-		using DataHVACGlobals::Other;
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 
