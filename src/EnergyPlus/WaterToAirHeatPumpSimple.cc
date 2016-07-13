@@ -171,6 +171,7 @@ namespace WaterToAirHeatPumpSimple {
 	Real64 QSource( 0.0 ); // Source side heat transfer rate [W]
 	Real64 Winput( 0.0 ); // Power Consumption [W]
 	Real64 PLRCorrLoadSideMdot( 0.0 ); // Load Side Mdot corrected for Part Load Ratio of the unit
+	bool MyOneTimeFlag( true ); // one time allocation flag
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -192,6 +193,10 @@ namespace WaterToAirHeatPumpSimple {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state() {
+		MyOneTimeFlag = true;
+	}
 
 	void
 	SimWatertoAirHPSimple(
@@ -655,7 +660,6 @@ namespace WaterToAirHeatPumpSimple {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirInletNode; // Node Number of the air inlet
 		int WaterInletNode; // Node Number of the Water inlet
-		static bool MyOneTimeFlag( true ); // one time allocation flag
 		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
 		static Array1D_bool MyPlantScanFlag;
 		Real64 rho; // local fluid density

@@ -314,6 +314,8 @@ namespace WaterToAirHeatPumpSimple {
 	extern Array1D< SimpleWatertoAirHPConditions > SimpleWatertoAirHP;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimWatertoAirHPSimple(
