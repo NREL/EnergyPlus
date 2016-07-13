@@ -1272,7 +1272,7 @@ namespace EvaporativeCoolers {
 							"Design Size Celdek Pad Area [m2]", PadAreaDes, "User-Specified Celdek Pad Area [m2]", PadAreaUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( PadAreaDes - PadAreaUser ) / PadAreaUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: \nPotential issue with equipment sizing for " +
+								ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
 									EvapCond( EvapCoolNum ).EvapCoolerName );
 								ShowContinueError( "User-Specified Celdek Pad Area of" + RoundSigDigits( PadAreaUser, 2 ) + " [m2]" );
 								ShowContinueError( "differs from Design Size Celdek Pad Area of " + RoundSigDigits( PadAreaDes, 2 ) + " [m2]" );
@@ -1307,7 +1307,7 @@ namespace EvaporativeCoolers {
 						"Design Size Celdek Pad Depth [m]", PadDepthDes, "User-Specified Celdek Pad Depth [m]", PadDepthUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( PadDepthDes - PadDepthUser ) / PadDepthUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: \nPotential issue with equipment sizing for " +
+							ShowMessage( "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
 								EvapCond( EvapCoolNum ).EvapCoolerName );
 							ShowContinueError( "User-Specified Celdek Pad Depth of" + RoundSigDigits( PadDepthUser, 2 ) + " [m]" );
 							ShowContinueError( "differs from Design Size Celdek Pad Depth of " + RoundSigDigits( PadDepthDes, 2 ) + " [m]" );
@@ -1390,7 +1390,7 @@ namespace EvaporativeCoolers {
 							"Design Size Celdek Pad Area [m2]", PadAreaDes, "User-Specified Celdek Pad Area [m2]", PadAreaUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( PadAreaDes - PadAreaUser ) / PadAreaUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: \nPotential issue with equipment sizing for " +
+								ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
 									EvapCond( EvapCoolNum ).EvapCoolerName );
 								ShowContinueError( "User-Specified Celdek Pad Area " + RoundSigDigits( PadAreaUser, 2) + " [m2]" );
 								ShowContinueError( "differs from Design Size Celdek Pad Area of " + RoundSigDigits( PadAreaDes, 2) + " [m2]" );
@@ -1423,7 +1423,7 @@ namespace EvaporativeCoolers {
 						"Design Size Celdek Pad Depth [m]", PadDepthDes, "User-Specified Celdek Pad Depth [m]", PadDepthUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( PadDepthDes - PadDepthUser ) / PadDepthUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: \nPotential issue with equipment sizing for " +
+							ShowMessage( "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
 								EvapCond( EvapCoolNum ).EvapCoolerName );
 							ShowContinueError( "User-Specified Celdek Pad Depth of" + RoundSigDigits( PadDepthUser, 2) + " [m]" );
 							ShowContinueError( "differs from Design Size Celdek Pad Depth of " + RoundSigDigits( PadDepthDes, 2 ) + " [m]" );
