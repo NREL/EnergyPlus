@@ -1802,7 +1802,7 @@ namespace EnergyPlus {
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
 		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
-		Array1D_bool lNumericBlanks( NumAlphas, true );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
@@ -1816,7 +1816,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 5, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "rated_capacity", "rated_gas_use_rate", "thermal_efficiency", "rated_fan_power", "auxiliary_electric_power" } ), cNumericFields ) );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, false, true, false, true, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, false, true, false, true } ), lNumericBlanks ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
@@ -1849,7 +1849,7 @@ namespace EnergyPlus {
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
 		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
-		Array1D_bool lNumericBlanks( NumAlphas, true );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
@@ -1863,7 +1863,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 1, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "rated_capacity", "rated_gas_use_rate", "thermal_efficiency", "rated_fan_power", "auxiliary_electric_power" } ), cNumericFields ) );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true } ), lNumericBlanks ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, 0, 0, 0, 0 } ), Numbers ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
@@ -1929,7 +1929,7 @@ namespace EnergyPlus {
 		int IOStatus = 0;
 		Array1D_string Alphas( NumAlphas );
 		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
-		Array1D_bool lNumericBlanks( NumAlphas, true );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
@@ -1948,10 +1948,579 @@ namespace EnergyPlus {
 		EXPECT_EQ( 17, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true, false, true, true, true, false, true, true, true,
 																false, true, true, true, true, true, false, true, true, true,
-																true, true, true, true, true, true, true} ), lNumericBlanks ) );
+																true, true, true, true, true, true } ), lNumericBlanks ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0,
 																  1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0,
 																  0, 0, 0, 0, 0, 0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_test_zone_input)
+	{
+		std::string const idf_objects = delimited_string({
+																 "Zone,",
+																 "  EAST ZONE,              !- Name",
+																 "  0,                      !- Direction of Relative North{ deg }",
+																 "  0,                      !- X Origin{ m }",
+																 "  0,                      !- Y Origin{ m }",
+																 "  0,                      !- Z Origin{ m }",
+																 "  1,                      !- Type",
+																 "  1,                      !- Multiplier",
+																 "  autocalculate,          !- Ceiling Height{ m }",
+																 "  autocalculate;          !- Volume{ m3 }",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Zone";
+
+		int num_zones = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_zones );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "EAST ZONE", "", "", ""} ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 8, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, 0, 0, 0, 1, 1, -99999, -99999, 0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_zone_HVAC_input)
+	{
+		std::string const idf_objects = delimited_string({
+																 "ZoneHVAC:EquipmentConnections,",
+																 "EAST ZONE,                 !- Zone Name",
+																 "  Zone2Equipment,          !- Zone Conditioning Equipment List Name",
+																 "  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name",
+																 "  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name",
+																 "  Zone 2 Node,             !- Zone Air Node Name",
+																 "  Zone 2 Outlet Node;      !- Zone Return Air Node Name",
+																 "  ",
+																 "ZoneHVAC:EquipmentList,",
+																 "  Zone2Equipment,          !- Name",
+																 "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+																 "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
+																 "  1,                       !- Zone Equipment 1 Cooling Sequence",
+																 "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
+
+		int num_equipment_connections = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_equipment_connections );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_equipment_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 6, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "EAST ZONE", "ZONE2EQUIPMENT", "ZONE 2 INLET NODE", "ZONE EXHAUST NODE",
+																	   "ZONE 2 NODE", "ZONE 2 OUTLET NODE", "", ""} ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
+
+		CurrentModuleObject = "ZoneHVAC:EquipmentList";
+
+		int num_equipment_lists = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_equipment_lists );
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_equipment_lists, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 3, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZONE2EQUIPMENT", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1", "", "",
+																	   "", "", "", "", "",
+																	   "", "", "", "", "",
+																	   "", "", "", "", "",
+																	   "", "", "", "", "",
+																	   "", "", "", "", "",
+																	   "", "", "", "", "",
+																	   "", "" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, true, true, true, true, true, true, true,
+																true, true, true, true, true, true, true, true, true, true,
+																true, true, true, true, true, true, true, true, true, true,
+																true, true, true, true, true, true, true } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 2, NumNumbers2 );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, true, true, true, true, true, true, true, true,
+																true, true, true, true, true, true, true, true, true, true,
+																true, true, true, true, true, true, true, true, true, true,
+																true, true, true, true, true, true } ), lNumericBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+																  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+																  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+																  0, 0, 0, 0, 0, 0 } ), Numbers2 ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_coil_heating_gas)
+	{
+		std::string const idf_objects = delimited_string({
+																 "Coil:Heating:Gas,",
+																 "  Furnace Heating Coil 1, !- Name",
+																 "  FanAndCoilAvailSched,   !- Availability Schedule Name",
+																 "  0.8,                    !- Gas Burner Efficiency",
+																 "  32000,                  !- Nominal Capacity{ W }",
+																 "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
+																 "  Reheat Coil Air Inlet Node;  !- Air Outlet Node Name",
+																 "  ",
+																 "Coil:Heating:Gas,",
+																 "  Humidistat Reheat Coil 1, !- Name",
+																 "  FanAndCoilAvailSched, !- Availability Schedule Name",
+																 "  0.8, !- Gas Burner Efficiency",
+																 "  32000, !- Nominal Capacity{ W }",
+																 "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
+																 "  Zone 2 Inlet Node;    !- Air Outlet Node Name",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Coil:Heating:Gas";
+
+		int num_coil_heating_gas = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 2,  num_coil_heating_gas );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FURNACE HEATING COIL 1", "FANANDCOILAVAILSCHED", "HEATING COIL AIR INLET NODE",
+																	   "REHEAT COIL AIR INLET NODE", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 2, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.8, 32000, 0, 0 } ), Numbers ) );
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 4, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HUMIDISTAT REHEAT COIL 1", "FANANDCOILAVAILSCHED", "REHEAT COIL AIR INLET NODE",
+																	   "ZONE 2 INLET NODE", "", "" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 2, NumNumbers2 );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, true, true } ), lNumericBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.8, 32000, 0, 0 } ), Numbers2 ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_fan_on_off)
+	{
+		std::string const idf_objects = delimited_string({
+																 "Fan:OnOff,",
+																 "  Supply Fan 1,           !- Name",
+																 "  FanAndCoilAvailSched,   !- Availability Schedule Name",
+																 "  0.7,                    !- Fan Total Efficiency",
+																 "  600.0,                  !- Pressure Rise{ Pa }",
+																 "  1.6,                    !- Maximum Flow Rate{ m3 / s }",
+																 "  0.9,                    !- Motor Efficiency",
+																 "  1.0,                    !- Motor In Airstream Fraction",
+																 "  Zone Exhaust Node,      !- Air Inlet Node Name",
+																 "  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+																 "  ",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Fan:OnOff";
+
+		int num_fans = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_fans );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE",
+																	   "", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 5, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.7, 600, 1.6, 0.9, 1.0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), lNumericBlanks ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_curve_quadratic)
+	{
+		std::string const idf_objects = delimited_string({
+																 "Curve:Quadratic,",
+																 "  CoolCapFFF,       !- Name",
+																 "  0.8,                    !- Coefficient1 Constant",
+																 "  0.2,                    !- Coefficient2 x",
+																 "  0.0,                    !- Coefficient3 x**2",
+																 "  0.5,                    !- Minimum Value of x",
+																 "  1.5;                    !- Maximum Value of x",
+																 "  ",
+																 "Curve:Quadratic,",
+																 "  COOLEIRFFF,           !- Name",
+																 "  1.1552,                 !- Coefficient1 Constant",
+																 "  -0.1808,                !- Coefficient2 x",
+																 "  0.0256,                 !- Coefficient3 x**2",
+																 "  0.5,                    !- Minimum Value of x",
+																 "  1.5;                    !- Maximum Value of x",
+																 "  ",
+																 "Curve:Quadratic,",
+																 "  PLFFPLR,          !- Name",
+																 "  0.85,                   !- Coefficient1 Constant",
+																 "  0.15,                   !- Coefficient2 x",
+																 "  0.0,                    !- Coefficient3 x**2",
+																 "  0.0,                    !- Minimum Value of x",
+																 "  1.0;                    !- Maximum Value of x",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Quadratic";
+
+		int num_curve_quad = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 3,  num_curve_quad );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFFF", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 5, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.8, 0.2, 0, 0.5, 1.5, 0, 0 } ), Numbers ) );
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 1, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFFF", "", "" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 5, NumNumbers2 );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1.1552, -0.1808, 0.0256, 0.5, 1.5, 0, 0 } ), Numbers2 ) );
+
+		int TotalArgs3 = 0;
+		int NumAlphas3 = 0;
+		int NumNumbers3 = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs3, NumAlphas3, NumNumbers3 );
+
+		Array1D_string Alphas3( NumAlphas3 );
+		Array1D< Real64 > Numbers3( NumNumbers3, 0.0 );
+		Array1D_bool lNumericBlanks3( NumNumbers3, true );
+		Array1D_bool lAlphaBlanks3( NumAlphas3, true );
+		Array1D_string cAlphaFields3( NumAlphas3 );
+		Array1D_string cNumericFields3( NumNumbers3 );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3 );
+
+		EXPECT_EQ( 1, NumAlphas3 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "PLFFPLR", "", "" } ), Alphas3 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks3 ) );
+
+		EXPECT_EQ( 5, NumNumbers3 );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks3 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.85, 0.15, 0, 0.0, 1, 0, 0 } ), Numbers3 ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
+	{
+		std::string const idf_objects = delimited_string({
+																 "Coil:Cooling:DX:VariableSpeed,",
+																 "  Furnace ACDXCoil 1, !- Name",
+																 "  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+																 "  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+																 "  10.0, !- Number of Speeds{ dimensionless }",
+																 "  10.0, !- Nominal Speed Level{ dimensionless }",
+																 "  32000.0, !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level{ w }",
+																 "  1.6, !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }",
+																 "  0.0, !- Nominal Time for Condensate to Begin Leaving the Coil{ s }",
+																 "  0.0, !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }",
+																 "  PLFFPLR, !- Energy Part Load Fraction Curve Name",
+																 "  , !- Condenser Air Inlet Node Name",
+																 "  AirCooled, !- Condenser Type",
+																 "  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
+																 "  200.0, !- Crankcase Heater Capacity{ W }",
+																 "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+																 "  , !- Supply Water Storage Tank Name",
+																 "  , !- Condensate Collection Water Storage Tank Name",
+																 "  , !- Basin Heater Capacity{ W / K }",
+																 "  , !- Basin Heater Setpoint Temperature{ C }",
+																 "  , !- Basin Heater Operating Schedule Name",
+																 "  1524.1, !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  1877.9, !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  2226.6, !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  2911.3, !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  3581.7, !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  4239.5, !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  4885.7, !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }",
+																 "  , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  5520.7, !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  6144.8, !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF, !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+																 "  6758.0, !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+																 "  0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+																 "  4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+																 "  0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }",
+																 "  0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+																 "  , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+																 "  CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name",
+																 "  CoolCapFFF, !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+																 "  COOLEIRFT, !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+																 "  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed";
+
+		int num_coils = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_coils );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 49, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FURNACE ACDXCOIL 1", "DX COOLING COIL AIR INLET NODE", "HEATING COIL AIR INLET NODE", "PLFFPLR", "",
+																	   "AIRCOOLED", "", "", "", "COOLCAPFT",
+																	   "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
+																	   "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
+																	   "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
+																	   "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT",
+																	   "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
+																	   "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
+																	   "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
+																	   "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, false, true, true, true, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 71, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 10.0, 10.0, 32000, 1.6, 0, 0, 0, 200, 10.0, 0,
+																  2, 1524.1, .75, 4, 0.1359072, 0.26, 0, 1877.9, 0.75, 4.0,
+																  0.151008, 0.30, 0, 2226.6, .75, 4.0, 0.1661088, 0.33, 0, 2911.3,
+																  0.75, 4.0, 0.1963104, 0.38, 0, 3581.7, 0.75, 4.0, 0.226512, 0.44,
+																  0, 4239.5, 0.75, 4.0, 0.2567136, 0.5, 0, 4885.7, 0.75, 4.0,
+																  0.2869152, 0.57, 0, 5520.7, 0.75, 4.0, 0.31711680, 0.63, 0, 6144.8,
+																  .75, 4.0, 0.3473184, 0.69, 0, 6758.0, 0.75, 4.0, 0.37752, 0.74, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, true, false, false, true, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true } ), lNumericBlanks ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 
