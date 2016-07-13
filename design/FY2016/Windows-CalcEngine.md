@@ -330,16 +330,8 @@ WindowsCalculationEngine,
   A1; \field Windows engine
       \type choice
       \key BuiltInWindowsModel
-```
-
-```
-WindowsOpticalModel,
-      \memo Used to select methodology of windows optical distribution
-  A1; \field Optical distribution
-      \type choice
-      \key Simplified
-      \key BSDF
-      \default Simplified
+      \key ExternalWindowsModel
+      \default BuiltInWindowsModel
 ```
 
 ## IDD Objects (Revised)

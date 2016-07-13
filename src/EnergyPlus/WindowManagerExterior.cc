@@ -119,9 +119,10 @@ namespace EnergyPlus {
       int ConstrNum = surface.Construction;
       auto & construction( Construct( ConstrNum ) );
 
-      shared_ptr< CTarEnvironment > Indoor = getIndoor( surface, SurfNum );
-      shared_ptr< CTarEnvironment > Outdoor = getOutdoor( surface, SurfNum, HextConvCoeff );
-      shared_ptr< CTarIGU > aIGU = getIGU( surface );
+      CWCELayerFactory aFactory = CWCELayerFactory();
+      shared_ptr< CTarEnvironment > Indoor = aFactory.getIndoor( surface, SurfNum );
+      shared_ptr< CTarEnvironment > Outdoor = aFactory.getOutdoor( surface, SurfNum, HextConvCoeff );
+      shared_ptr< CTarIGU > aIGU = aFactory.getIGU( surface );
 
       // pick-up all layers and put them in IGU (this includes gap layers as well)
       int TotLay = construction.TotLayers;
@@ -132,15 +133,26 @@ namespace EnergyPlus {
         shared_ptr< CBaseIGUTarcogLayer > aLayer = nullptr;
         if( material.Group == WindowGlass || material.Group == WindowSimpleGlazing ) {
           ++SolidLayerIndex;
-          aLayer = getSolidLayer( surface, material, SolidLayerIndex, SurfNum );
+          aLayer = aFactory.getSolidLayer( surface, material, SolidLayerIndex, SurfNum );
         } else if( material.Group == WindowGas || material.Group == WindowGasMixture ) {
-          aLayer = getGapLayer( material );
+          aLayer = aFactory.getGapLayer( material );
+        } else if( material.Group == ComplexWindowGap ) {
+          aLayer = aFactory.getComplexGapLayer( material );
         }
         aIGU->addLayer( aLayer );
       }
 
       shared_ptr< CTarcogSystem > aSystem = make_shared< CTarcogSystem >( aIGU, Indoor, Outdoor );
+      aSystem->setTolerance( 0.02 );
+
+      // get previous timestep temperatures solution for faster iterations
+      shared_ptr< vector< double > > Guess = make_shared< vector< double > >();
+      for( int k = 1; k <= 2 * construction.TotSolidLayers; ++k ) {
+        Guess->push_back( SurfaceWindow( SurfNum ).ThetaFace( k ) );
+      }
+      aSystem->setInitialGuess( Guess );
       aSystem->solve();
+      
       vector< shared_ptr < CTarIGUSolidLayer > > aLayers = aSystem->getSolidLayers();
       int i = 1;
       for( shared_ptr< CTarIGUSolidLayer > aLayer : aLayers ) {
@@ -155,6 +167,7 @@ namespace EnergyPlus {
         }
         SurfInsideTemp = aTemp - KelvinConv;
       }
+      
       HConvIn( SurfNum ) = Indoor->getHc();
       double heatFlow = Indoor->getHeatFlow() * surface.Area;
       WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) - heatFlow;
@@ -173,7 +186,7 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CTarIGUSolidLayer > getSolidLayer( const SurfaceData &surface, const MaterialProperties &material, 
+    shared_ptr< CTarIGUSolidLayer > CWCELayerFactory::getSolidLayer( const SurfaceData &surface, const MaterialProperties &material,
       const int t_Index, const int t_SurfNum ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
@@ -196,7 +209,7 @@ namespace EnergyPlus {
       return aSolidLayer;
     }
 
-    shared_ptr< CTarIGUGapLayer > getGapLayer( const MaterialProperties &material ) {
+    shared_ptr< CTarIGUGapLayer > CWCELayerFactory::getGapLayer( const MaterialProperties &material ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -207,11 +220,43 @@ namespace EnergyPlus {
       // Creates gap layer object from material properties in EnergyPlus
       const double pres = 1e5; // Old code uses this constant pressure
       double thickness = material.Thickness;
+      shared_ptr< CGas > aGas = getGas( material );
+      shared_ptr< CTarIGUGapLayer > aLayer = make_shared< CTarIGUGapLayer >( thickness, pres, aGas );
+      return aLayer;
+    }
+
+    shared_ptr< CTarIGUGapLayer > CWCELayerFactory::getComplexGapLayer( const MaterialProperties &material ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Creates gap layer object from material properties in EnergyPlus
+      const double pres = 1e5; // Old code uses this constant pressure
+      double thickness = material.Thickness;
+      int gasPointer = material.GasPointer;
+      auto & gasMaterial( Material( gasPointer ) );
+      shared_ptr< CGas > aGas = getGas( gasMaterial );
+      shared_ptr< CTarIGUGapLayer > aLayer = make_shared< CTarIGUGapLayer >( thickness, pres, aGas );
+      return aLayer;
+    }
+
+    shared_ptr< CGas > CWCELayerFactory::getGas( const MaterialProperties &material ) {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   July 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Creates gap layer object from material properties in EnergyPlus
       int numGases = material.NumberOfGasesInMixture;
       const double vacuumCoeff = 1.4; //Load vacuum coefficient once it is implemented (Simon).
       string gasName = material.Name;
       shared_ptr< CGas > aGas = make_shared< CGas >();
-      for( int i = 1; i <= numGases; ++i ) {        
+      for( int i = 1; i <= numGases; ++i ) {
         double wght = material.GasWght( i );
         double fract = material.GasFract( i );
         vector< double > gcon;
@@ -229,12 +274,11 @@ namespace EnergyPlus {
         shared_ptr< CGasItem > aGasItem = make_shared< CGasItem >( fract, aData );
         aGas->addGasItem( aGasItem );
       }
-      shared_ptr< CTarIGUGapLayer > aLayer = make_shared< CTarIGUGapLayer >( thickness, pres, aGas );
-      return aLayer;
+      return aGas;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CTarEnvironment > getIndoor( const SurfaceData &surface, const int t_SurfNum ) {
+    shared_ptr< CTarEnvironment > CWCELayerFactory::getIndoor( const SurfaceData &surface, const int t_SurfNum ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -255,7 +299,7 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CTarEnvironment > getOutdoor( const SurfaceData &surface, const int t_SurfNum, const double t_Hext ) {
+    shared_ptr< CTarEnvironment > CWCELayerFactory::getOutdoor( const SurfaceData &surface, const int t_SurfNum, const double t_Hext ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -283,7 +327,7 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CTarIGU > getIGU( const SurfaceData &surface ) {
+    shared_ptr< CTarIGU > CWCELayerFactory::getIGU( const SurfaceData &surface ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016

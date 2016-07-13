@@ -2125,8 +2125,8 @@ namespace WindowManager {
     // Subroutine to direct wheter to use exterior or interior window routines
     if( KickOffSizing || KickOffSimulation ) return;
 
-    // CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
-    CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+    CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
+    // CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
   }
 
 	void

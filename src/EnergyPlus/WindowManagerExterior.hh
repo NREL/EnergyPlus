@@ -78,23 +78,37 @@ namespace EnergyPlus {
       Real64 & SurfOutsideTemp // Outside surface temperature (C)
     );
 
-    std::shared_ptr< Tarcog::CTarIGUSolidLayer > getSolidLayer(
-      const EnergyPlus::DataSurfaces::SurfaceData &surface,
-      const EnergyPlus::DataHeatBalance::MaterialProperties &material, 
-      const int t_Index, const int t_SurfNum );
+    // Class that is used to create layers for Windows-CalcEngine
+    class CWCELayerFactory {
+    public:
 
-    std::shared_ptr< Tarcog::CTarIGUGapLayer > getGapLayer(
-      const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+      CWCELayerFactory() {};
 
-    std::shared_ptr< Tarcog::CTarEnvironment > getIndoor(
-      const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
+      std::shared_ptr< Tarcog::CTarIGUSolidLayer > getSolidLayer(
+        const EnergyPlus::DataSurfaces::SurfaceData &surface,
+        const EnergyPlus::DataHeatBalance::MaterialProperties &material,
+        const int t_Index, const int t_SurfNum );
 
-    std::shared_ptr< Tarcog::CTarEnvironment > getOutdoor(
-      const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum,
-      const double t_Hext );
+      std::shared_ptr< Tarcog::CTarIGUGapLayer > getGapLayer(
+        const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
-    std::shared_ptr< Tarcog::CTarIGU > getIGU(
-      const EnergyPlus::DataSurfaces::SurfaceData &surface );
+      std::shared_ptr< Tarcog::CTarIGUGapLayer > getComplexGapLayer(
+        const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+
+      std::shared_ptr< Tarcog::CTarEnvironment > getIndoor(
+        const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
+
+      std::shared_ptr< Tarcog::CTarEnvironment > getOutdoor(
+        const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum,
+        const double t_Hext );
+
+      std::shared_ptr< Tarcog::CTarIGU > getIGU(
+        const EnergyPlus::DataSurfaces::SurfaceData &surface );
+
+    private:      
+      std::shared_ptr< Gases::CGas > getGas( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+
+    };        
 
   }
 

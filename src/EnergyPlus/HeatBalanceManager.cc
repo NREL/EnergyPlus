@@ -1244,7 +1244,7 @@ namespace HeatBalanceManager {
 			gio::write( OutputFileInits, Format_733 ) << "No" << "N/A" << "N/A" << "N/A";
 		}
 
-	}
+	} 
 
 	void
 	GetSiteAtmosphereData( bool & ErrorsFound )

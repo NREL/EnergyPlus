@@ -8547,6 +8547,15 @@ WindowThermalModel:Params,
        \units Pa
        \minimum> 0
        \default 101325
+       
+WindowsCalculationEngine,
+       \memo This object is used to switch algorithms between built in windows engine 
+       \memo and windows engine as exterior component
+  A1;  \field Windows engine
+       \type choice
+       \key BuiltInWindowsModel
+       \key ExternalWindowsModel
+       \default BuiltInWindowsModel
 
 Construction:ComplexFenestrationState,
        \memo Describes one state for a complex glazing system
