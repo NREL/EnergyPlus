@@ -689,6 +689,7 @@ namespace HeatRecovery {
 	extern Array1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
 	extern Array1D< HeatExchCondNumericFieldData > HeatExchCondNumericFields;
 	extern Array1D< HeatExchCondNumericFieldData > BalDesDehumPerfNumericFields;
+
 	// Functions
 
 	void

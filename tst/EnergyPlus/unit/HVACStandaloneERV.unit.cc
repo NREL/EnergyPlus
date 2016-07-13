@@ -106,7 +106,8 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
 	People( 2 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
 	StandAloneERV.allocate( 1 );
-	
+
+	// size on floor area
 	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
 	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 1.0;
 	StandAloneERV( 1 ).AirVolFlowPerOccupant = 0.0;
@@ -115,6 +116,7 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
 	SizeStandAloneERV( 1 );
 	EXPECT_EQ( 1000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
 
+	// size on occupancy
 	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
 	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 0.0;
 	StandAloneERV( 1 ).AirVolFlowPerOccupant = 10.0;
@@ -123,6 +125,7 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
 	SizeStandAloneERV( 1 );
 	EXPECT_EQ( 3000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
 
+	// size on floor area and occupancy
 	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
 	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 1.0;
 	StandAloneERV( 1 ).AirVolFlowPerOccupant = 10.0;
@@ -131,6 +134,7 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
 	SizeStandAloneERV( 1 );
 	EXPECT_EQ( 4000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
 
+	// size on floor area and occupancy using zone multiplier
 	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
 	Zone( 1 ).Multiplier = 5.0;
 	SizeStandAloneERV( 1 );
@@ -228,7 +232,7 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
 	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 0.01;
 	StandAloneERV( 1 ).AirVolFlowPerOccupant = 0.0;
 	StandAloneERV( 1 ).HighRHOAFlowRatio = 1.2;
-	
+
 	SizeStandAloneERV( 1 );
 
 	EXPECT_EQ( 1.0, StandAloneERV( 1 ).SupplyAirVolFlow );

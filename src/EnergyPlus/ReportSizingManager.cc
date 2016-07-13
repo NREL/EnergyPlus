@@ -1360,7 +1360,7 @@ namespace ReportSizingManager {
 						}
 					}
 				} else if ( SizingType == SystemAirflowSizing ) {
-					if ( HRFlowSizingFlag ) {						
+					if ( HRFlowSizingFlag ) { // HX sizing
 						if ( CurOASysNum ) {
 							if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
 								AutosizeDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
@@ -1983,7 +1983,7 @@ namespace ReportSizingManager {
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
 					AutosizeDes = FinalSysSizing( CurSysNum ).HeatSupTemp;
 				} else if ( SizingType == DesiccantDehumidifierBFPerfDataFaceVelocitySizing ) {
-					AutosizeDes = 4.30551 + 0.01969 * DataAirFlowUsedForSizing;					     
+					AutosizeDes = 4.30551 + 0.01969 * DataAirFlowUsedForSizing;
 					AutosizeDes = min( 6.0, AutosizeDes);
 				}
 			}
