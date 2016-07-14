@@ -3069,11 +3069,10 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 					}
                     Alphas(i + 1) = MakeUPPERCase(val);
                 } else {
-                    std::stringstream ss;
-                    ss << it.value().get<double>();
-                    Alphas(i + 1) = ss.str();
-//					val = std::to_string(it.value().get<double>());
-//					Alphas( i + 1 ) = val;
+//                    std::stringstream ss;
+//                    ss << it.value().get<double>();
+//                    Alphas(i + 1) = ss.str();
+					Alphas( i + 1 ) = std::to_string(it.value().get<double>());
 					if (present(AlphaBlank)) AlphaBlank()(i + 1) = false;
                 }
                 NumAlphas++;
@@ -3085,7 +3084,7 @@ EnergyPlus::InputProcessor::GetRecordLocations(
         }
 
         if (object_in_schema->at("legacy_idd")["alphas"].find("extensions") !=
-            object_in_schema->at("legacy_idd")["alphas"].end()) {
+                object_in_schema->at("legacy_idd")["alphas"].end()) {
             auto const &alphas_extensions = object_in_schema->at("legacy_idd")["alphas"]["extensions"];
             auto const extensions = obj.value()["extensions"];
             int alphas_index = alphas_fields.size();
@@ -3095,15 +3094,26 @@ EnergyPlus::InputProcessor::GetRecordLocations(
                     std::string const field = alphas_extensions[i];
                     if (extension_obj.find(field) != extension_obj.end()) {
                         if (extension_obj[field].is_string()) {
-                            std::string const val = extension_obj[field];
-                            Alphas(alphas_index + 1) = MakeUPPERCase(val);
-							if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = val.empty();
+                            auto const &schema_obj = object_in_schema->at("patternProperties")[".*"]["extensions"][field];
+                            std::string val = extension_obj[field];
+                            if (val.empty() and schema_obj.find("default") != schema_obj.end()) {
+                                auto const &default_val = schema_obj["default"];
+                                if (default_val.is_string()) {
+                                    val = default_val.get<std::string>();
+                                } else {
+                                    val = std::to_string(default_val.get<double>());
+                                }
+                                if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = true;
+                            } else {
+                                if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = val.empty();
+                            }
+							Alphas(alphas_index + 1) = MakeUPPERCase(val);
                         } else {
-                            double val = extension_obj[field]; // TODO is this reachable?
-                            std::stringstream ss;
-                            ss << val;
-                            Alphas(alphas_index + 1) = ss.str();
-//							Alphas(alphas_index + 1) = std::to_string(val);
+                            double val = extension_obj[field];
+//                            std::stringstream ss;
+//                            ss << val;
+//                            Alphas(alphas_index + 1) = ss.str();
+							Alphas(alphas_index + 1) = std::to_string(val);
 							if (present(AlphaBlank)) AlphaBlank()(alphas_index + 1) = false;
                         }
                         NumAlphas++;

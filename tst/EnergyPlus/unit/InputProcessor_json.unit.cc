@@ -105,8 +105,8 @@ namespace EnergyPlus {
                                                      "  0.000000,",
                                                      "  1.000000,",
                                                      "  1.000000,",
-                                                     "  autocalculate,",
-                                                     "  autocalculate,",
+                                                     "  ,",
+                                                     "  ,",
                                                      "  Autocalculate,",
                                                      "  ,",
                                                      "  ,",
@@ -138,11 +138,11 @@ namespace EnergyPlus {
                                 {
                                         "Ref Bldg Medium Office New2004_v1.3_5.0",
                                         {
-                                                {"north_axis", 0.0},
-                                                {"terrain", "Suburbs"},
-                                                {"loads_convergence_tolerance_value", 0.04},
+                                                {"north_axis", ""},
+                                                {"terrain", ""},
+                                                {"loads_convergence_tolerance_value", ""},
                                                 {"temperature_convergence_tolerance_value", 0.2000},
-                                                {"solar_distribution", "FullExterior"},
+                                                {"solar_distribution", ""},
                                                 {"maximum_number_of_warmup_days", 25},
                                                 {"minimum_number_of_warmup_days", 6}
                                         }
@@ -2075,28 +2075,12 @@ namespace EnergyPlus {
 		InputProcessor::GetObjectItem( CurrentModuleObject, num_equipment_lists, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		EXPECT_EQ( 3, NumAlphas2 );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZONE2EQUIPMENT", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1", "", "",
-																	   "", "", "", "", "",
-																	   "", "", "", "", "",
-																	   "", "", "", "", "",
-																	   "", "", "", "", "",
-																	   "", "", "", "", "",
-																	   "", "", "", "", "",
-																	   "", "" } ), Alphas2 ) );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, true, true, true, true, true, true, true,
-																true, true, true, true, true, true, true, true, true, true,
-																true, true, true, true, true, true, true, true, true, true,
-																true, true, true, true, true, true, true } ), lAlphaBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZONE2EQUIPMENT", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false } ), lAlphaBlanks2 ) );
 
 		EXPECT_EQ( 2, NumNumbers2 );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, true, true, true, true, true, true, true, true,
-																true, true, true, true, true, true, true, true, true, true,
-																true, true, true, true, true, true, true, true, true, true,
-																true, true, true, true, true, true } ), lNumericBlanks2 ) );
-		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-																  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-																  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-																  0, 0, 0, 0, 0, 0 } ), Numbers2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false } ), lNumericBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 1 } ), Numbers2 ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 
@@ -2175,6 +2159,91 @@ namespace EnergyPlus {
 		EXPECT_EQ( 2, NumNumbers2 );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, true, true } ), lNumericBlanks2 ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.8, 32000, 0, 0 } ), Numbers2 ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_schedule_objects)
+	{
+		std::string const idf_objects = delimited_string({
+																 "ScheduleTypeLimits,",
+																 "  Any Number;             !- Name",
+																 "  ",
+																 "Schedule:Compact,",
+																 "  FanAndCoilAvailSched,   !- Name",
+																 "  Any Number,             !- Schedule Type Limits Name",
+																 "  Through: 12/31,         !- Field 1",
+																 "  For: AllDays,           !- Field 2",
+																 "  Until: 24:00, 1.0;      !- Field 3",
+																 "  ",
+																 "Schedule:Compact,",
+																 "  ContinuousFanSchedule,  !- Name",
+																 "  Any Number,             !- Schedule Type Limits Name",
+																 "  Through: 12/31,         !- Field 1",
+																 "  For: AllDays,           !- Field 2",
+																 "  Until: 24:00, 1.0;      !- Field 3",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string CurrentModuleObject = "ScheduleTypeLimits";
+
+		int num_schedule_type_limits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_schedule_type_limits );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_schedule_type_limits, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ANY NUMBER", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true } ), lNumericBlanks ) );
+
+
+		CurrentModuleObject = "Schedule:Compact";
+
+		int num_schedule_compact = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 2,  num_schedule_compact );
+
+		TotalArgs = 0;
+		NumAlphas = 0;
+		NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		Array1D_string Alphas2( NumAlphas );
+		Array1D< Real64 > Numbers2( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas, true );
+		Array1D_string cAlphaFields2( NumAlphas );
+		Array1D_string cNumericFields2( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		// Container size is 4500 here!
+		EXPECT_EQ( 6, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FANANDCOILAVAILSCHED", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.000000" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks2 ) );
 
 		EXPECT_EQ( 1, IOStatus );
 	}
