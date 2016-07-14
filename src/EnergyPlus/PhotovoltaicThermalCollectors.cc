@@ -701,7 +701,7 @@ namespace PhotovoltaicThermalCollectors {
 
 			if ( SELECT_CASE_var == LiquidWorkingFluid ) {
 
-				rho = GetDensityGlycol( PlantLoop( PVT( PVTnum ).WLoopNum ).FluidName, 60.0, PlantLoop( PVT( PVTnum ).WLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( PVT( PVTnum ).WLoopNum ).FluidName, HWInitConvTemp, PlantLoop( PVT( PVTnum ).WLoopNum ).FluidIndex, RoutineName );
 
 				PVT( PVTnum ).MaxMassFlowRate = PVT( PVTnum ).DesignVolFlowRate * rho;
 

@@ -1344,7 +1344,7 @@ namespace VentilatedSlab {
 			if ( VentSlab( Item ).HCoilPresent ) { // Only initialize these if a heating coil is actually present
 
 				if ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && ! MyPlantScanFlag( Item ) ) {
-					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 
 					VentSlab( Item ).MaxHotWaterFlow = rho * VentSlab( Item ).MaxVolHotWaterFlow;
 					VentSlab( Item ).MinHotWaterFlow = rho * VentSlab( Item ).MinVolHotWaterFlow;
@@ -1366,7 +1366,7 @@ namespace VentilatedSlab {
 			if ( VentSlab( Item ).CCoilPresent && ! MyPlantScanFlag( Item ) ) {
 				// Only initialize these if a cooling coil is actually present
 				if ( ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ) || ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
-					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
 					VentSlab( Item ).MaxColdWaterFlow = rho * VentSlab( Item ).MaxVolColdWaterFlow;
 					VentSlab( Item ).MinColdWaterFlow = rho * VentSlab( Item ).MinVolColdWaterFlow;
 					InitComponentNodes( VentSlab( Item ).MinColdWaterFlow, VentSlab( Item ).MaxColdWaterFlow, VentSlab( Item ).ColdControlNode, VentSlab( Item ).ColdCoilOutNodeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
@@ -1797,8 +1797,8 @@ namespace VentilatedSlab {
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
 								}
-								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
@@ -1895,8 +1895,8 @@ namespace VentilatedSlab {
 								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
 								LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 								SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
-								rho = GetDensityGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName );
+								rho = GetDensityGlycol( fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName );
 								MaxVolHotSteamFlowDes = DesCoilLoad / ( ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho ) + SteamDensity * LatentHeatSteam );
 							} else {
 								MaxVolHotSteamFlowDes = 0.0;

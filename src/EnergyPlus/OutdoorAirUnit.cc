@@ -1032,7 +1032,7 @@ namespace OutdoorAirUnit {
 
 					if ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterSimpleHeating ) {
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow = GetWaterCoilMaxFlowRate( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentName, errFlag );
-						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, HWInitConvTemp, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
 						InitComponentNodes( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterInletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterOutletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum );

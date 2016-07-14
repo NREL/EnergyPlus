@@ -119,6 +119,7 @@ namespace EnergyPlus {
 		using DataGlobals::InitConvTemp;
 		using namespace FluidProperties;
 		using DataSizing::PlantSizData;
+		using DataGlobals::CWInitConvTemp;
 
 		Real64 density;
 		Real64 cp;
@@ -128,10 +129,10 @@ namespace EnergyPlus {
 			if ( PlantLoopName == PlantLoop( i ).Name ) { //found it
 
 				density = GetDensityGlycol( PlantLoop( i ).FluidName,
-								InitConvTemp, PlantLoop( i ).FluidIndex,
+								CWInitConvTemp, PlantLoop( i ).FluidIndex,
 								"createNewCoincidentPlantAnalysisObject" );
 				cp = GetSpecificHeatGlycol( PlantLoop( i ).FluidName,
-								InitConvTemp, PlantLoop( i ).FluidIndex,
+								CWInitConvTemp, PlantLoop( i ).FluidIndex,
 								"createNewCoincidentPlantAnalysisObject" );
 
 				plantCoincAnalyObjs.emplace_back( PlantLoopName, i, PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn, density,
