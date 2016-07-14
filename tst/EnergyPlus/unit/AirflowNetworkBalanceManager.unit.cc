@@ -214,6 +214,10 @@ namespace EnergyPlus {
 		} );
 
 //		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		// added this instead of code below
+		ASSERT_TRUE (process_idf(idf_objects));
+		/*
 		InputProcessor IP;
 		std::ifstream ifs("FULL_SCHEMA_modified.json", std::ifstream::in);
 		ASSERT_TRUE( ifs.is_open() );
@@ -221,7 +225,7 @@ namespace EnergyPlus {
 		IP.idf_parser.initialize(IP.schema);
 //      json test = IP.idf_parser.decode(idf_objects, IP.schema);
 		InputProcessor::jdf = IP.idf_parser.decode(idf_objects, IP.schema);
-
+*/
 		GetAirflowNetworkInput();
 
 		EXPECT_EQ( 1, MultizoneZoneData( 1 ).VentingSchNum );
@@ -2254,12 +2258,13 @@ namespace EnergyPlus {
 		GetAirflowNetworkInput( );
 
 		Real64 PresssureSet = 0.5;
-		// Assign values
+		// Assign values (last two's indexes were swapped because of new input processor)
+
 		Schedule( 1 ).CurrentValue = PresssureSet; // Pressure setpoint
 		Schedule( 2 ).CurrentValue = 1.0; // set availability and fan schedule to 1
 		Schedule( 3 ).CurrentValue = 1.0; // On
-		Schedule( 4 ).CurrentValue = 25.55; // WindowVentSched
-		Schedule( 5 ).CurrentValue = 1.0; // VentingSched
+		Schedule( 5 ).CurrentValue = 25.55; // VentingSched
+		Schedule( 4 ).CurrentValue = 1.0; // WindowVentSched
 
 		AirflowNetworkFanActivated = true;
 		DataEnvironment::OutDryBulbTemp = -17.29025;
@@ -2272,7 +2277,7 @@ namespace EnergyPlus {
 			AirflowNetworkNodeSimu( i ).TZ = 23.0;
 			AirflowNetworkNodeSimu( i ).WZ = 0.0008400;
 			if ( ( i > 4 && i < 10 ) || i == 32) {
-				AirflowNetworkNodeSimu( i ).TZ = DataEnvironment::OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );
+				AirflowNetworkNodeSimu( i ).TZ = DataEnvironment::OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );  //AirflowNetworkNodeData vals differ
 				AirflowNetworkNodeSimu( i ).WZ = DataEnvironment::OutHumRat;
 			}
 		}
@@ -2400,7 +2405,10 @@ namespace EnergyPlus {
 		GetAirflowNetworkInput( );
 
 		// The original value before fix is zero. After the fix, the correct schedule number is assigned.
-		EXPECT_EQ( 2, MultizoneZoneData( 1 ).VentingSchNum );
+
+		//changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
+		// has index 1 which is the .VentSchNum
+		EXPECT_EQ( 1 , MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate( );
 		Surface.deallocate( );
