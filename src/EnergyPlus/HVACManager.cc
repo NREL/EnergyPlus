@@ -204,8 +204,6 @@ namespace HVACManager {
 
 	int HVACManageIteration( 0 ); // counts iterations to enforce maximum iteration limit
 	int RepIterAir( 0 );
-	Real64 HVACManagerTimeStepSysLast( 0.0 ); // time step of last iteration [hr]
-	Real64 HVACManagerCurrentEndTimeLast( 0.0 ); // time of last iteration [hr]
 
 	//Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	//Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
@@ -220,6 +218,10 @@ namespace HVACManager {
 		bool SimHVACIterSetup( false );
 		bool TriggerGetAFN( true );
 		bool ReportAirHeatBalanceFirstTimeFlag( true );
+		Real64 timeStepSysLast_HVACManager( 0.0 ); // time step of last iteration [hr]
+		Real64 currentEndTimeLast_HVACManager( 0.0 ); // time of last iteration [hr]
+		Real64 currentEndTime_HVACManager( 0.0 ); // end time of time step for current simulation time step
+
 	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -235,6 +237,9 @@ namespace HVACManager {
 		SimHVACIterSetup = false;
 		TriggerGetAFN = true;
 		ReportAirHeatBalanceFirstTimeFlag = true;
+		timeStepSysLast_HVACManager = 0.0;
+		currentEndTimeLast_HVACManager = 0.0;
+		currentEndTime_HVACManager = 0.0;
 	}
 
 
@@ -2746,13 +2751,10 @@ namespace HVACManager {
 		using General::CreateSysTimeIntervalString; // string representation of simulation time
 		using General::RoundSigDigits; // round to number of decimals
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Real64 CurrentEndTime( 0.0 ); // end time of time step for current simulation time step
-
 		if ( DataGlobals::WarmupFlag || DataGlobals::DoingSizing ) return;
 
 		// calculate end time of current time step to determine if error messages should be printed
-		CurrentEndTime = CurrentTime + SysTimeElapsed;
+		currentEndTime_HVACManager = CurrentTime + SysTimeElapsed;
 
 		for( int FanNum = 1; FanNum <= NumFans; ++FanNum ) {
 
@@ -2763,7 +2765,7 @@ namespace HVACManager {
 			if ( Fan( FanNum ).PrintNodeInletToFanInletMessage && DataGlobals::DisplayExtraWarnings) { // .AND. &
 
 				// CurrentTime incremented to next time step AND TimeStepSys is same as before and not smaller (i.e., when simulation downshifts warning is not valid)
-				if ( CurrentEndTime > HVACManagerCurrentEndTimeLast && TimeStepSys >= HVACManagerTimeStepSysLast ) {
+				if ( currentEndTime_HVACManager > currentEndTimeLast_HVACManager && TimeStepSys >= timeStepSysLast_HVACManager ) {
 
 					if (  Fan( FanNum ).FanInletVsNodeFlowNotMatchingIndex == 0 ) {
 
@@ -2780,7 +2782,7 @@ namespace HVACManager {
 
 			if ( Fan( FanNum ).PrintNodeOutletToFanOutletMessage && DataGlobals::DisplayExtraWarnings ) { // .AND. &
 
-				if ( CurrentEndTime > HVACManagerCurrentEndTimeLast && TimeStepSys >= HVACManagerTimeStepSysLast ) {
+				if ( currentEndTime_HVACManager > currentEndTimeLast_HVACManager && TimeStepSys >= timeStepSysLast_HVACManager ) {
 
 					if( Fan( FanNum ).FanOutletVsNodeFlowNotMatchingIndex == 0 ) {
 
@@ -2797,7 +2799,7 @@ namespace HVACManager {
 
 			if ( Fan( FanNum ).PrintNodeOutletToNodeInletMessage ) { // .AND. &
 
-				if ( CurrentEndTime > HVACManagerCurrentEndTimeLast && TimeStepSys >= HVACManagerTimeStepSysLast ) {
+				if ( currentEndTime_HVACManager > currentEndTimeLast_HVACManager && TimeStepSys >= timeStepSysLast_HVACManager ) {
 
 					if( Fan( FanNum ).FanInletVsFanOutletFlowNotMatchingIndex == 0 ) {
 
@@ -2869,7 +2871,7 @@ namespace HVACManager {
 			if ( PumpEquip( PumpNum ).PrintNodeOutletToNodeInletMessage ) { // .AND. &
 
 				// CurrentTime incremented to next time step AND TimeStepSys is same as before and not smaller (i.e., when simulation downshifts warning is not valid)
-				if ( CurrentEndTime > HVACManagerCurrentEndTimeLast && TimeStepSys >= HVACManagerTimeStepSysLast ) {
+				if ( currentEndTime_HVACManager > currentEndTimeLast_HVACManager && TimeStepSys >= timeStepSysLast_HVACManager ) {
 
 					if ( PumpEquip( PumpNum ).PumpInVsPumpOutFlowNotMatchingIndex == 0 ) {
 
@@ -2903,8 +2905,8 @@ namespace HVACManager {
 		}
 
 		// save last system time step and last end time of current time step (used to determine if warning is valid)
-		HVACManagerTimeStepSysLast = TimeStepSys;
-		HVACManagerCurrentEndTimeLast = CurrentEndTime;
+		timeStepSysLast_HVACManager = TimeStepSys;
+		currentEndTimeLast_HVACManager = currentEndTime_HVACManager;
 
 	}
 
