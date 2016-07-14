@@ -134,7 +134,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 	});
 
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	DataHeatBalance::ZoneIntGain.allocate(1);
 

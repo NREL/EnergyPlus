@@ -512,7 +512,7 @@ TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
 		"Schedule:Constant,MyScheduleOn,,1;",
 		"Schedule:Constant,MyScheduleOff,,0;",
 	} ) );
-	ASSERT_FALSE(process_idf(idf_contents));
+	ASSERT_TRUE(process_idf(idf_contents));
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 	ScheduleManager::ProcessScheduleInput();

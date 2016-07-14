@@ -261,7 +261,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY
 		"0,                       !- Output Value #1",
 		"1,                       !- X Value #2",
 		"1;                       !- Output Value #2" } );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;
@@ -309,7 +309,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEn
 		"5,                       !- X Value #6",
 		"2;                       !- Output Value #6" } );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
@@ -369,7 +369,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnter
 		"4.93,                    !- X Value #6",
 		"2;                       !- Output Value #6" } );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
@@ -474,7 +474,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		"  46.11111,       !- <none>",
 		"  21998.35468;    !- <none>" 	} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
@@ -671,7 +671,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
         "2,                       !- Y Value #12",
         "2;                       !- Output Value #12" });
 
-    ASSERT_FALSE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(idf_objects));
 
     EXPECT_EQ(0, CurveManager::NumCurves);
     CurveManager::GetCurveInput();
@@ -813,7 +813,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
         "2,                       !- Y Value #12",
         "2;                       !- Output Value #12"  });
 
-    ASSERT_FALSE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(idf_objects));
 
     EXPECT_EQ(0, CurveManager::NumCurves);
     CurveManager::GetCurveInput();
@@ -958,7 +958,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Linear_EvaluateCurveTyp
 		"4,                       !- X Value #5",
 		"4;                       !- Output Value #5" } );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;

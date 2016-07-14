@@ -122,7 +122,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 
 	} );
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 	EXPECT_FALSE(has_err_output());
 	bool ErrorsFound = false;
 	GetZoneData(ErrorsFound);

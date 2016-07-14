@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, SkyTempTest )
 		"    190;                     !- Elevation {m}",
 	});
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 	Array2D< Real64 > TomorrowSkyTemp; // Sky temperature
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
