@@ -5333,7 +5333,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
-	Schedule( 1 ).CurrentValue = 1.0;
+	Schedule( 2 ).CurrentValue = 1.0;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
 	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).DesignFanVolFlowRate * StdRhoAir;
