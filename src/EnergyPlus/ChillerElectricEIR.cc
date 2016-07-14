@@ -1373,8 +1373,12 @@ namespace ChillerElectricEIR {
 				if ( ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate > 0.0 && tempHeatRecVolFlowRate > 0.0 ) {
 					Real64 nomHeatRecVolFlowRateUser = ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 					if ( DataPlant::PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,
-							"Design Size Heat Recovery Water Flow Rate [m3/s]", tempHeatRecVolFlowRate , "User-Specified Heat Recovery Water Flow Rate [m3/s]", nomHeatRecVolFlowRateUser );
+						if ( DataGlobals::DoPlantSizing ) {
+							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name,"Design Size Heat Recovery Water Flow Rate [m3/s]", tempHeatRecVolFlowRate , "User-Specified Heat Recovery Water Flow Rate [m3/s]", nomHeatRecVolFlowRateUser );
+						} else {
+							ReportSizingOutput( "Chiller:Electric:EIR", ElectricEIRChiller( EIRChillNum ).Name, "User-Specified Heat Recovery Water Flow Rate [m3/s]", nomHeatRecVolFlowRateUser );
+						}
+
 						if ( DataGlobals::DisplayExtraWarnings ){
 							if ( ( std::abs( tempHeatRecVolFlowRate - nomHeatRecVolFlowRateUser ) / nomHeatRecVolFlowRateUser ) > DataSizing::AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeChillerElectricEIR: Potential issue with equipment sizing for " + ElectricEIRChiller( EIRChillNum ).Name );
@@ -1389,6 +1393,7 @@ namespace ChillerElectricEIR {
 				}
 			
 			}
+			if ( ! ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tempHeatRecVolFlowRate = ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 			PlantUtilities::RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).HeatRecInletNodeNum, tempHeatRecVolFlowRate );
 		} // Heat recovery active
 

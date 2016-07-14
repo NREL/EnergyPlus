@@ -3667,8 +3667,7 @@ namespace PlantChillers {
 
 		// autosize support for heat recovery flow rate. 
 		if ( EngineDrivenChiller( ChillNum ).HeatRecActive ) {
-			Real64 tmpHeatRecVolFlowRate = EngineDrivenChiller( ChillNum ).Base.CondVolFlowRate * EngineDrivenChiller( ChillNum ).HeatRecCapacityFraction;
-			if ( ! EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRate;
+			Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * EngineDrivenChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) {
 					EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
@@ -3684,9 +3683,11 @@ namespace PlantChillers {
 					if ( EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0 ) {
 						Real64 DesignHeatRecVolFlowRateUser = EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name,
-								"Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate,
-								"User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
+							if ( DataGlobals::DoPlantSizing ) {
+								ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name,"Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate,"User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
+							} else {
+								ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name,"User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
+							}
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser ) / DesignHeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeEngineDrivenChiller: Potential issue with equipment sizing for " + EngineDrivenChiller( ChillNum ).Base.Name );
@@ -3701,6 +3702,7 @@ namespace PlantChillers {
 					}
 				}
 			}
+			if ( ! EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRate;
 			// save the reference heat recovery fluid volumetric flow rate
 			RegisterPlantCompDesignFlow( EngineDrivenChiller( ChillNum ).HeatRecInletNodeNum, tmpHeatRecVolFlowRate );
 		}
@@ -4002,7 +4004,6 @@ namespace PlantChillers {
 		// autosize support for heat recovery flow rate. 
 		if ( GTChiller( ChillNum ).HeatRecActive ) {
 			Real64 tmpHeatRecVolFlowRate = GTChiller( ChillNum ).Base.CondVolFlowRate * GTChiller( ChillNum ).HeatRecCapacityFraction;
-			if ( ! GTChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = GTChiller( ChillNum ).DesignHeatRecVolFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( GTChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) {
 					GTChiller( ChillNum ).DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
@@ -4018,9 +4019,11 @@ namespace PlantChillers {
 					if ( GTChiller( ChillNum ).DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0 ) {
 						Real64 DesignHeatRecVolFlowRateUser = GTChiller( ChillNum ).DesignHeatRecVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name,
-								"Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate,
-								"User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
+							if ( DataGlobals::DoPlantSizing ) {
+								ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name,"Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate,"User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
+							} else {
+								ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name,"User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
+							}
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser ) / DesignHeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeEngineDrivenChiller: Potential issue with equipment sizing for " + EngineDrivenChiller( ChillNum ).Base.Name );
@@ -4035,6 +4038,7 @@ namespace PlantChillers {
 					}
 				}
 			}
+			if ( ! GTChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = GTChiller( ChillNum ).DesignHeatRecVolFlowRate;
 			// save the reference heat recovery fluid volumetric flow rate
 			RegisterPlantCompDesignFlow( GTChiller( ChillNum ).HeatRecInletNodeNum, tmpHeatRecVolFlowRate );
 		}
