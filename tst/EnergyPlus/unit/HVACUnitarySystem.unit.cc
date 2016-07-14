@@ -1052,7 +1052,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
-	Schedule( 1 ).CurrentValue = 1.0;
+	Schedule( 2 ).CurrentValue = 1.0; //changed index of schedule to 2 because object has new position in a schedule
 	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
 	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).MaxCoolAirVolFlow * StdRhoAir;
