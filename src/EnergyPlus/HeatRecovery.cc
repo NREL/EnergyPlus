@@ -1477,8 +1477,8 @@ namespace HeatRecovery {
 
 		HRFlowSizingFlag = true;
 		PrintFlag = true;
-		if ( ExchCond( ExchNum ).ExchTypeNum == HX_DESICCANT_BALANCED ) {
-			FieldNum = 0;
+		FieldNum = 0;
+		if( ExchCond( ExchNum ).ExchTypeNum == HX_DESICCANT_BALANCED ) {
 			PrintFlag = false;
 		} else if ( ExchCond( ExchNum ).ExchTypeNum == HX_AIRTOAIR_GENERIC ) {
 			FieldNum = 1;
