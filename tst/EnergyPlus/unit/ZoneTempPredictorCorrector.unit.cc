@@ -483,19 +483,27 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		int HeatZoneNum( 1 );
-		int CoolZoneNum( 2 );
-		int CoolHeatZoneNum( 3 );
-		int DualZoneNum( 4 );
+		//indexes (thermostat ones) for TempControlledZone array
+		// used to be acording to old schedule:
+
+		//int HeatZoneNum( 1 );
+		//int CoolZoneNum( 2 );
+		//int CoolHeatZoneNum( 3 );
+		//int DualZoneNum( 4 );
+
+		int HeatZoneNum( 4 );
+		int CoolZoneNum( 3 );
+		int CoolHeatZoneNum( 1 );
+		int DualZoneNum( 2 );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 		ProcessScheduleInput(); // read schedules
 
-		DaySchedule( 1 ).TSValue = 1;
-		DaySchedule( 3 ).TSValue = 2;
-		DaySchedule( 5 ).TSValue = 3;
-		DaySchedule( 6 ).TSValue = 4;
+		DaySchedule( 9 ).TSValue = 4; // 9 corresponds to 1 in old schedule
+		DaySchedule( 7 ).TSValue = 3; // 7 corresponds to 3 in old schedule
+		DaySchedule( 8 ).TSValue = 1; // 8 corresponds to 5 in old schedule
+		DaySchedule( 3 ).TSValue = 2; // 3 corresponds to 6 in old schedule
 
 		GetZoneAirSetPoints();
 
