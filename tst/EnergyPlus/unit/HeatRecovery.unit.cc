@@ -118,6 +118,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Real64 Tnode = 0.0;
 	Real64 SetPointTemp = 19.0;
 	Real64 PartLoadRatio = 0.25;
+	int BalDesDehumPerfDataIndex = 1;
 
 	CurZoneEqNum = 0;
 	CurSysNum = 0;
@@ -156,6 +157,11 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Node( ExchCond( ExchNum ).SecInletNode ).Enthalpy = ExchCond( ExchNum ).SecInEnth;
 	Node( ExchCond( ExchNum ).SupInletNode ).MassFlowRate = ExchCond( ExchNum ).SupInMassFlow;
 	Node( ExchCond( ExchNum ).SecInletNode ).MassFlowRate = ExchCond( ExchNum ).SecInMassFlow;
+
+	HeatExchCondNumericFields.allocate( ExchNum );
+	HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( 5 );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
 
 	// HXUnitOn is false so expect outlet = inlet
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
@@ -3889,4 +3895,61 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
 
+}
+
+TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
+	
+	int ExchNum( 1 );
+	int BalDesDehumPerfDataIndex( 1 );
+	Real64 FaceVelocity;
+	Real64 SysVolFlow;
+
+	SysSizingRunDone = true;
+	DataSizing::NumSysSizInput = 1;
+	DataSizing::SysSizInput.allocate( NumSysSizInput );
+	DataSizing::CurSysNum = 1; // primary air system
+	DataSizing::CurOASysNum = 0; // no OA system 
+	DataSizing::CurZoneEqNum = 0; // size it based on system
+	DataSizing::SysSizInput( CurSysNum ).AirLoopNum = 1;
+
+	// initialize sizing required variables
+	ExchCond.allocate( ExchNum );
+	ExchCond( ExchNum ).ExchTypeNum = HX_DESICCANT_BALANCED;
+	ExchCond( ExchNum ).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
+	ExchCond( ExchNum ).NomSupAirVolFlow = AutoSize;
+	ExchCond( ExchNum ).PerfDataIndex = BalDesDehumPerfDataIndex;
+
+	BalDesDehumPerfData.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).Name = "DehumPerformanceData";
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
+
+	// autosize nominal vol flow and face velocity
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 1 ) = "Nominal Air Flow Rate";
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow = AutoSize;
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 2 ) = "Nominal Air Face Velocity";
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel = AutoSize;
+
+	// initialize sizing variables
+	DataSizing::CurDuctType = DataHVACGlobals::Main;
+	FinalSysSizing.allocate( CurSysNum );
+	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+
+	// initialize UnitarySysEqSizing capacity flag to false; not unitary system
+	UnitarySysEqSizing.allocate( CurSysNum );
+	UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
+	UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
+
+	// calc heat recovery sizing
+	SizeHeatRecovery( ExchNum );
+	
+	// test autosized nominal vol flow rate
+	EXPECT_EQ( 1.0, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow ); // m3/s
+
+	// size nominal face velocity
+	SysVolFlow = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow;
+	FaceVelocity = 4.30551 + 0.01969 * SysVolFlow;
+
+	// test autosized face velocity
+	EXPECT_EQ( FaceVelocity, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel ); // m/s
 }
