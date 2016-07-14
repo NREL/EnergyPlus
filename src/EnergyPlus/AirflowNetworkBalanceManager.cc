@@ -6738,6 +6738,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkNodeSimu( i ).PZ = 0.0;
 			}
 			for ( i = AirflowNetworkNumOfSurfaces + 1; i <= AirflowNetworkNumOfLinks; ++i ) {
+				AirflowNetworkLinkSimu( i ).DP = 0.0;
 				AirflowNetworkLinkReport( i ).FLOW = 0.0;
 				AirflowNetworkLinkReport( i ).FLOW2 = 0.0;
 				AirflowNetworkLinkReport( i ).VolFLOW = 0.0;
