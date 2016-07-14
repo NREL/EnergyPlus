@@ -1362,18 +1362,55 @@ namespace ReportSizingManager {
 						}
 					}
 				} else if ( SizingType == SystemAirflowSizing ) {
-					if ( AirLoopSysFlag ) {
-						if ( UnitarySysEqSizing ( CurSysNum ).CoolingAirFlow && UnitarySysEqSizing ( CurSysNum ).HeatingAirFlow ) {
-							AutosizeDes = std::max ( UnitarySysEqSizing ( CurSysNum ).CoolingAirVolFlow, UnitarySysEqSizing ( CurSysNum ).HeatingAirVolFlow );
-						} else if ( UnitarySysEqSizing ( CurSysNum ).CoolingAirFlow ) {
-							AutosizeDes = UnitarySysEqSizing ( CurSysNum ).CoolingAirVolFlow;
-						} else if ( UnitarySysEqSizing ( CurSysNum ).HeatingAirFlow ) {
-							AutosizeDes = UnitarySysEqSizing ( CurSysNum ).HeatingAirVolFlow;
+					if ( HRFlowSizingFlag ) { // HX sizing
+						if ( CurOASysNum ) {
+							if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+							} else {
+								// ELSE size to supply air duct flow rate
+								{ auto const SELECT_CASE_var( CurDuctType );
+								if ( SELECT_CASE_var == Main ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								} else if ( SELECT_CASE_var == Cooling ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+								} else if ( SELECT_CASE_var == Heating ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+								} else if ( SELECT_CASE_var == Other ) {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								} else {
+									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								}}
+							}
+
 						} else {
-							AutosizeDes = FinalSysSizing ( CurSysNum ).DesMainVolFlow;
+							{ auto const SELECT_CASE_var( CurDuctType );
+							if ( SELECT_CASE_var == Main ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							} else if ( SELECT_CASE_var == Cooling ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+							} else if ( SELECT_CASE_var == Heating ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+							} else if ( SELECT_CASE_var == Other ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							} else {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							}}
 						}
+
 					} else {
-						AutosizeDes = FinalSysSizing ( CurSysNum ).DesMainVolFlow;
+						if ( AirLoopSysFlag ) {
+							if ( UnitarySysEqSizing( CurSysNum ).CoolingAirFlow && UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {
+								AutosizeDes = std::max( UnitarySysEqSizing( CurSysNum ).CoolingAirVolFlow, UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow );
+							} else if ( UnitarySysEqSizing( CurSysNum ).CoolingAirFlow ) {
+								AutosizeDes = UnitarySysEqSizing( CurSysNum ).CoolingAirVolFlow;
+							} else if ( UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {
+								AutosizeDes = UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow;
+							} else {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							}
+						} else {
+							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						}
 					}
 				} else if ( SizingType == CoolingWaterflowSizing ) {
 					if ( CurOASysNum > 0 ) {
@@ -1947,6 +1984,9 @@ namespace ReportSizingManager {
 					}
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
 					AutosizeDes = FinalSysSizing( CurSysNum ).HeatSupTemp;
+				} else if ( SizingType == DesiccantDehumidifierBFPerfDataFaceVelocitySizing ) {
+					AutosizeDes = 4.30551 + 0.01969 * DataAirFlowUsedForSizing;
+					AutosizeDes = min( 6.0, AutosizeDes);
 				}
 			}
 		} else {
