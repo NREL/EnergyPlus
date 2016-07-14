@@ -180,7 +180,7 @@ namespace EnergyPlus {
 	class EnergyPlusFixture : public testing::Test
 	{
 	protected:
-		static void SetUpTestCase() { }
+		static void SetUpTestCase();
 		static void TearDownTestCase() { }
 
 		// This is run every unit test for this fixture.
@@ -192,6 +192,8 @@ namespace EnergyPlus {
 		virtual void TearDown();
 
 		void clear_all_states();
+
+		static json::parser_callback_t call_back;
 
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
 		// Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the

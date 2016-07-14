@@ -1006,7 +1006,7 @@ namespace EnergyPlus {
 			"	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ProcessScheduleInput();
 		GetCurveInput();
@@ -1051,7 +1051,7 @@ namespace EnergyPlus {
 			"   Outside Air Inlet Node 2;!- Node 1 Name            ",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// Run
 		DXCoilNum = 1;
@@ -1243,7 +1243,7 @@ namespace EnergyPlus {
 			"  1.0;                     !- Maximum Value of x",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// Case 1 test
 		GetDXCoils();
@@ -1388,7 +1388,7 @@ namespace EnergyPlus {
 			"	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ProcessScheduleInput();
 		GetCurveInput();
@@ -1613,7 +1613,7 @@ namespace EnergyPlus {
 			"  1.0;                     !- Maximum Value of x",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// Case 1 test
 		GetDXCoils( );

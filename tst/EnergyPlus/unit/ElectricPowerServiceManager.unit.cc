@@ -206,7 +206,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
@@ -275,7 +275,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
@@ -353,7 +353,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
@@ -446,7 +446,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3
 "    1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// get availability schedule to work
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -555,7 +555,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
@@ -654,7 +654,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// get availability schedule to work
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized

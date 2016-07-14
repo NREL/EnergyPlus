@@ -2824,7 +2824,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
@@ -4000,7 +4000,7 @@ namespace EnergyPlus {
 			"    100.0;                   !- Maximum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
@@ -5425,7 +5425,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;

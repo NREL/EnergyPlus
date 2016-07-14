@@ -260,7 +260,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -570,7 +570,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -879,7 +879,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1220,7 +1220,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1536,7 +1536,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1885,7 +1885,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );

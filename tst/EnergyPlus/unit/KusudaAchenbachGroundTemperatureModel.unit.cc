@@ -84,7 +84,7 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1 )
 		"	1;			!- Phase Shift of Minimum Surface Temperature",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
 
@@ -127,7 +127,7 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2 ) // lNumericFiel
 		"	17.00;	!- December",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
 

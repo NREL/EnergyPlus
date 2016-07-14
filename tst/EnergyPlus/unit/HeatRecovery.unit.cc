@@ -493,7 +493,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 			"   AHU OA Controller;         !- Controller 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetReturnAirPathInput();
 		GetAirPathData();		
@@ -543,7 +543,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    -6.00,                   !- Time Zone {hr}",
 		"    190.00;                  !- Elevation {m}",
 
-		"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C",
+		"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C",
 		"SizingPeriod:DesignDay,",
 		"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
 		"    7,                       !- Month",
@@ -573,7 +573,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    1.0;                     !- Sky Clearness",
 
 
-		"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C",
+		"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C",
 		"SizingPeriod:DesignDay,",
 		"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 		"    1,                       !- Month",
@@ -3867,7 +3867,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 ); // 
 	ManageSimulation(); // run the design day

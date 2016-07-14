@@ -322,7 +322,7 @@ namespace FluidProperties {
 		bool FirstSHMatch;
 		int NumOfPressPts;
 		int NumOfConcPts;
-		static bool ErrorsFound( false );
+		bool ErrorsFound( false );
 		int Index;
 		int NumOfGlyConcs;
 		bool GlycolFound;

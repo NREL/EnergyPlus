@@ -1114,7 +1114,7 @@ namespace EnergyPlus {
 			"  Temperature;             !- Output Unit Type",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
@@ -2118,7 +2118,7 @@ namespace EnergyPlus {
 			"  Temperature;             !- Output Unit Type",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;

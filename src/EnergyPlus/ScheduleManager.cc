@@ -274,7 +274,7 @@ namespace ScheduleManager {
 		int NumPointer;
 		int Count;
 		int CheckIndex;
-		static bool ErrorsFound( false );
+		bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool NumErrorFlag;

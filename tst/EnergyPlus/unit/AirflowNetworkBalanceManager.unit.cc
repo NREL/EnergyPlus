@@ -336,7 +336,7 @@ namespace EnergyPlus {
 		} );
 
 //		ASSERT_FALSE( process_idf( idf_objects ) );
-		process_idf( idf_objects );
+		ASSERT_TRUE( process_idf(  idf_objects ) );
 		GetAirflowNetworkInput( );
 		std::string const error_string = delimited_string( {
 			"   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
@@ -2213,7 +2213,7 @@ namespace EnergyPlus {
 
 		} );
 
-		process_idf( idf_objects );
+		ASSERT_TRUE( process_idf(  idf_objects ) );
 
 		using namespace EnergyPlus::DataIPShortCuts;
 
@@ -2395,7 +2395,7 @@ namespace EnergyPlus {
 			"  0.78;                    !- Discharge Coefficient{ dimensionless }",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects) );
 
 		GetAirflowNetworkInput( );
 

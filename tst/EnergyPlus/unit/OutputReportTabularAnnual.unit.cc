@@ -91,7 +91,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_GetInput )
 		"Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::DoWeathSim = true;
 
@@ -140,7 +140,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering )
 		"Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitPow;
 	Real64 extLitUse;
@@ -186,7 +186,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_GatherResults )
 		"Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitPow;
 	Real64 extLitUse;

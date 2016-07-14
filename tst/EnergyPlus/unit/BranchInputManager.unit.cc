@@ -106,7 +106,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string BranchListName;
 		std::string FoundLoopName;
 		int FoundLoopNum;
@@ -127,7 +127,7 @@ namespace EnergyPlus {
 		FindAirLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop );
 
 		EXPECT_EQ( "AIR LOOP 1", FoundLoopName );
-		EXPECT_EQ( 2 , FoundLoopNum );
+		EXPECT_EQ( 1 , FoundLoopNum );
 		EXPECT_EQ( "Air", LoopType );
 		EXPECT_EQ( 50.0, FoundLoopVolFlowRate );
 		EXPECT_TRUE( MatchedLoop );
@@ -144,7 +144,7 @@ namespace EnergyPlus {
 		FindAirLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop );
 
 		EXPECT_EQ( "DOAS", FoundLoopName );
-		EXPECT_EQ( 1 , FoundLoopNum );
+		EXPECT_EQ( 2 , FoundLoopNum );
 		EXPECT_EQ( "Air", LoopType );
 		EXPECT_EQ( DataSizing::AutoSize, FoundLoopVolFlowRate );
 		EXPECT_TRUE( MatchedLoop );
@@ -211,7 +211,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string CompType;
 		std::string CompName;
 		int BranchIndex;

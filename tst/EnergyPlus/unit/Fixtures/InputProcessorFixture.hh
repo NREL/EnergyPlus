@@ -70,11 +70,13 @@ namespace EnergyPlus {
 	class InputProcessorFixture : public EnergyPlusFixture
 	{
 	protected:
-		static void SetUpTestCase() { }
+		static void SetUpTestCase() {
+			EnergyPlusFixture::SetUpTestCase();  // Sets up the base fixture
+		}
 		static void TearDownTestCase() { }
 
 		virtual void SetUp() {
-			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+			EnergyPlusFixture::SetUp();  // Sets up individual test cases.
 		}
 
 		virtual void TearDown() {

@@ -305,7 +305,7 @@ TEST_F( EnergyPlusFixture, ExhAbsorption_GetInput_Test )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	compare_err_stream( "" );
 
 	GetExhaustAbsorberInput();

@@ -110,7 +110,7 @@ namespace EnergyPlus {
 				"    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EXPECT_TRUE( compare_idf( "VERSION", 1, 0, { "8.3" }, { false }, {}, {} ) );
 
@@ -312,7 +312,7 @@ namespace EnergyPlus {
 				"    190;                     !- Elevation {m}",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EXPECT_FALSE( OverallErrorFlag );
 
@@ -398,7 +398,7 @@ namespace EnergyPlus {
 				"Output:SQLite,SimpleAndTabular;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			std::string const CurrentModuleObject = "Output:SQLite";
 
@@ -451,7 +451,7 @@ namespace EnergyPlus {
 				"  ;                        !- Water Storage Tank Name",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
@@ -1010,7 +1010,7 @@ namespace EnergyPlus {
 				"Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EXPECT_EQ( 1, GetNumObjectsFound( "VERSION" ) );
 			EXPECT_EQ( 1, GetNumObjectsFound( "OUTPUT:SQLITE" ) );
@@ -1526,7 +1526,7 @@ namespace EnergyPlus {
 				"Output:Variable,,Site Outdoor Air Drybulb Temperature,hourly;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			// reset global variable since process_idf() calls PreScanReportingVariables()
 			DataOutputs::NumConsideredOutputVariables = 0;

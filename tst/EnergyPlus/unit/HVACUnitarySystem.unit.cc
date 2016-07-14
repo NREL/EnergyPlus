@@ -154,7 +154,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 		"  Until: 24:00, 1.0;      !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 	int UnitarySysNum( 1 );
 	Real64 OnOffAirFlowRatio; // This is a return value
 	Real64 PartLoadRatio( 1.0 );
@@ -999,7 +999,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -1460,7 +1460,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -1789,7 +1789,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -2063,7 +2063,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  Dimensionless;          !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
@@ -2290,7 +2290,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 		"  1.0,                                                     !- Heating Speed 2 Supply Air Flow Ratio",
 		"  0.666,                                                   !- Cooling Speed 2 Supply Air Flow Ratio",
 		"  1.0,                                                     !- Heating Speed 3 Supply Air Flow Ratio",
-		"  1.0;,                                                    !- Cooling Speed 3 Supply Air Flow Ratio",
+		"  1.0;                                                    !- Cooling Speed 3 Supply Air Flow Ratio",
 
 		"Coil:Cooling:DX:MultiSpeed,",
 		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Name",
@@ -2486,7 +2486,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -3197,7 +3197,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 		"    Until: 24:00,15.6;       !- Field 23",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData();
 	createFacilityElectricPowerServiceObject();
@@ -3943,7 +3943,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 	Node.allocate( 10 );
 	ZoneEqSizing.deallocate( );
 	ZoneEqSizing.allocate( 1 );
@@ -4996,7 +4996,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"    Until: 24:00,15.6;       !- Field 23",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData( );
 	createFacilityElectricPowerServiceObject( );

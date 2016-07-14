@@ -447,7 +447,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 //	try {
 
-		// ProcessInput();
+	InputProcessor::ProcessInput();
 		InputProcessor IP;
 		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {

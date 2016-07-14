@@ -143,7 +143,7 @@ namespace EnergyPlus {
 			"    ProportionalMinimum;     !- Minimum Limit Type",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 		int ControllerNum( 0 ); // Controller number
@@ -302,7 +302,7 @@ namespace EnergyPlus {
 			"    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type" // HX bypass should be true because economizer has opened up
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		GetOAControllerInputs();
 		EXPECT_EQ( 2, OAController( 1 ).OANode );
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
@@ -491,7 +491,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
 		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
@@ -666,7 +666,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
 		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
@@ -789,7 +789,7 @@ namespace EnergyPlus {
 			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetOASysInputFlag = true;
 		DataGlobals::BeginEnvrnFlag = true;
@@ -935,7 +935,7 @@ namespace EnergyPlus {
 			"    DOAS OA Controller;      !- Controller 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
@@ -1033,7 +1033,7 @@ namespace EnergyPlus {
 			"    OAFractionSched;                        !- Minimum Outdoor Air Schedule Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetOAControllerInputs( );
 
@@ -1169,7 +1169,7 @@ namespace EnergyPlus {
 			"    1;                        !- High Humidity Outdoor Air Flow Ratio",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		compare_err_stream( "" ); // just for debugging
 
@@ -1332,7 +1332,7 @@ namespace EnergyPlus {
 			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		GetOAControllerInputs();
 
 		EXPECT_EQ( 1, GetNumOAMixers() );
@@ -1373,7 +1373,7 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-			"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C",
+			"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C",
 			"SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
 			"    7,                       !- Month",
@@ -1403,7 +1403,7 @@ namespace EnergyPlus {
 			"    1.0;                     !- Sky Clearness",
 
 
-			"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C",
+			"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C",
 			"SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -4698,7 +4698,7 @@ namespace EnergyPlus {
 		} );
 
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 			GetOAControllerInputs();
 
 			EXPECT_EQ( 6, GetNumOAMixers() );

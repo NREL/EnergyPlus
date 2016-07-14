@@ -55,6 +55,9 @@ public:
 
 	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc, json const & obj_loc );
 
+   void add_missing_field_value(std::string &field_name, json &root, json &extensible, json const &obj_loc,
+								json const &loc, int legacy_idd_index);
+
 	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc);
 
 	json parse_number( std::string const & idf, size_t & index, bool & success );
@@ -86,6 +89,7 @@ public:
 	}
 
 	inline std::string rtrim(std::string &s) {
+		if (s.size() == 0) return std::string();
 		for (size_t i = s.size() - 1; i > 0; i--) {
 			if (s[i] != ' ') break;
 			s.erase(i);
@@ -168,6 +172,7 @@ public:
 	static State state;
 	static json schema;
 	static json jdf;
+	static std::ostream * echo_stream;
 	/*
 	//MODULE PARAMETER DEFINITIONS
 	extern int const ObjectDefAllocInc; // Starting number of Objects allowed in IDD as well as the increment
@@ -420,11 +425,12 @@ public:
 
 	// Clears the global data in InputProcessor.
 	// Needed for unit tests, should not be normally called.
-//	void
-//	clear_state();
+	static void
+	clear_state();
 
-//	void
-//	ProcessInput();
+	static
+	void
+	ProcessInput();
 
 //	void
 //	ProcessDataDicFile(
@@ -1256,9 +1262,11 @@ public:
 //	void
 //	ParametricObjectsCheck();
 
+	static
 	void
 	PreScanReportingVariables();
 
+	static
 	void
 	AddVariablesForMonthlyReport( std::string const & reportName );
 
@@ -1271,12 +1279,14 @@ public:
 //		int const StartPointer
 //	);
 
+	static
 	void
 	AddRecordToOutputVariableStructure(
 		std::string const & KeyValue,
 		std::string const & VariableName
 	);
 
+	static
 	void
 	ReAllocateAndPreserveOutputVariablesForSimulation();
 
