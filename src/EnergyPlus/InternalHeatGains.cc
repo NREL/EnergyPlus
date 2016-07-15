@@ -3437,7 +3437,7 @@ namespace InternalHeatGains {
 			NZ = Lights( Loop ).ZonePtr;
 			Q = Lights( Loop ).DesignLevel * GetCurrentScheduleValue( Lights( Loop ).SchedPtr );
 
-			if ( ZoneDaylight( NZ ).DaylightType == SplitFluxDaylighting || ZoneDaylight( NZ ).DaylightType == DElightDaylighting ) {
+			if ( ZoneDaylight( NZ ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight( NZ ).DaylightMethod == DElightDaylighting ) {
 
 				if ( Lights( Loop ).FractionReplaceable > 0.0 ) { // FractionReplaceable can only be 0 or 1 for these models
 					Q *= ZoneDaylight( NZ ).ZonePowerReductionFactor;
@@ -4398,7 +4398,7 @@ namespace InternalHeatGains {
 			LightsRepMin = min( LightsRepMin, Lights( Loop ).FractionReplaceable );
 			LightsRepMax = max( LightsRepMax, Lights( Loop ).FractionReplaceable );
 			++NumLights;
-			if ( ( ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightType == SplitFluxDaylighting || ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightType == DElightDaylighting ) && ( Lights( Loop ).FractionReplaceable > 0.0 && Lights( Loop ).FractionReplaceable < 1.0 ) ) {
+			if ( ( ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightMethod == DElightDaylighting ) && ( Lights( Loop ).FractionReplaceable > 0.0 && Lights( Loop ).FractionReplaceable < 1.0 ) ) {
 				ShowWarningError( "CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting." );
 				ShowContinueError( "..Lights=\"" + Lights( Loop ).Name + "\", Fraction Replaceable will be reset to 1.0 to allow dimming controls" );
 				ShowContinueError( "..in Zone=" + Zone( WhichZone ).Name );
@@ -4406,7 +4406,7 @@ namespace InternalHeatGains {
 			}
 		}
 
-		if ( ZoneDaylight( WhichZone ).DaylightType == SplitFluxDaylighting ) {
+		if ( ZoneDaylight( WhichZone ).DaylightMethod == SplitFluxDaylighting ) {
 			if ( LightsRepMax == 0.0 ) {
 				ShowWarningError( "CheckLightsReplaceable: Zone \"" + Zone( WhichZone ).Name + "\" has Daylighting:Controls." );
 				ShowContinueError( "but all of the LIGHTS object in that zone have zero Fraction Replaceable." );
@@ -4417,7 +4417,7 @@ namespace InternalHeatGains {
 				ShowContinueError( "but there are no LIGHTS objects in that zone." );
 				ShowContinueError( "The daylighting controls will have no effect." );
 			}
-		} else if ( ZoneDaylight( WhichZone ).DaylightType == DElightDaylighting ) {
+		} else if ( ZoneDaylight( WhichZone ).DaylightMethod == DElightDaylighting ) {
 			if ( LightsRepMax == 0.0 ) {
 				ShowWarningError( "CheckLightsReplaceable: Zone \"" + Zone( WhichZone ).Name + "\" has Daylighting:Controls." );
 				ShowContinueError( "but all of the LIGHTS object in that zone have zero Fraction Replaceable." );

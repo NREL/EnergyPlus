@@ -310,19 +310,12 @@ namespace DElightManagerF {
 					ErrorsFound = true;
 				}
 
-				// If this zone already assigned a daylighting type, error
-				if ( ZoneDaylight( izone ).DaylightType != NoDaylighting ) {
-					ShowSevereError( "GetDElightDaylighting: Attempted to apply DElight Daylighting to a Zone with Previous Daylighting" );
-					ShowContinueError( "Error discovered in \"Daylighting:DElight\" for Zone=" + AlphaArrayDElight( 2 ) );
-					ShowContinueError( "Previously applied Daylighting Type=" + DaylightTypes( ZoneDaylight( izone ).DaylightType ) );
-					ErrorsFound = true;
-				}
 				// Init the DElight members of the ZoneDaylight structure for this Thermal Zone
 				// ZoneDaylight(izone)%TotalDElightRefPts > 0 is the trigger for DElight calcs
 				ZoneDaylight( izone ).TotalDElightRefPts = iNumRefPts;
 
-				// ZoneDaylight(izone)%DaylightType is another trigger for DElight calcs
-				ZoneDaylight( izone ).DaylightType = DElightDaylighting;
+				// ZoneDaylight(izone)%DaylightMethod is another trigger for DElight calcs
+				ZoneDaylight( izone ).DaylightMethod = DElightDaylighting;
 
 				// Register Warning if more than 100 DElight RefPts have been input for valid DElight object
 				if ( iNumRefPts > 100 ) {

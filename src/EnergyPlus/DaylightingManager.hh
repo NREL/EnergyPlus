@@ -395,9 +395,16 @@ namespace DaylightingManager {
 
 	void
 	GetDaylightingControls(
-		int const TotDaylightingControls, // Total daylighting controls inputs 
+		int const TotDaylightingControls, // Total daylighting controls inputs
 		bool & ErrorsFound
 	);
+
+	void
+	GeometryTransformForDaylighting(
+		int const TotDaylightingControls, // Total daylighting inputs
+		bool & ErrorsFound
+	);
+
 
 	void
 	GetInputDayliteRefPt(

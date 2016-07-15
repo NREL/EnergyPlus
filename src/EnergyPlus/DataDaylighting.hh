@@ -95,11 +95,16 @@ namespace DataDaylighting {
 	extern int const CalledForRefPoint;
 	extern int const CalledForMapPoint;
 
-	// Parameters for "DaylightType"
+	// Parameters for "DaylightMethod"
 	extern int const NoDaylighting;
 	extern int const SplitFluxDaylighting;
 	extern int const DElightDaylighting;
-	extern Array1D_string const DaylightTypes;
+
+	// Parameters for "Lighting Control Type"
+	extern int const Continuous;
+	extern int const Stepped;
+	extern int const ContinuousOff;
+
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -139,10 +144,11 @@ namespace DataDaylighting {
 		std::string Name; // Name of the daylighting:controls object
 		std::string ZoneName; //name of the zone where the daylighting:controls object is located
 		int zoneNumber; // index for the zone where the daylighting:controls object is located
-		int DaylightType; // Type of Daylighting (1=SplitFlux, 2=DElight)
+		int DaylightMethod; // Type of Daylighting (1=SplitFlux, 2=DElight)
 		int AvailSchedNum; // pointer to availability schedule if present
 		int TotalDaylRefPoints; // Number of splitflux daylighting reference points in a zone (0,1 or 2)
 		int TotalDElightRefPts; // Number of DElight daylighting reference points in a zone (0,1 or 2) - RJH
+		Array1D_int DaylRefPtNum; // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
 		Array2D< Real64 > DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
 		// in absolute coordinate system (m)
 		// Points 1 and 2 are the control reference points
@@ -151,6 +157,7 @@ namespace DataDaylighting {
 		Array1D< Real64 > IllumSetPoint; // =0.0  ! Illuminance setpoint at each reference point (lux)
 		int LightControlType; // Lighting control type (same for all reference points)
 		// (1=continuous, 2=stepped, 3=continuous/off)
+		int glareRefPtNumber; // from field: Glare Calculation Daylighting Reference Point Name
 		Real64 ViewAzimuthForGlare; // View direction relative to window for glare calculation (deg)
 		int MaxGlareallowed; // Maximum allowable discomfort glare index
 		Real64 MinPowerFraction; // Minimum fraction of power input that continuous dimming system can dim down to
@@ -159,6 +166,7 @@ namespace DataDaylighting {
 		Real64 LightControlProbability; // For manual control of stepped systems, probability that lighting will
 		int TotalExtWindows; // Total number of exterior windows in the zone
 		Real64 AveVisDiffReflect; // Area-weighted average inside surface visible reflectance of zone
+		Real64 DElightGriddingResolution; // Field: Delight Gridding Resolution
 		Array1D< Real64 > RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
 		// due to daylighting
 		Real64 ZonePowerReductionFactor; // Electric power reduction factor for entire zone due to daylighting
@@ -221,7 +229,7 @@ namespace DataDaylighting {
 
 		// Default Constructor
 		ZoneDaylightCalc() :
-			DaylightType( 0 ),
+			DaylightMethod( 0 ),
 			AvailSchedNum( 0 ),
 			TotalDaylRefPoints( 0 ),
 			TotalDElightRefPts( 0 ),
