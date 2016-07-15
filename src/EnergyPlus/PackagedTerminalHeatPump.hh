@@ -171,7 +171,6 @@ namespace PackagedTerminalHeatPump {
 		std::string DXHeatCoilName; // name of DX heating coil
 		std::string DXHeatCoilType; // type of DX heating coil,Coil:DX:HeatingEmpirical
 		int DXHeatCoilType_Num; // numeric equivalent for DX heating coil type
-		int DXHeatCoilIndex; // DX heating coil index number
 		std::string ACHeatCoilName; // name of heating coil for PTAC
 		std::string ACHeatCoilType; // type of heating coil for PTAC
 		Real64 ACHeatCoilCap; // heating coil capacity for PTAC
@@ -273,6 +272,7 @@ namespace PackagedTerminalHeatPump {
 		int ErrIndexVar;
 		int ZonePtr; // pointer to a zone served by a fancoil unit
 		int HVACSizingIndex; // index of a HVACSizing object for a fancoil unit
+		bool FirstPass; // used to reset sizing flags
 
 		// end of the additional variables for variable speed water source heat pump
 
@@ -309,7 +309,6 @@ namespace PackagedTerminalHeatPump {
 			CondenserNodeNum( 0 ),
 			DXHeatCoilIndexNum( 0 ),
 			DXHeatCoilType_Num( 0 ),
-			DXHeatCoilIndex( 0 ),
 			ACHeatCoilCap( 0.0 ),
 			ACHeatCoilIndex( 0 ),
 			HWCoilAirInletNode( 0 ),
@@ -397,7 +396,8 @@ namespace PackagedTerminalHeatPump {
 			ErrIndexCyc( 0 ),
 			ErrIndexVar( 0 ),
 			ZonePtr(0),
-			HVACSizingIndex(0)
+			HVACSizingIndex(0),
+			FirstPass( true )
 		{}
 
 	};
@@ -418,6 +418,9 @@ namespace PackagedTerminalHeatPump {
 	extern Array1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimPackagedTerminalUnit(

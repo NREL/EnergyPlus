@@ -8,11 +8,12 @@ PUBLIC
 CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
-      VerString='Conversion 8.1 => 8.2'
-      VersionNum=8.2
-      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-1-0-Energy+.idd'
-      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-2-0-Energy+.idd'
-      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-1-0-009 to 8-2-0.csv'
+      VerString='Conversion 8.5 => 8.6'
+      VersionNum=8.6
+      sVersionNum='8.6'
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-5-0-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-6-0-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-5-0 to 8-6-0.csv'
 END SUBROUTINE
 
 END MODULE
@@ -73,13 +74,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER DifLfn
   INTEGER xCount
   INTEGER Num
-!  INTEGER Num1
-!  INTEGER Num2
-!  INTEGER Num3
-!  INTEGER Num4
-!  INTEGER Num5
   INTEGER, EXTERNAL :: GetNewUnitNumber
-!  INTEGER, EXTERNAL :: FindNumber
   INTEGER Arg
   LOGICAL, SAVE :: FirstTime=.true.
   CHARACTER(len=30) UnitsArg
@@ -108,8 +103,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: FileExist
   CHARACTER(len=MaxNameLength) :: CreatedOutputName
   LOGICAL, ALLOCATABLE, DIMENSION(:) :: DeleteThisRecord
-!  REAL :: TestValue
-!  INTEGER :: NArgs
   INTEGER :: COutArgs
   CHARACTER(len=16) :: UnitsField
   LOGICAL :: ScheduleTypeLimitsAnyNumber
@@ -203,6 +196,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             EXIT
           ENDIF
 
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(DeleteThisRecord)) DEALLOCATE(DeleteThisRecord)
+          IF(ALLOCATED(Alphas)) DEALLOCATE(Alphas)
+          IF(ALLOCATED(Numbers)) DEALLOCATE(Numbers)
+          IF(ALLOCATED(InArgs)) DEALLOCATE(InArgs)
+          IF(ALLOCATED(AorN)) DEALLOCATE(AorN)
+          IF(ALLOCATED(ReqFld)) DEALLOCATE(ReqFld)
+          IF(ALLOCATED(FldNames)) DEALLOCATE(FldNames)
+          IF(ALLOCATED(FldDefaults)) DEALLOCATE(FldDefaults)
+          IF(ALLOCATED(FldUnits)) DEALLOCATE(FldUnits)
+          IF(ALLOCATED(NwAorN)) DEALLOCATE(NwAorN)
+          IF(ALLOCATED(NwReqFld)) DEALLOCATE(NwReqFld)
+          IF(ALLOCATED(NwFldNames)) DEALLOCATE(NwFldNames)
+          IF(ALLOCATED(NwFldDefaults)) DEALLOCATE(NwFldDefaults)
+          IF(ALLOCATED(NwFldUnits)) DEALLOCATE(NwFldUnits)
+          IF(ALLOCATED(OutArgs)) DEALLOCATE(OutArgs)
+          IF(ALLOCATED(MatchArg)) DEALLOCATE(MatchArg)
           ALLOCATE(Alphas(MaxAlphaArgsFound),Numbers(MaxNumericArgsFound))
           ALLOCATE(InArgs(MaxTotalArgs))
           ALLOCATE(AorN(MaxTotalArgs),ReqFld(MaxTotalArgs),FldNames(MaxTotalArgs),FldDefaults(MaxTotalArgs),FldUnits(MaxTotalArgs))
@@ -238,11 +248,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             IF (DeleteThisRecord(Num)) CYCLE
             DO xcount=IDFRecords(Num)%CommtS+1,IDFRecords(Num)%CommtE
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
-              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ' '
+              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ''
             ENDDO
             IF (NoVersion .and. Num == 1) THEN
               CALL GetNewObjectDefInIDD('VERSION',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-              OutArgs(1)='8.0'
+              OutArgs(1) = sVersionNum
               CurArgs=1
               CALL WriteOutIDFLinesAsComments(DifLfn,'Version',CurArgs,OutArgs,NwFldNames,NwFldUnits)
             ENDIF
@@ -321,240 +331,36 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-                IF ((InArgs(1)(1:3) == '8.2').and. ArgFile) THEN
+                IF ((InArgs(1)(1:3)) == sVersionNum .and. ArgFile) THEN
                   CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
                   CLOSE(diflfn,STATUS='DELETE')
                   LatestVersion=.true.
                   EXIT
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1)='8.2'
+                OutArgs(1) = sVersionNum
                 nodiff=.false.
 
-!    !!!    Changes for this version
-              CASE('ZONEHVAC:UNITVENTILATOR')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:16)=InArgs(1:16)
-                if (CurArgs > 16) then
-                  OutArgs(17)=blank
-                  if (CurArgs > 17) then
-                    OutArgs(18:CurArgs+1)=InArgs(17:CurArgs)
-                  endif
-                endif
-                CurArgs = CurArgs + 1
 
-              CASE('ZONEHVAC:UNITHEATER')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:7)=InArgs(1:7)
-                ! delete field 8
-                ! ..nothing with InArgs(8) then
-                !move fields 9 and 10 to now be 8 and 9
-                OutArgs(8:9)=InArgs(9:10)
-                ! add blank for the optional schedule
-                OutArgs(10)=blank
-                ! conditionally apply field 11 (A10)
-                if (SameString(InArgs(8), "ONOFF")) then
-                  OutArgs(11)="No"
-                elseif (SameString(InArgs(8), "CONTINUOUS")) then 
-                  OutArgs(11)="Yes"
-                else
-                  CALL ShowWarningError("Invalid fan control type in original v8.1 idf...expected onoff or continuous...assuming onoff")
-                  OutArgs(11)="No"
-                endif
-                ! the net effect here is the addition of 1 field
-                OutArgs(12:15)=InArgs(11:14)
-                CurArgs = CurArgs + 1
-      
-              CASE('PLANTLOOP', 'CONDENSERLOOP')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! assign the entire contents of IN to OUT to start
-                OutArgs=InArgs
-                ! then check the value of 19 and make a decision:
-                if (SameString(InArgs(19), "SEQUENTIAL")) then
-                  OutArgs(19)="SequentialLoad"
-                elseif (SameString(InArgs(19), "UNIFORM")) then
-                  OutArgs(19)="UniformLoad"
-                else
-                  OutArgs(19)=InArgs(19) ! Redundant, but clear
-                endif
+              ! It is debatable whether I should actually improve this to make it more like the report variables
+              ! I think it is much less likely that these will change between versions
+              ! So for now I'll just change them on a version by version basis.
+              CASE ('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                SELECT CASE ( MakeUPPERCase ( InArgs(4) ) )
+                CASE ('OUTDOOR AIR DRYBLUB TEMPERATURE')
+				  nodiff = .true.
+				  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Drybulb Temperature'
+                CASE ('OUTDOOR AIR WETBLUB TEMPERATURE')
+                  nodiff = .true.
+                  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Wetbulb Temperature'
+                END SELECT
 
-              CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! assign the entire contents of IN to OUT to start
-                OutArgs=InArgs
-                ! then check the value of 32, the chw loop load distribution type and make a decision:
-                if (SameString(InArgs(32), "SEQUENTIAL")) then
-                  OutArgs(32)="SequentialLoad"
-                elseif (SameString(InArgs(32), "UNIFORM")) then
-                  OutArgs(32)="UniformLoad"
-                else
-                  OutArgs(32)=InArgs(32) ! Redundant, but clear
-                endif
-                ! then check the value of 33, the cond loop load distribution type and make a decision:
-                if (SameString(InArgs(33), "SEQUENTIAL")) then
-                  OutArgs(33)="SequentialLoad"
-                elseif (SameString(InArgs(33), "UNIFORM")) then
-                  OutArgs(33)="UniformLoad"
-                else
-                  OutArgs(33)=InArgs(33) ! Redundant, but clear
-                endif
-
-              CASE('HVACTEMPLATE:PLANT:HOTWATERLOOP')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! assign the entire contents of IN to OUT to start
-                OutArgs=InArgs
-                ! then check the value of 21, the load distribution type and make a decision:
-                if (SameString(InArgs(21), "SEQUENTIAL")) then
-                  OutArgs(21)="SequentialLoad"
-                elseif (SameString(InArgs(21), "UNIFORM")) then
-                  OutArgs(21)="UniformLoad"
-                else
-                  OutArgs(21)=InArgs(21) ! Redundant, but clear
-                endif
-
-              CASE('HVACTEMPLATE:PLANT:MIXEDWATERLOOP')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! assign the entire contents of IN to OUT to start
-                OutArgs=InArgs
-                ! then check the value of 17, the load distribution type and make a decision:
-                if (SameString(InArgs(17), "SEQUENTIAL")) then
-                  OutArgs(17)="SequentialLoad"
-                elseif (SameString(InArgs(17), "UNIFORM")) then
-                  OutArgs(17)="UniformLoad"
-                else
-                  OutArgs(17)=InArgs(17) ! Redundant, but clear
-                endif
-
-              CASE('SIZING:SYSTEM')
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1 - 17
-                OutArgs(1:17) = InArgs(1:17)
-                ! add three more fields for air flow rate entry options
-                OutArgs(18:20) = ""
-                CurArgs = CurArgs + 3
-                ! just shift the next 2 fields
-                OutArgs(21:22) = InArgs(18:19)
-                ! then insert 4 new fields
-                OutArgs(23:26) = ""
-                CurArgs = CurArgs + 4
-                ! then shift the next 2 fields
-                OutArgs(27:28) = InArgs(20:21)
-                ! although there are new fields added to the end, they dont need to be filled out, so dont worry about them
-                !OutArgs(29:36) = ""
-                !CurArgs = CurArgs + 8
-                
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-6
-                OutArgs(1:6) = InArgs(1:6)
-                ! the new field 7 is a switch and the old 6 is moved into the new 8
-                OutArgs(7) = 'HeatingDesignCapacity'
-                OutArgs(8) = InArgs(7)
-                OutArgs(9:10) = ""
-                OutArgs(11:214) = InArgs(8:211)
-                CurArgs = CurArgs + 3                
-                
-              CASE('ZONEHVAC:HIGHTEMPERATURERADIANT') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-3
-                OutArgs(1:3) = InArgs(1:3)
-                ! the new field 4 is a switch and the old 4 is moved into the new 5
-                OutArgs(4) = 'HeatingDesignCapacity'
-                OutArgs(5) = InArgs(4)
-                OutArgs(6:7) = ""
-                OutArgs(8:216) = InArgs(5:213)
-                CurArgs = CurArgs + 3         
-                
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-4
-                OutArgs(1:4) = InArgs(1:4)
-                ! the new field 5 is a switch and there wasn't an entry before, so leave 6 blank (autosize)
-                OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6) = 'Autosize'
-                OutArgs(7:8) = ''
-                OutArgs(9:213) = InArgs(5:209)
-                CurArgs = CurArgs + 4      
-                
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-6
-                OutArgs(1:2) = InArgs(1:2)
-                ! the new field 3 is a switch and the old 4 is moved into the new 4
-                OutArgs(3) = 'HeatingDesignCapacity'
-                OutArgs(4) = InArgs(3)
-                OutArgs(5:6) = ""
-                OutArgs(7:209) = InArgs(4:206)
-                CurArgs = CurArgs + 3                
-                
-              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:WATER') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-4
-                OutArgs(1:4) = InArgs(1:4)
-                ! the new field 5 is a switch and there wasn't an entry before, so leave 6 blank (autosize)
-                OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6) = 'Autosize'
-                OutArgs(7:8) = ''
-                OutArgs(9:11) = InArgs(5:7)
-                CurArgs = CurArgs + 4         
-                
-              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-2
-                OutArgs(1:2) = InArgs(1:2)
-                ! the new field 3 is a switch and the old 4 is moved into the new 4
-                OutArgs(3) = 'HeatingDesignCapacity'
-                OutArgs(4) = InArgs(3)
-                OutArgs(5:6) = ""
-                OutArgs(7) = InArgs(4)
-                CurArgs = CurArgs + 3            
-                
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-7
-                OutArgs(1:7) = InArgs(1:7)
-                ! the new field 8 is a switch and there wasn't an entry before, so leave 9 blank (autosize)
-                OutArgs(8) = 'HeatingDesignCapacity'
-                OutArgs(9) = 'Autosize'
-                OutArgs(10:11) = ''
-                CurArgs = CurArgs + 4
-                ! shift 8-12 to 12-16
-                OutArgs(12:16) = InArgs(8:12)
-                ! the new field 17 is a switch and there wasn't an entry before, so leave 18 blank (autosize)
-                OutArgs(17) = 'CoolingDesignCapacity'
-                OutArgs(18) = 'Autosize'
-                OutArgs(19:20) = ''
-                CurArgs = CurArgs + 4
-                OutArgs(21:29) = InArgs(13:21)
-                
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-4
-                OutArgs(1:4) = InArgs(1:4)
-                ! the new field 5 is a switch and the old 5 is moved into the new 6
-                OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6) = InArgs(5)
-                OutArgs(7:8) = ""
-                OutArgs(9:11) = InArgs(6:8)
-                CurArgs = CurArgs + 3     
-                                
     !!!   Changes for report variables, meters, tables -- update names
-
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
@@ -983,6 +789,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
                 ENDDO
 
+              !! Changes for this version can go here
+
+
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
                     WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
@@ -1039,7 +848,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF (IDFRecords(NumIDFRecords)%CommtE /= CurComment) THEN
             DO xcount=IDFRecords(NumIDFRecords)%CommtE+1,CurComment
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
-              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ' '
+              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ''
             ENDDO
           ENDIF
 
@@ -1072,25 +881,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
       CALL CreateNewName('Reallocate',CreatedOutputName,' ')
 
-      IF (Allocated(DeleteThisRecord)) THEN
-        DEALLOCATE(DeleteThisRecord)
-        DEALLOCATE(Alphas)
-        DEALLOCATE(Numbers)
-        DEALLOCATE(InArgs)
-        DEALLOCATE(AorN)
-        DEALLOCATE(ReqFld)
-        DEALLOCATE(FldNames)
-        DEALLOCATE(FldDefaults)
-        DEALLOCATE(FldUnits)
-        DEALLOCATE(NwAorN)
-        DEALLOCATE(NwReqFld)
-        DEALLOCATE(NwFldNames)
-        DEALLOCATE(NwFldDefaults)
-        DEALLOCATE(NwFldUnits)
-        DEALLOCATE(OutArgs)
-        DEALLOCATE(MatchArg)
-      ENDIF
-
     ENDDO
 
     IF (.not. ExitBecauseBadFile) THEN
@@ -1107,34 +897,25 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   ENDDO
 
   IF (ArgFileBeingDone .and. .not. LatestVersion .and. .not. ExitBecauseBadFile) THEN
-    ! If this is true, then there was a "arg IDF File" on the command line and some files need to be
-                         ! renamed.
+    ! If this is true, then there was a "arg IDF File" on the command line and some files need to be renamed
     ErrFlag=.false.
     CALL copyfile(TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension),TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'old',ErrFlag)
-!    SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'" "'//  &
-!                                    TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'old"')
     CALL copyfile(TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'new',TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension),ErrFlag)
-!    SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'new" "'//  &
-!                                  TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'"')
     INQUIRE(File=TRIM(FileNamePath)//'.rvi',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.rvi',TRIM(FileNamePath)//'.rviold',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.rvi" "'//TRIM(FileNamePath)//'.rviold"')
     ENDIF
     INQUIRE(File=TRIM(FileNamePath)//'.rvinew',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.rvinew',TRIM(FileNamePath)//'.rvi',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.rvinew" "'//TRIM(FileNamePath)//'.rvi"')
     ENDIF
     INQUIRE(File=TRIM(FileNamePath)//'.mvi',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.mvi',TRIM(FileNamePath)//'.mviold',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.mvi" "'//TRIM(FileNamePath)//'.mviold"')
     ENDIF
     INQUIRE(File=TRIM(FileNamePath)//'.mvinew',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.mvinew',TRIM(FileNamePath)//'.mvi',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.mvinew" "'//TRIM(FileNamePath)//'.mvi"')
     ENDIF
   ENDIF
 
