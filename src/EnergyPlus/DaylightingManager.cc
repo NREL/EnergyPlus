@@ -4102,6 +4102,7 @@ namespace DaylightingManager {
 		if ( TotDaylightingControls > 0 ) {
 			GetInputDayliteRefPt( ErrorsFound );
 			GetDaylightingControls(TotDaylightingControls, ErrorsFound);
+			GeometryTransformForDaylighting( TotDaylightingControls, ErrorsFound );
 			GetInputIlluminanceMap( ErrorsFound );
 			GetLightWellData( ErrorsFound );
 			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );
@@ -4793,7 +4794,7 @@ namespace DaylightingManager {
 						SurfaceWindow( SurfLoop ).LumWinFromRefPtRep.allocate( curTotalDaylRefPts );
 						for ( refPtNum = 1; refPtNum <= ZoneDaylight( zoneOfSurf ).TotalDaylRefPoints; ++refPtNum ) {
 							SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + " Illuminance [lux]", SurfaceWindow( SurfLoop ).IllumFromWinAtRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
-							SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + "View Luminance [cd/m2]", SurfaceWindow( SurfLoop ).LumWinFromRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
+							SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + " View Luminance [cd/m2]", SurfaceWindow( SurfLoop ).LumWinFromRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
 						}
 					}
 				}
@@ -4809,7 +4810,7 @@ namespace DaylightingManager {
 	{
 		//       AUTHOR         Fred Winkelmann
 		//       DATE WRITTEN   March 2002
-		//       MODIFIED       Glazer - July 2016
+		//       MODIFIED       Glazer - July 2016 - separated this from GetInput function
 		// For splitflux daylighting, transform the geometry
 
 		using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
