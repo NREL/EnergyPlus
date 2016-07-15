@@ -4376,72 +4376,49 @@ namespace OutputProcessor {
 		// of the UpdateDataandReport subroutine. The code was moved to facilitate
 		// easier maintenance and writing of data to the SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
+		static char s[ 129 ];
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataPrecisionGlobals;
-		using DataGlobals::eso_stream;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string NumberOut; // Character for producing "number out"
-		std::string MaxOut; // Character for Max out string
-		std::string MinOut; // Character for Min out string
-		Real64 repVal; // The variable's value
+		Real64 repVal( repValue ); // The variable's value
 
-		repVal = repValue;
 		if ( storeType == AveragedVar ) repVal /= numOfItemsStored;
 		if ( repVal == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repVal;
-			strip_trailing_zeros( strip( NumberOut ) );
+			dtoa( repVal, s );
+			NumberOut = std::string( s );
 		}
-
-		if ( MaxValue == 0.0 ) {
-			MaxOut = "0.0";
-		} else {
-			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip_trailing_zeros( strip( MaxOut ) );
-		}
-
-		if ( minValue == 0.0 ) {
-			MinOut = "0.0";
-		} else {
-			gio::write( MinOut, fmtLD ) << minValue;
-			strip_trailing_zeros( strip( MinOut ) );
-		}
-
-		// Append the min and max strings with date information
-		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
-		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
 		if ( sqlite ) {
 			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
 		}
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 
 		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+			std::string MaxOut; // Character for Max out string
+			std::string MinOut; // Character for Min out string
+
+			if ( MaxValue == 0.0 ) {
+				MaxOut = "0.0";
+			} else {
+				dtoa( MaxValue, s );
+				MaxOut = std::string( s );
+			}
+
+			if ( minValue == 0.0 ) {
+				MinOut = "0.0";
+			} else {
+				dtoa( minValue, s );
+				MinOut = std::string( s );
+			}
+
+			// Append the min and max strings with date information
+			ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
+			ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
+
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
 
 		}
 
@@ -4466,52 +4443,26 @@ namespace OutputProcessor {
 		// This subroutine writes the cumulative meter data to the output files and
 		// SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataGlobals::eso_stream;
-		using DataGlobals::mtr_stream;
-		using DataGlobals::StdOutputRecordCount;
-		using DataGlobals::StdMeterRecordCount;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static char s[ 129 ];
 		std::string NumberOut; // Character for producing "number out"
 
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repValue;
-			strip_trailing_zeros( strip( NumberOut ) );
+			dtoa( repValue, s );
+			NumberOut = std::string( s );
 		}
 
 		if ( sqlite ) {
 			sqlite->createSQLiteReportDataRecord( reportID, repValue );
 		}
 
-		if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
-		++StdMeterRecordCount;
+		if ( DataGlobals::mtr_stream ) *DataGlobals::mtr_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+		++DataGlobals::StdMeterRecordCount;
 
 		if ( ! meterOnlyFlag ) {
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
-			++StdOutputRecordCount;
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+			++DataGlobals::StdOutputRecordCount;
 		}
 
 	}
@@ -4547,81 +4498,60 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using namespace DataPrecisionGlobals;
 		using DataGlobals::eso_stream;
 		using DataGlobals::mtr_stream;
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
 
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static char s[ 129 ];
 		std::string NumberOut; // Character for producing "number out"
-		std::string MaxOut; // Character for Max out string
-		std::string MinOut; // Character for Min out string
 
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repValue;
-			strip_trailing_zeros( strip( NumberOut ) );
-		}
-
-		if ( MaxValue == 0.0 ) {
-			MaxOut = "0.0";
-		} else {
-			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip_trailing_zeros( strip( MaxOut ) );
-		}
-
-		if ( minValue == 0.0 ) {
-			MinOut = "0.0";
-		} else {
-			gio::write( MinOut, fmtLD ) << minValue;
-			strip_trailing_zeros( strip( MinOut ) );
+			dtoa( repValue, s );
+			NumberOut = std::string( s );
 		}
 
 		if ( sqlite ) {
 			sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 		}
 
-		// Append the min and max strings with date information
-		//    CALL ProduceMinMaxStringWStartMinute(MinOut, minValueDate, reportingInterval)
-		//    CALL ProduceMinMaxStringWStartMinute(MaxOut, maxValueDate, reportingInterval)
-		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
-		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
-
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
+			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 			++StdMeterRecordCount;
-
-		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
-			++StdMeterRecordCount;
-
-		}
-
-		if ( ! meterOnlyFlag ) {
-			if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
-				++StdOutputRecordCount;
-			} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+			if ( eso_stream && ! meterOnlyFlag ) {
+				*eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 				++StdOutputRecordCount;
 			}
+		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
+			std::string MaxOut; // Character for Max out string
+			std::string MinOut; // Character for Min out string
 
+			if ( MaxValue == 0.0 ) {
+				MaxOut = "0.0";
+			} else {
+				dtoa( MaxValue, s );
+				MaxOut = std::string( s );
+			}
+
+			if ( minValue == 0.0 ) {
+				MinOut = "0.0";
+			} else {
+				dtoa( minValue, s );
+				MinOut = std::string( s );
+			}
+
+			// Append the min and max strings with date information
+			ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
+			ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
+
+			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
+			++StdMeterRecordCount;
+			if ( eso_stream && ! meterOnlyFlag ) {
+				*eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
+				++StdOutputRecordCount;
+			}
 		}
 
 	}
@@ -4689,7 +4619,7 @@ namespace OutputProcessor {
 
 		static char s[ 129 ];
 
-		if ( DataSystemVariables::UpdateDataDuringWarmupExternalInterface && 
+		if ( DataSystemVariables::UpdateDataDuringWarmupExternalInterface &&
 			! DataSystemVariables::ReportDuringWarmup )
 			return;
 

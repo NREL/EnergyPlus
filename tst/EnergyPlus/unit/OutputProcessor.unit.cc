@@ -380,7 +380,7 @@ namespace EnergyPlus {
 
 			std::vector<std::string> testResult0 {"1", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.25168393, 1,10,4283136.25248438, 1,60", "2,9999.9,4283136.25168393, 1,10,4283136.25248438, 1,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.251683925, 1,10,4283136.252484382, 1,60", "2,9999.9,4283136.251683925, 1,10,4283136.252484382, 1,60" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -456,7 +456,7 @@ namespace EnergyPlus {
 
 			std::vector<std::string> testResult0 {"1", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12", "1,999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60", "2,9999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12", "1,999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60", "2,9999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -532,7 +532,7 @@ namespace EnergyPlus {
 
 			std::vector<std::string> testResult0 {"1", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1", "1,999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60", "2,9999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1", "1,999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60", "2,9999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -645,38 +645,38 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 0, ReportTimeStep, 0.0, 0, 0.0, 0, false ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
@@ -734,31 +734,31 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 0, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
@@ -1553,11 +1553,11 @@ namespace EnergyPlus {
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 0, true ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
@@ -2845,19 +2845,19 @@ namespace EnergyPlus {
 				"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"1,0.0",
-				"7,4995.",
+				"7,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
 				"2,0.0",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,Tuesday",
 				"3,0.0,0.0,24,60,0.0,24,60",
-				"9,4995.,4995.,24,60,4995.,24,60",
+				"9,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
 				"4,0.0,0.0,31,24,60,0.0,31,24,60",
-				"10,4995.,4995.,31,24,60,4995.,31,24,60",
+				"10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
 				"5,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
-				"11,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -2867,15 +2867,15 @@ namespace EnergyPlus {
 				"10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
-				"7,4995.",
+				"7,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,Tuesday",
-				"9,4995.,4995.,24,60,4995.,24,60",
+				"9,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
-				"10,4995.,4995.,31,24,60,4995.,31,24,60",
+				"10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
-				"11,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 		}
 
@@ -3039,19 +3039,19 @@ namespace EnergyPlus {
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"1,0.0",
 				"2,0.0",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
 				"3,0.0",
-				"9,4995.",
+				"9,4995.0",
 				",365,12,31, 0,Tuesday",
 				"4,0.0,0.0,24,60,0.0,24,60",
-				"10,4995.,4995.,24,60,4995.,24,60",
+				"10,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
 				"5,0.0,0.0,31,24,60,0.0,31,24,60",
-				"11,4995.,4995.,31,24,60,4995.,31,24,60",
+				"11,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
 				"6,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
-				"12,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -3061,15 +3061,15 @@ namespace EnergyPlus {
 				"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
-				"9,4995.",
+				"9,4995.0",
 				",365,12,31, 0,Tuesday",
-				"10,4995.,4995.,24,60,4995.,24,60",
+				"10,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
-				"11,4995.,4995.,31,24,60,4995.,31,24,60",
+				"11,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
-				"12,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 		}
@@ -3351,7 +3351,7 @@ namespace EnergyPlus {
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
 				"6,200.0",
 				"5,365",
-				"37,300.,100.,12,31,24,10,200.,12,31,24,20",
+				"37,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
 			} ) );
 
 		}
