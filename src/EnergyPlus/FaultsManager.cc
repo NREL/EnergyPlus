@@ -879,39 +879,17 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang
 		//       DATE WRITTEN   Jun. 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// To calculate the dynamic fault offset based on the fault availability schedule and severity schedule.
-
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
+		//       To calculate the dynamic fault offset based on the fault availability schedule and severity schedule.
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetCurrentScheduleValue;
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FaultFac( 0.0 ); // fault modification factor
 		Real64 OffsetAct( 0.0 ); // actual offset after applying the modification factor
-
-		// FLOW
 		
 		// Check fault availability schedules
 		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
@@ -943,32 +921,9 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang
 		//       DATE WRITTEN   Jun. 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To calculate the mass flow rate and supply water temperature of a chiller with faulty SWT sensor.
-
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// Variables for fault free cases
@@ -980,8 +935,6 @@ namespace FaultsManager {
 		Real64 EvapOutletTemp_f = EvapOutletTemp_ff;    // Chiller supply water temperature, faulty case [C]
 		Real64 EvapMassFlowRate_f = EvapMassFlowRate_ff;  // Chiller mass flow rate, faulty case [kg/s]
 		Real64 QEvaporator_f = QEvaporator_ff;  // Chiller evaporator heat transfer rate, faulty case [W]
-		
-		// FLOW
 		
 		if( !FlagVariableFlow ){
 		// Chillers with ConstantFlow mode
@@ -1022,35 +975,15 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang
 		//       DATE WRITTEN   Apr. 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
 		// covers the rated operational point of the corresponding fan
 		// Return true if the curve covers the fan rated operational point
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using namespace Fans;
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FanMaxAirFlowRate; // Design Max Specified Volume Flow Rate of Fan [m3/sec]

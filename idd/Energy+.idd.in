@@ -79054,7 +79054,7 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
    
 FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
    \memo This object describes fault of chiller supply water temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
