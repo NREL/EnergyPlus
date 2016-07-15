@@ -116,7 +116,7 @@ namespace Boilers {
 	using namespace DataLoopNode;
 	using namespace DataHVACGlobals;
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::InitConvTemp;
+	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataPlant::PlantLoop;

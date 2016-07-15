@@ -108,7 +108,7 @@ namespace HeatPumpWaterToWaterSimple {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginSimFlag;
-	using DataGlobals::InitConvTemp;
+	//using DataGlobals::InitConvTemp;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::KelvinConv;

@@ -133,7 +133,7 @@ namespace OutdoorAirUnit {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::BeginTimeStepFlag;
-	using DataGlobals::InitConvTemp;
+	//using DataGlobals::InitConvTemp;
 	using DataGlobals::ZoneSizingCalc;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;

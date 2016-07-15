@@ -349,7 +349,7 @@ namespace ReportSizingManager {
 		using DataAirLoop::AirLoopControlInfo;
 		using DataAirSystems::PrimaryAirSystem;
 		using DataGlobals::DisplayExtraWarnings;
-		using DataGlobals::InitConvTemp;;
+		//using DataGlobals::InitConvTemp;;
 		using namespace DataSizing;
 		using namespace DataHVACGlobals;
 		using DXCoils::ValidateADP;

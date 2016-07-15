@@ -144,7 +144,7 @@ namespace PackagedTerminalHeatPump {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
-	using DataGlobals::InitConvTemp;
+	//using DataGlobals::InitConvTemp;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -2785,7 +2785,7 @@ namespace PackagedTerminalHeatPump {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
 		using DataEnvironment::StdRhoAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;

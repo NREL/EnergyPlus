@@ -116,7 +116,7 @@ namespace EnergyPlus {
 		using DataPlant::PlantLoop;
 		using DataPlant::TotNumLoops;
 		using DataPlant::SupplySide;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using namespace FluidProperties;
 		using DataSizing::PlantSizData;
 		using DataGlobals::CWInitConvTemp;

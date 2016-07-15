@@ -129,7 +129,7 @@ namespace PoweredInductionUnits {
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::SecInHour;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
+	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;

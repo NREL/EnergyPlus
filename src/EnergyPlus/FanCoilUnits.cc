@@ -134,7 +134,7 @@ namespace FanCoilUnits {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::SecInHour;
-	using DataGlobals::InitConvTemp;
+	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataEnvironment::OutBaroPress;

@@ -1264,7 +1264,7 @@ namespace HVACMultiSpeedHeatPump {
 			MSHeatPump( MSHPNum ).DesignHeatRecFlowRate = Numbers( 6 );
 			if ( MSHeatPump( MSHPNum ).DesignHeatRecFlowRate > 0.0 ) {
 				MSHeatPump( MSHPNum ).HeatRecActive = true;
-				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = RhoH2O( InitConvTemp ) * MSHeatPump( MSHPNum ).DesignHeatRecFlowRate;
+				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = RhoH2O( CWInitConvTemp ) * MSHeatPump( MSHPNum ).DesignHeatRecFlowRate;
 				MSHeatPump( MSHPNum ).HeatRecInletNodeNum = GetOnlySingleNode( Alphas( 16 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 				if ( MSHeatPump( MSHPNum ).HeatRecInletNodeNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", Missing " + cAlphaFields( 16 ) + '.' );

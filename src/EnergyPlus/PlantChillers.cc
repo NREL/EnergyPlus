@@ -121,7 +121,7 @@ namespace PlantChillers {
 	using namespace DataLoopNode;
 	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
-	using DataGlobals::InitConvTemp;
+	//using DataGlobals::InitConvTemp;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;

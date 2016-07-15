@@ -579,6 +579,7 @@ namespace PhotovoltaicThermalCollectors {
 		using DataPlant::PlantLoop;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
+		using DataGlobals::HWInitConvTemp;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

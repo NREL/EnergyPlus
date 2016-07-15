@@ -325,7 +325,7 @@ namespace PlantCentralGSHP {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using DataGlobals::DisplayExtraWarnings;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
@@ -1284,7 +1284,7 @@ namespace PlantCentralGSHP {
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CentralGroundSourceHeatPump;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -1574,7 +1574,7 @@ namespace PlantCentralGSHP {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using DataHVACGlobals::SmallLoad;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveMinMaxValues;
@@ -2048,7 +2048,7 @@ namespace PlantCentralGSHP {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using DataHVACGlobals::SmallLoad;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveMinMaxValues;

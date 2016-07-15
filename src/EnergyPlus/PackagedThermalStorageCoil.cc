@@ -1989,9 +1989,10 @@ namespace PackagedThermalStorageCoil {
 		using namespace OutputReportPredefined;
 		using CurveManager::CurveValue;
 		using DataGlobals::SecInHour;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
+		using DataGlobals::CWInitConvTemp;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

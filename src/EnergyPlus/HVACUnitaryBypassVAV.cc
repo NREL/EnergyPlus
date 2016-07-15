@@ -1261,7 +1261,7 @@ namespace HVACUnitaryBypassVAV {
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
-		using DataGlobals::InitConvTemp;
+		//using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
 		using DataGlobals::CWInitConvTemp;
 
