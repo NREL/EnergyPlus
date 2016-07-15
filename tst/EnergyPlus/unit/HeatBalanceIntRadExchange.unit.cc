@@ -56,90 +56,72 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+// EnergyPlus::HeatBalFiniteDiffManager Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
+
 // EnergyPlus Headers
-#include <DataAirLoop.hh>
-#include <DataPrecisionGlobals.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+
+using namespace EnergyPlus::HeatBalanceIntRadExchange;
 
 namespace EnergyPlus {
 
-namespace DataAirLoop {
-
-	// MODULE INFORMATION:
-	//       AUTHOR         Fred Buhl
-	//       DATE WRITTEN   November 2003
-	//       MODIFIED       L. Gu, Jan. 24, 2007. Add more variables to get information on OnOff fan operation
-	//       RE-ENGINEERED  na
-
-	// PURPOSE OF THIS MODULE:
-	// This data-only module contains type definitions and variables
-	// associated with HVAC air loops (AirLoopHVAC objects).
-
-	// REFERENCES:
-	// na
-
-	// OTHER NOTES:
-	// na
-
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
-
-	// MODULE PARAMETER DEFINITIONS:
-
-	// DERIVED TYPE DEFINITIONS:
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
-
-	int NumOASystems( 0 ); // Number of Outdoor Air Systems
-	int LoopFanOperationMode( 0 ); // OnOff fan operation mode
-	Real64 LoopSystemOnMassFlowrate( 0.0 ); // Loop mass flow rate during on cycle using an OnOff fan
-	Real64 LoopSystemOffMassFlowrate( 0.0 ); // Loop mass flow rate during off cycle using an OnOff fan
-	Real64 LoopOnOffFanPartLoadRatio( 0.0 ); // OnOff fan part load ratio
-	Real64 LoopHeatingCoilMaxRTF( 0.0 ); // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
-	Real64 LoopOnOffFanRTF( 0.0 ); // OnOff fan run time fraction in an HVAC Air Loop
-	Real64 LoopDXCoilRTF( 0.0 ); // OnOff fan run time fraction in an HVAC Air Loop
-	Real64 LoopCompCycRatio( 0.0 ); // Loop compressor cycling ratio for multispeed heat pump
-	bool AirLoopInputsFilled( false ); // Set to TRUE after first pass through air loop
-
-	// Object Data
-	Array1D< AirLoopZoneEquipConnectData > AirToZoneNodeInfo;
-	Array1D< AirLoopOutsideAirConnectData > AirToOANodeInfo;
-	Array1D< DefinePriAirSysAvailMgrs > PriAirSysAvailMgr;
-	Array1D< AirLooptoZoneData > AirLoopZoneInfo;
-	Array1D< AirLoopControlData > AirLoopControlInfo;
-	Array1D< AirLoopFlowData > AirLoopFlow;
-	Array1D< OutsideAirSysProps > OutsideAirSys;
-
-	// Clears the global data in DataAirLoop.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
+	TEST_F( EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 	{
-		NumOASystems = 0;
-		LoopFanOperationMode = 0;
-		LoopSystemOnMassFlowrate = 0.0;
-		LoopSystemOffMassFlowrate = 0.0;
-		LoopOnOffFanPartLoadRatio = 0.0;
-		LoopHeatingCoilMaxRTF = 0.0;
-		LoopOnOffFanRTF = 0.0;
-		LoopDXCoilRTF = 0.0;
-		LoopCompCycRatio = 0.0;
-		AirLoopInputsFilled = false;
-		AirToZoneNodeInfo.deallocate();
-		AirToOANodeInfo.deallocate();
-		PriAirSysAvailMgr.deallocate();
-		AirLoopZoneInfo.deallocate();
-		AirLoopControlInfo.deallocate();
-		AirLoopFlow.deallocate();
-		OutsideAirSys.deallocate();
+
+		int N; // NUMBER OF SURFACES
+		Array1D< Real64 > A; // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		Array2D< Real64 > F; // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+		int ZoneNum; // Zone number being fixe
+		Real64 OriginalCheckValue; // check of SUM(F) - N
+		Real64 FixedCheckValue; // check after fixed of SUM(F) - N
+		Real64 FinalCheckValue; // the one to go with
+		int NumIterations; // number of iterations to fixed
+		Real64 RowSum; // RowSum of Fixed
+		
+		N = 3;
+		
+		A.allocate( N );
+		F.allocate( N, N );
+		
+		A( 1 ) = 1.0;
+		A( 2 ) = 1.0;
+		A( 3 ) = 1.0;
+		
+		F( 1, 1 ) = 0.0;
+		F( 1, 2 ) = 0.5;
+		F( 1, 3 ) = 0.5;
+		F( 2, 1 ) = 0.5;
+		F( 2, 2 ) = 0.0;
+		F( 2, 3 ) = 0.5;
+		F( 3, 1 ) = 0.5;
+		F( 3, 2 ) = 0.5;
+		F( 3, 3 ) = 0.0;
+		
+		ZoneNum = 1;
+
+		DataHeatBalance::Zone.allocate( ZoneNum );
+		DataHeatBalance::Zone( ZoneNum ).Name = "Test";
+		
+		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
+
+		std::string const error_string = delimited_string( {
+			"   ** Warning ** Surfaces in Zone=\"Test\" do not define an enclosure.",
+			"   **   ~~~   ** Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.",
+			"   **   ~~~   ** Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.",
+			"   **   ~~~   ** Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.",
+			"   **   ~~~   ** So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but",
+			"   **   ~~~   ** it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure.",
+		} );
+		
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
 	}
 
-} // DataAirLoop
-
-} // EnergyPlus
+}

@@ -350,7 +350,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, TestAFNPressureStat ) {
 
-		// Unit test for a new feature of PressureStat
+		// Unit test for a new feature of PressureStat and #5687
 		int i;
 
 		std::string const idf_objects = delimited_string( {
@@ -2285,6 +2285,19 @@ namespace EnergyPlus {
 		EXPECT_NEAR( PresssureSet, AirflowNetworkNodeSimu( 3 ).PZ, 0.0001 );
 		EXPECT_NEAR( 0.00255337, ReliefMassFlowRate, 0.0001 );
 
+		// Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off 
+		AirflowNetworkFanActivated = false;
+
+		AirflowNetworkExchangeData.allocate( NumOfZones );
+
+		UpdateAirflowNetwork( );
+
+		EXPECT_NEAR( 0.0, AirflowNetworkNodeSimu( 10 ).PZ, 0.0001 );
+		EXPECT_NEAR( 0.0, AirflowNetworkNodeSimu( 20 ).PZ, 0.0001 );
+		EXPECT_NEAR( 0.0, AirflowNetworkLinkReport( 20 ).FLOW, 0.0001 );
+		EXPECT_NEAR( 0.0, AirflowNetworkLinkReport( 50 ).FLOW, 0.0001 );
+
+		AirflowNetworkExchangeData.deallocate( );
 		Node.deallocate( );
 	
 	}

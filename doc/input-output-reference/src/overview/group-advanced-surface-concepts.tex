@@ -197,7 +197,7 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 \paragraph{Field: Construction Name}\label{field-construction-name}
 
-This field is the name of a Construction object defined elsewhere. All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm slected in the previous field.
+This field is the name of a Construction object defined elsewhere. All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm selected in the previous field.
 
 An example IDF object follows.
 
@@ -363,7 +363,7 @@ SurfaceProperty:OtherSideCoefficients,
 \end{lstlisting}
 
 \begin{lstlisting}
-!  Example input for outside heat transfer coefficient of 1.23, using Tosdb
+!  Example input for outside heat transfer coefficient of 1.23, using Toadb
 SurfaceProperty:OtherSideCoefficients,
       OSCCoef:Zn005:Wall004,   !- Name
       1.230000,                !- Combined Convective/Radiative Film Coefficient {W/m2-K}
@@ -453,7 +453,7 @@ This is the effective temperature exposed to the other side of the surface for t
 
 \paragraph{Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient {[}W/m2-K{]}}\label{surface-other-side-conditions-modeled-radiation-heat-transfer-coefficient-wm2-k}
 
-This is the effective (Iinearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
+This is the effective (Linearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
 
 \subsection{SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections}\label{surfaceconvectionalgorithminsideadaptivemodelselections}
 
@@ -777,11 +777,11 @@ The key choice options include: BeausoleilMorrisonMixedAssistedWall, AlamdariHam
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
-\paragraph{Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation Source}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-source}
+\paragraph{Field: Mixed Regime Buoyancy Opposing Flow on Walls Equation Source}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-source}
 
 The key choice options include: BeausoleilMorrisonMixedOpposingWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
 
-\paragraph{Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation User Curve Name}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-user-curve-name}
+\paragraph{Field: Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name}\label{field-mixed-regime-buoyancy-oppossing-flow-on-walls-equation-user-curve-name}
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve
 
@@ -877,7 +877,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \paragraph{Field: Natural Convection Unstable Horizontal Equation Source}\label{field-natural-convection-unstable-horizontal-equation-source}
 
-This is for just the natural convection portion of the total film coefficient. This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice optios include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
+This is for just the natural convection portion of the total film coefficient. This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice options include: WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
 
 \paragraph{Field: Natural Convection Unstable Horizontal Equation User Curve Name}\label{field-natural-convection-unstable-horizontal-equation-user-curve-name}
 
@@ -925,7 +925,7 @@ Unique name of input object.
 
 \paragraph{Field: Wind Speed Type for Curve}\label{field-wind-speed-type-for-curve}
 
-This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field. There are for key choice options. ``WeatherFile'' directs using the unmodified value from the epw file or design weather data. ``HeightAdjust'' uses the value from the epw file modified for height above ground, as determined by the z cooridinate, using the site terrain and weather station information. ``ParallelComponent'' uses the value from the epw file modified to take just the velocity component that is parallel to the surface. ``ParallelComponentHeightAdjust'' uses the height adjusted wind velocity and then computes the parallel component.
+This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field. There are for key choice options. ``WeatherFile'' directs using the unmodified value from the epw file or design weather data. ``HeightAdjust'' uses the value from the epw file modified for height above ground, as determined by the z coordinate, using the site terrain and weather station information. ``ParallelComponent'' uses the value from the epw file modified to take just the velocity component that is parallel to the surface. ``ParallelComponentHeightAdjust'' uses the height adjusted wind velocity and then computes the parallel component.
 
 \paragraph{Field: Hf Function of Wind Speed Curve Name}\label{field-hf-function-of-wind-speed-curve-name}
 
@@ -973,12 +973,12 @@ The entries can be of several types: Value (simple numeric value), Schedule (nam
 
 \begin{longtable}[c]{p{3.49in}p{2.5in}}
 \toprule 
-Key choice & Applies to Insihe or Outsihe \tabularnewline
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Key choice & Applies to Insihe or Outsihe \tabularnewline
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endhead
 
@@ -1047,7 +1047,7 @@ The complete IDD definition for the ConvectionCoefficients object follows:
 
 \paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name}
 
-If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input object describing the model equations to be used during the time intervals for the schedule.
 
 In IDF usage:
 
@@ -1138,12 +1138,12 @@ The entries can be of several types: Value (simple numeric value), Schedule (nam
 
 \begin{longtable}[c]{p{3.49in}p{2.5in}}
 \toprule 
-Key choice & Applies to Insihe or Outsihe \tabularnewline
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Key choice & Applies to Insihe or Outsihe \tabularnewline
+Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endhead
 
@@ -1210,7 +1210,7 @@ If the Convection type was ``Schedule'', then this field contains the name of a 
 
 \paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name-1}
 
-If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input object describing the model equations to be used during the time intervals for the schedule.
 
 In IDF usage:
 
@@ -1224,7 +1224,7 @@ SurfaceProperty:ConvectionCoefficients:MultipleSurface,
 
 \subsection{Convection Coefficient Application Hierarchy}\label{convection-coefficient-application-hierarchy}
 
-Ultimate flexibility and possibly ultimate user confusion can result from the convection coefficient possibilties in EnergyPlus. The objects that control how convection models are assigned to individual surfaces~ are:
+Ultimate flexibility and possibly ultimate user confusion can result from the convection coefficient possibilities in EnergyPlus. The objects that control how convection models are assigned to individual surfaces~ are:
 
 \begin{itemize}
 \item
@@ -1353,12 +1353,12 @@ This variable reports the specific model equation used to calculate the inside f
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Report Cohe & Relateh key anh mohel \tabularnewline
+Report Code & Related key and model \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Cohe & Relateh key anh mohel \tabularnewline
+Report Code & Related key and model \tabularnewline
 \midrule
 \endhead
 
@@ -1402,12 +1402,12 @@ The inside face convection heat transfer calculations can be based on different 
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Report Cohe & Reference Air Temperature Methoh \tabularnewline
+Report Code & Reference Air Temperature Method \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Cohe & Reference Air Temperature Methoh \tabularnewline
+Report Code & Reference Air Temperature Method \tabularnewline
 \midrule
 \endhead
 
@@ -1423,12 +1423,12 @@ This variable reports how the surface was classified as part of the adaptive con
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
-Report Cohe & Surface Classification \tabularnewline
+Report Code & Surface Classification \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-Report Cohe & Surface Classification \tabularnewline
+Report Code & Surface Classification \tabularnewline
 \midrule
 \endhead
 
@@ -1501,7 +1501,7 @@ Select `yes' to use the value supplied as the external vapor transfer coefficien
 
 \paragraph{Field: External Vapor Coefficient Value}\label{field-external-vapor-coefficient-value}
 
-HAMT will use this value to calculate the vapour transfer into and out off the external surface of this surface. Units are kg/Pa.s.m2.
+HAMT will use this value to calculate the vapor transfer into and out off the external surface of this surface. Units are kg/Pa.s.m2.
 
 \paragraph{Field: Constant Internal vapor Transfer Coefficient}\label{field-constant-internal-vapor-transfer-coefficient}
 
@@ -1529,7 +1529,7 @@ This object is used to model a multi-skin exterior heat transfer surface. This i
 
 The area and orientation are obtained from \textbf{BuildingSurface:Detailed} objects, which are referenced by name. This object can be used to model certain types of photovoltaic mounting configurations such as interlocking roof pavers. If the baffle covers only part of a surface, then that surface should be split into separate \textbf{BuildingSurface:Detailed} objects where one matches the size of the baffle. A single baffle can be associated with as many \textbf{BuildingSurface:Detailed} objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The base heat transfer surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
-Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and bouancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
+Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and buoyancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
 
 \subsubsection{Inputs}\label{inputs-13}
 
@@ -1551,11 +1551,11 @@ This field is used to enter the thermal emissivity of the baffler. This surface 
 
 \paragraph{Field: Solar Absorptivity of Exterior Baffle}\label{field-solar-absorptivity-of-exterior-baffle}
 
-This field is used to enter the solar absorbtivity of the baffle. This surface property is for shortwave, solar radiation. The property is used for the front side of the baffle that faces the environment. Darker colors have a higher absorptivity. While black is the highest performance, other colors might be used to match the color scheme of the rest of the façade.
+This field is used to enter the solar absorptivity of the baffle. This surface property is for shortwave, solar radiation. The property is used for the front side of the baffle that faces the environment. Darker colors have a higher absorptivity. While black is the highest performance, other colors might be used to match the color scheme of the rest of the façade.
 
 \paragraph{Field: Height Scale for Buoyancy-Driven Ventilation}\label{field-height-scale-for-buoyancy-driven-ventilation}
 
-This field is used to enter a nominal height scale (m) for prediction of ventilation induced by bouancy. This value (\(\Delta {H_{NPL}}\) ) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
+This field is used to enter a nominal height scale (m) for prediction of ventilation induced by buoyancy. This value (\(\Delta {H_{NPL}}\) ) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
 
 \paragraph{Field: Effective Thickness of Cavity Behind Exterior Baffle}\label{field-effective-thickness-of-cavity-behind-exterior-baffle}
 
