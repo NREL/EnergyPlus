@@ -83,6 +83,7 @@ set( test_src
   PierceSurface.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantChillers.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc

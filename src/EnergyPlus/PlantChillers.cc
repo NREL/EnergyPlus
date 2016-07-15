@@ -3486,7 +3486,9 @@ namespace PlantChillers {
 		CondVolFlowRateUser = 0.0;
 
 		if ( EngineDrivenChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
-			PltSizCondNum = PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).PlantSizNum;
+			if ( EngineDrivenChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized ) {
+				PltSizCondNum = PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).PlantSizNum;
+			}
 		}
 
 		PltSizNum = PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).PlantSizNum;

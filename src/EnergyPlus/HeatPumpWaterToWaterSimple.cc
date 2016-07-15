@@ -1092,7 +1092,6 @@ namespace HeatPumpWaterToWaterSimple {
 					} else {
 						ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name,"User-Specified Heating Power Consumption [W]", nomPowerDrawUser );
 					}
-					ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Heating Power Consumption [W]", tmpPowerDraw, "User-Specified Heating Power Consumption [W]", nomPowerDrawUser );
 					if ( DataGlobals::DisplayExtraWarnings ){
 						if ( ( std::abs( tmpPowerDraw - nomPowerDrawUser ) / nomPowerDrawUser ) > DataSizing::AutoVsHardSizingThreshold ) {
 							ShowMessage( "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
