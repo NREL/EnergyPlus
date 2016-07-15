@@ -4509,40 +4509,25 @@ namespace FluidProperties {
 		// METHODOLOGY EMPLOYED:
 		// Perform iterations to identify the temperature by calling GetSupHeatEnthalpyRefrig.
 
-		// REFERENCES:
-		// na
-
 		// USE STATEMENTS:
 		using General::SolveRegulaFalsi;
 
 		// Return value
 		Real64 ReturnValue;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// FUNCTION PARAMETERS:
 		// the enthalpy calculated from the pressure found
 		static std::string const RoutineName( "GetSupHeatTempRefrig: " );
 		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrig:" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RefrigNum; // index for refrigerant under consideration
-		Real64 EnthalpyCheck; // recalculates enthalpy based on calculated pressure
 		Real64 EnthalpyHigh; // Enthalpy value at interpolated pressure and high temperature
 		Real64 EnthalpyLow; // Enthalpy value at interpolated pressure and low temperature
 		Real64 RefTHigh; // High Temperature Value for Ps (max in tables)
 		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
 		Real64 Temp; // Temperature of the superheated refrigerant at the given enthalpy and pressure
 		
-		// FLOW:
-
 		if ( GetInput ) {
 			GetFluidPropertiesData();
 			GetInput = false;
@@ -4582,7 +4567,7 @@ namespace FluidProperties {
 			ShowContinueError( " Called From:" + CalledFrom );
 			ShowContinueErrorTimeStamp( "" );
 			TempUp = RefTHigh;
-		}		
+		}
 		if ( TempLow >= TempUp ) {
 			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
 			ShowContinueError( " Called From:" + CalledFrom );
@@ -4590,7 +4575,7 @@ namespace FluidProperties {
 			TempLow = RefTSat;
 			TempUp = RefTHigh;
 		}
-			
+		
 		// check enthalpy data range and attempt to cap if necessary
 		EnthalpyLow = GetSupHeatEnthalpyRefrig( Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
 		EnthalpyHigh = GetSupHeatEnthalpyRefrig( Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
@@ -4615,11 +4600,6 @@ namespace FluidProperties {
 			Par( 3 ) = Pressure;
 			
 			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
-			// for ( Temp = TempLow; Temp <= TempUp; Temp++ ){
-			// 	EnthalpyCheck = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
-			// 	
-			// 	if( EnthalpyCheck > Enthalpy )  break; 
-			// }
 			ReturnValue = Temp;
 		}
 
