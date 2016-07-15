@@ -1692,7 +1692,7 @@ namespace EnergyPlus {
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -5000.0;
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = -4000.0;
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
-		
+
 		//indexes values has been changed according to new input_processor output
 		// node indexes may be viewed in NodeID array
 		DataLoopNode::Node( 16 ).Temp = 14.0; // chilled water inlet node
