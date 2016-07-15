@@ -78886,7 +78886,7 @@ WaterUse:RainCollector,
 !
 FaultModel:TemperatureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -78914,7 +78914,7 @@ FaultModel:TemperatureSensorOffset:OutdoorAir,
 
 FaultModel:HumiditySensorOffset:OutdoorAir,
    \memo This object describes outdoor air humidity sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -78942,7 +78942,7 @@ FaultModel:HumiditySensorOffset:OutdoorAir,
 
 FaultModel:EnthalpySensorOffset:OutdoorAir,
    \memo This object describes outdoor air enthalpy sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -78970,7 +78970,7 @@ FaultModel:EnthalpySensorOffset:OutdoorAir,
 
 FaultModel:PressureSensorOffset:OutdoorAir,
    \memo This object describes outdoor air pressure sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -78998,7 +78998,7 @@ FaultModel:PressureSensorOffset:OutdoorAir,
 
 FaultModel:TemperatureSensorOffset:ReturnAir,
    \memo This object describes return air temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79026,7 +79026,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
 
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79054,7 +79054,7 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
    
 FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
    \memo This object describes fault of chiller supply water temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79091,7 +79091,7 @@ FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
 
 FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
    \memo This object describes fault of condenser supply water temperature sensor offset
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79102,7 +79102,7 @@ FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
    A3, \field Severity Schedule Name
        \type object-list
        \object-list ScheduleNames
-   A4, \field Tower Object Type
+   A4, \field Cooling Tower Object Type
        \note Enter the type of the cooling tower affected
        \required-field
        \type choice
@@ -79124,7 +79124,7 @@ FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
 
 FaultModel:ThermostatOffset,
    \memo This object describes fault of thermostat offset
-   \min-fields 3
+   \min-fields 5
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79151,7 +79151,7 @@ FaultModel:ThermostatOffset,
 
 FaultModel:HumidistatOffset,
    \memo This object describes fault of humidistat offset
-   \min-fields 4
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79192,7 +79192,7 @@ FaultModel:HumidistatOffset,
 
 FaultModel:Fouling:AirFilter,
    \memo This object describes fault of dirty air filters
-   \min-fields 4
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79216,6 +79216,7 @@ FaultModel:Fouling:AirFilter,
        \note Enter the name of a schedule
        \note describing the variations of the fan pressure rise
        \note in terms of multipliers to the fan design pressure rise
+       \required-field
        \type object-list
        \object-list ScheduleNames
    A6; \field Fan Curve Name
@@ -79228,7 +79229,7 @@ FaultModel:Fouling:AirFilter,
 
 FaultModel:Fouling:CoolingTower,
    \memo This object describes the fault of fouling cooling towers
-   \min-fields 3
+   \min-fields 6
    A1, \field Name
        \note Enter the name of the fault
        \required-field
@@ -79261,6 +79262,7 @@ FaultModel:Fouling:CoolingTower,
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
+   \min-fields 6
    A1, \field Name
        \required-field
        \type alpha
