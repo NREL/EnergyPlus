@@ -143,7 +143,6 @@ namespace DataDaylighting {
 		// Members
 		std::string Name; // Name of the daylighting:controls object
 		std::string ZoneName; //name of the zone where the daylighting:controls object is located
-		int zoneNumber; // index for the zone where the daylighting:controls object is located
 		int DaylightMethod; // Type of Daylighting (1=SplitFlux, 2=DElight)
 		int AvailSchedNum; // pointer to availability schedule if present
 		int TotalDaylRefPoints; // Number of splitflux daylighting reference points in a zone (0,1 or 2)

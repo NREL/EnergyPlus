@@ -4645,22 +4645,23 @@ namespace DaylightingManager {
 		int curTotalDaylRefPts;
 		int refPtNum;
 		int SurfLoop;
+		int ZoneFound;
 
 		cCurrentModuleObject = "Daylighting:Controls";
 		for ( iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl ) {
 			cAlphaArgs = "";
 			rNumericArgs = 0.0;
 			GetObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			auto & zone_daylight( ZoneDaylight( iDaylCntrl ) );
-			zone_daylight.Name = cAlphaArgs( 1 );  // Field: Name
-			zone_daylight.ZoneName = cAlphaArgs( 2 );  // Field: Zone Name
-			zone_daylight.zoneNumber = FindItemInList( zone_daylight.ZoneName, Zone );
-    		if ( zone_daylight.zoneNumber == 0 ) {
+			ZoneFound = FindItemInList( cAlphaArgs( 2 ), Zone );
+			if ( ZoneFound == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 				continue;
 			}
+			auto & zone_daylight( ZoneDaylight( ZoneFound ) );
+			auto & zone( Zone( ZoneFound ) );
+			zone_daylight.Name = cAlphaArgs( 1 );  // Field: Name
+			zone_daylight.ZoneName = cAlphaArgs( 2 );  // Field: Zone Name
 
 			if ( SameString( cAlphaArgs( 3 ), "SPLITFLUX" )){  // Field: Daylighting Method
 				zone_daylight.DaylightMethod = SplitFluxDaylighting;
@@ -4704,7 +4705,7 @@ namespace DaylightingManager {
 
 			if ( !lAlphaFieldBlanks( 6 )){ // Field: Glare Calculation Daylighting Reference Point Name
 				zone_daylight.glareRefPtNumber = FindItemInList( cAlphaArgs( 6 ), DaylRefPt, &RefPointData::Name );  // Field: Glare Calculation Daylighting Reference Point Name
-				if ( zone_daylight.zoneNumber == 0 ) {
+				if ( zone_daylight.glareRefPtNumber == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" for object named: " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 					continue;
@@ -4761,10 +4762,10 @@ namespace DaylightingManager {
 				zone_daylight.FracZoneDaylit( refPtNum ) = rNumericArgs( 6 + refPtNum * 2 ); // Field: Fraction Controlled by Reference Point
 				zone_daylight.IllumSetPoint( refPtNum ) = rNumericArgs( 7 + refPtNum * 2 ); // Field: Illuminance Setpoint at Reference Point
 
-				SetupOutputVariable( "Daylighting Reference Point 1 Illuminance [lux]", zone_daylight.DaylIllumAtRefPt( refPtNum ), "Zone", "Average", Zone( zone_daylight.zoneNumber ).Name );
-				SetupOutputVariable( "Daylighting Reference Point 1 Glare Index []", zone_daylight.GlareIndexAtRefPt( refPtNum ), "Zone", "Average", Zone( zone_daylight.zoneNumber ).Name );
-				SetupOutputVariable( "Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingGlareIndexSPAtRefPt( refPtNum ), "Zone", "Sum", Zone( zone_daylight.zoneNumber ).Name );
-				SetupOutputVariable( "Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt( refPtNum ), "Zone", "Sum", Zone( zone_daylight.zoneNumber ).Name );
+				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Illuminance [lux]", zone_daylight.DaylIllumAtRefPt( refPtNum ), "Zone", "Average", zone_daylight.Name );
+				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index []", zone_daylight.GlareIndexAtRefPt( refPtNum ), "Zone", "Average", zone_daylight.Name );
+				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingGlareIndexSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
+				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Daylight Illuminance Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
 			}
 			if ( sum( zone_daylight.FracZoneDaylit ) < 1.0 ) {
 				ShowWarningError( "GetDetailedDaylighting: Fraction of Zone controlled by the Daylighting reference points is < 1.0." );
@@ -4780,21 +4781,19 @@ namespace DaylightingManager {
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", will use 1" );
 				zone_daylight.LightControlSteps = 1;
 			}
-			SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", Zone( zone_daylight.zoneNumber ).Name );
+			SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", zone_daylight.Name );
 		}
 
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
 			if ( Surface( SurfLoop ).Class == SurfaceClass_Window && Surface( SurfLoop ).ExtSolar ) {
 				int zoneOfSurf = Surface( SurfLoop ).Zone;
 				for ( iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl ) {
-					if ( ZoneDaylight( iDaylCntrl ).zoneNumber = zoneOfSurf ){
-						if ( !Zone( zoneOfSurf ).HasInterZoneWindow ){
-							SurfaceWindow( SurfLoop ).IllumFromWinAtRefPtRep.allocate( curTotalDaylRefPts );
-							SurfaceWindow( SurfLoop ).LumWinFromRefPtRep.allocate( curTotalDaylRefPts );
-							for ( refPtNum = 1; refPtNum <= ZoneDaylight( iDaylCntrl ).TotalDaylRefPoints; ++refPtNum ) {
-								SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + " Illuminance [lux]", SurfaceWindow( SurfLoop ).IllumFromWinAtRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
-								SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + "View Luminance [cd/m2]", SurfaceWindow( SurfLoop ).LumWinFromRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
-							}
+					if ( !Zone( zoneOfSurf ).HasInterZoneWindow ){
+						SurfaceWindow( SurfLoop ).IllumFromWinAtRefPtRep.allocate( curTotalDaylRefPts );
+						SurfaceWindow( SurfLoop ).LumWinFromRefPtRep.allocate( curTotalDaylRefPts );
+						for ( refPtNum = 1; refPtNum <= ZoneDaylight( zoneOfSurf ).TotalDaylRefPoints; ++refPtNum ) {
+							SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + " Illuminance [lux]", SurfaceWindow( SurfLoop ).IllumFromWinAtRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
+							SetupOutputVariable( "Daylighting Window Reference Point " + std::to_string( refPtNum ) + "View Luminance [cd/m2]", SurfaceWindow( SurfLoop ).LumWinFromRefPtRep( refPtNum ), "Zone", "Average", Surface( SurfLoop ).Name );
 						}
 					}
 				}
@@ -4858,93 +4857,95 @@ namespace DaylightingManager {
 		NewAspectRatio = 1.0;
 
 		CheckForGeometricTransform( doTransform, OldAspectRatio, NewAspectRatio );
-
+		int zoneIndex = 0;
 		for (auto & daylCntrl : ZoneDaylight) {
-			ZoneFound = daylCntrl.zoneNumber;
-			auto & zone( Zone( ZoneFound ) );
+			zoneIndex++;
+			if ( daylCntrl.TotalDaylRefPoints > 0 ){
+				auto & zone( Zone(zoneIndex) );
 
-			// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-			CosZoneRelNorth = std::cos( -zone.RelNorth * DegToRadians );
-			SinZoneRelNorth = std::sin( -zone.RelNorth * DegToRadians );
+				// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
+				CosZoneRelNorth = std::cos( -zone.RelNorth * DegToRadians );
+				SinZoneRelNorth = std::sin( -zone.RelNorth * DegToRadians );
 
-			rLightLevel = GetDesignLightingLevelForZone( ZoneFound );
-			CheckLightsReplaceableMinMaxForZone( ZoneFound );
+				rLightLevel = GetDesignLightingLevelForZone( zoneIndex );
+				CheckLightsReplaceableMinMaxForZone( zoneIndex );
 
-			for ( refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum ){
-				auto & curRefPt( DaylRefPt( daylCntrl.DaylRefPtNum( refPtNum ) ) ); // get the active daylighting:referencepoint
-				if ( DaylRefWorldCoordSystem ) {
-					//transform only by appendix G rotation
-					daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
-					daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
-					daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) = curRefPt.z;
-				} else {
-					//Transform reference point coordinates into building coordinate system
-					Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y  * SinZoneRelNorth + zone.OriginX;
-					Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y  * CosZoneRelNorth + zone.OriginY;
-					//Transform into World Coordinate System
-					daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-					daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-					daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) = curRefPt.z + zone.OriginZ;
-					if ( doTransform ) {
-						Xo = daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ); // world coordinates.... shifted by relative north angle...
-						Yo = daylCntrl.DaylRefPtAbsCoord( 2, refPtNum );
-						// next derotate the building
-						XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-						YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
-						// translate
-						Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
-						Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
-						// rerotate
-						daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-						daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
-					}
-				}
-				refName = curRefPt.Name;
-				PreDefTableEntry( pdchDyLtZone, refName, daylCntrl.Name );
-				PreDefTableEntry( pdchDyLtKind, refName, "Detailed" );
-				// (1=continuous, 2=stepped, 3=continuous/off)
-				if ( daylCntrl.LightControlType == Continuous ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous" );
-				} else if ( daylCntrl.LightControlType == Stepped ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Stepped" );
-				} else if ( daylCntrl.LightControlType == ContinuousOff ) {
-					PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous/Off" );
-				}
-				PreDefTableEntry( pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit( refPtNum ) );
-				PreDefTableEntry( pdchDyLtWInst, refName, rLightLevel );
-				PreDefTableEntry( pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit( refPtNum ) );
-
-				if ( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) > zone.MaximumX ) {
-					daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
-					ShowWarningError( "GetDetailedDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name );
-					ShowContinueError( "...X Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
-					if ( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) < zone.MinimumX ) {
-						ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ), 4 ) + " m." );
+				for ( refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum ){
+					auto & curRefPt( DaylRefPt( daylCntrl.DaylRefPtNum( refPtNum ) ) ); // get the active daylighting:referencepoint
+					if ( DaylRefWorldCoordSystem ) {
+						//transform only by appendix G rotation
+						daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
+						daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
+						daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) = curRefPt.z;
 					} else {
-						ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) - zone.MaximumX, 4 ) + " m." );
+						//Transform reference point coordinates into building coordinate system
+						Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y  * SinZoneRelNorth + zone.OriginX;
+						Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y  * CosZoneRelNorth + zone.OriginY;
+						//Transform into World Coordinate System
+						daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+						daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+						daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) = curRefPt.z + zone.OriginZ;
+						if ( doTransform ) {
+							Xo = daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ); // world coordinates.... shifted by relative north angle...
+							Yo = daylCntrl.DaylRefPtAbsCoord( 2, refPtNum );
+							// next derotate the building
+							XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
+							YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
+							// translate
+							Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
+							Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
+							// rerotate
+							daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+							daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+						}
 					}
-				}
-				if ( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) > zone.MaximumY ) {
-					daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
-					ShowWarningError( "GetDetailedDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name );
-					ShowContinueError( "...Y Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
-					if ( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) < zone.MinimumY ) {
-						ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ), 4 ) + " m." );
-					} else {
-						ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) - zone.MaximumY, 4 ) + " m." );
+					refName = curRefPt.Name;
+					PreDefTableEntry( pdchDyLtZone, refName, daylCntrl.Name );
+					PreDefTableEntry( pdchDyLtKind, refName, "Detailed" );
+					// (1=continuous, 2=stepped, 3=continuous/off)
+					if ( daylCntrl.LightControlType == Continuous ) {
+						PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous" );
+					} else if ( daylCntrl.LightControlType == Stepped ) {
+						PreDefTableEntry( pdchDyLtCtrl, refName, "Stepped" );
+					} else if ( daylCntrl.LightControlType == ContinuousOff ) {
+						PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous/Off" );
 					}
-				}
-				if ( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) > zone.MaximumZ ) {
-					daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
-					ShowWarningError( "GetDetailedDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name );
-					ShowContinueError( "...Z Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
-					if ( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) < zone.MinimumZ ) {
-						ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ), 4 ) + " m." );
-					} else {
-						ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) - zone.MaximumZ, 4 ) + " m." );
+					PreDefTableEntry( pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit( refPtNum ) );
+					PreDefTableEntry( pdchDyLtWInst, refName, rLightLevel );
+					PreDefTableEntry( pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit( refPtNum ) );
+
+					if ( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) > zone.MaximumX ) {
+						daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
+						ShowWarningError( "GetDetailedDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name );
+						ShowContinueError( "...X Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
+						if ( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) < zone.MinimumX ) {
+							ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ), 4 ) + " m." );
+						} else {
+							ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) - zone.MaximumX, 4 ) + " m." );
+						}
 					}
-				}
-			} // refPtNum
+					if ( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) > zone.MaximumY ) {
+						daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
+						ShowWarningError( "GetDetailedDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name );
+						ShowContinueError( "...Y Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
+						if ( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) < zone.MinimumY ) {
+							ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ), 4 ) + " m." );
+						} else {
+							ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 2, refPtNum ) - zone.MaximumY, 4 ) + " m." );
+						}
+					}
+					if ( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) > zone.MaximumZ ) {
+						daylCntrl.DaylRefPtInBounds( refPtNum ) = false;
+						ShowWarningError( "GetDetailedDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name );
+						ShowContinueError( "...Z Reference Point= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
+						if ( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) < zone.MinimumZ ) {
+							ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ), 4 ) + " m." );
+						} else {
+							ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( daylCntrl.DaylRefPtAbsCoord( 3, refPtNum ) - zone.MaximumZ, 4 ) + " m." );
+						}
+					}
+				} // refPtNum
+			}
 		}
 	}
 
@@ -4968,7 +4969,7 @@ namespace DaylightingManager {
 		TotRefPoints = GetNumObjectsFound( cCurrentModuleObject );
 		DaylRefPt.allocate( TotRefPoints );
 		for ( auto & pt : DaylRefPt ){
-			GetObjectItem( cCurrentModuleObject, RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			pt.Name = cAlphaArgs( 1 );
 			pt.Zone = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( pt.Zone == 0 ) {
