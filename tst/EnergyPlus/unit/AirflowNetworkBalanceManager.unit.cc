@@ -2276,7 +2276,7 @@ namespace EnergyPlus {
 		for ( i = 1; i <= 36; ++i ) {
 			AirflowNetworkNodeSimu( i ).TZ = 23.0;
 			AirflowNetworkNodeSimu( i ).WZ = 0.0008400;
-			if ( ( i > 4 && i < 10 ) || i == 32) {
+			if ( ( i > 4 && i < 10 ) || i == 20) { // NFACADE, EFACADE, SFACADE, WFACADE, HORIZONTAL, OA INTLET NODE
 				AirflowNetworkNodeSimu( i ).TZ = DataEnvironment::OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );  //AirflowNetworkNodeData vals differ
 				AirflowNetworkNodeSimu( i ).WZ = DataEnvironment::OutHumRat;
 			}
