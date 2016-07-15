@@ -5878,7 +5878,11 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             auto const &jdf_object = jdf_objects.value();
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
-                InputProcessor::AddRecordToOutputVariableStructure("*", fields.at("variable_or_meter_name"));
+
+                //TODO: Might be incorrect
+                for (auto const &extensions : fields["extensions"]) {
+                    InputProcessor::AddRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
+                }
             }
         }
 
@@ -5887,7 +5891,9 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             auto const &jdf_object = jdf_objects.value();
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
-                InputProcessor::AddRecordToOutputVariableStructure("*", fields.at("variable_or_meter_or_ems_variable_or_field_name"));
+                for (auto const &extensions : fields["extensions"]) {
+                    InputProcessor::AddRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                }
             }
         }
 
@@ -5896,13 +5902,15 @@ EnergyPlus::InputProcessor::GetRecordLocations(
             auto const &jdf_object = jdf_objects.value();
             for (auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj) {
                 json const &fields = obj.value();
-                auto const report_name = MakeUPPERCase(fields.at("report_name"));
-                if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
-                    for (Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1) {
-                        InputProcessor::AddVariablesForMonthlyReport(MonthlyNamedReports(Loop1));
+                for (auto const &extensions : fields["extensions"]) {
+                    auto const report_name = MakeUPPERCase(extensions.at("report_name"));
+                    if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
+                        for (Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1) {
+                            InputProcessor::AddVariablesForMonthlyReport(MonthlyNamedReports(Loop1));
+                        }
+                    } else {
+                        InputProcessor::AddVariablesForMonthlyReport(report_name);
                     }
-                } else {
-                   InputProcessor::AddVariablesForMonthlyReport(report_name);
                 }
             }
         }

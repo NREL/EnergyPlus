@@ -1230,7 +1230,7 @@ namespace EnergyPlus {
 
 		std::string const error_string = delimited_string( {
 			"   ** Warning ** Controller:OutdoorAir \"OA CONTROLLER 1\", missing field value",
-			"   **   ~~~   ** ...Control High Indoor Humidity Based on Outdoor Humidity Ratio will default to Yes when High Humidity Control= \"Yes\"",
+			"   **   ~~~   ** ...control_high_indoor_humidity_based_on_outdoor_humidity_ratio will default to Yes when high_humidity_control= \"Yes\"",
 		} );
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
