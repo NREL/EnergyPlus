@@ -1636,6 +1636,30 @@ namespace EnergyPlus {
 		VRF( VRFCond ).ZoneTUListPtr = TUListNum;
 		TerminalUnitList( TUListNum ).NumTUInList = NumTUList;
 
+		// Run and Check: GetSupHeatTempRefrig
+		{
+			//   Test the method GetSupHeatTempRefrig, which determines the refrigerant temperature corresponding to the given 
+			//   enthalpy and pressure.
+			
+			// Inputs_condition
+			std::string Refrigerant = "R410A";
+			Real64 Pressure = 2419666.67; // actual pressure given as input [Pa]
+			Real64 Enthalpy = 432842; // actual enthalpy given as input [kJ/kg] 
+			Real64 TempLow = 40; // lower bound of temperature in the iteration [C]
+			Real64 TempUp = 60; // upper bound of temperature in the iteration [C]
+			int RefrigIndex = 2; // Index to Refrigerant Properties
+			Real64 Temperature = 44; // temperature to be returned [C]
+			std::string CalledFrom = "EnergyPlusFixture:VRF_FluidTCtrl_VRFOU_Compressor";
+
+			DataEnvironment::OutDryBulbTemp = 10.35;
+
+			// Run
+			Temperature = GetSupHeatTempRefrig( Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom );
+
+			//Test
+			EXPECT_NEAR( Temperature, 44.5, 0.5 );
+		}
+
 		// Run and Check: VRFHR_OU_HR_Mode
 		{
 			//   Test the method VRFOU_CalcCompH, which determines the operational mode of the VRF-HR system, given the terminal unit side load conditions. 
@@ -1721,7 +1745,7 @@ namespace EnergyPlus {
 			VRF( VRFCond ).VRFOU_CompSpd( Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual );
 			
 			//Test
-			EXPECT_NEAR( 1298, CompSpdActual, 1 );
+			EXPECT_NEAR( 1295, CompSpdActual, 5 );
 			}
 			
 			{
@@ -1739,7 +1763,7 @@ namespace EnergyPlus {
 			VRF( VRFCond ).VRFOU_CompSpd( Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual );
 						
 			//Test
-			EXPECT_NEAR( 950, CompSpdActual, 1 );
+			EXPECT_NEAR( 950, CompSpdActual, 5 );
 			}
 		}
 		
@@ -1761,8 +1785,8 @@ namespace EnergyPlus {
 			VRF( VRFCond ).VRFOU_CompCap( CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp );
 			
 			//Test
-			EXPECT_NEAR( 6971, Q_c_tot, 1 );
-			EXPECT_NEAR( 1601, Ncomp, 1 );
+			EXPECT_NEAR( 6990, Q_c_tot, 10 );
+			EXPECT_NEAR( 1601, Ncomp, 10 );
 		}
 		
 		// Run and Check: VRFOU_CalcComp
@@ -2274,7 +2298,7 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand.deallocate();
 	}
 
-	TEST_F( EnergyPlusFixture,VRF_FluidTCtrl_CalcVRFIUTeTc )
+	TEST_F( EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at

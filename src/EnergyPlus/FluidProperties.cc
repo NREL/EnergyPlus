@@ -4513,7 +4513,7 @@ namespace FluidProperties {
 		// na
 
 		// USE STATEMENTS:
-		// na
+		using General::SolveRegulaFalsi;
 
 		// Return value
 		Real64 ReturnValue;
@@ -4602,18 +4602,94 @@ namespace FluidProperties {
 			ReturnValue = TempUp;
 			return ReturnValue;
 		}
+		
+		//Perform iterations to obtain the temperature level
+		{
+			Array1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
+			Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
+			int const MaxIte( 500 ); // maximum number of iterations
+			int SolFla; // Flag of RegulaFalsi solver
 			
-		for ( Temp = TempLow; Temp <= TempUp; Temp++ ){
-			EnthalpyCheck = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+			Par( 1 ) = RefrigNum;
+			Par( 2 ) = Enthalpy;
+			Par( 3 ) = Pressure;
 			
-			if( EnthalpyCheck > Enthalpy )  break; 
+			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
+			// for ( Temp = TempLow; Temp <= TempUp; Temp++ ){
+			// 	EnthalpyCheck = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
+			// 	
+			// 	if( EnthalpyCheck > Enthalpy )  break; 
+			// }
+			ReturnValue = Temp;
 		}
-		ReturnValue = Temp;
 
 		return ReturnValue;
 
 	}
+	
+	Real64
+	GetSupHeatTempRefrigResidual(
+		Real64 const Temp, // temperature of the refrigerant
+		Array1< Real64 > const & Par 
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Rongpeng Zhang, LBNL
+		//       DATE WRITTEN   July 2016
+		//       MODIFIED
+		//       RE-ENGINEERED
 
+		// PURPOSE OF THIS FUNCTION:
+		//  Calculates residual function (( Enthalpy_Actual - Enthalpy_Req ) / Enthalpy_Req )
+		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given 
+		//  enthalpy and pressure in superheated region.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		Real64 TempResidual;
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Par( 1 ) = RefrigNum;
+		// Par( 2 ) = Enthalpy;
+		// Par( 3 ) = Pressure;
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		//  na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		//  na
+
+		// DERIVED TYPE DEFINITIONS
+		//  na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrigResidual" );
+		std::string Refrigerant; // carries in substance name
+		int RefrigNum; // index for refrigerant under consideration
+		Real64 Pressure; // pressure of the refrigerant 
+		Real64 Enthalpy_Req; // enthalpy of the refrigerant to meet
+		Real64 Enthalpy_Act; // enthalpy of the refrigerant calculated
+		
+		RefrigNum = int( Par( 1 ) );
+		Enthalpy_Req = Par( 2 );
+		Pressure = Par( 3 );
+		Refrigerant = RefrigErrorTracking( RefrigNum ).Name;
+		if ( std::abs( Enthalpy_Req ) < 100.0 ) Enthalpy_Req = sign( 100.0, Enthalpy_Req );
+		
+		Enthalpy_Act = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
+		
+		TempResidual = ( Enthalpy_Act - Enthalpy_Req ) / Enthalpy_Req;
+
+		return TempResidual;
+	}
 	
 	//*****************************************************************************
 

@@ -594,6 +594,12 @@ namespace FluidProperties {
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	);
 
+	Real64
+	GetSupHeatTempRefrigResidual(
+		Real64 const Temperature, // temperature of the refrigerant
+		Array1< Real64 > const & Par 
+	);
+	
 	//*****************************************************************************
 
 	Real64

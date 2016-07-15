@@ -6,12 +6,12 @@
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !
-! Location:                Chicago, IL
+! Location:                Miami, FL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
 !
-! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
+! Run Period (Weather File): Winter 2/1, Summer 7/1, Miami Intl Ap FL USA 722020
 !
 ! Run Control:             Zone and System sizing with weather file run control
 !
@@ -96,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -2107,32 +2107,34 @@
  !  Data Source=ASHRAE 2009 Annual Design Conditions
 
   Site:Location,
-    CHICAGO_IL_USA TMY2-94846,  !- Name
-    42.00,                   !- Latitude {deg}
-    -87.88,                  !- Longitude {deg}
-    -6.00,                   !- Time Zone {hr}
-    190.00;                  !- Elevation {m}
+    Miami Intl Ap FL USA TMY3 WMO=722020,  !- Name
+    25.82,                   !- Latitude {deg}
+    -80.30,                  !- Longitude {deg}
+    -5.00,                   !- Time Zone {hr}
+    11.00;                   !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+ ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
+ ! Coldest Month=January
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
 
   SizingPeriod:DesignDay,
-    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
+    Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
     1,                       !- Month
-    25,                      !- Day of Month
+    21,                      !- Day of Month
     WinterDesignDay,         !- Day Type
-    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    8.7,                     !- Maximum Dry-Bulb Temperature {C}
     0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    8.7,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    4.9,                     !- Wind Speed {m/s}
-    270,                     !- Wind Direction {deg}
+    101217.,                 !- Barometric Pressure {Pa}
+    3.8,                     !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -2141,28 +2143,30 @@
     ,                        !- Diffuse Solar Day Schedule Name
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    0.0;                     !- Sky Clearness
+    0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+ ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
+ ! Hottest Month=July
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
 
   SizingPeriod:DesignDay,
-    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
+    Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
     7,                       !- Month
-    25,                      !- Day of Month
+    21,                      !- Day of Month
     SummerDesignDay,         !- Day Type
-    31.5,                    !- Maximum Dry-Bulb Temperature {C}
-    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    33.2,                    !- Maximum Dry-Bulb Temperature {C}
+    6.7,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    25.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    5.3,                     !- Wind Speed {m/s}
-    230,                     !- Wind Direction {deg}
+    101217.,                 !- Barometric Pressure {Pa}
+    4.5,                     !- Wind Speed {m/s}
+    140,                     !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -2171,7 +2175,7 @@
     ,                        !- Diffuse Solar Day Schedule Name
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1.0;                     !- Sky Clearness
+    1.00;                    !- Sky Clearness
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
@@ -3613,7 +3617,7 @@
   Sizing:Zone,
     SPACE1-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
@@ -3644,7 +3648,7 @@
   Sizing:Zone,
     SPACE2-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
@@ -3675,7 +3679,7 @@
   Sizing:Zone,
     SPACE3-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
@@ -3706,7 +3710,7 @@
   Sizing:Zone,
     SPACE4-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}

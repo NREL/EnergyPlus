@@ -3599,7 +3599,7 @@
   Sizing:Zone,
     SPACE1-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
@@ -3630,7 +3630,7 @@
   Sizing:Zone,
     SPACE2-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
@@ -3661,7 +3661,7 @@
   Sizing:Zone,
     SPACE3-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
@@ -3692,7 +3692,7 @@
   Sizing:Zone,
     SPACE4-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50.,                     !- Zone Heating Design Supply Air Temperature {C}
@@ -4170,18 +4170,16 @@
   Output:Variable,*,VRF Heat Pump Defrost Electric Power,timestep;
 
   Output:Variable,*,VRF Heat Pump Defrost Electric Energy,timestep;
-	
-  Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature at Cooling Mode,timestep;
+
+  Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature,timestep;
   
-  Output:Variable,*,VRF Heat Pump Outdoor Unit Condensing Temperature at Cooling Mode,timestep;
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Condensing Temperature,timestep;
   
-  Output:Variable,*,VRF Heat Pump Indoor Unit Condensing Temperature at Heating Mode,timestep;
+  Output:Variable,*,VRF Heat Pump Indoor Unit Condensing Temperature,timestep;
   
-  Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporating Temperature at Heating Mode,timestep;
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporating Temperature,timestep;
   
-  Output:Variable,*,VRF Heat Pump Compressor Electric Power at Cooling Mode,timestep;
-  
-  Output:Variable,*,VRF Heat Pump Compressor Electric Power at Heating Mode,timestep;
+  Output:Variable,*,VRF Heat Pump Compressor Electric Power,timestep;
   
   Output:Variable,*,VRF Heat Pump Compressor Rotating Speed,timestep;
 
