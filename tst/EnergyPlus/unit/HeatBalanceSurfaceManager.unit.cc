@@ -146,4 +146,107 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf )
+	{
+
+		Real64 surfTemp;
+		DataSurfaces::SurfaceData testSurface;
+		DataHeatBalance::ZoneData testZone;
+		int cntWarmupSurfTemp = 0;
+		testSurface.Name = "TestSurface";
+		testZone.Name = "TestZone";
+		testZone.InternalHeatGains = 2.5;
+		testZone.NominalInfilVent = 0.5;
+		testZone.NominalMixing = 0.7;
+
+		// no error
+		surfTemp = 26;
+		DataGlobals::WarmupFlag = true;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = true;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		EXPECT_TRUE( compare_err_stream( "", true ) );
+
+		// to hot - first time
+		surfTemp = 201;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = false;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string01 = delimited_string( {
+			"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+			"   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+			"   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+			"   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+			"   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+			"   **   ~~~   ** ...Zone is part of HVAC controlled system."
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string01, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+		// to hot - subsequent times
+		surfTemp = 201;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = true;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string02 = delimited_string( {
+			"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string02, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+
+		// to cold - first time
+		surfTemp = -101;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = false;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string03 = delimited_string( {
+			"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+			"   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+			"   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+			"   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+			"   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+			"   **   ~~~   ** ...Zone is part of HVAC controlled system."
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string03, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+		// to cold - subsequent times
+		surfTemp = -101;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = true;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string04 = delimited_string( {
+			"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00"
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string04, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+	}
+
+
+
 }
