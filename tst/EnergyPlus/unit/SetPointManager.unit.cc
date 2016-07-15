@@ -506,8 +506,9 @@ TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
 	SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
 	SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
 
-	int const OnSched  = 1;
-	int const OffSched = 2;
+	// indexes in Schedule
+	int const OnSched  = 2;
+	int const OffSched = 1;
 	std::string const idf_contents( delimited_string( {
 		"Schedule:Constant,MyScheduleOn,,1;",
 		"Schedule:Constant,MyScheduleOff,,0;",
