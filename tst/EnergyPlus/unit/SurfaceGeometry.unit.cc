@@ -517,9 +517,9 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SurfaceShape )
 	EXPECT_EQ( SurfaceShape::Triangle, Surface( 11 ).Shape );
 
 //	enum surfaceShape:Quadrilateral = 2
-//	Surface( 12 ).Name = "Surface 2 - Quadrilateral"
+//	Surface( 12 ).Name = "Surface 10 - Polygonal"
 	ProcessSurfaceVertices( 12, ErrorsFound );
-	EXPECT_EQ( SurfaceShape::Quadrilateral, Surface( 12 ).Shape );
+	EXPECT_EQ( SurfaceShape::Polygonal, Surface( 12 ).Shape );
 
 //	enum surfaceShape:Rectangle = 3
 //	Surface( 7 ).Name = "Surface 3 - Rectangle"
@@ -557,9 +557,9 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SurfaceShape )
 	EXPECT_EQ( SurfaceShape::TriangularDoor, Surface( 10 ).Shape );
 
 //	enum surfaceShape:Polygonal = 10
-//	Surface( 13 ).Name = "Surface 10 - Polygonal"
+//	Surface( 13 ).Name = "Surface 2 - Quadrilateral"
 	ProcessSurfaceVertices( 13, ErrorsFound );
-	EXPECT_EQ( SurfaceShape::Polygonal, Surface( 13 ).Shape );
+	EXPECT_EQ( SurfaceShape::Quadrilateral, Surface( 13 ).Shape );
 
 }
 
