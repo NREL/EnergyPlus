@@ -703,13 +703,17 @@ namespace HVACInterfaceManager {
 
 		//update heat trasport and heat storage rates
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT = ( TankInletTemp - TankFinalTemp ) * Cp * MassFlowRate;
-		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt = ThisTankMass * Cp * ( TankFinalTemp - LastTankOutletTemp );
+		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt = (ThisTankMass * Cp * ( TankFinalTemp - LastTankOutletTemp )) / TimeStepSeconds;
 
 		//Determine excessive storage
 		if ( PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT < PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt ) {
+			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
 			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTime += TimeStepSys;
 		}
-		PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TotalTime += TimeStepSys;
+		else {
+			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTimeReport = 0;
+		}
+		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_TotalTime += TimeStepSys;
 
 		// update report variable
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_TankTemp = TankAverageTemp;

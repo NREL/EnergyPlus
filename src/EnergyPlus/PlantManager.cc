@@ -2051,8 +2051,8 @@ namespace PlantManager {
 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
-				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTime, "System", "Sum", PlantLoop( LoopNum ).Name );
-				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTime, "System", "Sum", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
 				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {

@@ -885,6 +885,7 @@ namespace DataPlant {
 		Real64 LoopSideInlet_MdotCpDeltaT;
 		Real64 LoopSideInlet_McpDTdt;
 		Real64 LoopSideInlet_CapExcessStorageTime;
+		Real64 LoopSideInlet_CapExcessStorageTimeReport;
 		Real64 LoopSideInlet_TotalTime;
 		PlantConvergencePoint InletNode;
 		PlantConvergencePoint OutletNode;
@@ -931,6 +932,11 @@ namespace DataPlant {
 			errCount_LoadRemains( 0 ),
 			errIndex_LoadRemains( 0 ),
 			LoopSideInlet_TankTemp( 0.0 ),
+			LoopSideInlet_MdotCpDeltaT( 0.0 ),
+			LoopSideInlet_McpDTdt(0.0),
+			LoopSideInlet_CapExcessStorageTime(0.0),
+			LoopSideInlet_CapExcessStorageTimeReport(0.0),
+			LoopSideInlet_TotalTime(0.0),
 			InletNode( 0.0, 0.0 ),
 			OutletNode( 0.0, 0.0 )
 		{}
