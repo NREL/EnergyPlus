@@ -3953,3 +3953,58 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 	// test autosized face velocity
 	EXPECT_EQ( FaceVelocity, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel ); // m/s
 }
+
+TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
+
+	int ExchNum = 1;
+	int CompanionCoilNum = 0;
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.5;",
+
+		"  HeatExchanger:AirToAir:SensibleAndLatent,",
+		"    HEATRECOVERY HX IN ERV,  !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
+		"    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
+		"    0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
+		"    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
+		"    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
+		"    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
+		"    0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
+		"    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
+		"    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
+		"    ERV OA Inlet Node,       !- Supply Air Inlet Node Name",
+		"    HR Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
+		"    Zone 1 Exhaust Node,     !- Exhaust Air Inlet Node Name",
+		"    HR Sec aIR Outlet Node,  !- Exhaust Air Outlet Node Name",
+		"    50.0,                    !- Nominal Electric Power {W}",
+		"    No,                      !- Supply Air Outlet Temperature Control",
+		"    Rotary,                  !- Heat Exchanger Type",
+		"    None,                    !- Frost Control Type",
+		"    1.7;                     !- Threshold Temperature {C}",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	// get heat recovery heat exchanger generic
+	GetHeatRecoveryInput();
+
+	// initialize
+	DataSizing::CurZoneEqNum = 1;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+
+	// the HR HX is in Zone Equipment ERV
+	ZoneEqSizing.allocate( CurZoneEqNum );
+	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
+	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 1.0;
+
+	// size the HX nominal supply air volume flow rate 
+	SizeHeatRecovery( ExchNum );
+
+	// verify the name and autosized supply air flow rate
+	EXPECT_EQ( ExchCond( ExchNum ).Name, "HEATRECOVERY HX IN ERV" );
+	EXPECT_EQ( ExchCond( ExchNum ).NomSupAirVolFlow, 1.0 );
+}
