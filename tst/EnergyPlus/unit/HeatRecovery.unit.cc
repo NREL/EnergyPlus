@@ -3957,7 +3957,6 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 
 	int ExchNum = 1;
-	int CompanionCoilNum = 0;
 
 	std::string const idf_objects = delimited_string( {
 		"Version,8.5;",
@@ -4007,4 +4006,5 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 	// verify the name and autosized supply air flow rate
 	EXPECT_EQ( ExchCond( ExchNum ).Name, "HEATRECOVERY HX IN ERV" );
 	EXPECT_EQ( ExchCond( ExchNum ).NomSupAirVolFlow, 1.0 );
+
 }
