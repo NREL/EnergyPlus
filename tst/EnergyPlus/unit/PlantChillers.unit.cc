@@ -109,7 +109,7 @@ TEST_F( EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest )
 
 TEST_F( EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest )
 {
-	// unit test for autosizing heat recovery in Chiller:CombustionTurbine
+	// unit test for autosizing heat recovery in Chiller:EngineDriven
 	PlantChillers::EngineDrivenChiller.allocate( 1 );
 
 	PlantChillers::EngineDrivenChiller( 1 ).Base.SizFac = 1.0;

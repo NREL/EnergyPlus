@@ -64,6 +64,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -101,4 +103,40 @@ TEST_F( EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions )
 	Node.deallocate();
 	ElectricEIRChiller.deallocate();
 	ElectricEIRChillerReport.deallocate();
+}
+
+TEST_F( EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest )
+{
+	// unit test for autosizing heat recovery in Chiller:Electric:EIR
+	ChillerElectricEIR::ElectricEIRChiller.allocate( 1 );
+
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).SizFac = 1.0;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).DesignHeatRecVolFlowRateWasAutoSized = true;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).HeatRecCapacityFraction = 0.5;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).HeatRecActive = true;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CondenserType = ChillerElectricEIR::WaterCooled;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CWLoopNum = 1;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).EvapVolFlowRate = 1.0;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CondVolFlowRate = 1.0;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).RefCap = 10000;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).RefCOP = 3.0;
+
+	DataPlant::PlantLoop.allocate( 1 );
+	DataSizing::PlantSizData.allocate( 1 );
+	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
+	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+	DataPlant::PlantLoop( 1 ).FluidName = "WATER";
+	DataSizing::PlantSizData( 1 ).DesVolFlowRate = 1.0;
+	DataSizing::PlantSizData( 1 ).DeltaT = 5.0;
+	DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+	//now call sizing routine
+	ChillerElectricEIR::SizeElectricEIRChiller( 1 );
+	// see if heat recovery flow rate is as expected
+	EXPECT_NEAR( ChillerElectricEIR::ElectricEIRChiller( 1 ).DesignHeatRecVolFlowRate, 0.5, 0.00001 );
+
+	ChillerElectricEIR::ElectricEIRChiller.deallocate();
+	DataSizing::PlantSizData.deallocate();
+	DataPlant::PlantLoop.deallocate();
+
 }

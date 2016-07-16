@@ -863,6 +863,9 @@ namespace HeatPumpWaterToWaterSimple {
 
 		if ( ! GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowCool;
 		tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
+		//	but this is better, from EIR chiller, include compressor heat and use sizing deltaT and fluid properties			tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElectricEIRChiller( EIRChillNum ).RefCOP ) * ElectricEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
+
+
 		if ( GSHP( GSHPNum ).ratedSourceVolFlowCoolWasAutoSized ) {
 			GSHP( GSHPNum ).RatedSourceVolFlowCool = tmpSourceSideVolFlowRate;
 			if ( DataPlant::PlantFinalSizesOkayToReport ) { 

@@ -1176,7 +1176,10 @@ namespace ChillerElectricEIR {
 		Real64 CondVolFlowRateUser( 0.0 );
 
 		if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
-			PltSizCondNum = PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+			if ( ElectricEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) {
+				PltSizCondNum = PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+			}
+			
 		}
 
 		// find the appropriate Plant Sizing object
