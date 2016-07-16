@@ -504,7 +504,7 @@ A unique, user-assigned name for an instance of a hybrid ventilation availabilit
 
 The name of the air loop (AirLoopHVAC object) to be controlled by this system availability manager. If this field is left blank, hybrid ventilation manager will be applied to the controlled zone specified in the field below.
 
-\paragraph{Field: Controlled Zone Name}\label{field-controlled-zone-name}
+\paragraph{Field: Control Zone Name}\label{field-controlled-zone-name}
 
 The name of a controlled zone served by the air loop defined in the previous field. The air conditions in this zone are used to determine if natural ventilation should be provided.
 
@@ -571,6 +571,26 @@ Schedule values equal to zero indicate the individual ventilation control based 
 The name of a ZoneVentilation:* object whose zone name is the controlled zone name defined in a previous input field for this availability manager object (Ref. Field Controlled Zone Name ). The controls defined for this specific ZoneVentilation:* object to enable ventilation air will be applied to other ZoneVentilation:* and ZoneMixing objects served by the air loop controlled by this availability manager, regardless of the controls defined for the other ZoneVentilation:* and ZoneMixing objects. In other words, when ventilation is enabled by this specific ZoneVentilation:* object, the other ZoneVentilation:* and ZoneMixing objects in the zones served by the primary air loop are also enabled.
 
 \textbf{Note:} A \textbf{ZoneInfiltration:*} object indicates any one of \textbf{ZoneInfiltration:DesignFlowRate}, \textbf{ZoneInfiltration:EffectiveLeakageArea},and \textbf{ZoneInfiltration:FlowCoefficient} objects.A object of\textbf{ZoneVentilation:*} indicates any one of \textbf{ZoneVentilation:DesignFlowRate} and \textbf{ZoneVentilation:WindandStackOpenArea} objects.
+
+An example of this object in an input file:
+
+\begin{lstlisting}
+
+AvailabilityManager:HybridVentilation,
+  Hybrid ventilation controller 1,  !- Name
+  Typical Terminal Reheat 1,  !- HVAC Air Loop Name
+  NORTH ZONE,              !- Control Zone Name
+  Hybrid Control Mode Schedule,  !- Ventilation Control Mode Schedule Name
+  Yes,                     !- Use Weather File Rain Indicators
+  40.0,                    !- Maximum Wind Speed {m/s}
+  15.0,                    !- Minimum Outdoor Temperature {C}
+  35.0,                    !- Maximum Outdoor Temperature {C}
+  20000.0,                 !- Minimum Outdoor Enthalpy {J/kg}
+  30000.0,                 !- Maximum Outdoor Enthalpy {J/kg}
+  15.0,                    !- Minimum Outdoor Dewpoint {C}
+  30.0,                    !- Maximum Outdoor Dewpoint {C}
+  Outdoor air Schedule;    !- Minimum Outdoor Ventilation Air Schedule Name
+\end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-9-008}
 
