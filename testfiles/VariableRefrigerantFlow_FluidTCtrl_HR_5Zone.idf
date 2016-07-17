@@ -1,9 +1,10 @@
-! VariableRefrigerantFlow_FluidTCtrl_5Zone.idf
+! VariableRefrigerantFlow_FluidTCtrl_HR_5Zone.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              New physics based VRF model applicable for Fluid Temperature Control.
+! Highlights:              New physics based VRF Heat Recovery (HR) model applicable for Fluid Temperature Control.
+!                          The system is able to provide simultaneous heating and cooling.
 !
-! Simulation Location/Run: Miami Intl Ap FL USA TMY3 722020, 2 design days, 2 run periods,
+! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !
 ! Location:                Miami, FL
 !
@@ -15,7 +16,8 @@
 ! Run Control:             Zone and System sizing with weather file run control
 !
 ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
-!           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
+!           Exterior zone depth is 12 feet. Interior zone has a relatively high level of internal loads and thus may require
+!           cooling during winter time. There is a 2 foot high return plenum: the overall building height is
 !           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
@@ -76,7 +78,7 @@
 !                                 Terminal units are set to provide a fixed amount of outdoor air.
 !
 ! Zonal Equipment:                ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-! Central Air Handling Equipment: No (uses AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl condenser object)
+! Central Air Handling Equipment: No (uses AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR condenser object)
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
@@ -94,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.5;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -110,38 +112,45 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRCONDITIONER:VARIABLEREFRIGERANTFLOW ===========
 
-  AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
-    VRF Heat Pump,           !- Heat Pump Name
+  AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
+    VRF Heat Pump,           !- Name
     VRFCondAvailSched,       !- Availability Schedule Name
     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
     R410A,                   !- Refrigerant Type
-    41300,                   !- Rated Evaporative Capacity {W}
-    0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
-    -5,                      !- Minimum Outdoor Air Temperature in Cooling Mode {C}
-    43,                      !- Maximum Outdoor Air Temperature in Cooling Mode {C}
-    -20,                     !- Minimum Outdoor Air Temperature in Heating Mode {C}
-    22,                      !- Maximum Outdoor Air Temperature in Heating Mode {C}
-    3,                       !- Reference Outdoor Unit Superheating Degrees {C}
-    3,                       !- Reference Outdoor Unit Subcooling Degrees {C}
-    ConstantTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
-    6,                       !- Reference Evaporating Temperature for Indoor Unit {C}
-    44,                      !- Reference Condensing Temperature for Indoor Unit {C}
-    6,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}
-    13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
-    42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
+    autosize,                !- Rated Evaporative Capacity {W}
+    0.214,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
+    -6,                      !- Minimum Outdoor Air Temperature in Cooling Only Mode {C}
+    43,                      !- Maximum Outdoor Air Temperature in Cooling Only Mode {C}
+    -20,                     !- Minimum Outdoor Air Temperature in Heating Only Mode {C}
+    26,                      !- Maximum Outdoor Air Temperature in Heating Only Mode {C}
+    -20,                     !- Minimum Outdoor Air Temperature in Heat Recovery Mode {C}
+    26,                      !- Maximum Outdoor Air Temperature in Heat Recovery Mode {C}
+    VariableTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
+    ,                        !- Reference Evaporating Temperature for Indoor Unit {C}
+    ,                        !- Reference Condensing Temperature for Indoor Unit {C}
+    5,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}
+    14,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
+    36,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
     46,                      !- Variable Condensing Temperature Maximum for Indoor Unit {C}
-    4.12E-3,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {W/W}
-    7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
+    3,                       !- Outdoor Unit Evaporator Reference Superheating {C}
+    3,                       !- Outdoor Unit Condenser Reference Subcooling {C}
+    0.28,                    !- Outdoor Unit Evaporator Rated Bypass Factor
+    0.05,                    !- Outdoor Unit Condenser Rated Bypass Factor
+    ,                        !- Difference between Outdoor Unit Evaporating Temperature and Outdoor Air Temperature in Heat Recovery Mode {C}
+    0.3,                     !- Outdoor Unit Heat Exchanger Capacity Ratio
+    2.67E-2,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {W/W}
+    1.13E-4,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
-    0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
+    0.0349,                  !- Diameter of Main Pipe for Suction Gas {m}
+    0.0286,                  !- Diameter of Main Pipe for Discharge Gas {m}
     30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
     36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
     5,                       !- Height difference between the outdoor unit node and indoor unit node of the main pipe {m}
     0.02,                    !- Insulation thickness of the main pipe {m}
     0.032,                   !- Thermal conductivity of the main pipe insulation material {W/m-K}
     33,                      !- Crankcase Heater Power per Compressor {W}
-    1,                       !- Number of Compressors
+    3,                       !- Number of Compressors
     0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity
     7,                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
     ,                        !- Defrost Strategy
@@ -150,7 +159,17 @@
     ,                        !- Defrost Time Period Fraction
     ,                        !- Resistive Defrost Heater Capacity {W}
     ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
+    ,                        !- Initial Heat Recovery Cooling Capacity Fraction {W/W}
+    ,                        !- Heat Recovery Cooling Capacity Time Constant {hr}
+    ,                        !- Initial Heat Recovery Cooling Energy Fraction {W/W}
+    ,                        !- Heat Recovery Cooling Energy Time Constant {hr}
+    ,                        !- Initial Heat Recovery Heating Capacity Fraction {W/W}
+    ,                        !- Heat Recovery Heating Capacity Time Constant {hr}
+    ,                        !- Initial Heat Recovery Heating Energy Fraction {W/W}
+    ,                        !- Heat Recovery Heating Energy Time Constant {hr}
     4500000,                 !- Compressor maximum delta Pressure {Pa}
+    0.95,                    !- Compressor Inverter Efficiency
+    ,                        !- Compressor Evaporative Capacity Correction Factor
     3,                       !- Number of Compressor Loading Index Entries
     1500,                    !- Compressor Speed at Loading Index 1 {rev/min}
     MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
@@ -293,7 +312,6 @@
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-	
 	
 !-   ===========  ALL OBJECTS IN CLASS: ZONETERMINALUNITLIST ===========
 
@@ -3490,7 +3508,7 @@
     EQUIP-1,                 !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
-    10.76,                   !- Watts per Zone Floor Area {W/m2}
+    107.64,                   !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0,                       !- Fraction Latent
     0.3,                     !- Fraction Radiant
@@ -4119,6 +4137,11 @@
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
+
+!-   =========== OUTPUT VARIABLES ===========
+
+! Site and Zone
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;
 
   Output:Variable,*,System Node Wetbulb Temperature,timestep;
@@ -4137,6 +4160,8 @@
 
   Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,timestep;
 
+! Coil 
+
   Output:Variable,*,Heating Coil Total Heating Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
@@ -4148,20 +4173,25 @@
   Output:Variable,*,Cooling Coil Runtime Fraction,timestep;
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
-
+  
+  Output:Variable,*,Fan Electric Power,timestep;
+  
+! VRF
   Output:Variable,*,VRF Heat Pump Heating Electric Power,timestep;
-
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,timestep;
 
   Output:Variable,*,VRF Heat Pump Heating Electric Energy,timestep;
 
+  Output:Variable,*,VRF Heat Pump Cooling Electric Power,timestep;
+
   Output:Variable,*,VRF Heat Pump Cooling Electric Energy,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Fan Power,timestep;
+
+  Output:Variable,*,VRF Heat Pump Operating Mode,timestep;
 
   Output:Variable,*,VRF Heat Pump Total Cooling Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Total Heating Rate,timestep;
+  Output:Variable,*,VRF Heat Pump Total Heating Rate,timestep; 
 
   Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Power,timestep;
 
@@ -4173,15 +4203,25 @@
 
   Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature,timestep;
   
-  Output:Variable,*,VRF Heat Pump Outdoor Unit Condensing Temperature,timestep;
-  
   Output:Variable,*,VRF Heat Pump Indoor Unit Condensing Temperature,timestep;
+  
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Condensing Temperature,timestep;
   
   Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporating Temperature,timestep;
   
   Output:Variable,*,VRF Heat Pump Compressor Electric Power,timestep;
   
   Output:Variable,*,VRF Heat Pump Compressor Rotating Speed,timestep;
+  
+  Output:Variable,*,VRF Heat Pump Cooling Capacity at Max Compressor Speed,timestep;
+  
+  Output:Variable,*,VRF Heat Pump Heating Capacity at Max Compressor Speed,timestep;
+  
+  Output:Variable,*,VRF Heat Pump Indoor Unit Piping Correction for Cooling,timestep;
+  
+  Output:Variable,*,VRF Heat Pump Indoor Unit Piping Correction for Heating,timestep;
+  
+! VRF TU
 
   Output:Variable,*,Zone VRF Air Terminal Cooling Electric Power,timestep;
 
