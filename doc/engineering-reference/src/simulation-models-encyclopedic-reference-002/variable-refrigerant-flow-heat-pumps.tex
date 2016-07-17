@@ -1362,7 +1362,7 @@ $Q_{rps}$	evaporative capacity corresponding to $rps$ (W)
 
 $Q_{ref}$	rated evaporative capacity (W) 
 
-An example of resulting capacity for different $rps$ (at $T_c$=36°C and ${T_e}'$=9°C) is presented in Table~\ref{table:evaporative-capcity-at-different-loading-index}.
+An example of resulting capacity for different $rps$ (at $T_c$=36°C and ${T_e}'$=9°C) is presented in Table~\ref{table:evaporative-capacity-at-different-loading-index}.
 
 \begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
 \caption{Evaporative capacity at different Loading Index \label{table:evaporative-capacity-at-different-loading-index}} \tabularnewline
@@ -1564,7 +1564,7 @@ Where
 
 \(N_{out}\) total electric power consumption by the outdoor unit (W)
 
-\subsubsection{\texorpdfstring{\emph{Modeling of the outdoor unit (O/U) - Heating Mode}}{Modeling of the outdoor unit (O/U) - Heating Mode}}\label{modeling-of-the-outdoor-unit-ou---heating-mode}
+\subsubsection{\emph{Modeling of the outdoor unit (O/U) - Heating Mode}}\label{modeling-of-the-outdoor-unit-ou---heating-mode}
 
 \paragraph{Step 2h.1: Piping loss calculation in the heating mode}\label{step-2h.1-piping-loss-calculation-in-the-heating-mode}
 
@@ -2076,7 +2076,7 @@ Table~\ref{table:atmospheric-variables-at-two-different} -- Outdoor unit compres
 
 Same as that in the cooling mode (Step 2c. 7)
 
-\subsubsection{\texorpdfstring{\emph{Modeling of the indoor unit (I/U) - Part II - Cooling Mode}}{Modeling of the indoor unit (I/U) - Part II - Cooling Mode}}\label{modeling-of-the-indoor-unit-iu---part-ii---cooling-mode}
+\subsubsection{\emph{Modeling of the indoor unit (I/U) - Part II - Cooling Mode}}\label{modeling-of-the-indoor-unit-iu---part-ii---cooling-mode}
 
 \paragraph{Step 3c.1: Update air flow rate for each indoor unit}\label{step-3c.1-update-air-flow-rate-for-each-indoor-unit}
 
@@ -2156,7 +2156,7 @@ Where
   Else, directly go to Step 3c. 3
 \end{itemize}
 
-\paragraph{\texorpdfstring{Step 3c.2: Modify \(SH\) to adjust the indoor unit capacity}{Step 3c.2: Modify SH to adjust the indoor unit capacity}}\label{step-3c.2-modify-sh-to-adjust-the-indoor-unit-capacity}
+\paragraph{Step 3c.2: Modify \(SH\) to adjust the indoor unit capacity}\label{step-3c.2-modify-sh-to-adjust-the-indoor-unit-capacity}
 
 Set \(G_a\) at its minimum value (e.g., \(0.7\times\) \(G_{a,rate}\) ).
 
@@ -2174,7 +2174,7 @@ Given \(T_{fs}\) and \(T_e\) , \(SH\) can be determined using the equation shown
 
 The power consumption of the indoor unit comes from the fan operations. This can be calculated using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
 
-\subsubsection{\texorpdfstring{\emph{Modeling of the indoor unit (I/U) - Part II - Heating Mode}}{Modeling of the indoor unit (I/U) - Part II - Heating Mode}}\label{modeling-of-the-indoor-unit-iu---part-ii---heating-mode}
+\subsubsection{\emph{Modeling of the indoor unit (I/U) - Part II - Heating Mode}}\label{modeling-of-the-indoor-unit-iu---part-ii---heating-mode}
 
 \paragraph{Step 3h.1: Update air flow rate for each indoor unit.}\label{step-3h.1-update-air-flow-rate-for-each-indoor-unit.}
 
@@ -2232,7 +2232,7 @@ Where
   Else, directly go to Step 3h. 3
 \end{itemize}
 
-\paragraph{\texorpdfstring{Step 3h.2: Modify \(SC\) to modify the indoor unit capacity}{Step 3h.2: Modify SC to modify the indoor unit capacity}}\label{step-3h.2-modify-sc-to-modify-the-indoor-unit-capacity}
+\paragraph{Step 3h.2: Modify \(SC\) to modify the indoor unit capacity}\label{step-3h.2-modify-sc-to-modify-the-indoor-unit-capacity}
 
 Set \(G_a\) at its minimum value (\(0.7\times\) \(G_{a,rate}\) ).
 

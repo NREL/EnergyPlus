@@ -121,7 +121,7 @@ The moisture content (w) of a cell is needed for the calculation of the heat tra
 
 The porosity of a material (P) is an input variable and defined as the maximum fraction, by volume, of a material that can be taken up with moisture. It is used to calculate the maximum point on the sorption isotherm curve. ~The porosity is entered for each material via the MaterialProperty:HeatAndMoistureTransfer:Settings object, as described in the Input Output Reference document.
 
-\subsubsection{\texorpdfstring{Moisture Dependant Thermal Conductivity k\(^{w}\)}{Moisture Dependant Thermal Conductivity k\^{}\{w\}}}\label{moisture-dependant-thermal-conductivity-kw}
+\subsubsection{Moisture Dependant Thermal Conductivity k\(^{w}\)}\label{moisture-dependant-thermal-conductivity-kw}
 
 The thermal conductivity (k\(^{w}\)) of the cell is determined by interpolating between data points of thermal conductivity versus the moisture content of the material, entered into EnergyPlus via the MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity object. The moisture content is determined via the sorption isotherm which gives the moisture content as a function of Relative Humidity.
 
@@ -153,11 +153,11 @@ is the moisture resistance between cells i and j and \(R_{ij}^v = \frac{\mu_{ij}
 
 Equation can be used together with the heat equation in an alternate step by step fashion to calculate the new temperature and relative humidity profiles for each cell for the next time step.
 
-\subsubsection{\texorpdfstring{Liquid Transport Coefficient D\(^{w}\)}{Liquid Transport Coefficient D\^{}\{w\}}}\label{liquid-transport-coefficient-dw}
+\subsubsection{Liquid Transport Coefficient D\(^{w}\)}\label{liquid-transport-coefficient-dw}
 
 The Moisture Dependant Liquid Transport Coefficient is entered as a series of moisture density and liquid transport coefficient data points. There are two different coefficients, one for suction, where the surface is wet due to rain, and one for redistribution where the surface is no longer wet. If the weather file has a rain flag it is used to switch between these two types of coefficient. HAMT-SUCTION and HAMT-REDISTRIBUTION.
 
-\subsubsection{\texorpdfstring{Moisture Dependent Moisture Capacity \(\frac{\partial w}{\partial \phi}\)}{Moisture Dependent Moisture Capacity \textbackslash{}frac\{\textbackslash{}partial w\}\{\textbackslash{}partial \textbackslash{}phi\}}}\label{moisture-dependent-moisture-capacity-fracpartial-wpartial-phi}
+\subsubsection{Moisture Dependent Moisture Capacity \(\frac{\partial w}{\partial \phi}\)}\label{moisture-dependent-moisture-capacity-fracpartial-wpartial-phi}
 
 This is simply the gradient of moisture sorption isotherm at the RH of the material.
 

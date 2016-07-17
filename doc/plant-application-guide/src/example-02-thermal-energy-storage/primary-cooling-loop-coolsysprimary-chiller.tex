@@ -1,4 +1,4 @@
-\section{\texorpdfstring{Primary Cooling Loop (\emph{CoolSysPrimary}) - Chiller}{Primary Cooling Loop (CoolSysPrimary) - Chiller}}\label{primary-cooling-loop-coolsysprimary---chiller}
+\section{Primary Cooling Loop (\emph{CoolSysPrimary}) - Chiller}\label{primary-cooling-loop-coolsysprimary---chiller}
 
 The primary cooling system is constructed by using a \emph{PlantLoop} object. It uses an electric chiller that generates chilled water which is used to charge the TES tank at night. The chilled water stored in the TES tank is later used during the peak hours to satisfy the demand loads. Therefore, the supply side of the loop contains the electric chiller and the charge side of the TES tank. The demand side loop contains the cooling coil. The loop is operated by using plant equipment operation schemes, and schedules. Refer to Figure~\ref{fig:simple-line-diagram-for-the-primary-cooling} for a simple diagram of the Primary Cooling Loop.
 
@@ -112,12 +112,12 @@ The TES tank operation is modeled here. The \emph{PlantEquipmentOperationschemes
 
 \subsubsection{CoolSysPrimary Setpoints}\label{coolsysprimary-setpoints}
 
-The \emph{CoolSysPrimary Loop Setpoint Manager} uses the \emph{CoolSysPrimary Loop Temp Schedule} to set a temperature control point at the \emph{CoolSysPrimary Supply Outlet Node}. This setpoint allows the program to control the temperature at the node by operating the components in the Primary Cooling loop. ~A flowchart for Secondary Cooling loop setpoints is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-setpoints}.
+The \emph{CoolSysPrimary Loop Setpoint Manager} uses the \emph{CoolSysPrimary Loop Temp Schedule} to set a temperature control point at the \emph{CoolSysPrimary Supply Outlet Node}. This setpoint allows the program to control the temperature at the node by operating the components in the Primary Cooling loop. ~A flowchart for Secondary Cooling loop setpoints is provided in Figure~\ref{fig:flowchart-for-primary-cooling-loop-setpoints-2016-06-17}.
 
 \begin{figure}[htbp] % fig 59
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image059.png}
-\caption{Flowchart for primary cooling loop setpoints \protect \label{fig:flowchart-for-primary-cooling-loop-setpoints}}
+\caption{Flowchart for primary cooling loop setpoints \protect \label{fig:flowchart-for-primary-cooling-loop-setpoints-2016-06-17}}
 \end{figure}
 
 \subsubsection{CoolSysPrimary Sizing}\label{coolsysprimary-sizing}

@@ -1023,15 +1023,15 @@ This output field is the heating mode electricity consumption rate of the variab
 
 This output field is the heating mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), additional energy required for defrost, and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
-\paragraph{\texorpdfstring{VRF Heat Pump Cooling COP{[]}}{VRF Heat Pump Cooling COP}}\label{vrf-heat-pump-cooling-cop}
+\paragraph{VRF Heat Pump Cooling COP{[]}}\label{vrf-heat-pump-cooling-cop}
 
 This is the operating cooling coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Cooling Rate and Variable Refrigerant Flow Heat Pump Cooling Electric Consumption Rate output variables. Crankcase heater (usually 0 in cooling mode), evaporative condenser water pump, and defrost (usually 0 in cooling mode) consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in cooling mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Heating COP{[]}}{VRF Heat Pump Heating COP}}\label{vrf-heat-pump-heating-cop}
+\paragraph{VRF Heat Pump Heating COP{[]}}\label{vrf-heat-pump-heating-cop}
 
 This is the operating heating coefficient of performance for the heat pump. This value is calculated using the ratio of VRF Heat Pump Total Heating Rate and Variable Refrigerant Flow Heat Pump Heating Electric Consumption Rate output variables. Crankcase heater, evaporative condenser water pump (usually 0 in heating mode), and defrost consumption rate output variables are included in this calculation. This value is specific to outdoor unit performance in heating mode, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump COP{[]}}{VRF Heat Pump COP}}\label{vrf-heat-pump-cop}
+\paragraph{VRF Heat Pump COP{[]}}\label{vrf-heat-pump-cop}
 
 This is the operating coefficient of performance for the heat pump. This value is calculated using the ratio of the total terminal unit coil capacity (cooling plus heating and accounts for piping losses) and total system electric consumption rate (compressor, crankcase heater, evaporative condenser water pump, defrost, and terminal unit parasitic electric consumption rate). This output variable does not include pump power for a water-cooled system. This value is specific to overall system performance, is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -1047,15 +1047,15 @@ This is the electricity consumption of the heat pump in Joules for the time step
 
 This output field is the part-load ratio of the heat pump condenser. Heat pump part-load ratio is defined as the total coil load divided by the heat pump's maximum available capacity at the current operating conditions. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Runtime Fraction {[]}}{VRF Heat Pump Runtime Fraction }}\label{vrf-heat-pump-runtime-fraction}
+\paragraph{VRF Heat Pump Runtime Fraction {[]}}\label{vrf-heat-pump-runtime-fraction}
 
 This output field is the runtime fraction of the heat pump condenser's first stage compressor. Heat pump runtime fraction is defined as the fraction of time the first stage compressor is on during a given time period and includes cycling losses. This value is calculated as the ratio of the VRF Heat Pump Cycling Ratio and the output of the Cooling Part-Load Fraction Correlation Curve object as the specific cycling ratio. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Cycling Ratio {[]}}{VRF Heat Pump Cycling Ratio }}\label{vrf-heat-pump-cycling-ratio}
+\paragraph{VRF Heat Pump Cycling Ratio {[]}}\label{vrf-heat-pump-cycling-ratio}
 
 This output field is the cycling ratio of the heat pump condenser's first stage compressor. Heat pump cycling ratio is defined as the fraction of time the first stage compressor is on during a given time period. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{\texorpdfstring{VRF Heat Pump Operating Mode {[]}}{VRF Heat Pump Operating Mode }}\label{vrf-heat-pump-operating-mode}
+\paragraph{VRF Heat Pump Operating Mode {[]}}\label{vrf-heat-pump-operating-mode}
 
 This output field is an integer representation of the operating mode of the variable refrigerant flow heat pump. The operating mode for cooling mode is indicated by a 1 and heating mode is indicated by a 2. A value of 0 is reported if the heat pump is off. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -1123,7 +1123,7 @@ This output is the electric consumption rate of the heat pump's basin heater (fo
 
 This output is the electric consumption of the heat pump's basin heater (for evaporatively-cooled condenser type) in Joules. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{VRF Heat Pump Heat Recovery Status Change Multiplier {[]}}{VRF Heat Pump Heat Recovery Status Change Multiplier }}\label{vrf-heat-pump-heat-recovery-status-change-multiplier}
+\paragraph{VRF Heat Pump Heat Recovery Status Change Multiplier {[]}}\label{vrf-heat-pump-heat-recovery-status-change-multiplier}
 
 This output applies only when heat recovery is used and represents the multiplier used to derate the capacity of the system when transitioning from cooling or heating mode to heat recovery mode. This value is 1 when derating does not apply (i.e., the system has not recently changed modes to provide heat recovery). Derating during a transition period is applied according to the inputs for Heat Recovery Fraction and Heat Recovery Time Constant. To turn transition derating off, set Heat Recovery Fraction to 1. Refer to the engineering reference document discussion on the variable refrigerant flow heat pump model section for transition from cooling only mode to heat recovery mode for a more detailed description.
 
