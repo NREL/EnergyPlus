@@ -4080,7 +4080,6 @@ namespace DaylightingManager {
 		int SurfNumAdj; // Surface Number for adjacent surface
 		int ZoneNumAdj; // Zone Number for adjacent zone
 		// RJH DElight Modification Begin - local variable declarations
-		int TotDaylightingDElight; // Total Daylighting:DElight inputs
 		Real64 dLatitude; // double for argument passing
 		int iErrorFlag; // Error Flag for warning/errors returned from DElight
 		int iDElightErrorFile; // Unit number for reading DElight Error File
@@ -4102,7 +4101,7 @@ namespace DaylightingManager {
 		if ( TotDaylightingControls > 0 ) {
 			GetInputDayliteRefPt( ErrorsFound );
 			GetDaylightingControls(TotDaylightingControls, ErrorsFound);
-			GeometryTransformForDaylighting( TotDaylightingControls, ErrorsFound );
+			GeometryTransformForDaylighting(  );
 			GetInputIlluminanceMap( ErrorsFound );
 			GetLightWellData( ErrorsFound );
 			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );
@@ -4212,8 +4211,7 @@ namespace DaylightingManager {
 		}
 
 		// RJH DElight Modification Begin - Calls to DElight preprocessing subroutines
-		TotDaylightingDElight = GetNumObjectsFound( "Daylighting:DELight:Controls" );
-		if ( TotDaylightingDElight > 0 ) {
+		if ( doesDayLightingUseDElight() ) {
 			dLatitude = Latitude;
 			DisplayString( "Calculating DElight Daylighting Factors" );
 			DElightInputGenerator();
@@ -4660,7 +4658,6 @@ namespace DaylightingManager {
 				continue;
 			}
 			auto & zone_daylight( ZoneDaylight( ZoneFound ) );
-			auto & zone( Zone( ZoneFound ) );
 			zone_daylight.Name = cAlphaArgs( 1 );  // Field: Name
 			zone_daylight.ZoneName = cAlphaArgs( 2 );  // Field: Zone Name
 
@@ -4804,8 +4801,6 @@ namespace DaylightingManager {
 
 	void
 	GeometryTransformForDaylighting(
-    	int const TotDaylightingControls, // Total daylighting inputs
-		bool & ErrorsFound
 	)
 	{
 		//       AUTHOR         Fred Winkelmann
@@ -4822,17 +4817,14 @@ namespace DaylightingManager {
 
 		static gio::Fmt fmtA( "(A)" );
 
-		int iDaylCntrl;
 		int refPtNum;
-		int ZoneNum;
-		int ZoneFound;
 		std::string refName;
 		Real64 CosBldgRelNorth; // Cosine of Building rotation
 		Real64 SinBldgRelNorth; // Sine of Building rotation
 		Real64 CosZoneRelNorth; // Cosine of Zone rotation
 		Real64 SinZoneRelNorth; // Sine of Zone rotation
-		static Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only (relative north)
-		static Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only (relative north)
+		Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only (relative north)
+		Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only (relative north)
 		Real64 Xb; // temp var for transformation calc
 		Real64 Yb; // temp var for transformation calc
 		Real64 Xo;
@@ -5055,7 +5047,7 @@ namespace DaylightingManager {
 			if ( SurfNum > 0 ) {
 				if ( ZoneDaylight( Surface( SurfNum ).Zone ).DaylightMethod == NoDaylighting ) {
 					ShowSevereError( "DaylightingDevice:Tubular = " + TDDPipe( PipeNum ).Name + ":  is not connected to a Zone that has Daylighting.  " );
-					ShowContinueError( "Add Daylighting:Controls (or Daylighting:DELight:Controls) to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
+					ShowContinueError( "Add Daylighting:Controls to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
 					ShowContinueError( "A sufficient control is provided on the .dbg file." );
 					ErrorsFound = true;
 					if ( CheckTDDZone( Surface( SurfNum ).Zone ) ) {
@@ -5106,7 +5098,7 @@ namespace DaylightingManager {
 			//      IF (ZoneDaylight(Surface(SurfNum)%zone)%DaylightMethod == NoDaylighting) THEN
 			//        CALL ShowSevereError('DaylightingDevice:Shelf = '//TRIM(Shelf(ShelfNum)%Name)// &
 			//            ':  is not connected to a Zone that has Daylighting.  ')
-			//        CALL ShowContinueError('Add Daylighting:Controls (or Daylighting:DELight:Controls) ' //&
+			//        CALL ShowContinueError('Add Daylighting:Controls ' //&
 			//            'to Zone named:  '//TRIM(Zone(Surface(SurfNum)%zone)%name) )
 			//          ErrorsFound = .TRUE.
 			//      ENDIF

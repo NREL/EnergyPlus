@@ -401,20 +401,15 @@ namespace DaylightingManager {
 
 	void
 	GeometryTransformForDaylighting(
-		int const TotDaylightingControls, // Total daylighting inputs
-		bool & ErrorsFound
 	);
-
 
 	void
 	GetInputDayliteRefPt(
 		bool & ErrorsFound
 	);
 
-
 	bool
 	doesDayLightingUseDElight();
-
 
 	void
 	CheckTDDsAndLightShelvesInDaylitZones();
