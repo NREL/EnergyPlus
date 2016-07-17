@@ -412,6 +412,10 @@ namespace DaylightingManager {
 	);
 
 
+	bool
+	doesDayLightingUseDElight();
+
+
 	void
 	CheckTDDsAndLightShelvesInDaylitZones();
 

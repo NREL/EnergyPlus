@@ -4693,7 +4693,7 @@ namespace DaylightingManager {
 			} else if ( SameString( cAlphaArgs( 5 ), "CONTINUOUSOFF" ) ) {
 				zone_daylight.LightControlType = ContinuousOff;
 			} else if ( lAlphaFieldBlanks( 5 ) ) {
-				zone_daylight.DaylightMethod = Continuous;
+				zone_daylight.LightControlType = Continuous;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) + ", occurs in " + cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) );
 				ShowContinueError( "Continuous assumed, and the simulation continues." );
@@ -4982,6 +4982,17 @@ namespace DaylightingManager {
 			pt.z = rNumericArgs( 3 );
 		}
 	}
+
+	bool
+	doesDayLightingUseDElight()
+	{
+		for (auto & znDayl : ZoneDaylight )
+			if ( znDayl.DaylightMethod == DElightDaylighting ){
+				return true;
+			}
+		return false;
+	}
+
 
 	void
 	CheckTDDsAndLightShelvesInDaylitZones()
