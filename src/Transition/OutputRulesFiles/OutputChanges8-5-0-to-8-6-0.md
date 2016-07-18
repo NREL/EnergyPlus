@@ -54,12 +54,8 @@ See [5639](https://github.com/NREL/EnergyPlus/pull/5639).
 
 ### New column in Zone Summary table in IVRS report for Opening Area
 
-A new column for the window opening area (glass plus frame) has been added to the Zone Summary table under the Input Verification and Results Summary tabular report. The value shown in that column is consistent with the window opening area used in the Window-Wall Ratio tables in the same report and with the Exterior Fenestration table in the Envelope Summary tabular report.
+A new columns for the window opening area (glass plus frame) has been added to the Zone Summary table under the Input Verification and Results Summary tabular report. The value shown in that column is consistent with the window opening area used in the Window-Wall Ratio tables in the same report and with the Exterior Fenestration table in the Envelope Summary tabular report.
 
 See [5652](https://github.com/NREL/EnergyPlus/pull/5652).
 
-### Column Headings changed in summary table Plant Loop Coincident Design Fluid Flow Rate Adjustments
 
-Three of the column headings were modified to remove the "{TIMESTAMP}" text:  Peak Day into Period, Peak Hour of Day, and Peak Step Start.  The notion of a timestamp has a specific meaning inside the code for HVAC Sizing Simulations but is not really useful output here and needed to be cleaned out.
-
-See [5751](https://github.com/NREL/EnergyPlus/pull/5751).
