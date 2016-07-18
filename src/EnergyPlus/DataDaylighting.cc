@@ -130,11 +130,15 @@ namespace DataDaylighting {
 	bool DFSReportSizingDays( false );
 	bool DFSReportAllShadowCalculationDays( false );
 
+	int TotDElightCFS( 0 );
+
 	// Object Data
 	Array1D< ZoneDaylightCalc > ZoneDaylight;
 	Array1D< IllumMapData > IllumMap;
 	Array1D< MapCalcData > IllumMapCalc;
 	Array1D< RefPointData > DaylRefPt;
+	Array1D< DElightComplexFeneData> DElightComplexFene;
+
 
 } // DataDaylighting
 

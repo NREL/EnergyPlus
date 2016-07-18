@@ -4270,7 +4270,6 @@ namespace DaylightingManager {
 				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
-			SetupDElightOutput4EPlus();
 		}
 		// RJH DElight Modification End - Calls to DElight preprocessing subroutines
 
@@ -4708,7 +4707,7 @@ namespace DaylightingManager {
 					ErrorsFound = true;
 					continue;
 				}
-			} else {
+			} else if (zone_daylight.DaylightMethod == SplitFluxDaylighting) {
 				ShowWarningError( "No " + cAlphaFieldNames( 6 ) + " provided for object named: " + cAlphaArgs( 1 ) );
 				ShowContinueError( "No glare calculation performed, and the simulation continues." );
 			}
@@ -4764,13 +4763,15 @@ namespace DaylightingManager {
 				zone_daylight.IllumSetPoint( refPtNum ) = rNumericArgs( 7 + refPtNum * 2 ); // Field: Illuminance Setpoint at Reference Point
 
 				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Illuminance [lux]", zone_daylight.DaylIllumAtRefPt( refPtNum ), "Zone", "Average", zone_daylight.Name );
-				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index []", zone_daylight.GlareIndexAtRefPt( refPtNum ), "Zone", "Average", zone_daylight.Name );
-				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingGlareIndexSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
 				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Daylight Illuminance Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
+				if ( zone_daylight.DaylightMethod == SplitFluxDaylighting ){
+					SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index []", zone_daylight.GlareIndexAtRefPt( refPtNum ), "Zone", "Average", zone_daylight.Name );
+					SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingGlareIndexSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
+				}
 			}
 			// Register Error if 0 DElight RefPts have been input for valid DElight object
 			if ( countRefPts < 1 ) {
-				ShowSevereError( "No Reference Points input for " +  cCurrentModuleObject + " zone =" + znDayl.ZoneName );
+				ShowSevereError( "No Reference Points input for " + cCurrentModuleObject + " zone =" + zone_daylight.ZoneName );
 				ErrorsFound = true;
 			}
 
@@ -4784,7 +4785,7 @@ namespace DaylightingManager {
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", trying to control " + RoundSigDigits( sum( zone_daylight.FracZoneDaylit ), 2 ) + " of the zone." );
 				ErrorsFound = true;
 			}
-			if ( zone_daylight.LightControlType == 2 && zone_daylight.LightControlSteps <= 0 ) {
+			if ( zone_daylight.LightControlType == Stepped && zone_daylight.LightControlSteps <= 0 ) {
 				ShowWarningError( "GetDetailedDaylighting: For Stepped Control, the number of steps must be > 0" );
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", will use 1" );
 				zone_daylight.LightControlSteps = 1;
@@ -4875,6 +4876,7 @@ namespace DaylightingManager {
 
 				for ( refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum ){
 					auto & curRefPt( DaylRefPt( daylCntrl.DaylRefPtNum( refPtNum ) ) ); // get the active daylighting:referencepoint
+					curRefPt.indexToFracAndIllum = refPtNum; // back reference to the index to the ZoneDaylight structure arrays related to reference points
 					if ( DaylRefWorldCoordSystem ) {
 						//transform only by appendix G rotation
 						daylCntrl.DaylRefPtAbsCoord( 1, refPtNum ) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;

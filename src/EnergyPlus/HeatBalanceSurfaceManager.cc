@@ -546,7 +546,7 @@ namespace HeatBalanceSurfaceManager {
 
 			// RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
 			// Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-			if ( SunIsUp && ZoneDaylight( NZ ).TotalDElightRefPts != 0 ) {
+			if ( SunIsUp && ZoneDaylight( NZ ).TotalDaylRefPoints != 0 && (ZoneDaylight( NZ ).DaylightMethod == DataDaylighting::DElightDaylighting) ) {
 				// Call DElight interior illuminance and electric lighting control subroutine
 				dPowerReducFac = 1.0;
 				dHISKFFC = HISKF * LUX2FC;
@@ -633,7 +633,7 @@ namespace HeatBalanceSurfaceManager {
 						// Increment refpt counter
 						++iDElightRefPt;
 						// Assure refpt index does not exceed number of refpts in this zone
-						if ( iDElightRefPt <= ZoneDaylight( NZ ).TotalDElightRefPts ) {
+						if ( iDElightRefPt <= ZoneDaylight( NZ ).TotalDaylRefPoints ) {
 							ZoneDaylight( NZ ).DaylIllumAtRefPt( iDElightRefPt ) = dRefPtIllum;
 						}
 					}

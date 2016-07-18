@@ -145,8 +145,7 @@ namespace DataDaylighting {
 		std::string ZoneName; //name of the zone where the daylighting:controls object is located
 		int DaylightMethod; // Type of Daylighting (1=SplitFlux, 2=DElight)
 		int AvailSchedNum; // pointer to availability schedule if present
-		int TotalDaylRefPoints; // Number of splitflux daylighting reference points in a zone (0,1 or 2)
-		int TotalDElightRefPts; // Number of DElight daylighting reference points in a zone (0,1 or 2) - RJH
+		int TotalDaylRefPoints; // Number of daylighting reference points in a zone (0,1 or 2)
 		Array1D_int DaylRefPtNum; // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
 		Array2D< Real64 > DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
 		// in absolute coordinate system (m)
@@ -231,7 +230,6 @@ namespace DataDaylighting {
 			DaylightMethod( 0 ),
 			AvailSchedNum( 0 ),
 			TotalDaylRefPoints( 0 ),
-			TotalDElightRefPts( 0 ),
 			LightControlType( 1 ),
 			ViewAzimuthForGlare( 0.0 ),
 			MaxGlareallowed( 0 ),
@@ -348,22 +346,35 @@ namespace DataDaylighting {
 		Real64 x;  // x coordinate
 		Real64 y;  // y coordinate
 		Real64 z;  // z coordinate
+		int indexToFracAndIllum; 
 
 		// Default Constructor
 		RefPointData() :
 			ZoneNum( 0 ),
 			x( 0.0 ),
 			y( 0.0 ),
-			z( 0.0 )
+			z( 0.0 ),
+			indexToFracAndIllum( 0 )
 		{}
 
 	};
+
+	struct DElightComplexFeneData // holds Daylighting:DELight:ComplexFenestration
+	{
+		std::string Name;
+		std::string ComplexFeneType; // Complex Fenestration Type
+		std::string surfName; // Building Surface name
+		std::string wndwName; // Window name
+		Real64 feneRota; // Fenestration Rotation
+	};
+	extern int TotDElightCFS; // number of Daylighting:DELight:ComplexFenestration
 
 	// Object Data
 	extern Array1D< ZoneDaylightCalc > ZoneDaylight;
 	extern Array1D< IllumMapData > IllumMap;
 	extern Array1D< MapCalcData > IllumMapCalc;
 	extern Array1D< RefPointData > DaylRefPt;
+	extern Array1D< DElightComplexFeneData> DElightComplexFene;
 
 } // DataDaylighting
 
