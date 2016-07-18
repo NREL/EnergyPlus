@@ -1985,7 +1985,6 @@ namespace PackagedThermalStorageCoil {
 		using DataGlobals::SecInHour;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using DataGlobals::CWInitConvTemp;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeTESCoil " );
@@ -2166,8 +2165,8 @@ namespace PackagedThermalStorageCoil {
 			// for fluid tanks, assume a 10C deltaT or diff between max and min, whichever is smaller
 			deltaT = min( FluidTankSizingDeltaT, ( TESCoil( TESCoilNum ).MaximumFluidTankTempLimit - TESCoil( TESCoilNum ).MinimumFluidTankTempLimit ) );
 
-			rho = GetDensityGlycol( TESCoil( TESCoilNum ).StorageFluidName, CWInitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, calcTESWaterStorageTank );
-			Cp = GetSpecificHeatGlycol( TESCoil( TESCoilNum ).StorageFluidName, CWInitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, calcTESWaterStorageTank );
+			rho = GetDensityGlycol( TESCoil( TESCoilNum ).StorageFluidName, DataGlobals::CWInitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, calcTESWaterStorageTank );
+			Cp = GetSpecificHeatGlycol( TESCoil( TESCoilNum ).StorageFluidName, DataGlobals::CWInitConvTemp, TESCoil( TESCoilNum ).StorageFluidIndex, calcTESWaterStorageTank );
 			if ( TESCoil( TESCoilNum ).DischargeOnlyRatedDischargeCap > 0.0 && TESCoil( TESCoilNum ).DischargeOnlyModeAvailable ) {
 				TESCoil( TESCoilNum ).FluidStorageVolume = ( TESCoil( TESCoilNum ).DischargeOnlyRatedDischargeCap * TESCoil( TESCoilNum ).StorageCapacitySizingFactor * SecInHour ) / ( rho * Cp * deltaT );
 			} else {
