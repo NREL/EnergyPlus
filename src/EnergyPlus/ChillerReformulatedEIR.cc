@@ -128,7 +128,6 @@ namespace ChillerReformulatedEIR {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -139,8 +138,6 @@ namespace ChillerReformulatedEIR {
 	using FluidProperties::GetSpecificHeatGlycol;
 	using DataPlant::PlantLoop;
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
 	// Chiller type parameters
 	int const AirCooled( 1 ); // Air-cooled condenser currently not allowed
 	int const WaterCooled( 2 ); // Only water-cooled condensers are currently allowed

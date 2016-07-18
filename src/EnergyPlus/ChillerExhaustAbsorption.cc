@@ -129,7 +129,6 @@ namespace ChillerExhaustAbsorption {
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BigNumber;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
@@ -141,10 +140,6 @@ namespace ChillerExhaustAbsorption {
 	using DataGlobalConstants::iGeneratorMicroturbine;
 	using MicroturbineElectricGenerator::SimMTGenerator;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
-	// na
-
 	// MODULE VARIABLE DECLARATIONS:
 	int NumExhaustAbsorbers( 0 ); // number of Absorption Chillers specified in input
 
@@ -152,16 +147,9 @@ namespace ChillerExhaustAbsorption {
 
 	Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-
 	// Object Data
 	Array1D< ExhaustAbsorberSpecs > ExhaustAbsorber; // dimension to number of machines
 	Array1D< ReportVars > ExhaustAbsorberReport;
-
-	// MODULE SUBROUTINES:
-
-	// Beginning of Absorption Chiller Module Driver Subroutines
-	//*************************************************************************
 
 	// Functions
 	namespace {
@@ -757,7 +745,7 @@ namespace ChillerExhaustAbsorption {
 				if ( ExhaustAbsorber( ChillNum ).CDLoopNum > 0 ) {
 					rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				} else {
-					rho = RhoH2O( InitConvTemp );
+					rho = RhoH2O( DataGlobals::InitConvTemp );
 
 				}
 
@@ -768,7 +756,7 @@ namespace ChillerExhaustAbsorption {
 			if ( ExhaustAbsorber( ChillNum ).HWLoopNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).HWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else {
-				rho = RhoH2O( InitConvTemp );
+				rho = RhoH2O( DataGlobals::InitConvTemp );
 			}
 			ExhaustAbsorber( ChillNum ).DesHeatMassFlowRate = rho * ExhaustAbsorber( ChillNum ).HeatVolFlowRate;
 			//init available hot water flow rate
@@ -777,7 +765,7 @@ namespace ChillerExhaustAbsorption {
 			if ( ExhaustAbsorber( ChillNum ).CWLoopNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 			} else {
-				rho = RhoH2O( InitConvTemp );
+				rho = RhoH2O( DataGlobals::InitConvTemp );
 			}
 			ExhaustAbsorber( ChillNum ).DesEvapMassFlowRate = rho * ExhaustAbsorber( ChillNum ).EvapVolFlowRate;
 			//init available hot water flow rate

@@ -106,17 +106,10 @@ namespace Boilers {
 	// METHODOLOGY EMPLOYED:
 	// The BLAST/DOE-2 empirical model based on mfg. data
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using namespace DataHVACGlobals;
 	using namespace DataPrecisionGlobals;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataPlant::PlantLoop;
@@ -125,12 +118,6 @@ namespace Boilers {
 	using DataBranchAirLoopPlant::ControlType_SeriesActive;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
-
-	//USE FunctionFluidProperties
-	// Use statements for access to subroutines in other modules
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Boiler normalized efficiency curve types
 	int const Linear( 1 );
@@ -152,8 +139,6 @@ namespace Boilers {
 	int const ConstantFlow( 201 );
 	int const NotModulated( 202 );
 	int const LeavingSetPointModulated( 203 );
-
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumBoilers( 0 ); // Number of boilers

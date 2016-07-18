@@ -118,7 +118,6 @@ namespace ChillerIndirectAbsorption {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using General::TrimSigDigits;
@@ -135,8 +134,6 @@ namespace ChillerIndirectAbsorption {
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 	static std::string const calcChillerAbsorptionIndirect( "CALC Chiller:Absorption:Indirect " );
-
-	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumIndirectAbsorbers( 0 ); // number of Absorption Chillers specified in input

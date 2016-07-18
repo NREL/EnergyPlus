@@ -127,7 +127,6 @@ namespace ChillerElectricEIR {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using Psychrometrics::PsyCpAirFnWTdb;
