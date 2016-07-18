@@ -74,8 +74,6 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
-  PlantManager.unit.cc
-  PlantPipingSystemsManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
@@ -85,6 +83,7 @@ set( test_src
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
+  PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
   PlantUtilities.unit.cc
   Pumps.unit.cc
