@@ -15,30 +15,18 @@ If the user has selected a sizing option that requires HVAC Sizing Simulations t
   Call SetupSizingAnalyses(). This method creates the data logging apparatus needed to monitor operation during HVAC Sizing Simulations. Individual sizing algorithms include selecting specific variables, such as system node states or load output variables, that will be recorded.
 \item
   Loop over some number of Sizing Passes. The set of sizing periods, run as HVAC Sizing Simulations, can iterate up to a maximum limit on the number of passes
-\end{itemize}
-
-\begin{lstlisting}
--   Loop over all the sizing periods by each day. This runs the HVAC Sizing Simulations which have basically the same set of calls as are used for marching through time and calling of EnergyPlus modeling for the Primary Simulations (in ManageSimulation).
-\end{lstlisting}
-
-\begin{lstlisting}
-    -   Call PostProcessLogs(). This method applies running averages (if desired) and averages system timestep data to fill zone timestep data in the records.
-\end{lstlisting}
-
-\begin{lstlisting}
-    -   Call ProcessCoincidentPlantSizeAdjustments(). This method retrieves data from the logs and calls for the coincident plant sizing algorithm to execute. Set flag if the sizing analyses request another Sizing Pass. (See the section below on Coincident Plant Sizing.)
-\end{lstlisting}
-
-\begin{lstlisting}
-    -   Call RedoKickOffAndResize(). The methods calls SetupSimulation() and sets flag to signal that system and component level sizing methods need to be called again. These are fake timesteps used to initialize and are not part of a Simulation.
-\end{lstlisting}
-
-\begin{lstlisting}
--   Break out of Sizing Pass loop if size results did not change or the limit on Sizing Passes has been reached.
-\end{lstlisting}
-
-\begin{itemize}
-\tightlist
+  \begin{itemize}
+  \item
+    Loop over all the sizing periods by each day. This runs the HVAC Sizing Simulations which have basically the same set of calls as are used for marching through time and calling of EnergyPlus modeling for the Primary Simulations (in ManageSimulation).
+  \item
+    Call PostProcessLogs(). This method applies running averages (if desired) and averages system timestep data to fill zone timestep data in the records.
+  \item
+    Call ProcessCoincidentPlantSizeAdjustments(). This method retrieves data from the logs and calls for the coincident plant sizing algorithm to execute. Set flag if the sizing analyses request another Sizing Pass. (See the section below on Coincident Plant Sizing.)
+  \item
+    Call RedoKickOffAndResize(). The methods calls SetupSimulation() and sets flag to signal that system and component level sizing methods need to be called again. These are fake timesteps used to initialize and are not part of a Simulation.
+  \item
+    Break out of Sizing Pass loop if size results did not change or the limit on Sizing Passes has been reached.
+  \end{itemize}
 \item
   Empty HVACSizingSimulationManager object to free memory
 \end{itemize}
