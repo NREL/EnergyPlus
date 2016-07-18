@@ -1955,6 +1955,52 @@ namespace EnergyPlus {
 		EXPECT_EQ( 1, IOStatus );
 	}
 
+	TEST_F( InputProcessorFixture, getObjectItem_test_numbers_as_strings)
+	{
+		std::string const idf_objects = delimited_string({
+																 "  ZoneHVAC:EquipmentConnections,",
+																 "    401,                     !- Zone Name",
+																 "    Z401 terminal list,      !- Zone Conditioning Equipment List Name",
+																 "    Z401 zone inlet,         !- Zone Air Inlet Node or NodeList Name",
+																 "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+																 "    Z401 air node,           !- Zone Air Node Name",
+																 "    Z401 outlet node;        !- Zone Return Air Node Name",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
+
+		int num_eq_connections = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_eq_connections );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_eq_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 6, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "401", "Z401 TERMINAL LIST", "Z401 ZONE INLET", "",
+																	   "Z401 AIR NODE", "Z401 OUTLET NODE", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, true, false, false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
 	TEST_F( InputProcessorFixture, getObjectItem_test_zone_input)
 	{
 		std::string const idf_objects = delimited_string({
@@ -2696,6 +2742,65 @@ namespace EnergyPlus {
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
 																false, false, false, false, true, true } ), lNumericBlanks2 ) );
 
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_curve_biquadratic2)
+	{
+		std::string const idf_objects = delimited_string({
+																 "Curve:Biquadratic,",
+																 "  HPACCoolCapFT Speed 1, !- Name",
+																 "  1, !- Coefficient1 Constant",
+																 "  0, !- Coefficient2 x",
+																 "  0, !- Coefficient3 x**2",
+																 "  0, !- Coefficient4 y",
+																 "  0, !- Coefficient5 y**2",
+																 "  0, !- Coefficient6 x*y",
+																 "  0, !- Minimum Value of x",
+																 "  0, !- Maximum Value of x",
+																 "  0, !- Minimum Value of y",
+																 "  46.11111, !- Maximum Value of y",
+																 "  , !- Minimum Curve Output",
+																 "  , !- Maximum Curve Output",
+																 "  Temperature, !- Input Unit Type for X",
+																 "  Temperature, !- Input Unit Type for Y",
+																 "  Dimensionless;           !- Output Unit Type",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquad = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_curve_biquad );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquad, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLCAPFT SPEED 1", "TEMPERATURE", "TEMPERATURE",
+																	   "DIMENSIONLESS" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 12, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 0, 0, 0, 0,
+																  0, 0, 0, 0, 46.11111,
+																  0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
+																false, false, false, false, true, true } ), lNumericBlanks ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 

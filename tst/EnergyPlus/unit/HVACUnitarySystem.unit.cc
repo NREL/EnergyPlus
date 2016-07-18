@@ -3848,7 +3848,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  HPACCoolCapFT Speed 1, !- Name",
 		"  1, !- Coefficient1 Constant",
 		"  0, !- Coefficient2 x",
-		"  0 !- Coefficient3 x**2",
+		"  0, !- Coefficient3 x**2",
 		"  0, !- Coefficient4 y",
 		"  0, !- Coefficient5 y**2",
 		"  0, !- Coefficient6 x*y",

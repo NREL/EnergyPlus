@@ -3072,7 +3072,18 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 //                    std::stringstream ss;
 //                    ss << it.value().get<double>();
 //                    Alphas(i + 1) = ss.str();
-					Alphas( i + 1 ) = std::to_string(it.value().get<double>());
+                    std::string num_val = std::to_string(it.value().get<double>());
+                    bool is_double = false;
+                    for (auto j = num_val.find_first_of('.') + 1; j != num_val.size(); j++) {
+                        if (num_val[j] != '0') {
+                            is_double = true;
+                            break;
+                        }
+                    }
+                    if (!is_double) {
+                        num_val = std::to_string(it.value().get<int>());
+                    }
+					Alphas( i + 1 ) = num_val;
 					if (present(AlphaBlank)) AlphaBlank()(i + 1) = false;
                 }
                 NumAlphas++;
@@ -3197,7 +3208,13 @@ EnergyPlus::InputProcessor::GetRecordLocations(
 							if (present(NumBlank)) NumBlank()(numerics_index + 1) = false;
 						} else {
 							if (val.get<std::string>().empty()) {
-								Numbers(numerics_index + 1) = 0; // TODO once again we don't even know if this is correct behavior
+                                auto const &schema_obj = object_in_schema->at("patternProperties")[".*"]["properties"]["extensions"]["items"]["properties"][field]; // TODO make this account for special casing of Version like objects
+                                if (schema_obj.find("default") != schema_obj.end()) {
+                                    if (schema_obj["default"].is_string()) Numbers(numerics_index + 1) = -99999;
+                                    else Numbers(numerics_index + 1) = schema_obj["default"].get<double>();
+                                } else {
+                                    Numbers(numerics_index + 1) = 0;
+                                }
 							} else { // autosize and autocalculate
 								Numbers(numerics_index + 1) = -99999;
 							}
