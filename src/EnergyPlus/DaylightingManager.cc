@@ -4750,12 +4750,15 @@ namespace DaylightingManager {
 			zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt.allocate( curTotalDaylRefPts );
 			zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
 
+			int countRefPts = 0;
 			for ( refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum ){
 				zone_daylight.DaylRefPtNum(refPtNum) = FindItemInList( cAlphaArgs( 6 + refPtNum ), DaylRefPt, &RefPointData::Name );  // Field: Daylighting Reference Point Name
 				if ( zone_daylight.DaylRefPtNum( refPtNum ) == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 + refPtNum ) + "=\"" + cAlphaArgs( 6 + refPtNum ) + "\" for object named: " + cAlphaArgs(1));
 					ErrorsFound = true;
 					continue;
+				} else {
+					++countRefPts;
 				}
 				zone_daylight.FracZoneDaylit( refPtNum ) = rNumericArgs( 6 + refPtNum * 2 ); // Field: Fraction Controlled by Reference Point
 				zone_daylight.IllumSetPoint( refPtNum ) = rNumericArgs( 7 + refPtNum * 2 ); // Field: Illuminance Setpoint at Reference Point
@@ -4765,6 +4768,13 @@ namespace DaylightingManager {
 				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Glare Index Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingGlareIndexSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
 				SetupOutputVariable( "Daylighting Reference Point " + std::to_string( refPtNum ) + " Daylight Illuminance Setpoint Exceeded Time [hr]", zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt( refPtNum ), "Zone", "Sum", zone_daylight.Name );
 			}
+			// Register Error if 0 DElight RefPts have been input for valid DElight object
+			if ( countRefPts < 1 ) {
+				ShowSevereError( "No Reference Points input for " +  cCurrentModuleObject + " zone =" + znDayl.ZoneName );
+				ErrorsFound = true;
+			}
+
+
 			if ( sum( zone_daylight.FracZoneDaylit ) < 1.0 ) {
 				ShowWarningError( "GetDetailedDaylighting: Fraction of Zone controlled by the Daylighting reference points is < 1.0." );
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", only " + RoundSigDigits( sum( zone_daylight.FracZoneDaylit ), 2 ) + " of the zone is controlled." );
@@ -4964,8 +4974,8 @@ namespace DaylightingManager {
 		for ( auto & pt : DaylRefPt ){
 			GetObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			pt.Name = cAlphaArgs( 1 );
-			pt.Zone = FindItemInList( cAlphaArgs( 2 ), Zone );
-			if ( pt.Zone == 0 ) {
+			pt.ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			if ( pt.ZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}

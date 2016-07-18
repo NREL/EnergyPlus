@@ -344,14 +344,14 @@ namespace DataDaylighting {
 	struct RefPointData
 	{
 		std::string Name; // Map name
-		int Zone;  // Pointer to zone being referenced
+		int ZoneNum;  // Pointer to zone being referenced
 		Real64 x;  // x coordinate
 		Real64 y;  // y coordinate
 		Real64 z;  // z coordinate
 
 		// Default Constructor
 		RefPointData() :
-			Zone( 0 ),
+			ZoneNum( 0 ),
 			x( 0.0 ),
 			y( 0.0 ),
 			z( 0.0 )
