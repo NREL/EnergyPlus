@@ -1975,12 +1975,6 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataAirSystems::PrimaryAirSystem;
@@ -1989,23 +1983,14 @@ namespace PackagedThermalStorageCoil {
 		using namespace OutputReportPredefined;
 		using CurveManager::CurveValue;
 		using DataGlobals::SecInHour;
-		//using DataGlobals::InitConvTemp;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataGlobals::CWInitConvTemp;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeTESCoil " );
 		static std::string const calcTESWaterStorageTank( "CalcTESWaterStorageTank" );
 		Real64 const FluidTankSizingDeltaT( 10.0 );
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MixTemp;

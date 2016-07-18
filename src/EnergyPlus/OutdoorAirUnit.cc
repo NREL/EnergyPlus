@@ -123,17 +123,11 @@ namespace OutdoorAirUnit {
 	// algorithm that adjusts the hot or cold water flow to meet the setpoint
 	// condition.
 
-	// REFERENCES:
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::BeginTimeStepFlag;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::ZoneSizingCalc;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
@@ -151,9 +145,6 @@ namespace OutdoorAirUnit {
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
 	using General::TrimSigDigits;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// component types addressed by this module
 	std::string const cMO_OutdoorAirUnit( "ZoneHVAC:OutdoorAirUnit" );

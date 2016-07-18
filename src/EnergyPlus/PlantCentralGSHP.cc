@@ -314,9 +314,6 @@ namespace PlantCentralGSHP {
 		//  flow (or sourse side) rate is calculated from the reference capacity, the COP, and the condenser
 		//  loop design delta T.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
@@ -325,23 +322,13 @@ namespace PlantCentralGSHP {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataHVACGlobals::SmallWaterVolFlow;
-		//using DataGlobals::InitConvTemp;
 		using DataGlobals::DisplayExtraWarnings;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
 		using DataGlobals::CWInitConvTemp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeCGSHPChillerHeater" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
@@ -1278,13 +1265,9 @@ namespace PlantCentralGSHP {
 		// METHODOLOGY EMPLOYED:
 		//  Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-		//using DataGlobals::InitConvTemp;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CentralGroundSourceHeatPump;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -1300,17 +1283,8 @@ namespace PlantCentralGSHP {
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using DataGlobals::CWInitConvTemp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitCGSHPHeatPump" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyWrapperOneTimeFlag( true ); // Flag used to execute code only once
@@ -1574,7 +1548,6 @@ namespace PlantCentralGSHP {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		//using DataGlobals::InitConvTemp;
 		using DataHVACGlobals::SmallLoad;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveMinMaxValues;
@@ -1585,20 +1558,9 @@ namespace PlantCentralGSHP {
 		using General::RoundSigDigits;
 		using DataGlobals::CWInitConvTemp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcChillerHeaterModel" );
 		static std::string const RoutineNameElecEIRChiller( "CalcElectricEIRChillerModel" );
-
-		//CHARACTER(len=*), PARAMETER :: OutputFormat  = '(F6.2)'
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool IsLoadCoolRemaining( true );
@@ -2048,7 +2010,6 @@ namespace PlantCentralGSHP {
 
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
-		//using DataGlobals::InitConvTemp;
 		using DataHVACGlobals::SmallLoad;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveMinMaxValues;
@@ -2059,20 +2020,9 @@ namespace PlantCentralGSHP {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::CWInitConvTemp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcChillerHeaterModel" );
 		static std::string const RoutineNameElecEIRChiller( "CalcElectricEIRChillerModel" );
-
-		//CHARACTER(len=*), PARAMETER :: OutputFormat  = '(F6.2)'
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool IsLoadHeatRemaining( true ); // Ture if heating load remains for this chiller heater

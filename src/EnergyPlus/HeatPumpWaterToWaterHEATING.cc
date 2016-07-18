@@ -101,16 +101,9 @@ namespace HeatPumpWaterToWaterHEATING {
 	// This simulation is based on a set of selected parameters,
 	// Which are obtained using Parameter Estimation technique.
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginSimFlag;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::KelvinConv;
@@ -121,20 +114,9 @@ namespace HeatPumpWaterToWaterHEATING {
 	using DataGlobals::SecInHour;
 	using namespace DataLoopNode;
 
-	// Use statements for access to subroutines in other modules
-
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	std::string const ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Heating" );
 	std::string const ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING" );
-
-	// DERIVED TYPE DEFINITIONS
-
-	// Type Description of Heat Pump
-
-	// Output Variables Type definition
-
-	// MODULE VARIABLE DECLARATIONS:
 
 	std::string GSHPRefrigerant( "R22" ); // Refrigerent name and index
 	int GSHPRefrigIndex( 0 );
@@ -151,17 +133,9 @@ namespace HeatPumpWaterToWaterHEATING {
 	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
 	Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-	// Name Public routines, optionally name Private routines within this module
-
 	// Object Data
 	Array1D< GshpSpecs > GSHP; // dimension to number of machines
 	Array1D< ReportVars > GSHPReport;
-
-	// MODULE SUBROUTINES:
-
-	// Functions
 
 	void
 	SimHPWatertoWaterHEATING(

@@ -1261,21 +1261,11 @@ namespace HVACUnitaryBypassVAV {
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
-		//using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
 		using DataGlobals::CWInitConvTemp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitCBVAV" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InNode; // Inlet node number in CBVAV loop

@@ -339,9 +339,6 @@ namespace ReportSizingManager {
 		// Outside Air System Equipment (eg):
 		// Boolean - OASysEqSizing( CurOASysNum ).CoolingAirFlow and Real64 - OASysEqSizing ( CurOASysNum ).CoolingAirVolFlow
 
-		// REFERENCES :
-		// na
-
 		// USE STATEMENTS :
 		using CurveManager::CurveValue;
 		using DataEnvironment::StdRhoAir;
@@ -349,7 +346,6 @@ namespace ReportSizingManager {
 		using DataAirLoop::AirLoopControlInfo;
 		using DataAirSystems::PrimaryAirSystem;
 		using DataGlobals::DisplayExtraWarnings;
-		//using DataGlobals::InitConvTemp;;
 		using namespace DataSizing;
 		using namespace DataHVACGlobals;
 		using DXCoils::ValidateADP;
@@ -380,12 +376,6 @@ namespace ReportSizingManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		int const MaxIte( 500 ); // Maximum number of iterations
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DDNum; // design day number corresponding to TimeStepNumAtMax

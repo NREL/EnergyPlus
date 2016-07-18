@@ -122,7 +122,6 @@ namespace HVACCooledBeam {
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::Pi;
 	using DataGlobals::SecInHour;

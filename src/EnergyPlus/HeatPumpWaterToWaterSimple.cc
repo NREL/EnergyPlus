@@ -108,7 +108,6 @@ namespace HeatPumpWaterToWaterSimple {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginSimFlag;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::KelvinConv;
@@ -120,20 +119,11 @@ namespace HeatPumpWaterToWaterSimple {
 	using General::TrimSigDigits;
 	using namespace DataLoopNode;
 
-	// Use statements for access to subroutines in other modules
-
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	std::string const HPEqFitHeating( "HeatPump:WatertoWater:EquationFit:Heating" );
 	std::string const HPEqFitHeatingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING" );
 	std::string const HPEqFitCooling( "HeatPump:WatertoWater:EquationFit:Cooling" );
 	std::string const HPEqFitCoolingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING" );
-
-	// DERIVED TYPE DEFINITIONS
-
-	// Type Description of Heat Pump
-
-	// Output Variables Type definition
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumGSHPs( 0 ); // Number of GSHPs specified in input
@@ -141,25 +131,11 @@ namespace HeatPumpWaterToWaterSimple {
 		bool GetInputFlag( true ); // then TRUE, calls subroutine to read input file.
 		bool InitWatertoWaterHPOneTimeFlag( true );
 	}
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Computational routines
-
-	// Update routine to check convergence and update nodes
 
 	// Object Data
 	Array1D< GshpSpecs > GSHP;
 	Array1D< ReportVars > GSHPReport;
 
-	// MODULE SUBROUTINES:
-
-	// Functions
 	void
 	clear_state(){
 		NumGSHPs = 0;

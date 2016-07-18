@@ -122,16 +122,11 @@ namespace UnitVentilator {
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
 	// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
@@ -145,9 +140,6 @@ namespace UnitVentilator {
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Currrent Module Unit type
 	std::string const cMO_UnitVentilator( "ZoneHVAC:UnitVentilator" );

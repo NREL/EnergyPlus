@@ -116,12 +116,6 @@ namespace PoweredInductionUnits {
 	// algorithm that adjusts the primary air flow and the heating coil output
 	// to meet the zone load.
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
@@ -129,7 +123,6 @@ namespace PoweredInductionUnits {
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::SecInHour;
 	using DataGlobals::NumOfZones;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -153,7 +146,6 @@ namespace PoweredInductionUnits {
 	using namespace FluidProperties;
 	using DataHeatBalFanSys::TempControlType;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	int const SingleDuct_SeriesPIU_Reheat( 6 );
 	int const SingleDuct_ParallelPIU_Reheat( 7 );
@@ -166,8 +158,6 @@ namespace PoweredInductionUnits {
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_bool CheckEquipName;
 	bool GetPIUInputFlag( true ); // First time, input is "gotten"
@@ -176,14 +166,8 @@ namespace PoweredInductionUnits {
 	int NumSeriesPIUs( 0 );
 	int NumParallelPIUs( 0 );
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-	// PRIVATE UpdatePIU
-
 	// Object Data
 	Array1D< PowIndUnitData > PIU;
-
-	// Functions
 
 	void
 	SimPIU(

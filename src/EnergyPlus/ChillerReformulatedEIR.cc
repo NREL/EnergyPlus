@@ -715,9 +715,6 @@ namespace ChillerReformulatedEIR {
 		// METHODOLOGY EMPLOYED:
 		//  Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -733,19 +730,6 @@ namespace ChillerReformulatedEIR {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataGlobals::CWInitConvTemp;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "InitElecReformEIRChiller" );
@@ -769,7 +753,6 @@ namespace ChillerReformulatedEIR {
 		bool errFlag;
 		bool HeatRecRunFlag;
 		Real64 HeatRecHighInletLimit;
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -860,7 +843,7 @@ namespace ChillerReformulatedEIR {
 
 		if ( MyEnvrnFlag( EIRChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			ElecReformEIRChiller( EIRChillNum ).EvapMassFlowRateMax = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate * rho;
 
@@ -888,7 +871,7 @@ namespace ChillerReformulatedEIR {
 			}
 
 			if ( ElecReformEIRChiller( EIRChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				ElecReformEIRChiller( EIRChillNum ).DesignHeatRecMassFlowRate = rho * ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 				InitComponentNodes( 0.0, ElecReformEIRChiller( EIRChillNum ).DesignHeatRecMassFlowRate, ElecReformEIRChiller( EIRChillNum ).HeatRecInletNodeNum, ElecReformEIRChiller( EIRChillNum ).HeatRecOutletNodeNum, ElecReformEIRChiller( EIRChillNum ).HRLoopNum, ElecReformEIRChiller( EIRChillNum ).HRLoopSideNum, ElecReformEIRChiller( EIRChillNum ).HRBranchNum, ElecReformEIRChiller( EIRChillNum ).HRCompNum );
 				// overall capacity limit
@@ -972,9 +955,6 @@ namespace ChillerReformulatedEIR {
 		//  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		//  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -988,19 +968,9 @@ namespace ChillerReformulatedEIR {
 		using CurveManager::GetCurveMinMaxValues;
 		using namespace OutputReportPredefined;
 		using StandardRatings::CalcChillerIPLV;
-		using DataGlobals::CWInitConvTemp;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeElecReformEIRChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
@@ -1119,9 +1089,9 @@ namespace ChillerReformulatedEIR {
 					SizingEvapOutletTemp = ElecReformEIRChiller( EIRChillNum ).TempRefEvapOut;
 					SizingCondOutletTemp = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut;
 				}
-				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				RefCapFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, SizingEvapOutletTemp, SizingCondOutletTemp );
 				tmpNomCap = ( Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate ) / RefCapFT;
@@ -1176,7 +1146,7 @@ namespace ChillerReformulatedEIR {
 
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
-				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElecReformEIRChiller( EIRChillNum ).RefCOP ) * ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );

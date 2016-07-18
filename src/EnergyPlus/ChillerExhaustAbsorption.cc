@@ -624,9 +624,6 @@ namespace ChillerExhaustAbsorption {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -641,23 +638,9 @@ namespace ChillerExhaustAbsorption {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using Psychrometrics::RhoH2O;
-		using DataGlobals::CWInitConvTemp;
-
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// used to determine if heating side or cooling
-		// side of chiller-heater is being called
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		std::string const RoutineName( "InitExhaustAbsorber" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CondInletNode; // node number of water inlet node to the condenser
@@ -772,7 +755,7 @@ namespace ChillerExhaustAbsorption {
 			if ( ExhaustAbsorber( ChillNum ).isWaterCooled ) {
 				// init max available condenser water flow rate
 				if ( ExhaustAbsorber( ChillNum ).CDLoopNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				} else {
 					rho = RhoH2O( InitConvTemp );
 
@@ -783,7 +766,7 @@ namespace ChillerExhaustAbsorption {
 			}
 
 			if ( ExhaustAbsorber( ChillNum ).HWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).HWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).HWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else {
 				rho = RhoH2O( InitConvTemp );
 			}
@@ -792,7 +775,7 @@ namespace ChillerExhaustAbsorption {
 			InitComponentNodes( 0.0, ExhaustAbsorber( ChillNum ).DesHeatMassFlowRate, HeatInletNode, HeatOutletNode, ExhaustAbsorber( ChillNum ).HWLoopNum, ExhaustAbsorber( ChillNum ).HWLoopSideNum, ExhaustAbsorber( ChillNum ).HWBranchNum, ExhaustAbsorber( ChillNum ).HWCompNum );
 
 			if ( ExhaustAbsorber( ChillNum ).CWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 			} else {
 				rho = RhoH2O( InitConvTemp );
 			}
@@ -853,9 +836,6 @@ namespace ChillerExhaustAbsorption {
 		// the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		// is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -867,28 +847,15 @@ namespace ChillerExhaustAbsorption {
 		using namespace OutputReportPredefined;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using DataGlobals::CWInitConvTemp;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		std::string const RoutineName( "SizeExhaustAbsorber" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int PltSizCoolNum; // Plant Sizing index for cooling loop
 		int PltSizHeatNum; // Plant Sizing index for heating loop
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 
 		bool ErrorsFound; // If errors detected in input
-		//  LOGICAL             :: LoopErrorsFound
 		std::string equipName;
 		Real64 Cp; // local fluid specific heat
 		Real64 rho; // local fluid density
@@ -921,8 +888,8 @@ namespace ChillerExhaustAbsorption {
 
 		if ( PltSizCoolNum > 0 ) {
 			if ( PlantSizData( PltSizCoolNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				Cp = GetSpecificHeatGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizCoolNum ).DeltaT * PlantSizData( PltSizCoolNum ).DesVolFlowRate * ExhaustAbsorber( ChillNum ).SizFac;
 				if ( ! ExhaustAbsorber( ChillNum ).NomCoolingCapWasAutoSized ) tmpNomCap = ExhaustAbsorber( ChillNum ).NomCoolingCap;
 			} else {

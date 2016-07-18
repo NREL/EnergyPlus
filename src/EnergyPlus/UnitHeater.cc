@@ -121,16 +121,11 @@ namespace UnitHeater {
 	// Rick Strand's unit heater module which was based upon Fred Buhl's fan coil
 	// module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -149,7 +144,6 @@ namespace UnitHeater {
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using namespace FluidProperties;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	std::string const cMO_UnitHeater( "ZoneHVAC:UnitHeater" );
 
@@ -160,10 +154,6 @@ namespace UnitHeater {
 	std::string const SteamCoil( "SteamCoil" );
 
 	static std::string const fluidNameSteam( "STEAM" );
-
-	// DERIVED TYPE DEFINITIONS
-
-	// MODULE VARIABLE DECLARATIONS:
 
 	namespace {
 		// These were static variables within different functions. They were pulled out into the namespace

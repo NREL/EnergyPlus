@@ -144,7 +144,6 @@ namespace PackagedTerminalHeatPump {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -2785,7 +2784,6 @@ namespace PackagedTerminalHeatPump {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		//using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
 		using DataEnvironment::StdRhoAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -2797,7 +2795,6 @@ namespace PackagedTerminalHeatPump {
 		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
-		//unused-12/12/08  USE FluidProperties,      ONLY: GetSatDensityRefrig !, FindRefrigerant, FindGlycol
 		using DataHeatBalFanSys::TempControlType;
 		using Fans::GetFanVolFlow;
 		using DataPlant::TypeOf_CoilSteamAirHeating;

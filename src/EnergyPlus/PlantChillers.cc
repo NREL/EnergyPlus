@@ -121,7 +121,6 @@ namespace PlantChillers {
 	using namespace DataLoopNode;
 	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
-	//using DataGlobals::InitConvTemp;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
@@ -133,8 +132,6 @@ namespace PlantChillers {
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
 	// Parameters for use in Chillers
 	int const AirCooled( 1 );
 	int const WaterCooled( 2 );
