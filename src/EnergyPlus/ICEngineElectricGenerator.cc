@@ -101,45 +101,27 @@ namespace ICEngineElectricGenerator {
 	// is available to meet an electric load demand, it calls SimICEngineGenerator
 	// which in turn calls the ICEngine Generator model.
 
-	// REFERENCES:
-	// N/A
-
-	// OTHER NOTES:
-	// N/A
-
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobalConstants::iGeneratorICEngine;
 	using General::RoundSigDigits;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS
 	Real64 const ReferenceTemp( 25.0 ); // Reference temperature by which lower heating
 	// value is reported.  This should be subtracted
 	// off of when calculated exhaust energies.
 
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLE DECLARATIONS:
 	int NumICEngineGenerators( 0 ); // number of IC ENGINE Generators specified in input
 	bool GetICEInput( true ); // When TRUE, calls subroutine to read input file.
 	Array1D_bool CheckEquipName;
-	// SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
 
 	// Object Data
 	Array1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
 	Array1D< ReportVars > ICEngineGeneratorReport;
-
-	// MODULE SUBROUTINES:
-
-	// Beginning of IC ENGINE Generator Module Driver Subroutines
-	//*************************************************************************
-
-	// Functions
 
 	void
 	SimICEngineGenerator(
@@ -989,7 +971,7 @@ namespace ICEngineElectricGenerator {
 			HeatRecOutletNode = ICEngineGenerator( GeneratorNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			ICEngineGenerator( GeneratorNum ).DesignHeatRecMassFlowRate = rho * ICEngineGenerator( GeneratorNum ).DesignHeatRecVolFlowRate;
 			ICEngineGenerator( GeneratorNum ).HeatRecMdotDesign = ICEngineGenerator( GeneratorNum ).DesignHeatRecMassFlowRate;

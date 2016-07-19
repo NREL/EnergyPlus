@@ -3143,7 +3143,7 @@ namespace MixedAir {
 		if ( FirstHVACIteration ) {
 			// Mixed air setpoint. Set by a setpoint manager.
 			if ( thisOAController.ControllerType_Num == ControllerOutsideAir ) {
-				if ( Node( thisOAController.MixNode ).TempSetPoint > 0.0 ) {
+				if ( Node( thisOAController.MixNode ).TempSetPoint > SensedNodeFlagValue ) {
 					thisOAController.MixSetTemp = Node( thisOAController.MixNode ).TempSetPoint;
 				} else {
 					thisOAController.MixSetTemp = thisOAController.TempLowLim;

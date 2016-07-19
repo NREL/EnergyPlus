@@ -163,7 +163,7 @@ Cooling Coil Total Cooling Rate is the Rate of heat transfer taking place in the
 
 Cooling Coil Sensible Cooling Rate is the Rate of Sensible heat transfer taking place in the coil at the operating conditions.
 
-\paragraph{\texorpdfstring{Cooling Coil Wetted Area Fraction {[]}}{Cooling Coil Wetted Area Fraction }}\label{cooling-coil-wetted-area-fraction}
+\paragraph{Cooling Coil Wetted Area Fraction {[]}}\label{cooling-coil-wetted-area-fraction}
 
 It defines the fraction of total surface area of coil which is wet due to moisture condensation on the surface of the coil. Value varies between 0.0 and 1.0.
 
@@ -741,7 +741,7 @@ This output is the average electric consumption rate for the parasitic load asso
 
 This output is the electric consumption of the desuperheater heating coil parasitic load in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction}
 
 This is the runtime fraction of the desuperheater heating coil for the timestep being reported. Since the desuperheater heating coil can only provide heat when the heat source object is active, the runtime fraction of the desuperheater heating coil will always be less than or equal to the runtime fraction of the heat source object.
 
@@ -861,7 +861,7 @@ This is the latent cooling rate output of the DX coil in Watts. This is determin
 
 This is the latent cooling output of the DX coil in Joules for the time step being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction}
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
 
@@ -968,7 +968,7 @@ This field is the total heating rate output of the DX coil in Watts. This is det
 
 This is the total heating output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-1}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-1}
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
 
@@ -996,7 +996,7 @@ This alpha field defines the name of the air outlet node exiting the DX cooling 
 
 \paragraph{Field: Rated Total Cooling Capacity}\label{field-rated-total-cooling-capacity}
 
-This numeric field defines the gross rated total cooling capacity of the DX cooling coil in watts. The total cooling capacity should be a gross , i.e., the effect of supply air fan heat NOT accounted for.
+This numeric field defines the gross rated total cooling capacity of the DX cooling coil in watts. The total cooling capacity should be a gross , i.e., the effect of supply air fan heat NOT accounted for. Note that if autosize is selected for this field, the cooling design supply air temperature provided in the Sizing:Zone object needs to be in accordance with the Indoor Unit Evaporating Temperature Function of Superheating Curve provided below in this object.
 
 \paragraph{Field: Rated Sensible Heat Ratio}\label{field-rated-sensible-heat-ratio}
 
@@ -1100,7 +1100,7 @@ This is the latent cooling rate output of the DX coil in Watts. This is determin
 
 This is the latent cooling output of the DX coil in Joules for the time step being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-1}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-1}
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
 
@@ -1203,7 +1203,7 @@ This field is the total heating rate output of the DX coil in Watts. This is det
 
 This is the total heating output of the DX coil in Joules over the time step being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-2}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-2}
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the time step being reported.
 
@@ -1320,7 +1320,7 @@ This field is the electric consumption of the heating coil auxiliaries in Joules
 
 This field is the average electric consumption rate of the heating coil auxiliaries (e.g., inducer fan) in Watts over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-3}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-3}
 
 This field is the runtime fraction of the coil over the timestep being reported.
 
@@ -2776,7 +2776,7 @@ This output is the electricity consumption rate of the DX coil compressor and co
 
 This is the electricity consumption of the DX coil compressor and condenser fan(s) in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-2}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-2}
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the timestep being reported.
 
@@ -2808,11 +2808,11 @@ This is the average electricity consumption rate of the evaporative condenser wa
 
 This is the electricity consumption rate of the evaporative condenser water pump in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects). This output variable appears only when the DX Cooling Coil is evaporatively cooled.
 
-\paragraph{\texorpdfstring{Cooling Coil Stage 2 Runtime Fraction {[]}}{Cooling Coil Stage 2 Runtime Fraction }}\label{cooling-coil-stage-2-runtime-fraction}
+\paragraph{Cooling Coil Stage 2 Runtime Fraction {[]}}\label{cooling-coil-stage-2-runtime-fraction}
 
 This is the runtime fraction of the stage 2 DX coil compressor and condenser fan(s) for the timestep being reported. Applicable only for COIL Coil:Cooling:DX:TwoStageWithHumidityControlMode when 2 capacity stages are specified. For 2-stage systems, Cooling Coil Runtime Fraction is the stage 1 runtime fraction. These runtime fractions overlap, because stage 2 will not run unless stage 1 is already running. For example, a system where stage 1 is 60\% of total capacity is passed a load of 70\%. The Cooling Coil Runtime Fraction (stage 1) will be 1.0, and the Cooling Coil Stage 2 Runtime Fraction will be 0.25 {[}(70\%-60\%)/(100\%-60\%){]}.
 
-\paragraph{\texorpdfstring{Cooling Coil Dehumidification Mode {[]}}{Cooling Coil Dehumidification Mode }}\label{cooling-coil-dehumidification-mode}
+\paragraph{Cooling Coil Dehumidification Mode {[]}}\label{cooling-coil-dehumidification-mode}
 
 This is the dehumidification mode for the timestep being reported. Applicable only for Coil:Cooling:DX:TwoStageWithHumidityControlMode when enhanced dehumidification mode is available. A value of 0 indicates normal mode (extra dehumidification not active). A value of 1 indicates dehumidification mode 1 is active. Note that this is an averaged variable, so fractional values are likely to be reported for reporting frequencies longer than ``detailed''.
 
@@ -3213,11 +3213,11 @@ The output variable is the average sensible cooling load provide by the heat pum
 
 The output variable is the average heat rejected to the water at the heat pump condenser in Watts over the timestep being reported.
 
-\paragraph{\texorpdfstring{Cooling Coil Part Load Ratio {[]}}{Cooling Coil Part Load Ratio }}\label{cooling-coil-part-load-ratio}
+\paragraph{Cooling Coil Part Load Ratio {[]}}\label{cooling-coil-part-load-ratio}
 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the VSAirtoAirHP coil. For the cycling fan mode, the runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due to the part-load performance of the VSAirtoAirHP coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-3}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-3}
 
 This output variable is the function of the part load ratio (PLR, part-load capacity/ steady state capacity). The runtime fraction, or duty factor, accounts for efficiency losses due to compressor cycling.
 
@@ -3241,11 +3241,11 @@ The output variable is the average leaving air dry-bulb temperature over the tim
 
 The output variable is the average leaving air dry humidity ratio over the timestep being reported.
 
-\paragraph{\texorpdfstring{Cooling Coil Upper Speed Level {[]}}{Cooling Coil Upper Speed Level }}\label{cooling-coil-upper-speed-level}
+\paragraph{Cooling Coil Upper Speed Level {[]}}\label{cooling-coil-upper-speed-level}
 
 The output variable is the average upper speed level, for interpolating performances between two neighboring speed levels.
 
-\paragraph{\texorpdfstring{Cooling Coil Neighboring Speed Levels Ratio {[]}}{Cooling Coil Neighboring Speed Levels Ratio }}\label{cooling-coil-neighboring-speed-levels-ratio}
+\paragraph{Cooling Coil Neighboring Speed Levels Ratio {[]}}\label{cooling-coil-neighboring-speed-levels-ratio}
 
 The output variable is the average speed ratio, for interpolating performances between two neighboring speed levels.
 
@@ -3861,7 +3861,7 @@ This is the average electricity consumption rate of the DX coil compressor s cra
 
 This is the electricity consumption of the DX coil compressor s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Miscellaneous, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-4}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-4}
 
 This is the runtime fraction of the DX heating coil compressor and outdoor fan(s) for the timestep being reported.
 
@@ -4192,7 +4192,7 @@ This is the average electricity consumption rate of the DX coil compressor s cra
 
 This is the electricity consumption of the DX coil compressor s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-5}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-5}
 
 This is the runtime fraction of the DX heating coil compressor and outdoor fan(s) for the timestep being reported. When the heating speed is above 1, this output is the run time fraction for the higher speed.
 
@@ -4503,11 +4503,11 @@ The output variable is the average sensible heating capacity provide by the heat
 
 The output variable is the average heat absorbed at the heat pump evaporator in Watts over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heating Coil Part Load Ratio {[]}}{Heating Coil Part Load Ratio }}\label{heating-coil-part-load-ratio}
+\paragraph{Heating Coil Part Load Ratio {[]}}\label{heating-coil-part-load-ratio}
 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the heating coil. For the cycling fan mode, the runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due to the part-load performance of the heating coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-6}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-6}
 
 This output variable is the function of the part load ratio (PLR, part-load capacity/ steady state capacity). The duty factor or part load fraction accounts for efficiency losses due to compressor cycling.
 
@@ -4531,11 +4531,11 @@ The output variable is the average leaving air dry-bulb temperature over the tim
 
 The output variable is the average leaving air dry humidity ratio over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heating Coil Upper Speed Level {[]}}{Heating Coil Upper Speed Level }}\label{heating-coil-upper-speed-level}
+\paragraph{Heating Coil Upper Speed Level {[]}}\label{heating-coil-upper-speed-level}
 
 The output variable is the average upper speed level, for interpolating performances between two neighboring speed levels.
 
-\paragraph{\texorpdfstring{Heating Coil Neighboring Speed Levels Ratio {[]}}{Heating Coil Neighboring Speed Levels Ratio }}\label{heating-coil-neighboring-speed-levels-ratio}
+\paragraph{Heating Coil Neighboring Speed Levels Ratio {[]}}\label{heating-coil-neighboring-speed-levels-ratio}
 
 The output variable is the average speed ratio, for interpolating performances between two neighboring speed levels.
 
@@ -4759,7 +4759,7 @@ This output field contains the average electricity consumption rate for the wate
 
 This output field contains the electricity consumption of the water circulation pump in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Water Heater Heat Reclaim Efficiency Modifier Multiplier {[]}}{Water Heater Heat Reclaim Efficiency Modifier Multiplier }}\label{water-heater-heat-reclaim-efficiency-modifier-multiplier}
+\paragraph{Water Heater Heat Reclaim Efficiency Modifier Multiplier {[]}}\label{water-heater-heat-reclaim-efficiency-modifier-multiplier}
 
 This output field contains the average output of the Heat Reclaim Efficiency Modifier Curve (function of temperature) for the timestep being reported.
 
@@ -5492,7 +5492,7 @@ This output field is the average latent cooling rate output of the DX coil in Wa
 
 This output field is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-4}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-4}
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
@@ -5716,7 +5716,7 @@ This output field is the average latent cooling rate output of the DX coil in Wa
 
 This output field is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-5}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-5}
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
@@ -6072,11 +6072,11 @@ The output variable is the average sensible cooling load provide by the heat pum
 
 The output variable is the average heat rejected to the water at the heat pump condenser in Watts over the timestep being reported.
 
-\paragraph{\texorpdfstring{Cooling Coil Part Load Ratio {[]}}{Cooling Coil Part Load Ratio }}\label{cooling-coil-part-load-ratio-1}
+\paragraph{Cooling Coil Part Load Ratio {[]}}\label{cooling-coil-part-load-ratio-1}
 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the WatertoAirHP coil. For the cycling fan mode, the runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due to the part-load performance of the WatertoAirHP coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-6}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-6}
 
 This output variable is the function of the part load ratio (PLR, part-load capacity/ steady state capacity). The duty factor or part load fraction accounts for efficiency losses due to compressor cycling.
 
@@ -6581,11 +6581,11 @@ The output variable is the average sensible cooling load provide by the heat pum
 
 The output variable is the average heat rejected to the water at the heat pump condenser in Watts over the timestep being reported.
 
-\paragraph{\texorpdfstring{Cooling Coil Part Load Ratio {[]}}{Cooling Coil Part Load Ratio }}\label{cooling-coil-part-load-ratio-2}
+\paragraph{Cooling Coil Part Load Ratio {[]}}\label{cooling-coil-part-load-ratio-2}
 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the VSWatertoAirHP coil. For the cycling fan mode, the runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due to the part-load performance of the VSWatertoAirHP coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-7}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-7}
 
 This output variable is the function of the part load ratio (PLR, part-load capacity/ steady state capacity). The duty factor or runtime fraction accounts for efficiency losses due to compressor cycling.
 
@@ -6621,11 +6621,11 @@ The output variable is the average entering water temperature over the timestep 
 
 The output variable is the average leaving water temperature over the timestep being reported.
 
-\paragraph{\texorpdfstring{Cooling Coil Upper Speed Level {[]}}{Cooling Coil Upper Speed Level }}\label{cooling-coil-upper-speed-level-1}
+\paragraph{Cooling Coil Upper Speed Level {[]}}\label{cooling-coil-upper-speed-level-1}
 
 The output variable is the average upper speed level, for interpolating performances between two neighboring speed levels.
 
-\paragraph{\texorpdfstring{Cooling Coil Neighboring Speed Levels Ratio {[]}}{Cooling Coil Neighboring Speed Levels Ratio }}\label{cooling-coil-neighboring-speed-levels-ratio-1}
+\paragraph{Cooling Coil Neighboring Speed Levels Ratio {[]}}\label{cooling-coil-neighboring-speed-levels-ratio-1}
 
 The output variable is the average speed ratio, for interpolating performances between two neighboring speed levels.
 
@@ -6905,11 +6905,11 @@ The output variable is the average sensible heating capacity provide by the heat
 
 The output variable is the average heat absorbed at the heat pump evaporator in Watts over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heating Coil Part Load Ratio {[]}}{Heating Coil Part Load Ratio }}\label{heating-coil-part-load-ratio-1}
+\paragraph{Heating Coil Part Load Ratio {[]}}\label{heating-coil-part-load-ratio-1}
 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the WatertoAirHP coil. For the cycling fan mode, the runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due to the part-load performance of the WatertoAirHP coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-7}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-7}
 
 This output variable is the function of the part load ratio (PLR, part-load capacity/ steady state capacity). The duty factor or part load fraction accounts for efficiency losses due to compressor cycling.
 
@@ -7354,11 +7354,11 @@ The output variable is the average sensible heating capacity provide by the heat
 
 The output variable is the average heat absorbed at the heat pump evaporator in Watts over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heating Coil Part Load Ratio {[]}}{Heating Coil Part Load Ratio }}\label{heating-coil-part-load-ratio-2}
+\paragraph{Heating Coil Part Load Ratio {[]}}\label{heating-coil-part-load-ratio-2}
 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the VSWatertoAirHP coil. For the cycling fan mode, the runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due to the part-load performance of the VSWatertoAirHP coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
-\paragraph{\texorpdfstring{Heating Coil Runtime Fraction {[]}}{Heating Coil Runtime Fraction }}\label{heating-coil-runtime-fraction-8}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-8}
 
 This output variable is the function of the part load ratio (PLR, part-load capacity/ steady state capacity). The duty factor or part load fraction accounts for efficiency losses due to compressor cycling.
 
@@ -7394,11 +7394,11 @@ The output variable is the average entering water temperature over the timestep 
 
 The output variable is the average leaving water temperature over the timestep being reported.
 
-\paragraph{\texorpdfstring{Heating Coil Upper Speed Level {[]}}{Heating Coil Upper Speed Level }}\label{heating-coil-upper-speed-level-1}
+\paragraph{Heating Coil Upper Speed Level {[]}}\label{heating-coil-upper-speed-level-1}
 
 The output variable is the average upper speed level, for interpolating performances between two neighboring speed levels.
 
-\paragraph{\texorpdfstring{Heating Coil Neighboring Speed Levels Ratio {[]}}{Heating Coil Neighboring Speed Levels Ratio }}\label{heating-coil-neighboring-speed-levels-ratio-1}
+\paragraph{Heating Coil Neighboring Speed Levels Ratio {[]}}\label{heating-coil-neighboring-speed-levels-ratio-1}
 
 The output variable is the average speed ratio, for interpolating performances between two neighboring speed levels.
 
@@ -7486,7 +7486,7 @@ This field is used to determine what type of material is used for thermal storag
 
 This field is used to declare what type of user defined fluid is contained in the TES tank. This input field is only used (and required) if the previous field is set to UserDefinedFluidType. Water, EthyleneGlycol, and PropoleneGlycol have fluid properties built-in to EnergyPlus. Using a FluidProperties:GlycolConcentration object allows specifying a mixture of water and a glycol and the name of one can be entered here. For other types of fluids, a complete set of fluid property data is needed, see FluidProperties:Name, FluidProperties:Temperature, etc.
 
-\paragraph{\texorpdfstring{Field: Fluid Storage Volume {[}m\(^{3}\){]}}{Field: Fluid Storage Volume {[}m\^{}\{3\}{]}}}\label{field-fluid-storage-volume-m3}
+\paragraph{Field: Fluid Storage Volume {[}m\(^{3}\){]}}\label{field-fluid-storage-volume-m3}
 
 This field is used to describe the size of fluid-based TES tank, in m\(^{3}\). The storage volume can be automatically calculated based on the cooling capacity and sizing factor.
 
@@ -7510,7 +7510,7 @@ This field is used to characterize the rate at which heat is exchanged between t
 
 This field is used to define what temperature is used for rating conditions when using a fluid storage tank. This field is only used for Storage Type of Water or UserDefinedFluidType. The temperature here is used for declaring the state of the TES fluid tank that corresponds to Rated conditions. The temperature entered here is used to define fluid properties and to characterize the performance curves that depend on the state of the TES.
 
-\paragraph{\texorpdfstring{Field: Rated Evaporator Air Flow Rate {[}m\(^{3}\)/s{]}}{Field: Rated Evaporator Air Flow Rate {[}m\^{}\{3\}/s{]}}}\label{field-rated-evaporator-air-flow-rate-m3s}
+\paragraph{Field: Rated Evaporator Air Flow Rate {[}m\(^{3}\)/s{]}}\label{field-rated-evaporator-air-flow-rate-m3s}
 
 This field is the air volume flow rate through the coil, in m\(^{3}\)/s, at rating conditions. This is the rated air flow rate through the evaporator (and any other air cooling devices that are in series with the main evaporator). The coil can be operated with a different flow rate than this rated flow rate and the performance of the unit scales accordingly using the curves that are of the type Function of Flow Fraction Curve. All of the other rated values for capacity, COP, and SHR values, for all the various modes, should be determined at the same air flow rate used here. This field can be autosized.
 
@@ -7852,7 +7852,7 @@ This field is the name of system node that serves as the inlet to the condenser 
 
 This field is the name of system node that serves as the outlet to the condenser section of the packaged TES coil. This node is typically not connected to anything else. The conditions leaving the condenser are applied to this system node. This field is required.
 
-\paragraph{\texorpdfstring{Field: Condenser Design Air Flow Rate {[}m\(^{3}\)/s{]}}{Field: Condenser Design Air Flow Rate {[}m\^{}\{3\}/s{]}}}\label{field-condenser-design-air-flow-rate-m3s}
+\paragraph{Field: Condenser Design Air Flow Rate {[}m\(^{3}\)/s{]}}\label{field-condenser-design-air-flow-rate-m3s}
 
 This field is the rate of air flow through the condenser section, in m\(^{3}\)/s. The model assumes constant, single-speed condenser fans. The flow rate is not used to determine coil operation but is used to determine the conditions leaving the condenser section. This field is required, for both air-cooled and evaporatively-cooled condenser types.
 
@@ -7997,7 +7997,7 @@ This field is used for fluid-based TES tank (Storage Type of Water or UserDefine
   HVAC,Average,Cooling Coil Fluid Thermal Storage End Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Cooling Coil Operating Mode Index {[]}}{Cooling Coil Operating Mode Index }}\label{cooling-coil-operating-mode-index}
+\paragraph{Cooling Coil Operating Mode Index {[]}}\label{cooling-coil-operating-mode-index}
 
 This output variable reports the operating mode for the cooling coil. The numbers in this output are integer codes that correspond to the operating modes as described in the following table. These codes match the values used for input in schedules and EMS actuators to control operation.
 
@@ -8053,7 +8053,7 @@ This output is the electricity consumption rate, in Watts, of the compressor(s),
 
 This output is the electricity consumption, in Joules, of the compressor(s), pump(s), condenser fan(s) that are inside the package to drive heat transfer for the cooling coil. This does not include ancillary electrical consumption for such things as cold weather protection, off cycle ancillary power, or supply fans.
 
-\paragraph{\texorpdfstring{Cooling Coil Runtime Fraction {[]}}{Cooling Coil Runtime Fraction }}\label{cooling-coil-runtime-fraction-8}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-8}
 
 This output is the runtime fraction of cooling coil.
 
@@ -8075,7 +8075,7 @@ These are the power and energy outputs for the coil s heat exchange with the TES
 
 These are the power and energy outputs for the TES tank s heat exchange with the surrounding ambient conditions, in Watts and Joules respectively. The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging. This heat transfer is driven by the temperature difference between the media in the tank and the surrounding ambient and is governed by the UA factor.
 
-\paragraph{\texorpdfstring{Cooling Coil Ice Thermal Storage End Fraction {[]}}{Cooling Coil Ice Thermal Storage End Fraction }}\label{cooling-coil-ice-thermal-storage-end-fraction}
+\paragraph{Cooling Coil Ice Thermal Storage End Fraction {[]}}\label{cooling-coil-ice-thermal-storage-end-fraction}
 
 This output is the state of the TES tank as fraction of the storage capacity. Because the tank storage model is dynamic, this value corresponds to the point in time right at the end of the timestep. This output variable is only available for a storage type of Ice.
 
@@ -8087,11 +8087,11 @@ This output is the state of the TES tank as the temperature of the fluid in the 
 
 This output is the inlet temperature entering the condenser section of an evaporatively cooled condenser, in °C. This temperature is for the air stream after the evaporative assist and before entering the condenser. This is the temperature used for condenser entering drybulb conditions when evaluating performance curves for evaporatively cooled condensers. This output is only available for evaporatively cooled condensers.
 
-\paragraph{\texorpdfstring{Cooling Coil Evaporative Condenser Water Volume {[}m\(^{3}\){]}}{Cooling Coil Evaporative Condenser Water Volume {[}m\^{}\{3\}{]}}}\label{cooling-coil-evaporative-condenser-water-volume-m3-2}
+\paragraph{Cooling Coil Evaporative Condenser Water Volume {[}m\(^{3}\){]}}\label{cooling-coil-evaporative-condenser-water-volume-m3-2}
 
 This output is the amount of water used to evaporatively cool the condenser inlet air, in cubic meters. This output is only available for evaporatively cooled condensers.
 
-\paragraph{\texorpdfstring{Cooling Coil Evaporative Condenser Mains Supply Water Volume {[}m\(^{3}\){]}}{Cooling Coil Evaporative Condenser Mains Supply Water Volume {[}m\^{}\{3\}{]}}}\label{cooling-coil-evaporative-condenser-mains-supply-water-volume-m3-2}
+\paragraph{Cooling Coil Evaporative Condenser Mains Supply Water Volume {[}m\(^{3}\){]}}\label{cooling-coil-evaporative-condenser-mains-supply-water-volume-m3-2}
 
 This output is the volume of water drawn from mains water service for the evaporatively cooled condenser. This output is only available for evaporatively cooled condensers.
 
@@ -8337,23 +8337,23 @@ Coil:Cooling:DX:MultiSpeed,
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (evaporator) of a heat pump is installed. This is an optional input field specified only when user desires to extract heat from the zone via secondary coil. Heat extracted is modeled as internal gain. If the primary DX system is a heat pump, then the zone name should be the same as the zone name specified for placing the secondary cooling DX coil.
 
-\subsubsection{\texorpdfstring{Field: Speed Secondary Coil Air Flow Rate}{Field: Speed  Secondary Coil Air Flow Rate}}\label{field-speed-secondary-coil-air-flow-rate}
+\subsubsection{Field: Speed Secondary Coil Air Flow Rate}\label{field-speed-secondary-coil-air-flow-rate}
 
 This input value is the secondary coil (evaporator) air flow rate when the heat pump is working in heating mode or the secondary coil (condenser) air flow rate when the heat pump is working in cooling mode. This input field is auto-sizable.
 
-\subsubsection{\texorpdfstring{Field: Speed Secondary Coil Fan Flow Scaling Factor}{Field: Speed  Secondary Coil Fan Flow Scaling Factor}}\label{field-speed-secondary-coil-fan-flow-scaling-factor}
+\subsubsection{Field: Speed Secondary Coil Fan Flow Scaling Factor}\label{field-speed-secondary-coil-fan-flow-scaling-factor}
 
 This input field is scaling factor for autosizing the secondary DX coil fan flow rate. The secondary air flow rate is determined by multiplying the primary DX coil rated air flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set to 1.0.
 
-\subsubsection{\texorpdfstring{Field: Speed Nominal Sensible Heat Ratio of Secondary Coil}{Field: Speed  Nominal Sensible Heat Ratio of Secondary Coil}}\label{field-speed-nominal-sensible-heat-ratio-of-secondary-coil}
+\subsubsection{Field: Speed Nominal Sensible Heat Ratio of Secondary Coil}\label{field-speed-nominal-sensible-heat-ratio-of-secondary-coil}
 
 This input value is the nominal sensible heat ratio used to split the heat extracted by a secondary DX coil (evaporator) of a heat pump into sensible and latent components. This is an optional input field. If this input field is left blank, then pure sensible internal heat gain is assumed, i.e., sensible heat ratio of 1.0.
 
-\subsubsection{\texorpdfstring{Field: Speed Sensible Heat Ratio Modifier Function of Temperature Curve Name}{Field: Speed  Sensible Heat Ratio Modifier Function of Temperature Curve Name}}\label{field-speed-sensible-heat-ratio-modifier-function-of-temperature-curve-name}
+\subsubsection{Field: Speed Sensible Heat Ratio Modifier Function of Temperature Curve Name}\label{field-speed-sensible-heat-ratio-modifier-function-of-temperature-curve-name}
 
 This input field is name of sensible heat ratio modifier biquadratic curve. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary zone air node wet-bulb temperature and the heating DX coil entering air dry-bulb temperature. This is an optional input field. If this input field is left blank, then the nominal sensible heat ratio modifier curve value for temperature is set to 1.0.
 
-\subsubsection{\texorpdfstring{Field: Speed Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}{Field: Speed  Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}}\label{field-speed-sensible-heat-ratio-modifier-function-of-flow-fraction-curve-name}
+\subsubsection{Field: Speed Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}\label{field-speed-sensible-heat-ratio-modifier-function-of-flow-fraction-curve-name}
 
 This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field. If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
 
@@ -8518,11 +8518,11 @@ This is the sensible heat removed from a a zone by a secondary DX coil (evaporat
 
 This is the latent heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is the difference between the total heat removal rate and the sensible heat remobal rate of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that moisture is removed from the zone.
 
-\subsubsection{\texorpdfstring{Secondary Coil Sensible Heat Ratio {[]}}{Secondary Coil Sensible Heat Ratio }}\label{secondary-coil-sensible-heat-ratio}
+\subsubsection{Secondary Coil Sensible Heat Ratio {[]}}\label{secondary-coil-sensible-heat-ratio}
 
 This is the operating sensible heat ratio the secondary DX coil (condenser) when the heat pump is operating in heating mode.
 
-\subsubsection{\texorpdfstring{Secondary Coil Compressor Part Load Ratio {[]}}{Secondary Coil Compressor Part Load Ratio }}\label{secondary-coil-compressor-part-load-ratio}
+\subsubsection{Secondary Coil Compressor Part Load Ratio {[]}}\label{secondary-coil-compressor-part-load-ratio}
 
 This is the compressor part load ratio when the heat pump is operating in heating mode and the secondary coil is extracting heat from a zone where the coil is installed. The secondary coil DX coil compressor part load ratio can be different from the primary DX coil compressor part load ratio in that the later may include the defrosting load.
 

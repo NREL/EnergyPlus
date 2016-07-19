@@ -3,76 +3,56 @@
 The sizing calculations in EnergyPlus are managed by a sizing manager contained in the software module \emph{SizingManager}. The main sizing manager routine \emph{ManageSizing} is called from \emph{ManageSimulation} before the annual simulation sequence is invoked. \emph{ManageSizing} performs the following tasks.
 
 \begin{itemize}
-\item
-  By calling \emph{GetSizingParams}, \emph{GetZoneSizingInput}, \emph{GetSystemSizingInput} and \emph{GetPlantSizingInput} reads in all the user sizing input contained in objects \emph{Sizing:Parameters}, \emph{Sizing:Zone}, \emph{Sizing:System} and \emph{Sizing:Plant}. These objects and their data are described in the EnergyPlus Input Output Reference, Group Design Objects.
-\item
-  Set the \emph{ZoneSizingCalc} flag equal to \emph{true}.
-\item
-  Loop over all the sizing periods by each day. \textbf{This starts the zone design calculations.}
-\end{itemize}
-
-\begin{lstlisting}
--   Call *UpdateZoneSizing(BeginDay)* to initialize zone design load and flow rate sequences.
-\end{lstlisting}
-
-\begin{lstlisting}
--   Loop over hours in the day
-\end{lstlisting}
-
-\begin{lstlisting}
-    -   Loop over zone time steps in each hour
-\end{lstlisting}
-
-\begin{lstlisting}
-        -   Call *ManageWeather* to obtain outside conditions for this time-step.
-\end{lstlisting}
-
-\begin{lstlisting}
-        -   Call *ManageHeatBalance* to do a full heat balance calculation for each zone. The call to *ManageHeatBalance* also brings about an HVAC simulation. *ZoneSizingCalc = true* signals the *HVACManager* to ignore the real HVAC system and instead run the ideal zonal system (described below) used to calculate design loads and flow rates. HVACManager also calls *UpdateZoneSizing(DuringDay)* to save the results of the ideal zonal system calculation in the design load and flow rate sequences.
-\end{lstlisting}
-
-\begin{lstlisting}
-    -   Call *UpdateZoneSizing(EndDay)* to calculate peaks and moving averages from the zone design sequences for each design day.
-\end{lstlisting}
-
-\begin{itemize}
-\item
-  Call \emph{UpdateZoneSizing(EndZoneSizingCalc)} to calculate for each zone the peak heating \& cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the system design calculations. \textbf{This ends the zone design calculations.}
-\item
-  Set the \emph{SysSizingCalc} flag equal to \emph{true}.
-\item
-  Call \emph{ManageZoneEquipment} and \emph{ManageAirLoops} to read in the zone and central system inputs needed for the system design calculations. The program needs enough information to be able to figure out the overall air loop connectivity.
-\item
-  Loop over all the sizing periods by each day. \textbf{This starts the system design calculations.}
-\end{itemize}
-
-\begin{lstlisting}
--   Call *UpdateSysSizing(BeginDay)* to initialize system design load and flow rate sequences.
-\end{lstlisting}
-
-\begin{lstlisting}
--   Loop over hours in the day
-\end{lstlisting}
-
-\begin{lstlisting}
-    -   Loop over zone time steps in each hour
-\end{lstlisting}
-
-\begin{lstlisting}
-        -   Call *ManageWeather* to obtain outside conditions for this time-step.
-\end{lstlisting}
-
-\begin{lstlisting}
-        -   Call *UpdateSysSizing(DuringDay)* to save the results of the system design calculations in the system design load and flow rate sequences.
-\end{lstlisting}
-
-\begin{lstlisting}
--   Call *UpdateSysSizing(EndDay)* to calculate peaks and moving averages from the system design sequences for each sizing period.
-\end{lstlisting}
-
-\begin{itemize}
-\item
-  Call \emph{UpdateSysSizing(EndSysSizingCalc))} to calculate for each system the peak heating \& cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the component sizing calculations. \textbf{This ends the system design calculations.}
-\item
-  And this ends the tasks of the Sizing Manager.
+  \item
+    By calling \emph{GetSizingParams}, \emph{GetZoneSizingInput}, \emph{GetSystemSizingInput} and \emph{GetPlantSizingInput} reads in all the user sizing input contained in objects \emph{Sizing:Parameters}, \emph{Sizing:Zone}, \emph{Sizing:System} and \emph{Sizing:Plant}. These objects and their data are described in the EnergyPlus Input Output Reference, Group Design Objects.
+  \item
+    Set the \emph{ZoneSizingCalc} flag equal to \emph{true}.
+  \item
+    Loop over all the sizing periods by each day. \textbf{This starts the zone design calculations.}
+    \begin{itemize}
+      \item
+        Call \emph{UpdateZoneSizing(BeginDay)} to initialize zone design load and flow rate sequences.
+      \item
+        Loop over hours in the day
+        \begin{itemize}
+          \item
+            Loop over zone time steps in each hour
+            \begin{itemize}
+              \item
+                Call \emph{ManageWeather} to obtain outside conditions for this time-step.
+              \item
+                Call \emph{ManageHeatBalance} to do a full heat balance calculation for each zone. The call to \emph{ManageHeatBalance} also brings about an HVAC simulation. \emph{ZoneSizingCalc = true} signals the \emph{HVACManager} to ignore the real HVAC system and instead run the ideal zonal system (described below) used to calculate design loads and flow rates. HVACManager also calls \emph{UpdateZoneSizing(DuringDay)} to save the results of the ideal zonal system calculation in the design load and flow rate sequences.
+            \end{itemize}
+        \end{itemize}
+      \item
+        Call \emph{UpdateZoneSizing(EndDay)} to calculate peaks and moving averages from the zone design sequences for each design day.
+    \end{itemize}
+  \item
+    Call \emph{UpdateZoneSizing(EndZoneSizingCalc)} to calculate for each zone the peak heating \& cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the system design calculations. \textbf{This ends the zone design calculations.}
+  \item
+    Set the \emph{SysSizingCalc} flag equal to \emph{true}.
+  \item
+    Call \emph{ManageZoneEquipment} and \emph{ManageAirLoops} to read in the zone and central system inputs needed for the system design calculations. The program needs enough information to be able to figure out the overall air loop connectivity.
+  \item
+    Loop over all the sizing periods by each day. \textbf{This starts the system design calculations.}
+    \begin{itemize}
+      \item
+        Call \emph{UpdateSysSizing(BeginDay)} to initialize system design load and flow rate sequences.
+      \item
+        Loop over hours in the day
+        \begin{itemize}
+          \item
+            Loop over zone time steps in each hour
+            \begin{itemize}
+              \item Call \emph{ManageWeather} to obtain outside conditions for this time-step.
+              \item Call \emph{UpdateSysSizing(DuringDay)} to save the results of the system design calculations in the system design load and flow rate sequences.
+            \end{itemize}
+        \end{itemize}
+      \item
+        Call \emph{UpdateSysSizing(EndDay)} to calculate peaks and moving averages from the system design sequences for each sizing period.
+    \end{itemize}
+  \item
+    Call \emph{UpdateSysSizing(EndSysSizingCalc))} to calculate for each system the peak heating \& cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the component sizing calculations. \textbf{This ends the system design calculations.}
+  \item
+    And this ends the tasks of the Sizing Manager.
 \end{itemize}
