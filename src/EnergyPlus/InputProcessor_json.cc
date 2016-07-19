@@ -139,7 +139,11 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 }
             }
             if (root[obj_name].find(name) != root[obj_name].end()) {
-                name = obj_name + " " + std::to_string(root[obj_name].size() + 1);
+                if (name.empty()) {
+                    name = obj_name + " " + std::to_string(root[obj_name].size() + 1);
+                } else {
+                    name = name + "_special_case_" + std::to_string(root[obj_name].size() + 1);
+                }
             }
             root[obj_name][name] = obj;
         }
@@ -3039,7 +3043,11 @@ EnergyPlus::InputProcessor::GetRecordLocations(
         for (int i = 0; i < alphas_fields.size(); ++i) {
             std::string const field = alphas_fields[i];
             if (field == "name") {
-                Alphas(i + 1) = MakeUPPERCase(obj.key());
+                std::string name = obj.key();
+                if (obj.key().find("_special_case_") != std::string::npos) {
+                    name = obj.key().substr(0, obj.key().size() - (obj.key().size() - obj.key().find_first_of("_special_case_")));
+                }
+                Alphas(i + 1) = MakeUPPERCase(name);
                 if (present(AlphaBlank)) AlphaBlank()(i + 1) = obj.key().empty();  // TODO is this what should be done? unit tests for the original input processor are needed
                 if (present(AlphaFieldNames)) AlphaFieldNames()(i + 1) = field;
                 NumAlphas++;
