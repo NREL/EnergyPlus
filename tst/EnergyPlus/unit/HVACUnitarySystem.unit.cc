@@ -4015,7 +4015,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 
 	UnitarySystem( 1 ).ZoneInletNode = 3;
 
-	Schedule( 1 ).CurrentValue = 1.0;
+	Schedule( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ).CurrentValue = 1.0;
 
 	DataSizing::CurSysNum = 1;
 	UnitarySysEqSizing.allocate( 1 );
