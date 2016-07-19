@@ -339,9 +339,6 @@ namespace ReportSizingManager {
 		// Outside Air System Equipment (eg):
 		// Boolean - OASysEqSizing( CurOASysNum ).CoolingAirFlow and Real64 - OASysEqSizing ( CurOASysNum ).CoolingAirVolFlow
 
-		// REFERENCES :
-		// na
-
 		// USE STATEMENTS :
 		using CurveManager::CurveValue;
 		using DataEnvironment::StdRhoAir;
@@ -349,7 +346,6 @@ namespace ReportSizingManager {
 		using DataAirLoop::AirLoopControlInfo;
 		using DataAirSystems::PrimaryAirSystem;
 		using DataGlobals::DisplayExtraWarnings;
-		using DataGlobals::InitConvTemp;;
 		using namespace DataSizing;
 		using namespace DataHVACGlobals;
 		using DXCoils::ValidateADP;
@@ -378,12 +374,6 @@ namespace ReportSizingManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		int const MaxIte( 500 ); // Maximum number of iterations
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DDNum; // design day number corresponding to TimeStepNumAtMax
@@ -711,7 +701,7 @@ namespace ReportSizingManager {
 				} else if ( SizingType == CoolingWaterflowSizing ) {
 					CoilDesWaterDeltaT = PlantSizData( DataPltSizCoolNum ).DeltaT;
 					Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 5.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-					rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+					rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 					if ( TermUnitIU ) {
 						AutosizeDes = TermUnitSizing( CurZoneEqNum ).MaxCWVolFlow;
 					} else if (ZoneEqFanCoil || ZoneEqUnitVent || ZoneEqVentedSlab ) {
@@ -732,13 +722,13 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingWaterflowSizing ) {
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
 						AutosizeDes = TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow;
-						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						DesCoilLoad = AutosizeDes * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho;
 					} else if ( ZoneEqFanCoil ) {
 						AutosizeDes = ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow;
-						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						DesCoilLoad = AutosizeDes * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho;
 					} else if ( ZoneEqUnitHeater || ZoneEqVentedSlab ) {  // for unit ventilator the cp value is calculated at 5.05(InitConvTemp) for the child and 60.0C for the unit ventilator //|| ZoneEqUnitVent
 						AutosizeDes = ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow;
@@ -749,8 +739,8 @@ namespace ReportSizingManager {
 						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 						if ( DesCoilLoad >= SmallLoad ) {
-							Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-							rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop(DataWaterLoopNum ).FluidIndex, CallingRoutine );
+							Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+							rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(DataWaterLoopNum ).FluidIndex, CallingRoutine );
 							AutosizeDes = DesCoilLoad / ( PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho );
 						} else {
 							AutosizeDes = 0.0;
@@ -819,7 +809,7 @@ namespace ReportSizingManager {
 				} else if ( SizingType == CoolingWaterDesAirOutletTempSizing ) {
 					if ( TermUnitIU ) {
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 5.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						DesCoilLoad = DataWaterFlowUsedForSizing * PlantSizData( DataPltSizCoolNum ).DeltaT * Cp * rho;
 						T1Out = DataDesInletAirTemp - DesCoilLoad / ( StdRhoAir * PsyCpAirFnWTdb( DataDesInletAirHumRat, DataDesInletAirTemp ) * DataAirFlowUsedForSizing );
 						T2Out = PlantSizData( DataPltSizCoolNum ).ExitTemp + 2.0;
@@ -1105,13 +1095,13 @@ namespace ReportSizingManager {
 				} else if ( SizingType == WaterHeatingCapacitySizing ) {
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
 						DesMassFlow = TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow;
-						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						NominalCapacityDes = DesMassFlow * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho;
 					} else if ( ZoneEqFanCoil || ZoneEqUnitHeater ) {
 						DesMassFlow = ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow;
-						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						NominalCapacityDes = DesMassFlow * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho;
 						// if coil is part of a zonal unit, calc coil load to get hot water flow rate
 					} else {
@@ -1137,13 +1127,13 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingWaterDesCoilLoadUsedForUASizing ) {
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
 						DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow * TermUnitSizing( CurZoneEqNum ).ReheatAirFlowMult;
-						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataWaterFlowUsedForSizing * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho * TermUnitSizing( CurZoneEqNum ).ReheatLoadMult;
 					} else if ( ZoneEqFanCoil || ZoneEqUnitHeater ) {
 						DesMassFlow = StdRhoAir * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataWaterFlowUsedForSizing * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho;
 					} else {
 						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
@@ -1418,7 +1408,7 @@ namespace ReportSizingManager {
 					}
 					if ( DataCapacityUsedForSizing >= SmallLoad ) {
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 5.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataCapacityUsedForSizing / ( CoilDesWaterDeltaT * Cp * rho );
 					} else {
 						AutosizeDes = 0.0;
@@ -1427,8 +1417,8 @@ namespace ReportSizingManager {
 					bCheckForZero = false;
 				} else if ( SizingType == HeatingWaterflowSizing ) {
 					if ( DataCapacityUsedForSizing >= SmallLoad ) {
-						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
-						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
+						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataCapacityUsedForSizing / ( PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho );
 					} else {
 						AutosizeDes = 0.0;

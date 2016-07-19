@@ -2346,15 +2346,6 @@ namespace PlantPipingSystemsManager {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -2369,22 +2360,12 @@ namespace PlantPipingSystemsManager {
 		using DataGlobals::TimeStep;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
-		using DataGlobals::InitConvTemp;
 		using DataLoopNode::Node;
 		using PlantUtilities::SetComponentFlowRate;
 		using FluidProperties::GetDensityGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPipingSystems" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool errFlag;
@@ -2414,7 +2395,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Once we find ourselves on the plant loop, we can do other things
-			rho = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( PipingSystemCircuits( CircuitNum ).LoopNum ).FluidIndex, RoutineName );
 			PipingSystemCircuits( CircuitNum ).DesignMassFlowRate = PipingSystemCircuits( CircuitNum ).DesignVolumeFlowRate * rho;
 
 			PipingSystemCircuits( CircuitNum ).NeedToFindOnPlantLoop = false;
