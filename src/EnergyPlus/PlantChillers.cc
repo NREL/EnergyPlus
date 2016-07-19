@@ -122,7 +122,6 @@ namespace PlantChillers {
 	using namespace DataLoopNode;
 	using DataGlobals::MaxNameLength;
 	using DataGlobals::NumOfTimeStepInHour;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
@@ -134,8 +133,6 @@ namespace PlantChillers {
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
 	// Parameters for use in Chillers
 	int const AirCooled( 1 );
 	int const WaterCooled( 2 );
@@ -2089,9 +2086,6 @@ namespace PlantChillers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -2110,19 +2104,9 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitElectricChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -2238,7 +2222,7 @@ namespace PlantChillers {
 
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 
 			ElectricChiller( ChillNum ).Base.EvapMassFlowRateMax = rho * ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
 			InitComponentNodes( 0.0, ElectricChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, ElectricChiller( ChillNum ).Base.CWLoopNum, ElectricChiller( ChillNum ).Base.CWLoopSideNum, ElectricChiller( ChillNum ).Base.CWBranchNum, ElectricChiller( ChillNum ).Base.CWCompNum );
@@ -2248,7 +2232,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = ElectricChiller( ChillNum ).TempDesCondIn; //DSU? old behavior, still want?
 
-				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				ElectricChiller( ChillNum ).Base.CondMassFlowRateMax = rho * ElectricChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -2270,7 +2254,7 @@ namespace PlantChillers {
 			}
 
 			if ( ElectricChiller( ChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				ElectricChiller( ChillNum ).DesignHeatRecMassFlowRate = rho * ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
 
 				InitComponentNodes( 0.0, ElectricChiller( ChillNum ).DesignHeatRecMassFlowRate, ElectricChiller( ChillNum ).HeatRecInletNodeNum, ElectricChiller( ChillNum ).HeatRecOutletNodeNum, ElectricChiller( ChillNum ).HRLoopNum, ElectricChiller( ChillNum ).HRLoopSideNum, ElectricChiller( ChillNum ).HRBranchNum, ElectricChiller( ChillNum ).HRCompNum );
@@ -2389,9 +2373,6 @@ namespace PlantChillers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -2409,17 +2390,8 @@ namespace PlantChillers {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitEngineDrivenChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -2442,8 +2414,6 @@ namespace PlantChillers {
 		int BranchIndex;
 		int CompIndex;
 		bool FatalError;
-
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -2533,7 +2503,7 @@ namespace PlantChillers {
 		//     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 
 			EngineDrivenChiller( ChillNum ).Base.EvapMassFlowRateMax = rho * EngineDrivenChiller( ChillNum ).Base.EvapVolFlowRate;
 			InitComponentNodes( 0.0, EngineDrivenChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, EngineDrivenChiller( ChillNum ).Base.CWLoopNum, EngineDrivenChiller( ChillNum ).Base.CWLoopSideNum, EngineDrivenChiller( ChillNum ).Base.CWBranchNum, EngineDrivenChiller( ChillNum ).Base.CWCompNum );
@@ -2544,7 +2514,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = EngineDrivenChiller( ChillNum ).TempDesCondIn;
 
-				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				EngineDrivenChiller( ChillNum ).Base.CondMassFlowRateMax = rho * EngineDrivenChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -2563,7 +2533,7 @@ namespace PlantChillers {
 			}
 
 			if ( EngineDrivenChiller( ChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				EngineDrivenChiller( ChillNum ).DesignHeatRecMassFlowRate = rho * EngineDrivenChiller( ChillNum ).DesignHeatRecVolFlowRate;
 
 				InitComponentNodes( 0.0, EngineDrivenChiller( ChillNum ).DesignHeatRecMassFlowRate, EngineDrivenChiller( ChillNum ).HeatRecInletNodeNum, EngineDrivenChiller( ChillNum ).HeatRecOutletNodeNum, EngineDrivenChiller( ChillNum ).HRLoopNum, EngineDrivenChiller( ChillNum ).HRLoopSideNum, EngineDrivenChiller( ChillNum ).HRBranchNum, EngineDrivenChiller( ChillNum ).HRCompNum );
@@ -2660,17 +2630,8 @@ namespace PlantChillers {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitGTChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -2779,7 +2740,7 @@ namespace PlantChillers {
 
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 
 			GTChiller( ChillNum ).Base.EvapMassFlowRateMax = rho * GTChiller( ChillNum ).Base.EvapVolFlowRate;
 			InitComponentNodes( 0.0, GTChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, GTChiller( ChillNum ).Base.CWLoopNum, GTChiller( ChillNum ).Base.CWLoopSideNum, GTChiller( ChillNum ).Base.CWBranchNum, GTChiller( ChillNum ).Base.CWCompNum );
@@ -2789,7 +2750,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = GTChiller( ChillNum ).TempDesCondIn;
 
-				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				GTChiller( ChillNum ).Base.CondMassFlowRateMax = rho * GTChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -2808,7 +2769,7 @@ namespace PlantChillers {
 			}
 
 			if ( GTChiller( ChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				GTChiller( ChillNum ).DesignHeatRecMassFlowRate = rho * GTChiller( ChillNum ).DesignHeatRecVolFlowRate;
 
 				InitComponentNodes( 0.0, GTChiller( ChillNum ).DesignHeatRecMassFlowRate, GTChiller( ChillNum ).HeatRecInletNodeNum, GTChiller( ChillNum ).HeatRecOutletNodeNum, GTChiller( ChillNum ).HRLoopNum, GTChiller( ChillNum ).HRLoopSideNum, GTChiller( ChillNum ).HRBranchNum, GTChiller( ChillNum ).HRCompNum );
@@ -2905,20 +2866,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitConstCOPChiller" );
 		Real64 const TempDesCondIn( 25.0 ); // Design condenser inlet temp. C
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeFlag( true );
@@ -3006,7 +2957,7 @@ namespace PlantChillers {
 		//Initialize critical Demand Side Variables at the beginning of each environment
 		if ( MyEnvironFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 			ConstCOPChiller( ChillNum ).Base.EvapMassFlowRateMax = ConstCOPChiller( ChillNum ).Base.EvapVolFlowRate * rho;
 			InitComponentNodes( 0.0, ConstCOPChiller( ChillNum ).Base.EvapMassFlowRateMax, EvapInletNode, EvapOutletNode, ConstCOPChiller( ChillNum ).Base.CWLoopNum, ConstCOPChiller( ChillNum ).Base.CWLoopSideNum, ConstCOPChiller( ChillNum ).Base.CWBranchNum, ConstCOPChiller( ChillNum ).Base.CWCompNum );
 
@@ -3015,7 +2966,7 @@ namespace PlantChillers {
 
 				Node( CondInletNode ).Temp = TempDesCondIn;
 
-				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				ConstCOPChiller( ChillNum ).Base.CondMassFlowRateMax = rho * ConstCOPChiller( ChillNum ).Base.CondVolFlowRate;
 
@@ -3099,20 +3050,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeElectricChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
 		bool ErrorsFound( false ); // If errors detected in input
@@ -3141,8 +3082,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * ElectricChiller( ChillNum ).Base.SizFac;
 				if ( ! ElectricChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = ElectricChiller( ChillNum ).Base.NomCap;
 			} else {
@@ -3390,20 +3331,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeEngineDrivenChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
@@ -3435,8 +3366,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( EngineDrivenChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * EngineDrivenChiller( ChillNum ).Base.SizFac;
 				if ( ! EngineDrivenChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = EngineDrivenChiller( ChillNum ).Base.NomCap;
 
@@ -3655,20 +3586,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeGTChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
@@ -3708,8 +3629,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GTChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * GTChiller( ChillNum ).Base.SizFac;
 				if ( ! GTChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = GTChiller( ChillNum ).Base.NomCap;
 				//IF (PlantFirstSizesOkayToFinalize)  GTChiller(ChillNum)%Base%NomCap = tmpNomCap
@@ -3951,20 +3872,10 @@ namespace PlantChillers {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeConstCOPChiller" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
@@ -3999,8 +3910,8 @@ namespace PlantChillers {
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ConstCOPChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * ConstCOPChiller( ChillNum ).Base.SizFac;
 				if ( ! ConstCOPChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = ConstCOPChiller( ChillNum ).Base.NomCap;
 			} else {
