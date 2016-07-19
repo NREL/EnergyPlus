@@ -417,6 +417,11 @@ namespace HeatPumpWaterToWaterSimple {
 				GSHP( GSHPNum ).refCOP = 8.0;
 			}
 
+			//calculate reference COP if hard sized
+			if ( ! GSHP( GSHPNum ).ratedPowerCoolWasAutoSized && ! GSHP( GSHPNum ).ratedCapCoolWasAutoSized && GSHP( GSHPNum ).RatedPowerCool > 0.0 ) {
+				GSHP( GSHPNum ).refCOP = GSHP( GSHPNum ).RatedCapCool / GSHP( GSHPNum ).RatedPowerCool;
+			}
+
 			if ( NumNums > 15 ) {
 				if ( ! DataIPShortCuts::lNumericFieldBlanks( 16 ) ) {
 					GSHP( GSHPNum ).sizFac = NumArray( 16 );
@@ -498,6 +503,11 @@ namespace HeatPumpWaterToWaterSimple {
 			
 			} else {
 				GSHP( GSHPNum ).refCOP = 7.5;
+			}
+
+			//calculate reference COP if hard sized
+			if ( ! GSHP( GSHPNum ).ratedPowerHeatWasAutoSized && ! GSHP( GSHPNum ).ratedCapHeatWasAutoSized && GSHP( GSHPNum ).RatedPowerHeat > 0.0 ) {
+				GSHP( GSHPNum ).refCOP = GSHP( GSHPNum ).RatedCapHeat / GSHP( GSHPNum ).RatedPowerHeat;
 			}
 
 			if ( NumNums > 15 ) {
@@ -862,9 +872,15 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		if ( ! GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowCool;
-		tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
-		//	but this is better, from EIR chiller, include compressor heat and use sizing deltaT and fluid properties			tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElectricEIRChiller( EIRChillNum ).RefCOP ) * ElectricEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 
+		int pltSourceSizNum = DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).PlantSizNum;
+		if ( pltSourceSizNum > 0 ) {
+			Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
+			Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
+			tmpSourceSideVolFlowRate = tmpCoolingCap * ( 1.0 + ( 1.0 / GSHP( GSHPNum ).refCOP )) / ( DataSizing::PlantSizData( pltSourceSizNum ).DeltaT * Cp * rho );
+		} else {
+			tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
+		}
 
 		if ( GSHP( GSHPNum ).ratedSourceVolFlowCoolWasAutoSized ) {
 			GSHP( GSHPNum ).RatedSourceVolFlowCool = tmpSourceSideVolFlowRate;
@@ -1044,7 +1060,15 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		if ( ! GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized ) tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowHeat;
-		tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow
+
+		int pltSourceSizNum = DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).PlantSizNum;
+		if ( pltSourceSizNum > 0 ) {
+			Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
+			Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
+			tmpSourceSideVolFlowRate = tmpHeatingCap * ( 1.0 - ( 1.0 / GSHP( GSHPNum ).refCOP )) / ( DataSizing::PlantSizData( pltSourceSizNum ).DeltaT * Cp * rho );
+		} else {
+			tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
+		}
 		if ( GSHP( GSHPNum ).ratedSourceVolFlowHeatWasAutoSized ) {
 			GSHP( GSHPNum ).RatedSourceVolFlowHeat = tmpSourceSideVolFlowRate;
 			if ( DataPlant::PlantFinalSizesOkayToReport ) { 

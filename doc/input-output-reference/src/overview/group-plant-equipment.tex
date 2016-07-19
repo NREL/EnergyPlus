@@ -4433,21 +4433,21 @@ This alpha field contains the heat pump's load side inlet node name.
 
 This alpha field contains the heat pump's load side outlet node name.
 
-\paragraph{Field: Design Load Side Flow Rate}\label{field-rated-load-side-flow-rate}
+\paragraph{Field: Reference Load Side Flow Rate}\label{field-rated-load-side-flow-rate}
 
 This numeric field contains the design volume flow rate on the load side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Design Source Side Flow Rate}\label{field-rated-source-side-flow-rate}
+\paragraph{Field: Reference Source Side Flow Rate}\label{field-rated-source-side-flow-rate}
 
 This numeric field contains the design volume flow rate on the source side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Design Cooling Capacity}\label{field-rated-cooling-capacity}
+\paragraph{Field: Reference Cooling Capacity}\label{field-rated-cooling-capacity}
 
 This numeric field contains the design cooling capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Design Cooling Power Consumption}\label{field-rated-cooling-power-consumption}
+\paragraph{Field: Reference Cooling Power Consumption}\label{field-rated-cooling-power-consumption}
 
-This numeric field is the design electric power consumption for cooling, in W.  This corresponds to the electic power use at the Design Cooling Capacity. This field is autosizable.  When autosized, the field called Nominal Coefficient of Performance must be used.
+This numeric field is the design electric power consumption for cooling, in W.  This corresponds to the electic power use at the Reference Cooling Capacity. This field is autosizable.  When autosized, the field called Reference Coefficient of Performance must be used.
 
 \paragraph{Fields: Cooling Capacity Coefficients 1-5}\label{fields-cooling-capacity-coefficients-1-5}
 
@@ -4457,16 +4457,16 @@ Five fields are used to describe the coefficients for the Cooling Capacity curve
 
 Five fields are used to decribe the coefficients for the Cooling Compressor Power curve.
 
-\paragraph{Field: Nominal Coefficient of Performance}\label{field-cooling-nom-COP}
+\paragraph{Field: Reference Coefficient of Performance}\label{field-cooling-nom-COP}
 
-This field is required if the Design Cooling Power Consumption is set to autosize.  The nominal COP is defined by the Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and is non-dimensional.  This field is only used for sizing; if the Design Cooling Power Consumption is set to a fixed value then COP of the component during simulation will be determined by the ratio of Design Cooling Capacity divided by the corresponding Design Cooling Power Consumption and not by the value in this field. This COP does not include power for fluid circulation pumps, it is just the heat pump itself.
+This field is required if the Reference Cooling Power Consumption is set to autosize.  The nominal COP is defined by the Reference Cooling Capacity divided by the corresponding Reference Cooling Power Consumption and is non-dimensional.  This field is only used for sizing; if the Reference Power Consumption is set to a fixed value then the COP of the component during simulation will be determined by the ratio of Reference Cooling Capacity divided by the corresponding Reference Cooling Power Consumption and not by the value in this field. This COP does not include power for fluid circulation pumps, it is just the heat pump itself.
 
 \paragraph{Field: Sizing Factor}\label{field-cooling-siz-fac}
 
 This optional numeric field allows the user to specify a sizing factor for this component. The
 sizing factor is used when the component design inputs are autosized: the autosizing calculations
 are performed as usual and the results are multiplied by the sizing factor. For this component
-the inputs that would be altered by the sizing factor are: Design Load Side Flow Rate, Design Source Side Flow Rate, Design Cooling Capacity, and Design Cooling Power Consumption. The Sizing Factor allows the user to size
+the inputs that would be altered by the sizing factor are: Reference Load Side Flow Rate, Reference Source Side Flow Rate, Reference Cooling Capacity, and Reference Cooling Power Consumption. The Sizing Factor allows the user to size
 a component to meet part of the plant loop's design load while continuing to use the autosizing feature.  For example if there are two heat pumps on the supply side, each one could be sized to be half of the design load.
 
 An idf example:
@@ -4479,10 +4479,10 @@ HeatPump:WaterToWater:EquationFit:Cooling,
   GshpCLG SourceSide Outlet Node,     !- Source Side Outlet Node Name
   GshpCLG LoadSide Inlet Node,        !- Load Side Inlet Node Name
   GshpCLG LoadSide Outlet Node,       !- Load Side Outlet Node Name
-  1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
-  1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
-  39890.91,                !- Rated Cooling Capacity {W}
-  4790.00,                 !- Rated Cooling Power Consumption {W}
+  1.89E-03,                !- Reference Load Side Flow Rate {m3/s}
+  1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
+  39890.91,                !- Reference Cooling Capacity {W}
+  4790.00,                 !- Reference Cooling Power Consumption {W}
   -1.52030596,             !- Cooling Capacity Coefficient 1
   3.46625667,              !- Cooling Capacity Coefficient 2
   -1.32267797,             !- Cooling Capacity Coefficient 3
@@ -4493,7 +4493,7 @@ HeatPump:WaterToWater:EquationFit:Cooling,
   8.69489229,              !- Cooling Compressor Power Coefficient 3
   0.02501669,              !- Cooling Compressor Power Coefficient 4
   -0.20132665,             !- Cooling Compressor Power Coefficient 5
-  8.32,                    !- Nominal Coefficient of Performance
+  8.32,                    !- Reference Coefficient of Performance
   1.0;                     !- Sizing Factor
 \end{lstlisting}
 
@@ -4600,21 +4600,21 @@ This alpha field contains the heat pump's load side inlet node name.
 
 This alpha field contains the heat pump's load side outlet node name.
 
-\paragraph{Field: Design Load Side Flow Rate}\label{field-rated-load-side-flow-rate-1}
+\paragraph{Field: Reference Load Side Flow Rate}\label{field-rated-load-side-flow-rate-1}
 
 This numeric field contains the design volume flow rate on the load side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Design Source Side Flow Rate}\label{field-rated-source-side-flow-rate-1}
+\paragraph{Field: Reference Source Side Flow Rate}\label{field-rated-source-side-flow-rate-1}
 
 This numeric field contains the design volume flow rate on the source side of the heat pump in m3/s. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Design Heating Capacity}\label{field-rated-heating-capacity-000}
+\paragraph{Field: Reference Heating Capacity}\label{field-rated-heating-capacity-000}
 
 This numeric field contains the design heating capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data. This field is autosizable.
 
-\paragraph{Field: Design Heating Power Consumption}\label{field-rated-heating-power-consumption}
+\paragraph{Field: Reference Heating Power Consumption}\label{field-rated-heating-power-consumption}
 
-This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electic power use at the Design Heating Capacity. This field is autosizable.  When autosized, the field called Nominal Coefficient of Performance must be used.
+This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electic power use at the Reference Heating Capacity. This field is autosizable.  When autosized, the field called Reference Coefficient of Performance must be used.
 
 \paragraph{Fields: Heating Capacity Coefficients 1-5}\label{fields-heating-capacity-coefficients-1-5}
 
@@ -4624,16 +4624,16 @@ Five fields are used to describe the coefficients for the Heating Capacity curve
 
 Five fields are used to describe the coefficients for the Heating Compressor Power curve.
 
-\paragraph{Field: Nominal Coefficient of Performance}\label{field-heating-nom-COP}
+\paragraph{Field: Reference Coefficient of Performance}\label{field-heating-nom-COP}
 
-This field is required if the Design Heating Power Consumption is set to autosize.  The nominal COP is defined by the Design Heating Capacity divided by the corresponding Design Heating Power Consumption and is non-dimensional.  This field is only used for sizing; if the Design Heating Power Consumption is set to a fixed value then COP of the component during simulation will be determined by the ratio of Design Heating Capacity divided by the corresponding Design Heating Power Consumption and not by the value in this field.
+This field is required if the Design Heating Power Consumption is set to autosize.  The nominal COP is defined by the Reference Heating Capacity divided by the corresponding Reference Heating Power Consumption and is non-dimensional.  This field is only used for sizing; if the Reference Heating Power Consumption is set to a fixed value then the COP of the component during simulation will be determined by the ratio of Reference Heating Capacity divided by the corresponding Reference Heating Power Consumption and not by the value in this field.
 
 \paragraph{Field: Sizing Factor}\label{field-heating-siz-fac}
 
 This optional numeric field allows the user to specify a sizing factor for this component. The
 sizing factor is used when the component design inputs are autosized: the autosizing calculations
 are performed as usual and the results are multiplied by the sizing factor. For this component
-the inputs that would be altered by the sizing factor are: Design Load Side Flow Rate, Design Source Side Flow Rate, Design Heating Capacity, and Design Heating Power Consumption. The Sizing Factor allows the user to size
+the inputs that would be altered by the sizing factor are: Reference Load Side Flow Rate, Reference Source Side Flow Rate, Reference Heating Capacity, and Reference Heating Power Consumption. The Sizing Factor allows the user to size
 a component to meet part of the plant loop's design load while continuing to use the autosizing feature.  For example if there are two heat pumps on the supply side, each one could be sized to be half of the design load.
 
 
@@ -4647,10 +4647,10 @@ HeatPump:WaterToWater:EquationFit:Heating,
   GshpHeating SourceSide Outlet Node,     !- Source Side Outlet Node Name
   GshpHeating LoadSide Inlet Node,        !- Load Side Inlet Node Name
   GshpHeating LoadSide Outlet Node,       !- Load Side Outlet Node Name
-  1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
-  1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
-  39040.92,                !- Rated Heating Capacity {W}
-  5130.00,                 !- Rated Heating Power Consumption {W}
+  1.89E-03,                !- Reference Load Side Flow Rate {m3/s}
+  1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
+  39040.92,                !- Reference Heating Capacity {W}
+  5130.00,                 !- Reference Heating Power Consumption {W}
   -3.33491153,             !- Heating Capacity Coefficient 1
   -0.51451946,             !- Heating Capacity Coefficient 2
   4.51592706,              !- Heating Capacity Coefficient 3
@@ -4661,7 +4661,7 @@ HeatPump:WaterToWater:EquationFit:Heating,
   1.29660976,              !- Heating Compressor Power Coefficient 3
   -0.21629222,             !- Heating Compressor Power Coefficient 4
   0.033862378,             !- Heating Compressor Power Coefficient 5
-  7.61,                    !- Nominal Coefficient of Performance
+  7.61,                    !- Reference Coefficient of Performance
   1.0;                     !- Sizing Factor
 \end{lstlisting}
 
