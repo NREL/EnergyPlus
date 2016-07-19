@@ -1011,7 +1011,7 @@ namespace FaultsManager {
 		}
 		
 		// The more severe the fouling fault is (i.e., larger FaultFac), the less the UAReductionFactor is
-		if( FaultFac > 1.0 ) UAReductionFactorAct = this->UAReductionFactor / FaultFac;
+		if( FaultFac > 0.0 ) UAReductionFactorAct = min( this->UAReductionFactor / FaultFac, 1.0 );
 
 		return UAReductionFactorAct;
 	}

@@ -213,6 +213,7 @@ ADD_SIMULATION_TEST(IDF_FILE FanCoilAutoSize.idf EPW_FILE USA_CO_Golden-NREL.724
 ADD_SIMULATION_TEST(IDF_FILE FanCoilAutoSizeScalableSizing.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE FanCoilAutoSize_MultiSpeedFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE FanCoil_HybridVent_VentSch.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE Fault_CoolingTowerFouling_CondenserSWTSensorOffset.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_HumidistatOffset_Supermarket.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_HumidistatOffset_ThermostatOffset_Supermarket.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_ThermostatOffset_RefBldgMediumOfficeNew2004.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)

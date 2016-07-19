@@ -3731,6 +3731,9 @@ namespace CondenserLoopTowers {
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
 		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -3769,8 +3772,8 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
 			
 			//update the tower UA values at faulty cases
-			SimpleTower( TowerNum ).FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			SimpleTower( TowerNum ).HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			
 		}
 
@@ -3819,7 +3822,7 @@ namespace CondenserLoopTowers {
 			IncrNumCellFlag = false;
 
 			//   Initialize local variables to the free convection design values
-			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
+			UAdesign = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
@@ -3834,7 +3837,7 @@ namespace CondenserLoopTowers {
 
 			if ( OutletWaterTempOFF > TempSetPoint ) {
 				//     Setpoint was not met (or free conv. not used), turn on cooling tower fan
-				UAdesign = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+				UAdesign = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 				AirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 
 				// The fan power is for all cells operating
@@ -4080,6 +4083,9 @@ namespace CondenserLoopTowers {
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
 		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+		
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -4118,8 +4124,8 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
 			
 			//update the tower UA values at faulty cases
-			SimpleTower( TowerNum ).FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			SimpleTower( TowerNum ).HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			
 		}
 
@@ -4160,7 +4166,7 @@ namespace CondenserLoopTowers {
 			IncrNumCellFlag = false;
 
 			//set local variable for tower
-			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell; // where is NumCellOn?
+			UAdesign = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell; // where is NumCellOn?
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate; // ??useless subroutine variable??
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
@@ -4193,7 +4199,7 @@ namespace CondenserLoopTowers {
 					SpeedSel = 1;
 				} else {
 					//         Setpoint was not met, turn on cooling tower 2nd stage fan
-					UAdesign = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+					UAdesign = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 					AirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 					FanPowerHigh = SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
 
@@ -4322,6 +4328,9 @@ namespace CondenserLoopTowers {
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
 		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+		
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -4360,8 +4369,8 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
 			
 			//update the tower UA values at faulty cases
-			SimpleTower( TowerNum ).FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			SimpleTower( TowerNum ).HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			
 		}
 
@@ -4405,7 +4414,7 @@ namespace CondenserLoopTowers {
 		}
 
 		// first find free convection cooling rate
-		UAdesignPerCell = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
+		UAdesignPerCell = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 		OutletWaterTempOFF = Node( WaterInletNode ).Temp;
 		WaterMassFlowRate = Node( WaterInletNode ).MassFlowRate;
@@ -4426,7 +4435,7 @@ namespace CondenserLoopTowers {
 		}
 
 		// next find full fan speed cooling rate
-		UAdesignPerCell = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+		UAdesignPerCell = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 		AirFlowRateRatio = 1.0;
 		WaterFlowRateRatio = WaterMassFlowRatePerCell / SimpleTower( TowerNum ).DesWaterMassFlowRatePerCell;
