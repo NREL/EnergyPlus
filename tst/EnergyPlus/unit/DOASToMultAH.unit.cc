@@ -78,6 +78,7 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, DOASToMultAH1 ) {
 	
 			std::string const idf_objects = delimited_string( {
+				"Version,8.5;",
 				" AirLoopHVAC:SupplyPath,",
 				" AHU Supply Air Path 1, !- Name",
 				" DOAS Outlet Node, !- Supply Air Path Inlet Node Name",
@@ -109,17 +110,17 @@ namespace EnergyPlus {
 				" AHU Return Air Path 1; !- Return Air Path Name",
 				" AirLoopHVAC:ControllerList,",
 				" DOAS 1 Controllers, !- Name",
-				" Controller : OutdoorAir, !- Controller 1 Object Type",
+				" Controller:OutdoorAir, !- Controller 1 Object Type",
 				" DOAS 1 OA Controller, !- Controller 1 Name",
 				" Controller:WaterCoil, !- Controller 2 Object Type",
-				" DOAS 1 Cooling Coil Controller;  !- Controller 1 Name",
-				" AirLoopHVAC:OutdoorAirSystem : EquipmentList,",
+				" DOAS 1 Cooling Coil Controller;  !- Controller 2 Name",
+				" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
 				" DOAS 1 Equipment, !- Name",
-				" HeatExchanger : AirToAir : SensibleAndLatent, !- Component 1 Object Type",
+				" HeatExchanger:AirToAir : SensibleAndLatent, !- Component 1 Object Type",
 				" OA 1 Heat Recovery, !- Component 1 Name",
-				" Coil:Heating : Water, !- Component 2 Object Type",
+				" Coil:Heating:Water, !- Component 2 Object Type",
 				" DOAS 1 Heating Coil, !- Component 2 Name",
-				" Coil:Cooling : Water, !- Component 3 Object Type",
+				" Coil:Cooling:Water, !- Component 3 Object Type",
 				" DOAS 1 Cooling Coil, !- Component 3 Name",
 				" Fan:VariableVolume, !- Component 4 Object Type",
 				" DOAS 1 Supply Fan, !- Component 4 Name",
@@ -145,6 +146,9 @@ namespace EnergyPlus {
 		EXPECT_EQ( ReturnAirPath( 1 ).Name, "AHU RETURN AIR PATH 1" );
 		EXPECT_EQ( ReturnAirPath( 1 ).ComponentName( 1 ), "DOAS RETURN AIR MIXER 1" );
 		EXPECT_GT( ReturnAirPath( 1 ).OutletNodeNum, 0 );
+
+		GetOASysInputFlag = true;
+		GetOutsideAirSysInputs();
 
 	}
 	
