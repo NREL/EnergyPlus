@@ -1498,9 +1498,9 @@ namespace HeatRecovery {
 		SizingMethod = SystemAirflowSizing;
 		if ( CurZoneEqNum > 0 ) {
 			if ( ExchCond( ExchNum ).NomSupAirVolFlow == AutoSize ) {
-				// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
 				SizingMethod = AutoCalculateSizing;
 				if( ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent ) {
+					// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
 					DataConstantUsedForSizing = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 					PrintFlag = false;
 				} else {
@@ -1508,16 +1508,20 @@ namespace HeatRecovery {
 				}
 				DataFractionUsedForSizing = 1.0;
 			} else {
-				if ( ZoneSizingRunDone ) {
-					// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
+				if ( ZoneSizingRunDone ) {					
 					SizingMethod = AutoCalculateSizing;
 					if ( ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent ) {
+						// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
 						DataConstantUsedForSizing = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						PrintFlag = false;
 					} else {
 						DataConstantUsedForSizing = std::max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 					}
 					DataFractionUsedForSizing = 1.0;
+				} else {
+					if ( ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent ) {
+						PrintFlag = false;
+					}
 				}
 			}
 		}
