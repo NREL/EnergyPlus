@@ -109,26 +109,16 @@ namespace MicroturbineElectricGenerator {
 	//  MT Generator models are based on polynomial curve fits of generator
 	//  performance data.
 
-	// REFERENCES: na
-
-	// OTHER NOTES: na
-
-	// USE STATEMENTS:
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobalConstants::iGeneratorMicroturbine;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumMTGenerators( 0 ); // number of MT Generators specified in input
@@ -136,17 +126,9 @@ namespace MicroturbineElectricGenerator {
 
 	Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE MicroturbineElectricGenerator
-
 	// Object Data
 	Array1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
 	Array1D< ReportVars > MTGeneratorReport;
-
-	// MODULE SUBROUTINES:
-	// Beginning of MT Generator Module Driver Subroutine
-	//*************************************************************************
-
-	// Functions
 
 	void
 	SimMTGenerator(
@@ -1218,7 +1200,7 @@ namespace MicroturbineElectricGenerator {
 			HeatRecOutletNode = MTGenerator( GenNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( MTGenerator( GenNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			MTGenerator( GenNum ).DesignHeatRecMassFlowRate = rho * MTGenerator( GenNum ).RefHeatRecVolFlowRate;
 			MTGenerator( GenNum ).HeatRecMaxMassFlowRate = rho * MTGenerator( GenNum ).HeatRecMaxVolFlowRate;

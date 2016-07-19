@@ -112,7 +112,6 @@ namespace HeatPumpWaterToWaterSimple {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginSimFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::KelvinConv;
@@ -124,20 +123,11 @@ namespace HeatPumpWaterToWaterSimple {
 	using General::TrimSigDigits;
 	using namespace DataLoopNode;
 
-	// Use statements for access to subroutines in other modules
-
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	std::string const HPEqFitHeating( "HeatPump:WatertoWater:EquationFit:Heating" );
 	std::string const HPEqFitHeatingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING" );
 	std::string const HPEqFitCooling( "HeatPump:WatertoWater:EquationFit:Cooling" );
 	std::string const HPEqFitCoolingUC( "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING" );
-
-	// DERIVED TYPE DEFINITIONS
-
-	// Type Description of Heat Pump
-
-	// Output Variables Type definition
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumGSHPs( 0 ); // Number of GSHPs specified in input
@@ -145,25 +135,11 @@ namespace HeatPumpWaterToWaterSimple {
 		bool GetInputFlag( true ); // then TRUE, calls subroutine to read input file.
 		bool InitWatertoWaterHPOneTimeFlag( true );
 	}
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Computational routines
-
-	// Update routine to check convergence and update nodes
 
 	// Object Data
 	Array1D< GshpSpecs > GSHP;
 	Array1D< ReportVars > GSHPReport;
 
-	// MODULE SUBROUTINES:
-
-	// Functions
 	void
 	clear_state(){
 		NumGSHPs = 0;
@@ -612,17 +588,8 @@ namespace HeatPumpWaterToWaterSimple {
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitGshp" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoadSideInletNode; // Load Side Inlet Node
@@ -672,14 +639,14 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHP( GSHPNum ).MustRun = true;
 
 			if ( GSHP( GSHPNum ).WWHPPlantTypeOfNum == TypeOf_HPWaterEFHeating ) {
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).LoadSideDesignMassFlow = GSHP( GSHPNum ).RatedLoadVolFlowHeat * rho;
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).SourceSideDesignMassFlow = GSHP( GSHPNum ).RatedSourceVolFlowHeat * rho;
 			} else if ( GSHP( GSHPNum ).WWHPPlantTypeOfNum == TypeOf_HPWaterEFCooling ) {
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).LoadSideDesignMassFlow = GSHP( GSHPNum ).RatedLoadVolFlowCool * rho;
-				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 				GSHP( GSHPNum ).SourceSideDesignMassFlow = GSHP( GSHPNum ).RatedSourceVolFlowCool * rho;
 			}
 
