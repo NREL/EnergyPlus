@@ -515,7 +515,7 @@ The following output variables are applicable to all opaque heat transfer surfac
   Zone,Average,CondFD Surface Temperature Node \textless{}1\textgreater{} {[}C{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{CondFD Inner Solver Loop Iteration Count {[]}}{CondFD Inner Solver Loop Iteration Count }}\label{condfd-inner-solver-loop-iteration-count}
+\paragraph{CondFD Inner Solver Loop Iteration Count {[]}}\label{condfd-inner-solver-loop-iteration-count}
 
 This outputs the count of iterations on the inner solver loop of CondFD for each surface.
 
@@ -994,11 +994,18 @@ This is a factor that corrects for the presence of dirt on the glass. The progra
 Representative values of the dirt correction factor are shown in Table~\ref{table:dirt-correction-factors}.
 
 \begin{longtable}[c]{@{}llll@{}}
-\caption{Dirt Correction Factors \protect \label{table:dirt-correction-factors}} \\
-\toprule 
+\caption{Dirt Correction Factors \label{table:dirt-correction-factors}} \\
+\toprule
+Type of Location & \multicolumn{3}{c}{Angle of Glazing} \\ \cmidrule(r){2-4}
+                 & Vertical & 45$^{o}$ & Horizontal \\ \midrule
+\endfirsthead
+
+\caption[]{Dirt Correction Factors} \\
+\toprule
 Type of Location & \multicolumn{3}{c}{Angle of Glazing} \\ \cmidrule(r){2-4}
                  & Vertical & 45$^{o}$ & Horizontal \\ \midrule
 \endhead
+
 Non-industrial & 0.9 & 0.8 & 0.7 \\
 Industrial & 0.7 & 0.6 & 0.5 \\
 Very Dirty & 0.6 & 0.5 & 0.4 \\
@@ -3389,11 +3396,11 @@ Temperature of the Soil layer temperature in C.
 
 Temperature of the Vegetation layer temperature in C.
 
-\subsubsection{\texorpdfstring{Green Roof Soil Root Moisture Ratio {[]}}{Green Roof Soil Root Moisture Ratio }}\label{green-roof-soil-root-moisture-ratio}
+\subsubsection{Green Roof Soil Root Moisture Ratio {[]}}\label{green-roof-soil-root-moisture-ratio}
 
 Mean value of root moisture (m\(^{3}\)/m\(^{3}\))
 
-\subsubsection{\texorpdfstring{Green Roof Soil Near Surface Moisture Ratio {[]}}{Green Roof Soil Near Surface Moisture Ratio }}\label{green-roof-soil-near-surface-moisture-ratio}
+\subsubsection{Green Roof Soil Near Surface Moisture Ratio {[]}}\label{green-roof-soil-near-surface-moisture-ratio}
 
 The moisture content in the soil near the surface (m\(^{3}\)/m\(^{3}\))
 
@@ -4137,7 +4144,7 @@ WindowThermalModel:Params,
   13.238;                                             !- vacuum pressure limit
 \end{lstlisting}
 
-\subsection{Matix:TwoDimension}\label{matixtwodimension}
+\subsection{Matrix:TwoDimension}\label{matrixtwodimension}
 
 This is input object is only used with Construction:ComplexFenestrationState object to enter a two-dimensional matrix of values.
 
