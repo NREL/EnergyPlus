@@ -9654,7 +9654,7 @@ Output:Variable,*,Chiller Condenser Mass Flow Rate,hourly; !- HVAC Average [kg/s
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
 
-*** OPERAIONAL FAULTS ***
+!*** OPERAIONAL FAULTS ***
   
   FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
     Fault_CoolSys1Chiller1,  !- Name
