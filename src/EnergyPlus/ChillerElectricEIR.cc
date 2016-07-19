@@ -1123,6 +1123,8 @@ namespace ChillerElectricEIR {
 		//  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		//  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
+		// REFERENCES:
+		//  na
 
 		// Using/Aliasing
 		using namespace DataSizing;
