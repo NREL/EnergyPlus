@@ -90,6 +90,9 @@ namespace DElightManagerF {
 		Real64 & NewAspectRatio
 	);
 
+	void
+	SetupDElightOutput4EPlus();
+
 	std::string
 	ReplaceBlanksWithUnderscores(
 		std::string const & InputString
