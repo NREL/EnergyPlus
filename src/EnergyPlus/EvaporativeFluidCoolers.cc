@@ -111,19 +111,12 @@ namespace EvaporativeFluidCoolers {
 
 	// METHODOLOGY EMPLOYED:
 	// Based on cooling tower by Shirey, Raustad: Dec 2000; Shirey, Sept 2002
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
+	
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::KelvinConv;
 	using DataGlobals::SecInHour;
 	using DataGlobals::WarmupFlag;
-	using DataGlobals::InitConvTemp;
 	using namespace DataHVACGlobals;
 	using namespace DataLoopNode;
 	using DataEnvironment::StdBaroPress;
@@ -145,9 +138,6 @@ namespace EvaporativeFluidCoolers {
 	using FluidProperties::GetDensityGlycol;
 	using FluidProperties::GetSpecificHeatGlycol;
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-
 	std::string const cEvapFluidCooler_SingleSpeed( "EvaporativeFluidCooler:SingleSpeed" );
 	std::string const cEvapFluidCooler_TwoSpeed( "EvaporativeFluidCooler:TwoSpeed" );
 
@@ -165,8 +155,6 @@ namespace EvaporativeFluidCoolers {
 	int const EvapFluidCooler_TwoSpeed( 2 );
 
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumSimpleEvapFluidCoolers( 0 ); // Number of similar evaporative fluid coolers
@@ -1172,7 +1160,7 @@ namespace EvaporativeFluidCoolers {
 		// Begin environment initializations
 		if ( MyEnvrnFlag( EvapFluidCoolerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesWaterMassFlowRate = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate * rho;
 			InitComponentNodes( 0.0, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesWaterMassFlowRate, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterInletNodeNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterOutletNodeNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopSideNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).BranchNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).CompNum );
 			MyEnvrnFlag( EvapFluidCoolerNum ) = false;
@@ -1331,7 +1319,7 @@ namespace EvaporativeFluidCoolers {
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UFactor
 				&& ! SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUAWasAutoSized ) {
 			if ( PltSizCondNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity = DesEvapFluidCoolerLoad / SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio;
@@ -1383,7 +1371,7 @@ namespace EvaporativeFluidCoolers {
 					if ( PlantFirstSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 				} else if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-						rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+						rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 						tmpHighSpeedFanPower = 0.0105 * DesEvapFluidCoolerLoad;
@@ -1464,7 +1452,7 @@ namespace EvaporativeFluidCoolers {
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > 25.6 C if autosizing the Evaporative Fluid Cooler." );
 						ShowFatalError( "Review and revise design input values as appropriate." );
 					}
-					rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+					rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 					DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 					Par( 1 ) = DesEvapFluidCoolerLoad;
@@ -1552,7 +1540,7 @@ namespace EvaporativeFluidCoolers {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
 				// Standard Design Capacity doesn't include compressor heat;
 				// predefined factor was 1.25 W heat rejection per W of delivered cooling, now a user input with 1.25 default
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, 35.0, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
@@ -1606,7 +1594,7 @@ namespace EvaporativeFluidCoolers {
 
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity ) {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedUserSpecifiedDesignCapacity;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
@@ -1724,7 +1712,7 @@ namespace EvaporativeFluidCoolers {
 					&& SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacity > 0.0 ) {
 				// Standard design capacity doesn't include compressor heat;
 				// predefined factor was 1.25 W heat rejection per W of delivered cooling, now user input with default 1.25
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacity * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
@@ -1769,7 +1757,7 @@ namespace EvaporativeFluidCoolers {
 				&& SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow
 					&& SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity > 0.0 ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity;
 				Par( 1 ) = DesEvapFluidCoolerLoad;

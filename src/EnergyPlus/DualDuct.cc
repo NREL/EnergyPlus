@@ -111,29 +111,19 @@ namespace DualDuct {
 	// METHODOLOGY EMPLOYED:
 	// Needs description, as appropriate.
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataEnvironment::StdRhoAir;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using namespace DataSizing;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const DualDuct_ConstantVolume( 1 );
 	int const DualDuct_VariableVolume( 2 );
@@ -152,8 +142,6 @@ namespace DualDuct {
 
 	static std::string const BlankString;
 
-	// DERIVED TYPE DEFINITIONS
-
 	//MODULE VARIABLE DECLARATIONS:
 	Array1D_bool CheckEquipName;
 
@@ -164,19 +152,6 @@ namespace DualDuct {
 	Real64 MassFlowSetToler;
 	bool GetDualDuctInputFlag( true ); // Flag set to make sure you get input once
 
-	// Subroutine Specifications for the Module
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Algorithms for the module
-
-	// Update routine to check convergence and update nodes
-
-	// Reporting routines for module
-
 	// Object Data
 	Array1D< DamperDesignParams > Damper;
 	Array1D< DamperFlowConditions > DamperInlet;
@@ -185,11 +160,6 @@ namespace DualDuct {
 	Array1D< DamperFlowConditions > DamperOutlet;
 	Array1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
 	Array1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
-
-	// MODULE SUBROUTINES:
-	//*************************************************************************
-
-	// Functions
 
 	void
 	SimulateDualDuct(

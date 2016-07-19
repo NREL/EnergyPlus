@@ -116,12 +116,6 @@ namespace PoweredInductionUnits {
 	// algorithm that adjusts the primary air flow and the heating coil output
 	// to meet the zone load.
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
@@ -129,7 +123,6 @@ namespace PoweredInductionUnits {
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::SecInHour;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -153,7 +146,6 @@ namespace PoweredInductionUnits {
 	using namespace FluidProperties;
 	using DataHeatBalFanSys::TempControlType;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	int const SingleDuct_SeriesPIU_Reheat( 6 );
 	int const SingleDuct_ParallelPIU_Reheat( 7 );
@@ -166,8 +158,6 @@ namespace PoweredInductionUnits {
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_bool CheckEquipName;
 	bool GetPIUInputFlag( true ); // First time, input is "gotten"
@@ -176,14 +166,8 @@ namespace PoweredInductionUnits {
 	int NumSeriesPIUs( 0 );
 	int NumParallelPIUs( 0 );
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-	// PRIVATE UpdatePIU
-
 	// Object Data
 	Array1D< PowIndUnitData > PIU;
-
-	// Functions
 
 	void
 	SimPIU(
@@ -668,9 +652,6 @@ namespace PoweredInductionUnits {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -682,17 +663,8 @@ namespace PoweredInductionUnits {
 		using PlantUtilities::InitComponentNodes;
 		using DataGlobals::AnyPlantInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPIU" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PriNode; // primary air inlet node number
@@ -755,7 +727,7 @@ namespace PoweredInductionUnits {
 			HotConNode = PIU( PIUNum ).HotControlNode;
 			if ( HotConNode > 0 ) {
 				//plant upgrade note? why no separate handling of steam coil? add it ?
-				rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				PIU( PIUNum ).MaxHotWaterFlow = rho * PIU( PIUNum ).MaxVolHotWaterFlow;
 				PIU( PIUNum ).MinHotWaterFlow = rho * PIU( PIUNum ).MinVolHotWaterFlow;
@@ -864,9 +836,6 @@ namespace PoweredInductionUnits {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace InputProcessor;
@@ -883,17 +852,8 @@ namespace PoweredInductionUnits {
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizePIU" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1164,8 +1124,8 @@ namespace PoweredInductionUnits {
 								DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
 								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 
-								rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
