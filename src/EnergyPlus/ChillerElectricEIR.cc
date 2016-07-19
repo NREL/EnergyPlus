@@ -1150,7 +1150,7 @@ namespace ChillerElectricEIR {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
