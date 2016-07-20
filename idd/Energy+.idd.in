@@ -51989,8 +51989,6 @@ AirLoopHVAC:UnitarySystem,
        \note Unique name for the Unitary System.
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
   A2,  \field Control Type
        \type choice
        \key Load
