@@ -520,6 +520,8 @@ namespace DXCoils {
 		Real64 SC; // Subcooling  degrees [C]
 		Real64 ActualSH; // Actual superheating degrees [C]
 		Real64 ActualSC; // Actual subcooling degrees [C]
+		Real64 RateBFVRFIUEvap; // VRF Iutdoor Unit Evaporator Rated Bypass Factor
+		Real64 RateBFVRFIUCond; // VRF Iutdoor Unit Condenser Rated Bypass Factor
 
 		// Default Constructor
 		DXCoilData() :
@@ -755,7 +757,9 @@ namespace DXCoils {
 			SH( 0.0 ),
 			SC( 0.0 ),
 			ActualSH( 0.0 ),
-			ActualSC( 0.0 )
+			ActualSC( 0.0 ),
+			RateBFVRFIUEvap( 0.0592 ),
+			RateBFVRFIUCond( 0.1360 )
 		{}
 
 	};
