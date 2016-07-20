@@ -144,7 +144,6 @@ namespace WaterThermalTanks {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::NumOfTimeStepInHour;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::OutputFileInits;
 	using DataHeatBalance::NumRefrigeratedRacks;
@@ -2469,7 +2468,7 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).OnCycLossCoeff = rNumericArgs( 15 );
 					WaterThermalTank( WaterThermalTankNum ).OnCycLossFracToZone = rNumericArgs( 16 );
-					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
+					rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax = rNumericArgs( 17 ) * rho;
 
 					if ( ( cAlphaArgs( 14 ).empty() ) && ( cAlphaArgs( 15 ).empty() ) ) {
@@ -2625,7 +2624,7 @@ namespace WaterThermalTanks {
 					if ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) {
 						WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized = true;
 					}
-					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
+					rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 					WaterThermalTank( WaterThermalTankNum ).Height = rNumericArgs( 2 );
 					if ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) {
@@ -2936,7 +2935,7 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).OffCycFlueLossFracToZone = rNumericArgs( 21 );
 
 					//this is temporary until we know fluid type
-					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
+					rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax = rNumericArgs( 22 ) * rho;
 
 					if ( ( cAlphaArgs( 16 ).empty() ) && ( cAlphaArgs( 17 ).empty() ) ) {
@@ -3387,7 +3386,7 @@ namespace WaterThermalTanks {
 					if ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) {
 						WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized = true;
 					}
-					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
+					rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 					WaterThermalTank( WaterThermalTankNum ).Height = rNumericArgs( 2 );
 					if ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) {
@@ -4521,9 +4520,9 @@ namespace WaterThermalTanks {
 		Tank.Node.allocate( NumNodes );
 
 		if ( ( Tank.UseSidePlantLoopNum > 0 ) && allocated( PlantLoop ) ) {
-			rho = GetDensityGlycol( PlantLoop( Tank.UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( Tank.UseSidePlantLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( Tank.UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( Tank.UseSidePlantLoopNum ).FluidIndex, RoutineName );
 		} else {
-			rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+			rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 		}
 
 		NodeMass = Tank.Volume * rho / NumNodes;
@@ -4847,7 +4846,7 @@ namespace WaterThermalTanks {
 				if ( errFlag ) {
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
-				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
+				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
@@ -4864,7 +4863,7 @@ namespace WaterThermalTanks {
 				if ( errFlag ) {
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
-				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
+				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
@@ -4883,7 +4882,7 @@ namespace WaterThermalTanks {
 				if ( errFlag ) {
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
-				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
+				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).PlantSizNum;
 				if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) ) {
@@ -4944,7 +4943,7 @@ namespace WaterThermalTanks {
 			// Clear node initial conditions
 			if ( UseInletNode > 0 && UseOutletNode > 0 ) {
 				Node( UseInletNode ).Temp = 0.0;
-				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
+				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).MassFlowRateMin = WaterThermalTank( WaterThermalTankNum ).VolFlowRateMin * rho;
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 				InitComponentNodes( WaterThermalTank( WaterThermalTankNum ).MassFlowRateMin, WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax, UseInletNode, UseOutletNode, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum );
@@ -4958,7 +4957,7 @@ namespace WaterThermalTanks {
 			}
 
 			if ( ( SourceInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum == 0 ) ) {
-				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
+				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 				InitComponentNodes( 0.0, WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax, SourceInletNode, SourceOutletNode, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantCompNum );
 
@@ -4974,7 +4973,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp = 0.0;
 				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = 0.0;
 				WaterThermalTank( WaterThermalTankNum ).SavedSourceOutletTemp = 0.0;
-				rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, SizeTankForDemand );
+				rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, SizeTankForDemand );
 				WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 			}
 
@@ -5154,10 +5153,10 @@ namespace WaterThermalTanks {
 				if ( SchIndex > 0 ) {
 					WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate = GetCurrentScheduleValue( SchIndex ) * WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax;
 
-					WaterThermalTank( WaterThermalTankNum ).VolFlowRate = WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate / RhoH2O( InitConvTemp );
+					WaterThermalTank( WaterThermalTankNum ).VolFlowRate = WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 				} else {
 					WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate = WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax;
-					WaterThermalTank( WaterThermalTankNum ).VolFlowRate = WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate / RhoH2O( InitConvTemp );
+					WaterThermalTank( WaterThermalTankNum ).VolFlowRate = WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 				}
 
 			}
@@ -8839,7 +8838,7 @@ namespace WaterThermalTanks {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, tmpUseDesignVolFlowRate );
 						}
 
-						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
 						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 						} else {
@@ -8852,9 +8851,9 @@ namespace WaterThermalTanks {
 			} else {
 				RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 				if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
 				} else {
-					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+					rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 				}
 
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
@@ -8893,7 +8892,7 @@ namespace WaterThermalTanks {
 						} else {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, tmpSourceDesignVolFlowRate );
 						}
-						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
 						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 						} else {
@@ -8907,9 +8906,9 @@ namespace WaterThermalTanks {
 				if ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide == SupplySide ) {
 					RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 					if ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum > 0 ) {
-						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
 					} else {
-						rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+						rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 					}
 					WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 				}
@@ -9572,7 +9571,7 @@ namespace WaterThermalTanks {
 						} else {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, tmpUseDesignVolFlowRate );
 						}
-						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
 						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 						} else {
@@ -9587,9 +9586,9 @@ namespace WaterThermalTanks {
 				// not autosized - report flow to RegisterPlantCompDesignFlow for supply side component sizing
 				RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 				if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
 				} else {
-					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+					rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 				}
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 			} //autosizing needed.
@@ -9643,7 +9642,7 @@ namespace WaterThermalTanks {
 						} else {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, tmpSourceDesignVolFlowRate );
 						}
-						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
 						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 						} else {
@@ -9658,9 +9657,9 @@ namespace WaterThermalTanks {
 				// not autosized - report flow to RegisterPlantCompDesignFlow for supply side component sizing
 				RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 				if ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
 				} else {
-					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+					rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 				}
 				WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 			} //autosizing needed.
@@ -9743,7 +9742,7 @@ namespace WaterThermalTanks {
 
 			if ( SELECT_CASE_var == SizePeakDraw ) {
 				// get draw rate from maximum in schedule
-				rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+				rho = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 				DrawDesignVolFlowRate = GetScheduleMaxValue( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule ) * WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax / rho;
 
 				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
@@ -10118,7 +10117,6 @@ namespace WaterThermalTanks {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using Psychrometrics::PsyHFnTdbW;
-		using DataGlobals::InitConvTemp;
 		using CurveManager::CurveValue;
 		using DXCoils::HPWHHeatingCapacity;
 		using DXCoils::HPWHHeatingCOP;
@@ -10187,7 +10185,7 @@ namespace WaterThermalTanks {
 			WaterThermalTank( WaterThermalTankNum ).TankTemp = 57.2222; // Initialize tank temperature
 			if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) for ( auto & e : WaterThermalTank( WaterThermalTankNum ).Node ) e.Temp = 57.2222;
 
-			TotalDrawMass = 0.243402 * RhoH2O( InitConvTemp ); // 64.3 gal * rho
+			TotalDrawMass = 0.243402 * RhoH2O( DataGlobals::InitConvTemp ); // 64.3 gal * rho
 			DrawMass = TotalDrawMass / 6.0; // 6 equal draws
 			SecInTimeStep = TimeStepSys * SecInHour;
 			DrawMassFlowRate = DrawMass / SecInTimeStep;

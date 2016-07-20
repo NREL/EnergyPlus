@@ -121,7 +121,6 @@ namespace HVACSingleDuctInduc {
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -530,9 +529,6 @@ namespace HVACSingleDuctInduc {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
@@ -547,17 +543,8 @@ namespace HVACSingleDuctInduc {
 		using PlantUtilities::InitComponentNodes;
 		using DataGlobals::AnyPlantInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitIndUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PriNode; // primary air inlet node number
@@ -651,7 +638,7 @@ namespace HVACSingleDuctInduc {
 			HotConNode = IndUnit( IUNum ).HWControlNode;
 			if ( HotConNode > 0 && ! MyPlantScanFlag( IUNum ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 				IndUnit( IUNum ).MaxHotWaterFlow = rho * IndUnit( IUNum ).MaxVolHotWaterFlow;
 				IndUnit( IUNum ).MinHotWaterFlow = rho * IndUnit( IUNum ).MinVolHotWaterFlow;
 				// get component outlet node from plant structure
@@ -661,7 +648,7 @@ namespace HVACSingleDuctInduc {
 
 			ColdConNode = IndUnit( IUNum ).CWControlNode;
 			if ( ColdConNode > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidIndex, RoutineName );
 				IndUnit( IUNum ).MaxColdWaterFlow = rho * IndUnit( IUNum ).MaxVolColdWaterFlow;
 				IndUnit( IUNum ).MinColdWaterFlow = rho * IndUnit( IUNum ).MinVolColdWaterFlow;
 
@@ -727,9 +714,6 @@ namespace HVACSingleDuctInduc {
 		// Accesses zone sizing array for air flow rates and zone and plant sizing arrays to
 		// calculate coil water flow rates.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace InputProcessor;
@@ -744,17 +728,8 @@ namespace HVACSingleDuctInduc {
 		using DataPlant::MyPlantSizingIndex;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeIndUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -857,9 +832,9 @@ namespace HVACSingleDuctInduc {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
 								}
 								IndUnit( IUNum ).DesHeatingLoad = DesCoilLoad;
-								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
-								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 								MaxVolHotWaterFlowDes = max( MaxVolHotWaterFlowDes, 0.0 );

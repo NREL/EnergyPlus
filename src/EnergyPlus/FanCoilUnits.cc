@@ -134,7 +134,6 @@ namespace FanCoilUnits {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::SecInHour;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataEnvironment::OutBaroPress;
@@ -933,9 +932,6 @@ namespace FanCoilUnits {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -949,17 +945,8 @@ namespace FanCoilUnits {
 		using PlantUtilities::InitComponentNodes;
 		using DataHVACGlobals::ZoneComp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitFanCoilUnits" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InNode; // inlet node number in fan coil loop
@@ -976,8 +963,6 @@ namespace FanCoilUnits {
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 rho;
 		bool errFlag;
-
-		// FLOW:
 
 		// Do the one time initializations
 		if ( InitFanCoilUnitsOneTimeFlag ) {
@@ -1063,12 +1048,12 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).OutAirMassFlow = RhoAir * FanCoil( FanCoilNum ).OutAirVolFlow;
 
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-				rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineName );
 				FanCoil( FanCoilNum ).MaxHotWaterFlow = rho * FanCoil( FanCoilNum ).MaxHotWaterVolFlow;
 				FanCoil( FanCoilNum ).MinHotWaterFlow = rho * FanCoil( FanCoilNum ).MinHotWaterVolFlow;
 			}
 
-			rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineName );
 			FanCoil( FanCoilNum ).MaxColdWaterFlow = rho * FanCoil( FanCoilNum ).MaxColdWaterVolFlow;
 			FanCoil( FanCoilNum ).MinColdWaterFlow = rho * FanCoil( FanCoilNum ).MinColdWaterVolFlow;
 
@@ -1193,18 +1178,10 @@ namespace FanCoilUnits {
 		using DataHVACGlobals::MaxSATempHeatingSizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeFanCoilUnit: " ); // include trailing blank space
 		static std::string const RoutineNameNoSpace( "SizeFanCoilUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1559,8 +1536,8 @@ namespace FanCoilUnits {
 							}
 							FanCoil( FanCoilNum ).DesHeatingLoad = DesCoilLoad;
 							if ( DesCoilLoad >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
-								Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
+								rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
+								Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
 
 								MaxHotWaterVolFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
@@ -2003,14 +1980,36 @@ namespace FanCoilUnits {
 					Par( 4 ) = QZnReq;
 					SolveRegulaFalsi( 0.001, MaxIterCycl, SolFlag, CWFlow, CalcFanCoilCWLoadResidual, 0.0, MaxWaterFlow, Par );
 					if ( SolFlag == -1 ) {
-						++FanCoil( FanCoilNum ).ConvgErrCountC;
-						if ( FanCoil( FanCoilNum ).ConvgErrCountC < 2 ) {
-							ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
-							ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-							ShowContinueErrorTimeStamp( "..Water flow rate set to last iteration value " );
-						} else {
-							ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name,
-								FanCoil( FanCoilNum ).MaxIterIndexC );
+						// tighten limits on water flow rate to see if this allows convergence
+						CoolingLoad = true;
+						HeatingLoad = false;
+						TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+						SolveRegulaFalsi( 0.001, MaxIterCycl, SolFlag, CWFlow, CalcFanCoilCWLoadResidual, MinWaterFlow, MaxWaterFlow, Par );
+						if ( SolFlag == -1 ) {
+							++FanCoil( FanCoilNum ).ConvgErrCountC;
+							if ( FanCoil( FanCoilNum ).ConvgErrCountC < 2 ) {
+								ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
+								Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = CWFlow;
+								Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+								ShowContinueErrorTimeStamp( "Load Request = " + TrimSigDigits( QZnReq ) + ", Final Capacity = " + TrimSigDigits( QUnitOut ) );
+								ShowContinueErrorTimeStamp( "Min water flow used during iterations = " + TrimSigDigits( MinWaterFlow ) + ", Max water flow used during iterations = " + TrimSigDigits( MaxWaterFlow ) );
+								ShowContinueErrorTimeStamp( "Water flow rate on last iteration = " + TrimSigDigits( CWFlow ) );
+								ShowContinueErrorTimeStamp( "..Water flow rate set to last iteration value " );
+							} else {
+								ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name,
+									FanCoil( FanCoilNum ).MaxIterIndexC );
+							}
+						} else if( SolFlag == -2 ) {
+							++FanCoil( FanCoilNum ).LimitErrCountC;
+							if( FanCoil( FanCoilNum ).LimitErrCountC < 2 ) {
+								ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
+								ShowContinueError( "  Bad cold water mass flow limits" );
+								ShowContinueErrorTimeStamp( "..Water flow rate set to lower limit " );
+							} else{
+								ShowRecurringWarningErrorAtEnd( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name,
+									FanCoil( FanCoilNum ).BadMassFlowLimIndexC );
+							}
 						}
 					} else if ( SolFlag == -2 ) {
 						++FanCoil( FanCoilNum ).LimitErrCountC;
@@ -2046,8 +2045,7 @@ namespace FanCoilUnits {
 							CWFlow * Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Temp ) / MdotLockC;
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy = ( CWFlowBypass * Node( FanCoil( FanCoilNum ).ColdControlNode ).Enthalpy +
 							CWFlow * Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy ) / MdotLockC;
-					}
-					else {
+					} else {
 						// if MdotLockC <= HWFlow use MdotLockC as is
 						Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).MassFlowRate = MdotLockC;
@@ -2074,8 +2072,7 @@ namespace FanCoilUnits {
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxH );
 					if ( ! HotFlowLocked ) {
 						FanCoil( FanCoilNum ).QUnitOutMaxH = QUnitOutMaxH;
-					}
-					else {
+					} else {
 						QUnitOutMaxH = FanCoil( FanCoilNum ).QUnitOutMaxH;
 						MdotLockH = mdot; // save locked flow
 					}
@@ -2095,18 +2092,40 @@ namespace FanCoilUnits {
 						Par( 4 ) = QZnReq;
 						SolveRegulaFalsi( 0.001, MaxIterCycl, SolFlag, HWFlow, CalcFanCoilHWLoadResidual, 0.0, MaxWaterFlow, Par );
 						if ( SolFlag == -1 ) {
-							++FanCoil( FanCoilNum ).ConvgErrCountH;
-							if ( FanCoil( FanCoilNum ).ConvgErrCountH < 2 ) {
-								ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
-								ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-								ShowContinueErrorTimeStamp( "..Water flow rate set to last iteration value " );
-							} else {
-								ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name,
-									FanCoil( FanCoilNum ).MaxIterIndexH );
+							// tighten limits on water flow rate to see if this allows convergence
+							CoolingLoad = false;
+							HeatingLoad = true;
+							TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).HotControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+							SolveRegulaFalsi( 0.001, MaxIterCycl, SolFlag, HWFlow, CalcFanCoilHWLoadResidual, MinWaterFlow, MaxWaterFlow, Par );
+							if ( SolFlag == -1 ) {
+								++FanCoil( FanCoilNum ).ConvgErrCountH;
+								if ( FanCoil( FanCoilNum ).ConvgErrCountH < 2 ) {
+									ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
+									ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
+									Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = HWFlow;
+									Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+									ShowContinueErrorTimeStamp( "Load Request = " + TrimSigDigits( QZnReq ) + ", Final Capacity = " + TrimSigDigits( QUnitOut ) );
+									ShowContinueErrorTimeStamp( "Min water flow used during iterations = " + TrimSigDigits( MinWaterFlow ) + ", Max water flow used during iterations = " + TrimSigDigits( MaxWaterFlow ) );
+									ShowContinueErrorTimeStamp( "Water flow rate on last iteration = " + TrimSigDigits( HWFlow ) );
+									ShowContinueErrorTimeStamp( "..Water flow rate set to last iteration value " );
+								} else {
+									ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name,
+										FanCoil( FanCoilNum ).MaxIterIndexH );
+								}
+							} else if ( SolFlag == -2 ) {
+								++FanCoil( FanCoilNum ).LimitErrCountH;
+								if ( FanCoil( FanCoilNum ).LimitErrCountH < 2 ) {
+									ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
+									ShowContinueError( "  Bad hot water mass flow limits" );
+									ShowContinueErrorTimeStamp( "..Water flow rate set to lower limit " );
+								} else {
+									ShowRecurringWarningErrorAtEnd( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name,
+										FanCoil( FanCoilNum ).BadMassFlowLimIndexH );
+								}
 							}
-						} else if ( SolFlag == -2 ) {
+						} else if( SolFlag == -2 ) {
 							++FanCoil( FanCoilNum ).LimitErrCountH;
-							if ( FanCoil( FanCoilNum ).LimitErrCountH < 2 ) {
+							if( FanCoil( FanCoilNum ).LimitErrCountH < 2 ) {
 								ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 								ShowContinueError( "  Bad hot water mass flow limits" );
 								ShowContinueErrorTimeStamp( "..Water flow rate set to lower limit " );
@@ -2115,8 +2134,7 @@ namespace FanCoilUnits {
 									FanCoil( FanCoilNum ).BadMassFlowLimIndexH );
 							}
 						}
-					}
-					else {
+					} else {
 						Par( 1 ) = double( FanCoilNum );
 						Par( 2 ) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
 						if ( FirstHVACIteration ) Par( 2 ) = 1.0;
@@ -2128,7 +2146,7 @@ namespace FanCoilUnits {
 					// demand greater than capacity
 					if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 						HWFlow = MaxWaterFlow;
-					} else{
+					} else {
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 );
 					}
 				}
@@ -2138,8 +2156,7 @@ namespace FanCoilUnits {
 						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum,
 							FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
-					}
-					else {
+					} else {
 						// flow lock on 
 						if ( MdotLockH > HWFlow ) { // if mdot > HWFlow, bypass extra flow
 							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with HWFlow; rest will be bypassed 
@@ -2152,8 +2169,7 @@ namespace FanCoilUnits {
 								HWFlow * Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Temp ) / MdotLockH;
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Enthalpy = ( HWFlowBypass * Node( FanCoil( FanCoilNum ).HotControlNode ).Enthalpy +
 								HWFlow * Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Enthalpy ) / MdotLockH;
-						}
-						else {
+						} else {
 							// if MdotLockH <= HWFlow use MdotLockH as is
 							Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).MassFlowRate = MdotLockH;
@@ -3017,6 +3033,79 @@ namespace FanCoilUnits {
 
 		}}
 
+	}
+
+	void
+	TightenWaterFlowLimits(
+		int const FanCoilNum, // Unit index in fan coil array
+		bool const CoolingLoad, // true if zone requires cooling
+		bool const HeatingLoad, // true if zone requires heating
+		int const WaterControlNode, // water control node, either cold or hot water
+		int const ControlledZoneNum, // controlling zone index
+		bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // zone load [W]
+		Real64 & MinWaterFlow, // minimum water flow rate
+		Real64 & MaxWaterFlow // maximum water flow rate
+		)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         R. Raustad, FSEC
+		//       DATE WRITTEN   May 2016
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Find tighter limits of water flow rate for fan coil unit.
+
+				// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 QUnitOut; // fan coil delivered capacity [W]
+		Real64 mdot; // water flow rate passed to fan coil unit [kg/s]
+
+		// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 10% of flow before iterating
+		mdot = MaxWaterFlow * 0.1;
+		Node( WaterControlNode ).MassFlowRate = mdot;
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+		if ( ( CoolingLoad && QUnitOut < QZnReq ) || ( HeatingLoad && QUnitOut > QZnReq ) ) {
+			MaxWaterFlow = mdot;
+			// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 1% of flow before iterating
+			mdot *= 0.1;
+			Node( WaterControlNode ).MassFlowRate = mdot;
+			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+			if ( ( CoolingLoad && QUnitOut < QZnReq ) || ( HeatingLoad && QUnitOut > QZnReq ) ) {
+				MaxWaterFlow = mdot;
+				// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.1% of flow before iterating
+				mdot *= 0.1;
+				Node( WaterControlNode ).MassFlowRate = mdot;
+				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+				if ( ( CoolingLoad && QUnitOut < QZnReq ) || ( HeatingLoad && QUnitOut > QZnReq ) ) {
+					MaxWaterFlow = mdot;
+					// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.01% of flow before iterating
+					mdot *= 0.1;
+					Node( WaterControlNode ).MassFlowRate = mdot;
+					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+					if ( ( CoolingLoad && QUnitOut < QZnReq ) || ( HeatingLoad && QUnitOut > QZnReq ) ) {
+						MaxWaterFlow = mdot;
+						// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.001% of flow before iterating
+						mdot *= 0.1;
+						Node( WaterControlNode ).MassFlowRate = mdot;
+						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+						if ( ( CoolingLoad && QUnitOut < QZnReq ) || ( HeatingLoad && QUnitOut > QZnReq ) ) {
+							MaxWaterFlow = mdot;
+						} else {
+							MinWaterFlow = mdot;
+						}
+					} else {
+						MinWaterFlow = mdot;
+					}
+				} else {
+					MinWaterFlow = mdot;
+				}
+			} else {
+				MinWaterFlow = mdot;
+			}
+		} else {
+			MinWaterFlow = mdot;
+		}
+	
 	}
 
 	void
