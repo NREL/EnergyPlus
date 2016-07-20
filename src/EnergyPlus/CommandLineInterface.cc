@@ -70,7 +70,6 @@
 #include <DisplayRoutines.hh>
 #include <EnergyPlus.hh>
 #include <FileSystem.hh>
-#include <InputProcessor_json.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <OutputReports.hh>
