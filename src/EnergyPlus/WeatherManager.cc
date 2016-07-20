@@ -3105,7 +3105,7 @@ namespace WeatherManager {
 				Wthr.LiquidPrecip( Hour ) = TomorrowLiquidPrecip( 1, Hour );
 			}
 
-			if ( ! LastHourSet ) {
+			if ( !LastHourSet ) {
 				// For first day of weather, all time steps of the first hour will be
 				// equal to the first hour's value.
 				LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp( 24 );
@@ -3164,7 +3164,7 @@ namespace WeatherManager {
 					TomorrowOutDewPointTemp( TS, Hour ) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp( Hour ) * WtNow;
 					TomorrowOutRelHum( TS, Hour ) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum( Hour ) * WtNow;
 					TomorrowWindSpeed( TS, Hour ) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed( Hour ) * WtNow;
-					TomorrowWindDir( TS, Hour ) = LastHrWindDir * WtPrevHour + Wthr.WindDir( Hour ) * WtNow;
+					TomorrowWindDir( TS, Hour ) = interpolateWindDirection( LastHrWindDir, Wthr.WindDir( Hour ), WtNow );
 					TomorrowHorizIRSky( TS, Hour ) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky( Hour ) * WtNow;
 					if ( Environment( Environ ).WP_Type1 == 0 ) {
 						TomorrowSkyTemp( TS, Hour ) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp( Hour ) * WtNow;
@@ -3193,35 +3193,58 @@ namespace WeatherManager {
 				LastHrLiquidPrecip = Wthr.LiquidPrecip( Hour );
 
 			} // End of Hour Loop
-
-			if ( Environment( Environ ).WP_Type1 != 0 ) {
-				{ auto const SELECT_CASE_var( WPSkyTemperature( Environment( Environ ).WP_Type1 ).CalculationType );
-
-				if ( SELECT_CASE_var == WP_ScheduleValue ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
-				} else if ( SELECT_CASE_var == WP_DryBulbDelta ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
-					for ( Hour = 1; Hour <= 24; ++Hour ) {
-						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
-						}
-					}
-
-				} else if ( SELECT_CASE_var == WP_DewPointDelta ) {
-					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
-					for ( Hour = 1; Hour <= 24; ++Hour ) {
-						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
-						}
-					}
-
-				} else {
-
-				}}
-
-			}
 		}
 
+		if ( Environment( Environ ).WP_Type1 != 0 ) {
+			{ auto const SELECT_CASE_var( WPSkyTemperature( Environment( Environ ).WP_Type1 ).CalculationType );
+
+			if ( SELECT_CASE_var == WP_ScheduleValue ) {
+				GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
+			} else if ( SELECT_CASE_var == WP_DryBulbDelta ) {
+				GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
+				for ( Hour = 1; Hour <= 24; ++Hour ) {
+					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
+					}
+				}
+
+			} else if ( SELECT_CASE_var == WP_DewPointDelta ) {
+				GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear_Schedule, CurDayOfWeek );
+				for ( Hour = 1; Hour <= 24; ++Hour ) {
+					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
+					}
+				}
+
+			} else {
+
+			}}
+
+		}
+
+	}
+
+
+	Real64
+	interpolateWindDirection(
+		Real64 const prevHrWindDir,
+		Real64 const curHrWindDir,
+		Real64 const curHrWeight
+	)
+	{
+		// adapted from http://stackoverflow.com/questions/2708476/rotation-interpolation
+		Real64 curAng = curHrWindDir;
+		Real64 prevAng = prevHrWindDir;
+		Real64 diff = abs( curAng - prevAng );
+		if ( diff > 180. ){
+			if ( curAng > prevAng ){
+				prevAng += 360.;
+			} else {
+				curAng += 360.;
+			}
+		}
+		Real64 interpAng = prevAng + ( curAng - prevAng ) * curHrWeight;
+		return ( fmod(interpAng, 360.) ); // fmod is float modulus function
 	}
 
 	void

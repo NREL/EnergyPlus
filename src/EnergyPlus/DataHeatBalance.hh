@@ -1516,7 +1516,7 @@ namespace DataHeatBalance {
 		bool Show55Warning; // show the warning messages about ASHRAE 55-2004
 		Real64 CO2RateFactor; // Carbon Dioxide Generation Rate [m3/s-W]
 		// Report variables
-		Real64 NumOcc; // Number of occupants []
+		Real64 NumOcc; // Number of occupants at current timestep []
 		Real64 TemperatureInZone; // Temperature in zone (C)
 		Real64 RelativeHumidityInZone; // Relative humidity in zone
 		Real64 RadGainRate; // Radiant heat gain [W]

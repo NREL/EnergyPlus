@@ -522,9 +522,9 @@ One or more ventilation objects (i.e., ZoneVentilation:DesignFlowRate and/or Zon
 
 More advanced ventilation calculations are possible using the EnergyPlus AirflowNetwork model.
 
-\subsubsection{Inputs}\label{inputs-2-005}
+\subsubsection{Inputs}\label{inputs-2016-06-17-0936}
 
-\paragraph{Field: Name}\label{field-name-2-004}
+\paragraph{Field: Name}\label{field-name-2016-06-16}
 
 The name of the ZoneVentilation:DesignFlowRate object.
 
@@ -534,7 +534,7 @@ This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneList) and a
 
 The name of the actual ventilation object becomes \textless{}Zone Name\textgreater{} \textless{}ZoneVentilation:DesignFlowRate Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
-\paragraph{Field: Schedule Name}\label{field-schedule-name-2}
+\paragraph{Field: Schedule Name}\label{field-schedule-name-2016-06-16}
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (V\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
 
@@ -825,7 +825,7 @@ More advanced ventilation calculations are possible using the EnergyPlus Airflow
 
 The name of the ZoneVentilation:WindandStackOpenArea object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-1-001}
+\paragraph{Field: Zone Name}\label{field-zone-name-2016-06-16}
 
 This field is the name of the zone (ref: Zone) and attaches a particular ventilation statement to a thermal zone in the building.
 
@@ -2354,7 +2354,7 @@ This output variable represents the total zone mixing air mass flow rate of a re
 
 This output variable represents the total zone mixing source air mass flow rate of a source zone feeding one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single source zone.
 
-\paragraph{\texorpdfstring{Zone Air Mass Balance Infiltration Status {[]}}{Zone Air Mass Balance Infiltration Status }}\label{zone-air-mass-balance-infiltration-status}
+\paragraph{Zone Air Mass Balance Infiltration Status {[]}}\label{zone-air-mass-balance-infiltration-status}
 
 This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either \textbf{0} or \textbf{1}.~ If the value of this report variable is \textbf{0} then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for the current timestep.~ If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
 
