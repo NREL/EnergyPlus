@@ -753,11 +753,9 @@ namespace HeatPumpWaterToWaterSimple {
 		if ( pltLoadSizNum > 0 ) {
 			if ( DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow ) {
 				tmpLoadSideVolFlowRate = DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate * GSHP( GSHPNum ).sizFac;
-				
 				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				tmpCoolingCap = Cp * rho * DataSizing::PlantSizData( pltLoadSizNum ).DeltaT * DataSizing::PlantSizData( pltLoadSizNum ).DesVolFlowRate * GSHP( GSHPNum ).sizFac;
-				
 			} else {
 				if ( GSHP( GSHPNum ).ratedCapCoolWasAutoSized ) tmpCoolingCap = 0.0;
 				if ( GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) tmpLoadSideVolFlowRate = 0.0;
@@ -826,25 +824,25 @@ namespace HeatPumpWaterToWaterSimple {
 				}
 			}
 
-		} else { // did not find plant sizing to go with this.
-			
+		} else { // did not find load side loop plant sizing to go with this.
 			if ( GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
 				ShowContinueError("Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + GSHP( GSHPNum ).Name );
 				errorsFound = true;
 			}
-			if ( ! GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+			if ( ! GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized && DataPlant::PlantFinalSizesOkayToReport ) {
 				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling", GSHP( GSHPNum ).Name, "User-Specified Load Side Flow Rate [m3/s]", GSHP( GSHPNum ).RatedLoadVolFlowCool );
 			}
+			if ( ! GSHP( GSHPNum ).ratedCapCoolWasAutoSized && DataPlant::PlantFinalSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling", GSHP( GSHPNum ).Name, "User-Specified Nominal Capacity [W]", GSHP( GSHPNum ).RatedCapCool );
+			}
 		}
-
 		if ( ! GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowCool;
-
 		int pltSourceSizNum = DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).PlantSizNum;
 		if ( pltSourceSizNum > 0 ) {
 			Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 			Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
-			tmpSourceSideVolFlowRate = tmpCoolingCap * ( 1.0 + ( 1.0 / GSHP( GSHPNum ).refCOP )) / ( DataSizing::PlantSizData( pltSourceSizNum ).DeltaT * Cp * rho );
+			tmpSourceSideVolFlowRate = tmpCoolingCap * ( 1.0 + ( 1.0 / GSHP( GSHPNum ).refCOP ) ) / ( DataSizing::PlantSizData( pltSourceSizNum ).DeltaT * Cp * rho );
 		} else {
 			tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
 		}
@@ -858,7 +856,7 @@ namespace HeatPumpWaterToWaterSimple {
 				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
 			}
 		} else {
-			if ( GSHP( GSHPNum ).RatedSourceVolFlowCool > 0.0 && tmpSourceSideVolFlowRate > 0 ) {
+			if ( GSHP( GSHPNum ).RatedSourceVolFlowCool > 0.0 && tmpSourceSideVolFlowRate > 0.0 ) {
 				Real64 nomSourceSideVolFlowUser = GSHP( GSHPNum ).RatedSourceVolFlowCool;
 				if ( DataPlant::PlantFinalSizesOkayToReport ) {
 					if ( DataGlobals::DoPlantSizing ) {
@@ -969,7 +967,6 @@ namespace HeatPumpWaterToWaterSimple {
 							} else {
 								ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name,"User-Specified Nominal Capacity [W]", nomHeatingCapUser );
 							}
-
 							if ( DataGlobals::DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatingCap - nomHeatingCapUser ) / nomHeatingCapUser ) > DataSizing::AutoVsHardSizingThreshold ) {
 									ShowMessage( "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
@@ -1014,25 +1011,25 @@ namespace HeatPumpWaterToWaterSimple {
 					}
 				}
 			}
-
 		} else { // did not find plant sizing to go with this.
 			if ( GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize ) {
-				ShowSevereError( "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
-				ShowContinueError("Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + GSHP( GSHPNum ).Name );
+				ShowSevereError( "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object." );
+				ShowContinueError( "Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + GSHP( GSHPNum ).Name );
 				errorsFound = true;
 			}
-			if ( ! GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+			if ( ! GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized && DataPlant::PlantFinalSizesOkayToReport ) {
 				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating", GSHP( GSHPNum ).Name, "User-Specified Load Side Flow Rate [m3/s]", GSHP( GSHPNum ).RatedLoadVolFlowHeat );
 			}
+			if ( ! GSHP( GSHPNum ).ratedCapHeatWasAutoSized && DataPlant::PlantFinalSizesOkayToReport ) {
+				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating", GSHP( GSHPNum ).Name, "User-Specified Nominal Capacity [W]", GSHP( GSHPNum ).RatedCapHeat );
+			}
 		}
-
 		if ( ! GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized ) tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowHeat;
-
 		int pltSourceSizNum = DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).PlantSizNum;
 		if ( pltSourceSizNum > 0 ) {
 			Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, DataGlobals::HWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 			Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, DataGlobals::HWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
-			tmpSourceSideVolFlowRate = tmpHeatingCap * ( 1.0 - ( 1.0 / GSHP( GSHPNum ).refCOP )) / ( DataSizing::PlantSizData( pltSourceSizNum ).DeltaT * Cp * rho );
+			tmpSourceSideVolFlowRate = tmpHeatingCap * ( 1.0 - ( 1.0 / GSHP( GSHPNum ).refCOP ) ) / ( DataSizing::PlantSizData( pltSourceSizNum ).DeltaT * Cp * rho );
 		} else {
 			tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
 		}
@@ -1045,7 +1042,7 @@ namespace HeatPumpWaterToWaterSimple {
 				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
 			}
 		} else {
-			if ( GSHP( GSHPNum ).RatedSourceVolFlowHeat > 0.0 && tmpSourceSideVolFlowRate > 0 ) {
+			if ( GSHP( GSHPNum ).RatedSourceVolFlowHeat > 0.0 && tmpSourceSideVolFlowRate > 0.0 ) {
 				Real64 nomSourceSideVolFlowUser = GSHP( GSHPNum ).RatedSourceVolFlowHeat;
 				if ( DataPlant::PlantFinalSizesOkayToReport ) {
 					if ( DataGlobals::DoPlantSizing ) {

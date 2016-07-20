@@ -1271,7 +1271,7 @@ where
 
 \( \Delta T_{loop,des} \) is the chilled water loop design temperature rise (from the chilled water loop's Sizing:Plant input data);
 
-\( \dot V_{loop,des} \) is the loop design volumetric flow rate.
+\( \dot V_{loop,des} \) is the loop design volume flow rate.
 
 \( f_{size} \) is the chiller's sizing factor.
 
@@ -1309,7 +1309,8 @@ The chiller heat recovery volume flow rate, \( \dot V_{hr,des} \), is obtained f
 \dot V_{hr,des} = \dot V_{cond,des} \cdot F_{HR,cap} 
 \end{equation}
 
-where,
+where
+
 \( F_{HR,cap} \) is user input from the field called Condenser Heat Recovery Relative Capacity Fraction.
 
 
@@ -1325,7 +1326,9 @@ The load side design fluid flow rate, \( \dot V_{load,des} \), is set equal to t
 \end{equation}
 
 where
-\( \dot V_{loop,des} \) is the loop design volumetric flow rate.
+
+\( \dot V_{loop,des} \) is the loop design volume flow rate;
+
 \( f_{size} \) is the heat pump's sizing factor.
 
 \subsubsection{Reference Capacity}\label{wwhp-ref-capacity}
@@ -1336,12 +1339,13 @@ The nominal capacity is determined from the loop design flow rate, loop design t
 \dot Q_{hp,nom} = C_{p,w} \cdot \rho_w \cdot \Delta T_{loop,des} \cdot \dot V_{loop,des} \cdot f_{size}
 \end{equation}
 
-where,
-\( C_{p,w} \) is the specific heat of load side loop fluid at standard conditions (5.05 \(^{o}\)C);
+where
 
-\( \rho_w \) is the density of load side loop fluid at standard conditions (5.05 \(^{o}\)C);
+\( C_{p,w} \) is the specific heat of load side loop fluid at standard conditions (5.05 \(^{o}\)C for cooling, 60.0 \(^{o}\)C for heating);
 
-\( \Delta T_{loop,des} \) is the load side loop design temperature rise (from load side loop's Sizing:Plant input data);
+\( \rho_w \) is the density of load side loop fluid at standard conditions (5.05 \(^{o}\)C for cooling, 60.0 \(^{o}\)C for heating);
+
+\( \Delta T_{loop,des} \) is the load side loop design temperature rise (from load side loop's Sizing:Plant input data).
 
 \subsubsection{Reference Source Side Flow Rate}\label{WWHP-ref-source-side-flow-rate}
 
@@ -1358,7 +1362,8 @@ For the heating heat pump, the heat supplied is reduced by the compressor work,
 \dot V_{source,des} = \dot Q_{hp,nom} \cdot (1 - 1/COP_{hp,nom})/(\Delta T_{loop,des} \cdot C_{p,w} \cdot \rho_w)
 \end{equation}
 
-where, 
+where
+
 \( COP_{hp,nom} \) is the reference coefficient of performance.  This is from user input if reference power consumption is autosized.
 
 \subsubsection{Reference Power Consumption}\label{wwhp-ref-power-consumption}

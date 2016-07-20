@@ -1489,8 +1489,8 @@ namespace EnergyPlus {
 
 		EXPECT_NEAR( HeatPumpWaterToWaterSimple::GSHP( 1 ).RatedLoadVolFlowHeat,  0.00025, 0.0000001 );
 		EXPECT_NEAR( HeatPumpWaterToWaterSimple::GSHP( 1 ).RatedSourceVolFlowHeat,  0.00025, 0.0000001 );
-		EXPECT_NEAR( HeatPumpWaterToWaterSimple::GSHP( 1 ).RatedCapHeat, 7345.6, 0.1 );
-		EXPECT_NEAR( HeatPumpWaterToWaterSimple::GSHP( 1 ).RatedPowerHeat, 2194.3, 0.1 );
+		EXPECT_NEAR( HeatPumpWaterToWaterSimple::GSHP( 1 ).RatedCapHeat, 7200.71, 0.1 );
+		EXPECT_NEAR( HeatPumpWaterToWaterSimple::GSHP( 1 ).RatedPowerHeat, 2151.07, 0.1 );
 	}
 
 	
