@@ -327,7 +327,6 @@ namespace PoweredInductionUnits {
 		using namespace DataIPShortCuts;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using Fans::GetFanAvailSchPtr;
 		using WaterCoils::GetCoilWaterInletNode;
 		using SteamCoils::GetCoilSteamInletNode;
 
@@ -359,6 +358,7 @@ namespace PoweredInductionUnits {
 		int ADUNum;
 		static std::string const RoutineName( "GetPIUs: " ); // include trailing blank space
 		bool SteamMessageNeeded;
+		int FanType_Num; // integer representation of fan type
 
 		// FLOW
 		// find the number of each type of fan coil unit
@@ -444,7 +444,8 @@ namespace PoweredInductionUnits {
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
-			PIU( PIUNum ).FanAvailSchedPtr = GetFanAvailSchPtr( "PIU unit", PIU( PIUNum ).FanName, ErrorsFound );
+			Fans::GetFanType( PIU( PIUNum ).FanName, FanType_Num, ErrorsFound );
+			PIU( PIUNum ).FanAvailSchedPtr = Fans::GetFanAvailSchPtr( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
 			if ( IsNotOK ) {
@@ -577,7 +578,8 @@ namespace PoweredInductionUnits {
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
-			PIU( PIUNum ).FanAvailSchedPtr = GetFanAvailSchPtr( "PIU unit", PIU( PIUNum ).FanName, ErrorsFound );
+			Fans::GetFanType( PIU( PIUNum ).FanName, FanType_Num, ErrorsFound );
+			PIU( PIUNum ).FanAvailSchedPtr = Fans::GetFanAvailSchPtr( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
 			if ( IsNotOK ) {
