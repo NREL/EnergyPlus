@@ -228,7 +228,9 @@ namespace EnergyPlus {
 */
 		GetAirflowNetworkInput();
 
-		EXPECT_EQ( 1, MultizoneZoneData( 1 ).VentingSchNum );
+		//MultizoneZoneData has only 1 element so may be hardcoded
+		auto GetIndex = InputProcessor::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		EXPECT_EQ( GetIndex, MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate();
 		Surface.deallocate();
@@ -2408,7 +2410,8 @@ namespace EnergyPlus {
 
 		//changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
 		// has index 1 which is the .VentSchNum
-		EXPECT_EQ( 1 , MultizoneZoneData( 1 ).VentingSchNum );
+		auto GetIndex = InputProcessor::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		EXPECT_EQ( GetIndex , MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate( );
 		Surface.deallocate( );
