@@ -525,7 +525,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		//now process companion coils, if any
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			if ( ! GSHP( GSHPNum ).companionName.empty ) {
+			if ( ! GSHP( GSHPNum ).companionName.empty() ) {
 				GSHP( GSHPNum ).companionIndex = InputProcessor::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
 				if ( GSHP( GSHPNum ).companionIndex == 0 ) {
 					ShowSevereError( "GetEquationFitWaterToWater Input: did not find companion heat pump named '" + GSHP( GSHPNum ).companionName + "' in heat pump called " + GSHP( GSHPNum ).Name );
