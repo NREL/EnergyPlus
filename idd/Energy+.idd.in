@@ -62758,6 +62758,8 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \memo simple water-water hp curve-fit model
         \min-fields 19
    A1,  \field Name
+        \type alpa
+        \reference WWHPHeatingNames
         \required-field
    A2,  \field Source Side Inlet Node Name
         \required-field
@@ -62833,16 +62835,21 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \type real
         \minimum> 0.0
         \default 7.5
-   N16; \field Sizing Factor
+   N16, \field Sizing Factor
         \note Multiplies the autosized capacity and flow rates
         \type real
         \minimum> 0.0
         \default 1.0
+   A6 ; \field Companion Cooling Heat Pump Name
+        \type object-list
+        \object-list WWHPCoolingNames
 
 HeatPump:WaterToWater:EquationFit:Cooling,
         \memo simple water-water heat pump curve-fit model
         \min-fields 19
    A1,  \field Name
+        \type alpha
+        \reference WWHPCoolingNames
         \required-field
    A2,  \field Source Side Inlet Node Name
         \required-field
@@ -62918,11 +62925,15 @@ HeatPump:WaterToWater:EquationFit:Cooling,
         \type real
         \minimum> 0.0
         \default 8.0
-   N16; \field Sizing Factor
+   N16, \field Sizing Factor
         \note Multiplies the autosized capacity and flow rates
         \type real
         \minimum> 0.0
         \default 1.0
+   A6 ; \field Companion Heating Heat Pump Name
+        \type object-list
+        \object-list WWHPHeatingNames
+        \note This optional field is used to coordinate sizing calculations between heating and cooling modes.
 
 HeatPump:WaterToWater:ParameterEstimation:Cooling,
   \memo OSU parameter estimation model

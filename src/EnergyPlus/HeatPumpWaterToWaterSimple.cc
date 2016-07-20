@@ -344,7 +344,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks );
+			GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks,DataIPShortCuts::lAlphaFieldBlanks );
 			IsNotOK = false;
 			IsBlank = true;
 			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
@@ -420,6 +420,10 @@ namespace HeatPumpWaterToWaterSimple {
 			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Condenser Water Nodes" );
 			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Chilled Water Nodes" );
 
+			if ( NumAlphas > 5 && ! DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
+				GSHP( GSHPNum ).companionName = AlphArray( 5 );
+			}
+
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
 			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Cooling", _, "Plant" );
 			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
@@ -431,7 +435,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks );
+			GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
 			IsNotOK = false;
 			IsBlank = true;
 			VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
@@ -504,6 +508,10 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHP( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, HPEqFitHeatingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
+			if ( NumAlphas > 5 && ! DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
+				GSHP( GSHPNum ).companionName = AlphArray( 5 );
+			}
+
 			// Test node sets
 			TestCompSet( HPEqFitHeatingUC, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Condenser Water Nodes" );
 			TestCompSet( HPEqFitHeatingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Hot Water Nodes" );
@@ -512,6 +520,20 @@ namespace HeatPumpWaterToWaterSimple {
 			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
 			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+		}
+
+
+		//now process companion coils, if any
+		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
+			if ( ! GSHP( GSHPNum ).companionName.empty ) {
+				GSHP( GSHPNum ).companionIndex = InputProcessor::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
+				if ( GSHP( GSHPNum ).companionIndex == 0 ) {
+					ShowSevereError( "GetEquationFitWaterToWater Input: did not find companion heat pump named '" + GSHP( GSHPNum ).companionName + "' in heat pump called " + GSHP( GSHPNum ).Name );
+					ErrorsFound =  true;
+				} else {
+					GSHP( GSHPNum ).companionIdentified = true;
+				}
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -913,7 +935,8 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).LoadSideInletNodeNum, tmpLoadSideVolFlowRate );
-		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, tmpSourceSideVolFlowRate );
+		// only register half of the source side flow because we expect a companion heat pump to also register a flow and we don't want to double count
+		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, tmpSourceSideVolFlowRate * 0.5 );
 
 		if ( DataPlant::PlantFinalSizesOkayToReport ) {
 			//create predefined report
@@ -1099,7 +1122,8 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 
 		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).LoadSideInletNodeNum, tmpLoadSideVolFlowRate );
-		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, tmpSourceSideVolFlowRate );
+		// register half of source side flow to avoid double counting
+		PlantUtilities::RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, tmpSourceSideVolFlowRate * 0.5 );
 
 		if ( DataPlant::PlantFinalSizesOkayToReport ) {
 			//create predefined report

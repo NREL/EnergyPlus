@@ -177,6 +177,9 @@ namespace HeatPumpWaterToWaterSimple {
 		int CondMassFlowIndex; // index for criteria in PullCompInterconnectTrigger
 		Real64 refCOP; // reference COP used for sizing reference power, user input
 		Real64 sizFac; // component level sizing factor, user input
+		std::string companionName; // name of companion GSHP
+		int companionIndex; // index in GSHP structure for companion heat pump
+		bool companionIdentified; // true if this GSHP has found its companion heat pump
 
 		// Default Constructor
 		GshpSpecs() :
@@ -246,7 +249,9 @@ namespace HeatPumpWaterToWaterSimple {
 			LoadCompNum( 0 ),
 			CondMassFlowIndex( 0 ),
 			refCOP( 0.0 ),
-			sizFac( 0.0 )
+			sizFac( 0.0 ),
+			companionIndex( 0 ),
+			companionIdentified( false )
 		{}
 
 	};

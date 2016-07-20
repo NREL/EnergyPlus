@@ -4469,6 +4469,10 @@ are performed as usual and the results are multiplied by the sizing factor. For 
 the inputs that would be altered by the sizing factor are: Reference Load Side Flow Rate, Reference Source Side Flow Rate, Reference Cooling Capacity, and Reference Cooling Power Consumption. The Sizing Factor allows the user to size
 a component to meet part of the plant loop's design load while continuing to use the autosizing feature.  For example if there are two heat pumps on the supply side, each one could be sized to be half of the design load.
 
+\paragraph{Field: Companion Heating Heat Pump Name}\label{field-heating-companion-name}
+
+This optional name field allows the user to specify the companion heating water to water heat pump for this cooling component.  This should be the name of an HeatPump:WaterToWater:EquationFit:Heating object defined elsewhere in the input file.  Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding heating heat pump input object by name.  This is currently used with autosizing so that the sizing calculations can be coordinated so that the two companion heat pumps get the same design reference flow rates. 
+
 An idf example:
 
 \begin{lstlisting}
@@ -4494,7 +4498,8 @@ HeatPump:WaterToWater:EquationFit:Cooling,
   0.02501669,              !- Cooling Compressor Power Coefficient 4
   -0.20132665,             !- Cooling Compressor Power Coefficient 5
   8.32,                    !- Reference Coefficient of Performance
-  1.0;                     !- Sizing Factor
+  1.0,                     !- Sizing Factor
+  GshpHeating;             !- Companion Heating Heat Pump Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-12-004}
@@ -4636,6 +4641,10 @@ are performed as usual and the results are multiplied by the sizing factor. For 
 the inputs that would be altered by the sizing factor are: Reference Load Side Flow Rate, Reference Source Side Flow Rate, Reference Heating Capacity, and Reference Heating Power Consumption. The Sizing Factor allows the user to size
 a component to meet part of the plant loop's design load while continuing to use the autosizing feature.  For example if there are two heat pumps on the supply side, each one could be sized to be half of the design load.
 
+\paragraph{Field: Companion Cooling Heat Pump Name}\label{field-cooling-companion-name}
+
+This optional name field allows the user to specify the companion cooling water to water heat pump for this heating component.  This should be the name of an HeatPump:WaterToWater:EquationFit:Cooling object defined elsewhere in the input file.  Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding cooling heat pump input object by name.  This is currently used with autosizing so that the sizing calculations can be coordinated  so that the two companion heat pumps get the same design reference flow rates.
+
 
 An idf example:
 
@@ -4662,7 +4671,8 @@ HeatPump:WaterToWater:EquationFit:Heating,
   -0.21629222,             !- Heating Compressor Power Coefficient 4
   0.033862378,             !- Heating Compressor Power Coefficient 5
   7.61,                    !- Reference Coefficient of Performance
-  1.0;                     !- Sizing Factor
+  1.0,                     !- Sizing Factor
+  GshpCLG;                 !- Companion Cooling Heat Pump Name
 \end{lstlisting}
 
 Next, the parameter estimation model objects are described. This model has two sets of parameters, one for the heating mode and other for the cooling mode.
