@@ -2,7 +2,7 @@
 
 A ray-tracing method is used to calculate beam solar and sky solar radiation that is diffusely reflected onto each of a building's exterior surfaces (walls, roofs, windows and doors), called here ``receiving surfaces.'' The calculation begins by generating a set of rays proceeding into the outward hemisphere at each receiving point on a receiving surface. Then it determinines whether each ray hits the sky, ground or an obstruction. The radiance at the hit point from reflection of incident beam or sky solar is determined and the contribution of this radiance to the receiving surface is calculated, added to the contribution from other hit points, and averaged over the receiving points. Separate calculations are done for beam-to-diffuse and sky solar reflection from all obstructions and beam-to-diffuse and sky solar reflection from the ground. (For beam-to-beam reflection see ``Beam Solar Radiation Specularly Reflected from Obstructions,'' below.)
 
-\subsection{\texorpdfstring{\emph{Receiving points}}{Receiving points}}\label{receiving-points}
+\subsection{\emph{Receiving points}}\label{receiving-points}
 
 An \emph{N}-sided surface is assigned \emph{N} receiving points with the following coordinates, expressed in terms of the surface vertex coordinates:
 
@@ -28,7 +28,7 @@ For example, for a vertical 3m by 5m rectangle with vertices (0,0,3), (0,0,0), (
 \caption{Vertical rectangular exterior heat transfer surface showing location of receiving points for calculating incident solar radiation reflected from obstructions. \protect \label{fig:vertical-rectangular-exterior-heat-transfer}}
 \end{figure}
 
-\subsection{\texorpdfstring{\emph{Rays}}{Rays}}\label{rays}
+\subsection{\emph{Rays}}\label{rays}
 
 A total of 90 rays are sent out into the exterior hemisphere surrounding each receiving point. An upgoing ray may hit an obstruction or the sky. A downgoing ray may hit an obstruction or the ground. See Figure~\ref{fig:two-dimensional-schematic-showing-rays-going}.
 

@@ -99,17 +99,17 @@ public:
 	int numSubSteps = 0;
 	std::vector< SystemTimestepObject > subSteps; //nested object array for system timesteps inside here.
 
-	ZoneTimestepObject (
+	ZoneTimestepObject ( // full constructor
 		int kindSim,
 		int environmentNum,
 		int daySim,
 		int hourDay,
-		int stepEndMin,
+		int timeStep,
 		Real64 timeStepDurat,
 		int numOfTimeStepsPerHour
 	);
 
-	ZoneTimestepObject();
+	ZoneTimestepObject(); // default constructor
 };
 
 class SizingLog
@@ -129,38 +129,49 @@ public:
 
 	std::vector< ZoneTimestepObject > ztStepObj; //will be sized to the sum of all steps, eg. timesteps in hour * 24 hours * 2 design days.
 
-	void FillZoneStep(
+	void
+	FillZoneStep(
 		ZoneTimestepObject tmpztStepStamp
 	);
 
-	void FillSysStep(
+	void
+	FillSysStep(
 		ZoneTimestepObject tmpztStepStamp ,
 		SystemTimestepObject tmpSysStepStamp
 	);
 
-	void AverageSysTimeSteps();
+	void
+	AverageSysTimeSteps();
 
-	void ProcessRunningAverage();
+	void
+	ProcessRunningAverage();
 
-	ZoneTimestepObject GetLogVariableDataMax();
+	ZoneTimestepObject
+	GetLogVariableDataMax();
 
-	Real64 GetLogVariableDataAtTimestamp(
+	Real64
+	GetLogVariableDataAtTimestamp(
 		ZoneTimestepObject tmpztStepStamp
 	);
 
-	void ReInitLogForIteration();
+	void
+	ReInitLogForIteration();
 
-	void SetupNewEnvironment(
+	void
+	SetupNewEnvironment(
 		int const seedEnvrnNum,
 		int const newEnvrnNum
 	);
 
 private:
 
-	int GetSysStepZtStepIndex(
+	int
+	GetSysStepZtStepIndex(
 		const ZoneTimestepObject tmpztStepStamp
 	);
-	int GetZtStepIndex(
+
+	int
+	GetZtStepIndex(
 		const ZoneTimestepObject tmpztStepStamp
 	);
 
@@ -170,20 +181,28 @@ class SizingLoggerFramework
 {
 public:
 	std::vector <SizingLog> logObjs;
-	int SetupVariableSizingLog(
+
+	int 
+	SetupVariableSizingLog(
 		Real64 & rVariable,
 		int stepsInAverage
 	);
 
-	ZoneTimestepObject PrepareZoneTimestepStamp ();
+	ZoneTimestepObject
+	PrepareZoneTimestepStamp ();
 
-	void UpdateSizingLogValuesZoneStep();
+	void
+	UpdateSizingLogValuesZoneStep();
 
-	void UpdateSizingLogValuesSystemStep();
+	void
+	UpdateSizingLogValuesSystemStep();
 
-	void SetupSizingLogsNewEnvironment();
+	void
+	SetupSizingLogsNewEnvironment();
 
-	void IncrementSizingPeriodSet();
+	void
+	IncrementSizingPeriodSet();
+
 private:
 	int NumOfLogs = 0;
 
@@ -223,7 +242,8 @@ public:
 		int sizingIndex
 	);
 
-	void ResolveDesignFlowRate(
+	void
+	ResolveDesignFlowRate(
 		int const HVACSizingIterCount
 	);
 
@@ -237,7 +257,8 @@ private:
 	Real64 previousVolDesignFlowRate = 0.0;
 	Real64 newVolDesignFlowRate = 0.0;
 
-	bool CheckTimeStampForNull(
+	bool
+	CheckTimeStampForNull(
 		ZoneTimestepObject testStamp
 	);
 };
