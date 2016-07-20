@@ -3015,8 +3015,6 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   February 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for  initializations within the
@@ -3024,30 +3022,6 @@ namespace HeatBalanceAirManager {
 
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// FLOW:
 
 		// Do the Begin Day initializations
 		if ( BeginDayFlag ) {

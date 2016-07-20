@@ -1177,7 +1177,7 @@ ZoneVentilation:DesignFlowRate objects used to calculate a combined zone outdoor
 
 \subsection{ZoneMixing}\label{zonemixing}
 
-In EnergyPlus, the ZoneMixing syntax is intended to allow simplified treatment of air exchange between zones. Note that this statement only affects the energy balance of the ``receiving'' zone and that this statement will not produce any effect on the ``source'' zone. Mixing statements can be complementary and include multiple zones, but the balancing of flows between zones is left to the user's discretion. The use of the Cross Mixing syntax (ref: Cross Mixing) can allow for automatic balancing of flows and energy flow rates between zones but is hindered by the limitation of only a single cross mixing statement per zone. The use of Refrigeration Door Mixing syntax (ref: Refrigeration Door Mixing) automatically balances the flow and energy between two zones and allows multiple mixing statements per zone. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation. Mixing is entered using the following syntax.
+ZoneMixing is intended to allow simplified treatment of air exchange between zones. Note that this statement only affects the energy balance of the ``receiving'' zone and that this statement will not produce any effect on the ``source'' zone. ZoneMixing statements can be complementary and include multiple zones, but the balancing of flows between zones is left to the user's discretion. Also see ZoneCrossMixing and ZoneRefrigerationDoorMixing. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
 
 \subsubsection{Inputs}\label{inputs-5-004}
 
@@ -1373,11 +1373,9 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 \subsection{ZoneCrossMixing}\label{zonecrossmixing}
 
-The ZoneCrossMixing syntax is ideally suited for two zones that exchange an equal amount of air between each other and do not have any air exchange with other zones. As with Mixing (ref: Mixing), this is a simplified view of interzone airflow in EnergyPlus. The main difference between Mixing and Cross Mixing is that Cross Mixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones.
+ZoneCrossMixing is ideally suited for two zones that exchange an equal amount of air between each other. As with ZoneMixing, this is a simplified interzone airflow in EnergyPlus. The main difference between ZoneMixing and ZoneCrossMixing is that cross mixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. For refrigerated zones, see ZoneRefrigerationDoorMixing. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
 
-Cross Mixing can be entered once, in one of the mixing zones; or twice, once for each zone, or multiple times. Each object will be performed at its own control conditions. The object may be entered once if Delta Temperature \textgreater{} 0.0 and it is desirable to have mixing only when the source zone~ is warmer than the receiving zone. This might be the case when the warmer zone is below the colder zone and the mixing is buoyancy driven. If the zones are next to each other, separated by an open doorway, it would be more suitable to input a cross mixing object for each zone. Then mixing would occur if the zone temperatures differed by Delta Temperature or greater regardless of which is the warmer zone.
-
-Cross Mixing is entered using the following syntax.
+ZoneCrossMixing can be entered once (in one of the mixing zones), twice (once for each zone), or multiple times (exchanging with more than one zone). Each object will be modeled with its own control conditions. The object may be entered once if Delta Temperature \textgreater{} 0.0 and it is desirable to have mixing only when the source zone~ is warmer than the receiving zone. This might be the case when the warmer zone is below the colder zone and the mixing is buoyancy driven. If the zones are next to each other, separated by an open doorway, it would be more suitable to input a cross mixing object for each zone. Then mixing would occur if the zone temperatures differed by Delta Temperature or greater regardless of which is the warmer zone.
 
 \subsubsection{Inputs}\label{inputs-6-003}
 
@@ -1585,11 +1583,9 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 \subsection{ZoneRefrigerationDoorMixing}\label{zonerefrigerationdoormixing}
 
-The ZoneRefrigerationDoorMixing syntax is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. They may also have mixed air from other zones, but only one object should be entered for any one pair of zones. As with Mixing (ref: Mixing), this is a simplified view of interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both Mixing and Cross Mixing. Like Cross Mixing, RefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Like Mixing, the refrigerated zone can exchange air with multiple zones.~ Unlike either of the other two mixing objects, the RefrigeratedDoorMixing always calculates the air exchange based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
+ZoneRefrigerationDoorMixing is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. As with ZoneMixing, this is a simplified interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both ZoneMixing and ZoneCrossMixing. Like ZoneCrossMixing, ZoneRefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Unlike the other two mixing objects, ZoneRefrigerationDoorMixing always calculates the air exchange rate based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
 
-Unlike, Cross Mixing, Refrigeration Door Mixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder.
-
-Refrigeration Door Mixing is entered using the following syntax.
+ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder.
 
 \subsubsection{Inputs}\label{inputs-7-003}
 
