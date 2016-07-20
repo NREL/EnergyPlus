@@ -466,76 +466,133 @@ namespace CoolingPanelSimple {
 				CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = WaterMassFlowDefault;
 			}
 
-			CoolingPanel( CoolingPanelNum ).RatedCapacity = rNumericArgs( 4 );
-
-			CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax = rNumericArgs( 5 );
+			if ( SameString( cAlphaArgs( 5 ), "CoolingDesignCapacity" ) ) {
+				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
+				if ( ! lNumericFieldBlanks( 4 ) ) {
+					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 4 );
+					if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity < 0.0 && CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity != DataSizing::AutoSize ) {
+						ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+						ShowContinueError( "Illegal " + cNumericFieldNames( 4 ) + " = " + TrimSigDigits( rNumericArgs( 4 ), 7 ) );
+						ErrorsFound = true;
+					}
+				} else {
+					if( ( !lAlphaFieldBlanks( 6 ) ) || ( !lAlphaFieldBlanks( 7 ) ) ) {
+						ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+						ShowContinueError( "Input for " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+						ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( 4 ) );
+						ErrorsFound = true;
+					}
+				}
+			} else if ( SameString( cAlphaArgs( 5 ), "CapacityPerFloorArea" ) ) {
+				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CapacityPerFloorArea;
+				if ( ! lNumericFieldBlanks( 5 ) ) {
+					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 5 );
+					if ( CoolingPanel( CoolingPanelNum ).CoolingCapMethod <= 0.0) {
+						ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+						ShowContinueError( "Input for " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+						ShowContinueError( "Illegal " + cNumericFieldNames( 5 ) + " = " + TrimSigDigits( rNumericArgs( 5 ), 7 ) );
+						ErrorsFound = true;
+					} else if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity == DataSizing::AutoSize ) {
+						ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+						ShowContinueError( "Input for " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+						ShowContinueError( "Illegal " + cNumericFieldNames( 5 ) + " = Autosize" );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+					ShowContinueError( "Input for " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( 5 ) );
+					ErrorsFound = true;
+				}
+			} else if (SameString( cAlphaArgs( 5 ), "FractionOfAutosizedCoolingCapacity" ) ) {
+				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
+				if ( ! lNumericFieldBlanks( 6 ) ) {
+					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 6 );
+					if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity < 0.0 ) {
+						ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+						ShowContinueError( "Illegal " + cNumericFieldNames( 6 ) + " = " + TrimSigDigits( rNumericArgs( 6 ), 7 ) );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+					ShowContinueError( "Input for " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( 6 ) );
+					ErrorsFound = true;
+				}
+			} else {
+				ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+				ShowContinueError( "Illegal " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+				ErrorsFound = true;
+			}
+			
+			CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax = rNumericArgs( 7 );
 			if ( std::abs( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax ) <= MinWaterFlowRate ) {
-				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 4 ) + " was less than the allowable minimum." );
+				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 7 ) + " was less than the allowable minimum." );
 				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinWaterFlowRate, 2 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax = MinWaterFlowRate;
 			} else if ( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax > MaxWaterFlowRate ) {
-				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 4 ) + " was higher than the allowable maximum." );
+				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 7 ) + " was higher than the allowable maximum." );
 				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxWaterFlowRate, 2 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax = MaxWaterFlowRate;
 			}
 
 			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 5 ), MeanAirTemperature ) ) {
+			if ( SameString( cAlphaArgs( 6 ), MeanAirTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 5 ), MeanRadiantTemperature ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), MeanRadiantTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 5 ), OperativeTemperature ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), OperativeTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = OperativeControl;
-			} else if ( SameString( cAlphaArgs( 5 ), OutsideAirDryBulbTemperature ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), OutsideAirDryBulbTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ODBControl;
-			} else if ( SameString( cAlphaArgs( 5 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), OutsideAirWetBulbTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = OWBControl;
-			} else if ( SameString( cAlphaArgs( 5 ), ZoneTotalLoad ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), ZoneTotalLoad ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ZoneTotalLoadControl;
-			} else if ( SameString( cAlphaArgs( 5 ), ZoneConvectiveLoad ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), ZoneConvectiveLoad ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ZoneConvectiveLoadControl;
 			} else {
-				ShowWarningError( "Invalid " + cAlphaFieldNames( 5 ) + " =" + cAlphaArgs( 5 ) );
+				ShowWarningError( "Invalid " + cAlphaFieldNames( 6 ) + " =" + cAlphaArgs( 6 ) );
 				ShowContinueError( "Occurs in " + RoutineName + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Control reset to MAT control for this Simple Cooling Panel." );
 				CoolingPanel( CoolingPanelNum ).ControlType = MATControl;
 			}
 
-			CoolingPanel( CoolingPanelNum ).ColdThrottlRange = rNumericArgs( 6 );
+			CoolingPanel( CoolingPanelNum ).ColdThrottlRange = rNumericArgs( 8 );
 			if ( CoolingPanel( CoolingPanelNum ).ColdThrottlRange < MinThrottlingRange ) {
 				ShowWarningError( cCMO_CoolingPanel_Simple + "Cooling throttling range too small, reset to 0.5" );
 				ShowContinueError( "Occurs in Cooling Panel=" + CoolingPanel( CoolingPanelNum ).EquipID );
 				CoolingPanel( CoolingPanelNum ).ColdThrottlRange = MinThrottlingRange;
 			}
 			
-			CoolingPanel( CoolingPanelNum ).ColdSetptSched = cAlphaArgs( 6 );
-			CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
-			if ( ( CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr == 0 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
-				ShowSevereError( cAlphaFieldNames( 6 ) + " not found: " + cAlphaArgs( 6 ) );
+			CoolingPanel( CoolingPanelNum ).ColdSetptSched = cAlphaArgs( 7 );
+			CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) );
+			if ( ( CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr == 0 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
+				ShowSevereError( cAlphaFieldNames( 7 ) + " not found: " + cAlphaArgs( 7 ) );
 				ShowContinueError( "Occurs in " + RoutineName + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 			
-			if ( SameString( cAlphaArgs( 7 ), Off ) ) {
+			if ( SameString( cAlphaArgs( 8 ), Off ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlNone;
-			} else if ( SameString( cAlphaArgs( 7 ), SimpleOff ) ) {
+			} else if ( SameString( cAlphaArgs( 8 ), SimpleOff ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlSimpleOff;
-			} else if ( SameString( cAlphaArgs( 7 ), VariableOff ) ) {
+			} else if ( SameString( cAlphaArgs( 8 ), VariableOff ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlVariedOff;
 			} else {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlSimpleOff;
 			}
 			
-			CoolingPanel( CoolingPanelNum ).CondDewPtDeltaT = rNumericArgs( 7 );
+			CoolingPanel( CoolingPanelNum ).CondDewPtDeltaT = rNumericArgs( 9 );
 			
-			CoolingPanel( CoolingPanelNum ).FracRadiant = rNumericArgs( 8 );
+			CoolingPanel( CoolingPanelNum ).FracRadiant = rNumericArgs( 10 );
 			if ( CoolingPanel( CoolingPanelNum ).FracRadiant < MinFraction ) {
-				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 8 ) + " was lower than the allowable minimum." );
+				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 10 ) + " was lower than the allowable minimum." );
 				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).FracRadiant = MinFraction;
 			}
 			if ( CoolingPanel( CoolingPanelNum ).FracRadiant > MaxFraction ) {
-				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 8 ) + " was higher than the allowable maximum." );
+				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 10 ) + " was higher than the allowable maximum." );
 				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).FracRadiant = MaxFraction;
 			}
@@ -550,19 +607,19 @@ namespace CoolingPanelSimple {
 				CoolingPanel( CoolingPanelNum ).FracConvect = 1.0 - AllFracsSummed;
 			}
 
-			CoolingPanel( CoolingPanelNum ).FracDistribPerson = rNumericArgs( 9 );
+			CoolingPanel( CoolingPanelNum ).FracDistribPerson = rNumericArgs( 11 );
 			if ( CoolingPanel( CoolingPanelNum ).FracDistribPerson < MinFraction ) {
-				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 9 ) + " was lower than the allowable minimum." );
+				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 11 ) + " was lower than the allowable minimum." );
 				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 3 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).FracDistribPerson = MinFraction;
 			}
 			if ( CoolingPanel( CoolingPanelNum ).FracDistribPerson > MaxFraction ) {
-				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 9 ) + " was higher than the allowable maximum." );
+				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 11 ) + " was higher than the allowable maximum." );
 				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 3 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).FracDistribPerson = MaxFraction;
 			}
 
-			CoolingPanel( CoolingPanelNum ).TotSurfToDistrib = NumNumbers - 9;
+			CoolingPanel( CoolingPanelNum ).TotSurfToDistrib = NumNumbers - 11;
 			if ( ( CoolingPanel( CoolingPanelNum ).TotSurfToDistrib < MinDistribSurfaces ) && ( CoolingPanel( CoolingPanelNum ).FracRadiant > MinFraction ) ) {
 				ShowSevereError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", the number of surface/radiant fraction groups entered was less than the allowable minimum." );
 				ShowContinueError( "...the minimum that must be entered=[" + RoundSigDigits( MinDistribSurfaces ) + "]." );
@@ -579,20 +636,20 @@ namespace CoolingPanelSimple {
 
 			AllFracsSummed = CoolingPanel( CoolingPanelNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= CoolingPanel( CoolingPanelNum ).TotSurfToDistrib; ++SurfNum ) {
-				CoolingPanel( CoolingPanelNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 7 );
-				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface );
-				CoolingPanel( CoolingPanelNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 9 );
+				CoolingPanel( CoolingPanelNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 8 );
+				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 8 ), Surface );
+				CoolingPanel( CoolingPanelNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 11 );
 				if ( CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) == 0 ) {
-					ShowSevereError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 6 ) + "=\"" + cAlphaArgs( SurfNum + 6 ) + "\" invalid - not found." );
+					ShowSevereError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 8 ) + "=\"" + cAlphaArgs( SurfNum + 8 ) + "\" invalid - not found." );
 					ErrorsFound = true;
 				}
 				if ( CoolingPanel( CoolingPanelNum ).FracDistribToSurf( SurfNum ) > MaxFraction ) {
-					ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 9 ) + "was greater than the allowable maximum." );
+					ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 8 ) + "was greater than the allowable maximum." );
 					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 					CoolingPanel( CoolingPanelNum ).TotSurfToDistrib = MaxFraction;
 				}
 				if ( CoolingPanel( CoolingPanelNum ).FracDistribToSurf( SurfNum ) < MinFraction ) {
-					ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 9 ) + "was less than the allowable minimum." );
+					ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 8 ) + "was less than the allowable minimum." );
 					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 					CoolingPanel( CoolingPanelNum ).TotSurfToDistrib = MinFraction;
 				}

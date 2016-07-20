@@ -2259,7 +2259,10 @@
     5.0,                       !- Rated Water Inlet Temperature {C}
     24.0,                      !- Rated Space Temperature {C}
     0.63,                      !- Rated Water Mass Flow Rate {kg/s}
-    600.0,                     !- Rated capacity
+    CoolingDesignCapacity,     !- Cooling Capacity Method
+    600.0,                     !- Rated Cooling Capacity {W}
+    0.0,                       !- Cooling Capacity per Floor Area {W/m2}
+    0.0,                       !- Fraction of Autosized Cooling Capacity
     0.001,                     !- Maximum water flow rate {m3/s}
     MeanAirTemperature,        !- Temperature Control Type
     1.0,                       !- Cooling Control Throttling Range

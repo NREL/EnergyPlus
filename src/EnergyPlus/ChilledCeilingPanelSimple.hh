@@ -132,6 +132,8 @@ namespace CoolingPanelSimple {
 		Real64 ColdThrottlRange;
 		Real64 RatedWaterTemp;
 		Real64 RatedCapacity;
+		int CoolingCapMethod;
+		Real64 ScaledCoolingCapacity;
 		Real64 UA;
 		Real64 Offset;
 		Real64 WaterMassFlowRate;
@@ -183,6 +185,8 @@ namespace CoolingPanelSimple {
 			ColdThrottlRange( 0.0 ),
 			RatedWaterTemp( 0.0 ),
 			RatedCapacity( 0.0 ),
+			CoolingCapMethod( 0 ),
+			ScaledCoolingCapacity( 0.0 ),
 			UA( 0.0 ),
 			Offset( 0.0 ),
 			WaterMassFlowRate( 0.0 ),
