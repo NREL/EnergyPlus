@@ -207,6 +207,20 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
 	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
 
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 0.7; // PLR should have no affect for constant fan operating mode
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.5, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.0, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 1.0;
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 2;
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 	HeatingLoad = true;
@@ -226,6 +240,16 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
 
+	PartLoadRatio = 0.7;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 1.0;
 	// heating load with moisture load (cooling coil operates)
 	MoistureLoad = -0.001;
 	UnitarySystem( UnitarySysNum ).Humidistat = true;
@@ -315,6 +339,54 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.2, CompOnMassFlow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateHigh );
+
+	UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil = true;
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
+	HeatingLoad = true;
+	PartLoadRatio = 0.7;
+	// PLR has no impact for constant fan flow case
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	// test for cycling fan flow case where MSHPMassFlowRateLow variable is proportional to PLR (flow @ 0.25 * PLR @ 0.7 = 0.175)
+	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.175, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, HeatingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.175, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	// same test for cooling mode (flow @ 0.3 * PLR @ 0.7 = 0.21)
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 1;
+	UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil = true;
+	HeatingLoad = false;
+	CoolingLoad = true;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.21, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, CoolingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.21, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	// and flip back to constant fan and both variables should be the same
+	UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	SetSpeedVariables( UnitarySysNum, CoolingLoad, PartLoadRatio );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
 
 }
 
