@@ -340,9 +340,21 @@ Format](http://rfc7159.net/rfc7159)
     7159](http://rfc7159.net/rfc7159), because any order implements the
     specified "unordered" nature of JSON objects.
     */
+      template <class T>
+      struct compare {
+          bool operator()(const T &s1, const T &s2) const {
+			  if (s1.size() == s2.size()) {
+				  return s1 < s2;
+			  } else {
+				  return s1.size() < s2.size();
+			  }
+          }
+      };
+
       using object_t = ObjectType<StringType,
             basic_json,
-            std::less<StringType>,
+//            std::less<StringType>,
+			  compare<StringType>,
             AllocatorType<std::pair<const StringType,
                   basic_json>>>;
 
