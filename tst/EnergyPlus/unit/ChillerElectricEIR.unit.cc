@@ -110,9 +110,9 @@ TEST_F( EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions )
 TEST_F( EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller )
 {
 
-		bool FirstHVACIteration( false );
-		bool ErrorsFound( false );
-		Real64 QZnReq( -1000.0 );
+		bool RunFlag( true );
+		Real64 MyLoad( -10000.0 );
+
 		DataPlant::TotNumLoops = 2;
 		DataEnvironment::OutBaroPress = 101325.0;
 		DataEnvironment::StdRhoAir = 1.20;
@@ -194,9 +194,6 @@ TEST_F( EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller )
 		DataSizing::PlantSizData.allocate( 1 );
 		DataSizing::PlantSizData( 1 ).DesVolFlowRate = 0.001;
 		DataSizing::PlantSizData( 1 ).DeltaT = 5.0;
-
-		bool RunFlag( true );
-		Real64 MyLoad( -10000.0 );
 
 		DataPlant::PlantFirstSizesOkayToFinalize = true;
 		DataPlant::PlantFirstSizesOkayToReport = true;
