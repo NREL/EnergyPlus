@@ -355,11 +355,8 @@ namespace DElightManagerF {
 							// Count each Window hosted by the current opaque bounding Surface
 							iNumWindows = 0;
 							for ( int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo ) {
-
 								if ( Surface( iwndo ).Class == SurfaceClass_Window ) {
-
 									auto & wndo( Surface( iwndo ) );
-
 									if ( wndo.BaseSurfName == surf.Name ) {
 
 										// Error if window has multiplier > 1 since this causes incorrect illuminance calc
@@ -656,7 +653,7 @@ namespace DElightManagerF {
 		int IOStat;
 		int CFSNum = 0;
 
-		static std::string const cModuleObjectCFS( "Daylighting:DELight:ComplexFenestration" );
+		static std::string const cCurrentModuleObject( "Daylighting:DELight:ComplexFenestration" );
 
 		TotDElightCFS = GetNumObjectsFound( cCurrentModuleObject );
 		DElightComplexFene.allocate( TotDElightCFS );
