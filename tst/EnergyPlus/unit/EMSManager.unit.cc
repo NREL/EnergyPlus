@@ -1090,7 +1090,8 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 14 ).Operand( 1 ).Type, 1 ); // argument was passed to EMS function
 		index = 14 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR14" );
-		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.0 ); // @SeedRandom( 2.65 )
+		// seed may differ by processor, don't test seed generator
+		// EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 2.0 ); // @SeedRandom( 2.65 )
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).Operator, FuncRandU );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).NumOperands, 2 );
@@ -1098,7 +1099,8 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 15 ).Operand( 2 ).Type, 1 ); // argument was passed to EMS function
 		index = 15 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR15" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.148876574, 0.00000001 ); // @RANDOMUNIFORM 0.0 1.0
+		// don't test random number generator
+		// EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 0.148876574, 0.00000001 ); // @RANDOMUNIFORM 0.0 1.0
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).Operator, FuncRandG );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).NumOperands, 4 );
@@ -1106,7 +1108,8 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 16 ).Operand( 4 ).Type, 1 ); // argument was passed to EMS function
 		index = 16 + offset;
 		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( index ).Name, "VAR16" );
-		EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.30797328, 0.00000001 ); // @RANDOMNORMAL 1.5 0.5 0.75 2.25 (mean, std, min, max)
+		// don't test random number generator
+		// EXPECT_NEAR( DataRuntimeLanguage::ErlVariable( index ).Value.Number, 1.30797328, 0.00000001 ); // @RANDOMNORMAL 1.5 0.5 0.75 2.25 (mean, std, min, max)
 
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).Operator, FuncRhoAirFnPbTdbW );
 		EXPECT_EQ( DataRuntimeLanguage::ErlExpression( 17 ).NumOperands, 3 );
