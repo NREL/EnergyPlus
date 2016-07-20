@@ -144,7 +144,6 @@ namespace PackagedTerminalHeatPump {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -2780,12 +2779,8 @@ namespace PackagedTerminalHeatPump {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
 		using DataEnvironment::StdRhoAir;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -2797,7 +2792,6 @@ namespace PackagedTerminalHeatPump {
 		auto & GetSteamCoilCapacity( SteamCoils::GetCoilCapacity );
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
-		//unused-12/12/08  USE FluidProperties,      ONLY: GetSatDensityRefrig !, FindRefrigerant, FindGlycol
 		using DataHeatBalFanSys::TempControlType;
 		using Fans::GetFanVolFlow;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -2816,17 +2810,9 @@ namespace PackagedTerminalHeatPump {
 		// Locals
 		Real64 SupHeaterLoad;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPTUnit" );
 		static std::string const RoutineNameSpace( " InitPTUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InNode; // inlet node number in PTHP loop
@@ -2907,7 +2893,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
 
 					if ( PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineName );
 
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound ) * rho;
 					}
@@ -2945,7 +2931,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).SuppHeatCoilName, ErrorsFound );
 
 					if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineName );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).SuppHeatCoilName, ErrorsFound ) * rho;
 					}
 				} else if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) {
@@ -3213,7 +3199,7 @@ namespace PackagedTerminalHeatPump {
 					CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
 					if ( CoilMaxVolFlowRate != AutoSize ) {
 
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineNameSpace );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineNameSpace );
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
 
 					}
@@ -3225,7 +3211,7 @@ namespace PackagedTerminalHeatPump {
 					SimulateWaterCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, PTUnit( PTUnitNum ).SuppHeatCoilIndex );
 					CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).SuppHeatCoilName, ErrorsFound );
 					if ( CoilMaxVolFlowRate != AutoSize ) {
-						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineNameSpace );
+						rho = GetDensityGlycol( PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( PTUnit( PTUnitNum ).LoopNum ).FluidIndex, RoutineNameSpace );
 						PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 					}
 				}

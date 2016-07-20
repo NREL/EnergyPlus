@@ -1787,7 +1787,7 @@ Capacity\(_{AtMaxVolFlow}\) ~~~ = Secondary loop capacity corresponding to the m
 
 Capacity\(_{Max}\) ~~~~~~~~~~~ ~ = Maximum secondary evaporator capacity (W)
 
-\subsubsection{\texorpdfstring{Secondary Evaporator in a Two-Phase Secondary Loop~ (Liquid-Overfeed Loop, e.g., CO\(_{2}\))}{Secondary Evaporator in a Two-Phase Secondary Loop~ (Liquid-Overfeed Loop, e.g., CO\_\{2\})}}\label{secondary-evaporator-in-a-two-phase-secondary-loop-liquid-overfeed-loop-e.g.-coux5f2}
+\subsubsection{Secondary Evaporator in a Two-Phase Secondary Loop~ (Liquid-Overfeed Loop, e.g., CO\(_{2}\))}\label{secondary-evaporator-in-a-two-phase-secondary-loop-liquid-overfeed-loop-e.g.-coux5f2}
 
 For a two-phase system, the secondary evaporator effectiveness is not calculated. Both the evaporating and condensing sides of the heat exchanger are assumed to operate at fixed temperatures.~ If the capacity of the secondary evaporator is not input, it will be calculated as the sum of the rated loads plus the rated pump power.
 
@@ -1913,7 +1913,7 @@ The Refrigeration:TranscriticalSystem object coordinates the energy flows betwee
 
 The inputs for the refrigeration system object, in addition to the names of the other refrigeration objects described above, include a name for this system, the minimum condensing temperature, and the refrigeration system working fluid.~ Optional input fields are also provided for users seeking to keep track of refrigerant inventory and suction pipe heat gains.
 
-\subsubsection{\texorpdfstring{Transcritical CO\(_{2}\) Refrigeration Cycles}{Transcritical CO\_\{2\} Refrigeration Cycles}}\label{transcritical-co2-refrigeration-cycles}
+\subsubsection{Transcritical CO\(_{2}\) Refrigeration Cycles}\label{transcritical-co2-refrigeration-cycles}
 
 Transcritical CO\(_{2}\) refrigeration cycles are characterized by a subcritical evaporation process and a supercritical ``gas cooling'' process.~ In the subcritical evaporation process which occurs in the evaporator, the CO\(_{2}\) changes phase from a liquid and vapor mixture to a superheated vapor.~ In doing so, the CO\(_{2}\) absorbs heat, thereby creating the cooling effect.~ This process is similar to the evaporation process in a standard vapor-compression refrigeration cycle.
 
@@ -1935,7 +1935,7 @@ EnergyPlus is capable of modeling the transcritical booster refrigeration cycle.
 
 Carbon dioxide exits the gas cooler at Location~1 and passes through the suction line heat exchanger, exiting at Location~2, during which the refrigerant is cooled by the suction gas.~ An intermediate expansion occurs between Locations~2 and~3, and saturated CO\(_{2}\) enters the receiver.~ Saturated liquid CO\(_{2}\) exits the receiver at Location~6, which is then expanded and fed to the medium-temperature loads (between Locations~7 and~8) and the low-temperature loads (between Locations~9 and~10).~ Saturated vapor CO\(_{2}\) exits the receiver bypass at Location~4 and is expanded to the medium-temperature pressure level at Location~5.~ Carbon dioxide vapor exiting the low temperature loads is compressed to the medium-temperature pressure level (Location~10 to 11).~ The CO\(_{2}\) from the discharge of the low pressure compressors, the outlet of the medium-temperature loads and the outlet of the receiver bypass are then combined at Location~13.~ The CO\(_{2}\) suction gas then passes through the suction line heat exchanger where the refrigerant is heated, exiting at Location~14.~ The carbon dioxide is finally compressed to the gas cooler pressure level at Location~15 and heat is rejected to the surroundings in the gas cooler between Locations~15 and~1.
 
-\subsubsection{\texorpdfstring{CO\(_{2}\) Compressor Performance Modeling}{CO\_\{2\} Compressor Performance Modeling}}\label{coux5f2-compressor-performance-modeling}
+\subsubsection{CO\(_{2}\) Compressor Performance Modeling}\label{coux5f2-compressor-performance-modeling}
 
 To model the performance of the CO\(_{2}\) compressors during subcritical and transcritical operation, cubic polynomials are used to curve fit manufacturers' performance data.~ This technique is similar to that described in AHRI Standard 540 (AHRI 2004).~ For subcritical operation, the power consumption and cooling capacity of a CO\(_{2}\) compressor is a function of the saturated suction temperature, \emph{t\(_{ss}\)} (°C), and the saturated discharge temperature, \emph{t\(_{sd}\)} (°C), as follows:
 
@@ -1967,7 +1967,7 @@ Once the corrected capacity is calculated for each compressor, the compressors a
 
 Only one gas cooler is allowed per transcritical refrigeration system. However, multiple refrigeration systems can reject heat through the same gas cooler.~ Currently, only air-cooled gas coolers are modeled.~ The gas cooler performance is modeled to determine the gas cooler pressure, gas cooler outlet temperature and outlet enthalpy of the refrigerant, and the auxiliary power consumption for the fans.
 
-\paragraph{\texorpdfstring{Optimal Gas Cooler Pressure for Transcritical CO\(_{2}\) Cycles}{Optimal Gas Cooler Pressure for Transcritical CO\_\{2\} Cycles}}\label{optimal-gas-cooler-pressure-for-transcritical-coux5f2-cycles}
+\paragraph{Optimal Gas Cooler Pressure for Transcritical CO\(_{2}\) Cycles}\label{optimal-gas-cooler-pressure-for-transcritical-coux5f2-cycles}
 
 When the compressor discharge conditions are such that the CO\(_{2}\) is in the supercritical region, then the high-side operating pressure is independent of the gas cooler exit temperature (Sawalha 2008).~ Thus, for a given gas cooler exit temperature, there is an optimum pressure to achieve the maximum coefficient of performance (COP).~ Figure~\ref{fig:cop-of-co_2-transcritical-cycle-vs.-discharge} illustrates the variation in COP of a transcritical CO\(_{2}\) cycle with discharge pressure at different gas cooler exit temperatures.
 
