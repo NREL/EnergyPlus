@@ -136,6 +136,8 @@ namespace DataGlobals {
 	Real64 const KelvinConv( 273.15 ); // Conversion factor for C to K and K to C
 	Real64 const InitConvTemp( 5.05 ); // [deg C], standard init vol to mass flow conversion temp
 	Real64 const AutoCalculate( -99999.0 ); // automatically calculate some fields.
+	Real64 const CWInitConvTemp( 5.05 ); // [deg C], standard init chilled water vol to mass flow conversion temp
+	Real64 const HWInitConvTemp( 60.0 ); // [deg C], standard init hot water vol to mass flow conversion temp
 
 	Real64 const StefanBoltzmann( 5.6697E-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
 	Real64 const UniversalGasConst( 8314.462175 ); // (J/mol*K)

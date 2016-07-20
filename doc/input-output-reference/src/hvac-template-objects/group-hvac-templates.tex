@@ -2266,9 +2266,9 @@ The parallel powered induction unit is an air system terminal unit that mixes va
 \caption{Parallel PIU Terminal Unit \protect \label{fig:parallel-piu-terminal-unit-001}}
 \end{figure}
 
-\subsubsection{Inputs}\label{inputs-10-008}
+\subsubsection{Inputs}\label{inputs-2016-06-16-1620}
 
-\paragraph{Field: Zone Name}\label{field-zone-name-9-000}
+\paragraph{Field: Zone Name}\label{field-zone-name-2016-06-16-1620}
 
 Enter the name of the zone. The name must match a building zone name used in the ZONE object.
 
@@ -3990,7 +3990,7 @@ HVACTemplate:System:UnitaryHeatPump:AirToAir,
 
 This object simulates a unitary system with option cooling coil (air-cooled DX, water-cooled DX, and chilled water), options heating coil (gas, electric, hot water, air-to-air heat pump, and water-to-air heat pump) with cycling or continous fan controls. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:UnitarySystem object to simulate single zone system. In addition, multiple HVACTemplate:Zone:Unitary objects may reference the same HVACTemplate:System:UnitarySystem object in a multiple zone version. For a multiple zone system, only one zone is specified as the control zone. The model can simulate chilled water or heat pump systems seen in commercial buildings and split systems commonly seen in residential buildings. HVACTemplate:System:UnitarySystem is similar to HVACTemplate:System:Unitary and HVACTemplate:System:UnitaryHeatPump:AirToAir, but it offers more flexilbility by using the more general AirLoopHVAC:UnitarySystem object instead of the more specific unitary furnace and heat pump objects.
 
-\subsubsection{Inputs}\label{inputs-17-003}
+\subsubsection{Inputs}\label{inputs-2016-06-16-1621}
 
 \paragraph{Field: Name}\label{field-name-4-013}
 
@@ -6934,11 +6934,11 @@ Enter the type of air-to-air heat recovery which is available between the relief
 
 The default is None\emph{.}
 
-\paragraph{\texorpdfstring{Field: Heat Recovery Sensible Effectiveness {[]}}{Field: Heat Recovery Sensible Effectiveness }}\label{field-heat-recovery-sensible-effectiveness}
+\paragraph{Field: Heat Recovery Sensible Effectiveness {[]}}\label{field-heat-recovery-sensible-effectiveness}
 
 Enter the sensible heat recovery effectiveness. This is applied as a constant effectiveness at all conditions. The valid range is from 0.0 to 1.0, and the default is 0.70.
 
-\paragraph{\texorpdfstring{Field: Heat Recovery Latent Effectiveness {[]}}{Field: Heat Recovery Latent Effectiveness }}\label{field-heat-recovery-latent-effectiveness}
+\paragraph{Field: Heat Recovery Latent Effectiveness {[]}}\label{field-heat-recovery-latent-effectiveness}
 
 Enter the latent heat recovery effectiveness if Heat Recovery Type is \emph{Enthalpy}. This is applied as a constant effectiveness at all conditions. The valid range is from 0.0 to 1.0, and the default is 0.65.
 
@@ -7079,7 +7079,7 @@ The piping systems that connect the chilled water coils in the HVAC template obj
 
 \subsubsection{Inputs}\label{inputs-23-001}
 
-\paragraph{Field: Name}\label{field-name-10-007}
+\paragraph{Field: Name}\label{field-name-2016-06-16-1622}
 
 The name used to designate the HVACTemplate:Plant:ChilledWaterLoop.
 
