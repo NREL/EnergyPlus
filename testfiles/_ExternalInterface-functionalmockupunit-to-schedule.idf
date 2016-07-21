@@ -1167,30 +1167,30 @@
 ! -- Sensible heat transfer
 
   OtherEquipment,
-    OthEquSen_ZoneOne,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
-    FMU_OthEquSen_ZoneOne,   !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    1,                       !- Design Level {W}
-    ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
-    0,                       !- Fraction Latent
-    0,                       !- Fraction Radiant
-    0;                       !- Fraction Lost
+    OthEquSen_ZoneOne,            !- Name
+    None,                         !- Fuel Type
+    ZONE ONE,                     !- Zone or ZoneList Name
+    FMU_OthEquSen_ZoneOne,        !- Schedule Name
+    EquipmentLevel,               !- Design Level Calculation Method
+    1,                            !- Design Level {W}
+    ,                             !- Power per Zone Floor Area {W/m2}
+    ,                             !- Power per Person {W/Person}
+    0,                            !- Fraction Latent
+    0,                            !- Fraction Radiant
 
 ! -- latent heat transfer
 
   OtherEquipment,
-    OthEquLat_ZoneOne,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
-    FMU_OthEquLat_ZoneOne,   !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    1,                       !- Design Level {W}
-    ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
-    1,                       !- Fraction Latent
-    0,                       !- Fraction Radiant
-    0;                       !- Fraction Lost
+    OthEquLat_ZoneOne,            !- Name
+    None,                         !- Fuel Type
+    ZONE ONE,                     !- Zone or ZoneList Name
+    FMU_OthEquLat_ZoneOne,        !- Schedule Name
+    EquipmentLevel,               !- Design Level Calculation Method
+    1,                            !- Design Level {W}
+    ,                             !- Power per Zone Floor Area {W/m2}
+    ,                             !- Power per Person {W/Person}
+    1,                            !- Fraction Latent
+    0,                            !- Fraction Radiant
 
   ExternalInterface,
     FunctionalMockupUnitImport;  !- Name of External Interface

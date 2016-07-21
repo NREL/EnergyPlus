@@ -1102,6 +1102,7 @@
 
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -1110,7 +1111,6 @@
     ,                        !- Power per Person {W/Person}
     0.000,                   !- Fraction Latent
     0.500,                   !- Fraction Radiant
-    0.000;                   !- Fraction Lost
 
   Schedule:Day:Hourly,
     Day Sch 1,               !- Name

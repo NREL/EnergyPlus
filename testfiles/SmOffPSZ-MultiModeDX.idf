@@ -1402,16 +1402,16 @@
     0;                       !- Fraction Lost
 
   OtherEquipment,
-    BASE-1 OthEq 1,          !- Name
-    BASE-1,                  !- Zone or ZoneList Name
-    AlwaysOn,                !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    726,                     !- Design Level {W}
-    ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
-    0,                       !- Fraction Latent
-    0.7,                     !- Fraction Radiant
-    0;                       !- Fraction Lost
+    BASE-1 OthEq 1,        !- Name
+    None,                  !- Fuel Type
+    BASE-1,                !- Zone or ZoneList Name
+    AlwaysOn,              !- Schedule Name
+    EquipmentLevel,        !- Design Level Calculation Method
+    726,                   !- Design Level {W}
+    ,                      !- Power per Zone Floor Area {W/m2}
+    ,                      !- Power per Person {W/Person}
+    0,                     !- Fraction Latent
+    0.7,                   !- Fraction Radiant
 
   ZoneInfiltration:DesignFlowRate,
     ZSF1 Infil 1,            !- Name
