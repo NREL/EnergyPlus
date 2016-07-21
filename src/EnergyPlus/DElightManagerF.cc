@@ -160,8 +160,6 @@ namespace DElightManagerF {
 		int iNumWindows; // Counter for windows hosted in each surface
 		int iconstruct; // Index for construction type of surfaces
 		int iMatlLayer; // Index for the outside (i.e., 1st) Material Layer for a Construction
-		int iNumRefPts; // Counter for reference points
-		int iLtgCtrlType; // Integer converter for Lighting Control Type
 		Real64 rExtVisRefl; // Exterior visible reflectance of a material
 		Real64 rLightLevel; // installed lighting level for current zone
 		Real64 CosBldgRelNorth; // Cosine of Building rotation
@@ -170,7 +168,6 @@ namespace DElightManagerF {
 		Real64 SinZoneRelNorth; // Sine of Zone rotation
 		Real64 Xb; // temp var for transformation calc
 		Real64 Yb; // temp var for transformation calc
-		Real64 rTotalZoneFraction; // Zone Fraction sum for all RefPts in each Zone
 		Array1D< Real64 > RefPt_WCS_Coord( 3 );
 		Array1D_int iWndoConstIndexes( 100 );
 		bool lWndoConstFound; // Flag for non-unique window const index
@@ -247,8 +244,6 @@ namespace DElightManagerF {
 		// Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
 		for ( auto & znDayl : ZoneDaylight ) {
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
-
-				int const izone = FindItemInList( znDayl.ZoneName, Zone );
 
 				// Register Error if 0 DElight RefPts have been input for valid DElight object
 				if ( znDayl.TotalDaylRefPoints == 0 ) {
@@ -647,6 +642,7 @@ namespace DElightManagerF {
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
+		using DataSurfaces::Surface;
 
 		int NumAlpha;
 		int NumNumber;
@@ -662,8 +658,20 @@ namespace DElightManagerF {
 			cfs.Name = cAlphaArgs( 1 );
 			cfs.ComplexFeneType = cAlphaArgs( 2 );
 			cfs.surfName = cAlphaArgs( 3 );
+			if ( FindItemInList( cfs.surfName, Surface ) == 0 ){
+				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cfs.surfName + "\"." );
+				ErrorsFound = true;
+			}
 			cfs.wndwName = cAlphaArgs( 4 );
+			if ( FindItemInList( cfs.surfName, Surface ) == 0 ){
+				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 4 ) + "=\"" + cfs.wndwName + "\"." );
+				ErrorsFound = true;
+			}
 			cfs.feneRota = rNumericArgs( 1 );
+			if ( cfs.feneRota < 0. || cfs.feneRota > 360. ){
+				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cNumericFieldNames( 1 ) + " outside of range 0 to 360." );
+				ErrorsFound = true;
+			}
 		}
 	}
 
