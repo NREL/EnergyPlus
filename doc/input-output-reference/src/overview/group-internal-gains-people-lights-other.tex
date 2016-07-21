@@ -370,7 +370,7 @@ People specific outputs include:
   Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{People Occupant Count {[]}}{People Occupant Count }}\label{people-occupant-count}
+\paragraph{People Occupant Count {[]}}\label{people-occupant-count}
 
 This field is the number of people for this PEOPLE object during the timestep in question.
 
@@ -412,7 +412,7 @@ This output variable represents the zone air temperature based on the Fanger the
 
 This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Relative Humidity'' is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; otherwise, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
 
-\paragraph{\texorpdfstring{Zone People Occupant Count {[]}}{Zone People Occupant Count }}\label{zone-people-occupant-count}
+\paragraph{Zone People Occupant Count {[]}}\label{zone-people-occupant-count}
 
 This field is the total number of people within the zone during the timestep in question.
 
@@ -456,7 +456,7 @@ This output variable is the operative temperature as defined by the thermal comf
 
 Note for all Thermal Comfort reporting:~ Though the published values for thermal comfort ``vote'' have a discrete scale (e.g. --3 to +3 or --4 to +4), the calculations in EnergyPlus are carried out on a continuous scale and, thus, reporting may be ``off the scale'' with specific conditions encountered in the space. This is not necessarily an error in EnergyPlus -- rather a different approach that does not take the ``limits'' of the discrete scale values into account.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Fanger Model PMV {[]}}{Zone Thermal Comfort Fanger Model PMV }}\label{zone-thermal-comfort-fanger-model-pmv}
+\paragraph{Zone Thermal Comfort Fanger Model PMV {[]}}\label{zone-thermal-comfort-fanger-model-pmv}
 
 This field is the ``predicted mean vote'' (PMV) calculated using the Fanger thermal comfort model.
 
@@ -468,31 +468,31 @@ This field is the ``predicted percentage of dissatisfied'' (PPD) calculated usin
 
 This output variable is the calculation of the clothing surface temperature using the Fanger thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Effective Temperature PMV {[]}}{Zone Thermal Comfort Pierce Model Effective Temperature PMV }}\label{zone-thermal-comfort-pierce-model-effective-temperature-pmv}
+\paragraph{Zone Thermal Comfort Pierce Model Effective Temperature PMV {[]}}\label{zone-thermal-comfort-pierce-model-effective-temperature-pmv}
 
 This field is the ``predicted mean vote'' (PMV) calculated using the effective temperature and the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV {[]}}{Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV }}\label{zone-thermal-comfort-pierce-model-standard-effective-temperature-pmv}
+\paragraph{Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV {[]}}\label{zone-thermal-comfort-pierce-model-standard-effective-temperature-pmv}
 
 This field is the ``predicted mean vote'' (PMV) calculated using the ``standard'' effective temperature and the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Discomfort Index {[]}}{Zone Thermal Comfort Pierce Model Discomfort Index }}\label{zone-thermal-comfort-pierce-model-discomfort-index}
+\paragraph{Zone Thermal Comfort Pierce Model Discomfort Index {[]}}\label{zone-thermal-comfort-pierce-model-discomfort-index}
 
 This field is the ``discomfort index'' calculated using the the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Thermal Sensation Index {[]}}{Zone Thermal Comfort Pierce Model Thermal Sensation Index }}\label{zone-thermal-comfort-pierce-model-thermal-sensation-index}
+\paragraph{Zone Thermal Comfort Pierce Model Thermal Sensation Index {[]}}\label{zone-thermal-comfort-pierce-model-thermal-sensation-index}
 
 This field is the ``thermal sensation index'' (PMV) calculated using the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort KSU Model Thermal Sensation Vote {[]}}{Zone Thermal Comfort KSU Model Thermal Sensation Vote }}\label{zone-thermal-comfort-ksu-model-thermal-sensation-vote}
+\paragraph{Zone Thermal Comfort KSU Model Thermal Sensation Vote {[]}}\label{zone-thermal-comfort-ksu-model-thermal-sensation-vote}
 
 This field is the ``thermal sensation vote'' (TSV) calculated using the KSU two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort ASHRAE 55 Adaptive Model 90\% Acceptability Status {[]}}{Zone Thermal Comfort ASHRAE 55 Adaptive Model 90\% Acceptability Status }}\label{zone-thermal-comfort-ashrae-55-adaptive-model-90-acceptability-status}
+\paragraph{Zone Thermal Comfort ASHRAE 55 Adaptive Model 90\% Acceptability Status {[]}}\label{zone-thermal-comfort-ashrae-55-adaptive-model-90-acceptability-status}
 
 This field is to report whether the operative temperature falls into the 90\% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort ASHRAE 55 Adaptive Model 80\% Acceptability Status {[]}}{Zone Thermal Comfort ASHRAE 55 Adaptive Model 80\% Acceptability Status }}\label{zone-thermal-comfort-ashrae-55-adaptive-model-80-acceptability-status}
+\paragraph{Zone Thermal Comfort ASHRAE 55 Adaptive Model 80\% Acceptability Status {[]}}\label{zone-thermal-comfort-ashrae-55-adaptive-model-80-acceptability-status}
 
 This field is to report whether the operative temperature falls into the 80\% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
@@ -1730,11 +1730,11 @@ This is the amount of heating provided by the plant loop to the pool in Joules o
 
 The pool cover may block some or all of short- and long-wavelength radiation incident on the pool. To account for this and to not have the cover result in energy that is not accounted for by the model, the radiation that is blocked by the cover is converted to a convective gain (or loss) to/from the zone air. This output field reports this value.
 
-\paragraph{\texorpdfstring{Indoor Pool Current Activity Factor {[]}}{Indoor Pool Current Activity Factor }}\label{indoor-pool-current-activity-factor}
+\paragraph{Indoor Pool Current Activity Factor {[]}}\label{indoor-pool-current-activity-factor}
 
 This is the current activity factor as defined by the user input schedule.
 
-\paragraph{\texorpdfstring{Indoor Pool Current Cover Factor {[]}}{Indoor Pool Current Cover Factor }}\label{indoor-pool-current-cover-factor}
+\paragraph{Indoor Pool Current Cover Factor {[]}}\label{indoor-pool-current-cover-factor}
 
 This is the current cover factor as defined by the user input schedule.
 
@@ -2545,9 +2545,9 @@ The dewpoint temperature of the air entering the ITE.
 
 The dry-bulb temperature of the air leaving the ITE.
 
-\paragraph{\texorpdfstring{Zone ITE Average Supply Heat Index {[]}}{Zone ITE Average Supply Heat Index }}\label{zone-ite-average-supply-heat-index}
+\paragraph{Zone ITE Average Supply Heat Index {[]}}\label{zone-ite-average-supply-heat-index}
 
-\paragraph{\texorpdfstring{ITE Supply Heat Index {[]}}{ITE Supply Heat Index }}\label{ite-supply-heat-index}
+\paragraph{ITE Supply Heat Index {[]}}\label{ite-supply-heat-index}
 
 The supply heat index (SHI) for this equipment. SHI is a dimensionless measure of recirculation of hot air into the cold air intake of the ITE. SHI = (Tin -- Tsupply)/(Tout-Tsupply) where Tin is the dry-bulb temperature of the air entering the ITE, Tout is the dry-bulb temperature of the air leaving the ITE, and Tsupply is the dry-bulb temperature at the Supply Air Node. If a Supply Air Node Name is not specified for this object, then this output will not be reported.
 
