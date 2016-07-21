@@ -228,7 +228,9 @@ namespace EnergyPlus {
 */
 		GetAirflowNetworkInput();
 
-		EXPECT_EQ( 1, MultizoneZoneData( 1 ).VentingSchNum );
+		//MultizoneZoneData has only 1 element so may be hardcoded
+		auto GetIndex = InputProcessor::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		EXPECT_EQ( GetIndex, MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate();
 		Surface.deallocate();
@@ -2258,13 +2260,12 @@ namespace EnergyPlus {
 		GetAirflowNetworkInput( );
 
 		Real64 PresssureSet = 0.5;
-		// Assign values (last two's indexes were swapped because of new input processor)
 
-		Schedule( 1 ).CurrentValue = PresssureSet; // Pressure setpoint
-		Schedule( 2 ).CurrentValue = 1.0; // set availability and fan schedule to 1
-		Schedule( 3 ).CurrentValue = 1.0; // On
-		Schedule( 5 ).CurrentValue = 25.55; // VentingSched
-		Schedule( 4 ).CurrentValue = 1.0; // WindowVentSched
+		Schedule( InputProcessor::FindItemInList( "PRESSURE SETPOINT SCHEDULE", Schedule( {1,NumSchedules} )) ).CurrentValue = PresssureSet; // Pressure setpoint
+		Schedule( InputProcessor::FindItemInList( "FANANDCOILAVAILSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // set availability and fan schedule to 1
+		Schedule( InputProcessor::FindItemInList( "ON", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // On
+		Schedule( InputProcessor::FindItemInList( "VENTINGSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 25.55; // VentingSched
+		Schedule( InputProcessor::FindItemInList( "WINDOWVENTSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // WindowVentSched
 
 		AirflowNetworkFanActivated = true;
 		DataEnvironment::OutDryBulbTemp = -17.29025;
@@ -2273,10 +2274,11 @@ namespace EnergyPlus {
 		DataEnvironment::WindSpeed = 4.9;
 		DataEnvironment::WindDir = 270.0;
 
+		int index = InputProcessor::FindItemInList("OA INLET NODE", AirflowNetworkNodeData);
 		for ( i = 1; i <= 36; ++i ) {
 			AirflowNetworkNodeSimu( i ).TZ = 23.0;
 			AirflowNetworkNodeSimu( i ).WZ = 0.0008400;
-			if ( ( i > 4 && i < 10 ) || i == 20) { // NFACADE, EFACADE, SFACADE, WFACADE, HORIZONTAL, OA INTLET NODE
+			if ( ( i > 4 && i < 10 ) || i == index) { // NFACADE, EFACADE, SFACADE, WFACADE, HORIZONTAL are always at indexes 5 through 9
 				AirflowNetworkNodeSimu( i ).TZ = DataEnvironment::OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );  //AirflowNetworkNodeData vals differ
 				AirflowNetworkNodeSimu( i ).WZ = DataEnvironment::OutHumRat;
 			}
@@ -2408,7 +2410,8 @@ namespace EnergyPlus {
 
 		//changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
 		// has index 1 which is the .VentSchNum
-		EXPECT_EQ( 1 , MultizoneZoneData( 1 ).VentingSchNum );
+		auto GetIndex = InputProcessor::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		EXPECT_EQ( GetIndex , MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate( );
 		Surface.deallocate( );

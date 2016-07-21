@@ -341,6 +341,7 @@ Format](http://rfc7159.net/rfc7159)
     7159](http://rfc7159.net/rfc7159), because any order implements the
     specified "unordered" nature of JSON objects.
     */
+
       using object_t = ObjectType<StringType,
             basic_json,
             doj::alphanum_less<StringType>,
