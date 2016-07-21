@@ -2047,6 +2047,12 @@ namespace PlantManager {
 			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
 				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -3282,7 +3288,8 @@ namespace PlantManager {
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
 			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+			// Autocalculated loop volume based on a loop time of 2 minutes
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * 120;
 			if (PlantFinalSizesOkayToReport) {
 				if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 					// condenser loop vs plant loop breakout needed.
@@ -3304,7 +3311,10 @@ namespace PlantManager {
 				}
 			}
 		}
-
+		//Warning if user inputted plant loop volume is too large compared to the max flow rate
+		if (PlantLoop( LoopNum ).Volume / PlantLoop( LoopNum ).MaxVolFlowRate > 3600) {
+			ShowWarningError("PlantLoop " + PlantLoop( LoopNum ).Name + ": Plant Loop Volume is high relative to the Maximum Loop Flow Rate. The loop time is " + RoundSigDigits(PlantLoop( LoopNum ).Volume / PlantLoop( LoopNum ).MaxVolFlowRate / 3600, 3) + "hr.");
+		}
 		//should now have plant volume, calculate plant volume's mass for fluid type
 		if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
 			FluidDensity = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, InitConvTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
@@ -4530,6 +4540,20 @@ namespace PlantManager {
 			PlantLoop.allocate( 0 );
 		}
 
+	}
+	void
+	CheckOngoingPlantWarnings() 
+	{
+		int LoopNum;
+		for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+			//Warning if the excess storage time is more than half of the total time
+			if ( PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTime > PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop( LoopNum ).Name + " Demand Side is storing excess heat the majority of the time." );
+			}
+			if ( PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTime > PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop( LoopNum ).Name + " Supply Side is storing excess heat the majority of the time." );
+			}
+		}
 	}
 
 } // PlantManager
