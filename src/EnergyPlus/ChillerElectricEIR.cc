@@ -1336,7 +1336,7 @@ namespace ChillerElectricEIR {
 				// Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
 				if ( PlantFinalSizesOkayToReport ) {
 					SizingMethod = DataHVACGlobals::AutoCalculateSizing;
-					CompType = DataPlant::ValidLoopEquipTypes( DataPlant::TypeOf_Chiller_ElectricEIR );
+					CompType = DataPlant::ccSimPlantEquipTypes( DataPlant::TypeOf_Chiller_ElectricEIR );
 					CompName = ElectricEIRChiller( EIRChillNum ).Name;
 					SizingString = "Reference Condenser Fluid Flow Rate  [m3/s]";
 					DataConstantUsedForSizing = ElectricEIRChiller( EIRChillNum ).RefCap;
