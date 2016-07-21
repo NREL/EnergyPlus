@@ -4123,6 +4123,10 @@ namespace DaylightingManager {
 					SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt = 0.0;
 					SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 					SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt = 0.0;
+					SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep.allocate( MaxRefPoints );
+					SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep = 0.0;
+					SurfaceWindow( SurfNum ).LumWinFromRefPtRep.allocate( MaxRefPoints );
+					SurfaceWindow( SurfNum ).LumWinFromRefPtRep = 0.0;
 					SurfaceWindow( SurfNum ).SurfDayLightInit = true;
 				}
 			} else {
@@ -4141,6 +4145,10 @@ namespace DaylightingManager {
 							SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt = 0.0;
 							SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 							SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt = 0.0;
+							SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep.allocate( MaxRefPoints );
+							SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep = 0.0;
+							SurfaceWindow( SurfNum ).LumWinFromRefPtRep.allocate( MaxRefPoints );
+							SurfaceWindow( SurfNum ).LumWinFromRefPtRep = 0.0;
 							SurfaceWindow( SurfNum ).SurfDayLightInit = true;
 						}
 					}
