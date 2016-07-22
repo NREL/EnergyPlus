@@ -9654,12 +9654,13 @@ Output:Variable,*,Chiller Condenser Mass Flow Rate,hourly; !- HVAC Average [kg/s
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
 
-!*** OPERAIONAL FAULTS ***
+!*** OPERATIONAL FAULTS ***
   
   FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
     Fault_CoolSys1Chiller1,  !- Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    Chiller:Electric:ReformulatedEIR,   !- Chiller Object Type
+    Chiller:Electric:ReformulatedEIR, !- Chiller Object Type
     CoolSys1 Chiller 1,      !- Chiller Object Name
     2.0;                     !- Reference Sensor Offset {deltaC}
+

@@ -323,6 +323,9 @@ namespace FaultsManager {
 
 	void
 	CheckAndReadFaults();
+	
+	void
+	clear_state();
 
 } // FaultsManager
 

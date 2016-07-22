@@ -16,7 +16,7 @@ Most of the buildings, either new or old, have operational faults in the sensors
 
 The users in these cases are practitioners, not power users, so it is needed to implement the fault models using conventional EnergyPlus objects rather than the EMS, which, in any case, could only be used to model limited types of faults.
 
-EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, (3) fouling or scaling at air side or water side components (e.g., heating and cooling coil, air filter, cooling tower), (4) sensor faults with plant components.
+EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of a number of fault types that categorized as: (1) sensor faults with air economizers (e.g., outdoor air temperature sensor) (2) thermostat/humidistat offset faults, (3) fouling or scaling at air side or water side components (e.g., heating and cooling coil, air filter, cooling tower), (4) sensor faults with plant components (e.g., chiller supply water temperature sensor offset).
 
 
 \section{Operational Faults Modeling}\label{operational-faults-modeling}
@@ -362,9 +362,11 @@ These chillers can have different flow modes:
   \emph{NotModulated} for either variable or constant pumping with flow controlled by the external plant system.
 \end{itemize}
 
+\newline \newline
+
 \textbf{(a) constant flow chillers}
 
-For the chillers with emph{ConstantFlow} and emph{NotModulated}, local control is provided by resetting the leaving water temperature. The actual evaporator outlet water temperature value at faulty operations can be obtained via:
+For the chillers with \emph{ConstantFlow} and \emph{NotModulated}, local control is provided by resetting the leaving water temperature. The actual evaporator outlet water temperature value at faulty operations can be obtained via:
 
 \begin{equation}
 T_{evap-o,f} = T_{evap-o,ff} - \Delta T
@@ -393,6 +395,8 @@ Where,
 \(T_{evap-o,f}\) evaporator outlet temperature value in the faulty case (actual value)
 
 \(T_{evap-i}\) evaporator inlet temperature value 
+
+\newline \newline
 
 \textbf{(b) variable flow chillers}
 
