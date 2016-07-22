@@ -79787,7 +79787,7 @@ FaultModel:Fouling:CoolingTower,
        \note Enter the name of the cooling tower affected
        \required-field
        \type object-list
-       \object-list CoolingTower:VariableSpeed
+       \object-list CoolingTowers
    N1; \field UA Reduction Factor
        \note Factor describing the tower UA reduction due to fouling
        \note It is the ratio between the UA value at fouling case and that at fault free case
