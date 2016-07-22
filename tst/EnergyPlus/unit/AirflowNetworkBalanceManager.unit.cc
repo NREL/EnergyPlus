@@ -329,7 +329,6 @@ namespace EnergyPlus {
 			"  ReferenceCrackConditions; !- Reference Crack Conditions",
 		} );
 
-//		ASSERT_FALSE( process_idf( idf_objects ) );
 		ASSERT_TRUE( process_idf(  idf_objects ) );
 		GetAirflowNetworkInput( );
 		std::string const error_string = delimited_string( {
@@ -2303,7 +2302,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( PresssureSet, AirflowNetworkNodeSimu( 3 ).PZ, 0.0001 );
 		EXPECT_NEAR( 0.00255337, ReliefMassFlowRate, 0.0001 );
 
-		// Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off 
+		// Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
 		AirflowNetworkFanActivated = false;
 
 		AirflowNetworkExchangeData.allocate( NumOfZones );

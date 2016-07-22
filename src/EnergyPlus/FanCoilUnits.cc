@@ -2155,14 +2155,8 @@ namespace FanCoilUnits {
 						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum,
 							FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
-<<<<<<< HEAD
-					}
-					else {
-						// flow lock on
-=======
 					} else {
-						// flow lock on 
->>>>>>> NREL/develop
+						// flow lock on
 						if ( MdotLockH > HWFlow ) { // if mdot > HWFlow, bypass extra flow
 							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with HWFlow; rest will be bypassed
 							Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
@@ -3110,7 +3104,7 @@ namespace FanCoilUnits {
 		} else {
 			MinWaterFlow = mdot;
 		}
-	
+
 	}
 
 	void

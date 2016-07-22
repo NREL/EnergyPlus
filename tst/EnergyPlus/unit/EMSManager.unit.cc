@@ -186,7 +186,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		// test EMS actuator for Plant Component
 		// test SetActuatedBranchFlowRate for expected response
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
 		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
@@ -288,7 +288,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
-	
+
 		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
@@ -350,7 +350,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		// test EMS actuator for Plant Component
 		// test SetComponentFlowRate for expected response
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
 		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
@@ -451,7 +451,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
-	
+
 		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
@@ -955,7 +955,7 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::TimeStepZone = 0.25;
 

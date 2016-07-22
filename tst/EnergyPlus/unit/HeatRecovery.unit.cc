@@ -502,7 +502,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetReturnAirPathInput();
-		GetAirPathData();		
+		GetAirPathData();
 		ASSERT_EQ( SimAirServingZones::HeatXchngr, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 4 ).CompType_Num );
 		// Close and delete eio output file
 		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
@@ -3875,11 +3875,11 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
-	OutputProcessor::TimeValue.allocate( 2 ); // 
+	OutputProcessor::TimeValue.allocate( 2 ); //
 	ManageSimulation(); // run the design day
 
 	ASSERT_EQ( "DOAS HEAT RECOVERY", ExchCond( 1 ).Name );  // Name of Heat Recovery Exchange On Main Air Loop
-	ASSERT_EQ( ExchCond( 1 ).Name, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 2 ).Name );  // Heat Recovery Exchange On Main Air Loop	
+	ASSERT_EQ( ExchCond( 1 ).Name, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 2 ).Name );  // Heat Recovery Exchange On Main Air Loop
 
 	ASSERT_NEAR( -17.300, ExchCond( 1 ).SupInTemp, 0.001 ); // Heat Recovery Exchanger Primary Air Inlet Temp
 	ASSERT_GT( ExchCond( 1 ).SupOutTemp, ExchCond( 1 ).SupInTemp ); // Heat Recovery Exchanger is On in heating mode
@@ -3898,7 +3898,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 }
 
 TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
-	
+
 	int ExchNum( 1 );
 	int BalDesDehumPerfDataIndex( 1 );
 	Real64 FaceVelocity;
@@ -3908,7 +3908,7 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 	DataSizing::NumSysSizInput = 1;
 	DataSizing::SysSizInput.allocate( NumSysSizInput );
 	DataSizing::CurSysNum = 1; // primary air system
-	DataSizing::CurOASysNum = 0; // no OA system 
+	DataSizing::CurOASysNum = 0; // no OA system
 	DataSizing::CurZoneEqNum = 0; // size it based on system
 	DataSizing::SysSizInput( CurSysNum ).AirLoopNum = 1;
 
@@ -3942,7 +3942,7 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 
 	// calc heat recovery sizing
 	SizeHeatRecovery( ExchNum );
-	
+
 	// test autosized nominal vol flow rate
 	EXPECT_EQ( 1.0, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow ); // m3/s
 
@@ -3985,7 +3985,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// get heat recovery heat exchanger generic
 	GetHeatRecoveryInput();
@@ -4000,7 +4000,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
 	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 1.0;
 
-	// size the HX nominal supply air volume flow rate 
+	// size the HX nominal supply air volume flow rate
 	SizeHeatRecovery( ExchNum );
 
 	// verify the name and autosized supply air flow rate

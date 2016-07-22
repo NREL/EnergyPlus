@@ -2183,7 +2183,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 
@@ -2258,7 +2258,7 @@ namespace EnergyPlus {
 		// fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
 		// When this happens, this routine will find tighter limits on min/max water flow rate passed to RegulaFalsi
 		// This routine is only called when RegulaFalsi returns -1
-		
+
 		// example usage of function
 		// if( SolFlag == -1 ) {
 		// tighten limits on water flow rate to see if this allows convergence

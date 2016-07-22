@@ -107,7 +107,7 @@ namespace EnergyPlus {
 			"    0.0013,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.001;                   !- Convergence Tolerance",
-						
+
 			"  Coil:Heating:Water,",
 			"    Reheat Coil Zone 1,      !- Name",
 			"    FanAndCoilAvailSched,    !- Availability Schedule Name",
@@ -124,14 +124,14 @@ namespace EnergyPlus {
 			"    71.1,                    !- Rated Outlet Water Temperature {C}",
 			"    32.2,                    !- Rated Outlet Air Temperature {C}",
 			"    ;                        !- Rated Ratio for Air and Water Convection",
-												
+
 			"  Schedule:Compact,",
 			"    FanAndCoilAvailSched,    !- Name",
 			"    Fraction,                !- Schedule Type Limits Name",
 			"    Through: 12/31,           !- Field 1",
 			"    For: AllDays,            !- Field 2",
 			"    Until: 24:00,1.0;        !- Field 3",
-			
+
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone1Equipment,          !- Name",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
@@ -166,7 +166,6 @@ namespace EnergyPlus {
 
 		});
 
-//		ASSERT_FALSE( process_idf( idf_objects ) );
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -179,7 +178,7 @@ namespace EnergyPlus {
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetSysInput();
-		
+
 		EXPECT_EQ( "AirTerminal:SingleDuct:ConstantVolume:Reheat", Sys( 1 ).SysType ); // AT SD VAV Reheat Type
 		EXPECT_EQ( "REHEAT ZONE 1", Sys( 1 ).SysName ); // AT SD VAV Reheat Name
 		EXPECT_GT( Sys( 1 ).ReheatControlNode, 0 );  // none zero integer node index is expected
@@ -297,7 +296,6 @@ namespace EnergyPlus {
 
 		} );
 
-//		ASSERT_FALSE( process_idf( idf_objects ) );
 		process_idf( idf_objects );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -386,7 +384,6 @@ namespace EnergyPlus {
 
 		} );
 
-//		ASSERT_FALSE( process_idf( idf_objects ) );
 		process_idf( idf_objects );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -509,7 +506,6 @@ namespace EnergyPlus {
 
 		} );
 
-//		ASSERT_FALSE( process_idf( idf_objects ) );
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized

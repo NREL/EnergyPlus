@@ -2068,11 +2068,11 @@ namespace ReportSizingManager {
 			if ( !HardSizeNoDesRun || DataScalableSizingON || DataScalableCapSizingON ) {
 				if ( IsAutoSize ) { // Design Size values are available for both autosized and hard - sized
 					// check capacity to make sure design volume flow per total capacity is within range
-					
+
 					// Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and determines capacity using physical calculations instead of emperical curves
 					bool FlagCheckVolFlowPerRatedTotCap = true;
-					if ( SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) || SameString( CompType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ) FlagCheckVolFlowPerRatedTotCap = false;
-						
+					if ( InputProcessor::SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) || InputProcessor::SameString( CompType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ) FlagCheckVolFlowPerRatedTotCap = false;
+
 					if ( DataIsDXCoil && FlagCheckVolFlowPerRatedTotCap && ( SizingType == CoolingCapacitySizing || SizingType == HeatingCapacitySizing ) ) {
 						if ( SizingResult > 0.0 ) {
 							RatedVolFlowPerRatedTotCap = DesVolFlow / SizingResult;
