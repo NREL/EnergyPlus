@@ -2259,8 +2259,6 @@ namespace SystemAvailabilityManager {
 		// Sets the AvailStatus indicator according to the
 		// optimum start algorithm
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using namespace DataAirLoop;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -2274,15 +2272,6 @@ namespace SystemAvailabilityManager {
 		using DataEnvironment::DayOfWeekTomorrow;
 		using DataZoneControls::OccRoomTSetPointHeat;
 		using DataZoneControls::OccRoomTSetPointCool;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2301,29 +2290,64 @@ namespace SystemAvailabilityManager {
 		int I;
 		int J;
 		Real64 TempDiff;
-		static Real64 TempDiffHi( 0.0 );
-		static Real64 TempDiffLo( 0.0 );
-		//  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: ZoneCompOptStartControlType
+		Real64 TempDiffHi;
+		Real64 TempDiffLo;
 		static bool FirstTimeATGFlag( true );
 		static bool OverNightStartFlag( false ); // Flag to indicate the optimum start starts before mid night.
-		static bool CycleOnFlag( false );
+		bool CycleOnFlag( false );
 		static bool OSReportVarFlag( true );
 		int NumPreDays;
 		int NumOfZonesInList;
 		static Array1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
 		static Array1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
-		static Real64 AdaTempGradHeat;
-		static Real64 AdaTempGradCool;
-		static Real64 ATGUpdateTime1( 0.0 );
-		static Real64 ATGUpdateTime2( 0.0 );
-		static Real64 ATGUpdateTemp1( 0.0 );
-		static Real64 ATGUpdateTemp2( 0.0 );
-		static bool ATGUpdateFlag1( false );
-		static bool ATGUpdateFlag2( false );
+		Real64 AdaTempGradHeat;
+		Real64 AdaTempGradCool;
+		Real64 ATGUpdateTime1( 0.0 );
+		Real64 ATGUpdateTime2( 0.0 );
+		Real64 ATGUpdateTemp1( 0.0 );
+		Real64 ATGUpdateTemp2( 0.0 );
+		bool ATGUpdateFlag1( false );
+		bool ATGUpdateFlag2( false );
 		int ATGCounter;
 		int ATGWCZoneNumHi;
 		int ATGWCZoneNumLo;
-		static Real64 NumHoursBeforeOccupancy( 0.0 ); // Variable to store the number of hours before occupancy in optimum start period
+		Real64 NumHoursBeforeOccupancy; // Variable to store the number of hours before occupancy in optimum start period
+		bool exitLoop; // exit loop on found data
+
+		// update air loop specific data
+		TempDiffLo = OptStartSysAvailMgrData( SysAvailNum ).TempDiffLo;
+		TempDiffHi = OptStartSysAvailMgrData( SysAvailNum ).TempDiffHi;
+		ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ATGWCZoneNumLo;
+		ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ATGWCZoneNumHi;
+		CycleOnFlag = OptStartSysAvailMgrData( SysAvailNum ).CycleOnFlag;
+		ATGUpdateFlag1 = OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateFlag1;
+		ATGUpdateFlag2 = OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateFlag2;
+		NumHoursBeforeOccupancy = OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy;
+		FirstTimeATGFlag = OptStartSysAvailMgrData( SysAvailNum ).FirstTimeATGFlag;
+		OverNightStartFlag = OptStartSysAvailMgrData( SysAvailNum ).OverNightStartFlag;
+		OSReportVarFlag = OptStartSysAvailMgrData( SysAvailNum ).OSReportVarFlag;
+
+		if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlAlgType == AdaptiveTemperatureGradient ) {
+			NumPreDays = OptStartSysAvailMgrData( SysAvailNum ).NumPreDays;
+			if ( ! allocated( AdaTempGradTrdHeat ) ) {
+				AdaTempGradTrdHeat.allocate( NumPreDays );
+				AdaTempGradTrdCool.allocate( NumPreDays );
+			}
+			if ( ! allocated( OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdHeat ) ) {
+				OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdHeat.allocate( NumPreDays );
+				OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdHeat = 0.0;
+				OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdCool.allocate( NumPreDays );
+				OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdCool = 0.0;
+			}
+			AdaTempGradTrdHeat = OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdHeat;
+			AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdCool;
+			AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradHeat;
+			AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradCool;
+			ATGUpdateTime1 = OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTime1;
+			ATGUpdateTime2 = OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTime2;
+			ATGUpdateTemp1 = OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTemp1;
+			ATGUpdateTemp2 = OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTemp2;
+		}
 
 		// add or use a new variable OptStartSysAvailMgrData(SysAvailNum)%FanSchIndex
 		if ( KickOffSimulation ) {
@@ -2341,32 +2365,38 @@ namespace SystemAvailabilityManager {
 				OptStartData.OccStartTime.allocate( NumOfZones );
 			}
 			if ( ! allocated( OptStartData.ActualZoneNum ) ) OptStartData.ActualZoneNum.allocate( NumOfZones );
-			OptStartData.OptStartFlag = false;
-			OptStartData.OccStartTime = 99.99; //initialize the zone occupancy start time
+			if ( BeginDayFlag ) {
+				NumHoursBeforeOccupancy = 0.0; //Initialize the hours of optimum start period. This variable is for reporting purpose.
+				OptStartData.OccStartTime = 22.99; //initialize the zone occupancy start time
+				OptStartData.OptStartFlag = false;
+			}
+
 			GetScheduleValuesForDay( ScheduleIndex, DayValues );
 			GetScheduleValuesForDay( ScheduleIndex, DayValuesTmr, TmrJDay, TmrDayOfWeek );
 
 			FanStartTime = 0.0;
 			FanStartTimeTmr = 0.0;
+			exitLoop = false;
 			for ( I = 1; I <= 24; ++I ) {
 				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValues( J, I ) > 0.0 ) {
-						FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
-						goto Loop1_exit;
-					}
+					if ( DayValues( J, I ) <= 0.0 ) continue;
+					FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
+					exitLoop = true;
+					break;
 				}
+				if ( exitLoop ) break;
 			}
-			Loop1_exit: ;
 
+			exitLoop = false;
 			for ( I = 1; I <= 24; ++I ) {
 				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValuesTmr( J, I ) > 0.0 ) {
-						FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
-						goto Loop3_exit;
-					}
+					if ( DayValuesTmr( J, I ) <= 0.0 ) continue;
+					FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
+					exitLoop = true;
+					break;
 				}
+				if ( exitLoop ) break;
 			}
-			Loop3_exit: ;
 
 			if ( FanStartTimeTmr == 0.0 ) FanStartTimeTmr = 24.0;
 
@@ -2381,10 +2411,6 @@ namespace SystemAvailabilityManager {
 			if ( DSTIndicator > 0 ) {
 				--FanStartTime;
 				--FanStartTimeTmr;
-			}
-
-			if ( BeginDayFlag ) {
-				NumHoursBeforeOccupancy = 0.0; //Initialize the hours of optimum start period. This variable is for reporting purpose.
 			}
 
 			{ auto const SELECT_CASE_var( OptStartSysAvailMgrData( SysAvailNum ).CtrlAlgType );
@@ -2808,12 +2834,8 @@ namespace SystemAvailabilityManager {
 				}
 
 			} else if ( SELECT_CASE_var == AdaptiveTemperatureGradient ) {
-				NumPreDays = OptStartSysAvailMgrData( SysAvailNum ).NumPreDays;
+
 				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == ControlZone ) {
-					if ( ! allocated( AdaTempGradTrdHeat ) ) {
-						AdaTempGradTrdHeat.allocate( NumPreDays );
-						AdaTempGradTrdCool.allocate( NumPreDays );
-					}
 					ZoneNum = OptStartSysAvailMgrData( SysAvailNum ).ZoneNum;
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
@@ -3096,10 +3118,6 @@ namespace SystemAvailabilityManager {
 						CycleOnFlag = false;
 					}
 				} else if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == MaximumOfZoneList ) {
-					if ( ! allocated( AdaTempGradTrdHeat ) ) {
-						AdaTempGradTrdHeat.allocate( NumPreDays );
-						AdaTempGradTrdCool.allocate( NumPreDays );
-					}
 					NumOfZonesInList = OptStartSysAvailMgrData( SysAvailNum ).NumOfZones;
 					ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
 					ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
@@ -3110,21 +3128,19 @@ namespace SystemAvailabilityManager {
 							if ( allocated( OccRoomTSetPointHeat ) && allocated( OccRoomTSetPointCool ) ) {
 								TempDiffHi = 0.0;
 								TempDiffLo = 0.0;
+								ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
+								ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
 								for ( ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum ) {
 									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
 									TempDiffHi = max( TempDiffHi, TempDiff );
 									//Store the worse case zone number for actual temperature gradient calculation
 									if ( TempDiff == TempDiffHi ) {
 										ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum );
-									} else {
-										ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
 									}
 									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
 									TempDiffLo = min( TempDiffLo, TempDiff );
 									if ( TempDiff == TempDiffLo ) {
 										ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum );
-									} else {
-										ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
 									}
 								}
 							} else {
@@ -3141,8 +3157,8 @@ namespace SystemAvailabilityManager {
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
 						AdaTempGradTrdHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
 						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
+						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
+						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
@@ -3416,6 +3432,26 @@ namespace SystemAvailabilityManager {
 
 		OptStartSysAvailMgrData( SysAvailNum ).AvailStatus = AvailStatus;
 		OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy = NumHoursBeforeOccupancy;
+		OptStartSysAvailMgrData( SysAvailNum ).TempDiffLo = TempDiffLo;
+		OptStartSysAvailMgrData( SysAvailNum ).TempDiffHi = TempDiffHi;
+		OptStartSysAvailMgrData( SysAvailNum ).ATGWCZoneNumLo = ATGWCZoneNumLo;
+		OptStartSysAvailMgrData( SysAvailNum ).ATGWCZoneNumHi = ATGWCZoneNumHi;
+		OptStartSysAvailMgrData( SysAvailNum ).CycleOnFlag = CycleOnFlag;
+		OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateFlag1 = ATGUpdateFlag1;
+		OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateFlag2 = ATGUpdateFlag2;
+		OptStartSysAvailMgrData( SysAvailNum ).FirstTimeATGFlag = FirstTimeATGFlag;
+		OptStartSysAvailMgrData( SysAvailNum ).OverNightStartFlag = OverNightStartFlag;
+		OptStartSysAvailMgrData( SysAvailNum ).OSReportVarFlag = OSReportVarFlag;
+		if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlAlgType == AdaptiveTemperatureGradient ) {
+			OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdHeat = AdaTempGradTrdHeat;
+			OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradTrdCool = AdaTempGradTrdCool;
+			OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradHeat = AdaTempGradHeat;
+			OptStartSysAvailMgrData( SysAvailNum ).AdaTempGradCool = AdaTempGradCool;
+			OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTime1 = ATGUpdateTime1;
+			OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTime2 = ATGUpdateTime2;
+			OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTemp1 = ATGUpdateTemp1;
+			OptStartSysAvailMgrData( SysAvailNum ).ATGUpdateTemp2 = ATGUpdateTemp2;
+		}
 
 	}
 
