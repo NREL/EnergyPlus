@@ -92,7 +92,7 @@
 #include <DElightManagerF.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>

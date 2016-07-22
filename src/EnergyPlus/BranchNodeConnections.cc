@@ -68,7 +68,7 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

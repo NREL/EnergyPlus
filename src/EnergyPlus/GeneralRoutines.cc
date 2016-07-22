@@ -90,7 +90,7 @@
 #include <GeneralRoutines.hh>
 #include <HVACSingleDuctInduc.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <OutdoorAirUnit.hh>
 #include <PlantUtilities.hh>

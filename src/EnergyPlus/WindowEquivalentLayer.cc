@@ -77,7 +77,7 @@
 #include <DataZoneEquipment.hh>
 #include <DaylightingManager.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
 

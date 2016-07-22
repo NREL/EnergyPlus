@@ -84,7 +84,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>

@@ -82,7 +82,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -1210,7 +1210,7 @@ namespace HeatingCoils {
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
 		DataDesicRegCoil = false; // reset global to false so other heating coils are not affected
-		DataDesInletAirTemp = 0.0; // reset global data to zero so other heating coils are not 
+		DataDesInletAirTemp = 0.0; // reset global data to zero so other heating coils are not
 		DataDesOutletAirTemp = 0.0; // reset global data to zero so other heating coils are not affected
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage || HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
@@ -3312,7 +3312,7 @@ namespace HeatingCoils {
 		return NumberOfStages;
 
 	}
- 
+
 	// Clears the global data in HeatingCoils.
 	// Needed for unit tests, should not be normally called.
 	void
@@ -3337,7 +3337,7 @@ namespace HeatingCoils {
 		int const CoilNum, // Number of electric or gas heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this coil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this coil is used
 		) {
 
 		// FUNCTION INFORMATION:
@@ -3352,7 +3352,7 @@ namespace HeatingCoils {
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		if ( GetCoilsInputFlag ) { 
+		if ( GetCoilsInputFlag ) {
 			GetHeatingCoilInput();
 			GetCoilsInputFlag = false;
 		}

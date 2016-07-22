@@ -72,7 +72,7 @@ extern "C" {
 #include <DataStringGlobals.hh>
 #include <ExternalInterface.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 // C++ Standard Library Headers

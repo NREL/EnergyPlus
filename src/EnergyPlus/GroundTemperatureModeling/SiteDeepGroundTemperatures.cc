@@ -68,7 +68,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteDeepGroundTemperatures.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -79,9 +79,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Site:GroundTemperature:Deep factory
-	std::shared_ptr< SiteDeepGroundTemps > 
-	SiteDeepGroundTemps::DeepGTMFactory( 
-		int objectType, 
+	std::shared_ptr< SiteDeepGroundTemps >
+	SiteDeepGroundTemps::DeepGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -156,7 +156,7 @@ namespace EnergyPlus {
 			ShowContinueError( "Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
 			return nullptr;
 		}
-	}	
+	}
 
 	//******************************************************************************
 

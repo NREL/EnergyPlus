@@ -79,7 +79,7 @@
 #include <DataViewFactorInformation.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
 #include <Timer.h>

@@ -70,7 +70,7 @@
 #include <FluidProperties.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -280,7 +280,7 @@ namespace FluidProperties {
 
 		// Using/Aliasing
 		using namespace std::placeholders; // For use with 'std::bind' in Array initializers
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na

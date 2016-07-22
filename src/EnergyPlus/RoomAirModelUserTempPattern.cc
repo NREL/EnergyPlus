@@ -78,7 +78,7 @@
 #include <DataZoneEquipment.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>

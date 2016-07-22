@@ -80,7 +80,7 @@
 #include <Fans.hh>
 #include <General.hh>
 #include <HeatRecovery.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>

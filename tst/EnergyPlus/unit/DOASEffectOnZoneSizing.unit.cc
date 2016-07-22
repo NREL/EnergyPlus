@@ -65,7 +65,7 @@
 
 // EnergyPlus Headers
 #include <ZoneEquipmentManager.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <DataStringGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataSizing.hh>

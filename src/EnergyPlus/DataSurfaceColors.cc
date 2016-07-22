@@ -60,7 +60,7 @@
 #include <DataSurfaceColors.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

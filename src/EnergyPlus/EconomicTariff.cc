@@ -75,7 +75,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>

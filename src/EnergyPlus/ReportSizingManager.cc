@@ -76,7 +76,7 @@
 #include <DXCoils.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <SQLiteProcedures.hh>

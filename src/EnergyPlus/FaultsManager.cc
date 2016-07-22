@@ -59,7 +59,7 @@
 // EnergyPlus Headers
 #include <FaultsManager.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <CurveManager.hh>
 #include <Fans.hh>
@@ -88,7 +88,7 @@ namespace FaultsManager {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::ScheduleAlwaysOn;
-	
+
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 

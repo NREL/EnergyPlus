@@ -81,7 +81,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MicroturbineElectricGenerator.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>

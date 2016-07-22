@@ -81,7 +81,7 @@
 #include <DataUCSDSharedData.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>

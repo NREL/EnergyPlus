@@ -70,7 +70,7 @@
 #include <DataSizing.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>

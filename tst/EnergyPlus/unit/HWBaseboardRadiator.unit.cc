@@ -66,7 +66,7 @@
 #include <DataLoopNode.hh>
 #include <ScheduleManager.hh>
 #include <Psychrometrics.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <HWBaseboardRadiator.hh>
 #include <FluidProperties.hh>
 #include <DataPlant.hh>
@@ -88,14 +88,14 @@ TEST_F( EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {
 	Real64 LoadMet;
 	int BBNum;
-	
+
 	Node.allocate( 1 );
 	HWBaseboard.allocate( 1 );
 	ZoneSysEnergyDemand.allocate( 1 );
 	CurDeadBandOrSetback.allocate( 1 );
 	PlantLoop.allocate( 1 );
 	QBBRadSource.allocate( 1 );
-	
+
 	Node( 1 ).MassFlowRate = 0.40;
 	CurDeadBandOrSetback( 1 ) = false;
 	ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 12000.;
@@ -114,21 +114,21 @@ TEST_F( EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 	PlantLoop( 1 ).FluidIndex = 1;
 	PlantLoop( 1 ).FluidType = 2;
 	QBBRadSource( 1 ) = 0.0;
-	
+
 	CalcHWBaseboard( BBNum, LoadMet );
 
 	EXPECT_NEAR( 14746.226690452937, HWBaseboard( 1 ).TotPower, 0.000001);
 	EXPECT_NEAR( 50.349854486072232, HWBaseboard( 1 ).AirOutletTemp, 0.000001 );
 	EXPECT_NEAR( 73.224991258180438, HWBaseboard( 1 ).WaterOutletTemp, 0.000001 );
 	EXPECT_NEAR( 0.5, HWBaseboard( 1 ).AirMassFlowRate, 0.000001 );
-	
+
 	Node.deallocate();
 	HWBaseboard.deallocate();
 	ZoneSysEnergyDemand.deallocate();
 	CurDeadBandOrSetback.deallocate();
 	PlantLoop.deallocate();
 	QBBRadSource.deallocate();
-	
+
 }
 
 TEST_F( EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest ) {
@@ -144,11 +144,11 @@ TEST_F( EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest ) {
 	CurDeadBandOrSetback.allocate( 1 );
 	PlantLoop.allocate( 1 );
 	QBBRadSource.allocate( 1 );
-	
+
 
 	CurDeadBandOrSetback( 1 ) = false;
 	ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0; // zero load test
-	
+
 	HWBaseboard( 1 ).EquipID = "HWRadiativeConvectiveBB";
 	HWBaseboard( 1 ).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
 	HWBaseboard( 1 ).ZonePtr = 1;
@@ -203,7 +203,7 @@ TEST_F( EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest ) {
 	EXPECT_EQ( HWBaseboard( 1 ).AirInletTemp, HWBaseboard( 1 ).AirOutletTemp );
 	EXPECT_EQ( HWBaseboard( 1 ).WaterInletTemp, HWBaseboard( 1 ).WaterOutletTemp);
 	EXPECT_EQ( 0.0, HWBaseboard( 1 ).AirMassFlowRate );
-	
+
 	// clear
 	Node.deallocate();
 	HWBaseboard.deallocate();

@@ -111,7 +111,7 @@
 #include <HeatBalFiniteDiffManager.hh>
 #include <HighTempRadiantSystem.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
 #include <MoistureBalanceEMPDManager.hh>
@@ -4529,7 +4529,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 	// FLOW:
 	MovInsulErrorFlag = false;
-	
+
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 		// Need to transfer any source/sink for a surface to the local array.  Note that
 		// the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
@@ -4772,7 +4772,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
-				
+
 			} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) {
 				if ( Surface( SurfNum ).ExtCavityPresent ) {
 					CalcExteriorVentedCavity( SurfNum );
@@ -4878,7 +4878,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			}
 
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-				
+
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
 			}
@@ -5433,13 +5433,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 					} else { // Movable insulation present
 
 						if ( construct.SourceSinkPresent ) {
-							
+
 						    ShowSevereError( "Interior movable insulation is not valid with embedded sources/sinks" );
 							ShowContinueError( "Construction " + construct.Name + " contains an internal source or sink but also uses" );
 							ShowContinueError( "interior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulInt ).Name + " for a surface with that construction." );
 							ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accommodate this combination." );
 							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
-							
+
 						}
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );

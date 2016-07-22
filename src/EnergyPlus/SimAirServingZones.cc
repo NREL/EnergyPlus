@@ -104,7 +104,7 @@
 #include <HVACMultiSpeedHeatPump.hh>
 #include <HVACUnitaryBypassVAV.hh>
 #include <HVACUnitarySystem.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>

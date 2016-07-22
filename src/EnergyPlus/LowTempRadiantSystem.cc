@@ -88,7 +88,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -3377,7 +3377,7 @@ namespace LowTempRadiantSystem {
 			if ( SetPointTemp < OffTempHeat ) { // HEATING MODE
 
 				OperatingMode = HeatingMode;
-				
+
 				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).HotWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).HeatingSystem ) {
@@ -3419,7 +3419,7 @@ namespace LowTempRadiantSystem {
 			} else if ( SetPointTemp > OffTempCool ) { // COOLING MODE
 
 				OperatingMode = CoolingMode;
-				
+
 				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).ChWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).CoolingSystem ) {

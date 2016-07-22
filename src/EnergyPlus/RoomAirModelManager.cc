@@ -88,7 +88,7 @@
 #include <Fans.hh>
 #include <General.hh>
 #include <InternalHeatGains.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MundtSimMgr.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>

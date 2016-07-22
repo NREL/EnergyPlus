@@ -73,7 +73,7 @@
 #include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {

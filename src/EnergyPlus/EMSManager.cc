@@ -80,7 +80,7 @@
 #include <DataZoneControls.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <RuntimeLanguageProcessor.hh>

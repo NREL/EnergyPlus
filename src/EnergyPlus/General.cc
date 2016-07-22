@@ -75,7 +75,7 @@
 #include <DataRuntimeLanguage.hh>
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 #if defined( _WIN32 ) && _MSC_VER < 1900

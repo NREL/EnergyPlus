@@ -80,7 +80,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <ScheduleManager.hh>

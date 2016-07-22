@@ -78,7 +78,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputReportPredefined.hh>
 #include <UtilityRoutines.hh>

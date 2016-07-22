@@ -61,7 +61,7 @@
 // EnergyPlus Headers
 #include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 
 namespace EnergyPlus {
 

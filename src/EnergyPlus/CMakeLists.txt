@@ -322,8 +322,8 @@ SET( SRC
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
-  InputProcessor_json.cc
-  InputProcessor_json.hh
+  InputProcessor.cc
+  InputProcessor.hh
   InternalHeatGains.cc
   InternalHeatGains.hh
   LowTempRadiantSystem.cc

@@ -67,7 +67,7 @@
 #include "DataHeatBalance.hh"
 #include "DataPrecisionGlobals.hh"
 #include "DataRoomAirModel.hh"
-#include "InputProcessor_json.hh"
+#include "InputProcessor.hh"
 #include "UtilityRoutines.hh"
 #include "General.hh"
 #include "ScheduleManager.hh"

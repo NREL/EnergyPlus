@@ -64,7 +64,6 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-//#include "../TestHelpers/IdfParser.hh"
 // A to Z order
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
@@ -143,7 +142,7 @@
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 
-#include <EnergyPlus/InputProcessor_json.hh>
+#include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -209,8 +208,6 @@
 #include <algorithm>
 #include <EnergyPlus/DisplayRoutines.hh>
 
-struct InputProcessorCache;
-std::unique_ptr<EnergyPlus::InputProcessorCache> EnergyPlus::EnergyPlusFixture::m_idd_cache = nullptr;
 json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth, json::parse_event_t event, json &parsed,
 									   unsigned line_num, unsigned line_index) -> bool {
 	EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
@@ -220,11 +217,6 @@ json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth,
 namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUpTestCase() {
-//		call_back = [](int depth, json::parse_event_t event, json &parsed,
-//									 unsigned line_num, unsigned line_index) -> bool {
-//			InputProcessor::state.traverse(event, parsed, line_num, line_index);
-//			return true;
-//		};
 		bool errors_found = false;
 		process_idd("", errors_found);
 		if ( errors_found ) {
@@ -232,12 +224,10 @@ namespace EnergyPlus {
 			return;
 		}
 		InputProcessor::idf_parser.initialize(InputProcessor::schema);
-//		InputProcessor::state.initialize(InputProcessor::schema);
 	}
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
-//		InputProcessor::idf_parser.initialize(InputProcessor::schema);
 		InputProcessor::state.initialize(InputProcessor::schema);
 
 		show_message();
@@ -421,31 +411,6 @@ namespace EnergyPlus {
 		ZoneTempPredictorCorrector::clear_state();
 	}
 
-//	void EnergyPlusFixture::setup_cache()
-//	{
-//
-//		// if ( ! m_idd_cache ) {
-//		// 	static auto errors_found = false;
-//		// 	static auto const idd = "";
-//		// 	InputProcessor::clear_state();
-//		// 	process_idd( idd, errors_found );
-//		// 	if ( errors_found ) {
-//		// 		InputProcessor::clear_state();
-//		// 		return;
-//		// 	}
-//		// 	m_idd_cache = std::unique_ptr< InputProcessorCache >( new InputProcessorCache );
-//		// 	InputProcessor::clear_state();
-//		// }
-//	}
-
-//	void EnergyPlusFixture::use_cached_idd()
-//	{
-//		setup_cache();
-//		if ( m_idd_cache ) {
-//			m_idd_cache->use_cached_namespace_variables();
-//		}
-//	}
-
 	std::string EnergyPlusFixture::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {
 		std::ostringstream compare_text;
 		for( auto const & str : strings ) {
@@ -577,204 +542,22 @@ namespace EnergyPlus {
 					}
 			};
 		}
-		InputProcessor::ProcessInput();
+		InputProcessor::InitFiles();
 		SimulationManager::PostIPProcessing();
-		DataIPShortCuts::cAlphaFieldNames.allocate( 10000 );
-		DataIPShortCuts::cAlphaArgs.allocate( 10000 );
-		DataIPShortCuts::lAlphaFieldBlanks.dimension( 10000, false );
-		DataIPShortCuts::cNumericFieldNames.allocate( 10000 );
-		DataIPShortCuts::rNumericArgs.dimension( 10000, 0.0 );
-		DataIPShortCuts::lNumericFieldBlanks.dimension( 10000, false );
+
+		int MaxArgs = 0;
+		int MaxAlpha = 0;
+		int MaxNumeric = 0;
+		InputProcessor::GetMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
+
+		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlpha );
+		DataIPShortCuts::cAlphaArgs.allocate( MaxAlpha );
+		DataIPShortCuts::lAlphaFieldBlanks.dimension( MaxAlpha, false );
+		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
+		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
+		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
 		return true;
-//		if ( idf_snippet.empty() ) {
-//			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
-//			return true;
-//		}
-		// using namespace InputProcessor;
-
-		// Parse idf snippet to look for Building and GlobalGeometryRules. If not present then this adds a default implementation
-		// otherwise it will use the objects in the snippet. This is done because there is a check for required objects.
-		// Right now, IdfParser::decode returns a very naive data structure for objects but it works for this purpose.
-//		IdfParser parser;
-//		bool success = false;
-//		auto const parsed_idf = parser.decode( idf_snippet, success );
-//		if ( use_assertions ) EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
-//		bool found_building = false;
-//		bool found_global_geo = false;
-//		if ( success ) {
-//			for ( auto const obj : parsed_idf ) {
-//				if ( ! obj.empty() ) {
-//					if ( InputProcessor::SameString( obj[ 0 ], "Building" ) ) {
-//						found_building = true;
-//					}
-//					if ( InputProcessor::SameString( obj[ 0 ], "GlobalGeometryRules" ) ) {
-//						found_global_geo = true;
-//					}
-//					if ( found_building && found_global_geo ) break;
-//				}
-//			}
-//		}
-//		std::string idf = parser.encode( parsed_idf );
-//		if ( ! found_building ) {
-//			idf += "Building,Bldg,0.0,Suburbs,.04,.4,FullExterior,25,6;" + DataStringGlobals::NL;
-//		}
-//		if ( ! found_global_geo ) {
-//			idf += "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;" + DataStringGlobals::NL;
-//		}
-
-//		auto errors_found = false;
-
-		// if ( use_idd_cache ) {
-		// 	use_cached_idd();
-		// } else {
-//			auto const idd = "";
-//			process_idd( idd, errors_found );
-		// }
-
-//		if ( errors_found ) {
-//			if ( use_assertions ) {
-//				compare_eso_stream( "" );
-//				compare_mtr_stream( "" );
-//				// compare_echo_stream( "" );
-//				compare_err_stream( "" );
-//				compare_cout_stream( "" );
-//				compare_cerr_stream( "" );
-//			}
-//			return errors_found;
-//		}
-
-//		InputProcessor IP;
-//		InputProcessor::jdf = IP.idf_parser.decode(idf_snippet, InputProcessor::schema );
-		// NumLines = 0;
-		// InitSecretObjects();
-		// ProcessInputDataFile( *idf_stream );
-
-		// ListOfSections.allocate( NumSectionDefs );
-		// for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
-
-		// DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		// DataIPShortCuts::cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		// DataIPShortCuts::lAlphaFieldBlanks.dimension( MaxAlphaIDFDefArgsFound, false );
-		// DataIPShortCuts::cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		// DataIPShortCuts::rNumericArgs.dimension( MaxNumericIDFDefArgsFound, 0.0 );
-		// DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumericIDFDefArgsFound, false );
-
-		// IDFRecordsGotten.dimension( NumIDFRecords, false );
-
-		// int count_err = 0;
-		// std::string error_string;
-		// for ( int loop = 1; loop <= NumIDFSections; ++loop ) {
-		// 	if ( SectionsOnFile( loop ).LastRecord != 0 ) continue;
-		// 	if ( equali( SectionsOnFile( loop ).Name, "REPORT VARIABLE DICTIONARY" ) ) continue;
-		// 	if ( count_err == 0 ) {
-		// 		error_string += " Potential errors in IDF processing:" + DataStringGlobals::NL;
-		// 	}
-		// 	++count_err;
-		// 	int which = SectionsOnFile( loop ).FirstRecord;
-		// 	if ( which > 0 ) {
-		// 		int num_1 = 0;
-		// 		if ( DataSystemVariables::SortedIDD ) {
-		// 			num_1 = FindItemInSortedList( IDFRecords( which ).Name, ListOfObjects, NumObjectDefs );
-		// 			if ( num_1 != 0 ) num_1 = iListOfObjects( num_1 );
-		// 		} else {
-		// 			num_1 = FindItemInList( IDFRecords( which ).Name, ListOfObjects, NumObjectDefs );
-		// 		}
-		// 		if ( ObjectDef( num_1 ).NameAlpha1 && IDFRecords( which ).NumAlphas > 0 ) {
-		// 			error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
-		// 							", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
-		// 							"], Object Type Preceding=" + IDFRecords( which ).Name + ", Object Name=" + IDFRecords( which ).Alphas( 1 ) + DataStringGlobals::NL;
-		// 		} else {
-		// 			error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
-		// 							", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
-		// 							"], Object Type Preceding=" + IDFRecords( which ).Name + ", Name field not recorded for Object." + DataStringGlobals::NL;
-		// 		}
-		// 	} else {
-		// 		error_string += " Potential \"semi-colon\" misplacement=" + SectionsOnFile( loop ).Name +
-		// 						", at about line number=[" + IPTrimSigDigits( SectionsOnFile( loop ).FirstLineNo ) +
-		// 						"], No prior Objects." + DataStringGlobals::NL;
-		// 	}
-		// }
-		// if ( use_assertions ) EXPECT_EQ( 0, count_err ) << error_string;
-
-		// if ( NumIDFRecords == 0 ) {
-		// 	if ( use_assertions ) EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
-		// 	++NumMiscErrorsFound;
-		// 	errors_found = true;
-		// }
-
-		// for ( auto const obj_def : ObjectDef ) {
-		// 	if ( ! obj_def.RequiredObject ) continue;
-		// 	if ( obj_def.NumFound > 0 ) continue;
-		// 	if ( use_assertions ) EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
-		// 	++NumMiscErrorsFound;
-		// 	errors_found = true;
-		// }
-
-		// if ( TotalAuditErrors > 0 ) {
-		// 	if ( use_assertions ) EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
-		// 	errors_found = true;
-		// }
-
-		// if ( NumOutOfRangeErrorsFound > 0 ) {
-		// 	if ( use_assertions ) EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
-		// 	errors_found = true;
-		// }
-
-		// if ( NumBlankReqFieldFound > 0 ) {
-		// 	if ( use_assertions ) EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
-		// 	errors_found = true;
-		// }
-
-		// if ( NumMiscErrorsFound > 0 ) {
-		// 	if ( use_assertions ) EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
-		// 	errors_found = true;
-		// }
-		// if (DataStringGlobals::IDDVerString.find(DataStringGlobals::MatchVersion) == std::string::npos) {
-		// 	ShowSevereError("IP: Possible incorrect IDD File");
-		// 	ShowContinueError(DataStringGlobals::IDDVerString + " not the same as expected =\"" + DataStringGlobals::MatchVersion + "\"");
-		// }
-		// if ( OverallErrorFlag ) {
-		// 	if ( use_assertions ) EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
-
-		// 	// check if IDF version matches IDD version
-		// 	// this really shouldn't be an issue but i'm keeping it just in case a unit test is written against a specific IDF version
-		// 	// This fixture will always use the most up to date version of the IDD regardless.
-
-		// 	bool found_version = false;
-		// 	for ( auto const idf_record : IDFRecords ) {
-		// 		if ( "VERSION" == idf_record.Name ) {
-		// 			bool bad_version = false;
-		// 			auto const version_length( len(DataStringGlobals::MatchVersion ) );
-		// 			if ( ( version_length > 0 ) && ( DataStringGlobals::MatchVersion[ version_length - 1 ] == '0' ) ) {
-		// 				bad_version = ( DataStringGlobals::MatchVersion.substr( 0, version_length - 2 ) == idf_record.Alphas( 1 ).substr( 0, version_length - 2 ) );
-		// 			} else {
-		// 				bad_version = ( DataStringGlobals::MatchVersion == idf_record.Alphas( 1 ) );
-		// 			}
-		// 			found_version = true;
-		// 			if ( use_assertions ) EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
-		// 			break;
-		// 		}
-		// 	}
-		// 	if ( use_assertions ) EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
-		// 	errors_found = true;
-		// }
-
-//		if ( use_assertions ) {
-//			compare_eso_stream( "" );
-//			compare_mtr_stream( "" );
-//			// compare_echo_stream( "" );
-//			compare_err_stream( "" );
-//			compare_cout_stream( "" );
-//			compare_cerr_stream( "" );
-//		}
-
-//		if ( errors_found ) return errors_found;
-
-		// This can fatal error within it, which will cause the unit test to fail and exit.
-		// SimulationManager::PostIPProcessing();
-
-//		return errors_found;
 	}
 
 	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {
@@ -784,18 +567,18 @@ namespace EnergyPlus {
 			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 		} else {
 			static auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-			static auto idd_location = exeDirectory + "FULL_SCHEMA_modified.json";
+			static auto idd_location = exeDirectory + "Energy+.jdd";
 			static auto file_exists = FileSystem::fileExists( idd_location );
 
 			if ( ! file_exists ) {
-				// Energy+.idd is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "FULL_SCHEMA_modified.json";
+				// Energy+.jdd is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
+				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.jdd";
 				file_exists = FileSystem::fileExists( idd_location );
 			}
 
 			if ( ! file_exists ) {
 				EXPECT_TRUE( file_exists ) <<
-					"FULL_SCHEMA_modified.json does not exist at search location." << std::endl << "IDD search location: \"" << idd_location << "\"";
+					"Energy+.jdd does not exist at search location." << std::endl << "JDD search location: \"" << idd_location << "\"";
 				errors_found = true;
 				return errors_found;
 			}
@@ -850,138 +633,6 @@ namespace EnergyPlus {
 
 		// return ! has_error;
 		return false;
-	}
-
-	InputProcessorCache::InputProcessorCache()
-	{
-		// using namespace InputProcessor;
-
-		// m_ObjectDef = ObjectDef;
-		// m_SectionDef = SectionDef;
-		// m_SectionsOnFile = SectionsOnFile;
-		// m_ObjectStartRecord = ObjectStartRecord;
-		// m_ObjectGotCount = ObjectGotCount;
-		// m_ObsoleteObjectsRepNames = ObsoleteObjectsRepNames;
-		// m_ListOfSections = ListOfSections;
-		// m_ListOfObjects = ListOfObjects;
-		// m_iListOfObjects = iListOfObjects;
-		// m_IDFRecordsGotten = IDFRecordsGotten;
-		// m_IDFRecords = IDFRecords;
-		// m_RepObjects = RepObjects;
-		// m_LineItem = LineItem;
-		// m_cAlphaFieldNames = DataIPShortCuts::cAlphaFieldNames;
-		// m_cAlphaArgs = DataIPShortCuts::cAlphaArgs;
-		// m_lAlphaFieldBlanks = DataIPShortCuts::lAlphaFieldBlanks;
-		// m_cNumericFieldNames = DataIPShortCuts::cNumericFieldNames;
-		// m_rNumericArgs = DataIPShortCuts::rNumericArgs;
-		// m_lNumericFieldBlanks = DataIPShortCuts::lNumericFieldBlanks;
-		// m_NumObjectDefs = NumObjectDefs;
-		// m_NumSectionDefs = NumSectionDefs;
-		// m_MaxObjectDefs = MaxObjectDefs;
-		// m_MaxSectionDefs = MaxSectionDefs;
-		// m_NumLines = NumLines;
-		// m_MaxIDFRecords = MaxIDFRecords;
-		// m_NumIDFRecords = NumIDFRecords;
-		// m_MaxIDFSections = MaxIDFSections;
-		// m_NumIDFSections = NumIDFSections;
-		// m_EchoInputFile = EchoInputFile;
-		// m_InputLineLength = InputLineLength;
-		// m_MaxAlphaArgsFound = MaxAlphaArgsFound;
-		// m_MaxNumericArgsFound = MaxNumericArgsFound;
-		// m_NumAlphaArgsFound = NumAlphaArgsFound;
-		// m_NumNumericArgsFound = NumNumericArgsFound;
-		// m_MaxAlphaIDFArgsFound = MaxAlphaIDFArgsFound;
-		// m_MaxNumericIDFArgsFound = MaxNumericIDFArgsFound;
-		// m_MaxAlphaIDFDefArgsFound = MaxAlphaIDFDefArgsFound;
-		// m_MaxNumericIDFDefArgsFound = MaxNumericIDFDefArgsFound;
-		// m_NumOutOfRangeErrorsFound = NumOutOfRangeErrorsFound;
-		// m_NumBlankReqFieldFound = NumBlankReqFieldFound;
-		// m_NumMiscErrorsFound = NumMiscErrorsFound;
-		// m_MinimumNumberOfFields = MinimumNumberOfFields;
-		// m_NumObsoleteObjects = NumObsoleteObjects;
-		// m_TotalAuditErrors = TotalAuditErrors;
-		// m_NumSecretObjects = NumSecretObjects;
-		// m_ProcessingIDD = ProcessingIDD;
-		// m_InputLine = InputLine;
-		// m_CurrentFieldName = CurrentFieldName;
-		// m_ReplacementName = ReplacementName;
-		// m_OverallErrorFlag = OverallErrorFlag;
-		// m_EchoInputLine = EchoInputLine;
-		// m_ReportRangeCheckErrors = ReportRangeCheckErrors;
-		// m_FieldSet = FieldSet;
-		// m_RequiredField = RequiredField;
-		// m_RetainCaseFlag = RetainCaseFlag;
-		// m_ObsoleteObject = ObsoleteObject;
-		// m_RequiredObject = RequiredObject;
-		// m_UniqueObject = UniqueObject;
-		// m_ExtensibleObject = ExtensibleObject;
-		// m_ExtensibleNumFields = ExtensibleNumFields;
-	}
-
-	void InputProcessorCache::use_cached_namespace_variables()
-	{
-	// 	using namespace InputProcessor;
-
-	// 	ObjectDef = m_ObjectDef;
-	// 	SectionDef = m_SectionDef;
-	// 	SectionsOnFile = m_SectionsOnFile;
-	// 	ObjectStartRecord = m_ObjectStartRecord;
-	// 	ObjectGotCount = m_ObjectGotCount;
-	// 	ObsoleteObjectsRepNames = m_ObsoleteObjectsRepNames;
-	// 	ListOfSections = m_ListOfSections;
-	// 	ListOfObjects = m_ListOfObjects;
-	// 	iListOfObjects = m_iListOfObjects;
-	// 	IDFRecordsGotten = m_IDFRecordsGotten;
-	// 	IDFRecords = m_IDFRecords;
-	// 	RepObjects = m_RepObjects;
-	// 	LineItem = m_LineItem;
-	// 	DataIPShortCuts::cAlphaFieldNames = m_cAlphaFieldNames;
-	// 	DataIPShortCuts::cAlphaArgs = m_cAlphaArgs;
-	// 	DataIPShortCuts::lAlphaFieldBlanks = m_lAlphaFieldBlanks;
-	// 	DataIPShortCuts::cNumericFieldNames = m_cNumericFieldNames;
-	// 	DataIPShortCuts::rNumericArgs = m_rNumericArgs;
-	// 	DataIPShortCuts::lNumericFieldBlanks = m_lNumericFieldBlanks;
-	// 	NumObjectDefs = m_NumObjectDefs;
-	// 	NumSectionDefs = m_NumSectionDefs;
-	// 	MaxObjectDefs = m_MaxObjectDefs;
-	// 	MaxSectionDefs = m_MaxSectionDefs;
-	// 	NumLines = m_NumLines;
-	// 	MaxIDFRecords = m_MaxIDFRecords;
-	// 	NumIDFRecords = m_NumIDFRecords;
-	// 	MaxIDFSections = m_MaxIDFSections;
-	// 	NumIDFSections = m_NumIDFSections;
-	// 	EchoInputFile = m_EchoInputFile;
-	// 	InputLineLength = m_InputLineLength;
-	// 	MaxAlphaArgsFound = m_MaxAlphaArgsFound;
-	// 	MaxNumericArgsFound = m_MaxNumericArgsFound;
-	// 	NumAlphaArgsFound = m_NumAlphaArgsFound;
-	// 	NumNumericArgsFound = m_NumNumericArgsFound;
-	// 	MaxAlphaIDFArgsFound = m_MaxAlphaIDFArgsFound;
-	// 	MaxNumericIDFArgsFound = m_MaxNumericIDFArgsFound;
-	// 	MaxAlphaIDFDefArgsFound = m_MaxAlphaIDFDefArgsFound;
-	// 	MaxNumericIDFDefArgsFound = m_MaxNumericIDFDefArgsFound;
-	// 	NumOutOfRangeErrorsFound = m_NumOutOfRangeErrorsFound;
-	// 	NumBlankReqFieldFound = m_NumBlankReqFieldFound;
-	// 	NumMiscErrorsFound = m_NumMiscErrorsFound;
-	// 	MinimumNumberOfFields = m_MinimumNumberOfFields;
-	// 	NumObsoleteObjects = m_NumObsoleteObjects;
-	// 	TotalAuditErrors = m_TotalAuditErrors;
-	// 	NumSecretObjects = m_NumSecretObjects;
-	// 	ProcessingIDD = m_ProcessingIDD;
-	// 	InputLine = m_InputLine;
-	// 	CurrentFieldName = m_CurrentFieldName;
-	// 	ReplacementName = m_ReplacementName;
-	// 	OverallErrorFlag = m_OverallErrorFlag;
-	// 	EchoInputLine = m_EchoInputLine;
-	// 	ReportRangeCheckErrors = m_ReportRangeCheckErrors;
-	// 	FieldSet = m_FieldSet;
-	// 	RequiredField = m_RequiredField;
-	// 	RetainCaseFlag = m_RetainCaseFlag;
-	// 	ObsoleteObject = m_ObsoleteObject;
-	// 	RequiredObject = m_RequiredObject;
-	// 	UniqueObject = m_UniqueObject;
-	// 	ExtensibleObject = m_ExtensibleObject;
-	// 	ExtensibleNumFields = m_ExtensibleNumFields;
 	}
 
 }

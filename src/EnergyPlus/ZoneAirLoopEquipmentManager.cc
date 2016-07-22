@@ -76,7 +76,7 @@
 #include <GeneralRoutines.hh>
 #include <HVACCooledBeam.hh>
 #include <HVACSingleDuctInduc.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PoweredInductionUnits.hh>

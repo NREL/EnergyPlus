@@ -83,7 +83,7 @@
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -190,7 +190,7 @@ namespace FanCoilUnits {
 
 	// DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:	
+	// MODULE VARIABLE DECLARATIONS:
 	namespace {
 		bool InitFanCoilUnitsOneTimeFlag( true );
 		bool InitFanCoilUnitsCheckInZoneEquipmentListFlag( false ); // True after the Zone Equipment List has been checked for items
@@ -2033,9 +2033,9 @@ namespace FanCoilUnits {
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
 				}
 				else {
-					// flow lock on 
+					// flow lock on
 					if ( MdotLockC > CWFlow ) { // if mdot > CWFlow, bypass extra flow
-						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with CWFlow; rest will be bypassed 
+						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with CWFlow; rest will be bypassed
 						Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).MassFlowRate = MdotLockC;
 						// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
@@ -2139,9 +2139,9 @@ namespace FanCoilUnits {
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
 					}
 					else {
-						// flow lock on 
+						// flow lock on
 						if ( MdotLockH > HWFlow ) { // if mdot > HWFlow, bypass extra flow
-							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with HWFlow; rest will be bypassed 
+							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with HWFlow; rest will be bypassed
 							Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).MassFlowRate = MdotLockH;
 							// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
@@ -4324,7 +4324,7 @@ namespace FanCoilUnits {
 
 		// REFERENCES:
 		// na
-		
+
 		// USE STATEMENTS:
 		// na
 
@@ -4370,7 +4370,7 @@ namespace FanCoilUnits {
 		QZnReq = Par( 4 );
 
 		Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = HWFlow;
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); 
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 );
 
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
@@ -4450,7 +4450,7 @@ namespace FanCoilUnits {
 		QZnReq = Par( 4 );
 
 		Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = CWFlow;
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); 
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 );
 
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
@@ -4468,49 +4468,49 @@ namespace FanCoilUnits {
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
-		
+
 				// FUNCTION INFORMATION:
 				//       AUTHOR         Richard Raustad, FSEC
 				//       DATE WRITTEN   December 2015
 				//       MODIFIED       na
 				//       RE-ENGINEERED  na
-			
+
 				// PURPOSE OF THIS SUBROUTINE:
 				// To calculate the part-load ratio for the FCU with varying water flow rate
-			
+
 				// METHODOLOGY EMPLOYED:
 				// Use SolveRegulaFalsi to CALL this Function to converge on a solution
-			
+
 				// REFERENCES:
 				// na
-			
+
 				// USE STATEMENTS:
 				// na
-			
+
 				// Return value
 		Real64 Residuum; // Result (forces solution to be within tolerance)
 
 				// Argument array dimensioning
-			
+
 				// Locals
 				// SUBROUTINE ARGUMENT DEFINITIONS:
-			
+
 				//   Parameter description example:
 				//       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
 				//       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
 				//       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
 				//       Par(4)  = QZnReq               ! zone load [W]
 				//       Par(5)  = WaterControlNode     ! CW or HW control node number
-			
+
 				// SUBROUTINE PARAMETER DEFINITIONS:
 				// na
-			
+
 				// INTERFACE BLOCK SPECIFICATIONS
 				// na
-			
+
 				// DERIVED TYPE DEFINITIONS
 				// na
-			
+
 				// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanCoilNum; // Index to this fan coil unit
 		bool FirstHVACIteration; // FirstHVACIteration flag
@@ -4520,7 +4520,7 @@ namespace FanCoilUnits {
 		Real64 QUnitOut; // delivered capacity [W]
 		Real64 QZnReq;
 		Real64 FCOutletTempOn; // FCU outlet temperature
-		
+
 		// Convert parameters to usable variables
 		FanCoilNum = int( Par( 1 ) );
 		if ( Par( 2 ) == 1.0 ) {
@@ -4532,70 +4532,70 @@ namespace FanCoilUnits {
 		OutletTemp = Par( 4 );
 		QZnReq = Par( 5 );
 		WaterControlNode = int( Par( 6 ) );
-		
+
 		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode || ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) ) {
 			Node( WaterControlNode ).MassFlowRate = WaterFlow;
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		}
-		
+
 		FCOutletTempOn = Node( FanCoil( FanCoilNum ).AirOutNode ).Temp;
 		// Calculate residual based on output magnitude
 		Residuum = ( FCOutletTempOn - OutletTemp );
-		
+
 		return Residuum;
 	}
-	
+
 	Real64
 	CalcFanCoilWaterFlowResidual(
 		Real64 const WaterFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
-		
+
 				// FUNCTION INFORMATION:
 				//       AUTHOR         Richard Raustad, FSEC
 				//       DATE WRITTEN   December 2015
 				//       MODIFIED       na
 				//       RE-ENGINEERED  na
-			
+
 				// PURPOSE OF THIS SUBROUTINE:
 				// To calculate the part-load ratio for the FCU with varying water flow rate
-			
+
 				// METHODOLOGY EMPLOYED:
 				// Use SolveRegulaFalsi to CALL this Function to converge on a solution
-			
+
 				// REFERENCES:
 				// na
-			
+
 				// USE STATEMENTS:
 				// na
-			
+
 				// Return value
 		Real64 Residuum; // Result (forces solution to be within tolerance)
 
 				// Argument array dimensioning
-			
+
 				// Locals
 				// SUBROUTINE ARGUMENT DEFINITIONS:
-			
+
 				//   Parameter description example:
 				//       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
 				//       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
 				//       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
 				//       Par(4)  = QZnReq               ! zone load [W]
 				//       Par(5)  = WaterControlNode     ! CW or HW control node number
-			
+
 				// SUBROUTINE PARAMETER DEFINITIONS:
 				// na
-			
+
 				// INTERFACE BLOCK SPECIFICATIONS
 				// na
-			
+
 				// DERIVED TYPE DEFINITIONS
 				// na
-			
+
 				// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanCoilNum; // Index to this fan coil unit
 		bool FirstHVACIteration; // FirstHVACIteration flag
@@ -4603,7 +4603,7 @@ namespace FanCoilUnits {
 		int WaterControlNode; // water node to control
 		Real64 QZnReq; // Sensible load to be met [W]
 		Real64 QUnitOut; // delivered capacity [W]
-		
+
 		// Convert parameters to usable variables
 		FanCoilNum = int( Par( 1 ) );
 		if ( Par( 2 ) == 1.0 ) {
@@ -4614,21 +4614,21 @@ namespace FanCoilUnits {
 		ControlledZoneNum = int( Par( 3 ) );
 		QZnReq = Par( 4 );
 		WaterControlNode = int( Par( 5 ) );
-		
+
 		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode || ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) ) {
 			Node( WaterControlNode ).MassFlowRate = WaterFlow;
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		}
-		
+
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
 			Residuum = ( QUnitOut - QZnReq ) / 100.0;
 		} else {
 			Residuum = ( QUnitOut - QZnReq ) / QZnReq;
 		}
-		
+
 		return Residuum;
 	}
 

@@ -93,7 +93,7 @@
 #include <HeatingCoils.hh>
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -6750,7 +6750,7 @@ namespace HVACUnitarySystem {
 							UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 							if ( UnitarySystem( UnitarySysNum ).SingleMode == 1 ) {
 								CoolPLR = 1.0;
-							} 
+							}
 						}
 
 						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutputOff, LatOutputOff, HXUnitOn, _, _, CompressorONFlag );
@@ -10986,7 +10986,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).SensHeatEnergyRate = std::abs( max( 0.0, QSensUnitOut ) );
 				UnitarySystem( UnitarySysNum ).LatHeatEnergyRate = std::abs( max( 0.0, ( QTotUnitOut - QSensUnitOut ) ) );
 			}
-		} 
+		}
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 			if ( CompOnMassFlow > 0.0 ) {

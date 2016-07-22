@@ -71,7 +71,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>

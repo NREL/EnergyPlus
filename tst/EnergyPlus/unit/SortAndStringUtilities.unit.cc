@@ -67,7 +67,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/InputProcessor_json.hh>
+#include <EnergyPlus/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

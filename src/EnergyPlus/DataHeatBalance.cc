@@ -68,7 +68,7 @@
 #include <DataEnvironment.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -1019,7 +1019,7 @@ namespace DataHeatBalance {
 	}
 
 	void
-	CheckZoneOutBulbTempAt() 
+	CheckZoneOutBulbTempAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;

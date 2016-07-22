@@ -213,19 +213,7 @@ namespace EnergyPlus {
 			"  0.78;                    !- Discharge Coefficient{ dimensionless }",
 		} );
 
-//		ASSERT_FALSE( process_idf( idf_objects ) );
-
-		// added this instead of code below
 		ASSERT_TRUE (process_idf(idf_objects));
-		/*
-		InputProcessor IP;
-		std::ifstream ifs("FULL_SCHEMA_modified.json", std::ifstream::in);
-		ASSERT_TRUE( ifs.is_open() );
-		IP.schema = json::parse(ifs);
-		IP.idf_parser.initialize(IP.schema);
-//      json test = IP.idf_parser.decode(idf_objects, IP.schema);
-		InputProcessor::jdf = IP.idf_parser.decode(idf_objects, IP.schema);
-*/
 		GetAirflowNetworkInput();
 
 		//MultizoneZoneData has only 1 element so may be hardcoded

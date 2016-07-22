@@ -86,7 +86,7 @@
 #include <FuelCellElectricGenerator.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>

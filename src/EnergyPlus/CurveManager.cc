@@ -76,7 +76,7 @@
 #include <DataSystemVariables.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 
@@ -2002,7 +2002,7 @@ namespace CurveManager {
 				if ( !PerfCurve( CurveNum ).Var1MaxPresent ) {
 					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 				}
-			} 
+			}
 
 			// if user enters limits that exceed data range, warn that limits are based on table data
 			if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {

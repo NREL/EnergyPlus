@@ -68,7 +68,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -79,9 +79,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Site:GroundTemperature:Shallow factory
-	std::shared_ptr< SiteShallowGroundTemps > 
-	SiteShallowGroundTemps::ShallowGTMFactory( 
-		int objectType, 
+	std::shared_ptr< SiteShallowGroundTemps >
+	SiteShallowGroundTemps::ShallowGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{

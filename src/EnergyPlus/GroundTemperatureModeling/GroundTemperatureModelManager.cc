@@ -71,7 +71,7 @@
 #include <GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
 #include <GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
 #include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 
 namespace EnergyPlus {
 

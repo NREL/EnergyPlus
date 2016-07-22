@@ -64,7 +64,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -72,9 +72,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Xing model factory
-	std::shared_ptr< XingGroundTempsModel > 
-	XingGroundTempsModel::XingGTMFactory( 
-		int objectType, 
+	std::shared_ptr< XingGroundTempsModel >
+	XingGroundTempsModel::XingGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -120,7 +120,7 @@ namespace EnergyPlus {
 				thisModel->surfTempAmplitude_2 = rNumericArgs( 6 );
 				thisModel->phaseShift_1 = rNumericArgs( 7 );
 				thisModel->phaseShift_2 = rNumericArgs( 8 );
-				
+
 				found = true;
 				break;
 			}
@@ -212,7 +212,7 @@ namespace EnergyPlus {
 		Real64 const aveDaysInMonth = NumDaysInYear / 12;
 
 		depth = _depth;
-	
+
 		// Set month
 		if ( _month >= 1 && _month <= 12 ) {
 			simTimeInDays = aveDaysInMonth * ( ( _month - 1 ) + 0.5 );

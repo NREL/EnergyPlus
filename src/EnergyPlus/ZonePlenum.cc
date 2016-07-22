@@ -75,7 +75,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>

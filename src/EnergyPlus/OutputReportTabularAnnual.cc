@@ -74,7 +74,7 @@
 // EnergyPlus Headers
 #include <OutputReportTabularAnnual.hh>
 #include <OutputReportTabular.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <DataGlobals.hh>
 #include <OutputReportData.hh>
 #include <DataHVACGlobals.hh>

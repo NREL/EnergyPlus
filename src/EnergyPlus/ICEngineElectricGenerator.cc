@@ -73,7 +73,7 @@
 #include <DataPlant.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>

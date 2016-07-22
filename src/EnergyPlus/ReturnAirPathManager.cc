@@ -70,7 +70,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <UtilityRoutines.hh>

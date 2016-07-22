@@ -104,7 +104,7 @@
 #include <HVACUnitarySystem.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
 #include <OutdoorAirUnit.hh>
@@ -5479,7 +5479,7 @@ namespace ZoneEquipmentManager {
 
 		// REFERENCES:
 		// See IO Ref for suggested values
-		
+
 		// Using/Aliasing
 
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5598,7 +5598,7 @@ namespace ZoneEquipmentManager {
 
 		// BSLLC Start
 		// if ( sqlite ) {
-		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, 
+		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin,
 		// 		PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
 		// }
 		// BSLLC Finish

@@ -88,11 +88,11 @@
 #include <HighTempRadiantSystem.hh>
 #include <HWBaseboardRadiator.hh>
 #include <InternalHeatGains.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MoistureBalanceEMPDManager.hh>
 #include <OutputProcessor.hh>

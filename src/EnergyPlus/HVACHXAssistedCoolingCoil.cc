@@ -72,7 +72,7 @@
 #include <DXCoils.hh>
 #include <General.hh>
 #include <HeatRecovery.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>

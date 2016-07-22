@@ -68,7 +68,7 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -79,9 +79,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Site:GroundTemperature:FCFactorMethod factory
-	std::shared_ptr< SiteFCFactorMethodGroundTemps > 
-	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory( 
-		int objectType, 
+	std::shared_ptr< SiteFCFactorMethodGroundTemps >
+	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -142,7 +142,7 @@ namespace EnergyPlus {
 			thisModel->errorsFound = true;
 
 		} else if ( wthFCGroundTemps ) {
-			
+
 			for ( int i = 1; i <= 12; ++i ) {
 				thisModel->fcFactorGroundTemps( i ) = GroundTempsFCFromEPWHeader( i );
 			}

@@ -80,7 +80,7 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor_json.hh>
+#include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
