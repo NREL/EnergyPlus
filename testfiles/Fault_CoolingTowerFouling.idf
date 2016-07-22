@@ -1,7 +1,6 @@
-! Fault_CoolingTowerFouling_CondenserSWTSensorOffset.idf
+! Fault_CoolingTowerFouling.idf
 !
 ! Highlights:  Illustrates the modeling of two types of operational faults related with cooling towers  
-!              (1) Cooling tower fouling (2) Tower outlet temperature sensor offset
 !
 ! Modified from CoolingTower.idf
 !
@@ -2371,15 +2370,7 @@
     AllSummary;              !- Report 1 Name
 
 
-!*** OPERAIONAL FAULTS ***
-  
-  FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
-    Fault_SWT_CoolTower,     !- Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Severity Schedule Name
-    CoolingTower:SingleSpeed,!- Cooling Tower Object Type
-    Big Tower1,              !- Cooling Tower Object Name
-    1.0;                     !- Reference Sensor Offset {deltaC}
+!*** OPERATIONAL FAULTS ***
   
   FaultModel:Fouling:CoolingTower,
     Fault_fouling_CoolTower, !- Name
