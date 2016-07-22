@@ -97,14 +97,10 @@ namespace OutsideEnergySources {
 	// PURPOSE OF THIS MODULE:
 	// Module containing the routines dealing with the OutsideEnergySources
 
-	// METHODOLOGY EMPLOYED:
-	// Needs description, as appropriate.
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::SecInHour;
 	using DataGlobals::MaxNameLength;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataEnvironment;
 	using namespace DataHVACGlobals;
@@ -116,12 +112,9 @@ namespace OutsideEnergySources {
 	using DataPlant::TypeOf_PurchChilledWater;
 	using DataPlant::ScanPlantLoopsForObject;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const EnergyType_DistrictHeating( 1 );
 	int const EnergyType_DistrictCooling( 2 );
-
-	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumDistrictUnits( 0 );
@@ -609,8 +602,8 @@ namespace OutsideEnergySources {
 
 		PltSizNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
 		if ( PltSizNum > 0 ) {
-			rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
-			Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
+			rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
 			NomCapDes = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized ) {

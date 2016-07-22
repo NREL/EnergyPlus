@@ -1184,7 +1184,11 @@ namespace HeatBalanceIntRadExchange {
 			}
 
 			ShowWarningError( "Surfaces in Zone=\"" + Zone( ZoneNum ).Name + "\" do not define an enclosure." );
-			ShowContinueError( "Number of surfaces <= 3, view factors are set to force reciprocity." );
+			ShowContinueError( "Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness." );
+			ShowContinueError( "Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss." );
+			ShowContinueError( "Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity." );
+			ShowContinueError( "So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but" );
+			ShowContinueError( "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure." );
 
 			F = FixedF;
 			RowSum = sum( FixedF );

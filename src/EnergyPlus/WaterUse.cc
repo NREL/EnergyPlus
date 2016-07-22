@@ -96,18 +96,12 @@ namespace WaterUse {
 	//       MODIFIED       Brent Griffith, plant upgrade
 	//       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-
-	// METHODOLOGY EMPLOYED:
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::NumOfZones;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	int const HeatRecoveryHXIdeal( 1 );
 	int const HeatRecoveryHXCounterFlow( 2 );
@@ -119,28 +113,17 @@ namespace WaterUse {
 
 	static std::string const BlankString;
 
-	// DERIVED TYPE DEFINITIONS:
-
-	// MODULE VARIABLE TYPE DECLARATIONS:
-
 	// MODULE VARIABLE DECLARATIONS:
 	int NumWaterEquipment( 0 );
 	int NumWaterConnections( 0 );
-	//INTEGER :: MaxIterationsErrorCount =0
 	bool GetWaterUseInputFlag( true );
 
 	Array1D_bool CheckEquipName;
 	Array1D_bool CheckPlantLoop;
 
-	// SUBROUTINE SPECIFICATIONS:
-
 	// Object Data
 	Array1D< WaterEquipmentType > WaterEquipment;
 	Array1D< WaterConnectionsType > WaterConnections;
-
-	// MODULE SUBROUTINES:
-
-	// Functions
 
 	void
 	clear_state()
@@ -672,12 +655,12 @@ namespace WaterUse {
 				for ( WaterEquipNum = 1; WaterEquipNum <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++WaterEquipNum ) {
 					thisWaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( WaterEquipNum );
 					if ( WaterEquipment( thisWaterEquipNum ).Zone > 0 ) {
-						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( InitConvTemp ) * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).Multiplier * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).ListMultiplier;
+						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( DataGlobals::InitConvTemp ) * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).Multiplier * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).ListMultiplier;
 					} else { // can't have multipliers
-						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( InitConvTemp );
+						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 					}
 				}
-				RegisterPlantCompDesignFlow( WaterConnections( WaterConnNum ).InletNode, WaterConnections( WaterConnNum ).PeakMassFlowRate / RhoH2O( InitConvTemp ) );
+				RegisterPlantCompDesignFlow( WaterConnections( WaterConnNum ).InletNode, WaterConnections( WaterConnNum ).PeakMassFlowRate / RhoH2O( DataGlobals::InitConvTemp ) );
 			}
 		}
 
@@ -870,7 +853,7 @@ namespace WaterUse {
 			}
 		}
 
-		WaterEquipment( WaterEquipNum ).TotalMassFlowRate = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * RhoH2O( InitConvTemp );
+		WaterEquipment( WaterEquipNum ).TotalMassFlowRate = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 
 		// Calculate hot and cold water mixing at the tap
 		if ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate > 0.0 ) {
@@ -968,7 +951,7 @@ namespace WaterUse {
 				WaterEquipment( WaterEquipNum ).SensibleRate = 0.0;
 				WaterEquipment( WaterEquipNum ).SensibleEnergy = 0.0;
 			} else {
-				WaterEquipment( WaterEquipNum ).SensibleRate = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).SensibleFracSchedule ) * WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).MixedTemp - ZoneMAT );
+				WaterEquipment( WaterEquipNum ).SensibleRate = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).SensibleFracSchedule ) * WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).MixedTemp - ZoneMAT );
 				WaterEquipment( WaterEquipNum ).SensibleEnergy = WaterEquipment( WaterEquipNum ).SensibleRate * TimeStepSys * SecInHour;
 			}
 
@@ -996,7 +979,7 @@ namespace WaterUse {
 			if ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate == 0.0 ) {
 				WaterEquipment( WaterEquipNum ).DrainTemp = WaterEquipment( WaterEquipNum ).MixedTemp;
 			} else {
-				WaterEquipment( WaterEquipNum ).DrainTemp = ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( InitConvTemp ) * WaterEquipment( WaterEquipNum ).MixedTemp - WaterEquipment( WaterEquipNum ).SensibleRate - WaterEquipment( WaterEquipNum ).LatentRate ) / ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate * CPHW( InitConvTemp ) );
+				WaterEquipment( WaterEquipNum ).DrainTemp = ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * WaterEquipment( WaterEquipNum ).MixedTemp - WaterEquipment( WaterEquipNum ).SensibleRate - WaterEquipment( WaterEquipNum ).LatentRate ) / ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate * CPHW( DataGlobals::InitConvTemp ) );
 			}
 		}
 
@@ -1210,14 +1193,14 @@ namespace WaterUse {
 
 		if ( WaterConnections( WaterConnNum ).SupplyTankNum > 0 ) {
 			// Set the demand request for supply water from water storage tank
-			WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
+			WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 			WaterStorage( WaterConnections( WaterConnNum ).SupplyTankNum ).VdotRequestDemand( WaterConnections( WaterConnNum ).TankDemandID ) = WaterConnections( WaterConnNum ).ColdVolFlowRate;
 
 			// Check if cold flow rate should be starved by restricted flow from tank
 			// Currently, the tank flow is not really starved--water continues to flow at the tank water temperature
 			// But the user can see the error by comparing report variables for TankVolFlowRate < ColdVolFlowRate
 			WaterConnections( WaterConnNum ).TankVolFlowRate = WaterStorage( WaterConnections( WaterConnNum ).SupplyTankNum ).VdotAvailDemand( WaterConnections( WaterConnNum ).TankDemandID );
-			WaterConnections( WaterConnNum ).TankMassFlowRate = WaterConnections( WaterConnNum ).TankVolFlowRate * RhoH2O( InitConvTemp );
+			WaterConnections( WaterConnNum ).TankMassFlowRate = WaterConnections( WaterConnNum ).TankVolFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 		}
 
 	}
@@ -1267,7 +1250,7 @@ namespace WaterUse {
 			WaterConnections( WaterConnNum ).DrainTemp = WaterConnections( WaterConnNum ).HotTemp;
 		}
 
-		WaterConnections( WaterConnNum ).DrainVolFlowRate = WaterConnections( WaterConnNum ).DrainMassFlowRate * RhoH2O( InitConvTemp );
+		WaterConnections( WaterConnNum ).DrainVolFlowRate = WaterConnections( WaterConnNum ).DrainMassFlowRate * RhoH2O( DataGlobals::InitConvTemp );
 
 	}
 
@@ -1326,8 +1309,8 @@ namespace WaterUse {
 				WaterConnections( WaterConnNum ).RecoveryMassFlowRate = WaterConnections( WaterConnNum ).TotalMassFlowRate;
 			}}
 
-			HXCapacityRate = CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).RecoveryMassFlowRate;
-			DrainCapacityRate = CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).DrainMassFlowRate;
+			HXCapacityRate = CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).RecoveryMassFlowRate;
+			DrainCapacityRate = CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).DrainMassFlowRate;
 			MinCapacityRate = min( DrainCapacityRate, HXCapacityRate );
 
 			{ auto const SELECT_CASE_var( WaterConnections( WaterConnNum ).HeatRecoveryHX );
@@ -1352,9 +1335,9 @@ namespace WaterUse {
 
 			WaterConnections( WaterConnNum ).RecoveryRate = WaterConnections( WaterConnNum ).Effectiveness * MinCapacityRate * ( WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).ColdSupplyTemp );
 
-			WaterConnections( WaterConnNum ).RecoveryTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp + WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
+			WaterConnections( WaterConnNum ).RecoveryTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp + WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
 
-			WaterConnections( WaterConnNum ).WasteTemp = WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
+			WaterConnections( WaterConnNum ).WasteTemp = WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( DataGlobals::InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
 
 			if ( WaterConnections( WaterConnNum ).RecoveryTankNum > 0 ) {
 				WaterStorage( WaterConnections( WaterConnNum ).RecoveryTankNum ).VdotAvailSupply( WaterConnections( WaterConnNum ).TankSupplyID ) = WaterConnections( WaterConnNum ).DrainVolFlowRate;
@@ -1457,8 +1440,8 @@ namespace WaterUse {
 
 		// FLOW:
 		for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
-			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
+			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
+			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 			WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).ColdVolFlowRate + WaterEquipment( WaterEquipNum ).HotVolFlowRate;
 
 			WaterEquipment( WaterEquipNum ).ColdVolume = WaterEquipment( WaterEquipNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
@@ -1466,9 +1449,9 @@ namespace WaterUse {
 			WaterEquipment( WaterEquipNum ).TotalVolume = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
 
 			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
 			} else {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
 			}
 
 			WaterEquipment( WaterEquipNum ).Energy = WaterEquipment( WaterEquipNum ).Power * TimeStepSys * SecInHour;
@@ -1507,8 +1490,8 @@ namespace WaterUse {
 		// FLOW:
 		for ( Loop = 1; Loop <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++Loop ) {
 			WaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( Loop );
-			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
+			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
+			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 			WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).ColdVolFlowRate + WaterEquipment( WaterEquipNum ).HotVolFlowRate;
 
 			WaterEquipment( WaterEquipNum ).ColdVolume = WaterEquipment( WaterEquipNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
@@ -1516,23 +1499,23 @@ namespace WaterUse {
 			WaterEquipment( WaterEquipNum ).TotalVolume = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
 
 			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
 			} else {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
+				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
 			}
 
 			WaterEquipment( WaterEquipNum ).Energy = WaterEquipment( WaterEquipNum ).Power * TimeStepSys * SecInHour;
 		}
 
-		WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-		WaterConnections( WaterConnNum ).HotVolFlowRate = WaterConnections( WaterConnNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
+		WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
+		WaterConnections( WaterConnNum ).HotVolFlowRate = WaterConnections( WaterConnNum ).HotMassFlowRate / RhoH2O( DataGlobals::InitConvTemp );
 		WaterConnections( WaterConnNum ).TotalVolFlowRate = WaterConnections( WaterConnNum ).ColdVolFlowRate + WaterConnections( WaterConnNum ).HotVolFlowRate;
 
 		WaterConnections( WaterConnNum ).ColdVolume = WaterConnections( WaterConnNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
 		WaterConnections( WaterConnNum ).HotVolume = WaterConnections( WaterConnNum ).HotVolFlowRate * TimeStepSys * SecInHour;
 		WaterConnections( WaterConnNum ).TotalVolume = WaterConnections( WaterConnNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
 
-		WaterConnections( WaterConnNum ).Power = WaterConnections( WaterConnNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterConnections( WaterConnNum ).HotTemp - WaterConnections( WaterConnNum ).ReturnTemp );
+		WaterConnections( WaterConnNum ).Power = WaterConnections( WaterConnNum ).HotMassFlowRate * CPHW( DataGlobals::InitConvTemp ) * ( WaterConnections( WaterConnNum ).HotTemp - WaterConnections( WaterConnNum ).ReturnTemp );
 		WaterConnections( WaterConnNum ).Energy = WaterConnections( WaterConnNum ).Power * TimeStepSys * SecInHour;
 
 		WaterConnections( WaterConnNum ).RecoveryEnergy = WaterConnections( WaterConnNum ).RecoveryRate * TimeStepSys * SecInHour;

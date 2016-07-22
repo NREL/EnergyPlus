@@ -555,12 +555,6 @@ namespace PhotovoltaicThermalCollectors {
 		// PURPOSE OF THIS SUBROUTINE:
 		// init for PVT
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::SysSizingCalc;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -580,17 +574,8 @@ namespace PhotovoltaicThermalCollectors {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPVTcollectors" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode;
@@ -603,7 +588,6 @@ namespace PhotovoltaicThermalCollectors {
 		static Array1D_bool SetLoopIndexFlag; // get loop number flag
 		bool errFlag;
 		Real64 rho; // local fluid density kg/s
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -701,7 +685,7 @@ namespace PhotovoltaicThermalCollectors {
 
 			if ( SELECT_CASE_var == LiquidWorkingFluid ) {
 
-				rho = GetDensityGlycol( PlantLoop( PVT( PVTnum ).WLoopNum ).FluidName, 60.0, PlantLoop( PVT( PVTnum ).WLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( PVT( PVTnum ).WLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( PVT( PVTnum ).WLoopNum ).FluidIndex, RoutineName );
 
 				PVT( PVTnum ).MaxMassFlowRate = PVT( PVTnum ).DesignVolFlowRate * rho;
 

@@ -101,16 +101,9 @@ namespace HeatPumpWaterToWaterHEATING {
 	// This simulation is based on a set of selected parameters,
 	// Which are obtained using Parameter Estimation technique.
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginSimFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::KelvinConv;
@@ -121,20 +114,9 @@ namespace HeatPumpWaterToWaterHEATING {
 	using DataGlobals::SecInHour;
 	using namespace DataLoopNode;
 
-	// Use statements for access to subroutines in other modules
-
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	std::string const ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Heating" );
 	std::string const ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING" );
-
-	// DERIVED TYPE DEFINITIONS
-
-	// Type Description of Heat Pump
-
-	// Output Variables Type definition
-
-	// MODULE VARIABLE DECLARATIONS:
 
 	std::string GSHPRefrigerant( "R22" ); // Refrigerent name and index
 	int GSHPRefrigIndex( 0 );
@@ -151,17 +133,9 @@ namespace HeatPumpWaterToWaterHEATING {
 	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
 	Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-	// Name Public routines, optionally name Private routines within this module
-
 	// Object Data
 	Array1D< GshpSpecs > GSHP; // dimension to number of machines
 	Array1D< ReportVars > GSHPReport;
-
-	// MODULE SUBROUTINES:
-
-	// Functions
 
 	void
 	SimHPWatertoWaterHEATING(
@@ -509,23 +483,13 @@ namespace HeatPumpWaterToWaterHEATING {
 		// PURPOSE OF THIS SUBROUTINE:
 		// initialization
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitGshp" );
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyEnvrnFlag;
@@ -560,12 +524,12 @@ namespace HeatPumpWaterToWaterHEATING {
 
 			MyEnvrnFlag( GSHPNum ) = false;
 
-			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 			GSHP( GSHPNum ).LoadSideDesignMassFlow = GSHP( GSHPNum ).LoadSideVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, GSHP( GSHPNum ).LoadSideDesignMassFlow, GSHP( GSHPNum ).LoadSideInletNodeNum, GSHP( GSHPNum ).LoadSideOutletNodeNum, GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum );
 
-			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 			GSHP( GSHPNum ).SourceSideDesignMassFlow = GSHP( GSHPNum ).SourceSideVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, GSHP( GSHPNum ).SourceSideDesignMassFlow, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).SourceBranchNum, GSHP( GSHPNum ).SourceCompNum );

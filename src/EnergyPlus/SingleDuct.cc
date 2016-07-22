@@ -113,21 +113,11 @@ namespace SingleDuct {
 	// To encapsulate the data and algorithms required to
 	// simulate single duct systems as a single driver or inter-connecting controllers.
 
-	// METHODOLOGY EMPLOYED:
-	// Needs description, as appropriate.
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::DisplayExtraWarnings;
@@ -1554,18 +1544,9 @@ namespace SingleDuct {
 		using DataGlobals::AnyPlantInModel;
 		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitSys" );
 		static std::string const RoutineNameFull( "InitHVACSingleDuct" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode;
@@ -1665,7 +1646,7 @@ namespace SingleDuct {
 			MassFlowDiff( SysNum ) = 1.0e-10 * Sys( SysNum ).AirMassFlowRateMax;
 
 			if ( Sys( SysNum ).HWLoopNum > 0 && Sys( SysNum ).ReheatComp_Num != HCoilType_SteamAirHeating ) { //protect early calls before plant is setup
-				rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, InitConvTemp, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else {
 				rho = 1000.0;
 			}
@@ -1798,20 +1779,15 @@ namespace SingleDuct {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 				using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
-		//  USE BranchInputManager,  ONLY: MyPlantSizingIndex
 		using General::SafeDivide;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
-		//unused  USE DataHeatBalance,     ONLY: Zone
 		using DataGlobals::AutoCalculate;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataPlant::PlantLoop;
@@ -1819,18 +1795,9 @@ namespace SingleDuct {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeSys" );
 		static std::string const RoutineNameFull( "SizeHVACSingleDuct" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -2137,9 +2104,9 @@ namespace SingleDuct {
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {
 
-								rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
-								Cp = GetSpecificHeatGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( Sys( SysNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( Sys( SysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxReheatWaterVolFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {

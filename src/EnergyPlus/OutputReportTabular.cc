@@ -14262,7 +14262,7 @@ Label900: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
-		UnitConvSize = 95;
+		UnitConvSize = 115;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
 		UnitConv( 2 ).siName = "°C";
@@ -14359,6 +14359,26 @@ Label900: ;
 		UnitConv( 93 ).siName = "MJ/m2";
 		UnitConv( 94 ).siName = "MJ/m2";
 		UnitConv( 95 ).siName = "Invalid/Undefined";
+		UnitConv( 96 ).siName = "";
+		UnitConv( 97 ).siName = "W/C";
+		UnitConv( 98 ).siName = "DAY";
+		UnitConv( 99 ).siName = "MIN";
+		UnitConv( 100 ).siName = "HR/WK";
+		UnitConv( 101 ).siName = "$";
+		UnitConv( 102 ).siName = "$/UNIT ENERGY";
+		UnitConv( 103 ).siName = "KW";
+		UnitConv( 104 ).siName = "KGWATER/KGDRYAIR";
+		UnitConv( 105 ).siName = " ";
+		UnitConv( 106 ).siName = "AH";
+		UnitConv( 107 ).siName = "CLO";
+		UnitConv( 108 ).siName = "J/KG-K";
+		UnitConv( 109 ).siName = "J/KGWATER";
+		UnitConv( 110 ).siName = "KGWATER/S";
+		UnitConv( 111 ).siName = "PPM";
+		UnitConv( 112 ).siName = "RAD";
+		UnitConv( 113 ).siName = "REV/MIN";
+		UnitConv( 114 ).siName = "NM";
+		UnitConv( 115 ).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
 
 		UnitConv( 1 ).ipName = "%";
 		UnitConv( 2 ).ipName = "F";
@@ -14455,6 +14475,26 @@ Label900: ;
 		UnitConv( 93 ).ipName = "kBtu/ft2";
 		UnitConv( 94 ).ipName = "kWh/m2";
 		UnitConv( 95 ).ipName = "Invalid/Undefined";
+		UnitConv( 96 ).ipName = "";
+		UnitConv( 97 ).ipName = "Btu/h-F";
+		UnitConv( 98 ).ipName = "day";
+		UnitConv( 99 ).ipName = "min";
+		UnitConv( 100 ).ipName = "hr/wk";
+		UnitConv( 101 ).ipName = "$";
+		UnitConv( 102 ).ipName = "$/unit energy";
+		UnitConv( 103 ).ipName = "kW";
+		UnitConv( 104 ).ipName = "lbWater/lbDryAir";
+		UnitConv( 105 ).ipName = " ";
+		UnitConv( 106 ).ipName = "Ah";
+		UnitConv( 107 ).ipName = "clo";
+		UnitConv( 108 ).ipName = "Btu/lbm-R";
+		UnitConv( 109 ).ipName = "Btu/lbWater";
+		UnitConv( 110 ).ipName = "lbWater/s";
+		UnitConv( 111 ).ipName = "ppm";
+		UnitConv( 112 ).ipName = "rad";
+		UnitConv( 113 ).ipName = "rev/min";
+		UnitConv( 114 ).ipName = "lbf-ft";
+		UnitConv( 115 ).ipName = "Btu/W-h";
 
 		UnitConv( 1 ).mult = 1.0;
 		UnitConv( 2 ).mult = 1.8;
@@ -14551,6 +14591,26 @@ Label900: ;
 		UnitConv( 93 ).mult = 0.94708628903179 / 10.764961;
 		UnitConv( 94 ).mult = 0.27777777777778;
 		UnitConv( 95 ).mult = 1.0;
+		UnitConv( 96 ).mult = 1.0;
+		UnitConv( 97 ).mult = 1.8987;
+		UnitConv( 98 ).mult = 1.0;
+		UnitConv( 99 ).mult = 1.0;
+		UnitConv( 100 ).mult = 1.0;
+		UnitConv( 101 ).mult = 1.0;
+		UnitConv( 102 ).mult = 1.0;
+		UnitConv( 103 ).mult = 1.0;
+		UnitConv( 104 ).mult = 1.0;
+		UnitConv( 105 ).mult = 1.0;
+		UnitConv( 106 ).mult = 1.0;
+		UnitConv( 107 ).mult = 1.0;
+		UnitConv( 108 ).mult = 0.000238845896627;
+		UnitConv( 109 ).mult = 0.0000004302105;
+		UnitConv( 110 ).mult = 2.2046;
+		UnitConv( 111 ).mult = 1.0;
+		UnitConv( 112 ).mult = 1.0;
+		UnitConv( 113 ).mult = 1.0;
+		UnitConv( 114 ).mult = 0.737562149277;
+		UnitConv( 115 ).mult = 1.0;
 
 		UnitConv( 2 ).offset = 32.0;
 		UnitConv( 11 ).offset = 32.0;
@@ -14659,7 +14719,7 @@ Label900: ;
 		std::string::size_type const posLBrac = index( inString, '[' ); // left bracket
 		std::string::size_type const posRBrac = index( inString, ']' ); // right bracket
 		//extract the substring with the units
-		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			outUnit = inString.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 		}
 		return outUnit;
@@ -14702,11 +14762,13 @@ Label900: ;
 		std::string::size_type posRBrac = index( stringInUpper, ']' ); // right bracket
 		std::string::size_type posLParen = index( stringInUpper, '(' ); // left parenthesis
 		std::string::size_type posRParen = index( stringInUpper, ')' ); // right parenthesis
+		bool noBrackets = true;
 		//extract the substring with the units
-		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 2 ) ) {
+		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLBrac + 1, posRBrac - posLBrac - 1 );
 			modeInString = misBrac;
-		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 2 ) ) {
+			noBrackets = false;
+		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
 			modeInString = misParen;
 		} else {
@@ -14768,7 +14830,14 @@ Label900: ;
 		// For debugging only
 		//CALL  ShowWarningError('LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
 		//IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // IntToStr(foundConv) )
+
 		unitConvIndex = selectedConv;
+
+		// Add warning if units not found.
+		if (unitConvIndex == 0 && ! noBrackets) {
+			ShowWarningError("Unable to find a unit conversion from " + stringInWithSI + " into IP units");
+			ShowContinueError("Applying default conversion factor of 1.0");
+		}
 	}
 
 
@@ -14847,7 +14916,7 @@ Label900: ;
 		} else if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
 			ConvertIP = ( SIvalue * UnitConv( unitConvIndex ).mult ) + UnitConv( unitConvIndex ).offset;
 		} else {
-			ConvertIP = 0.0;
+			ConvertIP = SIvalue;
 		}
 		return ConvertIP;
 	}
@@ -14896,10 +14965,12 @@ Label900: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    na
 
-		if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
+		if ( unitConvIndex == 0 ) {
+			ConvertIPdelta = SIvalue;
+		} else if ( ( unitConvIndex > 0 ) && ( unitConvIndex <= UnitConvSize ) ) {
 			ConvertIPdelta = SIvalue * UnitConv( unitConvIndex ).mult;
 		} else {
-			ConvertIPdelta = 0.0;
+			ConvertIPdelta = SIvalue;
 		}
 		return ConvertIPdelta;
 	}
@@ -14952,7 +15023,7 @@ Label900: ;
 			offset = UnitConv( unitConvIndex ).offset;
 			IPunit = UnitConv( unitConvIndex ).ipName;
 		} else {
-			multiplier = 0.0;
+			multiplier = 1.0;
 			offset = 0.0;
 			IPunit = "";
 		}
@@ -15018,7 +15089,9 @@ Label900: ;
 		if ( found != 0 ) {
 			getSpecificUnitMultiplier = UnitConv( found ).mult;
 		} else {
-			getSpecificUnitMultiplier = 0.0;
+			ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+			ShowContinueError("Applying default conversion factor of 1.0");
+			getSpecificUnitMultiplier = 1.0;
 		}
 		return getSpecificUnitMultiplier;
 	}
@@ -15075,7 +15148,9 @@ Label900: ;
 		if ( mult != 0 ) {
 			getSpecificUnitDivider = 1 / mult;
 		} else {
-			getSpecificUnitDivider = 0.0;
+			ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+			ShowContinueError("Applying default conversion factor of 1.0");
+			getSpecificUnitDivider = 1.0;
 		}
 		return getSpecificUnitDivider;
 	}

@@ -122,16 +122,11 @@ namespace UnitVentilator {
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
 	// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
@@ -145,9 +140,6 @@ namespace UnitVentilator {
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Currrent Module Unit type
 	std::string const cMO_UnitVentilator( "ZoneHVAC:UnitVentilator" );
@@ -1118,7 +1110,7 @@ namespace UnitVentilator {
 
 				if ( UnitVent( UnitVentNum ).HCoilType == Heating_WaterCoilType ) {
 
-					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 					UnitVent( UnitVentNum ).MaxHotWaterFlow = rho * UnitVent( UnitVentNum ).MaxVolHotWaterFlow;
 					UnitVent( UnitVentNum ).MinHotWaterFlow = rho * UnitVent( UnitVentNum ).MinVolHotWaterFlow;
@@ -1720,8 +1712,8 @@ namespace UnitVentilator {
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
 								}
-								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 								MaxVolHotWaterFlowDes = DesHeatingLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 
 							} else {

@@ -124,7 +124,6 @@ namespace ChillerGasAbsorption {
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BigNumber;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
@@ -709,9 +708,9 @@ namespace ChillerGasAbsorption {
 			if ( GasAbsorber( ChillNum ).isWaterCooled ) {
 				// init max available condenser water flow rate
 				if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				} else {
-					rho = RhoH2O( InitConvTemp );
+					rho = RhoH2O( DataGlobals::InitConvTemp );
 
 				}
 
@@ -720,18 +719,18 @@ namespace ChillerGasAbsorption {
 			}
 
 			if ( GasAbsorber( ChillNum ).HWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else {
-				rho = RhoH2O( InitConvTemp );
+				rho = RhoH2O( DataGlobals::InitConvTemp );
 			}
 			GasAbsorber( ChillNum ).DesHeatMassFlowRate = rho * GasAbsorber( ChillNum ).HeatVolFlowRate;
 			//init available hot water flow rate
 			InitComponentNodes( 0.0, GasAbsorber( ChillNum ).DesHeatMassFlowRate, HeatInletNode, HeatOutletNode, GasAbsorber( ChillNum ).HWLoopNum, GasAbsorber( ChillNum ).HWLoopSideNum, GasAbsorber( ChillNum ).HWBranchNum, GasAbsorber( ChillNum ).HWCompNum );
 
 			if ( GasAbsorber( ChillNum ).CWLoopNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 			} else {
-				rho = RhoH2O( InitConvTemp );
+				rho = RhoH2O( DataGlobals::InitConvTemp );
 			}
 			GasAbsorber( ChillNum ).DesEvapMassFlowRate = rho * GasAbsorber( ChillNum ).EvapVolFlowRate;
 			//init available hot water flow rate
@@ -836,8 +835,8 @@ namespace ChillerGasAbsorption {
 
 		if ( PltSizCoolNum > 0 ) {
 			if ( PlantSizData( PltSizCoolNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizCoolNum ).DeltaT * PlantSizData( PltSizCoolNum ).DesVolFlowRate * GasAbsorber( ChillNum ).SizFac;
 				if ( ! GasAbsorber( ChillNum ).NomCoolingCapWasAutoSized ) tmpNomCap = GasAbsorber( ChillNum ).NomCoolingCap;
 			} else {

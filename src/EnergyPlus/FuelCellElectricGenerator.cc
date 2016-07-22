@@ -118,9 +118,6 @@ namespace FuelCellElectricGenerator {
 	// REFERENCES:
 	// IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells
 
-	// OTHER NOTES:
-	// N/A
-
 	// Using/Aliasing
 	using namespace DataGenerators;
 	using namespace DataLoopNode;
@@ -130,7 +127,6 @@ namespace FuelCellElectricGenerator {
 	using DataGlobals::DayOfSim;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::KelvinConv;
 	using DataGlobals::HoursInDay;
@@ -138,25 +134,9 @@ namespace FuelCellElectricGenerator {
 	using namespace GeneratorFuelSupply;
 	using namespace GeneratorDynamicsManager;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLE DECLARATIONS:
 	bool GetFuelCellInput( true ); // When TRUE, calls subroutine to read input file.
 	Array1D_bool CheckEquipName;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE FuelCell ElectricGenerator
-
-	//PRIVATE    SetupFuelAndAirConstituentData ! hardwired data for gas phase thermochemistry calcs
-
-	// MODULE SUBROUTINES:
-
-	// Beginning of FuelCell Generator Module Driver Subroutines
-	//*************************************************************************
-
-	// Functions
 
 	void
 	SimFuelCellGenerator(

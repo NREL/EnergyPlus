@@ -762,7 +762,7 @@ namespace HWBaseboardRadiator {
 			RhoAirStdInit = StdRhoAir;
 			WaterInletNode = HWBaseboard( BaseboardNum ).WaterInletNode;
 
-			rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 
 			HWBaseboard( BaseboardNum ).WaterMassFlowRateMax = rho * HWBaseboard( BaseboardNum ).WaterVolFlowRateMax;
 
@@ -972,8 +972,8 @@ namespace HWBaseboardRadiator {
 					CheckZoneSizing( cCMO_BBRadiator_Water, HWBaseboard( BaseboardNum ).EquipID );
 					DesCoilLoad = RatedCapacityDes;
 					if ( DesCoilLoad >= SmallLoad ) {
-						Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, 60.0, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
-						rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+						Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, HWInitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 						WaterVolFlowRateMaxDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 					} else {
 						WaterVolFlowRateMaxDes = 0.0;
@@ -1003,7 +1003,7 @@ namespace HWBaseboardRadiator {
 					WaterMassFlowRateStd = HWBaseboard( BaseboardNum ).WaterMassFlowRateStd;
 				} else if ( HWBaseboard( BaseboardNum ).RatedCapacity == AutoSize || HWBaseboard( BaseboardNum ).RatedCapacity == 0.0 ) {
 					DesCoilLoad = RatedCapacityDes;
-					rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineNameFull );
+					rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineNameFull );
 					WaterMassFlowRateStd = HWBaseboard( BaseboardNum ).WaterVolFlowRateMax * rho;
 				}
 				if ( DesCoilLoad >= SmallLoad ) {

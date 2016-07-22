@@ -258,7 +258,6 @@ namespace SolarCollectors {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using DataGlobals::InitConvTemp;
 		using namespace DataHeatBalance;
 
 
@@ -387,7 +386,7 @@ namespace SolarCollectors {
 				}}
 
 				if ( rNumericArgs( 2 ) > 0.0 ) {
-					Parameters( ParametersNum ).TestMassFlowRate = rNumericArgs( 2 ) * RhoH2O( InitConvTemp );
+					Parameters( ParametersNum ).TestMassFlowRate = rNumericArgs( 2 ) * RhoH2O( DataGlobals::InitConvTemp );
 				} else {
 					ShowSevereError( CurrentModuleParamObject + " = " + cAlphaArgs( 1 ) + ":  flow rate must be greater than zero for " + cNumericFieldNames( 2 ) );
 					ErrorsFound = true;
@@ -787,7 +786,6 @@ namespace SolarCollectors {
 
 		// Using/Aliasing
 		using DataGlobals::SysSizingCalc;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::DegToRadians;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::TimeStep;
@@ -861,7 +859,7 @@ namespace SolarCollectors {
 		if ( BeginEnvrnFlag && Collector( CollectorNum ).Init ) {
 			// Clear node initial conditions
 			if ( Collector( CollectorNum ).VolFlowRateMax > 0 ) { //CR7425
-				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 
 				Collector( CollectorNum ).MassFlowRateMax = Collector( CollectorNum ).VolFlowRateMax * rho;
 			} else { //CR7425

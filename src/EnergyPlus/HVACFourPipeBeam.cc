@@ -797,7 +797,7 @@ namespace FourPipeBeam {
 		}
 
 		if ( this->beamCoolingPresent ) {
-			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->cWLocation.loopNum ).FluidName, DataGlobals::InitConvTemp,
+			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->cWLocation.loopNum ).FluidName, DataGlobals::CWInitConvTemp,
 									DataPlant::PlantLoop( this->cWLocation.loopNum ).FluidIndex, routineName );
 			this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
 			this->mDotDesignCW = this->vDotDesignCW * rho ;
@@ -812,7 +812,7 @@ namespace FourPipeBeam {
 									);
 		}
 		if ( this->beamHeatingPresent ) {
-			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->hWLocation.loopNum ).FluidName, DataGlobals::InitConvTemp,
+			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->hWLocation.loopNum ).FluidName, DataGlobals::CWInitConvTemp,
 									DataPlant::PlantLoop( this->hWLocation.loopNum ).FluidIndex, routineName );
 			this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
 			this->mDotDesignHW = this->vDotDesignHW * rho;
@@ -867,7 +867,7 @@ namespace FourPipeBeam {
 		this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
 		if ( this->vDotDesignCWWasAutosized ) {
 			this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
-			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->cWLocation.loopNum ).FluidName, DataGlobals::InitConvTemp,
+			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->cWLocation.loopNum ).FluidName, DataGlobals::CWInitConvTemp,
 									DataPlant::PlantLoop( this->cWLocation.loopNum ).FluidIndex, routineName );
 			this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
 			this->mDotCW = this->vDotDesignCW * rho;
@@ -885,7 +885,7 @@ namespace FourPipeBeam {
 		}
 		if ( vDotDesignHWWasAutosized ) {
 			this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
-			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->hWLocation.loopNum ).FluidName, DataGlobals::InitConvTemp,
+			rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( this->hWLocation.loopNum ).FluidName, DataGlobals::CWInitConvTemp,
 									DataPlant::PlantLoop( this->hWLocation.loopNum ).FluidIndex, routineName );
 			this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
 			this->mDotHW = this->vDotDesignHW * rho;

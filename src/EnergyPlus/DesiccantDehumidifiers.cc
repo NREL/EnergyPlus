@@ -1430,22 +1430,12 @@ namespace DesiccantDehumidifiers {
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
 		using DataSizing::AutoSize;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitDesiccantDehumidifier" );
 		static std::string const initCBVAV( "InitCBVAV" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ProcInNode; // inlet node number
@@ -1461,8 +1451,6 @@ namespace DesiccantDehumidifiers {
 		Real64 CoilMaxVolFlowRate; // water or steam max volumetric water flow rate
 		Real64 QCoilActual; // actual CBVAV steam heating coil load met (W)
 		bool ErrorFlag; // local error flag returned from data mining
-		//unused  REAL(r64)                      :: mdot                 ! heating coil fluid mass flow rate, kg/s
-		//unused  REAL(r64)                      :: QDelivered           ! regen heat actually delivered by regen coil [W]
 
 		if ( InitDesiccantDehumidifierOneTimeFlag ) {
 
@@ -1488,7 +1476,7 @@ namespace DesiccantDehumidifiers {
 					ErrorFlag = false;
 					DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", DesicDehum( DesicDehumNum ).RegenCoilName, ErrorFlag );
 					if ( DesicDehum( DesicDehumNum ).MaxCoilFluidFlow > 0.0 ) {
-						FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, initCBVAV );
+						FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, initCBVAV );
 						DesicDehum( DesicDehumNum ).MaxCoilFluidFlow *= FluidDensity;
 					}
 
@@ -1591,7 +1579,7 @@ namespace DesiccantDehumidifiers {
 								ErrorsFound = true;
 							}
 							if ( CoilMaxVolFlowRate != AutoSize ) {
-								FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, RoutineName );
+								FluidDensity = GetDensityGlycol( PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( DesicDehum( DesicDehumNum ).LoopNum ).FluidIndex, RoutineName );
 								DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
 							}
 						}

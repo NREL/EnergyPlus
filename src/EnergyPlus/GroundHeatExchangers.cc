@@ -128,7 +128,6 @@ namespace GroundHeatExchangers {
 	using DataGlobals::TimeStepZone;
 	using DataGlobals::DayOfSim;
 	using DataGlobals::Pi;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::SecInHour;
 	using DataHVACGlobals::TimeStepSys;
@@ -136,9 +135,6 @@ namespace GroundHeatExchangers {
 	using namespace DataLoopNode;
 	using General::TrimSigDigits;
 	using namespace GroundTemperatureManager;
-
-	// Data
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE PARAMETER DEFINITIONS
 	Real64 const hrsPerDay( 24.0 ); // Number of hours in a day

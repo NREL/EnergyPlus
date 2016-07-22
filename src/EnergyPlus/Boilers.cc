@@ -106,17 +106,10 @@ namespace Boilers {
 	// METHODOLOGY EMPLOYED:
 	// The BLAST/DOE-2 empirical model based on mfg. data
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using namespace DataHVACGlobals;
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataPlant::PlantLoop;
@@ -125,12 +118,6 @@ namespace Boilers {
 	using DataBranchAirLoopPlant::ControlType_SeriesActive;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
-
-	//USE FunctionFluidProperties
-	// Use statements for access to subroutines in other modules
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Boiler normalized efficiency curve types
 	int const Linear( 1 );
@@ -152,8 +139,6 @@ namespace Boilers {
 	int const ConstantFlow( 201 );
 	int const NotModulated( 202 );
 	int const LeavingSetPointModulated( 203 );
-
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumBoilers( 0 ); // Number of boilers
@@ -591,9 +576,6 @@ namespace Boilers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -607,17 +589,8 @@ namespace Boilers {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitBoiler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
@@ -626,7 +599,6 @@ namespace Boilers {
 		Real64 rho;
 		bool FatalError;
 		bool errFlag;
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -656,7 +628,7 @@ namespace Boilers {
 
 		if ( MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 			//if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
-			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 			Boiler( BoilerNum ).DesMassFlowRate = Boiler( BoilerNum ).VolFlowRate * rho;
 
 			InitComponentNodes( 0.0, Boiler( BoilerNum ).DesMassFlowRate, Boiler( BoilerNum ).BoilerInletNodeNum, Boiler( BoilerNum ).BoilerOutletNodeNum, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum );
@@ -729,9 +701,6 @@ namespace Boilers {
 		// Obtains hot water flow rate from the plant sizing array. Calculates nominal capacity from
 		// the hot water flow rate and the hot water loop design delta T.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -744,17 +713,8 @@ namespace Boilers {
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeBoiler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
@@ -775,7 +735,7 @@ namespace Boilers {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
-				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Boiler( BoilerNum ).TempDesBoilerOut, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
 				if ( ! Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = Boiler( BoilerNum ).NomCap;

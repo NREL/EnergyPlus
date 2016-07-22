@@ -1822,10 +1822,6 @@ namespace SurfaceGeometry {
 				ShowSevereError( RoutineName + "Zone " + Zone( ZoneNum ).Name + " has only one floor, wall or roof, and this surface has a window." );
 				ShowContinueError( "Add more floors, walls or roofs, or an internal mass surface." );
 			}
-			if ( ( OpaqueHTSurfs + InternalMassSurfs ) < 6 ) {
-				ShowWarningError( RoutineName + "The total number of floors, walls, roofs and internal mass surfaces in Zone " + Zone( ZoneNum ).Name );
-				ShowContinueError( "is < 6. This may cause an inaccurate zone heat balance calculation." );
-			}
 		}
 
 		// set up vertex of centroid for each surface.

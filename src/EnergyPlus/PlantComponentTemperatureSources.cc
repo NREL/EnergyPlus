@@ -101,36 +101,25 @@ namespace PlantComponentTemperatureSources {
 	// Called by plantloopequipment, model accepts inputs, and calculates a
 	// thermal response using new plant routines such as SetComponentFlowRate
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using DataPlant::TypeOf_WaterSource;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS:
 	int const TempSpecType_Constant( -1 );
 	int const TempSpecType_Schedule( -2 );
-
-	//MODULE DERIVED TYPE DEFINITIONS:
 
 	//MODULE VARIABLES
 	int NumSources( 0 );
 	bool GetInput( true ); // then TRUE, calls subroutine to read input file.
 
-	//MODULE ROUTINES
-
 	// Object Data
 	Array1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
-
-	// Functions
 
 	void
 	SimWaterSource(
@@ -420,7 +409,7 @@ namespace PlantComponentTemperatureSources {
 		//Initialize critical Demand Side Variables at the beginning of each environment
 		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).MassFlowRateMax = WaterSource( SourceNum ).DesVolFlowRate * rho;
 			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum );
 

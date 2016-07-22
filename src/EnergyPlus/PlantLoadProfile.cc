@@ -101,17 +101,11 @@ namespace PlantLoadProfile {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_PlantLoadProfile;
 	using DataPlant::ScanPlantLoopsForObject;
 	using PlantUtilities::SetComponentFlowRate;
 	using PlantUtilities::InitComponentNodes;
-
-	// Data
-	// DERIVED TYPE DEFINITIONS:
-
-	// MODULE VARIABLE TYPE DECLARATIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
 	bool GetPlantLoadProfileInputFlag( true );
@@ -252,7 +246,7 @@ namespace PlantLoadProfile {
 			//    Node(InletNode)%Temp = 0.0
 			Node( OutletNode ).Temp = 0.0;
 
-			FluidDensityInit = GetDensityGlycol( PlantLoop( this->WLoopNum ).FluidName, InitConvTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
+			FluidDensityInit = GetDensityGlycol( PlantLoop( this->WLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
 
 			Real64 MaxFlowMultiplier = GetScheduleMaxValue( this->FlowRateFracSchedule );
 

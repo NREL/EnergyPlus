@@ -1965,6 +1965,8 @@ namespace HeatingCoils {
 				EffHS = HeatingCoil( CoilNum ).MSEfficiency( StageNumHS );
 
 				PartLoadRat = min( 1.0, SpeedRatio );
+				HeatingCoil( CoilNum ).RTF = 1.0;
+
 				// Get full load output and power
 				LSFullLoadOutAirEnth = InletAirEnthalpy + TotCapLS / MSHPMassFlowRateLow;
 				HSFullLoadOutAirEnth = InletAirEnthalpy + TotCapHS / MSHPMassFlowRateHigh;
@@ -2008,6 +2010,7 @@ namespace HeatingCoils {
 				TotCap = HeatingCoil( CoilNum ).MSNominalCapacity( StageNumLS );
 
 				PartLoadRat = min( 1.0, CycRatio );
+				HeatingCoil( CoilNum ).RTF = PartLoadRat;
 
 				// Calculate full load outlet conditions
 				FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
@@ -2035,8 +2038,6 @@ namespace HeatingCoils {
 
 				EffLS = HeatingCoil( CoilNum ).MSEfficiency( StageNumLS );
 
-				//    HeatingCoil(CoilNum)%HeatingCoilLoad = TotCap
-				//   This would require a CR to change
 				HeatingCoil( CoilNum ).HeatingCoilLoad = TotCap * PartLoadRat;
 
 				HeatingCoil( CoilNum ).GasUseLoad = HeatingCoil( CoilNum ).HeatingCoilLoad / EffLS;
@@ -2049,16 +2050,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).OutletAirHumRat = OutletAirHumRat;
 				HeatingCoil( CoilNum ).OutletAirEnthalpy = OutletAirEnthalpy;
 				HeatingCoil( CoilNum ).OutletAirMassFlowRate = HeatingCoil( CoilNum ).InletAirMassFlowRate;
-				// This seems unecessary (i.e., cycratio or speedratio is > 0) , and would require a CR to change
-				//  ELSE
-				//    ! Gas coil is off; just pass through conditions
-				//    HeatingCoil(CoilNum)%OutletAirEnthalpy = HeatingCoil(CoilNum)%InletAirEnthalpy
-				//    HeatingCoil(CoilNum)%OutletAirHumRat   = HeatingCoil(CoilNum)%InletAirHumRat
-				//    HeatingCoil(CoilNum)%OutletAirTemp     = HeatingCoil(CoilNum)%InletAirTemp
-				//    HeatingCoil(CoilNum)%OutletAirMassFlowRate = HeatingCoil(CoilNum)%InletAirMassFlowRate
-				//    HeatingCoil(CoilNum)%ElecUseLoad      = 0.0
-				//    HeatingCoil(CoilNum)%HeatingCoilLoad  = 0.0
-				//    ElecHeatingCoilPower                  = 0.0
+
 			}
 
 			// This requires a CR to correct (i.e., calculate outputs when coil is off)
@@ -2122,13 +2114,6 @@ namespace HeatingCoils {
 					OnOffFanPartLoadFraction = PLF;
 				}
 			}
-			// This requires a CR to correct (i.e., if PLFCurveIndex = 0 do this)
-			//   ELSE
-			//     IF(CycRatio > 0.0d0 .AND. StageNum < 2)THEN
-			//       HeatingCoil(CoilNum)%ElecUseLoad = HeatingCoil(CoilNum)%MSParasiticElecLoad(StageNum) * CycRatio
-			//       HeatingCoil(CoilNum)%GasUseLoad  = HeatingCoil(CoilNum)%MSNominalCapacity(StageNum) / EffLS * CycRatio
-			//       HeatingCoil(CoilNum)%ParasiticGasRate = HeatingCoil(CoilNum)%ParasiticGasCapacity * (1.0d0 - CycRatio)
-			//     END IF
 		}
 
 	}

@@ -107,24 +107,13 @@ namespace CTElectricGenerator {
 	// All CT Generator models are based on a polynomial fit of Generator
 	// performance data.
 
-	// REFERENCES: na
-
-	// OTHER NOTES:
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobalConstants::iGeneratorCombTurbine;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumCTGenerators( 0 ); // number of CT Generators specified in input
@@ -132,17 +121,9 @@ namespace CTElectricGenerator {
 
 	Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-
 	// Object Data
 	Array1D< CTGeneratorSpecs > CTGenerator; // dimension to number of machines
 	Array1D< ReportVars > CTGeneratorReport;
-
-	// MODULE SUBROUTINES:
-	// Beginning of CT Generator Module Driver Subroutines
-	//*************************************************************************
-
-	// Functions
 
 	void
 	SimCTGenerator(
@@ -873,7 +854,7 @@ namespace CTElectricGenerator {
 			HeatRecOutletNode = CTGenerator( GeneratorNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( CTGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			CTGenerator( GeneratorNum ).DesignHeatRecMassFlowRate = rho * CTGenerator( GeneratorNum ).DesignHeatRecVolFlowRate;
 
