@@ -79020,6 +79020,8 @@ ElectricLoadCenter:Distribution,
        \note Controls timing and magnitude of discharging storage
        \note Required field if Storage Operation Scheme is set to TrackChargeDischargeSchedules.
        \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
+       \type object-list
+       \object-list ScheduleNames
   N6,  \field Storage Control Utility Demand Target
        \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses. 
        \note Required field for FacilityDemandLeveling storage operation scheme
