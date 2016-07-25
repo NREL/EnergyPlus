@@ -970,7 +970,6 @@ namespace EnergyPlus {
 		Optional < Array1D_string > AlphaFieldNames,
 		Optional < Array1D_string > NumericFieldNames
 	) {
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
 		//       DATE WRITTEN   September 1997
@@ -979,19 +978,6 @@ namespace EnergyPlus {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the 'number' 'object' from the IDFRecord data structure.
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Count;
-		int LoopIndex;
-		std::string ObjectWord;
-		std::string UCObject;
-		int MaxAlphas;
-		int MaxNumbers;
-		int Found;
-		int StartRecord;
-		std::string cfld1;
-		std::string cfld2;
-		bool GoodItem;
 
 		json * object_in_jdf;
 		if ( jdf.find( Object ) == jdf.end() ) {
@@ -1020,26 +1006,19 @@ namespace EnergyPlus {
 		NumAlphas = 0; //Autodesk:Uninit Force default initialization
 		NumNumbers = 0; //Autodesk:Uninit Force default initialization
 
-		MaxAlphas = isize( Alphas, 1 );
-		MaxNumbers = isize( Numbers, 1 );
-		GoodItem = false;
-
 		Status = -1;
-		UCObject = MakeUPPERCase( Object );
 
 		Alphas = "";
 		Numbers = 0;
 
-		auto obj = object_in_jdf->begin() + Number - 1;
-		auto const obj_val = obj.value();
+		auto const & obj = object_in_jdf->begin() + Number - 1;
+		auto const & obj_val = obj.value();
 		auto const & alphas_fields = object_in_schema->at( "legacy_idd" )[ "alphas" ][ "fields" ];
 		for ( int i = 0; i < alphas_fields.size(); ++i ) {
 			std::string const field = alphas_fields[ i ];
 			if ( field == "name" ) {
 				Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
-				if ( present( AlphaBlank ) )
-					AlphaBlank()( i +
-					              1 ) = obj.key().empty();
+				if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = obj.key().empty();
 				if ( present( AlphaFieldNames ) ) AlphaFieldNames()( i + 1 ) = field;
 				NumAlphas++;
 				continue;
@@ -1085,8 +1064,7 @@ namespace EnergyPlus {
 				}
 				NumAlphas++;
 			} else {
-				Alphas( i +
-				        1 ) = "";
+				Alphas( i + 1 ) = "";
 				if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = true;
 			}
 			if ( present( AlphaFieldNames ) ) AlphaFieldNames()( i + 1 ) = field;
@@ -1095,7 +1073,7 @@ namespace EnergyPlus {
 		if ( object_in_schema->at( "legacy_idd" )[ "alphas" ].find( "extensions" ) !=
 		     object_in_schema->at( "legacy_idd" )[ "alphas" ].end() ) {
 			auto const & alphas_extensions = object_in_schema->at( "legacy_idd" )[ "alphas" ][ "extensions" ];
-			auto const extensions = obj.value()[ "extensions" ];
+			auto const & extensions = obj.value()[ "extensions" ];
 			int alphas_index = alphas_fields.size();
 			for ( auto it = extensions.begin(); it != extensions.end(); ++it ) {
 				auto const extension_obj = it.value();
@@ -1170,7 +1148,7 @@ namespace EnergyPlus {
 		if ( object_in_schema->at( "legacy_idd" )[ "numerics" ].find( "extensions" ) !=
 		     object_in_schema->at( "legacy_idd" )[ "numerics" ].end() ) {
 			auto const & numerics_extensions = object_in_schema->at( "legacy_idd" )[ "numerics" ][ "extensions" ];
-			auto const extensions = obj.value()[ "extensions" ];
+			auto const & extensions = obj.value()[ "extensions" ];
 			int numerics_index = numerics_fields.size();
 			for ( auto it = extensions.begin(); it != extensions.end(); ++it ) {
 				auto const extension_obj = it.value();
@@ -1184,7 +1162,7 @@ namespace EnergyPlus {
 						} else {
 							if ( val.get < std::string >().empty() ) {
 								auto const & schema_obj = object_in_schema->at(
-								"patternProperties" )[ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field ]; // TODO make this account for special casing of Version like objects
+								"patternProperties" )[ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field ];
 								if ( schema_obj.find( "default" ) != schema_obj.end() ) {
 									if ( schema_obj[ "default" ].is_string() ) Numbers( numerics_index + 1 ) = -99999;
 									else Numbers( numerics_index + 1 ) = schema_obj[ "default" ].get < double >();
@@ -1199,9 +1177,9 @@ namespace EnergyPlus {
 						}
 						NumNumbers++;
 					} else {
-						auto const pattern_props = object_in_schema->find( "patternProperties" );
+						auto const & pattern_props = object_in_schema->find( "patternProperties" );
 						if ( pattern_props != object_in_schema->end() ) {
-							auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
+							auto const & field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
 							if ( field_in_schema.find( field ) != field_in_schema.end() ) {
 								if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
 									auto const default_val = field_in_schema[ field ][ "default" ];
@@ -1223,15 +1201,12 @@ namespace EnergyPlus {
 						} else if ( object_in_schema->find( "properties" ) != object_in_schema->end() ) {
 							if ( object_in_schema->at( "properties" )[ field ].find( "default" ) !=
 							     object_in_schema->at( "properties" )[ field ].end() ) {
-								Numbers( numerics_index + 1 ) = object_in_schema->at(
-								"properties" )[ field ][ "default" ].get < double >();
+								Numbers( numerics_index + 1 ) = object_in_schema->at( "properties" )[ field ][ "default" ].get < double >();
 							} else {
 								Numbers( numerics_index + 1 ) = 0;
 							}
 						}
-						if ( present( NumBlank ) )
-							NumBlank()(
-							numerics_index + 1 ) = true; // TODO same issue, we don't know if this is correct
+						if ( present( NumBlank ) ) NumBlank()( numerics_index + 1 ) = true;
 					}
 					if ( present( NumericFieldNames ) ) NumericFieldNames()( numerics_index + 1 ) = field;
 					numerics_index++;
