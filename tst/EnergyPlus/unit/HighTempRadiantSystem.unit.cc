@@ -81,7 +81,7 @@ using namespace EnergyPlus::DataSurfaces;
 
 namespace EnergyPlus {
 	
-	TEST_F( EnergyPlusFixture, GetHighTempRadiantSystem )
+	TEST_F( EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem )
 	{
 
 		bool ErrorsFound;

@@ -195,6 +195,9 @@ namespace HighTempRadiantSystem {
 	// Functions
 
 	void
+	clear_state();
+	
+	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep

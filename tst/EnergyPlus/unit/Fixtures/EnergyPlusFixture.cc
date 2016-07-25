@@ -135,6 +135,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
@@ -330,6 +331,7 @@ namespace EnergyPlus {
 		HeatPumpWaterToWaterSimple::clear_state();
 		HeatRecovery::clear_state();
 		HeatingCoils::clear_state();
+		HighTempRadiantSystem::clear_state();
 		Humidifiers::clear_state();
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
