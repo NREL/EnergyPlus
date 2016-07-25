@@ -1615,7 +1615,7 @@
     Continuous,              !- Lighting Control Type
     0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name
     180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}

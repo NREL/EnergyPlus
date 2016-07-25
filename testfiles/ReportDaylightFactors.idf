@@ -3894,7 +3894,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_bot_ZN_3_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     90,                      !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -3919,7 +3919,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_bot_ZN_2_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -3944,7 +3944,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_bot_ZN_1_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     270,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -3969,7 +3969,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_bot_ZN_4_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     0,                       !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -3994,7 +3994,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_mid_ZN_3_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     90,                      !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -4019,7 +4019,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_mid_ZN_2_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -4044,7 +4044,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_mid_ZN_1_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     270,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -4069,7 +4069,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_mid_ZN_4_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     0,                       !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -4094,7 +4094,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_top_ZN_3_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     90,                      !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -4119,7 +4119,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_top_ZN_2_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -4144,7 +4144,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_top_ZN_1_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     270,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
@@ -4169,7 +4169,7 @@
     Continuous,              !- Lighting Control Type
     0.0,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
     0.0,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
-    0,                       !- Number of Stepped Control Steps
+    ,                        !- Number of Stepped Control Steps
     1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
     Perimeter_top_ZN_4_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     0,                       !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}

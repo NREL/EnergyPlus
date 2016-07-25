@@ -21005,7 +21005,6 @@ Daylighting:Controls,
        \object-list ScheduleNames
   A5,  \field Lighting Control Type
        \required-field
-       \type integer
        \type choice
        \key Continuous
        \key Stepped
@@ -21024,6 +21023,7 @@ Daylighting:Controls,
   N3,  \field Number of Stepped Control Steps
        \note for Stepped Lighting Control Type, this field cannot be zero.
        \type integer
+       \minimum 1 
        \default 1
   N4,  \field Probability Lighting will be Reset When Needed in Manual Stepped Control
        \type real

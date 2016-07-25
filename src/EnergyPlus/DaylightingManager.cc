@@ -4347,7 +4347,6 @@ namespace DaylightingManager {
 		Real64 NewAspectRatio;
 		Array1D_bool ZoneMsgDone;
 
-		//*** NEED TO REFACTOR START (repeated in GetDaylightingControls)
 		CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
 		SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
 		// these are only for Building Rotation for Appendix G when using world coordinate system
@@ -4359,7 +4358,6 @@ namespace DaylightingManager {
 		NewAspectRatio = 1.0;
 
 		CheckForGeometricTransform(doTransform, OldAspectRatio, NewAspectRatio);
-		//*** NEED TO REFACTOR END
 
 		cCurrentModuleObject = "Output:IlluminanceMap";
 		TotIllumMaps = GetNumObjectsFound(cCurrentModuleObject);
@@ -4468,11 +4466,9 @@ namespace DaylightingManager {
 		for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
 			if (IllumMap(MapNum).Zone > 0) {
 				auto & zone(Zone(IllumMap(MapNum).Zone));
-				//*** NEED TO REFACTOR START (repeated in GetDaylightingControls)
 				// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
 				CosZoneRelNorth = std::cos(-zone.RelNorth * DegToRadians);
 				SinZoneRelNorth = std::sin(-zone.RelNorth * DegToRadians);
-				// *** NEED TO REFACTOR END
 				if (IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum > 0) {
 					// Add additional daylighting reference points for map
 					AddMapPoints = IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum;
