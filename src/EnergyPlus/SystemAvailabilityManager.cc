@@ -194,6 +194,7 @@ namespace SystemAvailabilityManager {
 	bool GetAvailMgrInputFlag( true ); // First time, input is "gotten"
 	bool GetHybridInputFlag( true ); // Flag set to make sure you get input once
 	int NumOptStartSysAvailMgrs( 0 );
+	bool BeginOfDayResetFlag( true );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -248,6 +249,7 @@ namespace SystemAvailabilityManager {
 		OptStartSysAvailMgrData.deallocate();
 		ASHRAEOptSCoeffCooling.deallocate();
 		ASHRAEOptSCoeffHeating.deallocate();
+		BeginOfDayResetFlag = true;
 	}
 
 	void
@@ -2292,10 +2294,10 @@ namespace SystemAvailabilityManager {
 		Real64 TempDiff;
 		Real64 TempDiffHi;
 		Real64 TempDiffLo;
-		static bool FirstTimeATGFlag( true );
-		static bool OverNightStartFlag( false ); // Flag to indicate the optimum start starts before mid night.
+		bool FirstTimeATGFlag( true );
+		bool OverNightStartFlag( false ); // Flag to indicate the optimum start starts before mid night.
 		bool CycleOnFlag( false );
-		static bool OSReportVarFlag( true );
+		bool OSReportVarFlag( true );
 		int NumPreDays;
 		int NumOfZonesInList;
 		static Array1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
@@ -2365,11 +2367,17 @@ namespace SystemAvailabilityManager {
 				OptStartData.OccStartTime.allocate( NumOfZones );
 			}
 			if ( ! allocated( OptStartData.ActualZoneNum ) ) OptStartData.ActualZoneNum.allocate( NumOfZones );
+
+			// reset OptStartData once per beginning of day
 			if ( BeginDayFlag ) {
 				NumHoursBeforeOccupancy = 0.0; //Initialize the hours of optimum start period. This variable is for reporting purpose.
-				OptStartData.OccStartTime = 22.99; //initialize the zone occupancy start time
-				OptStartData.OptStartFlag = false;
+				if ( BeginOfDayResetFlag ) {
+					OptStartData.OccStartTime = 22.99; //initialize the zone occupancy start time
+					OptStartData.OptStartFlag = false;
+					BeginOfDayResetFlag = false;
+				}
 			}
+			if ( !BeginDayFlag ) BeginOfDayResetFlag = true;
 
 			GetScheduleValuesForDay( ScheduleIndex, DayValues );
 			GetScheduleValuesForDay( ScheduleIndex, DayValuesTmr, TmrJDay, TmrDayOfWeek );
@@ -2858,8 +2866,8 @@ namespace SystemAvailabilityManager {
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
 						AdaTempGradTrdHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
 						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
+						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
+						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
