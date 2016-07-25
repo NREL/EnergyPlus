@@ -2283,6 +2283,24 @@ namespace HeatBalanceAirManager {
 					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 				}
 			}
+			if ( CrossMixing( Loop ).FromZone > 0 ) {
+				if ( RepVarSet( CrossMixing( Loop ).FromZone ) ) {
+					RepVarSet( CrossMixing( Loop ).FromZone ) = false;
+					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+				}
+			}
+
+
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "ZoneCrossMixing", CrossMixing( Loop ).Name, "Air Exchange Flow Rate", "[m3/s]", CrossMixing( Loop ).EMSSimpleMixingOn, CrossMixing( Loop ).EMSimpleMixingFlowRate );
 			}
