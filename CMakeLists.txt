@@ -182,6 +182,7 @@ if( BUILD_TESTING )
   endif()
 endif()
 
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "${EnergyPlus_SOURCE_DIR}/scripts/dev/generate_jdd_schema/generate_jdd.py" "${EnergyPlus_SOURCE_DIR}")
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
 configure_file( idd/Energy+.jdd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.jdd" )
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
