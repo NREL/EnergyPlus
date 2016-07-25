@@ -3151,8 +3151,7 @@ Schedule:Compact,
     For: Weekdays SummerDesignDay, !- Field 2
     Until: 24:00,1.0,        !- Field 3
     For: AllOtherDays,       !- Field 4
-    Until: 24:00,0.0;        !- Field 5
-
+    Until: 24:00,0.0;        !- Field 5
 ! Off Peak Energy Period, all hours except 9 a.m. to 10 p.m., Weekdays (Chicago ComEd, Rate 6 TOU)
 
   Schedule:Compact,

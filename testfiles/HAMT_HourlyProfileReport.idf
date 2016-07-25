@@ -1090,28 +1090,28 @@
 !-   ===========  ALL OBJECTS IN CLASS: OTHEREQUIPMENT ===========
 
   OtherEquipment,
-    latent,                !- Name
-    None,                  !- Fuel Type
-    Test room,             !- Zone or ZoneList Name
-    Moisture on,           !- Schedule Name
-    EquipmentLevel,        !- Design Level Calculation Method
-    352.6,                 !- Design Level {W}
-    ,                      !- Power per Zone Floor Area {W/m2}
-    ,                      !- Power per Person {W/Person}
-    1,                     !- Fraction Latent
-    0,                     !- Fraction Radiant
+    latent,                  !- Name
+    Test room,               !- Zone or ZoneList Name
+    Moisture on,             !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    352.6,                   !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/Person}
+    1,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
 
   OtherEquipment,
-    Other,                 !- Name
-    None,                  !- Fuel Type
-    Test room,             !- Zone or ZoneList Name
-    On,                    !- Schedule Name
-    EquipmentLevel,        !- Design Level Calculation Method
-    800,                   !- Design Level {W}
-    ,                      !- Power per Zone Floor Area {W/m2}
-    ,                      !- Power per Person {W/Person}
-    0,                     !- Fraction Latent
-    0,                     !- Fraction Radiant
+    Other,                   !- Name
+    Test room,               !- Zone or ZoneList Name
+    On,                      !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    800,                     !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/Person}
+    0,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION:DESIGNFLOWRATE ===========
 

@@ -722,28 +722,28 @@
     DISCRETE;                !- Numeric Type
 
   OtherEquipment,
-    Test 352a,             !- Name
-    None,                  !- Fuel Type
-    ZONE ONE,              !- Zone or ZoneList Name
-    AlwaysOn,              !- Schedule Name
-    EquipmentLevel,        !- Design Level Calculation Method
-    352,                   !- Design Level {W}
-    ,                      !- Power per Zone Floor Area {W/m2}
-    ,                      !- Power per Person {W/Person}
-    0,                     !- Fraction Latent
-    0,                     !- Fraction Radiant
+    Test 352a,               !- Name
+    ZONE ONE,                !- Zone or ZoneList Name
+    AlwaysOn,                !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    352,                     !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/Person}
+    0,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
 
   OtherEquipment,
-    Test 352 minus,        !- Name
-    None,                  !- Fuel Type
-    ZONE ONE,              !- Zone or ZoneList Name
-    AlwaysOn,              !- Schedule Name
-    EquipmentLevel,        !- Design Level Calculation Method
-    -352,                  !- Design Level {W}
-    ,                      !- Power per Zone Floor Area {W/m2}
-    ,                      !- Power per Person {W/Person}
-    0,                     !- Fraction Latent
-    0,                     !- Fraction Radiant
+    Test 352 minus,          !- Name
+    ZONE ONE,                !- Zone or ZoneList Name
+    AlwaysOn,                !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    -352,                    !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/Person}
+    0,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
 
   Schedule:Constant,AlwaysOn,On/Off,1.0;
 
