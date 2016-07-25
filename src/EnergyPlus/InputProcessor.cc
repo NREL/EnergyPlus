@@ -129,11 +129,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 				}
 			}
 			if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
-				if ( name.empty() ) {
-					name = obj_name + " " + std::to_string( root[ obj_name ].size() + 1 );
-				} else {
-					name = name + "_special_case_" + std::to_string( root[ obj_name ].size() + 1 );
-				}
+                name = obj_name + " " + std::to_string( root[ obj_name ].size() + 1 );
 			}
 			root[ obj_name ][ name ] = obj;
 		}
@@ -147,7 +143,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	json root, extensible = json::object();
 	json array_of_extensions = json::array();
 	Token token;
-	index += 1; // move index past the comma of the EnergyPlus Object Type
+	index += 1;
 	int legacy_idd_index = 0, extensible_index = 0;
 	success = true;
 	bool was_value_parsed = false;
@@ -181,20 +177,10 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			was_value_parsed = false;
 			next_token( idf, index );
 			if ( token == Token::SEMICOLON ) {
-//                for (int i = legacy_idd_index; i < loc["fields"].size(); i++) {
-//                    std::string name = loc["fields"][i];
-//                    add_missing_field_value(name, root, extensible, obj_loc, loc, legacy_idd_index);
-//                }
-				if ( loc.find( "extensibles" ) == loc.end() ) break;
-//                unsigned long ext_size = loc["extensibles"].size();
-//                if (extensible_index % ext_size == 0) break;
-//                while (extensible_index % ext_size) {
-//                    std::string name = loc["extensibles"][extensible_index % ext_size];
-//                    add_missing_field_value(name, root, extensible, obj_loc, loc, legacy_idd_index);
-//                    extensible_index++;
-//                }
-				if ( extensible.size() ) array_of_extensions.push_back( extensible );
-				extensible.clear();
+				if ( extensible.size() ) {
+					array_of_extensions.push_back( extensible );
+					extensible.clear();
+				}
 				break;
 			}
 		} else if ( token == Token::EXCLAMATION ) {
@@ -260,20 +246,11 @@ void IdfParser::add_missing_field_value( std::string & field_name, json & root, 
 	}
 	if ( tmp.find( field_name ) != tmp.end() ) {
 		auto const obj_field = tmp[ field_name ];
-//        if (obj_field.find("default") != obj_field.end()) {
-//            auto const default_val = obj_field["default"];
-//            if (default_val.is_string()) {
-//                if (!ext_size) root[field_name] = default_val.get<std::string>();
-//                else extensible[field_name] = default_val.get<std::string>();
-//            } else {
-//                if (!ext_size) root[field_name] = default_val.get<double>();
-//                else extensible[field_name] = default_val.get<double>();
-//            }
-//        } else {
-		if ( !ext_size ) root[ field_name ] = "";
-		else extensible[ field_name ] = "";
-		//  extensible[field_name] = "";
-//        }
+		if ( !ext_size ) {
+			root[ field_name ] = "";
+		} else {
+			extensible[ field_name ] = "";
+		}
 	}
 }
 
@@ -1059,15 +1036,10 @@ namespace EnergyPlus {
 		for ( int i = 0; i < alphas_fields.size(); ++i ) {
 			std::string const field = alphas_fields[ i ];
 			if ( field == "name" ) {
-				std::string name = obj.key();
-				if ( obj.key().find( "_special_case_" ) != std::string::npos ) {
-					name = obj.key().substr( 0, obj.key().size() -
-					                            ( obj.key().size() - obj.key().find_first_of( "_special_case_" ) ) );
-				}
-				Alphas( i + 1 ) = MakeUPPERCase( name );
+				Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
 				if ( present( AlphaBlank ) )
 					AlphaBlank()( i +
-					              1 ) = obj.key().empty();  // TODO is this what should be done? unit tests for the original input processor are needed
+					              1 ) = obj.key().empty();
 				if ( present( AlphaFieldNames ) ) AlphaFieldNames()( i + 1 ) = field;
 				NumAlphas++;
 				continue;
@@ -1114,7 +1086,7 @@ namespace EnergyPlus {
 				NumAlphas++;
 			} else {
 				Alphas( i +
-				        1 ) = "";  // this might be completely redundant bc this has already been taken care of during the input processing
+				        1 ) = "";
 				if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = true;
 			}
 			if ( present( AlphaFieldNames ) ) AlphaFieldNames()( i + 1 ) = field;
@@ -1173,7 +1145,7 @@ namespace EnergyPlus {
 				} else {
 					if ( it.value().get < std::string >().empty() ) {
 						auto const & schema_obj = object_in_schema->at(
-						"patternProperties" )[ ".*" ][ "properties" ][ field ]; // TODO make this account for special casing of Version like objects
+						"patternProperties" )[ ".*" ][ "properties" ][ field ];
 						if ( schema_obj.find( "default" ) != schema_obj.end() ) {
 							if ( schema_obj[ "default" ].is_string() ) Numbers( i + 1 ) = -99999;
 							else Numbers( i + 1 ) = schema_obj[ "default" ].get < double >();
@@ -1187,32 +1159,9 @@ namespace EnergyPlus {
 				}
 				NumNumbers++;
 			} else {
-				// TODO What to do if a numeric field is left blank?
-//                auto const pattern_props = object_in_schema->find("patternProperties");
-//                if (pattern_props != object_in_schema->end()) {
-//                    auto const field_in_schema = pattern_props.value()[".*"]["properties"];
-//                    if (field_in_schema.find(field) != field_in_schema.end()) {
-//                        if (field_in_schema[field].find("default") != field_in_schema[field].end()) {
-//                            auto const default_val = field_in_schema[field]["default"];
-//                            if (!default_val.is_string()) Numbers(i + 1) = default_val.get<double>();
-//                            else Numbers(i + 1) = -99999;  // autosize and autocalculate
-//                        } else {
-//                            Numbers(i + 1) = 0; // TODO this might not be ok at all, unit tests needed.
-//                        }
-//                    } else {
-//                        std::cout << "field " << field << " not found in object " << Object << std::endl;
-//                    }
-//                } else if (object_in_schema->find("properties") != object_in_schema->end()) {
-//                    if (object_in_schema->at("properties")[field].find("default") !=
-//                        		object_in_schema->at("properties")[field].end()) {
-//                        Numbers(i + 1) = object_in_schema->at("properties")[field]["default"].get<double>();
-//                    } else {
-//                        Numbers(i + 1) = 0;
-//                    }
-//                }
 				Numbers( i + 1 ) = 0;
 				if ( present( NumBlank ) )
-					NumBlank()( i + 1 ) = true; // TODO AHHH IS IT CONSIDERED BLANK STILL? unit tests needed
+					NumBlank()( i + 1 ) = true;
 			}
 			if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 ) = field;
 		}
@@ -1289,44 +1238,6 @@ namespace EnergyPlus {
 				}
 			}
 		}
-
-//		auto const &numerics_extensions = object_in_schema[ "legacy_idd" ][ "numerics" ][ "extensions" ];
-//		for (int i = numerics_fields.size(); i < numerics_fields.size() + numerics_extensions.size(); ++i) {
-//			std::string const field = numerics_extensions[i];
-//			auto it = obj.value().find(field);
-//			if ( it != obj.value().end() ) {
-//				if (!it.value().is_string()) Numbers( i + 1 ) = it.value().get<double>();
-//				else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
-//				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = false;
-//				NumNumbers++;
-//			} else {
-//				// TODO What to do if a numeric field is left blank?
-//				auto const pattern_props = object_in_schema.find( "patternProperties" );
-//				if (pattern_props != object_in_schema.end()) {
-//					auto const field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
-//					if ( field_in_schema.find( field ) != field_in_schema.end() ) {
-//						if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
-//							auto const default_val = field_in_schema[ field ][ "default" ];
-//							if (!default_val.is_string()) Numbers( i + 1 ) = default_val.get<double>();
-//							else Numbers( i + 1 ) = -99999;  // autosize and autocalculate
-//						} else {
-//							Numbers ( i + 1 ) = -99999;
-//						}
-//					} else {
-//						std::cout << "field " << field << " not found in object " << Object << std::endl;
-//					}
-//				} else if ( object_in_schema.find( "properties" ) != object_in_schema.end() ) {
-//					if ( object_in_schema[ "properties" ][ field ].find("default") != object_in_schema["properties"][field].end()) {
-//						Numbers( i + 1 ) = object_in_schema[ "properties" ][ field ][ "default" ].get< double >();
-//					} else {
-//						Numbers( i + 1 ) = -99999;
-//					}
-//				}
-////			Numbers( i + 1 ) = -99999;
-//				if ( present( NumBlank ) ) NumBlank()( i + 1 ) = true;
-//			}
-//			if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 )= field;
-//		}
 
 		Status = 1;
 	}

@@ -369,9 +369,9 @@
 !      years
 ! **************************************************************************
 
-Lead Input;
+! Lead Input;
 
-Simulation Data;
+! Simulation Data;
 
 \group Simulation Parameters
 
@@ -2325,6 +2325,7 @@ Site:SpectrumData,
       \memo Spectrum Data Type is followed by up to 107 sets of normal-incidence measured values of
       \memo [wavelength, spectrum] for wavelengths covering the solar (0.25 to 2.5 microns) or visible
       \memo spectrum (0.38 to 0.78 microns)
+      \extensible:2
   A1, \field Name
       \required-field
       \type alpha
@@ -2345,6 +2346,7 @@ Site:SpectrumData,
   N4, \field Spectrum
       \type real
   N5, \field Wavelength
+      \begin-extensible
       \type real
       \units micron
   N6, \field Spectrum
@@ -3189,6 +3191,7 @@ Schedule:Day:Interval,
 Schedule:Day:List,
       \memo Schedule:Day:List will allow the user to list 24 hours worth of values, which can be sub-hourly in nature.
       \min-fields 5
+      \extensible:1
   A1 , \field Name
        \required-field
        \type alpha
@@ -3211,6 +3214,7 @@ Schedule:Day:List,
        \minimum 1
        \maximum 60
   N2,  \field Value 1
+       \begin-extensible
        \default 0.0
         N3,N4,         N5,N6,N7,N8,         N9,N10,N11,N12,      N13,N14,N15,N16,     N17,N18,N19,N20, \note fields as indicated
   N21,N22,N23,N24,     N25,N26,N27,N28,     N29,N30,N31,N32,     N33,N34,N35,N36,     N37,N38,N39,N40, \note fields as indicated
@@ -3372,6 +3376,7 @@ Schedule:Week:Compact,
        \required-field
        \type choice
        \key AllDays
+       \key AllOtherDays
        \key Weekdays
        \key Weekends
        \key Sunday
@@ -3392,6 +3397,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A4 , \field DayType List 2
        \type choice
+       \key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3412,6 +3418,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A6 , \field DayType List 3
        \type choice
+       \Key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3432,6 +3439,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A8 , \field DayType List 4
        \type choice
+       \Key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -3452,6 +3460,7 @@ Schedule:Week:Compact,
        \object-list DayScheduleNames
   A10, \field DayType List 5
        \type choice
+       \Key AllDays
        \key AllOtherDays
        \key Weekdays
        \key Weekends
@@ -8131,6 +8140,7 @@ MaterialProperty:GlazingSpectralData,
        \memo [wavelength, transmittance, front reflectance, back reflectance] for wavelengths
        \memo covering the solar spectrum (from about 0.25 to 2.5 microns)
        \format Spectral
+       \extensible:4
   A1,  \field Name
        \required-field
        \reference SpectralDataSets
@@ -8159,6 +8169,7 @@ MaterialProperty:GlazingSpectralData,
   N15, \field Front Reflectance 4
   N16, \field Back Reflectance 4
   N17, \field Wavelength 5
+       \begin-extensible
        \type real
        \units micron
   N18, \field Transmittance 5
@@ -15987,7 +15998,6 @@ SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
        \memo EMPD (Effective Moisture Penetration Depth with Conduction Transfer Functions).
        \memo Advanced/Research Usage: CondFD (Conduction Finite Difference)
        \memo Advanced/Research Usage: HAMT (Combined Heat And Moisture Finite Element)
-       \min-fields 3
   A1 , \field Name
        \required-field
        \type alpha
@@ -24047,6 +24057,7 @@ AirflowNetwork:Distribution:Component:Coil,
       \required-field
       \type choice
       \key Coil:Cooling:DX:SingleSpeed
+      \key Coil:Cooling:DX:TwoSpeed
       \key Coil:Heating:Gas
       \key Coil:Heating:Electric
       \key Coil:Heating:DX:SingleSpeed
@@ -24413,6 +24424,7 @@ Exterior:FuelEquipment,
   A2 , \field Fuel Use Type
        \required-field
        \type choice
+       \key Water
        \key Electricity
        \key NaturalGas
        \key PropaneGas
@@ -39882,6 +39894,9 @@ ZoneHVAC:AirDistributionUnit,
        \key AirTerminal:DualDuct:ConstantVolume
        \key AirTerminal:DualDuct:VAV
        \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+       \key AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
+       \key AirTerminal:SingleDuct:InletSideMixer
+       \key AirTerminal:SingleDuct:SupplySideMixer
        \key AirTerminal:SingleDuct:VAV:Reheat
        \key AirTerminal:SingleDuct:VAV:NoReheat
        \key AirTerminal:SingleDuct:SeriesPIU:Reheat
@@ -39939,6 +39954,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -39985,6 +40001,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40027,6 +40044,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40069,6 +40087,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40111,6 +40130,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40153,6 +40173,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40195,6 +40216,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40237,6 +40259,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40279,6 +40302,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40321,6 +40345,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40363,6 +40388,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40405,6 +40431,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40447,6 +40474,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40489,6 +40517,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40531,6 +40560,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40573,6 +40603,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40615,6 +40646,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -40657,6 +40689,7 @@ ZoneHVAC:EquipmentList,
        \key AirTerminal:SingleDuct:Uncontrolled
        \key ZoneHVAC:EnergyRecoveryVentilator
        \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:ForcedAir:UserDefined
        \key ZoneHVAC:FourPipeFanCoil
        \key ZoneHVAC:OutdoorAirUnit
        \key ZoneHVAC:PackagedTerminalAirConditioner
@@ -54194,7 +54227,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo Temperature Control
        \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
        \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-       \extensible:3 - repeat last three fields, remembering to remove ; from "inner" fields.
+       \extensible:3
        \min-fields 11
   A1 , \field Heat Pump Name
        \required-field
@@ -54575,7 +54608,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \memo This is a key object in the new physics based VRF Heat Recovery (HR) model applicable for Fluid
        \memo Temperature Control. It describes the VRF HR system excluding the performance of indoor units.
        \memo Indoor units are modeled separately in the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-       \extensible:3 repeat last three fields (changing numbering, please), remembering to remove ";" from "inner" fields.
+       \extensible:3
        \min-fields 11
   A1 , \field Name
        \required-field
@@ -67407,7 +67440,7 @@ WaterHeater:HeatPump:PumpedCondenser,
        \note proportional to the schedule value (i.e. 0.4 = 40% outdoor air, 60% zone air).
   A29, \field Tank Element Control Logic
        \type choice
-       \key MutuallyExlcusive
+       \key MutuallyExclusive
        \key Simultaneous
        \default Simultaneous
        \note MutuallyExclusive means that once the tank heating element is active the
@@ -70158,6 +70191,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A3 , \field Control Scheme 1 Name
        \required-field
@@ -70173,6 +70207,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A6 , \field Control Scheme 2 Name
        \type object-list
@@ -70186,6 +70221,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A9 , \field Control Scheme 3 Name
        \type object-list
@@ -70199,6 +70235,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A12, \field Control Scheme 4 Name
        \type object-list
@@ -70212,6 +70249,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A15, \field Control Scheme 5 Name
        \type object-list
@@ -70225,6 +70263,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A18, \field Control Scheme 6 Name
        \type object-list
@@ -70238,6 +70277,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A21, \field Control Scheme 7 Name
        \type object-list
@@ -70251,6 +70291,7 @@ PlantEquipmentOperationSchemes,
        \key PlantEquipmentOperation:HeatingLoad
        \key PlantEquipmentOperation:Uncontrolled
        \key PlantEquipmentOperation:ComponentSetpoint
+       \key PlantEquipmentOperation:ThermalEnergyStorage
        \key PlantEquipmentOperation:UserDefined
   A24, \field Control Scheme 8 Name
        \type object-list
@@ -71981,6 +72022,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A3 , \field Availability Manager 1 Name
        \required-field
        \type object-list
@@ -71997,6 +72039,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A5 , \field Availability Manager 2 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -72012,6 +72055,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A7 , \field Availability Manager 3 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -72027,6 +72071,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A9 , \field Availability Manager 4 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -72042,6 +72087,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A11, \field Availability Manager 5 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -72057,6 +72103,7 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
   A13; \field Availability Manager 6 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -81527,10 +81574,12 @@ Curve:CubicLinear,
   A2,  \field Input Unit Type for X
        \type choice
        \key Dimensionless
+       \key Temperature
        \default Dimensionless
   A3,  \field Input Unit Type for Y
        \type choice
        \key Dimensionless
+       \key Temperature
        \default Dimensionless
   A4;  \field Output Unit Type
        \type choice
@@ -83549,7 +83598,7 @@ FluidProperties:Temperatures,
 FluidProperties:Saturated,
       \memo fluid properties for the saturated region
       \format FluidProperty
-  A1, \field Name
+  A1, \field Fluid Name
       \type object-list
       \object-list FluidNames
   A2, \field Fluid Property Type
@@ -83558,16 +83607,16 @@ FluidProperties:Saturated,
       \note SpecificHeat Units are J/kg-K
       \note Pressure Units are Pa
       \type choice
-      \key Enthalpy     ! Units are J/kg
-      \key Density      ! Units are kg/m3
-      \key SpecificHeat ! Units are J/kg-K
-      \key Pressure     ! Units are Pa
+      \key Enthalpy
+      \key Density
+      \key SpecificHeat
+      \key Pressure
   A3, \field Fluid Phase
       \note Fluid=saturated fluid
       \note FluidGas=saturated vapor
       \type choice
-      \key Fluid        ! saturated fluid
-      \key FluidGas     ! saturated vapor
+      \key Fluid
+      \key FluidGas
   A4, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -84333,8 +84382,8 @@ FluidProperties:Superheated,
       \note Enthalpy Units are J/kg
       \note Density Units are kg/m3
       \type choice
-      \key Enthalpy     ! Units are J/kg
-      \key Density      ! Units are kg/m3
+      \key Enthalpy
+      \key Density
   A3, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -85108,10 +85157,10 @@ FluidProperties:Concentration,
       \note Conductivity Units are W/m-K
       \note Viscosity Units are N-s/m2
       \type choice
-      \key Density      ! Units are kg/m3
-      \key SpecificHeat ! Units are J/kg-K
-      \key Conductivity ! Units are W/m-K
-      \key Viscosity    ! Units are N-s/m2
+      \key Density
+      \key SpecificHeat
+      \key Conductivity
+      \key Viscosity
   A3, \field Temperature Values Name
       \note Enter the name of a FluidProperties:Temperatures object.
       \type object-list
@@ -97185,7 +97234,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A6, \field Variable or Meter or EMS Variable or Field 2 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A7, \field Aggregation Type for Variable or Meter 2
@@ -97212,7 +97260,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A8, \field Variable or Meter or EMS Variable or Field 3 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A9, \field Aggregation Type for Variable or Meter 3
@@ -97239,7 +97286,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A10,\field Variable or Meter or EMS Variable or Field 4 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A11,\field Aggregation Type for Variable or Meter 4
@@ -97266,7 +97312,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A12,\field Variable or Meter or EMS Variable or Field 5 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A13,\field Aggregation Type for Variable or Meter 5
@@ -97293,7 +97338,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A14,\field Variable or Meter or EMS Variable or Field 6 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A15,\field Aggregation Type for Variable or Meter 6
@@ -97320,7 +97364,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A16,\field Variable or Meter or EMS Variable or Field 7 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A17,\field Aggregation Type for Variable or Meter 7
@@ -97347,7 +97390,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A18,\field Variable or Meter or EMS Variable or Field 8 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A19,\field Aggregation Type for Variable or Meter 8
@@ -97374,7 +97416,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A20,\field Variable or Meter or EMS Variable or Field 9 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A21,\field Aggregation Type for Variable or Meter 9
@@ -97401,7 +97442,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A22,\field Variable or Meter or EMS Variable or Field 10 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A23,\field Aggregation Type for Variable or Meter 10
@@ -97428,7 +97468,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A24,\field Variable or Meter or EMS Variable or Field 11 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A25,\field Aggregation Type for Variable or Meter 11
@@ -97455,7 +97494,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A26,\field Variable or Meter or EMS Variable or Field 12 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A27,\field Aggregation Type for Variable or Meter 12
@@ -97482,7 +97520,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A28,\field Variable or Meter or EMS Variable or Field 13 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A29,\field Aggregation Type for Variable or Meter 13
@@ -97509,7 +97546,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A30,\field Variable or Meter or EMS Variable or Field 14 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A31,\field Aggregation Type for Variable or Meter 14
@@ -97536,7 +97572,6 @@ Output:Table:Annual,
        \minimum 0
        \maximum 10
    A32,\field Variable or Meter or EMS Variable or Field 15 Name
-       \begin-extensible
        \type external-list
        \external-list autoRDDvariableMeter
    A33,\field Aggregation Type for Variable or Meter 15
@@ -97660,7 +97695,7 @@ Output:Meter,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1 , \field Name
+  A1 , \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -97674,6 +97709,7 @@ Output:Meter,
        \note RunPeriod, Environment, and Annual are the same
        \key Hourly
        \key Daily
+       \key Detailed
        \key Monthly
        \key RunPeriod
        \key Environment
@@ -97687,7 +97723,7 @@ Output:Meter:MeterFileOnly,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1,  \field Name
+  A1,  \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -97715,7 +97751,7 @@ Output:Meter:Cumulative,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1,  \field Name
+  A1,  \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -97743,7 +97779,7 @@ Output:Meter:Cumulative:MeterFileOnly,
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
        \format singleLine
-  A1,  \field Name
+  A1,  \field Key Name
        \required-field
        \type external-list
        \external-list autoRDDmeter
@@ -97917,6 +97953,7 @@ Output:EnvironmentalImpactFactors,
        \key Hourly
        \key Daily
        \key Monthly
+       \key Annual
        \key RunPeriod
 
 EnvironmentalImpactFactors,
