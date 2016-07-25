@@ -38,22 +38,20 @@ Though only one ``trigger'' value is selected from this screen, consecutive valu
 
 An excerpt from the audit file is illustrative:
 
+\begin{lstlisting}
 Average Delta DB Change = 0.78°C ; Std Dev = 0.83°C
 
 Average Delta DP Change = 0.68°C ; Std Dev = 0.78°C
 
-Average Delta Relative Humidity Change = 4.02\% ; Std Dev = 4.22\%
+Average Delta Relative Humidity Change = 4.02% ; Std Dev = 4.22%
 
 Average Delta Wind Speed Change = 0.91m/s ; Std Dev = 0.88m/s
 
 Hourly Dry Bulb temperature change trigger = minimum of 12.13°C and 10.°C
 
-\begin{lstlisting}
- 12.13°C = calculated trigger based on mean change in dry-bulb temperature and standard deviation shown above
-\end{lstlisting}
+12.13°C = calculated trigger based on mean change in dry-bulb temperature and standard deviation shown above
 
-\begin{lstlisting}
- 10.°C = trigger set by user
+10.°C = trigger set by user
 \end{lstlisting}
 
 Here the calculated DB trigger would be 12.13°C, but the user chosen trigger is 10°C. Changes \textgreater{} = 10°C will be reported.

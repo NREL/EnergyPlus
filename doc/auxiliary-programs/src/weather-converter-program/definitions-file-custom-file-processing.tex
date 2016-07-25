@@ -1,6 +1,6 @@
 \section{Definitions File \& Custom File Processing}\label{definitions-file-custom-file-processing}
 
-\subsection{\texorpdfstring{Description of ``Def'' input file}{Description of Def input file}}\label{description-of-def-input-file}
+\subsection{Description of ``Def'' input file}\label{description-of-def-input-file}
 
 Some of the data formats have inherent omissions (e.g.~TMY does not have location data, BLAST ASCII does not have elevations). In order to overcome this limitation and to provide further flexibility, a definitions file (extension must be .def) is implemented. By naming this with the same ``file name'' as your input file (in the same folder), the weather converter will read the format and use that data, as appropriate, in the file conversions. The .def file uses Fortran ``Namelist'' input fields as shown in the example below. For flexibility, you can also define a ``presets.def'' file (such as when you have a list of files to process and the format or some portion is all the same between the group of files. The two def files (one named the same as the file name for the raw data and one named presets.def) will both be processed. Conflicts between the two will be shown in the .audit file. The set of namelist groups is:
 
@@ -192,7 +192,7 @@ Custom or User & Custom Data File \tabularnewline
 
 This field can be used to specify multi-interval (per hour) files. Without this field, the only formats that can have multiple intervals per hour are the EPW and CSV file formats - using the header record DataPeriods value for that field.
 
-\subsubsection{\texorpdfstring{Fields below only used in ``Custom'' format processing}{Fields below only used in Custom format processing}}\label{fields-below-only-used-in-custom-format-processing}
+\subsubsection{Fields below only used in ``Custom'' format processing}\label{fields-below-only-used-in-custom-format-processing}
 
 \subsubsection{Field: DataElements}\label{field-dataelements}
 
