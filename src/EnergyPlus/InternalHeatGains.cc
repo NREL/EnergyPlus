@@ -152,6 +152,7 @@ namespace InternalHeatGains {
 	int const ITEInletRoomAirModel( 2 );
 
 	bool GetInternalHeatGainsInputFlag( true ); // Controls the GET routine calling (limited to first time)
+	bool ErrorsFound( false ); // if errors were found in the input
 
 	static std::string const BlankString;
 
@@ -169,6 +170,7 @@ namespace InternalHeatGains {
 	clear_state()
 	{
 		GetInternalHeatGainsInputFlag = true;
+		ErrorsFound = false;
 	}
 
 	void
@@ -283,7 +285,6 @@ namespace InternalHeatGains {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string AlphaName;
-		static bool ErrorsFound( false ); // If errors found in input
 		bool IsNotOK; // Flag to verify name
 		Array1D< Real64 > IHGNumbers;
 		int IOStat;
