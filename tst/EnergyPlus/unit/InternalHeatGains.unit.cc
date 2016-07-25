@@ -234,7 +234,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
 		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
 		"   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
 		"   ...Summary of Errors that led to program termination:",
-		"   ..... Reference severe error count=2",
+		"   ..... Reference severe error count=1",
 		"   ..... Last severe error=GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1"
 	});
 
