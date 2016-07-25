@@ -7,7 +7,7 @@ def update_other_equipment_in_file(filename):
     with open(filename, 'rU') as f:
         input_file_lines = f.readlines()
 
-    linere = re.compile(r'^(\s*)(.*)([,;])\s*(?:!-\s*(.*))?')
+    linere = re.compile(r'^(\s*)(.*)([,;])(\s*)(?:!-\s*(.*))?')
 
     reading_otherequip_block = False
     with open(filename, 'w') as f:
@@ -17,7 +17,8 @@ def update_other_equipment_in_file(filename):
             if blockm:
                 block_whitespace = blockm.group(1)
                 reading_otherequip_block = True
-                whitespaces = []
+                max_comment_col = 0
+                leading_whitespaces = []
                 fields = []
                 comments = []
                 continue
@@ -31,31 +32,31 @@ def update_other_equipment_in_file(filename):
             if m is None:
                 continue
 
-            whitespace, value, delimeter, comment = m.groups()
-            whitespaces.append(whitespace)
+            leading_whitespace, value, delimeter, comment_whitespace, comment = m.groups()
+            max_comment_col = max(max_comment_col, sum(map(len, (leading_whitespace, value, delimeter, comment_whitespace))))
+            leading_whitespaces.append(leading_whitespace)
             fields.append(value)
             comments.append(comment)
 
             if delimeter == ';':
                 reading_otherequip_block = False
-                whitespaces.insert(1, whitespaces[0])
+                leading_whitespaces.insert(1, leading_whitespaces[0])
                 fields.insert(1, 'None')
                 comments.insert(1, 'Fuel Type')
                 newblock = '{}OtherEquipment,\n'.format(block_whitespace)
-                max_field_width = max([len(field) + len(whitespace) for field, whitespace in zip(fields, whitespaces)]) + 8
-                for i, (field, whitespace, comment) in enumerate(zip(fields, whitespaces, comments)[:-1]):
+                for i, (field, leading_whitespace, comment) in enumerate(zip(fields, leading_whitespaces, comments)):
                     if i == len(fields) - 1:
                         delim = ';'
                     else:
                         delim = ','
                     newblock += '{}{}{}'.format(
-                        whitespace,
+                        leading_whitespace,
                         field,
                         delim,
                     )
                     if comment is not None:
                         newblock += '{}!- {}'.format(
-                            ' ' * (max_field_width - (len(field) + len(whitespace))),
+                            ' ' * (max_comment_col - (len(field) + len(leading_whitespace) + 1)),
                             comment
                         )
                     newblock += '\n'
