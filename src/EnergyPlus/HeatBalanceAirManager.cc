@@ -1948,8 +1948,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( Mixing( Loop ).ZonePtr ) ) {
 					RepVarSet( Mixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
@@ -2271,8 +2271,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( CrossMixing( Loop ).ZonePtr ) ) {
 					RepVarSet( CrossMixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
@@ -2287,8 +2287,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( CrossMixing( Loop ).FromZone ) ) {
 					RepVarSet( CrossMixing( Loop ).FromZone ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
@@ -2483,8 +2483,8 @@ namespace HeatBalanceAirManager {
 					if ( RepVarSet( ZoneNumA ) ) {
 						RepVarSet( ZoneNumA ) = false;
 						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumA ).MixVolume, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumA ).MixMass, "System", "Sum", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumA ).MixMdot, "System", "Average", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumA ).MixHeatLoss, "System", "Sum", Zone( ZoneNumA ).Name );
@@ -2503,8 +2503,8 @@ namespace HeatBalanceAirManager {
 					if ( RepVarSet( ZoneNumB ) ) {
 						RepVarSet( ZoneNumB ) = false;
 						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumB ).MixVolume, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumB ).MixMass, "System", "Sum", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumB ).MixMdot, "System", "Average", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumB ).MixHeatLoss, "System", "Sum", Zone( ZoneNumB ).Name );
