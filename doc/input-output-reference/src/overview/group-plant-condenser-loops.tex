@@ -50,7 +50,7 @@ This numeric field contains the minimum loop flow rate in cubic meters per secon
 
 \paragraph{Field: Plant Loop Volume}\label{field-plant-loop-volume}
 
-Volume of the plant loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e.~both the demand side and the supply side. This is used for the loop capacitance calculation.. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The loop capacitance \textbf{autocalculate} option gives reasonable values for most system sizes. This calculation is described in the Engineering Reference manual.
+Volume of the plant loop in m\(^{3}\). This numeric field contains the loop volume for the entire loop, i.e.~both the demand side and the supply side. This is used for the loop capacitance calculation.. Loop volume (m\(^{3}\)) could be calculated from pipe size data but this is not usually known. If zero volume is specified the loop has no fluid heat capacity. If a very large capacitance is specified unrealistic time delay may result and there may be poor response to changes in loop setpoint temperature. The loop capacitance \textbf{autocalculate} option gives reasonable values for most system sizes. This calculation assumes a loop time of 2 minutes and uses the Maximum Loop Flow Rate to calculate the volume.
 
 \paragraph{Field: Plant Side Inlet Node Name}\label{field-plant-side-inlet-node-name}
 
