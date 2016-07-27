@@ -345,6 +345,10 @@ where
 \(\frac{du}{d\phi}\) = slope of moisture soprtion curve,
 \(a b \phi^{b-1} + c d \phi^{d-1}\)
 
+If this field is left blank or set to \texttt{autocalculate}, 
+the above equation will be used to calculate the surface layer penetration depth 
+assuming a $\tau_{surf}$ of one day.
+
 \paragraph{Field: Deep Layer Penetration
 	Depth}\label{field-deep-layer-penetration-depth}
 
@@ -362,6 +366,10 @@ estimated with the following equation:
 where each term is the same as the surface layer, except that the cycle
 period is different. This is usually on the order of weeks for the deep
 layer.
+
+If this field is left blank or set to \texttt{autocalculate}, 
+the above equation will be used to calculate the deep layer penetration depth 
+assuming a $\tau_{surf}$ of three weeks.
 
 \paragraph{Field: Coating Layer
 	Thickness}\label{field-coating-layer-thickness}
