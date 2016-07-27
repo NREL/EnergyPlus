@@ -1380,6 +1380,7 @@ namespace ChillerElectricEIR {
 		// Using/Aliasing
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::DoWeathSim;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
@@ -1609,7 +1610,7 @@ namespace ChillerElectricEIR {
 		}}
 		
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
 			
@@ -1776,19 +1777,6 @@ namespace ChillerElectricEIR {
 			QEvaporator = max( 0.0, ( EvapMassFlowRate * Cp * EvapDeltaTemp ) );
 			EvapOutletTemp = EvapOutletTempSetPoint;
 		}
-
-		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
-			//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
-			bool VarFlowFlag = ( ElectricEIRChiller( EIRChillNum ).FlowMode == LeavingSetPointModulated );
-			FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
-			//update corresponding variables at faulty case
-			PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
-			PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
-			ChillerPartLoadRatio = PartLoadRat;
-			EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
-		}
 		
 		//Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
 		if ( EvapOutletTemp < TempLowLimitEout ) {
@@ -1823,6 +1811,19 @@ namespace ChillerElectricEIR {
 				QEvaporator = 0.0;
 				EvapOutletTemp = Node( EvapInletNode ).Temp;
 			}
+		}
+
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+			//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+			bool VarFlowFlag = ( ElectricEIRChiller( EIRChillNum ).FlowMode == LeavingSetPointModulated );
+			FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+			//update corresponding variables at faulty case
+			PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+			PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+			ChillerPartLoadRatio = PartLoadRat;
+			EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 		}
 
 		// Checks QEvaporator on the basis of the machine limits.

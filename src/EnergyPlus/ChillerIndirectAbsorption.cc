@@ -1407,6 +1407,7 @@ namespace ChillerIndirectAbsorption {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
 		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::DoWeathSim;
 		using DataGlobals::WarmupFlag;
 		using CurveManager::CurveValue;
@@ -1566,7 +1567,7 @@ namespace ChillerIndirectAbsorption {
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 		
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
 			
@@ -1653,7 +1654,7 @@ namespace ChillerIndirectAbsorption {
 			} //End of Constant Variable Flow If Block
 
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
 				bool VarFlowFlag = ( IndirectAbsorber( ChillNum ).FlowMode == LeavingSetPointModulated );
@@ -1716,16 +1717,6 @@ namespace ChillerIndirectAbsorption {
 					QEvaporator = EvapMassFlowRate * CpFluid * EvapDeltaTemp;
 				}
 			}
-		
-			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
-				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
-				bool VarFlowFlag = false;
-				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
-				//update corresponding variables at faulty case
-				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
-			}
 
 			// Checks QEvaporator on the basis of the machine limits.
 			if ( QEvaporator > std::abs( MyLoad ) ) {
@@ -1737,6 +1728,16 @@ namespace ChillerIndirectAbsorption {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 		} //This is the end of the FlowLock Block
@@ -1768,7 +1769,7 @@ namespace ChillerIndirectAbsorption {
 			HeatInputfEvapTemp = 1.0;
 		}
 
-		//Calculate steam input ratio. Inlcude impact of generator and evaporator temperatures
+		//Calculate steam input ratio. Include impact of generator and evaporator temperatures
 		if ( IndirectAbsorber( ChillNum ).GeneratorInputCurvePtr > 0 ) {
 			HeatInputRat = CurveValue( IndirectAbsorber( ChillNum ).GeneratorInputCurvePtr, PartLoadRat ) * HeatInputfCondTemp * HeatInputfEvapTemp;
 		} else {

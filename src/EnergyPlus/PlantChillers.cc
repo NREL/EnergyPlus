@@ -4117,6 +4117,7 @@ namespace PlantChillers {
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -4342,7 +4343,7 @@ namespace PlantChillers {
 		}
 
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
 			
@@ -4470,7 +4471,7 @@ namespace PlantChillers {
 			} //End of Constant Variable Flow If Block
 
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = ( ElectricChiller( ChillNum ).Base.FlowMode == LeavingSetPointModulated );
@@ -4559,7 +4560,7 @@ namespace PlantChillers {
 			}
 		
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = false;
@@ -4703,6 +4704,7 @@ namespace PlantChillers {
 		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::DoWeathSim;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
@@ -4948,7 +4950,7 @@ namespace PlantChillers {
 		//*********************************
 
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
 			
@@ -5054,7 +5056,7 @@ namespace PlantChillers {
 			} //End of Constant Variable Flow If Block
 
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = ( EngineDrivenChiller( ChillerNum ).Base.FlowMode == LeavingSetPointModulated );
@@ -5145,7 +5147,7 @@ namespace PlantChillers {
 			}
 		
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = false;
@@ -5348,6 +5350,7 @@ namespace PlantChillers {
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -5583,7 +5586,7 @@ namespace PlantChillers {
 		//*********************************
 
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
 			
@@ -5687,7 +5690,7 @@ namespace PlantChillers {
 			} //End of Constant Variable Flow If Block
 
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = ( GTChiller( ChillerNum ).Base.FlowMode == LeavingSetPointModulated );
@@ -5772,7 +5775,7 @@ namespace PlantChillers {
 			}
 		
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = false;
@@ -6063,6 +6066,7 @@ namespace PlantChillers {
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -6136,7 +6140,7 @@ namespace PlantChillers {
 		}}
 
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
 			
@@ -6316,7 +6320,7 @@ namespace PlantChillers {
 			} //End of Constant or Variable Flow If Block for FlowLock = 0 (or making a flow request)
 
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = ( ConstCOPChiller( ChillNum ).Base.FlowMode == LeavingSetPointModulated );
@@ -6384,7 +6388,7 @@ namespace PlantChillers {
 			}
 		
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 				bool VarFlowFlag = false;

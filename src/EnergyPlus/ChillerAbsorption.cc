@@ -1279,6 +1279,7 @@ namespace ChillerAbsorption {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
@@ -1394,7 +1395,7 @@ namespace ChillerAbsorption {
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 		
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
 			
@@ -1459,7 +1460,7 @@ namespace ChillerAbsorption {
 			} //End of Constant Variable Flow If Block
 
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
 				bool VarFlowFlag = ( BLASTAbsorber( ChillNum ).FlowMode == LeavingSetPointModulated );
@@ -1522,16 +1523,6 @@ namespace ChillerAbsorption {
 					QEvaporator = EvapMassFlowRate * CpFluid * EvapDeltaTemp;
 				}
 			}
-		
-			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
-				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-				int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
-				bool VarFlowFlag = false;
-				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
-				//update corresponding variables at faulty case
-				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
-			}
 
 			// Checks QEvaporator on the basis of the machine limits.
 			if ( QEvaporator > std::abs( MyLoad ) ) {
@@ -1543,6 +1534,16 @@ namespace ChillerAbsorption {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 		} //This is the end of the FlowLock Block

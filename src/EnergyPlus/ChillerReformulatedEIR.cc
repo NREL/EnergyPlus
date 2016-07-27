@@ -1880,7 +1880,6 @@ namespace ChillerReformulatedEIR {
 		//    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::TimeStepSys;
 		using General::RoundSigDigits;
@@ -2074,7 +2073,7 @@ namespace ChillerReformulatedEIR {
 		}}
 		
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
 			
@@ -2220,7 +2219,7 @@ namespace ChillerReformulatedEIR {
 			} //End of Constant Variable Flow If Block
 
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 				bool VarFlowFlag = ( ElecReformEIRChiller( EIRChillNum ).FlowMode == LeavingSetPointModulated );
@@ -2285,7 +2284,7 @@ namespace ChillerReformulatedEIR {
 			}
 		
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( EvapMassFlowRate > 0 )){
+			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
 				int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 				bool VarFlowFlag = false;
