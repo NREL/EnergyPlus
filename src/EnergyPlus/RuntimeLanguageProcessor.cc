@@ -1562,31 +1562,31 @@ namespace RuntimeLanguageProcessor {
 						Token( NumTokens ).Operator = FuncTdbFnHW;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
-					} else if ( SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
-						Token( NumTokens ).Operator = FuncRhovFnTdbRh;
-						Token( NumTokens ).String = String.substr( Pos, 12 );
-						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 18 ), "@RhovFnTdbRhLBnd0C" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRhLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
+					} else if ( SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						Token( NumTokens ).Operator = FuncRhovFnTdbRh;
+						Token( NumTokens ).String = String.substr( Pos, 12 );
+						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 13 ), "@RhovFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
-					} else if ( SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
-						Token( NumTokens ).Operator = FuncRhFnTdbRhov;
-						Token( NumTokens ).String = String.substr( Pos, 12 );
-						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 18 ), "@RhFnTdbRhovLBnd0C" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhovLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
+					} else if ( SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						Token( NumTokens ).Operator = FuncRhFnTdbRhov;
+						Token( NumTokens ).String = String.substr( Pos, 12 );
+						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 11 ), "@RhFnTdbWPb" ) ) {
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbWPb;
