@@ -157,6 +157,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -193,6 +194,7 @@
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
@@ -353,6 +355,7 @@ namespace EnergyPlus {
 		OutputReportTabular::clear_state();
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
+		PackagedTerminalHeatPump::clear_state();
 		PlantCondLoopOperation::clear_state();
 		PlantChillers::clear_state();
 		PlantLoadProfile::clear_state();
@@ -387,6 +390,7 @@ namespace EnergyPlus {
 		VentilatedSlab::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();
+		WaterToAirHeatPumpSimple::clear_state();
 		WaterUse::clear_state();
 		WeatherManager::clear_state();
 		WindowAC::clear_state();
