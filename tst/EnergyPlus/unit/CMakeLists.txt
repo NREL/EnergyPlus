@@ -51,11 +51,8 @@ set( test_src
   General.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
-<<<<<<< HEAD
   HeatBalanceMovableInsulation.unit.cc
-=======
   HeatBalanceIntRadExchange.unit.cc
->>>>>>> develop
   HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
