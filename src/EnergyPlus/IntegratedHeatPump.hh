@@ -70,12 +70,6 @@ namespace EnergyPlus {
 
 	namespace IntegratedHeatPump {
 
-		// Using/Aliasing
-		// Using/Aliasing
-
-		// Data
-		//MODULE PARAMETER DEFINITIONS
-
 		// Identifier is VarSpeedCoil
 		extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
 
@@ -91,23 +85,6 @@ namespace EnergyPlus {
 			SHDWHElecHeatOffMode,
 			SHDWHElecHeatOnMode
 		};
-
-		// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-		// Driver/Manager Routines
-
-		// Get Input routines for module
-
-		// Initialization routines for module
-
-		// Update routines to check convergence and update nodes
-
-		// Update routine
-
-		// Utility routines
-		//SHR, bypass factor routines
-
-		// Types
 
 		struct IntegratedHeatPumpData // variable speed coil
 		{
@@ -297,7 +274,7 @@ namespace EnergyPlus {
 				EnergyLatent( 0.0 ), // total latent energy [J]
 				EnergySource( 0.0 ),//total source energy
 				TotalCOP( 0.0 )//total COP
-			{ }
+			{}
 
 		};
 
@@ -340,9 +317,10 @@ namespace EnergyPlus {
 		UpdateIHP( int const DXCoilNum );
 
 		void
-		DecideWorkMode( int const DXCoilNum,
-		                Real64 const SensLoad, // Sensible demand load [W]
-		                Real64 const LatentLoad // Latent demand load [W]
+		DecideWorkMode(
+			int const DXCoilNum,
+			Real64 const SensLoad, // Sensible demand load [W]
+			Real64 const LatentLoad // Latent demand load [W]
 		);
 
 		IHPOperationMode
@@ -355,18 +333,21 @@ namespace EnergyPlus {
 		GetMaxSpeedNumIHP( int const DXCoilNum );
 
 		Real64
-		GetAirVolFlowRateIHP( int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio,
-		                      bool const IsCallbyWH //whether the call from the water heating loop or air loop, true = from water heating loop
+		GetAirVolFlowRateIHP(
+			int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio,
+			bool const IsCallbyWH //whether the call from the water heating loop or air loop, true = from water heating loop
 		);
 
 		Real64
-		GetWaterVolFlowRateIHP( int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio,
-		                        bool const IsCallbyWH //whether the call from the water heating loop or air loop, true = from water heating loop
+		GetWaterVolFlowRateIHP(
+			int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio,
+			bool const IsCallbyWH //whether the call from the water heating loop or air loop, true = from water heating loop
 		);
 
 		Real64
-		GetAirMassFlowRateIHP( int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio,
-		                       bool const IsCallbyWH //whether the call from the water heating loop or air loop, true = from water heating loop
+		GetAirMassFlowRateIHP(
+			int const DXCoilNum, int const SpeedNum, Real64 const SpeedRatio,
+			bool const IsCallbyWH //whether the call from the water heating loop or air loop, true = from water heating loop
 		);
 
 		bool
