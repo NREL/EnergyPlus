@@ -63646,6 +63646,7 @@ CoolingTower:SingleSpeed,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
   A2 , \field Water Inlet Node Name
        \required-field
@@ -63857,6 +63858,7 @@ CoolingTower:TwoSpeed,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
   A2 , \field Water Inlet Node Name
        \required-field
@@ -64131,6 +64133,7 @@ CoolingTower:VariableSpeed:Merkel,
        \required-field
        \type alpha
        \reference CoolingTowers
+       \reference CoolingTowersWithUA
        \note Tower Name
   A2 , \field Water Inlet Node Name
        \required-field
@@ -79789,7 +79792,7 @@ FaultModel:Fouling:CoolingTower,
        \note Enter the name of the cooling tower affected
        \required-field
        \type object-list
-       \object-list CoolingTowers
+       \object-list CoolingTowersWithUA
    N1; \field UA Reduction Factor
        \note Factor describing the tower UA reduction due to fouling
        \note It is the ratio between the UA value at fouling case and that at fault free case

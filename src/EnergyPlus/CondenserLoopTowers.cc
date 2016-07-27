@@ -3651,7 +3651,7 @@ namespace CondenserLoopTowers {
 
 		// Using/Aliasing
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -3739,7 +3739,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			
@@ -3751,7 +3751,7 @@ namespace CondenserLoopTowers {
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
@@ -4013,7 +4013,7 @@ namespace CondenserLoopTowers {
 
 		// Using/Aliasing
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -4091,7 +4091,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			
@@ -4103,7 +4103,7 @@ namespace CondenserLoopTowers {
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
@@ -4255,7 +4255,7 @@ namespace CondenserLoopTowers {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
@@ -4336,7 +4336,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			
@@ -4348,7 +4348,7 @@ namespace CondenserLoopTowers {
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
@@ -4680,7 +4680,7 @@ namespace CondenserLoopTowers {
 		using DataEnvironment::CurMnDy;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -4796,7 +4796,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			
