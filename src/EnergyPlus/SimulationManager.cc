@@ -634,6 +634,8 @@ namespace SimulationManager {
 			}
 		}
 
+		PlantManager::CheckOngoingPlantWarnings();
+
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
@@ -642,6 +644,8 @@ namespace SimulationManager {
 		SimCostEstimate();
 
 		ComputeTariff(); //     Compute the utility bills
+
+		EMSManager::checkForUnusedActuatorsAtEnd();
 
 		ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
