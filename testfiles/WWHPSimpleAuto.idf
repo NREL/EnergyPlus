@@ -1486,7 +1486,8 @@
     0.02501669,              !- Cooling Compressor Power Coefficient 4
     -0.20132665,             !- Cooling Compressor Power Coefficient 5
     8.0,                     !- Reference Coefficient of Performance
-    1.0;                     !- Sizing Factor
+    1.0,                     !- Sizing Factor
+    GshpHeating;             !- Companion Heating Heat Pump Name
 
   Pump:ConstantSpeed,
     Circ Pump,               !- Name
@@ -1807,7 +1808,8 @@
     -0.21629222,             !- Heating Compressor Power Coefficient 4
     0.033862378,             !- Heating Compressor Power Coefficient 5
     7.5,                     !- Reference Coefficient of Performance
-    1.0;                     !- Sizing Factor
+    1.0,                     !- Sizing Factor
+    GshpCLG;                 !- Companion Cooling Heat Pump Name
 
   CondenserLoop,
     Chilled Water Condenser Loop,  !- Name

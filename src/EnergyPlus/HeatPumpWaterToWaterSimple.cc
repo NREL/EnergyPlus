@@ -316,7 +316,7 @@ namespace HeatPumpWaterToWaterSimple {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		Array1D_string AlphArray( 5 ); // character string data
+		Array1D_string AlphArray( 6 ); // character string data
 		Array1D< Real64 > NumArray( 17 ); // numeric data
 
 		static bool ErrorsFound( false );
@@ -421,7 +421,7 @@ namespace HeatPumpWaterToWaterSimple {
 			TestCompSet( HPEqFitCoolingUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Chilled Water Nodes" );
 
 			if ( NumAlphas > 5 && ! DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
-				GSHP( GSHPNum ).companionName = AlphArray( 5 );
+				GSHP( GSHPNum ).companionName = AlphArray( 6 );
 			}
 
 			// CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
@@ -509,7 +509,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHP( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, HPEqFitHeatingUC, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			if ( NumAlphas > 5 && ! DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
-				GSHP( GSHPNum ).companionName = AlphArray( 5 );
+				GSHP( GSHPNum ).companionName = AlphArray( 6 );
 			}
 
 			// Test node sets
@@ -790,6 +790,8 @@ namespace HeatPumpWaterToWaterSimple {
 				//now compare to companion coil and take higher
 				if ( GSHP( GSHPNum ).companionIdentified ) {
 					tmpLoadSideVolFlowRate = max ( tmpLoadSideVolFlowRate,GSHP( GSHPNum ).RatedLoadVolFlowHeat );
+					//store flow rate right away regardless of PlantFirstSizesOkayToFinalize so that data are available 
+					GSHP( GSHPNum ).RatedLoadVolFlowCool = tmpLoadSideVolFlowRate;
 				}
 				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
@@ -1030,6 +1032,8 @@ namespace HeatPumpWaterToWaterSimple {
 				//now compare to companion coil and take higher
 				if ( GSHP( GSHPNum ).companionIdentified ) {
 					tmpLoadSideVolFlowRate = max ( tmpLoadSideVolFlowRate,GSHP( GSHPNum ).RatedLoadVolFlowCool );
+					//store flow rate right away regardless of PlantFirstSizesOkayToFinalize so that data are available for companion when PlantFirstSizesOkayToFinalize is true
+					GSHP( GSHPNum ).RatedLoadVolFlowHeat = tmpLoadSideVolFlowRate;
 				}
 				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::HWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::HWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
