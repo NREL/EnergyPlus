@@ -6868,13 +6868,16 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \ip-units in
        \type real
        \minimum> 0
+       \autocalculatable
+       \default autocalculate
   N7 , \field Deep Layer Penetration Depth
        \required-field
        \units m
        \ip-units in
        \type real
        \minimum 0
-       \default 0
+       \autocalculatable
+       \default autocalculate
   N8 , \field Coating Layer Thickness
        \required-field
        \type real

@@ -21,7 +21,7 @@ using namespace EnergyPlus;
 TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 {
 	std::string const idf_objects = delimited_string({
-		"Version, 8.3;",
+		"Version, 8.6;",
 		"Material,",
 		"Concrete,                !- Name",
 		"Rough,                   !- Roughness",
@@ -107,4 +107,44 @@ TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 	// Clean up
 	DataHeatBalFanSys::ZoneAirHumRat.deallocate();
 	DataMoistureBalance::RhoVaporAirIn.deallocate();
+}
+
+TEST_F( EnergyPlusFixture, EMPDAutocalcDepth )
+{
+	std::string const idf_objects = delimited_string({
+		"Version, 8.6;",
+		"Material,",
+		"Concrete,                !- Name",
+		"Rough,                   !- Roughness",
+		"0.152,                   !- Thickness {m}",
+		"0.3,                     !- Conductivity {W/m-K}",
+		"850,                     !- Density {kg/m3}",
+		"950,                     !- Specific Heat {J/kg-K}",
+		"0.900000,                !- Thermal Absorptance",
+		"0.600000,                !- Solar Absorptance",
+		"0.600000;                !- Visible Absorptance",
+		"MaterialProperty:MoisturePenetrationDepth:Settings,",
+		"Concrete,                !- Name",
+		"8,                     !- Water Vapor Diffusion Resistance Factor {dimensionless} (mu)",
+		"0.012,                   !- Moisture Equation Coefficient a {dimensionless} (MoistACoeff)",
+		"1,                       !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
+		"0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
+		"1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
+		",                    !- Surface-layer penetrtion depth {m} (dEMPD)",
+		"autocalculate,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
+		"0,                       !- Coating layer permability {m} (CoatingThickness)",
+		"1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"
+	});
+
+	ASSERT_FALSE( process_idf(idf_objects) );
+
+	bool errors_found( false );
+	HeatBalanceManager::GetMaterialData(errors_found);
+	ASSERT_FALSE( errors_found ) << "Errors in GetMaterialData";
+	MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput();
+
+	const DataHeatBalance::MaterialProperties & material = DataHeatBalance::Material( 1 );
+	ASSERT_NEAR( material.EMPDSurfaceDepth, 0.014143, 0.000001 );
+	ASSERT_NEAR( material.EMPDDeepDepth, 0.064810, 0.000001);
+
 }

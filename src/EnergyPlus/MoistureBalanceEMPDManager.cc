@@ -149,6 +149,37 @@ namespace MoistureBalanceEMPDManager {
 		EMPDReportVars.deallocate();
 	}
 
+	Real64
+	CalcDepthFromPeriod(
+		Real64 const period, // in seconds
+		MaterialProperties const & mat // material
+	)
+	{
+
+		// Assume T, RH, P
+		Real64 const T = 24.0; // C
+		Real64 const RH = 0.45;
+		Real64 const P_amb = 101325; // Pa
+
+		// Calculate saturation vapor pressure at assumed temperature
+		Real64 const PV_sat = Psychrometrics::PsyPsatFnTemp( T, "CalcDepthFromPeriod" );
+
+		// Calculate slope of moisture sorption curve
+		Real64 const slope_MC = mat.MoistACoeff * mat.MoistBCoeff * std::pow( RH, mat.MoistBCoeff - 1 ) + mat.MoistCCoeff * mat.MoistDCoeff * std::pow( RH, mat.MoistDCoeff - 1 );
+
+		// Equation for the diffusivity of water vapor in air
+		Real64 const diffusivity_air = 2.0e-7 * std::pow( T + 273.15, 0.81 ) / P_amb;
+
+		// Convert mu to diffusivity [kg/m^2-s-Pa]
+		Real64 const EMPDdiffusivity = diffusivity_air / mat.EMPDmu;
+
+		// Calculate penetration depth
+		Real64 const PenetrationDepth = std::sqrt( EMPDdiffusivity * PV_sat * period / ( mat.Density * slope_MC * DataGlobals::Pi ) );
+
+		return PenetrationDepth;
+
+	}
+
 	void
 	GetMoistureBalanceEMPDInput()
 	{
@@ -254,8 +285,16 @@ namespace MoistureBalanceEMPDManager {
 			material.MoistBCoeff = MaterialProps( 3 );
 			material.MoistCCoeff = MaterialProps( 4 );
 			material.MoistDCoeff = MaterialProps( 5 );
-			material.EMPDSurfaceDepth = MaterialProps( 6 );
-			material.EMPDDeepDepth = MaterialProps( 7 );
+			if ( lNumericFieldBlanks( 6 ) || MaterialProps( 6 ) == AutoCalculate ) {
+				material.EMPDSurfaceDepth = CalcDepthFromPeriod( 24 * 3600 , material ); // 1 day
+			} else {
+				material.EMPDSurfaceDepth = MaterialProps( 6 );
+			}
+			if ( lNumericFieldBlanks( 7 ) || MaterialProps( 7 ) == AutoCalculate ) {
+				material.EMPDDeepDepth = CalcDepthFromPeriod( 21 * 24 * 3600, material ); // 3 weeks
+			} else {
+				material.EMPDDeepDepth = MaterialProps( 7 );
+			}
 			material.EMPDCoatingThickness = MaterialProps( 8 );
 			material.EMPDmuCoating = MaterialProps( 9 );
 
@@ -577,19 +616,13 @@ namespace MoistureBalanceEMPDManager {
 		// Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
 		mass_flux_surf_deep_max = material.EMPDDeepDepth*material.Density*dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (TimeStepZone * 3600.0);
 		mass_flux_surf_deep = hm_deep_layer * (rv_surf_layer_old - rv_deep_old);
-		if (std::abs(mass_flux_surf_deep_max) > std::abs(mass_flux_surf_deep)) {
-			mass_flux_surf_deep = mass_flux_surf_deep;
-		}
-		else {
+		if (std::abs(mass_flux_surf_deep_max) < std::abs(mass_flux_surf_deep)) {
 			mass_flux_surf_deep = mass_flux_surf_deep_max;
 		}
 
 		mass_flux_zone_surf_max = material.EMPDSurfaceDepth*material.Density*dU_dRH * (RHZone - RH_surf_layer_old) / (TimeStepZone * 3600.0);
 		mass_flux_zone_surf = hm_surf_layer * (rho_vapor_air_in - rv_surf_layer_old);
-		if (std::abs(mass_flux_zone_surf_max) > std::abs(mass_flux_zone_surf)) {
-			mass_flux_zone_surf = mass_flux_zone_surf;
-		}
-		else {
+		if (std::abs(mass_flux_zone_surf_max) < std::abs(mass_flux_zone_surf)) {
 			mass_flux_zone_surf = mass_flux_zone_surf_max;
 		}
 
