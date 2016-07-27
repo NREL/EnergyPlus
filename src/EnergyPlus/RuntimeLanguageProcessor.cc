@@ -961,7 +961,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == KeywordRun ) {
 				ReturnValue.Type = ValueString;
 				ReturnValue.String = "";
-				WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				ReturnValue = EvaluateStack( ErlStack( StackNum ).Instruction( InstructionNum ).Argument1 );
 
 			} else if ( ( SELECT_CASE_var == KeywordIf ) || ( SELECT_CASE_var == KeywordElse ) ) { // same???
@@ -970,7 +970,7 @@ namespace RuntimeLanguageProcessor {
 
 				if ( ExpressionNum > 0 ) { // could be 0 if this was an ELSE
 					ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
-					WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
+					WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 					if ( ReturnValue.Number == 0.0 ) { //  This is the FALSE case
 						// Eventually should handle strings and arrays too
 						InstructionNum = InstructionNum2;
@@ -980,7 +980,7 @@ namespace RuntimeLanguageProcessor {
 					// KeywordELSE  -- kind of a kludge
 					ReturnValue.Type = ValueNumber;
 					ReturnValue.Number = 1.0;
-					WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
+					WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				}
 
 			} else if ( SELECT_CASE_var == KeywordGoto ) {
@@ -996,14 +996,14 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == KeywordEndIf ) {
 				ReturnValue.Type = ValueString;
 				ReturnValue.String = "";
-				WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 
 			} else if ( SELECT_CASE_var == KeywordWhile ) {
 				// evaluate expresssion at while, skip to past endwhile if not true
 				ExpressionNum = ErlStack( StackNum ).Instruction( InstructionNum ).Argument1;
 				InstructionNum2 = ErlStack( StackNum ).Instruction( InstructionNum ).Argument2;
 				ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
-				WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
+				WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 				if ( ReturnValue.Number == 0.0 ) { //  This is the FALSE case
 					// Eventually should handle strings and arrays too
 					InstructionNum = InstructionNum2;
@@ -1017,7 +1017,7 @@ namespace RuntimeLanguageProcessor {
 				ReturnValue = EvaluateExpression( ExpressionNum, seriousErrorFound );
 				if ( ( ReturnValue.Number != 0.0 ) && ( WhileLoopExitCounter <= MaxWhileLoopIterations ) ) { //  This is the True case
 					// Eventually should handle strings and arrays too
-					WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound ); // duplicative?
+					WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound ); // duplicative?
 					InstructionNum = InstructionNum2;
 					++WhileLoopExitCounter;
 
@@ -1027,7 +1027,7 @@ namespace RuntimeLanguageProcessor {
 						WhileLoopExitCounter = 0;
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-						WriteTrace( StackNum, InstructionNum, ReturnValue,seriousErrorFound );
+						WriteTrace( StackNum, InstructionNum, ReturnValue, seriousErrorFound );
 					} else {
 						ReturnValue.Type = ValueNumber;
 						ReturnValue.Number = 0.0;
