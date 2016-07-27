@@ -633,6 +633,8 @@ namespace SimulationManager {
 			}
 		}
 
+		PlantManager::CheckOngoingPlantWarnings();
+
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
