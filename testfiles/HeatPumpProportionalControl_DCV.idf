@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.6;
 
   Building,
     NONE,                    !- Name
@@ -1528,7 +1528,7 @@
 
   ZoneControl:ContaminantController,
     CO2 Controller1,         !- Name
-    EAST ZONE,               !- Controlled Zone Name
+    EAST ZONE,               !- Zone Name
     CO2AvailSchedule,        !- Carbon Dioxide Control Availability Schedule Name
     CO2SetpointSchedule;     !- Carbon Dioxide Setpoint Schedule Name
 

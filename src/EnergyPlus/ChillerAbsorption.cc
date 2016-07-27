@@ -117,7 +117,6 @@ namespace ChillerAbsorption {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallWaterVolFlow;
 	using General::TrimSigDigits;
@@ -590,9 +589,6 @@ namespace ChillerAbsorption {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -611,17 +607,8 @@ namespace ChillerAbsorption {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitBLASTAbsorberModel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -644,8 +631,6 @@ namespace ChillerAbsorption {
 		Real64 mdotEvap; // local fluid mass flow rate thru evaporator
 		Real64 mdotCond; // local fluid mass flow rate thru condenser
 		Real64 mdotGen; // local fluid mass flow rate thru generator
-
-		// FLOW:
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
@@ -727,13 +712,13 @@ namespace ChillerAbsorption {
 
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			BLASTAbsorber( ChillNum ).EvapMassFlowRateMax = BLASTAbsorber( ChillNum ).EvapVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, BLASTAbsorber( ChillNum ).EvapMassFlowRateMax, BLASTAbsorber( ChillNum ).EvapInletNodeNum, BLASTAbsorber( ChillNum ).EvapOutletNodeNum, BLASTAbsorber( ChillNum ).CWLoopNum, BLASTAbsorber( ChillNum ).CWLoopSideNum, BLASTAbsorber( ChillNum ).CWBranchNum, BLASTAbsorber( ChillNum ).CWCompNum );
 
-			rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
 			BLASTAbsorber( ChillNum ).CondMassFlowRateMax = rho * BLASTAbsorber( ChillNum ).CondVolFlowRate;
 
@@ -743,7 +728,7 @@ namespace ChillerAbsorption {
 			if ( BLASTAbsorber( ChillNum ).GeneratorInletNodeNum > 0 ) {
 
 				if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
-					rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 
 					BLASTAbsorber( ChillNum ).GenMassFlowRateMax = rho * BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
 				} else if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam ) {
@@ -820,9 +805,6 @@ namespace ChillerAbsorption {
 		// the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		// is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -834,22 +816,13 @@ namespace ChillerAbsorption {
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
 		using namespace FluidProperties;
-		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 
 		// Locals
 		Real64 SteamMassFlowRate; // steam mass flow rate through generator
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeAbsorpChiller" );
 		static std::string const RoutineNameLong( "SizeAbsorptionChiller" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizIndex; // Plant Sizing Do loop index
@@ -921,9 +894,9 @@ namespace ChillerAbsorption {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * BLASTAbsorber( ChillNum ).SizFac;
 				if ( ! BLASTAbsorber( ChillNum ).NomCapWasAutoSized ) tmpNomCap = BLASTAbsorber( ChillNum ).NomCap;
 			} else {
@@ -1071,7 +1044,7 @@ namespace ChillerAbsorption {
 
 				Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidName, BLASTAbsorber( ChillNum ).TempDesCondIn, PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
-				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + SteamInputRatNom + tmpNomPumpPower / tmpNomCap ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! BLASTAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = BLASTAbsorber( ChillNum ).CondVolFlowRate;
 
@@ -1247,8 +1220,8 @@ namespace ChillerAbsorption {
 				BLASTAbsorber( ChillNum ).GeneratorDeltaTemp = max( 0.5, PlantSizData( PltSizHeatingNum ).DeltaT );
 			} else if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 				if ( PlantFirstSizesOkayToFinalize ) {
-					Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
-					rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
+					Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 
 					BLASTAbsorber( ChillNum ).GeneratorDeltaTemp = ( SteamInputRatNom * BLASTAbsorber( ChillNum ).NomCap ) / ( Cp * rho * BLASTAbsorber( ChillNum ).GeneratorVolFlowRate );
 				}

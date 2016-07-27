@@ -939,6 +939,11 @@ namespace WaterThermalTanks {
 	bool
 	GetWaterThermalTankInput();
 
+	bool
+	GetWaterThermalTankInputData(
+		bool & ErrorFlag
+	);
+
 	void
 	ValidatePLFCurve(
 		int const CurveIndex,
