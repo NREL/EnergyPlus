@@ -429,9 +429,15 @@ namespace FaultsManager {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
-					// Link the coil with the fault model
-						SteamCoils::SteamCoil( CoilNum ).FaultyCoilSATFlag = true;
-						SteamCoils::SteamCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+						
+						if( SteamCoils::SteamCoil( CoilNum ).TypeOfCoil != SteamCoils::TemperatureSetPointControl ){
+						// The fault model is only applicable to the coils controlled on leaving air temperature
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified coil is not controlled on leaving air temperature. The coil SAT sensor fault model will not be applied." );
+						} else {
+						// Link the fault model with the coil that is controlled on leaving air temperature
+							SteamCoils::SteamCoil( CoilNum ).FaultyCoilSATFlag = true;
+							SteamCoils::SteamCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+						}
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Coil:Heating:Water" ) ||
