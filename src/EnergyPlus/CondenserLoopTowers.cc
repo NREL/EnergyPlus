@@ -115,20 +115,11 @@ namespace CondenserLoopTowers {
 	// PURPOSE OF THIS MODULE:
 	// Model the performance of cooling towers
 
-	// METHODOLOGY EMPLOYED:
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::KelvinConv;
 	using DataGlobals::SecInHour;
 	using DataGlobals::WarmupFlag;
-	using DataGlobals::InitConvTemp;
 	using namespace DataHVACGlobals;
 	using namespace DataLoopNode;
 	using DataEnvironment::StdBaroPress;
@@ -140,7 +131,6 @@ namespace CondenserLoopTowers {
 	using FluidProperties::GetDensityGlycol;
 	using FluidProperties::GetSpecificHeatGlycol;
 	using DataPlant::PlantLoop;
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbRhPb;
@@ -149,8 +139,6 @@ namespace CondenserLoopTowers {
 	using Psychrometrics::PsyWFnTdbH;
 	using General::TrimSigDigits;
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 	// Empirical Model Type
 	int const CoolToolsXFModel( 1 );
 	// CoolTools counterflow model does not work properly. The empirical model seems flawed since the tower
@@ -2264,7 +2252,7 @@ namespace CondenserLoopTowers {
 		// Begin environment initializations
 		if ( MyEnvrnFlag( TowerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 
-			rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
 			SimpleTower( TowerNum ).DesWaterMassFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate * rho;
 			SimpleTower( TowerNum ).DesWaterMassFlowRatePerCell = SimpleTower( TowerNum ).DesWaterMassFlowRate / SimpleTower( TowerNum ).NumCell;
@@ -2478,7 +2466,7 @@ namespace CondenserLoopTowers {
 			} else {
 				if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-						rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 						DesTowerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 						tmpHighSpeedFanPower = 0.0105 * DesTowerLoad;
@@ -2544,7 +2532,7 @@ namespace CondenserLoopTowers {
 		if ( SimpleTower( TowerNum ).HighSpeedTowerUAWasAutoSized ) {
 			if ( PltSizCondNum > 0 ) {
 				if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-					rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 					DesTowerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 
@@ -3185,10 +3173,10 @@ namespace CondenserLoopTowers {
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 					SimpleTowerInlet( TowerNum ).WaterTemp = PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
 				} else { // probably no plant sizing object
-					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 					SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // design condition
 				}
-				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
 				// full speed fan tower UA
 				Par( 1 ) = tmpNomTowerCap * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
@@ -3373,7 +3361,7 @@ namespace CondenserLoopTowers {
 				}
 				// now calcuate UA values from nominal capacities and flow rates
 				if ( PlantFirstSizesOkayToFinalize ) {
-					rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 					// full speed fan tower UA
 					Par( 1 ) = tmpNomTowerCap * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
@@ -3663,7 +3651,7 @@ namespace CondenserLoopTowers {
 
 		// Using/Aliasing
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -3731,6 +3719,9 @@ namespace CondenserLoopTowers {
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
 		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -3748,7 +3739,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			
@@ -3760,7 +3751,7 @@ namespace CondenserLoopTowers {
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
@@ -3769,8 +3760,8 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
 			
 			//update the tower UA values at faulty cases
-			SimpleTower( TowerNum ).FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			SimpleTower( TowerNum ).HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			
 		}
 
@@ -3819,7 +3810,7 @@ namespace CondenserLoopTowers {
 			IncrNumCellFlag = false;
 
 			//   Initialize local variables to the free convection design values
-			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
+			UAdesign = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
@@ -3834,7 +3825,7 @@ namespace CondenserLoopTowers {
 
 			if ( OutletWaterTempOFF > TempSetPoint ) {
 				//     Setpoint was not met (or free conv. not used), turn on cooling tower fan
-				UAdesign = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+				UAdesign = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 				AirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 
 				// The fan power is for all cells operating
@@ -4022,7 +4013,7 @@ namespace CondenserLoopTowers {
 
 		// Using/Aliasing
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -4080,6 +4071,9 @@ namespace CondenserLoopTowers {
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
 		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+		
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -4097,7 +4091,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			
@@ -4109,7 +4103,7 @@ namespace CondenserLoopTowers {
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
@@ -4118,8 +4112,8 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
 			
 			//update the tower UA values at faulty cases
-			SimpleTower( TowerNum ).FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			SimpleTower( TowerNum ).HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			
 		}
 
@@ -4160,7 +4154,7 @@ namespace CondenserLoopTowers {
 			IncrNumCellFlag = false;
 
 			//set local variable for tower
-			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell; // where is NumCellOn?
+			UAdesign = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell; // where is NumCellOn?
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate; // ??useless subroutine variable??
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
@@ -4193,7 +4187,7 @@ namespace CondenserLoopTowers {
 					SpeedSel = 1;
 				} else {
 					//         Setpoint was not met, turn on cooling tower 2nd stage fan
-					UAdesign = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+					UAdesign = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 					AirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 					FanPowerHigh = SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
 
@@ -4261,7 +4255,7 @@ namespace CondenserLoopTowers {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
@@ -4322,6 +4316,9 @@ namespace CondenserLoopTowers {
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
 		
+		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
+		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
+		
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -4339,7 +4336,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			
@@ -4351,7 +4348,7 @@ namespace CondenserLoopTowers {
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyTowerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
@@ -4360,8 +4357,8 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
 			
 			//update the tower UA values at faulty cases
-			SimpleTower( TowerNum ).FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			SimpleTower( TowerNum ).HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
+			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			
 		}
 
@@ -4405,7 +4402,7 @@ namespace CondenserLoopTowers {
 		}
 
 		// first find free convection cooling rate
-		UAdesignPerCell = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
+		UAdesignPerCell = FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
 		OutletWaterTempOFF = Node( WaterInletNode ).Temp;
 		WaterMassFlowRate = Node( WaterInletNode ).MassFlowRate;
@@ -4426,7 +4423,7 @@ namespace CondenserLoopTowers {
 		}
 
 		// next find full fan speed cooling rate
-		UAdesignPerCell = SimpleTower( TowerNum ).HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
+		UAdesignPerCell = HighSpeedTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 		AirFlowRateRatio = 1.0;
 		WaterFlowRateRatio = WaterMassFlowRatePerCell / SimpleTower( TowerNum ).DesWaterMassFlowRatePerCell;
@@ -4683,7 +4680,7 @@ namespace CondenserLoopTowers {
 		using DataEnvironment::CurMnDy;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;
@@ -4799,7 +4796,7 @@ namespace CondenserLoopTowers {
 		}}
 
 		//If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
 			

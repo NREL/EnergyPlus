@@ -396,31 +396,26 @@ namespace FaultsManager {
 					CondenserLoopTowers::GetInput = false;
 				}
 				// Check the tower name and tower type
-				if ( FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower ) <= 0 ) {
+				int TowerNum = FindItemInList( FaultsTowerFouling( jFault_TowerFouling ).TowerName, CondenserLoopTowers::SimpleTower );
+				if ( TowerNum <= 0 ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 					ErrorsFound = true;
 				} else {
 				// Link the tower with the fault model
-					for ( int TowerNum = 1; TowerNum <= CondenserLoopTowers::NumSimpleTowers; ++TowerNum ) {
-						if ( SameString( CondenserLoopTowers::SimpleTower( TowerNum ).Name, FaultsTowerFouling( jFault_TowerFouling ).TowerName ) ) {
-							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = true;
-							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingIndex = jFault_TowerFouling;
-							
-							// Check the faulty tower type
-							if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsTowerFouling( jFault_TowerFouling ).TowerType )) {
-								ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type in the fault model is updated. " );
-								FaultsTowerFouling( jFault_TowerFouling ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
-							}
-							
-							// Check the tower model
-							// Performance Input Method should be UFactorTimesAreaAndDesignWaterFlowRate to apply the fault model
-							if ( CondenserLoopTowers::SimpleTower( TowerNum ).PerformanceInputMethod_Num != CondenserLoopTowers::PIM_UFactor ) {
-								ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaFieldNames( 5 ) + ". Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. " + "The tower fouling fault model will not be applied to the tower. " );
-								CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = false;
-							}
-							
-							break;
-						}
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = true;
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingIndex = jFault_TowerFouling;
+					
+					// Check the faulty tower type
+					if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsTowerFouling( jFault_TowerFouling ).TowerType )) {
+						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type in the fault model is updated. " );
+						FaultsTowerFouling( jFault_TowerFouling ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
+					}
+					
+					// Check the tower model
+					// Performance Input Method should be UFactorTimesAreaAndDesignWaterFlowRate to apply the fault model
+					if ( CondenserLoopTowers::SimpleTower( TowerNum ).PerformanceInputMethod_Num != CondenserLoopTowers::PIM_UFactor ) {
+						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaFieldNames( 5 ) + ". Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. " + "The tower fouling fault model will not be applied to the tower. " );
+						CondenserLoopTowers::SimpleTower( TowerNum ).FaultyTowerFoulingFlag = false;
 					}
 				}
 			}
@@ -485,24 +480,19 @@ namespace FaultsManager {
 					CondenserLoopTowers::GetInput = false;
 				}
 				// Check the tower name and tower type
-				if ( FindItemInList( FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName, CondenserLoopTowers::SimpleTower ) <= 0 ) {
+				int TowerNum = FindItemInList( FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName, CondenserLoopTowers::SimpleTower );
+				if ( TowerNum <= 0 ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 					ErrorsFound = true;
 				} else {
 				// Link the tower with the fault model
-					for ( int TowerNum = 1; TowerNum <= CondenserLoopTowers::NumSimpleTowers; ++TowerNum ) {
-						if ( SameString( CondenserLoopTowers::SimpleTower( TowerNum ).Name, FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerName ) ) {
-							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTFlag = true;
-							CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTIndex = jFault_CondenserSWT;
-							
-							// Check the faulty tower type
-							if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType )) {
-								ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type is updated. " );
-								FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
-							} 
-							
-							break;
-						}
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTFlag = true;
+					CondenserLoopTowers::SimpleTower( TowerNum ).FaultyCondenserSWTIndex = jFault_CondenserSWT;
+					
+					// Check the faulty tower type
+					if ( ! SameString( CondenserLoopTowers::SimpleTower( TowerNum ).TowerType, FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType )) {
+						ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not match the type of " + cAlphaFieldNames( 5 ) + ". Tower type is updated. " );
+						FaultsCondenserSWTSensor( jFault_CondenserSWT ).TowerType = CondenserLoopTowers::SimpleTower( TowerNum ).TowerType;
 					}
 				}
 			}
@@ -964,34 +954,14 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang
 		//       DATE WRITTEN   Jul. 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To calculate the dynamic tower fouling factor based on the fault availability schedule and severity schedule.
 		// Fouling factor is the ratio between the UA value at fouling case and that at fault free case
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetCurrentScheduleValue;
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FaultFac( 0.0 ); // fault modification factor
@@ -1011,7 +981,7 @@ namespace FaultsManager {
 		}
 		
 		// The more severe the fouling fault is (i.e., larger FaultFac), the less the UAReductionFactor is
-		if( FaultFac > 1.0 ) UAReductionFactorAct = this->UAReductionFactor / FaultFac;
+		if( FaultFac > 0.0 ) UAReductionFactorAct = min( this->UAReductionFactor / FaultFac, 1.0 );
 
 		return UAReductionFactorAct;
 	}
