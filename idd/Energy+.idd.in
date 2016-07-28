@@ -55447,9 +55447,14 @@ Controller:MechanicalVentilation,
         \object-list ZoneAndZoneListNames
         \note A zone name or a zone list name may be used here
    A6,  \field Design Specification Outdoor Air Object Name 1
+        \note If left blank, the name will be taken from the Sizing:Zone object for this zone.
+        \note If no specification is found for this zone, then the default of 0.00944 m3/s-person will be used.
         \type object-list
         \object-list DesignSpecificationOutdoorAirNames
    A7,  \field Design Specification Zone Air Distribution Object Name 1
+        \note If left blank, the name will be taken from the Sizing:Zone object for this zone.
+        \note If no specification is found for this zone, then effectivness will be 1.0 and
+        \note and secondary recirculation will be zero.
         \type object-list
         \object-list DesignSpecificationZoneAirDistributionNames
    A8,  \field Zone 2 Name

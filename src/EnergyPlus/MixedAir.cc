@@ -280,25 +280,8 @@ namespace MixedAir {
 		bool AllocateOAControllersFlag( true );
 		Array1D_string DesignSpecOAObjName; // name of the design specification outdoor air object
 		Array1D_int DesignSpecOAObjIndex; // index of the design specification outdoor air object
-		Array1D_string VentMechZoneName; // Zone or Zone List to apply mechanical ventilation rate
-		Array1D< Real64 > VentMechZoneOAAreaRate; // Mechanical ventilation rate (m3/s/m2) for zone or zone list
-		Array1D< Real64 > VentMechZoneOAPeopleRate; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-		Array1D< Real64 > VentMechZoneOAFlow; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-		Array1D< Real64 > VentMechZoneOAACH; // Mechanical ventilation rate (m3/s/person) for zone or zone list
-
-		Array1D< Real64 > VentMechZoneADEffCooling; // Zone air distribution effectiveness in cooling mode
-		// for each zone or zone list
-		Array1D< Real64 > VentMechZoneADEffHeating; // Zone air distribution effectiveness in heating mode
-		// for each zone or zone list
-		Array1D_int VentMechZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule
-		// for each zone or zone list
-		Array1D_string VentMechZoneADEffSchName; // Zone air distribution effectiveness
-		//  schedule name for each zone or zone list
-
-		Array1D< Real64 > VentMechZoneSecondaryRecirculation; // Zone air secondary recirculation ratio
-		//  for each zone or zone list
-		Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air
-		//  distribution object for each zone or zone list
+		Array1D_string VentMechZoneOrListName; // Zone or Zone List to apply mechanical ventilation rate
+		Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air distribution object
 		Array1D_int DesignSpecZoneADObjIndex; // index of the design specification zone air distribution object
 	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE MixedAir
@@ -391,19 +374,9 @@ namespace MixedAir {
 		OAController.deallocate();
 		OAMixer.deallocate();
 		VentilationMechanical.deallocate();
-		VentMechZoneName.deallocate();
+		VentMechZoneOrListName.deallocate();
 		DesignSpecOAObjName.deallocate();
 		DesignSpecOAObjIndex.deallocate();
-		VentMechZoneOAFlow.deallocate();
-		VentMechZoneOAACH.deallocate();
-		VentMechZoneOAAreaRate.deallocate();
-		VentMechZoneOAPeopleRate.deallocate();
-		VentMechZoneADEffSchName.deallocate();
-		VentMechZoneADEffCooling.deallocate();
-		VentMechZoneADEffHeating.deallocate();
-		VentMechZoneADEffSchPtr.deallocate();
-		VentMechZoneADEffSchName.deallocate();
-		VentMechZoneSecondaryRecirculation.deallocate();
 		DesignSpecZoneADObjName.deallocate();
 		DesignSpecZoneADObjIndex.deallocate();
 	}
@@ -1352,7 +1325,6 @@ namespace MixedAir {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		int ZoneListNum; // Index to Zone List
-		int ScanZoneListNum; // Index used to loop through zone list
 		int MechVentZoneCount; // Index counter for zones with mechanical ventilation
 		bool ErrorInName; // Error returned from VerifyName call
 		int NumArg; // Number of arguments from GetObjectDefMaxArgs call
@@ -1494,13 +1466,14 @@ namespace MixedAir {
 		if ( NumVentMechControllers > 0 ) {
 			VentilationMechanical.allocate( NumVentMechControllers );
 			for ( VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum ) {
+				auto & thisVentilationMechanical( VentilationMechanical( VentMechNum ) );
 				GetObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				MechVentZoneCount = 0;
 
 				NumGroups = ( NumAlphas + NumNums - 5 ) / 3;
 				if ( mod( ( NumAlphas + NumNums - 5 ), 3 ) != 0 ) ++NumGroups;
-				VentilationMechanical( VentMechNum ).Name = AlphArray( 1 );
+				thisVentilationMechanical.Name = AlphArray( 1 );
 
 				// Check Controller:MechanicalVentilation object name
 				ErrorInName = false;
@@ -1511,12 +1484,12 @@ namespace MixedAir {
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 				}
 
-				VentilationMechanical( VentMechNum ).SchName = AlphArray( 2 );
+				thisVentilationMechanical.SchName = AlphArray( 2 );
 				if ( lAlphaBlanks( 2 ) ) {
-					VentilationMechanical( VentMechNum ).SchPtr = ScheduleAlwaysOn;
+					thisVentilationMechanical.SchPtr = ScheduleAlwaysOn;
 				} else {
-					VentilationMechanical( VentMechNum ).SchPtr = GetScheduleIndex( AlphArray( 2 ) ); // convert schedule name to pointer
-					if ( VentilationMechanical( VentMechNum ).SchPtr == 0 ) {
+					thisVentilationMechanical.SchPtr = GetScheduleIndex( AlphArray( 2 ) ); // convert schedule name to pointer
+					if ( thisVentilationMechanical.SchPtr == 0 ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" not found." );
 						ErrorsFound = true;
 					}
@@ -1524,9 +1497,9 @@ namespace MixedAir {
 
 				// Adding new flag for DCV
 				if ( SameString( AlphArray( 3 ), "Yes" ) ) {
-					VentilationMechanical( VentMechNum ).DCVFlag = true;
+					thisVentilationMechanical.DCVFlag = true;
 				} else if ( SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
-					VentilationMechanical( VentMechNum ).DCVFlag = false;
+					thisVentilationMechanical.DCVFlag = false;
 				} else {
 					ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid value " + cAlphaFields( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
 					ShowContinueError( "...Valid values are \"Yes\" or \"No\"." );
@@ -1536,15 +1509,15 @@ namespace MixedAir {
 				// System outdoor air method
 				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 4 ) ) );
 				if ( SELECT_CASE_var == "ZONESUM" ) { // Simplifily sum the zone OA flow rates
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ZoneSum;
+					thisVentilationMechanical.SystemOAMethod = SOAM_ZoneSum;
 				} else if ( ( SELECT_CASE_var == "VRP" ) || ( SELECT_CASE_var == "VENTILATIONRATEPROCEDURE" ) ) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
 					if ( SameString( AlphArray( 4 ), "VRP" ) ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using VentilationRateProcedure." );
 					}
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_VRP;
+					thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
 				} else if ( ( SELECT_CASE_var == "IAQP" ) || ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_IAQP;
+					thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
 					if ( SameString( AlphArray( 4 ), "IAQP" ) ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using IndoorAirQualityProcedure." );
@@ -1555,28 +1528,28 @@ namespace MixedAir {
 						ErrorsFound = true;
 					}
 				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE" ) { // Proportional Control based on ASHRAE Standard 62.1-2004
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ProportionalControlSchOcc;
+					thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlSchOcc;
 					if ( ! Contaminant.CO2Simulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
 				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY" ) { // Proportional Control based on ASHRAE Standard 62.1-2004
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ProportionalControlDesOcc;
+					thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOcc;
 					if ( !Contaminant.CO2Simulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
 				} else if ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDUREGENERICCONTAMINANT" ) { // Indoor Air Quality Procedure based on generic contaminant setpoint
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_IAQPGC;
+					thisVentilationMechanical.SystemOAMethod = SOAM_IAQPGC;
 					if ( ! Contaminant.GenericContamSimulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires generic contaminant simulation." );
 						ShowContinueError( "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
 				} else if ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURECOMBINED" ) { // Indoor Air Quality Procedure based on both generic contaminant and CO2 setpoint
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_IAQPCOM;
+					thisVentilationMechanical.SystemOAMethod = SOAM_IAQPCOM;
 					if ( ! Contaminant.GenericContamSimulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires generic contaminant simulation." );
 						ShowContinueError( "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance" );
@@ -1588,35 +1561,24 @@ namespace MixedAir {
 						ErrorsFound = true;
 					}
 				} else { // If specified incorrectly, show errors
-					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ZoneSum;
+					thisVentilationMechanical.SystemOAMethod = SOAM_ZoneSum;
 					ShowWarningError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" incorrect specification for " + cAlphaFields( 4 ) + ", the ZoneSum method will be used." );
 					//ErrorsFound=.TRUE.
 				}}
 
 				//Zone maximum outdoor air fraction
-				VentilationMechanical( VentMechNum ).ZoneMaxOAFraction = NumArray( 1 );
+				thisVentilationMechanical.ZoneMaxOAFraction = NumArray( 1 );
 
-				VentMechZoneName.allocate( NumGroups );
+				VentMechZoneOrListName.allocate( NumGroups );
 				DesignSpecOAObjName.allocate( NumGroups );
 				DesignSpecOAObjIndex.dimension( NumGroups, 0 );
-				VentMechZoneOAAreaRate.dimension( NumGroups, 0.0 );
-				VentMechZoneOAPeopleRate.dimension( NumGroups, 0.0 );
-				VentMechZoneOAFlow.allocate( NumGroups );
-				VentMechZoneOAACH.allocate( NumGroups );
-				// use defaults for Cooling and Heating Effectiveness
-				VentMechZoneADEffCooling.dimension( NumGroups, 1.0 );
-				VentMechZoneADEffHeating.dimension( NumGroups, 1.0 );
-				VentMechZoneADEffSchPtr.dimension( NumGroups, 0 );
-				VentMechZoneADEffSchName.allocate( NumGroups );
-
-				VentMechZoneSecondaryRecirculation.dimension( NumGroups, 0.0 );
 				DesignSpecZoneADObjName.allocate( NumGroups );
 				DesignSpecZoneADObjIndex.dimension( NumGroups, 0 );
 
 				//   First time through find the total number of zones requiring mechanical ventilation
 				//   May include duplicate zones. Will check for duplicate zones further down in this subroutine.
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
-					VentMechZoneName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 5 );
+					VentMechZoneOrListName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 5 );
 
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
@@ -1624,13 +1586,8 @@ namespace MixedAir {
 						ObjIndex = FindItemInList( DesignSpecOAObjName( groupNum ), OARequirements );
 						DesignSpecOAObjIndex( groupNum ) = ObjIndex;
 
-						if ( ObjIndex > 0 ) {
-							VentMechZoneOAAreaRate( groupNum ) = OARequirements( ObjIndex ).OAFlowPerArea;
-							VentMechZoneOAPeopleRate( groupNum ) = OARequirements( ObjIndex ).OAFlowPerPerson;
-							VentMechZoneOAFlow( groupNum ) = OARequirements( ObjIndex ).OAFlowPerZone;
-							VentMechZoneOAACH( groupNum ) = OARequirements( ObjIndex ).OAFlowACH;
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", invalid" );
+						if ( ObjIndex == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid" );
 							ShowContinueError( "... not found " + cAlphaFields( ( groupNum - 1 ) * 3 + 6 ) + "=\"" + DesignSpecOAObjName( groupNum ) + "\"." );
 							ErrorsFound = true;
 						}
@@ -1642,208 +1599,143 @@ namespace MixedAir {
 						ObjIndex = FindItemInList( DesignSpecZoneADObjName( groupNum ), ZoneAirDistribution );
 						DesignSpecZoneADObjIndex( groupNum ) = ObjIndex;
 
-						if ( ObjIndex > 0 ) {
-							// found the design specification Zone Air Distribution object
-							VentMechZoneADEffCooling( groupNum ) = ZoneAirDistribution( ObjIndex ).ZoneADEffCooling;
-							VentMechZoneADEffHeating( groupNum ) = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
-							VentMechZoneSecondaryRecirculation( groupNum ) = ZoneAirDistribution( ObjIndex ).ZoneSecondaryRecirculation;
-							VentMechZoneADEffSchName( groupNum ) = ZoneAirDistribution( ObjIndex ).ZoneADEffSchName;
-							VentMechZoneADEffSchPtr( groupNum ) = GetScheduleIndex( VentMechZoneADEffSchName( groupNum ) );
-						} else {
+						if ( ObjIndex == 0 ) {
 							// Cannot find the design specification Zone Air Distribution object
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", invalid" );
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid" );
 							ShowContinueError( "... not found " + cAlphaFields( ( groupNum - 1 ) * 3 + 7 ) + "=\"" + DesignSpecZoneADObjName( groupNum ) + "\"." );
 							ErrorsFound = true;
 						}
 					}
 
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
+					ZoneNum = FindItemInList( VentMechZoneOrListName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						++MechVentZoneCount;
 					} else {
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
+						ZoneListNum = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							MechVentZoneCount += ZoneList( ZoneListNum ).NumOfZones;
 						} else {
 							ShowWarningError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( ( groupNum - 1 ) * 3 + 5 ) + " not found." );
-							ShowContinueError( "Missing " + cAlphaFields( ( groupNum - 1 ) * 3 + 5 ) + " = " + VentMechZoneName( groupNum ) );
+							ShowContinueError( "Missing " + cAlphaFields( ( groupNum - 1 ) * 3 + 5 ) + " = " + VentMechZoneOrListName( groupNum ) );
 							ErrorsFound = true;
 						}
 					}
 				}
 
-				VentilationMechanical( VentMechNum ).NumofVentMechZones = MechVentZoneCount;
+				thisVentilationMechanical.NumofVentMechZones = MechVentZoneCount;
 
 				// Now allocate and store unique zone and associated ventilation rate information
-				VentilationMechanical( VentMechNum ).VentMechZone.dimension( MechVentZoneCount, 0 );
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName.dimension( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex.dimension( MechVentZoneCount, 0 );
-				VentilationMechanical( VentMechNum ).ZoneOAAreaRate.dimension( MechVentZoneCount, 0.0 );
-				VentilationMechanical( VentMechNum ).ZoneOAPeopleRate.dimension( MechVentZoneCount, 0.0 );
-				VentilationMechanical( VentMechNum ).ZoneOAFlowRate.dimension( MechVentZoneCount, 0.0 );
-				VentilationMechanical( VentMechNum ).ZoneOAACHRate.dimension( MechVentZoneCount, 0.0 );
+				thisVentilationMechanical.VentMechZone.dimension( MechVentZoneCount, 0 );
+				thisVentilationMechanical.VentMechZoneName.dimension( MechVentZoneCount );
+				thisVentilationMechanical.ZoneDesignSpecOAObjName.dimension( MechVentZoneCount );
+				thisVentilationMechanical.ZoneDesignSpecOAObjIndex.dimension( MechVentZoneCount, 0 );
+				thisVentilationMechanical.ZoneOAAreaRate.dimension( MechVentZoneCount, 0.0 );
+				thisVentilationMechanical.ZoneOAPeopleRate.dimension( MechVentZoneCount, 0.0 );
+				thisVentilationMechanical.ZoneOAFlowRate.dimension( MechVentZoneCount, 0.0 );
+				thisVentilationMechanical.ZoneOAACHRate.dimension( MechVentZoneCount, 0.0 );
 
 				// added for new DCV, 2/12/2009
-				VentilationMechanical( VentMechNum ).ZoneADEffCooling.dimension( MechVentZoneCount, 1.0 );
+				thisVentilationMechanical.ZoneADEffCooling.dimension( MechVentZoneCount, 1.0 );
 				// Zone air distribution effectiveness in heating mode
-				VentilationMechanical( VentMechNum ).ZoneADEffHeating.dimension( MechVentZoneCount, 1.0 );
+				thisVentilationMechanical.ZoneADEffHeating.dimension( MechVentZoneCount, 1.0 );
 				// Indices to the zone air distribution effectiveness schedules
-				VentilationMechanical( VentMechNum ).ZoneADEffSchPtr.dimension( MechVentZoneCount, 0 );
+				thisVentilationMechanical.ZoneADEffSchPtr.dimension( MechVentZoneCount, 0 );
 				// Zone air distribution effectiveness schedule names
-				VentilationMechanical( VentMechNum ).ZoneADEffSchName.allocate( MechVentZoneCount );
+				thisVentilationMechanical.ZoneADEffSchName.allocate( MechVentZoneCount );
 				// Zone air secondary recirculation ratio, added 3/2012
-				VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation.dimension( MechVentZoneCount, 0.0 );
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex.dimension( MechVentZoneCount, 0 );
+				thisVentilationMechanical.ZoneSecondaryRecirculation.dimension( MechVentZoneCount, 0.0 );
+				thisVentilationMechanical.ZoneDesignSpecADObjName.allocate( MechVentZoneCount );
+				thisVentilationMechanical.ZoneDesignSpecADObjIndex.dimension( MechVentZoneCount, 0 );
 
 				MechVentZoneCount = 0;
 
-				//   Loop through zone names and list of zone names and store data
+				//   Loop through zone names and list of zone names, remove duplicate zones, and store designspec names and indexes
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
-					ZoneNum = FindItemInList( VentMechZoneName( groupNum ), Zone );
+					ZoneNum = FindItemInList( VentMechZoneOrListName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
-						if ( any_eq( VentilationMechanical( VentMechNum ).VentMechZone, ZoneNum ) ) {
+						if ( any_eq( thisVentilationMechanical.VentMechZone, ZoneNum ) ) {
 							//          Disregard duplicate zone names, show warning and do not store data for this zone
-							ShowWarningError( "Zone name = " + VentMechZoneName( groupNum ) + " for " + CurrentModuleObject + " object = " + VentilationMechanical( VentMechNum ).Name );
+							ShowWarningError( "Zone name = " + VentMechZoneOrListName( groupNum ) + " for " + CurrentModuleObject + " object = " + thisVentilationMechanical.Name );
 							ShowContinueError( "is specified more than once. The first ventilation values specified for this zone will be used" );
 							ShowContinueError( "and the rest will be ignored. Simulation will continue.." );
 						} else {
 							//          Store unique zone names
 							++MechVentZoneCount;
-							VentilationMechanical( VentMechNum ).VentMechZone( MechVentZoneCount ) = ZoneNum;
+							thisVentilationMechanical.VentMechZone( MechVentZoneCount ) = ZoneNum;
+							thisVentilationMechanical.VentMechZoneName( MechVentZoneCount ) = Zone( ZoneNum ).Name;
+
 							// Populating new temp array to hold design spec OA object for each zone
-							if ( ! DesignSpecOAObjName( groupNum ).empty() ) {
-								VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = VentMechZoneOAAreaRate( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = VentMechZoneOAPeopleRate( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneOAFlowRate( MechVentZoneCount ) = VentMechZoneOAFlow( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneOAACHRate = VentMechZoneOAACH( groupNum );
+							if ( DesignSpecOAObjIndex( groupNum ) > 0) {
+								thisVentilationMechanical.ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
+								thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+									ObjIndex = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
-										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
-										if ( ObjIndex > 0 ) {
-											VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = OARequirements( ObjIndex ).OAFlowPerArea;
-											VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = OARequirements( ObjIndex ).OAFlowPerPerson;
-											VentilationMechanical( VentMechNum ).ZoneOAFlowRate( MechVentZoneCount ) = OARequirements( ObjIndex ).OAFlowPerZone;
-											VentilationMechanical( VentMechNum ).ZoneOAACHRate = OARequirements( ObjIndex ).OAFlowACH;
-										} else { // use defaults
-											VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = 0.0;
-											// since this is case with no DesSpcOA object, cannot determine the method and default would be Flow/Person which should default to this flow rate
-											VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.00944;
-											VentilationMechanical( VentMechNum ).ZoneOAFlowRate( MechVentZoneCount ) = 0.0;
-											VentilationMechanical( VentMechNum ).ZoneOAACHRate = 0.0;
-										}
-									} else {
-										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", missing" );
-										ShowContinueError( "...blank (required entry) - cannot locate in Sizing:Zone for Zone=\"" + VentMechZoneName( groupNum ) + "\"." );
-										ErrorsFound = true;
+										thisVentilationMechanical.ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
+										thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
 									}
 								}
 							}
 							// Zone Air Distribution inputs
-							if ( ! DesignSpecZoneADObjName( groupNum ).empty() ) {
+							if ( DesignSpecZoneADObjIndex( groupNum ) > 0 ) {
 								// new DCV inputs
-								VentilationMechanical( VentMechNum ).ZoneADEffCooling( MechVentZoneCount ) = VentMechZoneADEffCooling( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneADEffHeating( MechVentZoneCount ) = VentMechZoneADEffHeating( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneADEffSchPtr( MechVentZoneCount ) = VentMechZoneADEffSchPtr( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneADEffSchName( MechVentZoneCount ) = VentMechZoneADEffSchName( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation( MechVentZoneCount ) = VentMechZoneSecondaryRecirculation( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = DesignSpecZoneADObjName( groupNum );
-								VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
+								thisVentilationMechanical.ZoneDesignSpecADObjName( MechVentZoneCount ) = DesignSpecZoneADObjName( groupNum );
+								thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-									ObjIndex = FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+									ObjIndex = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
-										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount );
-									} else {
-										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", missing" );
-										ShowContinueError( "...blank (required entry) - cannot locate in Sizing:Zone for Zone=\"" + VentMechZoneName( groupNum ) + "\"." );
-										ErrorsFound = true;
+										thisVentilationMechanical.ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
+										thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
 									}
 								}
 							}
 						}
 					} else {
 						//       Not a zone name, must be a zone list
-						ZoneListNum = FindItemInList( VentMechZoneName( groupNum ), ZoneList );
+						ZoneListNum = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
-							for ( ScanZoneListNum = 1; ScanZoneListNum <= ZoneList( ZoneListNum ).NumOfZones; ++ScanZoneListNum ) {
+							for ( int ScanZoneListNum = 1; ScanZoneListNum <= ZoneList( ZoneListNum ).NumOfZones; ++ScanZoneListNum ) {
+								ObjIndex = 0;
 								// check to make sure zone name is unique (not listed more than once)...
 								ZoneNum = ZoneList( ZoneListNum ).Zone( ScanZoneListNum );
-								if ( any_eq( VentilationMechanical( VentMechNum ).VentMechZone, ZoneNum ) ) {
+								if ( any_eq( thisVentilationMechanical.VentMechZone, ZoneNum ) ) {
 									//             Disregard duplicate zone names, show warning and do not store data for this zone
-									ShowWarningError( "Zone name = " + Zone( ZoneNum ).Name + " in ZoneList = " + VentMechZoneName( groupNum ) + " for " + CurrentModuleObject + " object = " + VentilationMechanical( VentMechNum ).Name );
+									ShowWarningError( "Zone name = " + Zone( ZoneNum ).Name + " in ZoneList = " + VentMechZoneOrListName( groupNum ) + " for " + CurrentModuleObject + " object = " + thisVentilationMechanical.Name );
 									ShowContinueError( "is a duplicate. The first ventilation values specified for this zone will be used " );
 									ShowContinueError( "and the rest will be ignored. The simulation will continue..." );
 								} else {
 									//           Store data for each zone name from zone list (duplicate zone names accounted for in HeatBalanceManager)
 									++MechVentZoneCount;
-									VentilationMechanical( VentMechNum ).VentMechZone( MechVentZoneCount ) = ZoneNum;
+									thisVentilationMechanical.VentMechZone( MechVentZoneCount ) = ZoneNum;
+									thisVentilationMechanical.VentMechZoneName( MechVentZoneCount ) = Zone( ZoneNum ).Name;
 									// Populating new temp array to hold design spec OA object for each zone
-									if ( ! DesignSpecOAObjName( groupNum ).empty() ) {
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
-										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
+									if ( DesignSpecOAObjIndex( groupNum ) > 0 ) {
+										thisVentilationMechanical.ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
+										thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+											ObjIndex = FindItemInList( Zone( ZoneNum ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
-												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
-												VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
-												ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
-												if ( ObjIndex > 0 ) {
-													VentilationMechanical( VentMechNum ).ZoneADEffCooling( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffCooling;
-													VentilationMechanical( VentMechNum ).ZoneADEffHeating( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
-													VentilationMechanical( VentMechNum ).ZoneADEffSchPtr( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffSchPtr;
-													VentilationMechanical( VentMechNum ).ZoneADEffSchName( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffSchName;
-													VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneSecondaryRecirculation;
-												}
-											} else {
-												ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", missing" );
-												ShowContinueError( "...blank (required entry) - cannot locate in Sizing:Zone for Zone=\"" + Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name + "\"." );
-												ErrorsFound = true;
+												thisVentilationMechanical.ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
+												thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
 											}
 										}
-									}
-									if ( ObjIndex > 0 ) {
-										VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = OARequirements( ObjIndex ).OAFlowPerArea;
-										VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = OARequirements( ObjIndex ).OAFlowPerPerson;
-										VentilationMechanical( VentMechNum ).ZoneOAFlowRate( MechVentZoneCount ) = OARequirements( ObjIndex ).OAFlowPerZone;
-										VentilationMechanical( VentMechNum ).ZoneOAACHRate( MechVentZoneCount ) = OARequirements( ObjIndex ).OAFlowACH;
 									}
 
-									if ( ! VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ).empty() ) {
+									if ( thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) > 0 ) {
 										// new DCV inputs
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = DesignSpecZoneADObjName( groupNum );
-										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
-										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount );
+										thisVentilationMechanical.ZoneDesignSpecADObjName( MechVentZoneCount ) = DesignSpecZoneADObjName( groupNum );
+										thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
 									} else {
 										if ( DoZoneSizing ) {
-											ObjIndex = FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+											ObjIndex = FindItemInList( Zone( ZoneNum ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
-												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
-												VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
-												ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount );
-											} else {
-												ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", missing" );
-												ShowContinueError( "...blank (required entry) - cannot locate in Sizing:Zone for Zone=\"" + Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name + "\"." );
-												ErrorsFound = true;
+												thisVentilationMechanical.ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
+												thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
 											}
 										}
-									}
-									if ( ObjIndex > 0 ) {
-										VentilationMechanical( VentMechNum ).ZoneADEffCooling( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffCooling;
-										VentilationMechanical( VentMechNum ).ZoneADEffHeating( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
-										VentilationMechanical( VentMechNum ).ZoneADEffSchPtr( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffSchPtr;
-										VentilationMechanical( VentMechNum ).ZoneADEffSchName( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneADEffSchName;
-										VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation( MechVentZoneCount ) = ZoneAirDistribution( ObjIndex ).ZoneSecondaryRecirculation;
 									}
 								}
 							}
@@ -1852,48 +1744,75 @@ namespace MixedAir {
 				}
 
 				//   Overwrite previous number of zones with number that does not include duplicates
-				VentilationMechanical( VentMechNum ).NumofVentMechZones = MechVentZoneCount;
+				thisVentilationMechanical.NumofVentMechZones = MechVentZoneCount;
 
-				VentMechZoneName.deallocate();
+				// Loop over zones and fill OA and AD specs, if none were found, use defaults
+				for ( int ventMechZoneNum = 1; ventMechZoneNum <= MechVentZoneCount; ++ventMechZoneNum ) {
+					int zoneOAReqObjIndex = thisVentilationMechanical.ZoneDesignSpecOAObjIndex( ventMechZoneNum );
+					if ( zoneOAReqObjIndex > 0 ) {
+						auto const & curOARequirements( OARequirements( zoneOAReqObjIndex ) );
+						thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) = curOARequirements.OAFlowPerArea;
+						thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) = curOARequirements.OAFlowPerPerson;
+						thisVentilationMechanical.ZoneOAFlowRate( ventMechZoneNum ) = curOARequirements.OAFlowPerZone;
+						thisVentilationMechanical.ZoneOAACHRate( ventMechZoneNum ) = curOARequirements.OAFlowACH;
+					} else { // use defaults
+						thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) = 0.0;
+						// since this is case with no DesSpcOA object, cannot determine the method and default would be Flow/Person which should default to this flow rate
+						thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) = 0.00944;
+						thisVentilationMechanical.ZoneOAFlowRate( ventMechZoneNum ) = 0.0;
+						thisVentilationMechanical.ZoneOAACHRate = 0.0;
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( ventMechZoneNum ).Name);
+						ShowContinueError( "Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"" + thisVentilationMechanical.VentMechZoneName( ventMechZoneNum ) + "\"." );
+						ShowContinueError( "Using default OA of 0.00944 m3/s-person and 0.0 m3/s-m2." );
+					}
+					int zoneAirDistObjIndex = thisVentilationMechanical.ZoneDesignSpecADObjIndex( ventMechZoneNum );
+					if ( zoneAirDistObjIndex > 0 ) {
+						auto const & curZoneAirDistribution ( ZoneAirDistribution( zoneAirDistObjIndex ) );
+						thisVentilationMechanical.ZoneADEffCooling( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffCooling;
+						thisVentilationMechanical.ZoneADEffHeating( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffHeating;
+						thisVentilationMechanical.ZoneADEffSchPtr( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffSchPtr;
+						thisVentilationMechanical.ZoneADEffSchName( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffSchName;
+						thisVentilationMechanical.ZoneSecondaryRecirculation( ventMechZoneNum ) = curZoneAirDistribution.ZoneSecondaryRecirculation;
+					} else { // use defaults
+						thisVentilationMechanical.ZoneADEffCooling( ventMechZoneNum ) = 1.0;
+						thisVentilationMechanical.ZoneADEffHeating( ventMechZoneNum ) = 1.0;
+						thisVentilationMechanical.ZoneSecondaryRecirculation( ventMechZoneNum ) = 0.0;
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
+						ShowContinueError( "Cannot locate a matching DesignSpecification:ZoneAirDistribution object for Zone=\"" + thisVentilationMechanical.VentMechZoneName( ventMechZoneNum ) + "\"." );
+						ShowContinueError( "Using default zone air distribution effectiveness of 1.0 for heating and cooling." );
+					}
+				}
+				VentMechZoneOrListName.deallocate();
 				DesignSpecOAObjName.deallocate();
 				DesignSpecOAObjIndex.deallocate();
-				VentMechZoneOAAreaRate.deallocate();
-				VentMechZoneOAPeopleRate.deallocate();
-				VentMechZoneADEffCooling.deallocate();
-				VentMechZoneADEffHeating.deallocate();
-				VentMechZoneADEffSchPtr.deallocate();
-				VentMechZoneADEffSchName.deallocate();
-				VentMechZoneOAFlow.deallocate();
-				VentMechZoneOAACH.deallocate();
-
 				DesignSpecZoneADObjName.deallocate();
 				DesignSpecZoneADObjIndex.deallocate();
-				VentMechZoneSecondaryRecirculation.deallocate();
 
 			}
 
 			for ( VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum ) {
-				for ( jZone = 1; jZone <= VentilationMechanical( VentMechNum ).NumofVentMechZones; ++jZone ) {
-					if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
-						if ( VentilationMechanical( VentMechNum ).ZoneOAACHRate( jZone ) > 0.0 || VentilationMechanical( VentMechNum ).ZoneOAFlowRate( jZone ) > 0.0 ) {
-							ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate outdoor air method" );
-							ShowContinueError( "Inappropriate method for Design Specification Outdoor Air Object Name=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
-							ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + "\"." );
+				auto & thisVentilationMechanical( VentilationMechanical( VentMechNum ) );
+				for ( jZone = 1; jZone <= thisVentilationMechanical.NumofVentMechZones; ++jZone ) {
+					if ( thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlSchOcc ) {
+						if ( thisVentilationMechanical.ZoneOAACHRate( jZone ) > 0.0 || thisVentilationMechanical.ZoneOAFlowRate( jZone ) > 0.0 ) {
+							ShowWarningError( CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", inappropriate outdoor air method" );
+							ShowContinueError( "Inappropriate method for Design Specification Outdoor Air Object Name=\"" + thisVentilationMechanical.ZoneDesignSpecOAObjName( jZone ) + "\"." );
+							ShowContinueError( "For Zone=\"" + thisVentilationMechanical.VentMechZoneName( jZone ) + "\"." );
 							ShowContinueError( "Since System Outdoor Air Method= ProportionalControlBasedonOccupancySchedule\", AirChanges/Hour or Flow/Zone outdoor air methods are not valid. Simulation continues.... " );
 						}
 					}
-					if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
-						if ( VentilationMechanical( VentMechNum ).ZoneOAACHRate( jZone ) > 0.0 || VentilationMechanical( VentMechNum ).ZoneOAFlowRate( jZone ) > 0.0 ) {
-							ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate outdoor air method" );
-							ShowContinueError( "Inappropriate method for Design Specification Outdoor Air Object Name=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
-							ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + "\"." );
+					if ( thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+						if ( thisVentilationMechanical.ZoneOAACHRate( jZone ) > 0.0 || thisVentilationMechanical.ZoneOAFlowRate( jZone ) > 0.0 ) {
+							ShowWarningError( CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", inappropriate outdoor air method" );
+							ShowContinueError( "Inappropriate method for Design Specification Outdoor Air Object Name=\"" + thisVentilationMechanical.ZoneDesignSpecOAObjName( jZone ) + "\"." );
+							ShowContinueError( "For Zone=\"" + thisVentilationMechanical.VentMechZoneName( jZone ) + "\"." );
 							ShowContinueError( "Since System Outdoor Air Method= ProportionalControlBasedonDesignOccupancy\", AirChanges/Hour or Flow/Zone outdoor air methods are not valid. Simulation continues.... " );
 						}
 					}
 
 					// Error check to see if a single duct air terminal is assigned to a zone that has zone secondary recirculation
-					if ( VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation( jZone ) > 0.0 ) {
-						ZoneNum = VentilationMechanical( VentMechNum ).VentMechZone( jZone );
+					if ( thisVentilationMechanical.ZoneSecondaryRecirculation( jZone ) > 0.0 ) {
+						ZoneNum = thisVentilationMechanical.VentMechZone( jZone );
 						if ( ZoneNum > 0 ) {
 							EquipListIndex = ZoneEquipConfig( ZoneNum ).EquipListIndex;
 							if ( EquipListIndex > 0 ) {
@@ -1904,12 +1823,12 @@ namespace MixedAir {
 												for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 													if ( SameString( ZoneEquipList( EquipListNum ).EquipName( EquipNum ), AirDistUnit( ADUNum ).Name ) ) {
 														if ( ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctVAVReheatVSFan ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctCBVAVNoReheat ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolCooledBeam ) || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == SingleDuctConstVolFourPipeBeam )  || ( AirDistUnit( ADUNum ).EquipType_Num( EquipNum ) == DualDuctVAVOutdoorAir ) ) {
-															ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate use of Zone secondary recirculation" );
+															ShowWarningError( CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", inappropriate use of Zone secondary recirculation" );
 															ShowContinueError( "A zone secondary recirculation fraction is specified for zone served by " );
 															ShowContinueError( "...terminal unit \"" + AirDistUnit( ADUNum ).Name + "\" , that indicates a single path system" );
-															ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + "\"." );
+															ShowContinueError( "For Zone=\"" + thisVentilationMechanical.VentMechZoneName( jZone ) + "\"." );
 															ShowContinueError( "...The zone secondary recirculation for that zone was set to 0.0" );
-															VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation( jZone ) = 0.0;
+															thisVentilationMechanical.ZoneSecondaryRecirculation( jZone ) = 0.0;
 														}
 														goto EquipLoop_exit;
 													}
@@ -1922,28 +1841,28 @@ namespace MixedAir {
 							}
 						}
 					}
-					if ( VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ).empty() ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", Design Specification Outdoor Air Object Name blank" );
-						ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + "\"." );
+					if ( thisVentilationMechanical.ZoneDesignSpecOAObjName( jZone ).empty() ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", Design Specification Outdoor Air Object Name blank" );
+						ShowContinueError( "For Zone=\"" + thisVentilationMechanical.VentMechZoneName( jZone ) + "\"." );
 						ShowContinueError( "This field either needs to be filled in in this object or Sizing:Zone object." );
 						ShowContinueError( "For this run, default values for these fields will be used." );
 					}
-					if ( VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( jZone ) <= 0.0 && VentilationMechanical( VentMechNum ).DCVFlag ) {
-						ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", Zone OA/person rate" );
-						ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + "\"." );
-						ShowContinueError( "Zone outside air per person rate not set in Design Specification Outdoor Air Object=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
+					if ( thisVentilationMechanical.ZoneOAPeopleRate( jZone ) <= 0.0 && thisVentilationMechanical.DCVFlag ) {
+						ShowWarningError( CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", Zone OA/person rate" );
+						ShowContinueError( "For Zone=\"" + thisVentilationMechanical.VentMechZoneName( jZone ) + "\"." );
+						ShowContinueError( "Zone outside air per person rate not set in Design Specification Outdoor Air Object=\"" + thisVentilationMechanical.ZoneDesignSpecOAObjName( jZone ) + "\"." );
 					}
 
-					if ( VentilationMechanical( VentMechNum ).ZoneOAAreaRate( jZone ) < 0.0 ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", invalid Outdoor Air flow per area" );
-						ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + "\"." );
-						ShowContinueError( "invalid Outdoor Air flow per area specified in object=\"" + OARequirements( VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( jZone ) ).Name + "\". Value must be >= 0.0." );
+					if ( thisVentilationMechanical.ZoneOAAreaRate( jZone ) < 0.0 ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid Outdoor Air flow per area" );
+						ShowContinueError( "For Zone=\"" + thisVentilationMechanical.VentMechZoneName( jZone ) + "\"." );
+						ShowContinueError( "invalid Outdoor Air flow per area specified in object=\"" + thisVentilationMechanical.ZoneDesignSpecOAObjName( jZone ) + "\". Value must be >= 0.0." );
 						ErrorsFound = true;
 					}
-					if ( VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( jZone ) < 0.0 ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", invalid Outdoor Air flow per person" );
-						ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + "\"." );
-						ShowContinueError( "invalid Outdoor Air flow per person specified in object \"" + OARequirements( VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( jZone ) ).Name + "\". Value must be >= 0.0." );
+					if ( thisVentilationMechanical.ZoneOAPeopleRate( jZone ) < 0.0 ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid Outdoor Air flow per person" );
+						ShowContinueError( "For Zone=\"" + thisVentilationMechanical.VentMechZoneName( jZone ) + "\"." );
+						ShowContinueError( "invalid Outdoor Air flow per person specified in object \"" + thisVentilationMechanical.ZoneDesignSpecOAObjName( jZone ) + "\". Value must be >= 0.0." );
 						ErrorsFound = true;
 					}
 				}
@@ -1992,7 +1911,7 @@ namespace MixedAir {
 					if ( jZone < VentilationMechanical( VentMechNum ).NumofVentMechZones ) {
 						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( jZone ) + ','; }
 					} else {
-						gio::write( OutputFileInits, fmtA ) << Zone( VentilationMechanical( VentMechNum ).VentMechZone( jZone ) ).Name + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( jZone );
+						gio::write( OutputFileInits, fmtA ) << VentilationMechanical( VentMechNum ).VentMechZoneName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( jZone );
 					}
 				}
 			}

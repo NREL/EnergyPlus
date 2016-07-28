@@ -398,6 +398,7 @@ namespace MixedAir {
 		Array1D< Real64 > ZoneOAFlowRate; // OA Flow Rate (m3/s/zone) for each zone
 		Array1D< Real64 > ZoneOAACHRate; // OA ACH (m3/s/volume) for each zone
 		Array1D_int VentMechZone; // Zones requiring mechanical ventilation
+		Array1D_string VentMechZoneName; // name of mech vent zone
 		Array1D_int ZoneDesignSpecOAObjIndex; // index of the design specification outdoor air object
 		// for each zone in zone list
 		Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object
