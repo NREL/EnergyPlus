@@ -273,6 +273,10 @@ namespace WaterCoils {
 		Real64 FoulingFactor; // Coil fouling factor [m2K/W]
 		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
+		// variables for coil fault
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -383,7 +387,10 @@ namespace WaterCoils {
 			CoilPerfInpMeth( 0 ),
 			FoulingFactor( 0.0 ),
 			DesiccantRegenerationCoil( false ),
-			DesiccantDehumNum( 0 )
+			DesiccantDehumNum( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};

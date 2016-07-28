@@ -290,7 +290,7 @@ namespace FaultsManager {
 		std::string CoilName; // Coil name
 	
 		// Default Constructor
-		FaultPropertiesCondenserSWT():
+		FaultPropertiesCoilSAT():
 			CoilType( "" ),
 			CoilName( "" )
 		{}

@@ -171,7 +171,10 @@ namespace HeatingCoils {
 		Array1D< Real64 > MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
 		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
-
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		
 		// Default Constructor
 		HeatingCoilEquipConditions() :
 			HCoilType_Num( 0 ),
@@ -214,7 +217,10 @@ namespace HeatingCoils {
 			ReclaimHeatingSource( 0 ),
 			NumOfStages( 0 ),
 			DesiccantRegenerationCoil( false ),
-			DesiccantDehumNum( 0 )
+			DesiccantDehumNum( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};

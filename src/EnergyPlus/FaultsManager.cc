@@ -63,9 +63,12 @@
 #include <CurveManager.hh>
 #include <DataPrecisionGlobals.hh>
 #include <Fans.hh>
+#include <HeatingCoils.hh>
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
+#include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
+#include <WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -281,7 +284,7 @@ namespace FaultsManager {
 		// check number of faults
 		NumFaults = 0;
 		NumFaultyEconomizer = 0;
-		for ( int NumFaultsTemp = 0, i = 1; i <= 12; ++i ){ //@@ i <= NumFaultTypes
+		for ( int NumFaultsTemp = 0, i = 1; i <= NumFaultTypes; ++i ){
 			NumFaultsTemp = GetNumObjectsFound( cFaults( i ) );
 			NumFaults += NumFaultsTemp;
 			
@@ -337,6 +340,123 @@ namespace FaultsManager {
 		if( NumFaultyTowerFouling > 0 ) FaultsTowerFouling.allocate( NumFaultyTowerFouling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 
+		// read faults input of Fault_type 113: Coil SAT Sensor Offset
+		for ( int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT ) {
+
+			cFaultCurrentObject = cFaults( 13 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_CoilSAT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsCoilSATSensor( jFault_CoilSAT ).FaultType = cFaultCurrentObject;
+			FaultsCoilSATSensor( jFault_CoilSAT ).FaultTypeEnum = iFault_TemperatureSensorOffset_CoilSupplyAir;
+			FaultsCoilSATSensor( jFault_CoilSAT ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsCoilSATSensor( jFault_CoilSAT ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsCoilSATSensor( jFault_CoilSAT ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsCoilSATSensor( jFault_CoilSAT ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsCoilSATSensor( jFault_CoilSAT ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsCoilSATSensor( jFault_CoilSAT ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsCoilSATSensor( jFault_CoilSAT ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsCoilSATSensor( jFault_CoilSAT ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsCoilSATSensor( jFault_CoilSAT ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// offset - degree of fault
+			FaultsCoilSATSensor( jFault_CoilSAT ).Offset = rNumericArgs( 1 );
+			
+			// Coil type
+			FaultsCoilSATSensor( jFault_CoilSAT ).CoilType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Coil name
+			FaultsCoilSATSensor( jFault_CoilSAT ).CoilName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Coil check and link
+			{ auto const SELECT_CASE_VAR( FaultsCoilSATSensor( jFault_CoilSAT ).CoilType );
+	   
+				if( SameString( SELECT_CASE_VAR, "Coil:Heating:Electric" ) ||
+					SameString( SELECT_CASE_VAR, "Coil:Heating:Electric:Multistage" ) ||
+					SameString( SELECT_CASE_VAR, "Coil:Heating:Gas" ) ||
+					SameString( SELECT_CASE_VAR, "Coil:Heating:Gas:Multistage" ) ||
+					SameString( SELECT_CASE_VAR, "Coil:Heating:Desuperheater" )
+				){
+					// Read in coil input if not done yet
+					if ( HeatingCoils::GetCoilsInputFlag ) {
+						HeatingCoils::GetHeatingCoilInput();
+						HeatingCoils::GetCoilsInputFlag = false;
+					}
+					// Check the coil name and coil type
+					int CoilNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HeatingCoils::HeatingCoil );
+					if ( CoilNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the coil with the fault model
+						HeatingCoils::HeatingCoil( CoilNum ).FaultyCoilSATFlag = true;
+						HeatingCoils::HeatingCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Coil:Heating:Steam" ) ) {
+					
+					// Read in coil input if not done yet
+					if ( SteamCoils::GetSteamCoilsInputFlag ) {
+						SteamCoils::GetSteamCoilInput();
+						SteamCoils::GetSteamCoilsInputFlag = false;
+					}
+					// Check the coil name and coil type
+					int CoilNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, SteamCoils::SteamCoil );
+					if ( CoilNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the coil with the fault model
+						SteamCoils::SteamCoil( CoilNum ).FaultyCoilSATFlag = true;
+						SteamCoils::SteamCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Coil:Heating:Water" ) ||
+					SameString( SELECT_CASE_VAR, "Coil:Cooling:Water" ) ||
+					SameString( SELECT_CASE_VAR, "Coil:Cooling:Water:Detailedgeometry" )
+				){
+					// Read in coil input if not done yet
+					if ( WaterCoils::GetWaterCoilsInputFlag ) {
+						WaterCoils::GetWaterCoilInput();
+						WaterCoils::GetWaterCoilsInputFlag = false;
+					}
+					// Check the coil name and coil type
+					int CoilNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, WaterCoils::WaterCoil );
+					if ( CoilNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the coil with the fault model
+						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATFlag = true;
+						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+					}
+				}
+			}
+		}
+		
 		// read faults input of Fault_type 112: Cooling tower scaling
 		for ( int jFault_TowerFouling = 1; jFault_TowerFouling <= NumFaultyTowerFouling; ++jFault_TowerFouling ) {
 
