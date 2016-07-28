@@ -213,7 +213,7 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesChillerSWT > FaultsChillerSWTSensor;
 	Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
 	Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
-	Array1D< FaultProperties > FaultsCoilSATSensor;
+	Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 
 	// Functions
 
