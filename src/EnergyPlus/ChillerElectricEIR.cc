@@ -1381,7 +1381,6 @@ namespace ChillerElectricEIR {
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
-		using DataGlobals::DoWeathSim;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::SysTimeElapsed;

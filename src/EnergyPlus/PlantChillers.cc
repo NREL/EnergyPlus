@@ -4116,7 +4116,6 @@ namespace PlantChillers {
 		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
@@ -4705,7 +4704,6 @@ namespace PlantChillers {
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
-		using DataGlobals::DoWeathSim;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -5349,7 +5347,6 @@ namespace PlantChillers {
 		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;
@@ -6065,7 +6062,6 @@ namespace PlantChillers {
 		using DataGlobals::SecInHour;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TimeStepSys;

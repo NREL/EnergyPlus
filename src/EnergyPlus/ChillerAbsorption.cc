@@ -1278,7 +1278,6 @@ namespace ChillerAbsorption {
 		using namespace FluidProperties;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::DoingSizing;
-		using DataGlobals::DoWeathSim;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::SecInHour;

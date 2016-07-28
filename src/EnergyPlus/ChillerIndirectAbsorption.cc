@@ -1408,7 +1408,6 @@ namespace ChillerIndirectAbsorption {
 		using DataGlobals::SecInHour;
 		using DataGlobals::DoingSizing;
 		using DataGlobals::KickOffSimulation;
-		using DataGlobals::DoWeathSim;
 		using DataGlobals::WarmupFlag;
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
