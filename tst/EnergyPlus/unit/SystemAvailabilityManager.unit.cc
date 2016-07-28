@@ -86,12 +86,28 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	std::string const idf_objects = delimited_string( {
 
 		" AvailabilityManager:OptimumStart,",
-		"   OptStart Availability,   !- Name",
+		"   OptStart Availability 1, !- Name",
 		"   Sch_OptStart,            !- Applicability Schedule Name",
 		"   Fan_Schedule,            !- Fan Schedule Name",
 		"   MaximumofZoneList,       !- Control Type",
 		"   ,                        !- Control Zone Name",
 		"   List_Zones,              !- Zone List Name",
+		"   4,                       !- Maximum Value for Optimum Start Time {hr}",
+		"   AdaptiveTemperatureGradient,  !- Control Algorithm",
+		"   ,                        !- Constant Temperature Gradient during Cooling {deltaC/hr}",
+		"   ,                        !- Constant Temperature Gradient during Heating {deltaC/hr}",
+		"   2,                       !- Initial Temperature Gradient during Cooling {deltaC/hr}",
+		"   2,                       !- Initial Temperature Gradient during Heating {deltaC/hr}",
+		"   ,                        !- Constant Start Time {hr}",
+		"   2;                       !- Number of Previous Days {days}",
+
+		" AvailabilityManager:OptimumStart,",
+		"   OptStart Availability 2, !- Name",
+		"   Sch_OptStart,            !- Applicability Schedule Name",
+		"   Fan_Schedule,            !- Fan Schedule Name",
+		"   ControlZone,             !- Control Type",
+		"   Zone 4,                  !- Control Zone Name",
+		"   ,                        !- Zone List Name",
 		"   4,                       !- Maximum Value for Optimum Start Time {hr}",
 		"   AdaptiveTemperatureGradient,  !- Control Algorithm",
 		"   ,                        !- Constant Temperature Gradient during Cooling {deltaC/hr}",
@@ -135,24 +151,36 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	DataHeatBalance::ZoneList( 1 ).Zone( 2 ) = 2;
 	DataHeatBalance::ZoneList( 1 ).Zone( 3 ) = 3;
 
-	DataHVACGlobals::NumPrimaryAirSys = 1;
-	DataAirLoop::PriAirSysAvailMgr.allocate( 1 );
+	DataHVACGlobals::NumPrimaryAirSys = 2;
+	DataAirLoop::PriAirSysAvailMgr.allocate( 2 );
 	DataAirLoop::PriAirSysAvailMgr( 1 ).NumAvailManagers = 1;
+	DataAirLoop::PriAirSysAvailMgr( 2 ).NumAvailManagers = 1;
 
 	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerType.allocate( 1 );
 	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerName.allocate( 1 );
 	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerNum.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr( 2 ).AvailManagerType.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr( 2 ).AvailManagerName.allocate( 1 );
+	DataAirLoop::PriAirSysAvailMgr( 2 ).AvailManagerNum.allocate( 1 );
 
 	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerType( 1 ) = 12; // cValidSysAvailManagerTypes( { ......., "AvailabilityManager:OptimumStart" } );
-	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerName( 1 ) = "OptStart Availability";
+	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerName( 1 ) = "OptStart Availability 1";
 	DataAirLoop::PriAirSysAvailMgr( 1 ).AvailManagerNum( 1 ) = 1;
+	DataAirLoop::PriAirSysAvailMgr( 2 ).AvailManagerType( 1 ) = 12; // cValidSysAvailManagerTypes( { ......., "AvailabilityManager:OptimumStart" } );
+	DataAirLoop::PriAirSysAvailMgr( 2 ).AvailManagerName( 1 ) = "OptStart Availability 2";
+	DataAirLoop::PriAirSysAvailMgr( 2 ).AvailManagerNum( 1 ) = 2;
 
-	DataAirLoop::AirToZoneNodeInfo.allocate( 1 );
+	DataAirLoop::AirToZoneNodeInfo.allocate( 2 );
 	DataAirLoop::AirToZoneNodeInfo( 1 ).NumZonesCooled = 3;
 	DataAirLoop::AirToZoneNodeInfo( 1 ).CoolCtrlZoneNums.allocate( 3 );
 	DataAirLoop::AirToZoneNodeInfo( 1 ).CoolCtrlZoneNums( 1 ) = 1;
 	DataAirLoop::AirToZoneNodeInfo( 1 ).CoolCtrlZoneNums( 2 ) = 2;
 	DataAirLoop::AirToZoneNodeInfo( 1 ).CoolCtrlZoneNums( 3 ) = 3;
+
+	DataAirLoop::AirToZoneNodeInfo( 2 ).NumZonesCooled = 2;
+	DataAirLoop::AirToZoneNodeInfo( 2 ).CoolCtrlZoneNums.allocate( 2 );
+	DataAirLoop::AirToZoneNodeInfo( 2 ).CoolCtrlZoneNums( 1 ) = 4;
+	DataAirLoop::AirToZoneNodeInfo( 2 ).CoolCtrlZoneNums( 2 ) = 5;
 
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -170,9 +198,17 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
 	ScheduleManager::UpdateScheduleValues();
 
-	DataZoneEquipment::ZoneEquipAvail.allocate( 3 );
+	DataZoneEquipment::ZoneEquipAvail.allocate( 5 );
 
-	DataZoneEquipment::NumOfZones = 3;
+	DataZoneEquipment::NumOfZones = 5;
+
+	DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+	DataHeatBalance::Zone( 1).Name = "ZONE 1";
+	DataHeatBalance::Zone( 2).Name = "ZONE 2";
+	DataHeatBalance::Zone( 3).Name = "ZONE 3";
+	DataHeatBalance::Zone( 4).Name = "ZONE 4";
+	DataHeatBalance::Zone( 5).Name = "ZONE 5";
+
 	DataZoneEquipment::ZoneEquipConfig.allocate( DataZoneEquipment::NumOfZones ); 
 
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
@@ -190,34 +226,37 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	DataZoneEquipment::ZoneEquipConfig( 3 ).ZoneNode = 3;
 	DataZoneEquipment::ZoneEquipConfig( 3 ).AirLoopNum = 1;
 
+	DataZoneEquipment::ZoneEquipConfig( 4 ).ZoneName = "Zone 4";
+	DataZoneEquipment::ZoneEquipConfig( 4 ).ActualZoneNum = 4;
+	DataZoneEquipment::ZoneEquipConfig( 4 ).ZoneNode = 4;
+	DataZoneEquipment::ZoneEquipConfig( 4 ).AirLoopNum = 2;
+
+	DataZoneEquipment::ZoneEquipConfig( 5 ).ZoneName = "Zone 5";
+	DataZoneEquipment::ZoneEquipConfig( 5 ).ActualZoneNum = 5;
+	DataZoneEquipment::ZoneEquipConfig( 5 ).ZoneNode = 5;
+	DataZoneEquipment::ZoneEquipConfig( 5 ).AirLoopNum = 2;
+
 	DataZoneEquipment::ZoneEquipInputsFilled = true;
 
 
-	DataHeatBalFanSys::TempTstatAir.allocate( 3 );
-	DataHeatBalFanSys::ZoneThermostatSetPointLo.allocate( 3 );
-	DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate( 3 );
-
-	DataHeatBalFanSys::TempTstatAir( 1 ) = 18.0;
-	DataHeatBalFanSys::ZoneThermostatSetPointLo( 1 ) = 19.0;
-	DataHeatBalFanSys::ZoneThermostatSetPointHi( 1 ) = 24.0;
-
+	DataHeatBalFanSys::TempTstatAir.allocate( 5 );
+	DataHeatBalFanSys::TempTstatAir( 1 ) = 18.0; // all zones have different space temperature
 	DataHeatBalFanSys::TempTstatAir( 2 ) = 17.0;
-	DataHeatBalFanSys::ZoneThermostatSetPointLo( 2 ) = 19.0;
-	DataHeatBalFanSys::ZoneThermostatSetPointHi( 2 ) = 24.0;
-
 	DataHeatBalFanSys::TempTstatAir( 3 ) = 16.0;
-	DataHeatBalFanSys::ZoneThermostatSetPointLo( 3 ) = 19.0;
-	DataHeatBalFanSys::ZoneThermostatSetPointHi( 3 ) = 24.0;
+	DataHeatBalFanSys::TempTstatAir( 4 ) = 15.0;
+	DataHeatBalFanSys::TempTstatAir( 5 ) = 14.0;
 
-	DataZoneControls::OccRoomTSetPointHeat.allocate( 3 );
-	DataZoneControls::OccRoomTSetPointCool.allocate( 3 );
+	DataHeatBalFanSys::ZoneThermostatSetPointLo.allocate( 5 );
+	DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate( 5 );
 
-	DataZoneControls::OccRoomTSetPointHeat( 1 ) = 19.0;
-	DataZoneControls::OccRoomTSetPointHeat( 2 ) = 19.0;
-	DataZoneControls::OccRoomTSetPointHeat( 3 ) = 19.0;
-	DataZoneControls::OccRoomTSetPointCool( 1 ) = 24.0;
-	DataZoneControls::OccRoomTSetPointCool( 2 ) = 24.0;
-	DataZoneControls::OccRoomTSetPointCool( 3 ) = 24.0;
+	DataHeatBalFanSys::ZoneThermostatSetPointLo = 19.0; // all zones use same set point temperature
+	DataHeatBalFanSys::ZoneThermostatSetPointHi = 24.0;
+
+	DataZoneControls::OccRoomTSetPointHeat.allocate( 5 );
+	DataZoneControls::OccRoomTSetPointCool.allocate( 5 );
+
+	DataZoneControls::OccRoomTSetPointHeat = 19.0; // all zones use same set point temperature
+	DataZoneControls::OccRoomTSetPointCool = 24.0;
 
 	SystemAvailabilityManager::	ManageSystemAvailability(); // 1st time through just gets input
 	
@@ -231,6 +270,8 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	EXPECT_EQ(  0.0, SystemAvailabilityManager::OptStartSysAvailMgrData( 1 ).TempDiffHi ); // cooling data did not get set so is 0
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::OptStartSysAvailMgrData( 1 ).AvailStatus ); // avail manager should not yet be set
 
+	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::OptStartSysAvailMgrData( 2 ).AvailStatus ); // avail manager should not be set until 6 AM
+
 	DataGlobals::WarmupFlag = false;
 	DataGlobals::BeginDayFlag = false; // start processing temp data to find optimum start time
 	DataGlobals::CurrentTime = 2.0; // set the current time to 2 AM
@@ -242,10 +283,14 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	EXPECT_EQ(  0.0, SystemAvailabilityManager::OptStartSysAvailMgrData( 1 ).TempDiffHi ); // cooling data did not get set so is 0
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::OptStartSysAvailMgrData( 1 ).AvailStatus ); // avail manager should not yet be set
 
+	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::OptStartSysAvailMgrData( 2 ).AvailStatus ); // avail manager should not be set until 6 AM
+
 	DataGlobals::CurrentTime = 7.0; // set the current time to 7 AM which is past time to pre-start HVAC
 	SystemAvailabilityManager::	ManageSystemAvailability();
 
 	EXPECT_EQ( DataHVACGlobals::CycleOn, SystemAvailabilityManager::OptStartSysAvailMgrData( 1 ).AvailStatus ); // avail manager should be set to cycle on
 	EXPECT_EQ( 1.5, SystemAvailabilityManager::OptStartSysAvailMgrData( 1 ).NumHoursBeforeOccupancy ); // 1.5 hours = 3C from SP divided by 2C/hour
+
+	EXPECT_EQ( DataHVACGlobals::CycleOn, SystemAvailabilityManager::OptStartSysAvailMgrData( 2 ).AvailStatus ); // avail manager should be set at 6 AM
 
 }

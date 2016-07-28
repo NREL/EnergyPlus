@@ -231,6 +231,7 @@ namespace SystemAvailabilityManager {
 		// Members
 		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
+		bool isSimulated; // true after availability manager is simulated
 		int SchedPtr; // Applicability schedule pointer
 		std::string FanSched; // Fan schedule name
 		int FanSchedPtr; // Fan schedule pointer
@@ -276,6 +277,7 @@ namespace SystemAvailabilityManager {
 		// Default Constructor
 		DefineOptStartSysAvailManager() :
 			MgrType( 0 ),
+			isSimulated( false),
 			SchedPtr( 0 ),
 			FanSchedPtr( 0 ),
 			CtrlType( 0 ),
