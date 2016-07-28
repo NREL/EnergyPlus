@@ -79630,6 +79630,48 @@ FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
        \default 0.0
        \units deltaC
 
+FaultModel:TemperatureSensorOffset:CoilSupplyAir,
+   \memo This object describes fault of coil supply air temperature sensor offset
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Coil Object Type
+       \note Enter the type of the coil affected
+       \required-field
+       \type choice
+       \key Coil:Heating:Electric
+       \key Coil:Heating:Electric:Multistage
+       \key Coil:Heating:Gas
+       \key Coil:Heating:Gas:Multistage
+       \key Coil:Heating:Steam
+       \key Coil:Heating:Desuperheater
+       \key Coil:Heating:Water
+       \key Coil:Cooling:Water
+       \key Coil:Cooling:Water:Detailedgeometry
+   A5, \field Coil Object Name
+       \note Enter the name of the coil affected
+       \required-field
+       \type object-list
+       \object-list CoolingCoilName
+       \object-list HeatingCoilName
+       \object-list HeatingCoilsElectricMultiStage
+       \object-list HeatingCoilsGasMultiStage
+       \object-list HeatingCoilsDesuperheater
+   N1; \field Reference Sensor Offset
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 0.0
+       \units deltaC
+
 FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
    \memo This object describes fault of condenser supply water temperature sensor offset
    \min-fields 6
