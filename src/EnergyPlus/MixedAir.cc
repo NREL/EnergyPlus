@@ -1724,7 +1724,7 @@ namespace MixedAir {
 										}
 									}
 
-									if ( thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) > 0 ) {
+									if ( DesignSpecZoneADObjIndex( groupNum ) > 0 ) {
 										// new DCV inputs
 										thisVentilationMechanical.ZoneDesignSpecADObjName( MechVentZoneCount ) = DesignSpecZoneADObjName( groupNum );
 										thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
