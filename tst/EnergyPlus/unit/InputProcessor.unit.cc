@@ -1827,6 +1827,82 @@ namespace EnergyPlus {
 
 	}
 
+    TEST_F( InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields )
+    {
+        std::string const idf_objects = delimited_string({
+                                                                 "Version,8.3;",
+                                                                 "Sizing:System,",
+                                                                 "  West Zone Air System,    !- AirLoop Name",
+                                                                 "  Sensible,                !- Type of Load to Size On",
+                                                                 "  autosize,                !- Design Outdoor Air Flow Rate {m3/s}",
+                                                                 "  0.4,                     !- Minimum System Air Flow Ratio",
+                                                                 "  7.0,                     !- Preheat Design Temperature {C}",
+                                                                 "  0.0085,                  !- Preheat Design Humidity Ratio {kgWater/kgDryAir}",
+                                                                 "  11.0,                    !- Precool Design Temperature {C}",
+                                                                 "  0.0085,                  !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
+                                                                 "  12.8,                    !- Central Cooling Design Supply Air Temperature {C}",
+                                                                 "  16.7,                    !- Central Heating Design Supply Air Temperature {C}",
+                                                                 "  NonCoincident,           !- Sizing Option",
+                                                                 "  Yes,                     !- 100% Outdoor Air in Cooling",
+                                                                 "  No,                      !- 100% Outdoor Air in Heating",
+                                                                 "  0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+                                                                 "  0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+                                                                 "  DesignDay,               !- Cooling Design Air Flow Method",
+                                                                 "  ,                        !- Cooling Design Air Flow Rate {m3/s}",
+                                                                 "  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}",
+                                                                 "  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
+                                                                 "  ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}",
+                                                                 "  DesignDay,               !- Heating Design Air Flow Method",
+                                                                 "  ,                        !- Heating Design Air Flow Rate {m3/s}",
+                                                                 "  ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}",
+                                                                 "  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}",
+                                                                 "  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
+                                                                 "  ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}",
+                                                                 "  ;                        !- System Outdoor Air Method",
+                                                         });
+
+
+        ASSERT_TRUE( process_idf( idf_objects, false ) );
+
+        std::string const CurrentModuleObject = "Sizing:System";
+
+        int NumSizingSystem = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+        ASSERT_EQ( 1, NumSizingSystem );
+
+        int TotalArgs = 0;
+        int NumAlphas = 0;
+        int NumNumbers = 0;
+
+        InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+        int IOStatus = 0;
+        Array1D_string Alphas( NumAlphas );
+        Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+        Array1D_bool lNumericBlanks( NumNumbers, true );
+        Array1D_bool lAlphaBlanks( NumAlphas, true );
+        Array1D_string cAlphaFields( NumAlphas );
+        Array1D_string cNumericFields( NumNumbers );
+
+        InputProcessor::GetObjectItem( CurrentModuleObject, NumSizingSystem, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+        EXPECT_EQ( 11, NumAlphas );
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "WEST ZONE AIR SYSTEM", "SENSIBLE", "NONCOINCIDENT", "YES", "NO", "DESIGNDAY",
+                                                                       "DESIGNDAY", "ZONESUM", "COOLINGDESIGNCAPACITY", "HEATINGDESIGNCAPACITY", "ONOFF" } ), Alphas ) );
+        // The commented out compare containers is what the original input processor said that alpha blanks should be, even though the last 3 alpha fields are filled
+        // in with defaults. We think the last three fields really should be considered blank, i.e. true
+//        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, true, false, false, false } ), lAlphaBlanks ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, true, true, true, true } ), lAlphaBlanks ) );
+
+        EXPECT_EQ( 26, NumNumbers );
+        EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8, 16.7, 0.0085, 0.0085,
+                                                                  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+                                                                  -99999, 0, 0, -99999, 0, 0 } ), Numbers ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+                                                                true, true, true, true, true, true, true, true, true, true,
+                                                                true, true, true, true, true, true } ), lNumericBlanks ) );
+        EXPECT_EQ( 1, IOStatus );
+    }
+
 	TEST_F( InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_autosize )
 	{
 		std::string const idf_objects = delimited_string({

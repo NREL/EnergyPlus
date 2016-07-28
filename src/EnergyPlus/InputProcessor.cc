@@ -177,6 +177,17 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			was_value_parsed = false;
 			next_token( idf, index );
 			if ( token == Token::SEMICOLON ) {
+				int min_fields = 0;
+				if ( obj_loc.find( "min_fields" ) != obj_loc.end() ) {
+					min_fields = obj_loc[ "min_fields" ];
+				}
+				// what about if this is in extensibles? should check for that before running this loop
+				// so if legacy_idd_index > loc[ "fields" ].size() then must be in extensibles, then mod operation
+				// TODO: find out if filling in objects UP TO MIN FIELDS applies to extensible objects
+                for (; legacy_idd_index < min_fields; legacy_idd_index++) {
+					std::string name = loc[ "fields" ][ legacy_idd_index ];
+					add_missing_field_value(name, root, extensible, obj_loc, loc, legacy_idd_index);
+				}
 				if ( extensible.size() ) {
 					array_of_extensions.push_back( extensible );
 					extensible.clear();
@@ -406,7 +417,6 @@ std::string IdfParser::parse_string( std::string const & idf, size_t & index, bo
 		success = false;
 		return std::string();
 	}
-	size_t str_size = s.size();
 	return rtrim( s );
 }
 
@@ -717,12 +727,9 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 				warnings.push_back( "type == string was not found in anyOf in object \"" + cur_obj_name
 				                    + "\" at line " + std::to_string( line_num ) );
 			}
-		}
-		else {
-			if ( loc.find( "type" ) != loc.end() && loc[ "type" ] != "string" ) {
+		} else if ( loc.find( "type" ) != loc.end() && loc[ "type" ] != "string" && ! parsed.get< std::string >().empty() ) {
 				errors.push_back( "In object \"" + cur_obj_name + "\", at line " + std::to_string( line_num ) +
 				                  ": type needs to be string" );
-			}
 		}
 	}
 }
@@ -885,7 +892,7 @@ namespace EnergyPlus {
 			return true;
 		};
 		InputProcessor::jdf = json::parse(user_input_dump, cb);
-//		InputProcessor::state.print_errors();
+		InputProcessor::state.print_errors();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -1046,7 +1053,11 @@ namespace EnergyPlus {
 						val = it.value().get < std::string >();
 						if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = val.empty();
 					}
-					Alphas( i + 1 ) = MakeUPPERCase( val );
+                    if ( schema_obj.find("retaincase") != schema_obj.end() ) {
+                        Alphas( i + 1 ) = val;
+                    } else {
+						Alphas( i + 1 ) = MakeUPPERCase( val );
+					}
 				} else {
 					std::string num_val = std::to_string( it.value().get < double >() );
 					bool is_double = false;
@@ -1095,7 +1106,11 @@ namespace EnergyPlus {
 							} else {
 								if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = val.empty();
 							}
-							Alphas( alphas_index + 1 ) = MakeUPPERCase( val );
+							if ( schema_obj.find("retaincase") != schema_obj.end() ) {
+								Alphas( alphas_index + 1 ) = val;
+							} else {
+								Alphas( alphas_index + 1 ) = MakeUPPERCase( val );
+							}
 						} else {
 							double val = extension_obj[ field ];
 							Alphas( alphas_index + 1 ) = std::to_string( val );
