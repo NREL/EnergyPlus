@@ -5,6 +5,7 @@ Outdoor Air Controller Cleanup - Issue #4663
 
  - April 22, 2016
  - Revised April 28, 2016
+ - Revised July 28-29, 2016 (see dated notes below)
 
 ## Conference Calls and Other Discussion ##
 
@@ -115,15 +116,28 @@ The current combination of Controller:OutdoorAir plus Controller:MechanicalVenti
 
 ```
 
-## Proposed Changes ##
+## Proposed/Actual Changes ##
 
 x 1. No changes to `Controller:MechanicalVentilation` and `Controller:OutdoorAir` inputs.
 
 x 2. In `Controller:MechanicalVentilation` make the zone names and design object names optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there. *This would be consistent with current docs and warning messages.*
 
-x 3. Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero if a Controller:MechanicalVentilation object is specified.
+x 3.  *July 28, 2016* Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero **if a Controller:MechanicalVentilation object is specified.**
+~~if one of the advanced methods (VRP, DCV, IAQ) of control is selected.  *Or maybe autosize to the non-per-person flow?*~~
+
 
 4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
+    *July 29, 2016* **Order of Precedence for OA Flow Rate Limit Checks**
+    - Minimum Outdoor Air Flow Rate * Minimum Outdoor Air Schedule
+    - Apply economizer controls
+    - OA flow rate >= Controller:MechanicalVentilation OA flow rate
+    - OA flow rate >= System exhaust flow rate
+    - (OA flow rate)/(Current Mixed air flow rate) >= Minimum Fraction of Outdoor Air Schedule
+    - (OA flow rate)/(Current Mixed air flow rate) <= Maximum Fraction of Outdoor Air Schedule (even if this is smaller than Min Fraction  schedule)
+    - OA flow rate <= Maximum Outdoor Air Flow Rate
+    - Apply OA mass flow rate specified by demand limiting
+    - Apply OA mass flow rate specified by EMS
+    - OA flow rate <= Current mixed air flow rate (system flow rate) **previously this check was before demand limiting and EMS, but my understanding is that OA flow > Mixed air flow can cause problems further into the system simulation.**
 
 5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Schedule Name" to "Outdoor Air Schedule Name" and use this schedule in `Controller:MechanicalVentilation`.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
 

@@ -3357,8 +3357,6 @@ namespace MixedAir {
 		Real64 MinOASchedVal; // value of the minimum outside air schedule
 		Real64 OASignal; // Outside air flow rate fraction (0.0 to 1.0)
 		bool AirLoopCyclingFan; // Type of air loop fan (TRUE if Fan:OnOff)
-		Real64 MinOAflowfracVal;
-		Real64 MaxOAflowfracVal;
 		bool HighHumidityOperationFlag; // TRUE if zone humidistat senses a high humidity condition
 		Real64 RecircTemp; // - return air temp, used for custom economizer control calculation
 		Real64 MixedAirTempAtMinOAFlow; // - mixed air temperature at min flow rate, used for custom economizer control calculation
@@ -3476,31 +3474,7 @@ namespace MixedAir {
 		}
 
 		// Economizer
-		CalcOAEconomizer( AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag );
-
-		// Apply Minimum Fraction of Outdoor Air Schedule
-		if ( this->MinOAflowSchPtr > 0 ) {
-			MinOAflowfracVal = GetCurrentScheduleValue( this->MinOAflowSchPtr );
-			MinOAflowfracVal = min( max( MinOAflowfracVal, 0.0 ), 1.0 );
-			OutAirMinFrac = max( MinOAflowfracVal, OutAirMinFrac );
-			OASignal = max( MinOAflowfracVal, OASignal );
-		}
-
-		if ( this->MaxOAflowSchPtr > 0 ) {
-			MaxOAflowfracVal = GetCurrentScheduleValue( this->MaxOAflowSchPtr );
-			MaxOAflowfracVal = min( max( MaxOAflowfracVal, 0.0 ), 1.0 );
-			if ( MaxOAflowfracVal < OutAirMinFrac ) {
-				OutAirMinFrac = MaxOAflowfracVal;
-			}
-			OASignal = min( MaxOAflowfracVal, OASignal );
-
-			if ( this->MinOAflowSchPtr > 0 ) {
-				if ( MaxOAflowfracVal < MinOAflowfracVal ) {
-					ShowWarningError( "Min OA flow frac Greater than Max OA flow frac - check the Schedules in \"Controller:OutdoorAir \" " + this->MinOAflowSch + this->MaxOAflowSch );
-				}
-			}
-
-		}
+		this->CalcOAEconomizer( AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag );
 
 		this->OAMassFlow = OASignal * this->MixMassFlow;
 
@@ -3524,9 +3498,19 @@ namespace MixedAir {
 			}
 		}
 
-		// Don't let OA flow be > mixed air flow.
-		// Seems if RAB (return air bypass) that this should be don't let OA flow be > design supply flow but that causes other issues
-		this->OAMassFlow = min( this->OAMassFlow, this->MixMassFlow );
+		// Apply Minimum Fraction of Outdoor Air Schedule
+		if ( this->MinOAflowSchPtr > 0 ) {
+			Real64 MinOAflowfracVal = GetCurrentScheduleValue( this->MinOAflowSchPtr );
+			MinOAflowfracVal = min( max( MinOAflowfracVal, 0.0 ), 1.0 );
+			this->OAMassFlow = max( this->OAMassFlow, this->MixMassFlow * MinOAflowfracVal );
+		}
+
+		// Apply Maximum Fraction of Outdoor Air Schedule
+		if ( this->MaxOAflowSchPtr > 0 ) {
+			Real64 MaxOAflowfracVal = GetCurrentScheduleValue( this->MaxOAflowSchPtr );
+			MaxOAflowfracVal = min( max( MaxOAflowfracVal, 0.0 ), 1.0 );
+			this->OAMassFlow = min( this->OAMassFlow, this->MixMassFlow * MaxOAflowfracVal );
+		}
 
 		// Don't let the OA flow be > than the max OA limit. OA for high humidity control is allowed to be greater than max OA.
 		// Night Ventilation has priority and may override an OASignal > 1 high humidity condition with OASignal = 1
@@ -3541,6 +3525,10 @@ namespace MixedAir {
 		if ( this->EMSOverrideOARate ) {
 			this->OAMassFlow = this->EMSOARateValue;
 		}
+
+		// Don't let OA flow be > mixed air flow.
+		// Seems if RAB (return air bypass) that this should be don't let OA flow be > design supply flow but that causes other issues
+		this->OAMassFlow = min(this->OAMassFlow, this->MixMassFlow);
 
 		// save the min outside air flow fraction and max outside air mass flow rate
 		if ( AirLoopNum > 0 ) {
