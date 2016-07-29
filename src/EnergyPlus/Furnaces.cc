@@ -450,8 +450,7 @@ namespace Furnaces {
 		CoolHeatPLRRat = 1.0;
 
 		// Simulate correct system type (1 of 4 choices)
-		{
-		auto const SELECT_CASE_var( Furnace( FurnaceNum ).FurnaceType_Num );
+		{auto const SELECT_CASE_var( Furnace( FurnaceNum ).FurnaceType_Num );
 
 		// Simulate HeatOnly systems:
 		if ( ( SELECT_CASE_var == Furnace_HeatOnly ) || ( SELECT_CASE_var == UnitarySys_HeatOnly ) ) {
@@ -653,8 +652,7 @@ namespace Furnaces {
 			// will never get here, all system types are simulated above
 			assert( false );
 
-		}
-		}
+		}}
 
 		// set the econo lockout flags
 		if ( Furnace( FurnaceNum ).CompPartLoadRatio > 0.0 && AirLoopControlInfo( AirLoopNum ).CanLockoutEconoWithCompressor ) {
@@ -8337,69 +8335,67 @@ namespace Furnaces {
 			MaxHotWaterFlow = Furnace( FurnaceNum ).MaxHeatCoilFluidFlow;
 		}
 
-		{
-			auto const SELECT_CASE_var( CoilTypeNum );
-			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
-				SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode );
-			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
-				if ( QCoilLoad > SmallLoad ) {
-					SetComponentFlowRate( MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
-					SimulateWaterCoilComponents( HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode );
-
-					if ( QActual > ( QCoilLoad + SmallLoad ) ) {
-						// control water flow to obtain output matching QCoilLoad
-						MinWaterFlow = 0.0;
-						Par( 1 ) = double( FurnaceNum );
-						if ( FirstHVACIteration ) {
-							Par( 2 ) = 1.0;
-						} else {
-							Par( 2 ) = 0.0;
-						}
-						Par( 3 ) = QCoilLoad;
-						if ( SuppHeatingCoilFlag ) {
-							Par( 4 ) = 1.0;
-						} else {
-							Par( 4 ) = 0.0;
-						}
-						SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
-						if ( SolFlag == -1 ) {
-							if ( Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex == 0 ) {
-								ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name + "\"" );
-								ShowContinueErrorTimeStamp( "" );
-								ShowContinueError( "  Iteration limit [" + RoundSigDigits( SolveMaxIter ) + "] exceeded in calculating hot water mass flow rate" );
-							}
-							ShowRecurringWarningErrorAtEnd( "CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" + RoundSigDigits( SolveMaxIter ) + "]) for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name, Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex );
-						} else if ( SolFlag == -2 ) {
-							if ( Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex2 == 0 ) {
-								ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name + "\"" );
-								ShowContinueErrorTimeStamp( "" );
-								ShowContinueError( "...Bad hot water maximum flow rate limits" );
-								ShowContinueError( "...Given minimum water flow rate=" + RoundSigDigits( MinWaterFlow, 3 ) + " kg/s" );
-								ShowContinueError( "...Given maximum water flow rate=" + RoundSigDigits( MaxHotWaterFlow, 3 ) + " kg/s" );
-							}
-							ShowRecurringWarningErrorAtEnd( "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name + "\"", Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex2, MaxHotWaterFlow, MinWaterFlow, _, "[kg/s]", "[kg/s]" );
-						}
-					}
-				} else {
-					mdot = 0.0;
-					SetComponentFlowRate( mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
-				}
-				// simulate the hot water heating coil
+		{auto const SELECT_CASE_var( CoilTypeNum );
+		if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
+			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode );
+		} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
+			if ( QCoilLoad > SmallLoad ) {
+				SetComponentFlowRate( MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
 				SimulateWaterCoilComponents( HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode );
-			} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
-				if ( QCoilLoad > SmallLoad ) {
-					SetComponentFlowRate( MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
-					// simulate the steam heating coil
-					SimulateSteamCoilComponents( HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode );
-				} else {
-					mdot = 0.0;
-					SetComponentFlowRate( mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
-					// simulate the steam heating coil
-					SimulateSteamCoilComponents( HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode );
-				}
 
+				if ( QActual > ( QCoilLoad + SmallLoad ) ) {
+					// control water flow to obtain output matching QCoilLoad
+					MinWaterFlow = 0.0;
+					Par( 1 ) = double( FurnaceNum );
+					if ( FirstHVACIteration ) {
+						Par( 2 ) = 1.0;
+					} else {
+						Par( 2 ) = 0.0;
+					}
+					Par( 3 ) = QCoilLoad;
+					if ( SuppHeatingCoilFlag ) {
+						Par( 4 ) = 1.0;
+					} else {
+						Par( 4 ) = 0.0;
+					}
+					SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+					if ( SolFlag == -1 ) {
+						if ( Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex == 0 ) {
+							ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name + "\"" );
+							ShowContinueErrorTimeStamp( "" );
+							ShowContinueError( "  Iteration limit [" + RoundSigDigits( SolveMaxIter ) + "] exceeded in calculating hot water mass flow rate" );
+						}
+						ShowRecurringWarningErrorAtEnd( "CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" + RoundSigDigits( SolveMaxIter ) + "]) for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name, Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex );
+					} else if ( SolFlag == -2 ) {
+						if ( Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex2 == 0 ) {
+							ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name + "\"" );
+							ShowContinueErrorTimeStamp( "" );
+							ShowContinueError( "...Bad hot water maximum flow rate limits" );
+							ShowContinueError( "...Given minimum water flow rate=" + RoundSigDigits( MinWaterFlow, 3 ) + " kg/s" );
+							ShowContinueError( "...Given maximum water flow rate=" + RoundSigDigits( MaxHotWaterFlow, 3 ) + " kg/s" );
+						}
+						ShowRecurringWarningErrorAtEnd( "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + "=\"" + Furnace( FurnaceNum ).Name + "\"", Furnace( FurnaceNum ).HotWaterCoilMaxIterIndex2, MaxHotWaterFlow, MinWaterFlow, _, "[kg/s]", "[kg/s]" );
+					}
+				}
+			} else {
+				mdot = 0.0;
+				SetComponentFlowRate( mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
 			}
-		}
+			// simulate the hot water heating coil
+			SimulateWaterCoilComponents( HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode );
+		} else if ( SELECT_CASE_var == Coil_HeatingSteam ) {
+			if ( QCoilLoad > SmallLoad ) {
+				SetComponentFlowRate( MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
+				// simulate the steam heating coil
+				SimulateSteamCoilComponents( HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode );
+			} else {
+				mdot = 0.0;
+				SetComponentFlowRate( mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum );
+				// simulate the steam heating coil
+				SimulateSteamCoilComponents( HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode );
+			}
+
+		}}
 
 		HeatCoilLoadmet = QActual;
 
