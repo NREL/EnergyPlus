@@ -325,7 +325,7 @@ The condenser supply water temperature readings deviate from the actual water te
 
 \subsubsection{Modeling Approach}
 
-The fault applies to a number of cooling types, namely:
+The fault applies to a number of cooling tower types, namely:
 
 \begin{itemize}
 \tightlist
@@ -364,7 +364,7 @@ The fault of scaling widely exists in the cooling tower operations. It occurs wh
 
 \subsubsection{Modeling Approach}
 
-The fault applies to a number of cooling types, namely:
+The fault applies to a number of cooling tower types, namely:
 
 \begin{itemize}
 \tightlist
@@ -389,4 +389,49 @@ Where,
 \(UA_{tower,ff}\) U-factor times area values in the fault-free case
 
 \(F_{UA}\) Factor describing the tower UA reduction due to fouling
+
+
+\subsection{Coil Supply Air Temperature Sensor Offset}\label{coil-supply-air-temperature-sensor-offset}
+
+\subsubsection{Symptom}
+
+The coil supply air temperature readings deviate from the actual air temperature levels due to sensor offset at the coil outlet. Because coil outlet node are often used as the setpoint node for coil control, the fault may affect the actual performance of the coils. It can results in inappropriate coil operations such as coil on/off mode and water-side flow rate control, and therefore affect the coil energy consumption. Since the coil outlet air temperature deviate from the design level, the operations and performance of other components (e.g., other dcoils) at the downstream may also be affected.
+
+\subsubsection{Modeling Approach}
+
+EnergyPlus can model a number of coil types, some of which are temperature-based control and the others are load-based control. The proposed fault model will be applied to the ones with temperature-based control, namely:
+
+\begin{itemize}
+\tightlist
+\item
+  Coil:Heating:Electric
+\item
+  Coil:Heating:Gas
+\item
+  Coil:Heating:Steam
+\item
+  Coil:Heating:Desuperheater
+\item
+  Coil:Heating:Water
+\item
+  Coil:Cooling:Water
+\item
+  Coil:Cooling:Water:Detailedgeometry
+\end{itemize}
+
+The effect of an offset in a coil supply air temperature sensor whose sole use is for calculation of the difference between the set-points and the actual values can be modeled as an equal and opposite offset:
+
+\begin{equation}
+T_{coil-o,f} = T_{coil-o,ff} - \Delta T
+\end{equation}
+
+Where,
+
+\(T_{coil-o,f}\) coil outlet temperature in the faulty case (actual value)
+
+\(T_{coil-o,ff}\) coil outlet temperature in the fault-free case (reading value)
+
+\(\Delta T\) difference between the temperature reading and the actual temperature
+
+Note that \emph{Coil:Heating:Water}, \emph{Coil:Cooling:Water}, and \emph{Coil:Cooling:Water:Detailedgeometry} are controlled via \emph{Controller:WaterCoil}, while the other coil types are controlled with an internal \emph{Temperature Setpoint Node}. For the water coils, users need to specify a \emph{Controller:WaterCoil} object that corresponds to the faulty water coil.
 
