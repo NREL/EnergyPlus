@@ -117,11 +117,11 @@ The current combination of Controller:OutdoorAir plus Controller:MechanicalVenti
 
 ## Proposed Changes ##
 
-1. No changes to `Controller:MechanicalVentilation` and `Controller:OutdoorAir` inputs.
+x 1. No changes to `Controller:MechanicalVentilation` and `Controller:OutdoorAir` inputs.
 
-2. In `Controller:MechanicalVentilation` make the zone names and design object names optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there. *This would be consistent with current docs and warning messages.*
+x 2. In `Controller:MechanicalVentilation` make the zone names and design object names optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there. *This would be consistent with current docs and warning messages.*
 
-3. Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero if one of the advanced methods (VRP, DCV, IAQ) of control is selected.  *Or maybe autosize to the non-per-person flow?*
+x 3. Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero if a Controller:MechanicalVentilation object is specified.
 
 4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
 

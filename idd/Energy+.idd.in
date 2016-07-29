@@ -55264,6 +55264,7 @@ Controller:OutdoorAir,
        \required-field
        \note Outdoor air inlet node entering the first pre-treat component if any
   N1 , \field Minimum Outdoor Air Flow Rate
+       \note If there is a Mechanical Ventilation Controller, then this will autosize to zero.
        \type real
        \required-field
        \units m3/s
