@@ -83,32 +83,21 @@ namespace EnergyPlus {
 
 	namespace IntegratedHeatPump {
 
-		// USE STATEMENTS:
-		// Use statements for data only modules
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using namespace DataLoopNode;
 		using namespace DataGlobals;
 		using General::RoundSigDigits;
 
-		// Data
 		//MODULE PARAMETER DEFINITIONS
-
 		static std::string const BlankString;
 
-		// DERIVED TYPE DEFINITIONS
-
 		// MODULE VARIABLE DECLARATIONS:
-		// Identifier is VarSpeedCoil
 		bool GetCoilsInputFlag( true );
 
 		// Object Data
 		Array1D< IntegratedHeatPumpData > IntegratedHeatPumps;
 
-		// MODULE SUBROUTINES:
-		//*************************************************************************
-
-		// Functions
 		void
 		clear_state() {
 			IntegratedHeatPumps.deallocate();
@@ -192,7 +181,7 @@ namespace EnergyPlus {
 
 			switch ( IntegratedHeatPumps( DXCoilNum ).CurMode ) {
 				case IHPOperationMode::SCMode:
-					if ( false == IsCallbyWH )//process when called from air loop
+					if ( !IsCallbyWH )//process when called from air loop
 					{
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -228,7 +217,7 @@ namespace EnergyPlus {
 					IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate = 0.0;
 					break;
 				case IHPOperationMode::SHMode:
-					if ( false == IsCallbyWH )//process when called from air loop
+					if ( !IsCallbyWH )//process when called from air loop
 					{
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -298,7 +287,7 @@ namespace EnergyPlus {
 						IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum ).MassFlowRate;
 					break;
 				case IHPOperationMode::SCWHMatchSCMode:
-					if ( false == IsCallbyWH )//process when called from air loop
+					if ( !IsCallbyWH )//process when called from air loop
 					{
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -372,7 +361,7 @@ namespace EnergyPlus {
 						IntegratedHeatPumps( DXCoilNum ).WaterInletNodeNum ).MassFlowRate;
 					break;
 				case IHPOperationMode::SCDWHMode:
-					if ( false == IsCallbyWH )//process when called from air loop
+					if ( !IsCallbyWH )//process when called from air loop
 					{
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHDWHHeatCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -411,7 +400,7 @@ namespace EnergyPlus {
 					break;
 				case IHPOperationMode::SHDWHElecHeatOffMode:
 				case IHPOperationMode::SHDWHElecHeatOnMode:
-					if ( false == IsCallbyWH )//process when called from air loop
+					if ( !IsCallbyWH )//process when called from air loop
 					{
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -558,9 +547,7 @@ namespace EnergyPlus {
 			if ( NumASIHPs <= 0 ) return;
 
 			// Allocate Arrays
-			if ( NumASIHPs > 0 ) {
-				IntegratedHeatPumps.allocate( NumASIHPs );
-			}
+			IntegratedHeatPumps.allocate( NumASIHPs );
 
 			//air-source integrated heat pump
 			GetObjectDefMaxArgs( "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", NumParams, NumAlphas, NumNums );
@@ -1508,7 +1495,7 @@ namespace EnergyPlus {
 			//check if there is a water heating call
 			IntegratedHeatPumps( DXCoilNum ).IsWHCallAvail = false;
 			IntegratedHeatPumps( DXCoilNum ).CheckWHCall = true; //set checking flag
-			if ( 0 == IntegratedHeatPumps( DXCoilNum ).WHtankID )//not initialized yet
+			if ( IntegratedHeatPumps( DXCoilNum ).WHtankID == 0 )//not initialized yet
 			{
 				IntegratedHeatPumps( DXCoilNum ).IsWHCallAvail = false;
 			}
@@ -1541,7 +1528,7 @@ namespace EnergyPlus {
 			IntegratedHeatPumps( DXCoilNum ).SHDWHRunTime = 0.0;
 			IntegratedHeatPumps( DXCoilNum ).WaterFlowAccumVol = 0.0;
 
-			if ( false == IntegratedHeatPumps( DXCoilNum ).IsWHCallAvail )//no water heating call
+			if ( !IntegratedHeatPumps( DXCoilNum ).IsWHCallAvail )//no water heating call
 			{
 				if ( ( SensLoad < ( -1.0 * SmallLoad ) ) || ( LatentLoad < ( -1.0 * SmallLoad ) ) )//space cooling mode
 				{
@@ -1798,9 +1785,6 @@ namespace EnergyPlus {
 			// Return value
 			int PLRNumber( 0 ); // returned outlet node of matched coil
 
-			// FUNCTION LOCAL VARIABLE DECLARATIONS:
-			int WhichCoil;
-
 			// Obtains and Allocates WatertoAirHP related parameters from input file
 			if ( GetCoilsInputFlag ) { //First time subroutine has been entered
 				GetIHPInput();
@@ -1808,7 +1792,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			WhichCoil = FindItemInList( CoilName, IntegratedHeatPumps );
+			int WhichCoil = FindItemInList( CoilName, IntegratedHeatPumps );
 			if ( WhichCoil != 0 ) {
 				//this will be called by HPWH parent
 				if ( IntegratedHeatPumps( WhichCoil ).DWHCoilIndex > 0 )
@@ -1860,9 +1844,6 @@ namespace EnergyPlus {
 			// Return value
 			Real64 CoilCapacity; // returned capacity of matched coil
 
-			// FUNCTION LOCAL VARIABLE DECLARATIONS:
-			int WhichCoil;
-
 			// Obtains and Allocates WatertoAirHP related parameters from input file
 			if ( GetCoilsInputFlag ) { //First time subroutine has been entered
 				GetIHPInput();
@@ -1870,7 +1851,7 @@ namespace EnergyPlus {
 				GetCoilsInputFlag = false;
 			}
 
-			WhichCoil = FindItemInList( CoilName, IntegratedHeatPumps );
+			int WhichCoil = FindItemInList( CoilName, IntegratedHeatPumps );
 			if ( WhichCoil != 0 ) {
 
 				if ( IntegratedHeatPumps( WhichCoil ).IHPCoilsSized == false ) SizeIHP( WhichCoil );
@@ -2306,27 +2287,33 @@ namespace EnergyPlus {
 					break;
 			}
 
-			if ( false == IsResultFlow ) {
-				if ( 1 == SpeedNum ) AirMassFlowRate = VarSpeedCoil( IHPCoilIndex ).MSRatedAirMassFlowRate( SpeedNum );
-				else
+			if ( !IsResultFlow ) {
+				if ( SpeedNum == 1 ) {
+					AirMassFlowRate = VarSpeedCoil( IHPCoilIndex ).MSRatedAirMassFlowRate( SpeedNum );
+				} else {
 					AirMassFlowRate = SpeedRatio * VarSpeedCoil( IHPCoilIndex ).MSRatedAirMassFlowRate( SpeedNum ) +
 					                  ( 1.0 - SpeedRatio ) *
 					                  VarSpeedCoil( IHPCoilIndex ).MSRatedAirMassFlowRate( SpeedNum - 1 );
+				}
 
 				AirMassFlowRate = AirMassFlowRate * FlowScale;
 			}
 
 			if ( AirMassFlowRate > IntegratedHeatPumps( DXCoilNum ).MaxCoolAirMassFlow )
+			{
 				AirMassFlowRate = IntegratedHeatPumps( DXCoilNum ).MaxCoolAirMassFlow;
+			}
 			if ( AirMassFlowRate > IntegratedHeatPumps( DXCoilNum ).MaxHeatAirMassFlow )
+			{
 				AirMassFlowRate = IntegratedHeatPumps( DXCoilNum ).MaxHeatAirMassFlow;
+			}
 
 			//set max air flow rate
 			Node( IntegratedHeatPumps( DXCoilNum ).AirCoolInletNodeNum ).MassFlowRateMax = AirMassFlowRate;
 			Node( IntegratedHeatPumps( DXCoilNum ).AirHeatInletNodeNum ).MassFlowRateMax = AirMassFlowRate;
 			Node( IntegratedHeatPumps( DXCoilNum ).AirOutletNodeNum ).MassFlowRateMax = AirMassFlowRate;
 
-			return ( AirMassFlowRate );
+			return AirMassFlowRate;
 		}
 
 	} // IntegratedHeatPump
