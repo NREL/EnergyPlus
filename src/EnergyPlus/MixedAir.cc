@@ -3502,6 +3502,7 @@ namespace MixedAir {
 		if ( this->MinOAflowSchPtr > 0 ) {
 			Real64 MinOAflowfracVal = GetCurrentScheduleValue( this->MinOAflowSchPtr );
 			MinOAflowfracVal = min( max( MinOAflowfracVal, 0.0 ), 1.0 );
+			OutAirMinFrac = max( MinOAflowfracVal, OutAirMinFrac );
 			this->OAMassFlow = max( this->OAMassFlow, this->MixMassFlow * MinOAflowfracVal );
 		}
 
@@ -3509,6 +3510,7 @@ namespace MixedAir {
 		if ( this->MaxOAflowSchPtr > 0 ) {
 			Real64 MaxOAflowfracVal = GetCurrentScheduleValue( this->MaxOAflowSchPtr );
 			MaxOAflowfracVal = min( max( MaxOAflowfracVal, 0.0 ), 1.0 );
+			OutAirMinFrac = min( MaxOAflowfracVal, OutAirMinFrac );
 			this->OAMassFlow = min( this->OAMassFlow, this->MixMassFlow * MaxOAflowfracVal );
 		}
 

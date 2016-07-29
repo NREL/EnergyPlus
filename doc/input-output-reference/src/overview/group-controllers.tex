@@ -99,6 +99,22 @@ Although the mixer will commonly be connected directly to the outdoor air, other
 
 If all the limits are satisfied, the outdoor air controller does the following for cycling fan systems: the outdoor air flow rate is set to the maximum when the fan cycles on. If the limits are not satisfied, the outdoor air flow rate is at the minimum when the fan cycles on.
 
+There are various minimum and maximum limits on the outdoor air flow rate which are applied in the following order. Limits that fall later in the list can override earlier limits.
+
+\begin{itemize}
+\tightlist
+\item  OA flow rate = Minimum Outdoor Air Flow Rate * Minimum Outdoor Air Schedule
+\item  Apply economizer controls
+\item  OA flow rate \(\ge\) Controller:MechanicalVentilation OA flow rate
+\item  OA flow rate \(\ge\) System exhaust flow rate
+\item  (OA flow rate)/(Current mixed air flow rate) \(\ge\) Minimum Fraction of Outdoor Air Schedule
+\item  (OA flow rate)/(Current mixed air flow rate) \(\le\) Maximum Fraction of Outdoor Air Schedule (even if this reduces the OA flow rate, can override all minimums and economizer)
+\item  OA flow rate \(\le\) Maximum Outdoor Air Flow Rate
+\item  Apply OA flow rate specified by demand limiting
+\item  Apply OA flow rate specified by EMS
+\item  OA flow rate \(\le\) Current mixed air flow rate (system flow rate)
+\end{itemize}
+
 \subsubsection{Inputs}\label{inputs-1-007}
 
 \paragraph{Field: Name}\label{field-name-1-006}
@@ -228,13 +244,13 @@ The name of a schedule which uses decimal values (e.g., 0.0 or 1.0). These value
 
 \paragraph{Field: Minimum Fraction of Outdoor Air Schedule Name}\label{field-minimum-fraction-of-outdoor-air-schedule-name}
 
-The name of a schedule which uses decimal values (0.0 1.0) These values are multiplied by the total (design) air flow rate. This is an alternate method for specifying the minimum outdoor air amount. (The other method is the \textbf{\emph{Minimum Outdoor Air Schedule}} \emph{described above.) Note: This field overrides \textbf{Minimum Outdoor Air Schedule} and \textbf{Minimum Outdoor Air Flowrate.}}
+The name of a schedule with decimal values which are limited between 0.0 and 1.0. The current schedule value is multiplied by the current system mixed air flow rate to set the minimum outdoor air flow rate. If this schedule name is blank, then it is not applied.
+
+If this schedule is 1.0 (and there is no Maximum Fraction of Outdoor Air Schedule Name), then the system works at 100\% outdoor air regardless of any other condition as long as the Maximum Outdoor Air Flow Rate is \(\ge\) the system supply air flow rate.
 
 \paragraph{Field: Maximum Fraction of Outdoor Air Schedule Name}\label{field-maximum-fraction-of-outdoor-air-schedule-name}
 
-This is an optional field with the schedule values in decimal fractions (0.0-1.0). This field enables the user to limit the maximum of amount of outdoor air permissible and thus also limits the permissible maximum outdoor air into the system.
-
-If both the above schedules are given values of 1.0, the system works at 100\% outdoor air, so in a system if 100\% outdoor air is required regardless of any other condition, these fields are helpful.
+The name of a schedule with decimal values which are limited between 0.0 and 1.0. The current schedule value is multiplied by the current system mixed air flow rate to set the maximum outdoor air flow rate. This schedule is applied after all other limits (except EMS and demand-limiting overrides).  This schedule can override all minimums and economizer opearation.  For example, if this schedule is zero, then the outdoor air flow rate will be zero, regardless of any other settings in Controller:OutdoorAir or Controller:MechanicalVentilation. If this schedule name is blank, then it is not applied.
 
 \paragraph{Field: Mechanical Ventilation Controller Name}\label{field-mechanical-ventilation-controller-name}
 
@@ -253,7 +269,7 @@ If a valid name for a Controller:MechanicalVentilation object is entered in this
 
 Leaving this input field blank will bypass the Controller:MechanicalVentilation object calculations and the minimum outdoor air flow rate will be based on the other inputs associated with this outdoor air controller object. Actual outdoor air flow rates may be higher than the minimum if free cooling is available and the object inputs are properly selected. Regardless, the maximum outdoor air flow rate is limited by the field Maximum Outdoor Air Flow Rate.
 
-If the Minimum Outdoor Air Flow Rate is autosized, it will size to zero when a valid Controller:MechanicalVentilation object is entered.
+If the Minimum Outdoor Air Flow Rate is autosized, it will size to zero when a valid Controller:MechanicalVentilation object is entered.  The Minimum Fraction of Outdoor Air Schedule can reduce the outdoor air flow rate set by the Controller:MechanicalVentilation.
 
 \paragraph{Field: Time of Day Economizer Control Schedule Name}\label{field-time-of-day-economizer-control-schedule-name}
 
