@@ -292,6 +292,7 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 				return val;
 			}
 			is_scientific = true;
+			is_double = true;
 		}
 		save_i++;
 	}
@@ -303,7 +304,11 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 		return val;
 	}
 	if ( is_double ) {
-		val = stod( num_str, 0 );
+        try {
+			val = stod(num_str, 0);
+		} catch ( std::exception e ) {
+			val = stoll( num_str, 0 );
+		}
 	} else {
 		try {
 			val = stoi( num_str, 0 );

@@ -1434,6 +1434,28 @@ namespace EnergyPlus {
 		EXPECT_EQ(7ul, index);
 		EXPECT_TRUE(success);
 
+        // handling weird scientific notation
+        index = 0;
+        output = InputProcessor::idf_parser.parse_number("5E-5;", index, success);
+        EXPECT_EQ(0.00005, output.get<double>());
+        EXPECT_EQ(4ul, index);
+        EXPECT_TRUE(success);
+
+
+        // handling weird scientific notation
+        index = 0;
+        output = InputProcessor::idf_parser.parse_number("5E-05;", index, success);
+        EXPECT_EQ(0.00005, output.get<double>());
+        EXPECT_EQ(5ul, index);
+        EXPECT_TRUE(success);
+
+        // handling weird scientific notation
+        index = 0;
+        output = InputProcessor::idf_parser.parse_number("5.E-05;", index, success);
+        EXPECT_EQ(0.00005, output.get<double>());
+        EXPECT_EQ(6ul, index);
+        EXPECT_TRUE(success);
+
 		index = 0;
 		output = InputProcessor::idf_parser.parse_number("11th of April,", index, success);
 		EXPECT_TRUE(output.is_null());
