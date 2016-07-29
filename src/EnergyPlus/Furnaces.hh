@@ -138,7 +138,8 @@ namespace Furnaces {
 
 	// Types
 
-	struct FurnaceEquipConditions {
+	struct FurnaceEquipConditions
+	{
 		// Members
 		std::string Name; // Name of the Furnace
 		int FurnaceType_Num; // Numeric Equivalent for Furnace Type
@@ -432,7 +433,8 @@ namespace Furnaces {
 			ErrIndexVar( 0 ),
 			WaterCyclingMode( 0 ),
 			iterationCounter( 0 ),
-			iterationMode( 0 ) {}
+			iterationMode( 0 )
+		{}
 
 	};
 
