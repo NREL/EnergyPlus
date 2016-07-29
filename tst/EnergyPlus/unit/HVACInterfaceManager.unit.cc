@@ -56,180 +56,63 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef EMSManager_hh_INCLUDED
-#define EMSManager_hh_INCLUDED
+// EnergyPlus::HVACInterfaceManager Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
+	TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test) {
+		using namespace DataPlant;
+		using namespace HVACInterfaceManager;
+		using namespace DataHVACGlobals;
+		Real64 TankOutletTemp;
+		TimeStepSys = 1;
+		TotNumLoops = 1;
+		PlantLoop.allocate(TotNumLoops);
+		for (int i = 1; i <= TotNumLoops; ++i) {
+			auto & loop(PlantLoop(i));
+			loop.LoopSide.allocate(2);
+		}
+		//Set Up PlantLoop Variables
+		PlantLoop(1).Mass = 50;
+		PlantLoop(1).FluidName = "Water";
+		PlantLoop(1).FluidIndex = 1;
+		PlantLoop(1).LoopSide(1).NodeNumOut = 1;
+		PlantLoop(1).LoopSide(1).NodeNumIn = 1;
+		PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 80;
+		PlantLoop(1).LoopSide(2).TotalPumpHeat = 500;
+		DataLoopNode::Node.allocate(TotNumLoops);
+		DataLoopNode::Node(1).Temp = 100;
+		DataLoopNode::Node(1).MassFlowRate = 10;
 
-//note there are routines that lie outside of the Module at the end of this file
+		//LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
+		//Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep
+		UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+		EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
+		EXPECT_NEAR(2928.82, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, 0.001);
+		EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
+		EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);
 
-namespace EMSManager {
+		PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 120;		//random
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	extern int const iTemperatureSetPoint; // integer for node setpoint control type
-	extern int const iTemperatureMinSetPoint; // integer for node setpoint control type
-	extern int const iTemperatureMaxSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioMinSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioMaxSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateMinSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateMaxSetPoint; // integer for node setpoint control type
+																		//LoopSideInlet_MdotCpDeltaT should be > LoopSideInlet_McpDTdt
+																		//Therefore TotalTime will increase by 1 more timestep, but CapExcessStorageTime will NOT increase
+		UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+		EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, .001);
+		EXPECT_NEAR(-588.264, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, .001);
+		EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
+		EXPECT_EQ(2, PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);
 
-	// DERIVED TYPE DEFINITIONS:
-
-	// MODULE VARIABLE TYPE DECLARATIONS:
-
-	// MODULE VARIABLE DECLARATIONS:
-	extern bool GetEMSUserInput; // Flag to prevent input from being read multiple times
-	extern bool ZoneThermostatActuatorsHaveBeenSetup;
-	extern bool FinishProcessingUserInput; // Flag to indicate still need to process input
-
-	// SUBROUTINE SPECIFICATIONS:
-
-	// Functions
-	void
-	clear_state();
-	
-	void
-	CheckIfAnyEMS();
-
-	// MODULE SUBROUTINES:
-
-	void
-	ManageEMS(
-		int const iCalledFrom, // indicates where subroutine was called from, parameters in DataGlobals.
-		bool & anyProgramRan, // true if any Erl programs ran for this call 
-		Optional_int_const ProgramManagerToRun = _ // specific program manager to run
-	);
-
-	void
-	InitEMS( int const iCalledFrom ); // indicates where subroutine was called from, parameters in DataGlobals.
-
-	void
-	ReportEMS();
-
-	void
-	GetEMSInput();
-
-	void
-	ProcessEMSInput( bool const reportErrors ); // .  If true, then report out errors ,otherwise setup what we can
-
-	void
-	GetVariableTypeAndIndex(
-		std::string const & VarName,
-		std::string const & VarKeyName,
-		int & VarType,
-		int & VarIndex
-	);
-
-	void
-	EchoOutActuatorKeyChoices();
-
-	void
-	EchoOutInternalVariableChoices();
-
-	void
-	SetupNodeSetPointsAsActuators();
-
-	void
-	UpdateEMSTrendVariables();
-
-	void
-	CheckIfNodeSetPointManagedByEMS(
-		int const NodeNum, // index of node being checked.
-		int const SetPointType,
-		bool & ErrorFlag
-	);
-
-	bool
-	CheckIfNodeMoreInfoSensedByEMS( 
-		int const nodeNum, // index of node being checked.
-		std::string const & varName
-	);
-
-	void
-	SetupPrimaryAirSystemAvailMgrAsActuators();
-
-	void
-	SetupWindowShadingControlActuators();
-
-	void
-	SetupThermostatActuators();
-
-	void
-	SetupSurfaceConvectionActuators();
-
-	void
-	SetupSurfaceConstructionActuators();
-
-	void
-	SetupSurfaceOutdoorBoundaryConditionActuators();
-
-	void
-	SetupZoneInfoAsInternalDataAvail();
-
-	void
-	checkForUnusedActuatorsAtEnd();
-
-} // EMSManager
-
-//Moved these setup EMS actuator routines out of module to solve circular use problems between
-//  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
-
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	Real64 & rValue
-);
-
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	int & iValue
-);
-
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	bool & lValue
-);
-
-void
-SetupEMSInternalVariable(
-	std::string const & cDataTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cUnits,
-	Real64 & rValue
-);
-
-void
-SetupEMSInternalVariable(
-	std::string const & cDataTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cUnits,
-	int & iValue
-);
-
-} // EnergyPlus
-
-#endif
+	}
+}
