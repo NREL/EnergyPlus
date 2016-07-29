@@ -2938,7 +2938,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:ThreeNodeDisplacementVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:ThreeNodeDisplacementVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;

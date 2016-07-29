@@ -910,6 +910,71 @@ ValidateComponent(
 
 }
 
+
+	void
+	ValidateComponent(
+			std::string const & CompType, // Component Type (e.g. Chiller:Electric)
+			std::string const & CompValType, //Component "name" field type
+			std::string const & CompName, // Component Name (e.g. Big Chiller)
+			bool & IsNotOK, // .TRUE. if this component pair is invalid
+			std::string const & CallString // Context of this pair -- for error message
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   October 2002
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine can be called to validate the component type-name pairs that
+		// are so much a part of the EnergyPlus input.  The main drawback to this validation
+		// has been that the "GetInput" routine may not have been called and/or exists in
+		// another module from the one with the list.  This means that validation must be
+		// done later, perhaps after simulation has already started or perhaps raises an
+		// array bound error instead.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses existing routines in InputProcessor.  GetObjectItemNum uses the "standard"
+		// convention of the Name of the item/object being the first Alpha Argument.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int ItemNum;
+
+		IsNotOK = false;
+
+		ItemNum = InputProcessor::GetObjectItemNum( CompType, CompValType, CompName );
+
+		if ( ItemNum < 0 ) {
+			ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
+			ShowContinueError( "Component name=" + CompName );
+			IsNotOK = true;
+		} else if ( ItemNum == 0 ) {
+			ShowSevereError( "During " + CallString + " Input, Invalid Component Name input=" + CompName );
+			ShowContinueError( "Component type=" + CompType );
+			IsNotOK = true;
+		}
+
+	}
+
 void
 CalcPassiveExteriorBaffleGap(
 	Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces

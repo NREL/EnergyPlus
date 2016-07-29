@@ -1267,7 +1267,54 @@ namespace EnergyPlus {
 			object_item_num++;
 		}
 
-		if ( !found ) return -1;
+		if ( !found ) {
+			ShowWarningError("Didn't find name, need to probably use search key");
+			return -1;
+		}
+		return object_item_num;
+		}
+
+
+	int
+	EnergyPlus::InputProcessor::GetObjectItemNum(
+			std::string const & ObjType, // Object Type (ref: IDD Objects)
+			std::string const & NameTypeVal, // Object "name" field type ( used as search key )
+			std::string const & ObjName // Name of the object type
+	) {
+		// PURPOSE OF THIS SUBROUTINE:
+		// Get the occurrence number of an object of type ObjType and name ObjName
+
+		json * obj;
+
+		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end() ) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+				return -1;
+			}
+			obj = &jdf[ tmp_umit->second ];
+		} else {
+			obj = &jdf[ ObjType ];
+		}
+
+		int object_item_num = 1;
+		bool found = false;
+
+
+		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
+			auto it2 = it.value().find(NameTypeVal);
+
+			if ( (it2 != it.value().end()) && (MakeUPPERCase( it2.value() ) == MakeUPPERCase( ObjName )) ) {
+				found = true;
+				break;
+			}
+			object_item_num++;
+		}
+
+
+		if ( !found ) {
+			ShowWarningError("Didn't find name, need to probably use search key");
+			return -1;
+		}
 		return object_item_num;
 	}
 

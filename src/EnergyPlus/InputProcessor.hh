@@ -227,6 +227,14 @@ namespace EnergyPlus {
 		);
 
 		static
+		int
+		GetObjectItemNum(
+				std::string const & ObjType, // Object Type (ref: IDD Objects)
+				std::string const & NameTypeVal, // Object "name" field type ( used as search key )
+				std::string const & ObjName // Name of the object type
+		);
+
+		static
 		Real64
 		ProcessNumber(
 			std::string const & String,
