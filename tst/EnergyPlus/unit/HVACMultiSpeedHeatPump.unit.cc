@@ -63,6 +63,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -1303,5 +1304,57 @@ namespace EnergyPlus {
 
 			ZoneSysEnergyDemand.deallocate();
 			CurDeadBandOrSetback.deallocate();
+	}
+
+	TEST_F( EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest ) {
+
+			DataLoopNode::Node.allocate( 2 );
+			MSHeatPump.allocate( 1 );
+			int HeatRecInNode( 1 );
+			int HeatRecOutNode( 2 );
+			MSHeatPump( 1 ).HeatRecInletNodeNum = HeatRecInNode;
+			MSHeatPump( 1 ).HeatRecOutletNodeNum = HeatRecOutNode;
+			MSHeatPump( 1 ).MaxHeatRecOutletTemp = 80;
+			MSHeatPump( 1 ).HRLoopNum = 1; // index to plant
+			DataLoopNode::Node( HeatRecInNode ).Temp = 50.0;
+			DataHVACGlobals::MSHPWasteHeat = 1000.0;
+
+			DataPlant::PlantLoop.allocate( 1 );
+			DataPlant::PlantLoop( 1 ).FluidName = "WATER";
+			DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+
+			DataLoopNode::Node( HeatRecInNode ).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
+			HVACMultiSpeedHeatPump::MSHPHeatRecovery( 1 );
+
+			// outlet temp should equal inlet temp since mass flow rate = 0
+			Real64 calculatedOutletTemp = DataLoopNode::Node( HeatRecInNode ).Temp + DataHVACGlobals::MSHPWasteHeat / ( DataLoopNode::Node( HeatRecInNode ).MassFlowRate * 4181.0 );
+			EXPECT_DOUBLE_EQ( 0.0, MSHeatPump( 1 ).HeatRecoveryRate );
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryOutletTemp );
+			EXPECT_DOUBLE_EQ( 0.0, MSHeatPump( 1 ).HeatRecoveryMassFlowRate );
+
+			DataLoopNode::Node( HeatRecInNode ).MassFlowRate = 0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
+			HVACMultiSpeedHeatPump::MSHPHeatRecovery( 1 );
+
+			// outlet temp should equal temperature rise due to 1 kW of heat input at 0.1 kg/s
+			calculatedOutletTemp = DataLoopNode::Node( HeatRecInNode ).Temp + DataHVACGlobals::MSHPWasteHeat / ( DataLoopNode::Node( HeatRecInNode ).MassFlowRate * 4181.0 );
+			EXPECT_DOUBLE_EQ( 1000.0, MSHeatPump( 1 ).HeatRecoveryRate );
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( calculatedOutletTemp, MSHeatPump( 1 ).HeatRecoveryOutletTemp );
+			EXPECT_DOUBLE_EQ( 52.391772303276724, calculatedOutletTemp );
+			EXPECT_DOUBLE_EQ( 0.1, MSHeatPump( 1 ).HeatRecoveryMassFlowRate );
+
+			DataHVACGlobals::MSHPWasteHeat = 100000.0; // test very high heat transfer that would limit outlet water temperature
+			DataLoopNode::Node( HeatRecInNode ).MassFlowRate = 0.1;
+			HVACMultiSpeedHeatPump::MSHPHeatRecovery( 1 );
+
+			// outlet temp should equal max limit of 80 C since 100 kW would cause outlet water temperature to exceed 80 C
+			EXPECT_DOUBLE_EQ( 50.0, MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( 80.0, MSHeatPump( 1 ).HeatRecoveryOutletTemp );
+			EXPECT_DOUBLE_EQ( 0.1, MSHeatPump( 1 ).HeatRecoveryMassFlowRate );
+			Real64 QHeatRecovery = DataLoopNode::Node( HeatRecInNode ).MassFlowRate * 4181.0 * ( MSHeatPump( 1 ).HeatRecoveryOutletTemp - MSHeatPump( 1 ).HeatRecoveryInletTemp );
+			EXPECT_DOUBLE_EQ( QHeatRecovery, MSHeatPump( 1 ).HeatRecoveryRate );
+			EXPECT_DOUBLE_EQ( 12543.0, QHeatRecovery );
+
 	}
 }
