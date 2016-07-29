@@ -55197,6 +55197,7 @@ Controller:WaterCoil,
        \type alpha
        \required-field
        \reference AirLoopControllers
+       \reference WaterCoilControllers
   A2 , \field Control Variable
        \required-field
        \type choice
@@ -79663,6 +79664,11 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \object-list HeatingCoilsElectricMultiStage
        \object-list HeatingCoilsGasMultiStage
        \object-list HeatingCoilsDesuperheater
+   A6, \field Water Coil Controller Name
+       \note Enter the name of the coil affected
+       \required for water coils
+       \type object-list
+       \object-list WaterCoilControllers
    N1; \field Reference Sensor Offset
        \type real
        \minimum> -10

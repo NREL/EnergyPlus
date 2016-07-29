@@ -64,6 +64,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <Fans.hh>
 #include <HeatingCoils.hh>
+#include <HVACControllers.hh>
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
@@ -443,13 +444,13 @@ namespace FaultsManager {
 					SameString( SELECT_CASE_VAR, "Coil:Cooling:Water:Detailedgeometry" )
 				){
 					// Read in coil input if not done yet
-					if ( WaterCoils::GetWaterCoilsInputFlag ) {
+					if( WaterCoils::GetWaterCoilsInputFlag ) {
 						WaterCoils::GetWaterCoilInput();
 						WaterCoils::GetWaterCoilsInputFlag = false;
 					}
 					// Check the coil name and coil type
 					int CoilNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, WaterCoils::WaterCoil );
-					if ( CoilNum <= 0 ) {
+					if( CoilNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
@@ -457,9 +458,37 @@ namespace FaultsManager {
 						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATFlag = true;
 						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
+					
+					// Read in Water Coil Controller Name
+					FaultsCoilSATSensor( jFault_CoilSAT ).WaterCoilControllerName = cAlphaArgs( 6 );
+					if( lAlphaFieldBlanks( 6 ) ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" blank." );
+						ErrorsFound = true;
+					}
+					// Read in controller input if not done yet
+					if( HVACControllers::GetControllerInputFlag ) { 
+						HVACControllers::GetControllerInput();
+						HVACControllers::GetControllerInputFlag = false;
+					}
+					// Check the controller name
+					int ControlNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).WaterCoilControllerName, HVACControllers::ControllerProps, &HVACControllers::ControllerPropsType::ControllerName );
+					if( ControlNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the controller with the fault model
+						HVACControllers::ControllerProps( ControlNum ).FaultyCoilSATFlag = true;
+						HVACControllers::ControllerProps( ControlNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+						
+						// Check whether the controller match the coil
+						if( HVACControllers::ControllerProps( ControlNum ).SensedNode != WaterCoils::WaterCoil( CoilNum ).AirOutletNodeNum ){
+							ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" does not match " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) );
+							ErrorsFound = true;
+						}
+					}
 				}
 			}
-		}
+		} // End read faults input of Fault_type 113
 		
 		// read faults input of Fault_type 112: Cooling tower scaling
 		for ( int jFault_TowerFouling = 1; jFault_TowerFouling <= NumFaultyTowerFouling; ++jFault_TowerFouling ) {

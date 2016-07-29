@@ -288,11 +288,13 @@ namespace FaultsManager {
 		// Members
 		std::string CoilType; // Coil type
 		std::string CoilName; // Coil name
+		std::string WaterCoilControllerName; // Water coil controller name
 	
 		// Default Constructor
 		FaultPropertiesCoilSAT():
 			CoilType( "" ),
-			CoilName( "" )
+			CoilName( "" ),
+			WaterCoilControllerName( "" )
 		{}
 			
 	};
