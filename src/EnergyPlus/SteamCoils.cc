@@ -73,6 +73,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -930,6 +931,7 @@ namespace SteamCoils {
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using FaultsManager::FaultsCoilSATSensor;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals

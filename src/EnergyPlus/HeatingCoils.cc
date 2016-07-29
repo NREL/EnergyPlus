@@ -79,6 +79,7 @@
 #include <DataSizing.hh>
 #include <DXCoils.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
@@ -1317,7 +1318,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rich Liesen
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset 
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1328,9 +1329,13 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
 		using DataHVACGlobals::ElecHeatingCoilPower;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
+		using FaultsManager::FaultsCoilSATSensor;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1362,6 +1367,15 @@ namespace HeatingCoils {
 		Control = HeatingCoil( CoilNum ).Control;
 		TempSetPoint = HeatingCoil( CoilNum ).DesiredOutletTemp;
 
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
+		
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
@@ -1680,7 +1694,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rich Liesen
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1691,10 +1705,14 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
+		using FaultsManager::FaultsCoilSATSensor;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1730,6 +1748,15 @@ namespace HeatingCoils {
 		AirMassFlow = HeatingCoil( CoilNum ).InletAirMassFlowRate;
 
 		CapacitanceAir = PsyCpAirFnWTdb( Win, TempAirIn ) * AirMassFlow;
+
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
 
 		// If the coil is operating there should be some heating capacitance
 		//  across the coil, so do the simulation. If not set outlet to inlet and no load.
@@ -2129,7 +2156,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   January 2005
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -2148,7 +2175,11 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using FaultsManager::FaultsCoilSATSensor;
 		using namespace DXCoils;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2182,6 +2213,15 @@ namespace HeatingCoils {
 		Win = HeatingCoil( CoilNum ).InletAirHumRat;
 		CapacitanceAir = PsyCpAirFnWTdb( Win, TempAirIn ) * AirMassFlow;
 		TempSetPoint = HeatingCoil( CoilNum ).DesiredOutletTemp;
+
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
 
 		// Access the appropriate structure to find the available heating capacity of the desuperheater heating coil
 		// The nominal capacity of the desuperheater heating coil varies based on the amount of heat rejected by the source

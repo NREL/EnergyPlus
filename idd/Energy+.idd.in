@@ -79648,11 +79648,9 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \required-field
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Electric:Multistage
        \key Coil:Heating:Gas
-       \key Coil:Heating:Gas:Multistage
-       \key Coil:Heating:Steam
        \key Coil:Heating:Desuperheater
+       \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:Detailedgeometry
