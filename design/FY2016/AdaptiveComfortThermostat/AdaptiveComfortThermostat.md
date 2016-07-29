@@ -5,7 +5,7 @@ Thermostat Based-on Adaptive Thermal Comfort Models
  **Lawrence Berkeley National Laboratory**
 
  - Original Date: July 20, 2016
- 
+ - Revised Date: July 29, 2016
 
 ## Justification for New Feature ##
 
@@ -13,7 +13,7 @@ ASHRAE Standard 55-2010 and CEN 15251-2007 provide adaptive thermal comfort mode
 
 ## Introduction ##
 
-ASHRAE Standard 55-2010, Thermal Environmental Conditions for Human Occupancy, introduces an adaptive thermal comfort model for spaces relying on occupants opening windows for natural ventilation and cooling. The adaptive comfort model relates the zone operative temperature setpoint to the outdoor air temperature, as a function defined in Figure 1.
+ASHRAE Standard 55-2010, Thermal Environmental Conditions for Human Occupancy, introduces an adaptive thermal comfort model for spaces relying on occupants opening windows for natural ventilation and cooling. The adaptive comfort model relates the zone operative temperature setpoint to the outdoor air temperature, as a function defined in Figure 1. The adaptive comfort model only applies to cooling mode.
 
 ![](AdaptiveComfortThermostat_ASHRAE55.png)
 Figure 1. Acceptable operative temperature ranges based on the adaptive thermal comfort model of ASHRAE Standard 55-2010
@@ -33,12 +33,12 @@ N/A
 
 ## Overview ##
 
-The adaptive comfort model has been adopted in EnergyPlus as one of the thermal comfort models of the People object, as well as one control strategy to operate windows in the Airflow Network model. The existing code will be reused as much as possible. We propose to enhance the existing ThermostatSetpoint objects to indicate the applicability of the adaptive comfort model with three choices: 
+The adaptive comfort model has been adopted in EnergyPlus as one of the thermal comfort models of the People object, as well as one control strategy to operate windows in the Airflow Network model. The existing code will be reused as much as possible. We propose to enhance the existing ZoneControl:Thermostat:OperativeTemperature object to indicate the applicability of the adaptive comfort model with three choices: 
 - **None**. The adaptive comfort model is not applicable; 
 - **AdaptiveASH55**. The central line of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint; and 
 - **AdaptiveCEN15251**. The central line of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint. 
 
-When the adaptive comfort model is selected, the thermostat setpoint temperature schedule will be overwritten with the calculated operative temperature based on the central line of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007. Such calculations have been implemented in EnergyPlus already. The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. 
+When the adaptive comfort model is selected, the thermostat setpoint temperature schedule for space cooling will be overwritten with the calculated operative temperature based on the central line of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007. Such calculations have been implemented in EnergyPlus already. The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. 
 
 
 ## IDD Object (New) ##
@@ -47,57 +47,30 @@ N/A
 
 ## IDD Object(s) (Revised) ##
 
-We propose to modify three existing IDD thermostat setpoint objects by adding a field to indicate which adaptive comfort model to use. The three thermostat setpoint objects are, ThermostatSetpoint:SingleCooling, ThermostatSetpoint:SingleHeatingOrCooling, and ThermostatSetpoint:DualSetpoint, which are referenced by the ZoneControl:Thermostat object.
+As the adaptive comfort models are based on space operative temperature, we propose to modify the ZoneControl:Thermostat:OperativeTemperature object by adding a field to indicate which adaptive comfort model to use. If an adaptive comfort model is chosen, the thermostat setpoint schedule of the ThermostatSetpoint object, referenced by the ZoneControl:Thermostat object, will be overwritten accordingly. 
 
 <pre>
-ThermostatSetpoint:SingleCooling,
-       \memo Used for a cooling only thermostat. The setpoint can be scheduled and varied throughout
-       \memo the simulation but only cooling is allowed.
-  A1 , \field Name
+ZoneControl:Thermostat:OperativeTemperature,
+       \memo This object can be used with the ZoneList option on a thermostat or with one
+       \memo of the zones on that list (but you won't be able to use the object list to
+       \memo pick only one of those zones.  Thermostat names are <Zone Name> <global Thermostat name> internally.
+  A1,  \field Thermostat Name
+       \note Enter the name of a ZoneControl:Thermostat object.
+       \note This object modifies a ZoneControl:Thermostat object to add a
+       \note radiative fraction.
        \required-field
-       \type alpha
-       \reference ControlTypeNames
-  A2 , \field Setpoint Temperature Schedule Name
        \type object-list
-       \object-list ScheduleNames
-  <b>A3</b> ; \field Adaptive Comfort Model Type
+       \object-list ZoneControlThermostaticNames
+  A2,  \field Radiative Fraction Input Mode
+       \required-field
        \type choice
-       \key None
-       \key AdaptiveASH55
-       \key AdaptiveCEN15251
-       \default None
-       \note the setpoint temperature schedule will be adjusted based on the selected adaptive comfort model type
-
-ThermostatSetpoint:SingleHeatingOrCooling,
-       \memo Used for a heating and cooling thermostat with a single setpoint. The setpoint can be
-       \memo scheduled and varied throughout the simulation for both heating and cooling.
-  A1 , \field Name
-       \required-field
-       \type alpha
-       \reference ControlTypeNames
-  A2 , \field Setpoint Temperature Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-  <b>A3</b> ; \field Adaptive Comfort Model Type
-       \type choice
-       \key None
-       \key AdaptiveASH55
-       \key AdaptiveCEN15251
-       \default None
-       \note the setpoint temperature schedule will be adjusted based on the selected adaptive comfort model type
-
-
-ThermostatSetpoint:DualSetpoint,
-       \memo Used for a heating and cooling thermostat with dual setpoints. The setpoints can be
-       \memo scheduled and varied throughout the simulation for both heating and cooling.
-  A1 , \field Name
-       \required-field
-       \type alpha
-       \reference ControlTypeNames
-  A2 , \field Heating Setpoint Temperature Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-  A3 , \field Cooling Setpoint Temperature Schedule Name
+       \key Constant
+       \key Scheduled
+  N1,  \field Fixed Radiative Fraction
+       \minimum 0.0
+       \maximum< 0.9
+  A3,  \field Radiative Fraction Schedule Name
+       \note Schedule values of 0.0 indicate no operative temperature control
        \type object-list
        \object-list ScheduleNames
   <b>A4</b> ; \field Adaptive Comfort Model Type
@@ -106,8 +79,8 @@ ThermostatSetpoint:DualSetpoint,
        \key AdaptiveASH55
        \key AdaptiveCEN15251
        \default None
-       \note the cooling setpoint temperature schedule will be adjusted based on the selected adaptive comfort model type
-
+       \note the cooling setpoint temperature schedule of the referenced thermostat will be adjusted based on the selected adaptive comfort model type
+    
 </pre>
 
 ## IO Ref ##
