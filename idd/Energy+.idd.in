@@ -53035,13 +53035,13 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \key CoilSystem:IntegratedHeatPump:AirSource
         \note  Only works with Coil:Heating:DX:SingleSpeed or
         \note Coil:Heating:DX:VariableSpeed or
-		\note COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
+        \note CoilSystem:IntegratedHeatPump:AirSource
    A9,  \field Heating Coil Name
         \required-field
         \type object-list
         \object-list HeatingCoilsDXSingleSpeed
         \object-list HeatingCoilsDXVariableSpeed
-		\object-list IntegratedHeatPumps
+        \object-list IntegratedHeatPumps
         \note  Needs to match in the DX heating coil object
    A10, \field Cooling Coil Object Type
         \required-field
@@ -53053,14 +53053,14 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \note Only works with Coil:Cooling:DX:SingleSpeed or
         \note CoilSystem:Cooling:DX:HeatExchangerAssisted or
         \note Coil:Cooling:DX:VariableSpeed or
-		\note COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
+        \note CoilSystem:IntegratedHeatPump:AirSource
    A11, \field Cooling Coil Name
         \required-field
         \note Needs to match in the DX cooling coil object
         \type object-list
         \object-list CoolingCoilsDXSingleSpeed
         \object-list CoolingCoilsDXVariableSpeed
-		\object-list IntegratedHeatPumps
+        \object-list IntegratedHeatPumps
    A12, \field Supplemental Heating Coil Object Type
         \required-field
         \type choice
@@ -67417,17 +67417,17 @@ WaterHeater:HeatPump:PumpedCondenser,
        \type choice
        \key Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
-	   \key COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
+       \key CoilSystem:IntegratedHeatPump:AirSource
        \default Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \note Specify the type of DX coil used by this heat pump water heater. The only
-       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, and COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, and CoilSystem:IntegratedHeatPump:AirSource
   A19, \field DX Coil Name
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoilsPumped
        \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
        \object-list IntegratedHeatPumps
-       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object, or COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object, or CoilSystem:IntegratedHeatPump:AirSource
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C

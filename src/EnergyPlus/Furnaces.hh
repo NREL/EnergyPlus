@@ -56,7 +56,6 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-
 #ifndef Furnaces_hh_INCLUDED
 #define Furnaces_hh_INCLUDED
 

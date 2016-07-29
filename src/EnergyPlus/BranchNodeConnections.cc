@@ -255,7 +255,6 @@ namespace BranchNodeConnections {
 		using InputProcessor::FindItemInList;
 
 		static std::string const RoutineName( "ModifyNodeConnectionType: " );
-		int Found;
 
 		if ( ! IsValidConnectionType( ConnectionType ) ) {
 			ShowSevereError( RoutineName + "Invalid ConnectionType=" + ConnectionType );
@@ -263,7 +262,7 @@ namespace BranchNodeConnections {
 			errFlag = true;
 		}
 
-		Found = 0;
+		int Found = 0;
 		for ( int Count = 1; Count <= NumOfNodeConnections; ++Count ) {
 			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
 			if ( ! SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
