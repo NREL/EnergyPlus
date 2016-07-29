@@ -76,8 +76,6 @@ namespace HeatBalanceMovableInsulation {
 	// MODULE INFORMATION:
 	//       AUTHOR         Rick Strand
 	//       DATE WRITTEN   December 2000
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// The purpose of this module is to contain all of the routines associated with
@@ -85,10 +83,6 @@ namespace HeatBalanceMovableInsulation {
 
 	// METHODOLOGY EMPLOYED:
 	// See individual routines
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
 
 	// USE STATEMENTS:
 	// Use statements for data only modules
@@ -99,18 +93,6 @@ namespace HeatBalanceMovableInsulation {
 
 	// Use statements for access to subroutines in other modules
 	using ScheduleManager::GetCurrentScheduleValue;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-
-	// MODULE VARIABLE DECLARATIONS:
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceMovableInsulation
-
-	// Functions
 
 	void
 	EvalOutsideMovableInsulation(
@@ -124,8 +106,6 @@ namespace HeatBalanceMovableInsulation {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   March 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine determines whether or not outside movable insulation
@@ -138,19 +118,6 @@ namespace HeatBalanceMovableInsulation {
 
 		// REFERENCES:
 		// (I)BLAST legacy routine OMVINS
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -196,7 +163,6 @@ namespace HeatBalanceMovableInsulation {
 		//       DATE WRITTEN   March 1998
 		//       MODIFIED       Nov. 1999, FW, add AbsInt; change MaterialMovInsulExt to
 		//                      MaterialMovInsulInt
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine determines whether or not inside movable insulation
@@ -210,19 +176,6 @@ namespace HeatBalanceMovableInsulation {
 		// REFERENCES:
 		// (I)BLAST legacy routine IMVINS
 
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
@@ -231,11 +184,13 @@ namespace HeatBalanceMovableInsulation {
 
 		if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 
+			Surface( SurfNum ).MovInsulIntPresent = false;
 			HMovInsul = 0.0;
 			AbsInt = 0.0;
 
 		} else { // Movable insulation present-->calculate output parameters
 
+			Surface( SurfNum ).MovInsulIntPresent = true;
 			if ( ( Material( Surface( SurfNum ).MaterialMovInsulInt ).Resistance ) <= 0.0 ) {
 				if ( Material( Surface( SurfNum ).MaterialMovInsulInt ).Conductivity > 0.0 && Material( Surface( SurfNum ).MaterialMovInsulInt ).Thickness > 0.0 ) {
 					Material( Surface( SurfNum ).MaterialMovInsulInt ).Resistance = Material( Surface( SurfNum ).MaterialMovInsulInt ).Thickness / Material( Surface( SurfNum ).MaterialMovInsulExt ).Conductivity;
