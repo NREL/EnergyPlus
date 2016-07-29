@@ -1,8 +1,4 @@
-!-Generator IDFEditor 1.34
-!-Option OriginalOrderTop UseSpecialFormat
-!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
-!-      Use '!' comments if they need to be retained when using the IDFEditor.
-! GasTurbChiller.idf
+! GasTurbChillerAuto.idf
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Outdoor air is modulated based on occupancy and floor area.
 !
@@ -89,7 +85,7 @@
 ! Coils:                          Coil:Cooling:Water:DetailedGeometry
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
-! Chillers:                       CHILLER:COMBUSTION TURBINE
+! Chillers:                       CHILLER:COMBUSTIONTURBINE
 !                                 Chiller:ConstantCOP or DistrictCooling may be used if desired in various
 !                                 combinations by changing priority control equipment list name in
 !                                 PlantEquipmentOperation:CoolingLoad object.
@@ -103,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.6;
 
   Building,
     NONE,                    !- Name
@@ -162,6 +158,11 @@
     -87.88,                  !- Longitude {deg}
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
+
+  Sizing:Parameters,
+    1.25,
+    1.15,
+    6;
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -873,7 +874,7 @@
     ANY NUMBER,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
+    Until: 24:00,45.00;      !- Field 3
 
   Schedule:Compact,
     HOT WATER AMBIENT TEMPERATURE SCHEDULE,  !- Name
@@ -887,7 +888,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,25.00;      !- Field 3
+    Until: 24:00,50.00;      !- Field 3
 
   Schedule:Compact,
     ACTIVITY SCH,            !- Name
@@ -1034,7 +1035,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
+    Until: 24:00,50.00;      !- Field 3
 
   Schedule:Compact,
     FANANDCOILAVAILSCHED,    !- Name
@@ -1112,6 +1113,13 @@
     Through: 12/31,          !- Field 9
     For: AllDays,            !- Field 10
     Until: 24:00,1.00;       !- Field 11
+    
+  Schedule:Compact,
+    DUAL ZONE CONTROL TYPE SCHED,  !- Name
+    CONTROL TYPE,            !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4.00;       !- Field 3
 
   People,
     West Zone,               !- Name
@@ -1896,7 +1904,7 @@
     HW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
     100,                     !- Maximum Loop Temperature {C}
     10,                      !- Minimum Loop Temperature {C}
-    0.0043,                  !- Maximum Loop Flow Rate {m3/s}
+    autosize,                  !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
     HW Supply Inlet Node,    !- Plant Side Inlet Node Name
@@ -1908,6 +1916,12 @@
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
     Optimal;                 !- Load Distribution Scheme
+
+  Sizing:Plant,
+    Hot Water Loop,      !- Plant or Condenser Loop Name
+    Heating,                 !- Loop Type
+    55.00,                     !- Design Loop Exit Temperature {C}
+    7.0;                    !- Loop Design Temperature Difference {deltaC}
 
   CondenserLoop,
     Chilled Water Condenser Loop,  !- Name
@@ -1946,7 +1960,7 @@
     10,                      !- Minimum Loop Temperature {C}
     autosize,                   !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
-    autocalculate,           !- Plant Loop Volume {m3}
+    0.005,           !- Plant Loop Volume {m3}
     Heat Recovery Supply Inlet Node,  !- Plant Side Inlet Node Name
     Heat Recovery Supply Outlet Node,  !- Plant Side Outlet Node Name
     Heat Recovery Supply Side Branches,  !- Plant Side Branch List Name
@@ -1960,8 +1974,8 @@
   Sizing:Plant,
     Heat Recovery Water Loop,      !- Plant or Condenser Loop Name
     Heating,                 !- Loop Type
-    25.00,                     !- Design Loop Exit Temperature {C}
-    10.0;                    !- Loop Design Temperature Difference {deltaC}
+    45.00,                     !- Design Loop Exit Temperature {C}
+    7.0;                    !- Loop Design Temperature Difference {deltaC}
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name
@@ -2170,7 +2184,7 @@
     Typical Terminal Reheat 1,  !- Name
     Reheat System 1 Controllers,  !- Controller List Name
     Reheat System 1 Avail List,  !- Availability Manager List Name
-    1.3,                     !- Design Supply Air Flow Rate {m3/s}
+    autosize,                     !- Design Supply Air Flow Rate {m3/s}
     Air Loop Branches,       !- Branch List Name
     ,                        !- Connector List Name
     Air Loop Inlet Node,     !- Supply Side Inlet Node Name
@@ -2230,7 +2244,7 @@
 
   AvailabilityManager:Scheduled,
     Reheat System 1 Avail,   !- Name
-    FanAndCoilAvailSched;    !- Schedule Name
+    on;    !- Schedule Name
 
   SetpointManager:Scheduled,
     Chilled Water Loop Setpoint Manager,  !- Name
@@ -2332,74 +2346,65 @@
 
   AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Reheat Zone 1,           !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    on,    !- Availability Schedule Name
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
-    0.47,                    !- Maximum Air Flow Rate {m3/s}
+    autosize,                    !- Maximum Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
-    0.0013,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
+    autosize,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
 
   AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Reheat Zone 2,           !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    on,    !- Availability Schedule Name
     Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
-    0.36,                    !- Maximum Air Flow Rate {m3/s}
+    autosize,                    !- Maximum Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
-    0.0012,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
+    autosize,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
 
   AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Reheat Zone 3,           !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    on,    !- Availability Schedule Name
     Zone 3 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 3 Reheat Air Inlet Node,  !- Air Inlet Node Name
-    0.47,                    !- Maximum Air Flow Rate {m3/s}
+    autosize,                    !- Maximum Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Reheat Coil Object Type
     Reheat Coil Zone 3,      !- Reheat Coil Name
-    0.0013,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
+    autosize,                  !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
 
   ZoneControl:Thermostat,
     Zone 1 Thermostat,       !- Name
     West Zone,               !- Zone or ZoneList Name
-    Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:SingleHeating,  !- Control 1 Object Type
-    Heating Setpoint with SB,!- Control 1 Name
-    ThermostatSetpoint:SingleCooling,  !- Control 2 Object Type
-    Cooling Setpoint with SB;!- Control 2 Name
+    Dual Zone Control Type Sched,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    Dual setpoints;          !- Control 1 Name
 
   ZoneControl:Thermostat,
     Zone 2 Thermostat,       !- Name
     EAST ZONE,               !- Zone or ZoneList Name
-    Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:SingleHeating,  !- Control 1 Object Type
-    Heating Setpoint with SB,!- Control 1 Name
-    ThermostatSetpoint:SingleCooling,  !- Control 2 Object Type
-    Cooling Setpoint with SB;!- Control 2 Name
+    Dual Zone Control Type Sched,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    Dual setpoints;          !- Control 1 Name
 
   ZoneControl:Thermostat,
     Zone 3 Thermostat,       !- Name
     NORTH ZONE,              !- Zone or ZoneList Name
-    Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:SingleHeating,  !- Control 1 Object Type
-    Heating Setpoint with SB,!- Control 1 Name
-    ThermostatSetpoint:SingleCooling,  !- Control 2 Object Type
-    Cooling Setpoint with SB;!- Control 2 Name
+    Dual Zone Control Type Sched,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    Dual setpoints;          !- Control 1 Name
 
-  ThermostatSetpoint:SingleHeating,
-    Heating Setpoint with SB,!- Name
-    Heating Setpoints;       !- Setpoint Temperature Schedule Name
-
-  ThermostatSetpoint:SingleCooling,
-    Cooling Setpoint with SB,!- Name
-    Cooling Setpoints;       !- Setpoint Temperature Schedule Name
+  ThermostatSetpoint:DualSetpoint,
+    Dual setpoints,          !- Name
+    Heating Setpoints,       !- Heating Setpoint Temperature Schedule Name
+    Cooling Setpoints;       !- Cooling Setpoint Temperature Schedule Name
 
   AirLoopHVAC:SupplyPath,
     TermReheatSupplyPath,    !- Name
@@ -2477,8 +2482,8 @@
     35.0,                    !- Design Condenser Inlet Temperature {C}
     2.778,                   !- Temperature Rise Coefficient
     6.67,                    !- Design Chilled Water Outlet Temperature {C}
-    autosize,                  !- Design Chilled Water Flow Rate {m3/s}
-    autosize,                  !- Design Condenser Water Flow Rate {m3/s}
+    autosize,                !- Design Chilled Water Flow Rate {m3/s}
+    autosize,                !- Design Condenser Water Flow Rate {m3/s}
     0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
     -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
     -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
@@ -2509,11 +2514,11 @@
     0.2286,                  !- Coefficient 3 of Recovery Lube Heat Curve
     0.01907045,              !- Coefficient 1 of U-Factor Times Area Curve
     0.9,                     !- Coefficient 2 of U-Factor Times Area Curve
-    50000,                   !- Gas Turbine Engine Capacity {W}
+    autosize,                !- Gas Turbine Engine Capacity {W}
     0.00000504,              !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}
     150,                     !- Design Steam Saturation Temperature {C}
     43500,                   !- Fuel Higher Heating Value {kJ/kg}
-    autosize,                  !- Design Heat Recovery Water Flow Rate {m3/s}
+    autosize,                !- Design Heat Recovery Water Flow Rate {m3/s}
     Big Chiller Heat Rec Inlet Node,                        !- Heat Recovery Inlet Node Name
     Big Chiller Heat Rec Outlet Node,                        !- Heat Recovery Outlet Node Name
     LeavingSetpointModulated,!- Chiller Flow Mode
@@ -2523,7 +2528,7 @@
     ,                        !- Basin Heater Capacity
     ,                        !- Basin Heater Setpoint Temperature
     ,                        !- Basin Heater Operating Schedule Name
-    0.25;                        !- Condenser Heat Recovery Relative Capacity Fraction
+    0.25;                    !- Condenser Heat Recovery Relative Capacity Fraction
     
   SetpointManager:Scheduled,
     Big Chiller Setpoint Manager,  !- Name
@@ -2535,7 +2540,7 @@
     Purchased Cooling,       !- Name
     Purchased Cooling Inlet Node,  !- Chilled Water Inlet Node Name
     Purchased Cooling Outlet Node,  !- Chilled Water Outlet Node Name
-    680000;                  !- Nominal Capacity {W}
+    25000;                  !- Nominal Capacity {W}
 
   WaterHeater:Mixed,
     Big Water Heater,        !- Name
@@ -2544,12 +2549,12 @@
     5.0,                     !- Deadband Temperature Difference {deltaC}
     82.2222,                 !- Maximum Temperature Limit {C}
     CYCLE,                   !- Heater Control Type
-    200000,                  !- Heater Maximum Capacity {W}
+    12000,                  !- Heater Maximum Capacity {W}
     ,                        !- Heater Minimum Capacity {W}
     ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
     ,                        !- Heater Ignition Delay {s}
     ELECTRIC,                !- Heater Fuel Type
-    0.8,                     !- Heater Thermal Efficiency
+    1.0,                     !- Heater Thermal Efficiency
     ,                        !- Part Load Factor Curve Name
     ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}
     ,                        !- Off Cycle Parasitic Fuel Type
@@ -2574,8 +2579,8 @@
     Big Water Heater Source Side Inlet Node,  !- Source Side Inlet Node Name
     Big Water Heater Source Side Outlet Node,  !- Source Side Outlet Node Name
     0.9,                     !- Source Side Effectiveness
-    0.0043,                  !- Use Side Design Flow Rate {m3/s}
-    0.005;                   !- Source Side Design Flow Rate {m3/s}
+    autosize,                  !- Use Side Design Flow Rate {m3/s}
+    0.000471;                   !- Source Side Design Flow Rate {m3/s}
 
 
   CoolingTower:SingleSpeed,
@@ -2662,15 +2667,15 @@
 
   Coil:Heating:Water,
     Reheat Coil Zone 1,      !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    400.0,                   !- U-Factor Times Area Value {W/K}
-    0.0013,                  !- Maximum Water Flow Rate {m3/s}
+    on,    !- Availability Schedule Name
+    autosize,                   !- U-Factor Times Area Value {W/K}
+    autosize,                  !- Maximum Water Flow Rate {m3/s}
     Zone 1 Reheat Water Inlet Node,  !- Water Inlet Node Name
     Zone 1 Reheat Water Outlet Node,  !- Water Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    ,                !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2679,15 +2684,15 @@
 
   Coil:Heating:Water,
     Reheat Coil Zone 2,      !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    400.0,                   !- U-Factor Times Area Value {W/K}
-    0.0012,                  !- Maximum Water Flow Rate {m3/s}
+    on,    !- Availability Schedule Name
+    autosize,                   !- U-Factor Times Area Value {W/K}
+    autosize,                  !- Maximum Water Flow Rate {m3/s}
     Zone 2 Reheat Water Inlet Node,  !- Water Inlet Node Name
     Zone 2 Reheat Water Outlet Node,  !- Water Outlet Node Name
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    ,                !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2696,15 +2701,15 @@
 
   Coil:Heating:Water,
     Reheat Coil Zone 3,      !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    400.0,                   !- U-Factor Times Area Value {W/K}
-    0.0018,                  !- Maximum Water Flow Rate {m3/s}
+    on,    !- Availability Schedule Name
+    autosize,                   !- U-Factor Times Area Value {W/K}
+    autosize,                  !- Maximum Water Flow Rate {m3/s}
     Zone 3 Reheat Water Inlet Node,  !- Water Inlet Node Name
     Zone 3 Reheat Water Outlet Node,  !- Water Outlet Node Name
     Zone 3 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 3 Reheat Air Outlet Node,  !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    ,                !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2713,23 +2718,23 @@
 
   Coil:Cooling:Water:DetailedGeometry,
     Detailed Cooling Coil,   !- Name
-    CoolingCoilAvailSched,   !- Availability Schedule Name
-    0.0011,                  !- Maximum Water Flow Rate {m3/s}
-    6.23816,                 !- Tube Outside Surface Area {m2}
-    6.20007018,              !- Total Tube Inside Area {m2}
-    101.7158224,             !- Fin Surface Area {m2}
-    0.810606367,             !- Minimum Airflow Area {m2}
-    0.165097968,             !- Coil Depth {m}
-    0.43507152,              !- Fin Diameter {m}
-    0.001499982,             !- Fin Thickness {m}
-    0.014449958,             !- Tube Inside Diameter {m}
-    0.015879775,             !- Tube Outside Diameter {m}
-    385.764854,              !- Tube Thermal Conductivity {W/m-K}
-    203.882537,              !- Fin Thermal Conductivity {W/m-K}
-    0.001814292,             !- Fin Spacing {m}
-    0.02589977,              !- Tube Depth Spacing {m}
+    on,   !- Availability Schedule Name
+    AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
+    AUTOSIZE,                !- Tube Outside Surface Area {m2}
+    AUTOSIZE,                !- Total Tube Inside Area {m2}
+    AUTOSIZE,                !- Fin Surface Area {m2}
+    AUTOSIZE,                !- Minimum Airflow Area {m2}
+    AUTOSIZE,                !- Coil Depth {m}
+    AUTOSIZE,                !- Fin Diameter {m}
+    0.0015,                  !- Fin Thickness {m}
+    0.01445,                 !- Tube Inside Diameter {m}
+    0.0159,                  !- Tube Outside Diameter {m}
+    386.0,                   !- Tube Thermal Conductivity {W/m-K}
+    204.0,                   !- Fin Thermal Conductivity {W/m-K}
+    0.0018,                  !- Fin Spacing {m}
+    0.026,                   !- Tube Depth Spacing {m}
     6,                       !- Number of Tube Rows
-    16,                      !- Number of Tubes per Row
+    AUTOSIZE,                !- Number of Tubes per Row
     Cooling Coil Water Inlet Node,  !- Water Inlet Node Name
     Cooling Coil Water Outlet Node,  !- Water Outlet Node Name
     Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -2737,10 +2742,10 @@
 
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    on,    !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
-    1.3,                     !- Maximum Flow Rate {m3/s}
+    autosize,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Air Loop Inlet Node,     !- Air Inlet Node Name
@@ -2792,6 +2797,9 @@
 
   Output:Variable,*,Chiller Heat Recovery Mass Flow Rate,timestep;
 
+  Output:Variable,*,Water Heater Source Side Heat Transfer Rate ,timestep;
+  Output:Variable,*,Water Heater Use Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Water Heater Tank Temperature ,timestep;
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Building,monthly;
@@ -2820,7 +2828,7 @@
 
   Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
 
-  Output:VariableDictionary,Regular;
+  Output:VariableDictionary,IDF;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

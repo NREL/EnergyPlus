@@ -3891,9 +3891,7 @@ namespace PlantChillers {
 		// save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
 		if ( GTChiller( ChillNum ).Base.CondenserType == WaterCooled ) RegisterPlantCompDesignFlow( GTChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 
-	// why was EngineEff in the numerator here? seems wrong, should be in denominator or else maybe (1.0 - EngineEff)... need to check this out
-
-		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap * GTChiller( ChillNum ).engineCapacityScalar / GTChiller( ChillNum ).Base.COP; 
+		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap / ( GTChiller( ChillNum ).engineCapacityScalar * GTChiller( ChillNum ).Base.COP ); 
 		if ( PlantFirstSizesOkayToFinalize ) {
 			if ( GTChiller( ChillNum ).GTEngineCapacityWasAutoSized ) {
 				GTChiller( ChillNum ).GTEngineCapacity = GTEngineCapacityDes;
