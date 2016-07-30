@@ -73,6 +73,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 
@@ -807,6 +808,110 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 
 }
 
+TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
+	// this tests the new initialized variable added to Erl variable value data structure, for issue #4943
+	// this is also what is checked to see if an actuator has been used for issue #4404.
+	std::string const idf_objects = delimited_string( {
+		"Version,8.6;",
+
+		"OutdoorAir:Node, Test node 1;",
+
+		"EnergyManagementSystem:Actuator,",
+		"TempSetpoint1,          !- Name",
+		"Test node 1,  !- Actuated Component Unique Name",
+		"System Node Setpoint,    !- Actuated Component Type",
+		"Temperature Setpoint;    !- Actuated Component Control Type",
+
+		"EnergyManagementSystem:Program,",
+		"SetNodeSetpointTest,",
+		"Set TempSetpoint1 = 21.0;"
+
+		"EnergyManagementSystem:ProgramCallingManager,",
+		"Test Program Manager 1,  !- Name",
+		"BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
+		"SetNodeSetpointTest;  !- Program Name 1",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	OutAirNodeManager::SetOutAirNodes();
+
+	EMSManager::CheckIfAnyEMS();
+	EMSManager::FinishProcessingUserInput = true;
+	bool anyRan;
+	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+	// Expect the variable to not yet be initialized
+	EXPECT_FALSE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
+	// next run a small program that sets the value
+	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
+	// check that it worked and the value came thru
+	EXPECT_NEAR( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.Number, 21.0, 0.0000001 );
+	// check of state to see if now initialized
+	EXPECT_TRUE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
+
+}
+
+TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
+	// this tests the new initialized variable added to Erl variable value data structure in a slightly different way
+	// we call the routine EvaluateExpression and examine the new bool argument for fatal errors.  
+	std::string const idf_objects = delimited_string( {
+		"Version,8.6;",
+
+		"OutdoorAir:Node, Test node 1;",
+
+		"EnergyManagementSystem:Actuator,",
+		"TempSetpoint1,          !- Name",
+		"Test node 1,  !- Actuated Component Unique Name",
+		"System Node Setpoint,    !- Actuated Component Type",
+		"Temperature Setpoint;    !- Actuated Component Control Type",
+
+		"EnergyManagementSystem:Program,",
+		"SetNodeSetpointTest,",
+		"Set TempSetpoint1 = testGlobalVar;"
+
+		"EnergyManagementSystem:Program,",
+		"SetGlobalValue,",
+		"SET testGlobalVar = 21.0;"
+
+		"EnergyManagementSystem:GlobalVariable, ",
+		"testGlobalVar;"
+
+		"EnergyManagementSystem:ProgramCallingManager,",
+		"Test Program Manager 1,  !- Name",
+		"BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
+		"SetNodeSetpointTest;  !- Program Name 1",
+
+		"EnergyManagementSystem:ProgramCallingManager,",
+		"Test Program Manager 2,  !- Name",
+		"BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+		"SetGlobalValue;  !- Program Name 1",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	OutAirNodeManager::SetOutAirNodes();
+
+	EMSManager::CheckIfAnyEMS();
+	EMSManager::FinishProcessingUserInput = true;
+	bool anyRan;
+	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
+	// Expect the variable to not yet be initialized, call EvaluateExpresssion and check argument
+
+	ErlValueType ReturnValue;
+	bool seriousErrorFound = false;
+	EMSManager::FinishProcessingUserInput = false;
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); // we just check the logic and don't throw the fatal errors.
+	EXPECT_TRUE ( seriousErrorFound );
+
+	// next run a small program that sets the global variable value
+	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
+	// now check that it worked, should stay false
+	seriousErrorFound = false;
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); 
+	EXPECT_FALSE ( seriousErrorFound );
+}
 
 TEST_F( EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS ) {
 
