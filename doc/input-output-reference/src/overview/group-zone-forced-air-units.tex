@@ -3892,7 +3892,7 @@ This alpha field defines the name of the supply air fan operating mode schedule.
 
 \paragraph{Field: Supply Air Fan Placement}\label{field-supply-air-fan-placement-000}
 
-This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. If this field is left blank, the default is blow through.
+This alpha field has two choices: \textit{BlowThrough} or \textit{DrawThrough}. If this field is left blank, the default is blow through.
 
 The first choice stands for ``blow through fan''. This means that the unit consists of a fan followed by the DX coils. The fan ``blows through'' the cooling and heating coils. If an outside air mixer is used, the fan inlet connects to the outdoor air mixer's mixed air node. If an outdoor air mixer is not used, the fan inlet connects to the zone exhaust node. For this configuration, the fan outlet always connects to the DX cooling coil inlet node (or if a DX cooling coil is not used, the DX heating coil inlet node).
 
@@ -3900,7 +3900,7 @@ The second choice stands for ``draw through fan''. This means that the unit cons
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-8}
 
-This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textbf{Fan:OnOff} or \textbf{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff} or \textit{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
 
 \paragraph{Field: Supply Air Fan Object Name}\label{field-supply-air-fan-object-name}
 
@@ -3908,15 +3908,15 @@ This alpha field defines the name of the terminal unit's supply air fan.
 
 \paragraph{Field: Outdoor Air Mixer Object Type}\label{field-outdoor-air-mixer-object-type}
 
-This alpha field contains the identifying type of outdoor air mixer specified for the terminal unit. Outdoor air mixer type must be \textbf{OutdoorAir:Mixer}. This input field should be left blank when the VRF terminal unit is placed in \textbf{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer is not simulated.
+This alpha field contains the identifying type of outdoor air mixer specified for the terminal unit. Outdoor air mixer type must be \textit{OutdoorAir:Mixer}. This input field should be left blank when the VRF terminal unit is placed in \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer is not simulated.
 
 \paragraph{Field: Outdoor Air Mixer Object Name}\label{field-outdoor-air-mixer-object-name}
 
-This alpha field defines the name of the terminal unit's outdoor air mixer. This input field should be left blank when the VRF terminal unit is placed in \textbf{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer is not simulated.
+This alpha field defines the name of the terminal unit's outdoor air mixer. This input field should be left blank when the VRF terminal unit is placed in \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer is not simulated.
 
 \paragraph{Field: DX Cooling Coil Object Type}\label{field-dx-cooling-coil-object-type}
 
-This choice field contains the identifying type of the terminal unit's DX cooling coil. The only valid DX cooling coil type is \textbf{Coil:Cooling:DX:VariableRefrigerantFlow}. This field should be left blank when a DX cooling coil is not simulated.
+This choice field contains the identifying type of the terminal unit's DX cooling coil. The only valid DX cooling coil type is \textit{Coil:Cooling:DX:VariableRefrigerantFlow}. This field should be left blank when a DX cooling coil is not simulated.
 
 \paragraph{Field: DX Cooling Coil Name}\label{field-dx-cooling-coil-name-1}
 
@@ -3924,7 +3924,7 @@ This alpha field defines the name of the terminal unit's DX cooling coil. If thi
 
 \paragraph{Field: DX Heating Coil Object Type}\label{field-dx-heating-coil-object-type}
 
-This choice field contains the identifying type of the terminal unit's DX heating coil. The only valid DX heating coil type is \textbf{Coil:Heating:DX:VariableRefrigerantFlow}. This field should be left blank when a DX heating coil is not simulated.
+This choice field contains the identifying type of the terminal unit's DX heating coil. The only valid DX heating coil type is \textit{Coil:Heating:DX:VariableRefrigerantFlow}. This field should be left blank when a DX heating coil is not simulated.
 
 \paragraph{Field: DX Heating Coil Object Name}\label{field-dx-heating-coil-object-name}
 

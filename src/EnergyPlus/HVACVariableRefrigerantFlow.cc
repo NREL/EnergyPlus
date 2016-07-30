@@ -9129,7 +9129,7 @@ namespace HVACVariableRefrigerantFlow {
 		OpMode = this->OpMode;
 		EvapTemp = VRF(VRFCond).IUEvaporatingTemp;
 		CondTemp = VRF(VRFCond).IUCondensingTemp;
-		ZoneNode = ZoneEquipConfig( VRFTU( VRFTUNum ).ZoneNum ).ZoneNode;
+		ZoneNode = ZoneEquipConfig( this->ZoneNum ).ZoneNode;
 
 		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
 		if( PartLoadRatio == 0 ) {
@@ -9143,15 +9143,15 @@ namespace HVACVariableRefrigerantFlow {
 		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
 		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
 
-		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
+		if ( this->ATMixerExists ) {
 			// There is an air terminal mixer
-			ATMixOutNode = VRFTU( VRFTUNum ).ATMixerOutNode;
-			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
+			ATMixOutNode = this->ATMixerOutNode;
+			if ( this->ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
-				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
+				Node( this->ATMixerPriNode ).MassFlowRate = min( Node( this->ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
 				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
 				// (it is the "inlet" node flow rate)
-				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+				SimATMixer( this->ATMixerName, FirstHVACIteration, this->ATMixerIndex );
 			}
 		} else {
 			ATMixOutNode = 0;
@@ -9196,14 +9196,14 @@ namespace HVACVariableRefrigerantFlow {
 		this->FanPower = FanElecPower;
 
 		// calculate supply side terminal unit OA mixer
-		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
-			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
-				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
+		if ( this->ATMixerExists ) {
+			if ( this->ATMixerType == ATMixer_SupplySide ) {
+				SimATMixer( this->ATMixerName, FirstHVACIteration, this->ATMixerIndex );
 			}
 		}
 		// calculate sensible load met
-		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
-			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
+		if ( this->ATMixerExists ) {
+			if ( this->ATMixerType == ATMixer_SupplySide ) {
 				// Air terminal supply side mixer
 				MinHumRat = min( Node( ZoneNode ).HumRat, Node( ATMixOutNode ).HumRat );
 				LoadMet = Node( ATMixOutNode ).MassFlowRate * ( PsyHFnTdbW( Node( ATMixOutNode ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneNode ).Temp, MinHumRat ) );
