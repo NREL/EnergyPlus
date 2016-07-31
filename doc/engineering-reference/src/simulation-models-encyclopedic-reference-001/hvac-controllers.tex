@@ -117,7 +117,7 @@ When the heat exchanger assisted cooling coil is used with a furnace or unitary 
 \item
   Maximum outside air flow rate~ (\({\dot V_{oa,\max }}\) ) {[}m\(^{3}\)/s{]}
 \item
-  EconomizerChoice: \emph{FixedDryBulbr} \textbar{} \emph{FixedEnthalpy} \textbar{} \emph{~DifferentialDryBulb~} \textbar{} \emph{~DifferentialEnthalpy} \textbar{} \emph{~~ElectronicEnthalpy} \textbar{} \emph{~~FixedDewPointAndDryBulb~~~} \textbar{} \emph{DifferentialDryBulbAndEnthalpy~} \textbar{} \emph{NoEconomizer}
+  EconomizerChoice: \emph{FixedDryBulbr} \textbar{} \emph{FixedEnthalpy} \textbar{} \emph{~DifferentialDryBulb~} \textbar{} \emph{~DifferentialEnthalpy} \textbar{} \emph{~~ElectronicEnthalpy} \textbar{} \emph{~~FixedDewPointAndDryBulb~~~} \textbar{} \emph{DifferentialDryBulbAndEnthalpy~} \textbar{} \emph{TimeOfDay} \textbar{} \emph{NoEconomizer}
 \item
   Bypasschoice: \emph{MinimumFlowWithBypass} \textbar{} \emph{ModulateFlow}
 \item
@@ -143,7 +143,7 @@ When the heat exchanger assisted cooling coil is used with a furnace or unitary 
 \item
   Name of Controller:MechanicalVentilation object
 \item
-  Time-of-day economizer control schedule (economizer active when schedule values are greater than 0)
+  Economizer control schedule (economizer active when schedule values are greater than 0)
 \item
   High humidity control flag: \emph{Yes} \textbar{} \emph{No}
 \item
@@ -218,47 +218,48 @@ Finally, \({S_{oa,init}}\) is constrained to be: \({f_{oa,\min }} \le {S_{oa,ini
 
 \subsubsection{Step 3: do the on/off and limit checks}\label{step-3-do-the-onoff-and-limit-checks}
 
-·~~~~~~~~If \emph{EconomizerChoice} = \emph{No Economizer}, \({S_{oa,init}} = {f_{oa,\min }}\) .
+\begin{itemize}
+\item  If \emph{EconomizerChoice} = \emph{No Economizer}, \({S_{oa,init}} = {f_{oa,\min }}\) .
 
-·~~~~~~~~If \({\dot V_{oa,\max }} < {\dot V_{small}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; \({\dot V_{small}}\) is.001 m\(^{3}\)/s.
+\item  If \({\dot V_{oa,\max }} < {\dot V_{small}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; \({\dot V_{small}}\) is.001 m\(^{3}\)/s.
 
-·~~~~~~~~If the economizer is locked out, \({S_{oa,init}} = {f_{oa,\min }}\) .
+\item  If the economizer is locked out, \({S_{oa,init}} = {f_{oa,\min }}\) .
 
-Note: the above three checks also set the \emph{EconomizerOperationFlag} and \emph{HighHumidityControlFlag} to \emph{false} (economizer and high humidity control not operating).
+\item  If the economizer control schedule is \(\le 0\), \({S_{oa,init}} = {f_{oa,\min }}\) .
+\end{itemize}
 
-·~~~~~~~~If \({T_i} > {T_{mix,set}}\) ~, \({S_{oa,init}} = 1\) .
+Note: the above four checks also set the \emph{EconomizerOperationFlag} and \emph{HighHumidityControlFlag} to \emph{false} (economizer and high humidity control not operating).
 
-·~~~~~~~~If Differential dry-bulb was input as Economizer choiceand \({T_i} > {T_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) .
+\begin{itemize}
+\item If \({T_i} > {T_{mix,set}}\) ~, \({S_{oa,init}} = 1\) .
 
-·~~~~~~~~If Differential Enthalpy was input as Economizer choiceand \({h_i} > {h_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) , where \emph{h\(_{i}\)} and \emph{h\(_{r}\)}~are the outside air inlet and return air enthalpies.
+\item If Differential dry-bulb was input as Economizer choiceand \({T_i} > {T_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) .
 
-Setpoints are checked after this which include check for Fixed dry-bulb temperature~ limit, Enthalpy Limit, Dewpoint Limit and Humidity ratio limit if specified.
+\item If Differential Enthalpy was input as Economizer choice and \({h_i} > {h_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) , where \emph{h\(_{i}\)} and \emph{h\(_{r}\)}~are the outside air inlet and return air enthalpies.
 
-·~~~~~~~~If Differential Enthalpy was input as Economizer choiceand \({h_i} > {h_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) , where \emph{h\(_{i}\)} and \emph{h\(_{r}\)}~are the outside air inlet and return air enthalpies.
+\item If DifferentialDryBulbAndEnthalpy was input checks the outside air temperature against return temperature and outside air enthalpy against return air enthalpy and also checks the setpoints.
+
+\end{itemize}
 
 Setpoints are checked after this which include check for Fixed dry-bulb temperature limit, Enthalpy Limit, Dewpoint Limit and Humidity ratio limit if specified.
 
-·~~~~~~~~If a FixedDryBulb / FixedEnthalpy / FixedDewPointAndDryBulb / ElectronicEnthalpy was input as the economizer choice then the limits are checked as before.
+\begin{itemize}
 
-·~~~~~~~~Limits are checked as follows
+\item  If a high temperature limit was input and \({T_{oa}} > {T_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{T\(_{oa}\)} is the outside air temperature.
 
-o~~~If a high temperature limit was input and \({T_{oa}} > {T_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{T\(_{oa}\)} is the outside air temperature.
+\item  If an enthalpy limit was input and \({h_{oa}} > {h_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{h\(_{oa}\)} is the outside air specific enthalpy.
 
-o~~~If an enthalpy limit was input and \({h_{oa}} > {h_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{h\(_{oa}\)} is the outside air specific enthalpy.
+\item  If a dewpoint temperature limit was input and \({T_{DP,OA}} > {T_{DP,high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where T\(_{DP,OA}\) is the outside air dewpoint temperature and T\(_{DP,high}\) is dewpoint temperature limit.
 
-o~~~If a dewpoint temperature limit was input and \({T_{DP,OA}} > {T_{DP,high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where T\(_{DP,OA}\) is the outside air dewpoint temperature and T\(_{DP,high}\) is dewpoint temperature limit.
+\item  If an electronic enthalpy curve was input and \({w_{OA}} > {w_{CurveOutput}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{w}\(_{OA}\) is the outside air humidity ratio and \emph{w}\(_{CurveOutput}\) is the curve's humidity ratio output as a function of outdoor air dry-bulb temperature.
 
-o~~~If an electronic enthalpy curve was input and \({w_{OA}} > {w_{CurveOutput}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{w}\(_{OA}\) is the outside air humidity ratio and \emph{w}\(_{CurveOutput}\) is the curve's humidity ratio output as a function of outdoor air dry-bulb temperature.
+\item  If a low temperature limit was input and \({T_{oa}} < {T_{low}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) .
 
-·~~~~~~~~Another Economizer choice called DifferentialDryBulbAndEnthalpy checks the outside air temperature against return temperature and outside air enthalpy against return air enthalpy and also checks the setpoints.
-
-·~~~~~~~~If a low temperature limit was input and \({T_{oa}} < {T_{low}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) .
+\end{itemize}
 
 Note: the above nine cases set the \emph{EconomizerOperationFlag} to \emph{false}~~~~~~ (economizer not operating), otherwise the economizer is active.
 
-·~~~~~~~~If high humidity control is specified and the zone humidistat indicates a moisture load (i.e.~zone relative humidity greater than the relative humidity setpoint), the \emph{HighHumidityOperationFlag} is set to \emph{true.} If high humidity control is based on the outdoor humidity ratio then the \emph{HighHumidityOperationFlag} is set to \emph{true} only when the outdoor air humidity ratio is less than the humidstat's zone humidity ratio. A \emph{true} HIghHumidityOperationFlag also enables economizer operation in the heat exchangers as if the economizer flag used here was also set to \emph{true} (Ref. HeatExchanger:* - field Economizer Lockout).
-
-The economizer schedule is then checked to determine if a ``push-button'' type economizer control is used. When schedule values are greater than 0, the economizer is active (\emph{EconomizerOperationFlag} = \emph{true)}. This test overrides the economizer limit checks described above in Step 3.
+If high humidity control is specified and the zone humidistat indicates a moisture load (i.e.~zone relative humidity greater than the relative humidity setpoint), the \emph{HighHumidityOperationFlag} is set to \emph{true.} If high humidity control is based on the outdoor humidity ratio then the \emph{HighHumidityOperationFlag} is set to \emph{true} only when the outdoor air humidity ratio is less than the humidstat's zone humidity ratio. A \emph{true} HIghHumidityOperationFlag also enables economizer operation in the heat exchangers as if the economizer flag used here was also set to \emph{true} (Ref. HeatExchanger:* - field Economizer Lockout).
 
 \subsubsection{Step 4: calculate the final outside air signal}\label{step-4-calculate-the-final-outside-air-signal}
 

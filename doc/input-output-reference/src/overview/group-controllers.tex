@@ -165,6 +165,8 @@ The options for this field are
 \item
   DifferentialDryBulbAndEnthalpy
 \item
+  TimeOfDay
+\item
   NoEconomizer
 \end{itemize}
 
@@ -184,9 +186,11 @@ Choosing \textbf{FixedDewPointAndDryBulb} compares both the outdoor dewpoint tem
 
 Another option \textbf{DifferentialDryBulbAndEnthalpy} enables the control strategy to be based on both the DifferentialDryBulb and DifferentialEnthalpy economizer control strategies.
 
-In addition to all economizer control types listed above, each control type checks for user-entered values for the upper limit of dry-bulb temperature, enthalpy limit, humidity ratio limit and dewpoint limit. The outdoor air flow rate is set to minimum if any of these entered limits are exceeded.
+Choosing \textbf{TimeOfDay} means the economizer will be fully open whenever the Economizer Control Schedule is greater than zero. This control type does not modulate to the mixed air temperature; it is either at the minimum or the maximum.
 
 The default for this field is \textbf{NoEconomizer}.
+
+In addition, for all economizer control types listed above, the controller checks the Economizer Control Schedule and the user-entered values for the upper limit of dry-bulb temperature, enthalpy limit, humidity ratio limit and dewpoint limit. The outdoor air flow rate is set to minimum if any of these entered limits are exceeded or the schedule is zero.
 
 \paragraph{Field: Economizer Control Action Type}\label{field-economizer-control-action-type}
 
@@ -271,9 +275,9 @@ Leaving this input field blank will bypass the Controller:MechanicalVentilation 
 
 If the Minimum Outdoor Air Flow Rate is autosized, it will size to zero when a valid Controller:MechanicalVentilation object is entered.  The Minimum Fraction of Outdoor Air Schedule can reduce the outdoor air flow rate set by the Controller:MechanicalVentilation.
 
-\paragraph{Field: Time of Day Economizer Control Schedule Name}\label{field-time-of-day-economizer-control-schedule-name}
+\paragraph{Field: Economizer Control Schedule Name}\label{economizer-control-schedule-name}
 
-This alpha field is the name of a schedule which controls the outdoor air flow rate based on a time-of-day economizer. Schedule values equal to 0 disable this feature. Schedule values greater than 0 cause the outdoor air flow rate to increase to the maximum. When an economizer is used in conjunction with the high humidity control option, high humidity control has priority.
+This alpha field is the name of a schedule which controls the availability of the economizer for all economizer control types. Schedule values greater than 0 enable the economizer and enables high humidity control. If this field is blank, the schedule defaults to 1.0 at all times.
 
 \paragraph{Field: High Humidity Control}\label{field-high-humidity-control}
 
