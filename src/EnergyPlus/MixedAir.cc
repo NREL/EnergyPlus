@@ -1633,6 +1633,8 @@ namespace MixedAir {
 				thisVentilationMechanical.ZoneOAPeopleRate.dimension( MechVentZoneCount, 0.0 );
 				thisVentilationMechanical.ZoneOAFlowRate.dimension( MechVentZoneCount, 0.0 );
 				thisVentilationMechanical.ZoneOAACHRate.dimension( MechVentZoneCount, 0.0 );
+				thisVentilationMechanical.ZoneOAFlowMethod.dimension( MechVentZoneCount, 0 );
+				thisVentilationMechanical.ZoneOASchPtr.dimension( MechVentZoneCount, 0 );
 
 				// added for new DCV, 2/12/2009
 				thisVentilationMechanical.ZoneADEffCooling.dimension( MechVentZoneCount, 1.0 );
@@ -1640,8 +1642,6 @@ namespace MixedAir {
 				thisVentilationMechanical.ZoneADEffHeating.dimension( MechVentZoneCount, 1.0 );
 				// Indices to the zone air distribution effectiveness schedules
 				thisVentilationMechanical.ZoneADEffSchPtr.dimension( MechVentZoneCount, 0 );
-				// Zone air distribution effectiveness schedule names
-				thisVentilationMechanical.ZoneADEffSchName.allocate( MechVentZoneCount );
 				// Zone air secondary recirculation ratio, added 3/2012
 				thisVentilationMechanical.ZoneSecondaryRecirculation.dimension( MechVentZoneCount, 0.0 );
 				thisVentilationMechanical.ZoneDesignSpecADObjName.allocate( MechVentZoneCount );
@@ -1755,12 +1755,16 @@ namespace MixedAir {
 						thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) = curOARequirements.OAFlowPerPerson;
 						thisVentilationMechanical.ZoneOAFlowRate( ventMechZoneNum ) = curOARequirements.OAFlowPerZone;
 						thisVentilationMechanical.ZoneOAACHRate( ventMechZoneNum ) = curOARequirements.OAFlowACH;
+						thisVentilationMechanical.ZoneOAFlowMethod( ventMechZoneNum ) = curOARequirements.OAFlowMethod;
+						thisVentilationMechanical.ZoneOASchPtr( ventMechZoneNum ) = curOARequirements.OAFlowFracSchPtr;
 					} else { // use defaults
 						thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) = 0.0;
 						// since this is case with no DesSpcOA object, cannot determine the method and default would be Flow/Person which should default to this flow rate
 						thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) = 0.00944;
 						thisVentilationMechanical.ZoneOAFlowRate( ventMechZoneNum ) = 0.0;
 						thisVentilationMechanical.ZoneOAACHRate = 0.0;
+						thisVentilationMechanical.ZoneOAFlowMethod( ventMechZoneNum ) = OAFlowPPer;
+						thisVentilationMechanical.ZoneOASchPtr( ventMechZoneNum ) = ScheduleAlwaysOn;
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( ventMechZoneNum ).Name);
 						ShowContinueError( "Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"" + thisVentilationMechanical.VentMechZoneName( ventMechZoneNum ) + "\"." );
 						ShowContinueError( "Using default OA of 0.00944 m3/s-person and 0.0 m3/s-m2." );
@@ -1771,7 +1775,6 @@ namespace MixedAir {
 						thisVentilationMechanical.ZoneADEffCooling( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffCooling;
 						thisVentilationMechanical.ZoneADEffHeating( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffHeating;
 						thisVentilationMechanical.ZoneADEffSchPtr( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffSchPtr;
-						thisVentilationMechanical.ZoneADEffSchName( ventMechZoneNum ) = curZoneAirDistribution.ZoneADEffSchName;
 						thisVentilationMechanical.ZoneSecondaryRecirculation( ventMechZoneNum ) = curZoneAirDistribution.ZoneSecondaryRecirculation;
 					} else { // use defaults
 						thisVentilationMechanical.ZoneADEffCooling( ventMechZoneNum ) = 1.0;
@@ -2524,16 +2527,10 @@ namespace MixedAir {
 		//       MODIFIED       Shirey/Raustad FSEC, June/Aug 2003, Feb 2004
 		//                      Tianzhen Hong, Feb 2009 for DCV
 		//                      Tianzhen Hong, Aug 2013 for economizer faults
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE
 		// Initialize the OAController data structure with input node data
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
 		using namespace DataLoopNode;
 		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::Zone;
@@ -2550,23 +2547,6 @@ namespace MixedAir {
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
 		using DataAirSystems::PrimaryAirSystem;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		/////////// hoisted into namespace
-		//static bool MyOneTimeFlag( true ); // One-time initialization flag
-		//static bool MySetPointCheckFlag( true ); // One-time initialization flag
-		//static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
-		//////////////////////////////////
 		static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
 		static Array1D_bool OAControllerMyEnvrnFlag; // One-time initialization flag
 		static Array1D_bool OAControllerMySizeFlag; // One-time initialization flag
@@ -2580,8 +2560,6 @@ namespace MixedAir {
 		Real64 RhoAirStdInit; // Standard air density
 		Real64 TotalPeopleOAFlow; // Total outside air required for PEOPLE objects served by this OA controller
 		int MixedAirNode; // Controller:OutdoorAir mixed air node
-		int ZoneNum; // DO loop index (zone number)
-		int ZoneIndex; // Index to zone in mechanical ventilation zone list
 		int AirLoopZoneInfoZoneNum; // Index to AirLoopZoneInfo structure
 		int NumZone; // Zone number in AirLoopZoneInfo structure
 		int PeopleNum; // Index to PEOPLE objects
@@ -2826,7 +2804,7 @@ namespace MixedAir {
 				// Make sure all zones with mechanical ventilation are on the correct air loop
 				TempMechVentArrayCounter = 0;
 				for ( NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone ) {
-					ZoneNum = vent_mech.VentMechZone( NumMechVentZone );
+					int ZoneNum = vent_mech.VentMechZone( NumMechVentZone );
 					auto const & zone( Zone( ZoneNum ) );
 					FoundZone = false;
 
@@ -2841,6 +2819,8 @@ namespace MixedAir {
 								vent_mech.ZoneOAPeopleRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAPeopleRate( NumMechVentZone );
 								vent_mech.ZoneOAFlowRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAFlowRate( NumMechVentZone );
 								vent_mech.ZoneOAACHRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAACHRate( NumMechVentZone );
+								vent_mech.ZoneOAFlowMethod( TempMechVentArrayCounter ) = vent_mech.ZoneOAFlowMethod( NumMechVentZone );
+								vent_mech.ZoneOASchPtr( TempMechVentArrayCounter ) = vent_mech.ZoneOASchPtr( NumMechVentZone );
 								vent_mech.ZoneDesignSpecOAObjIndex( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjIndex( NumMechVentZone );
 								vent_mech.ZoneDesignSpecOAObjName( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjName( NumMechVentZone );
 
@@ -2848,7 +2828,6 @@ namespace MixedAir {
 								vent_mech.ZoneADEffCooling( TempMechVentArrayCounter ) = vent_mech.ZoneADEffCooling( NumMechVentZone );
 								vent_mech.ZoneADEffHeating( TempMechVentArrayCounter ) = vent_mech.ZoneADEffHeating( NumMechVentZone );
 								vent_mech.ZoneADEffSchPtr( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchPtr( NumMechVentZone );
-								vent_mech.ZoneADEffSchName( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchName( NumMechVentZone );
 							}
 
 							// Sum outside air per unit floor area for each mechanical ventilation object only once per simulation
@@ -2871,13 +2850,14 @@ namespace MixedAir {
 					vent_mech.ZoneOAPeopleRate.redimension( TempMechVentArrayCounter );
 					vent_mech.ZoneOAFlowRate.redimension( TempMechVentArrayCounter );
 					vent_mech.ZoneOAACHRate.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneOAFlowMethod.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneOASchPtr.redimension( TempMechVentArrayCounter );
 					vent_mech.ZoneDesignSpecOAObjIndex.redimension( TempMechVentArrayCounter );
 					vent_mech.ZoneDesignSpecOAObjName.redimension( TempMechVentArrayCounter );
 
 					vent_mech.ZoneADEffCooling.redimension( TempMechVentArrayCounter );
 					vent_mech.ZoneADEffHeating.redimension( TempMechVentArrayCounter );
 					vent_mech.ZoneADEffSchPtr.redimension( TempMechVentArrayCounter );
-					vent_mech.ZoneADEffSchName.redimension( TempMechVentArrayCounter );
 
 					vent_mech.NumofVentMechZones = TempMechVentArrayCounter;
 				}
@@ -2888,11 +2868,25 @@ namespace MixedAir {
 					PreDefTableEntry( pdchDCVventMechName, zoneName, vent_mech.Name );
 					PreDefTableEntry( pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate( jZone ), 6 );
 					PreDefTableEntry( pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate( jZone ), 6 );
+					PreDefTableEntry( pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate( jZone ), 6 );
+					PreDefTableEntry( pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate( jZone ), 6 );
+					PreDefTableEntry( pdchDCVMethod, zoneName, cOAFlowMethodTypes( vent_mech.ZoneOAFlowMethod( jZone ) ) ); 
+					if ( vent_mech.ZoneOASchPtr( jZone ) > 0 ) {
+						PreDefTableEntry( pdchDCVOASchName, zoneName, GetScheduleName( vent_mech.ZoneOASchPtr( jZone ) ) );
+					} else {
+						PreDefTableEntry( pdchDCVOASchName, zoneName, "" );
+					}
 
 					// added for new DCV inputs
-					PreDefTableEntry( pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling( jZone ), 2 );
-					PreDefTableEntry( pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating( jZone ), 2 );
-					PreDefTableEntry( pdchDCVZoneADEffSchName, zoneName, GetScheduleName( vent_mech.ZoneADEffSchPtr( jZone ) ) );
+					if ( vent_mech.ZoneADEffSchPtr( jZone ) > 0 ) {
+						PreDefTableEntry( pdchDCVZoneADEffCooling, zoneName, "" );
+						PreDefTableEntry( pdchDCVZoneADEffHeating, zoneName, "" );
+						PreDefTableEntry( pdchDCVZoneADEffSchName, zoneName, GetScheduleName( vent_mech.ZoneADEffSchPtr( jZone ) ) );
+					} else {
+						PreDefTableEntry( pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling( jZone ), 2 );
+						PreDefTableEntry( pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating( jZone ), 2 );
+						PreDefTableEntry( pdchDCVZoneADEffSchName, zoneName, "" );
+					}
 				}
 
 				// Check to see if any zones on an air loop are not accounted for by a mechanical ventilation object
@@ -2901,7 +2895,7 @@ namespace MixedAir {
 					FoundAreaZone = false;
 					FoundPeopleZone = false;
 					for ( NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone ) {
-						ZoneNum = vent_mech.VentMechZone( NumMechVentZone );
+						int ZoneNum = vent_mech.VentMechZone( NumMechVentZone );
 						if ( ZoneNum == NumZone ) {
 							FoundAreaZone = true;
 							if ( vent_mech.ZoneOAPeopleRate( NumMechVentZone ) > 0.0 ) {
@@ -2920,16 +2914,6 @@ namespace MixedAir {
 						for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
 							if ( People( PeopleNum ).ZonePtr == NumZone ) {
 								if ( ! FoundAreaZone ) {
-									//  !             If the zone was found, then the people ventilation rate is set to 0
-									//                CALL ShowWarningError('PEOPLE object for zone = '//TRIM(Zone(NumZone)%Name)// &
-									//                                    ' is not accounted for by '//TRIM(CurrentModuleObjects(CMO_MechVentilation))//  &
-									//                                    ' object name = '//TRIM(OAController(OAControllerNum)%VentilationMechanicalName))
-									//                CALL ShowContinueError('A "PEOPLE" object has been specified in the idf for this zone, '// &
-									//                                       'but the ventilation rate is set to 0 in this Controller:MechanicalVentilation Object.')
-									//                CALL ShowContinueError('Check ventilation rate in Controller:MechanicalVentilation object. '//  &
-									//                   ' Simulation will continue.')
-									//              ELSE
-									//             If the zone was not found, then the PEOPLE objects are not accounted for
 									ShowWarningError( "PEOPLE object for zone = " + Zone( NumZone ).Name + " is not accounted for by " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + thisOAController.VentilationMechanicalName );
 									ShowContinueError( "A \"PEOPLE\" object has been specified in the idf for this zone, but it is not included in this " + CurrentModuleObjects( CMO_MechVentilation ) + " Object." );
 									ShowContinueError( "Check " + CurrentModuleObjects( CMO_MechVentilation ) + " object. Simulation will continue." );
@@ -3071,18 +3055,13 @@ namespace MixedAir {
 				TotalPeopleOAFlow = 0.0;
 				if ( VentMechObjectNum != 0 ) {
 					auto & vent_mech( VentilationMechanical( VentMechObjectNum ) );
-					for ( ZoneIndex = 1; ZoneIndex <= vent_mech.NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = vent_mech.VentMechZone( ZoneIndex );
+					for ( int ZoneIndex = 1; ZoneIndex <= vent_mech.NumofVentMechZones; ++ZoneIndex ) {
+						int ZoneNum = vent_mech.VentMechZone( ZoneIndex );
 
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
-						if( vent_mech.ZoneDesignSpecOAObjIndex(ZoneIndex) > 0 ) {
-							int OAFlowMethod = OARequirements( vent_mech.ZoneDesignSpecOAObjIndex( ZoneIndex ) ).OAFlowMethod;
-							if ( OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax ) {
-								TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
-							}
-						} else {
-							// use default value if design specification object is missing
-							TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
+						int OAFlowMethod = vent_mech.ZoneOAFlowMethod( ZoneIndex );
+						if ( OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax ) {
+							TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex ) * GetCurrentScheduleValue( vent_mech.ZoneOASchPtr( ZoneIndex ) );
 						}
 					}
 					vent_mech.TotPeopleOAFlow = TotalPeopleOAFlow;
@@ -3635,9 +3614,6 @@ namespace MixedAir {
 		Real64 NodeHumRat; // node humidity ratio
 		Real64 MassFlowRate; // Temporary variable
 		Real64 ZoneLoad; // Zone loads
-		int ZoneIndex;
-		int ZoneNum;
-		int ZoneADEffSchPtr;
 		std::string ZoneName; // Zone name
 		int OAIndex; // index to design specification outdoor air objects
 		int PeopleNum;
@@ -3669,31 +3645,31 @@ namespace MixedAir {
 			if ( this->SystemOAMethod == SOAM_IAQP ) {
 				// IAQP for CO2 control
 				SysOA = 0.0;
-				for ( ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
-					ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP;
+				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
+					int ZoneNum = this->VentMechZone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
 				MechVentOutsideAirFlow = SysOA;
 			} else if ( this->SystemOAMethod == SOAM_IAQPGC ) {
 				// IAQP for generic contaminant control
 				SysOA = 0.0;
-				for ( ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
-					ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP;
+				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
+					int ZoneNum = this->VentMechZone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
 				MechVentOutsideAirFlow = SysOA;
 			} else if ( this->SystemOAMethod == SOAM_IAQPCOM ) {
 				// IAQP for both CO2 and generic contaminant control
 				SysOA = 0.0;
-				for ( ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
-					ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP;
+				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
+					int ZoneNum = this->VentMechZone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
 				MechVentOutsideAirFlow = SysOA;
 				SysOA = 0.0;
-				for ( ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
-					ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP;
+				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
+					int ZoneNum = this->VentMechZone( ZoneIndex );
+					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
 				MechVentOutsideAirFlow = max( SysOA, MechVentOutsideAirFlow );
 			} else {
@@ -3703,23 +3679,24 @@ namespace MixedAir {
 				// Loop through each zone first to calc uncorrected system OA flow rate
 				SysOAuc = 0.0;
 				SysOA = 0.0;
-				for ( ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
-					ZoneNum = this->VentMechZone( ZoneIndex );
-					auto & curZone( Zone( ZoneNum ) );
+				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
+					int ZoneNum = this->VentMechZone( ZoneIndex );
+					auto const & curZone( Zone( ZoneNum ) );
+					Real64 curZoneOASchValue = GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 
 					// Calc the zone OA flow rate based on the people component
 					// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
 					//  Checking DCV flag before calculating zone OA per person
 					if ( this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
-						ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
+						ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex ) * curZoneOASchValue;
 					} else {
-						ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
+						ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex ) * curZoneOASchValue;
 					}
 
 					// Calc the zone OA flow rate based on the floor area component
-					ZoneOAArea = curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate( ZoneIndex );
-					ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate( ZoneIndex );
-					ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
+					ZoneOAArea = curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate( ZoneIndex ) * curZoneOASchValue;
+					ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate( ZoneIndex ) * curZoneOASchValue;
+					ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * Zone( ZoneIndex ).Volume ) * curZoneOASchValue / 3600.0;
 
 					// Calc the breathing-zone OA flow rate
 					OAIndex = this->ZoneDesignSpecOAObjIndex( ZoneIndex );
@@ -3768,8 +3745,8 @@ namespace MixedAir {
 
 					// Loop through each zone again
 					SysEv = 2.0; // starting with a big fraction
-					for ( ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = this->VentMechZone( ZoneIndex );
+					for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
+						int ZoneNum = this->VentMechZone( ZoneIndex );
 						int ZoneEquipConfigNum = ZoneNum; // correspondence - 1:1 of ZoneEquipConfig to Zone index
 						ZoneEz = 0.0;
 
@@ -3778,14 +3755,15 @@ namespace MixedAir {
 						auto & curZoneEquipConfig( ZoneEquipConfig( ZoneEquipConfigNum ) );
 						auto & curZoneSysEnergyDemand( ZoneSysEnergyDemand( ZoneEquipConfigNum ) );
 						ZoneName = curZone.Name;
+						Real64 curZoneOASchValue = GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 
 						// Calc the zone OA flow rate based on the people component
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
 						//  Checking DCV flag before calculating zone OA per person
 						if ( this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc ) {
-							ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
+							ZoneOAPeople = ZoneIntGain( ZoneNum ).NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex ) * curZoneOASchValue;
 						} else {
-							ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex );
+							ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate( ZoneIndex ) * curZoneOASchValue;
 							CO2PeopleGeneration = 0.0;
 							if ( this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 								// Accumulate CO2 generation from people at design occupancy and current activity level
@@ -3797,9 +3775,9 @@ namespace MixedAir {
 						}
 
 						// Calc the zone OA flow rate based on the floor area component
-						ZoneOAArea = curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate( ZoneIndex );
-						ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate( ZoneIndex );
-						ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
+						ZoneOAArea = curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate( ZoneIndex ) * curZoneOASchValue;
+						ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate( ZoneIndex ) * curZoneOASchValue;
+						ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * Zone( ZoneIndex ).Volume ) * curZoneOASchValue / 3600.0;
 
 						// Calc the breathing-zone OA flow rate
 						OAIndex = this->ZoneDesignSpecOAObjIndex( ZoneIndex );
@@ -3826,10 +3804,10 @@ namespace MixedAir {
 						// Calc the zone supplied OA flow rate counting the zone air distribution effectiveness
 						//  First check whether the zone air distribution effectiveness schedule exists, if yes uses it;
 						//   otherwise uses the inputs of zone distribution effectiveness in cooling mode or heating mode
-						ZoneADEffSchPtr = this->ZoneADEffSchPtr( ZoneIndex );
-						if ( ZoneADEffSchPtr > 0 ) {
+						int ADEffSchPtr = this->ZoneADEffSchPtr( ZoneIndex );
+						if ( ADEffSchPtr > 0 ) {
 							// Get schedule value for the zone air distribution effectiveness
-							ZoneEz = GetCurrentScheduleValue( ZoneADEffSchPtr );
+							ZoneEz = GetCurrentScheduleValue( ADEffSchPtr );
 						} else {
 							ZoneLoad = ZoneSysEnergyDemand( curZoneEquipConfig.ActualZoneNum ).TotalOutputRequired;
 

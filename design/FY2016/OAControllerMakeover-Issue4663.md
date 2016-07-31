@@ -5,7 +5,7 @@ Outdoor Air Controller Cleanup - Issue #4663
 
  - April 22, 2016
  - Revised April 28, 2016
- - Revised July 28-29, 2016 (see dated notes below)
+ - Revised July 28-30, 2016 (see dated notes below)
 
 ## Conference Calls and Other Discussion ##
 
@@ -126,7 +126,7 @@ x 3.  *July 28, 2016* Change the autosizing for `Controller:OutdoorAir` Minimum 
 ~~if one of the advanced methods (VRP, DCV, IAQ) of control is selected.  *Or maybe autosize to the non-per-person flow?*~~
 
 
-4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
+x 4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
     *July 29, 2016* **Order of Precedence for OA Flow Rate Limit Checks**
     - Minimum Outdoor Air Flow Rate * Minimum Outdoor Air Schedule
     - Apply economizer controls
@@ -139,11 +139,23 @@ x 3.  *July 28, 2016* Change the autosizing for `Controller:OutdoorAir` Minimum 
     - Apply OA mass flow rate specified by EMS
     - OA flow rate <= Current mixed air flow rate (system flow rate) **previously this check was before demand limiting and EMS, but my understanding is that OA flow > Mixed air flow can cause problems further into the system simulation.**
 
-5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Schedule Name" to "Outdoor Air Schedule Name" and use this schedule in `Controller:MechanicalVentilation`.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
+x 5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Schedule Name" to "Outdoor Air Schedule Name" and use this schedule in `Controller:MechanicalVentilation`.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
+    - *July 30, 2016 Implementation notes*
+    - OARequirements (which holds DesignSpecification:OutdoorAir)
+    - OARequirements includes this variable: Real64 MaxOAFractionSchValue; // - Maximum value from OAFlow fraction schedule (used for sizing) which is set in SizingManager::ProcessInputOARequirements but it's never used. **Deleted**
+    - DataZoneEquipment::CalcDesignSpecificationOutdoorAir calculates an OA flow rate but has arguments to control whether the DSOA Schedule is to be applied or not.
+    - ZoneEquipmentManager:SetUpZoneSizingArrays calls CalcDesignSpecificationOutdoorAir with UseMinOASchFlag=false
+    - AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir, ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem call CalcDesignSpecificationOutdoorAir and always sets UseMinOASchFlag=true
+    - When DesignSpecification:OutdoorAir input is processed, the choice of method will silently zero out all other OA rate inputs if one of the exclusive OA methods, such as Flow/Person, is used.
+    - Controller:MechanicalVentilation does not use CalcDesignSpecificationOutdoorAir
+    - Controller:MecahnicalVentilation does not store grab either the outdoor air method, but it checks it during init and calc
+    - **New July 30, 2016** Add more columns to HVAC Sizing Summary table Demand Controlled Ventilation using Controller:MechanicalVentilation
+    - **FIXED** Schedule name was not correct in above report for air distribution effectiveness when not specified, now is blank.
+    
 
 6. Change "Time of Day Economizer Control Schedule" to apply to any type of economizer control, and add a new Economizer Control Type = TimeOfDay.
 
-7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
+x 7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
 
 ## Modified Objects ##
 

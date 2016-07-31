@@ -59,3 +59,16 @@ A new columns for the window opening area (glass plus frame) has been added to t
 See [5652](https://github.com/NREL/EnergyPlus/pull/5652).
 
 
+### Changes to Demand Controlled Ventilation table of HVAC Sizing Summary report
+
+Four new columns were added in the middle of this table which summarizes the Controller:MechanicalVentilation inputs:
+ - Outdoor Air Per Zone [m3/s]
+ - Outdoor Air ACH [ach]
+ - Outdoor Air Method (one of "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum")
+ - Outdoor Air Schedule Name (if no schedule is specified, then this column is blank)
+ 
+The following changes were made to existing columns
+ - Air Distribution Effectiveness in Cooling Mode and Air Distribution Effectiveness in Heating Mode are now blank if there is an Air Distribution Effectiveness Schedule Name specified (previously these columns would show 1.0)
+ - Air Distribution Effectiveness Schedule heading changed to Air Distribution Effectiveness Schedule Name
+ 
+See [5794](https://github.com/NREL/EnergyPlus/pull/5794).

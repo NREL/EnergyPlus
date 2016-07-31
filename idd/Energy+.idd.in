@@ -31137,33 +31137,39 @@ DesignSpecification:OutdoorAir,
       \default 0.00944
       \minimum 0
       \note 0.00944 m3/s is equivalent to 20 cfm per person
-      \note This input should be used if the field Outdoor Air Method is Flow/Person.
-      \note This input is used if the field Outdoor Air Method is Flow/Person, Sum, or Maximum
+      \note This input is only used if the field Outdoor Air Method is Flow/Person, Sum, or Maximum
+      \note For sizing, the design number of occupants is used. For outdoor air flow control, the use
+      \note of design occupants or current occupants depends on the component and DCV options.
+      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat use the DCV flag specified in Controller:MechanicalVentilation
+      \note AirTerminal:DualDuct:VAV:OutdoorAir and ZoneHVAC:IdealLoadsAirSystem have their own DCV control input.
+      \note ZoneHVAC:FourPipeFanCoil always uses current occupants.
   N2, \field Outdoor Air Flow per Zone Floor Area
       \units m3/s-m2
       \default 0.0
       \minimum 0
-      \note This input should be used if the field Outdoor Air Method is Flow/Area.
-      \note This input is used if the field Outdoor Air Method is Flow/Area, Sum, or Maximum
+      \note This input is only used if the field Outdoor Air Method is Flow/Area, Sum, or Maximum
   N3, \field Outdoor Air Flow per Zone
       \type real
       \units m3/s
       \default 0.0
       \minimum 0
-      \note This input should be used if the field Outdoor Air Method is Flow/Zone.
-      \note This input is used if the field Outdoor Air Method is Flow/Zone, Sum, or Maximum
+      \note This input is only used if the field Outdoor Air Method is Flow/Zone, Sum, or Maximum
   N4, \field Outdoor Air Flow Air Changes per Hour
       \units 1/hr
       \type real
       \default 0.0
       \minimum 0
-      \note This input should be used if the field Outdoor Air Method is AirChanges/Hour.
-      \note This input is used if the field Outdoor Air Method is AirChanges/Hour, Sum, or Maximum
-  A3; \field Outdoor Air Flow Rate Fraction Schedule Name
+      \note This input is only used if the field Outdoor Air Method is AirChanges/Hour, Sum, or Maximum
+  A3; \field Outdoor Air Schedule Name
       \type object-list
       \object-list ScheduleNames
       \note Schedule values are multiplied by the Outdoor Air Flow rate calculated using
-      \note the previous four inputs. Schedule values are limited to 0 to 1.
+      \note the previous four inputs. Schedule values are limited to 0 to 1. If left blank, the schedule defaults to 1.0.
+      \note This schedule is ignored during sizing.  All other components which reference this design specification
+      \note use the current schedule value to calculate the current outdoor air requirement. This includes
+      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir, 
+      \note ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem.
+      \note This schedule will also be applied by Controller:MechanicalVentilation for all System Outdoor Air Methods.
 
 DesignSpecification:ZoneAirDistribution,
   \min-fields 1
@@ -55283,6 +55289,7 @@ Controller:OutdoorAir,
        \key FixedDewPointAndDryBulb
        \key ElectronicEnthalpy
        \key DifferentialDryBulbAndEnthalpy
+       \key TimeOfDay
        \key NoEconomizer
        \default NoEconomizer
   A7 , \field Economizer Control Action Type
@@ -55351,14 +55358,11 @@ Controller:OutdoorAir,
        \object-list ControllerMechanicalVentNames
        \note Optional field for defining outdoor ventilation air based on flow rate per unit floor
        \note area and flow rate per person. Simplified method of demand-controlled ventilation.
-  A15, \field Time of Day Economizer Control Schedule Name
+  A15, \field Economizer Control Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Optional schedule to simulate "push-button" type economizer control.
-       \note Schedule values greater than 0 indicate time-of-day economizer control is enabled.
-       \note Economizer control may be used with or without the high humidity control option.
-       \note When used together, high humidity control has priority over economizer control.
-       \note If the field Economizer Control Type = NoEconomizer, then this option is disabled.
+       \note Optional schedule to control economizer operation. If left blank, economizer is always available.
+       \note Schedule values greater than 0 indicate economizer control is enabled.
   A16, \field High Humidity Control
        \type choice
        \key Yes

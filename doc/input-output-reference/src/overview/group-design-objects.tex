@@ -881,9 +881,11 @@ The design outdoor air flow rate for this zone in cubic meters per second. This 
 
 The design outdoor air volume flow rate in air changes per hour. This factor is used along with the Zone Volume and converted to cubic meters per second. This input field is used if \emph{Outdoor Air Method} is \emph{AirChanges/Hour, Sum} or \emph{Maximum}. The default value for this field is 0.
 
-\paragraph{Field: Outdoor Air Flow Rate Fraction Schedule Name}\label{field-outdoor-air-flow-rate-fraction-schedule-name}
+\paragraph{Field: Outdoor Air Schedule Name}\label{field-outdoor-air-schedule-name}
 
-This field is the name of schedule that defines how outdoor air requirements change over time.~ The field is optional.~ If used, then the schedule values are multiplied by the outdoor air flow rate defined by the previous fields.~ The schedule values must be between 0 and 1, inclusive.
+This field is the name of schedule that defines how outdoor air requirements change over time. The field is optional. If left blank, the schedule defaults to 1.0. If used, then the schedule values are multiplied by the outdoor air flow rate defined by the previous fields. The schedule values must be between 0 and 1, inclusive.  
+
+If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calcaulations.
 
 An IDF example:
 
@@ -896,7 +898,7 @@ DesignSpecification:OutdoorAir
       0.00305,               !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
       ,                      !- Outdoor Air Flow per Zone {m3/s}
       ,                      !- Outdoor Air Flow Air Changes per Hour
-      OARequirements Sched;  !- Outdoor Air Flow Rate Fraction Schedule Name
+      OARequirements Sched;  !- Outdoor Air Schedule Name
 
 
   Schedule:Compact,
