@@ -77,13 +77,13 @@ namespace EnergyPlus {
         auto const idf = delimited_string({
                                                   "Building,",
                                                   "  Ref Bldg Medium Office New2004_v1.3_5.0,",
-                                                  "  0.000000,",
+                                                  "  0.000000000000000,",
                                                   "  City,",
-                                                  "  0.040000,",
-                                                  "  0.200000,",
+                                                  "  0.040000000000000,",
+                                                  "  0.200000000000000,",
                                                   "  FullInteriorAndExterior,",
-                                                  "  25.000000,",
-                                                  "  6.000000;",
+                                                  "  25.000000000000000,",
+                                                  "  6.000000000000000;",
                                                   "",
                                                   "BuildingSurface:Detailed,",
                                                   "  Zn009:Flr001,",
@@ -94,20 +94,20 @@ namespace EnergyPlus {
                                                   "  Zn009:Flr001,",
                                                   "  NoSun,",
                                                   "  NoWind,",
-                                                  "  1.000000,",
-                                                  "  4.000000,",
-                                                  "  10.000000,",
-                                                  "  0.000000,",
-                                                  "  0.000000,",
-                                                  "  0.000000,",
-                                                  "  0.000000,",
-                                                  "  0.000000,",
-                                                  "  0.000000,",
-                                                  "  10.000000,",
-                                                  "  0.000000,",
-                                                  "  10.000000,",
-                                                  "  10.000000,",
-                                                  "  0.000000;",
+                                                  "  1.000000000000000,",
+                                                  "  4.000000000000000,",
+                                                  "  10.000000000000000,",
+                                                  "  0.000000000000000,",
+                                                  "  0.000000000000000,",
+                                                  "  0.000000000000000,",
+                                                  "  0.000000000000000,",
+                                                  "  0.000000000000000,",
+                                                  "  0.000000000000000,",
+                                                  "  10.000000000000000,",
+                                                  "  0.000000000000000,",
+                                                  "  10.000000000000000,",
+                                                  "  10.000000000000000,",
+                                                  "  0.000000000000000;",
                                                   "",
                                                   "GlobalGeometryRules,",
                                                   "  UpperLeftCorner,",
@@ -127,12 +127,12 @@ namespace EnergyPlus {
         auto const idf(delimited_string({
                                                 "Zone,",
                                                 "  Core_mid,",
-                                                "  0.000000,",
-                                                "  0.000000,",
-                                                "  0.000000,",
-                                                "  0.000000,",
-                                                "  1.000000,",
-                                                "  1.000000,",
+                                                "  0.000000000000000,",
+                                                "  0.000000000000000,",
+                                                "  0.000000000000000,",
+                                                "  0.000000000000000,",
+                                                "  1.000000000000000,",
+                                                "  1.000000000000000,",
                                                 "  ,",
                                                 "  ,",
                                                 "  autocalculate,",
@@ -144,13 +144,13 @@ namespace EnergyPlus {
         auto const expected(delimited_string({
                                                      "Building,",
                                                      "  Bldg,",
-                                                     "  0.000000,",
+                                                     "  0.000000000000000,",
                                                      "  Suburbs,",
-                                                     "  0.040000,",
-                                                     "  0.400000,",
+                                                     "  0.040000000000000,",
+                                                     "  0.400000000000000,",
                                                      "  FullExterior,",
-                                                     "  25.000000,",
-                                                     "  6.000000;",
+                                                     "  25.000000000000000,",
+                                                     "  6.000000000000000;",
                                                      "",
                                                      "GlobalGeometryRules,",
                                                      "  UpperLeftCorner,",
@@ -162,12 +162,12 @@ namespace EnergyPlus {
                                                      "",
 													                           "Zone,",
                                                      "  Core_mid,",
-                                                     "  0.000000,",
-                                                     "  0.000000,",
-                                                     "  0.000000,",
-                                                     "  0.000000,",
-                                                     "  1.000000,",
-                                                     "  1.000000,",
+                                                     "  0.000000000000000,",
+                                                     "  0.000000000000000,",
+                                                     "  0.000000000000000,",
+                                                     "  0.000000000000000,",
+                                                     "  1.000000000000000,",
+                                                     "  1.000000000000000,",
                                                      "  ,",
                                                      "  ,",
                                                      "  Autocalculate,",
@@ -1136,14 +1136,10 @@ namespace EnergyPlus {
 				}));
 		ASSERT_TRUE( process_idf( idf ) );
 		json::parse(InputProcessor::jdf.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 4);
-		if (InputProcessor::state.errors.size() >= 4) {
+		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 2);
+		if (InputProcessor::state.errors.size() >= 2) {
 			EXPECT_NE(InputProcessor::state.errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("In object \"HVACTemplate:Thermostat\""), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("type needs to be string"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[2].find("In object \"HVACTemplate:Thermostat\""), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[2].find("type needs to be string"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[3].find("You must run Parametric Preprocesor for \"Parametric:Logic\" at line"), std::string::npos);
+			EXPECT_NE(InputProcessor::state.errors[1].find("You must run Parametric Preprocesor for \"Parametric:Logic\" at line"), std::string::npos);
 		}
 	}
 
@@ -2560,7 +2556,7 @@ namespace EnergyPlus {
 
 		// Container size is 4500 here!
 		EXPECT_EQ( 6, NumAlphas );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FANANDCOILAVAILSCHED", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.000000" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FANANDCOILAVAILSCHED", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.000000000000000" } ), Alphas2 ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false } ), lAlphaBlanks2 ) );
 
 		EXPECT_EQ( 0, NumNumbers );

@@ -346,44 +346,54 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 
 json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
 	json value;
-	switch ( look_ahead( idf, index ) ) {
-		case Token::STRING: {
-			value = parse_string( idf, index, success );
-			if ( field_loc.find( "enum" ) != field_loc.end() ) {
-				for ( auto & s : field_loc[ "enum" ] ) {
-					if ( icompare( s, value.get < std::string >() ) ) {
-						value = s;
-						break;
-					}
-				}
-			} else if ( icompare( value.get < std::string >(), "Autosize" ) ||
-			            icompare( value.get < std::string >(), "Autocalculate" ) ) {
-				value = field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
-			}
-			return value;
-		}
-		case Token::NUMBER: {
-			size_t save_line_index = index_into_cur_line;
-			size_t save_line_num = cur_line_num;
+
+    if ( field_loc.find("type") != field_loc.end() ) {
+		if ( field_loc[ "type" ] == "number" || field_loc[ "type" ] == "integer" ) {
 			value = parse_number( idf, index, success );
-			if ( !success ) {
-				cur_line_num = save_line_num;
-				index_into_cur_line = save_line_index;
-				success = true;
-				value = parse_string( idf, index, success );
+		} else {
+			value = parse_string( idf, index, success );
+		}
+        return value;
+	} else {
+		switch (look_ahead(idf, index)) {
+			case Token::STRING: {
+				value = parse_string(idf, index, success);
+				if (field_loc.find("enum") != field_loc.end()) {
+					for (auto &s : field_loc["enum"]) {
+						if (icompare(s, value.get<std::string>())) {
+							value = s;
+							break;
+						}
+					}
+				} else if (icompare(value.get<std::string>(), "Autosize") ||
+						   icompare(value.get<std::string>(), "Autocalculate")) {
+					value = field_loc["anyOf"][1]["enum"][0];
+				}
 				return value;
 			}
-			return value;
+			case Token::NUMBER: {
+				size_t save_line_index = index_into_cur_line;
+				size_t save_line_num = cur_line_num;
+				value = parse_number(idf, index, success);
+				if (!success) {
+					cur_line_num = save_line_num;
+					index_into_cur_line = save_line_index;
+					success = true;
+					value = parse_string(idf, index, success);
+					return value;
+				}
+				return value;
+			}
+			case Token::NONE:
+			case Token::END:
+			case Token::EXCLAMATION:
+			case Token::COMMA:
+			case Token::SEMICOLON:
+				break;
 		}
-		case Token::NONE:
-		case Token::END:
-		case Token::EXCLAMATION:
-		case Token::COMMA:
-		case Token::SEMICOLON:
-			break;
+		success = false;
+		return value;
 	}
-	success = false;
-	return value;
 }
 
 std::string IdfParser::parse_string( std::string const & idf, size_t & index, bool & success ) {
