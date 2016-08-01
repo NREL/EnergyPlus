@@ -2957,7 +2957,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UCSDUFI;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
-					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionInterior", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionInterior","zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2966,7 +2966,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UCSDUFE;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
-					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionExterior", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionExterior", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
