@@ -56,86 +56,88 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef HeatBalanceAirManager_hh_INCLUDED
-#define HeatBalanceAirManager_hh_INCLUDED
+// EnergyPlus::Standalone ERV Unit Tests
+
+#include <fstream>
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <Fixtures/EnergyPlusFixture.hh>
+#include <DataHeatBalance.hh>
+#include <General.hh>
+#include <HVACManager.hh>
+#include <DataEnvironment.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataZoneEquipment.hh>
+#include <DataGlobals.hh>
+#include <DataHVACGlobals.hh>
 
-namespace EnergyPlus {
+using namespace EnergyPlus;
+using namespace HVACManager;
 
-namespace HeatBalanceAirManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+TEST_F( EnergyPlusFixture, CrossMixingReportTest ) {
 
-	//         Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
+	// Test for #5007
+	int NumOfZones = 2;
+	int NumOfCrossMixing = 1;
 
-	// Get Input routines for module
+	DataHeatBalance::Zone.allocate( NumOfZones );
+	DataHeatBalFanSys::MAT.allocate( NumOfZones );
+	DataHeatBalFanSys::ZoneAirHumRat.allocate( NumOfZones );
+	DataHeatBalance::CrossMixing.allocate( NumOfCrossMixing );
+	DataHeatBalance::ZnAirRpt.allocate( NumOfZones );
+	DataZoneEquipment::CrossMixingReportFlag.allocate( NumOfCrossMixing );
+	DataHeatBalFanSys::MCPI.allocate( NumOfZones );
+	DataHeatBalFanSys::MCPV.allocate( NumOfZones );
+	DataHeatBalFanSys::ZoneAirHumRatAvg.allocate( NumOfZones );
 
-	// Initialization routines for module
+	DataGlobals::NumOfZones = NumOfZones;
+	DataHeatBalance::TotCrossMixing = NumOfCrossMixing;
+	DataZoneEquipment::CrossMixingReportFlag( 1 ) = true;
+	DataHVACGlobals::TimeStepSys = 1.0;
+	DataHeatBalFanSys::MCPI = 0.0;
+	DataHeatBalFanSys::MCPV = 0.0;
+	DataEnvironment::OutBaroPress = 101325.0;
+	DataHeatBalFanSys::MAT( 1 ) = 22.0;
+	DataHeatBalFanSys::MAT( 2 ) = 25.0;
+	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.001;
+	DataHeatBalFanSys::ZoneAirHumRat( 2 ) = 0.0011;
+	DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+	DataEnvironment::StdRhoAir = 1.20;
 
-	// Algorithms for the module
-	// Reporting routines for module
+	DataHeatBalance::CrossMixing( 1 ).ZonePtr = 1;
+	DataHeatBalance::CrossMixing( 1 ).FromZone = 2;
+	DataHeatBalance::CrossMixing( 1 ).DesiredAirFlowRate = 0.1;
 
-	// Functions
-	void
-	clear_state();
+	// Call HVACManager
+	ReportAirHeatBalance( );
 
-	void
-	ManageAirHeatBalance();
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixVolume, DataHeatBalance::ZnAirRpt( 2 ).MixVolume, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixVdotCurDensity, DataHeatBalance::ZnAirRpt( 2 ).MixVdotCurDensity, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixVdotStdDensity, DataHeatBalance::ZnAirRpt( 2 ).MixVdotStdDensity, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixMass, DataHeatBalance::ZnAirRpt( 2 ).MixMass, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixMdot, DataHeatBalance::ZnAirRpt( 2 ).MixMdot, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixHeatLoss, DataHeatBalance::ZnAirRpt( 2 ).MixHeatGain, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixHeatGain, DataHeatBalance::ZnAirRpt( 2 ).MixHeatLoss, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixLatentLoss, DataHeatBalance::ZnAirRpt( 2 ).MixLatentGain, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixLatentGain, DataHeatBalance::ZnAirRpt( 2 ).MixLatentLoss, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixTotalLoss, DataHeatBalance::ZnAirRpt( 2 ).MixTotalGain, 0.0001 );
+	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixTotalGain, DataHeatBalance::ZnAirRpt( 2 ).MixTotalLoss, 0.0001 );
 
-	// Get Input Section of the Module
-	//******************************************************************************
+	// Cleanup
+	DataHeatBalance::Zone.deallocate( );
+	DataHeatBalFanSys::MAT.deallocate( );
+	DataHeatBalFanSys::ZoneAirHumRat.deallocate( );
+	DataHeatBalance::CrossMixing.deallocate( );
+	DataHeatBalance::ZnAirRpt.deallocate( );
+	DataZoneEquipment::CrossMixingReportFlag.deallocate( );
+	DataHeatBalFanSys::MCPI.deallocate( );
+	DataHeatBalFanSys::MCPV.deallocate( );
+	DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate( );
 
-	void
-	GetAirHeatBalanceInput();
+}
 
-	void
-	GetAirFlowFlag( bool & ErrorsFound ); // Set to true if errors found
 
-	void
-	SetZoneMassConservationFlag();  // sets the zone air mass flow variables
-
-	void
-	GetSimpleAirModelInputs( bool & ErrorsFound ); // IF errors found in input
-
-	//*****************************************************************************************
-	// This subroutine was moved from 'RoomAirManager' Module
-
-	void
-	GetRoomAirModelParameters( bool & errFlag ); // True if errors found during this input routine
-
-	// END of Get Input subroutines for the HBAir Module
-	//******************************************************************************
-
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
-
-	void
-	InitAirHeatBalance();
-
-	void
-	InitSimpleMixingConvectiveHeatGains();
-
-	// END Initialization Section of the Module
-	//******************************************************************************
-
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
-
-	void
-	CalcHeatBalanceAir();
-
-	// END Algorithm Section of the Module
-
-	void
-	ReportZoneMeanAirTemp();
-
-} // HeatBalanceAirManager
-
-} // EnergyPlus
-
-#endif
