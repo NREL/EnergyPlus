@@ -2928,7 +2928,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					MundtModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:OneNodeDisplacementVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:OneNodeDisplacementVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2978,7 +2978,7 @@ namespace HeatBalanceAirManager {
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
 					AirModel( ZoneNum ).SimAirModel = true;
-					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:AirflowNetwork", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
