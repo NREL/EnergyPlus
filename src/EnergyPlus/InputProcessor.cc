@@ -20,6 +20,7 @@
 #include <SortAndStringUtilities.hh>
 
 using json = nlohmann::json;
+#include <iomanip>
 
 json EnergyPlus::InputProcessor::jdf = json();
 json EnergyPlus::InputProcessor::schema = json();
@@ -61,8 +62,16 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 				skipped_fields = 0;
 				encoded += ",\n  ";
 				auto const & val = obj_in.value()[ entry ];
-				if ( val.is_string() ) encoded += val.get < std::string >();
-				else encoded += std::to_string( val.get < double >() );
+				if ( val.is_string() ) {
+					encoded += val.get < std::string >();
+				} else {
+					std::stringstream ss;
+					ss.clear();
+					ss.str("");
+					ss << std::setprecision(15) << std::fixed << val.get < double >();
+					encoded += ss.str();
+//					encoded += std::to_string( val.get < double >() );
+				}
 			}
 
 			if ( obj_in.value().find( "extensions" ) == obj_in.value().end() ) {
@@ -83,8 +92,16 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 					for ( int j = 0; j < skipped_fields; j++ ) encoded += ",\n  ";
 					skipped_fields = 0;
 					encoded += ",\n  ";
-					if ( cur_extension_obj[ tmp ].is_string() ) encoded += cur_extension_obj[ tmp ];
-					else encoded += std::to_string( cur_extension_obj[ tmp ].get < double >() );
+					if ( cur_extension_obj[ tmp ].is_string() ) {
+						encoded += cur_extension_obj[ tmp ];
+					} else {
+//						encoded += std::to_string( cur_extension_obj[ tmp ].get < double >() );
+						std::stringstream ss;
+						ss.clear();
+						ss.str("");
+						ss << std::setprecision(15) << std::fixed << cur_extension_obj[ tmp ].get < double >();
+						encoded += ss.str();
+					}
 				}
 			}
 			encoded += ";\n\n";
@@ -297,7 +314,14 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 		save_i++;
 	}
 
+
 	assert( !num_str.empty() );
+
+	if ( num_str[ num_str.size() - 1 ] == 'e' || num_str[ num_str.size() - 1 ] == 'E' ) {
+		success = false;
+		return val;
+	}
+
 	Token token = look_ahead( idf, save_i );
 	if ( token != Token::SEMICOLON && token != Token::COMMA ) {
 		success = false;
@@ -898,6 +922,9 @@ namespace EnergyPlus {
 		};
 		InputProcessor::jdf = json::parse(user_input_dump, cb);
 		InputProcessor::state.print_errors();
+//		std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
+//		std::ofstream ofs("encoded_json.idf", std::ofstream::out);
+//		ofs << encoded << std::endl;
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -1051,7 +1078,12 @@ namespace EnergyPlus {
 						if ( default_val.is_string() ) {
 							val = default_val.get < std::string >();
 						} else {
-							val = std::to_string( default_val.get < double >() );
+//							val = std::to_string( default_val.get < double >() );
+							std::stringstream ss;
+							ss.clear();
+							ss.str("");
+							ss << std::setprecision(15) << std::fixed << default_val.get < double >();
+							val = ss.str();
 						}
 						if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = true;
 					} else {
@@ -1064,7 +1096,12 @@ namespace EnergyPlus {
 						Alphas( i + 1 ) = MakeUPPERCase( val );
 					}
 				} else {
-					std::string num_val = std::to_string( it.value().get < double >() );
+//					std::string num_val = std::to_string( it.value().get < double >() );
+					std::stringstream ss;
+					ss.clear();
+					ss.str("");
+					ss << std::setprecision(15) << std::fixed << it.value().get < double >();
+					std::string num_val = ss.str();
 					bool is_double = false;
 					for ( auto j = num_val.find_first_of( '.' ) + 1; j != num_val.size(); j++ ) {
 						if ( num_val[ j ] != '0' ) {
@@ -1073,7 +1110,11 @@ namespace EnergyPlus {
 						}
 					}
 					if ( !is_double ) {
-						num_val = std::to_string( it.value().get < int >() );
+//						num_val = std::to_string( it.value().get < int >() );
+						ss.clear();
+                        ss.str("");
+						ss << std::setprecision(15) << std::fixed << it.value().get < int >();
+						num_val = ss.str();
 					}
 					Alphas( i + 1 ) = num_val;
 					if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = false;
@@ -1105,7 +1146,12 @@ namespace EnergyPlus {
 								if ( default_val.is_string() ) {
 									val = default_val.get < std::string >();
 								} else {
-									val = std::to_string( default_val.get < double >() );
+//									val = std::to_string( default_val.get < double >() );
+									std::stringstream ss;
+									ss.clear();
+									ss.str("");
+									ss << std::setprecision(15) << std::fixed << default_val.get < double >();
+									val = ss.str();
 								}
 								if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = true;
 							} else {
@@ -1118,7 +1164,12 @@ namespace EnergyPlus {
 							}
 						} else {
 							double val = extension_obj[ field ];
-							Alphas( alphas_index + 1 ) = std::to_string( val );
+//							Alphas( alphas_index + 1 ) = std::to_string( val );
+							std::stringstream ss;
+							ss.clear();
+							ss.str("");
+							ss << std::setprecision(15) << std::fixed << val;
+							Alphas( alphas_index + 1 ) = ss.str();
 							if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = false;
 						}
 						NumAlphas++;

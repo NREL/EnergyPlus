@@ -1724,6 +1724,120 @@ namespace EnergyPlus {
         EXPECT_EQ(1, IOStatus);
     }
 
+    TEST_F( InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields )
+    {
+        std::string const idf_objects = delimited_string({
+                                                                 "FenestrationSurface:Detailed,",
+                                                                 "Zn001:Wall001:Win001,    !- Name",
+                "Window,                  !- Surface Type",
+                "DoubleClear,             !- Construction Name",
+                "123456E,           !- Building Surface Name",
+                ",                        !- Outside Boundary Condition Object",
+                "0.5000000,               !- View Factor to Ground",
+                ",                        !- Shading Control Name",
+                ",                        !- Frame and Divider Name",
+                "1.0,                     !- Multiplier",
+                "4,                       !- Number of Vertices",
+                "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+                "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+                "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+                "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+                                                         });
+        ASSERT_TRUE( process_idf( idf_objects ) );
+
+        std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
+
+        int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+        ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+        int TotalArgs = 0;
+        int NumAlphas = 0;
+        int NumNumbers = 0;
+
+        InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+        int IOStatus = 0;
+        Array1D_string Alphas( NumAlphas );
+        Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+        Array1D_bool lNumericBlanks( NumNumbers, true );
+        Array1D_bool lAlphaBlanks( NumAlphas, true );
+        Array1D_string cAlphaFields( NumAlphas );
+        Array1D_string cNumericFields( NumNumbers );
+
+        InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+        EXPECT_EQ( 7, NumAlphas );
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "",
+                                                                     "", "" } ), Alphas ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
+
+        EXPECT_EQ( 15, NumNumbers );
+        EXPECT_TRUE( compare_containers( std::vector< Real64 >( {0.5000000, 1.0 , 4, 0.548000 , 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5,
+                                                                 5.548, 0, 2.5 } ), Numbers ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+                                                                false, false, false, false, false } ), lNumericBlanks ) );
+
+        EXPECT_EQ( 1, IOStatus );
+    }
+
+    TEST_F( InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2 )
+    {
+        std::string const idf_objects = delimited_string({
+                                                                 "FenestrationSurface:Detailed,",
+                                                                 "Zn001:Wall001:Win001,    !- Name",
+                                                                 "Window,                  !- Surface Type",
+                                                                 "DoubleClear,             !- Construction Name",
+                                                                 "E123,           !- Building Surface Name",
+                                                                 ",                        !- Outside Boundary Condition Object",
+                                                                 "0.5000000,               !- View Factor to Ground",
+                                                                 ",                        !- Shading Control Name",
+                                                                 ",                        !- Frame and Divider Name",
+                                                                 "1.0,                     !- Multiplier",
+                                                                 "4,                       !- Number of Vertices",
+                                                                 "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+                                                                 "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+                                                                 "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+                                                                 "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+                                                         });
+        ASSERT_TRUE( process_idf( idf_objects ) );
+
+        std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
+
+        int num_curve_biquadratic_objects = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+        ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+        int TotalArgs = 0;
+        int NumAlphas = 0;
+        int NumNumbers = 0;
+
+        InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+        int IOStatus = 0;
+        Array1D_string Alphas( NumAlphas );
+        Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+        Array1D_bool lNumericBlanks( NumNumbers, true );
+        Array1D_bool lAlphaBlanks( NumAlphas, true );
+        Array1D_string cAlphaFields( NumAlphas );
+        Array1D_string cNumericFields( NumNumbers );
+
+        InputProcessor::GetObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+        EXPECT_EQ( 7, NumAlphas );
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "",
+                                                                       "", "" } ), Alphas ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
+
+        EXPECT_EQ( 15, NumNumbers );
+        EXPECT_TRUE( compare_containers( std::vector< Real64 >( {0.5000000, 1.0 , 4, 0.548000 , 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5,
+                                                                 5.548, 0, 2.5 } ), Numbers ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+                                                                false, false, false, false, false } ), lNumericBlanks ) );
+
+        EXPECT_EQ( 1, IOStatus );
+    }
+
 	TEST_F( InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults )
 	{
 		std::string const idf_objects = delimited_string({
