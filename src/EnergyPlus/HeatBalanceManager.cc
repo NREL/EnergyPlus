@@ -4187,7 +4187,7 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 			// Check to see if "nominally" controlled -- Zone Name appears in Zone Equip Configuration
 			// relies on zone name being the "name" of the Zone Controlled Equip Configuration
-			if ( InputProcessor::GetObjectItemNum( "ZoneHVAC:EquipmentConnections", Zone( Loop ).Name ) > 0 ) {
+			if ( InputProcessor::GetObjectItemNum( "ZoneHVAC:EquipmentConnections", "zone_name", Zone( Loop ).Name ) > 0 ) {
 				Zone( Loop ).isNominalControlled = true;
 			} else {
 				Zone( Loop ).isNominalControlled = false;

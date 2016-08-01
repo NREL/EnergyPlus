@@ -925,6 +925,8 @@ namespace EnergyPlus {
 //		std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
 //		std::ofstream ofs("encoded_json.idf", std::ofstream::out);
 //		ofs << encoded << std::endl;
+//		std::ofstream ofs("json_dump.json", std::ofstream::out);
+//		ofs << InputProcessor::jdf.dump(4) << std::endl;
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
