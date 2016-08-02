@@ -918,12 +918,6 @@ namespace EnergyPlus {
 		json const user_input = InputProcessor::idf_parser.decode(input_file, InputProcessor::schema);
 		auto const user_input_dump = user_input.dump(4);
 
-//		std::ofstream ofs("output.json", std::ofstream::out);
-//		if (!ofs.is_open()) {
-//			perror("ofs");
-//		}
-//		ofs << user_input_dump << std::endl;
-
 		InputProcessor::state.initialize(InputProcessor::schema);
 
 		json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index) -> bool {
@@ -931,7 +925,7 @@ namespace EnergyPlus {
 			return true;
 		};
 		InputProcessor::jdf = json::parse(user_input_dump, cb);
-		InputProcessor::state.print_errors();
+//		InputProcessor::state.print_errors();
 //		std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
 //		std::ofstream ofs("encoded_json.idf", std::ofstream::out);
 //		ofs << encoded << std::endl;
