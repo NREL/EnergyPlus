@@ -277,11 +277,7 @@ namespace InternalHeatGains {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "GetInternalHeatGains: " );
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		int const noOtherFuelTypeZero = 0;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string AlphaName;
@@ -2150,11 +2146,11 @@ namespace InternalHeatGains {
 
 					std::string FuelTypeString( "" );
 					if ( AlphaName( 2 ) == "NONE" ) {
-						ZoneOtherEq( Loop ).OtherEquipFuelType = 0;
+						ZoneOtherEq( Loop ).OtherEquipFuelType = noOtherFuelTypeZero;
 						FuelTypeString = AlphaName( 2 );
 					} else {
 						ExteriorEnergyUse::ValidateFuelType( ZoneOtherEq( Loop ).OtherEquipFuelType, AlphaName( 2 ), FuelTypeString, CurrentModuleObject, cAlphaFieldNames( 2 ), AlphaName( 2 ) );
-						if ( ZoneOtherEq( Loop ).OtherEquipFuelType == 0 || ZoneOtherEq( Loop ).OtherEquipFuelType == ExteriorEnergyUse::WaterUse ) {
+						if ( ZoneOtherEq( Loop ).OtherEquipFuelType == noOtherFuelTypeZero || ZoneOtherEq( Loop ).OtherEquipFuelType == ExteriorEnergyUse::WaterUse ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) + " for " + cAlphaFieldNames( 1 ) + '=' + AlphaName( 1 ) );
 							ErrorsFound = true;
 						}
@@ -2218,7 +2214,7 @@ namespace InternalHeatGains {
 					}}
 
 					// Throw an error if the design level is negative and we have a fuel type
-					if ( ZoneOtherEq( Loop ).DesignLevel < 0.0 && ZoneOtherEq( Loop ).OtherEquipFuelType != 0 ) {
+					if ( ZoneOtherEq( Loop ).DesignLevel < 0.0 && ZoneOtherEq( Loop ).OtherEquipFuelType != noOtherFuelTypeZero ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cNumericFieldNames( DesignLevelFieldNumber ) + " is not allowed to be negative" );
 						ShowContinueError( "... when a fuel type of " + FuelTypeString + " is specified." );
 						ErrorsFound = true;
@@ -2261,7 +2257,7 @@ namespace InternalHeatGains {
 					if ( ZoneOtherEq( Loop ).ZonePtr <= 0 ) continue; // Error, will be caught and terminated later
 
 					// Object report variables
-					if ( ZoneOtherEq( Loop ).OtherEquipFuelType > 0 ) {
+					if ( ZoneOtherEq( Loop ).OtherEquipFuelType > noOtherFuelTypeZero ) {
 						SetupOutputVariable( "Other Equipment " + FuelTypeString + " Rate [W]", ZoneOtherEq( Loop ).Power, "Zone", "Average", ZoneOtherEq( Loop ).Name );
 						SetupOutputVariable( "Other Equipment " + FuelTypeString + " Energy [J]", ZoneOtherEq( Loop ).Consumption, "Zone", "Sum", ZoneOtherEq( Loop ).Name, _, FuelTypeString, "InteriorEquipment", ZoneOtherEq( Loop ).EndUseSubcategory, "Building", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name, Zone( ZoneOtherEq( Loop ).ZonePtr ).Multiplier, Zone( ZoneOtherEq( Loop ).ZonePtr ).ListMultiplier );
 					}
@@ -2281,7 +2277,7 @@ namespace InternalHeatGains {
 					if ( RepVarSet( ZoneOtherEq( Loop ).ZonePtr ) ) {
 						RepVarSet( ZoneOtherEq( Loop ).ZonePtr ) = false;
 
-						if ( ZoneOtherEq( Loop ).OtherEquipFuelType > 0 ) {
+						if ( ZoneOtherEq( Loop ).OtherEquipFuelType > noOtherFuelTypeZero ) {
 							SetupOutputVariable( "Zone Other Equipment " + FuelTypeString + " Rate [W]", ZnRpt( ZoneOtherEq( Loop ).ZonePtr ).OtherPower, "Zone", "Average", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name );
 							SetupOutputVariable( "Zone Other Equipment " + FuelTypeString + " Energy [J]", ZnRpt( ZoneOtherEq( Loop ).ZonePtr ).OtherConsump, "Zone", "Sum", Zone( ZoneOtherEq( Loop ).ZonePtr ).Name );
 						}
