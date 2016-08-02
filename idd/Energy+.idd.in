@@ -38897,6 +38897,7 @@ AirTerminal:SingleDuct:VAV:NoReheat,
 AirTerminal:SingleDuct:VAV:Reheat,
        \memo Central air system terminal unit, single duct, variable volume, with reheat coil (hot
        \memo water, electric, gas, or steam).
+       \min-fields 19
   A1 , \field Name
        \required-field
   A2 , \field Availability Schedule Name
