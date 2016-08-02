@@ -1516,11 +1516,7 @@ namespace BranchInputManager {
 						Branch( BCount ).Component( Comp ).CType = Alphas( Loop );
 						Branch( BCount ).Component( Comp ).Name = Alphas( Loop + 1 );
 
-                        if (InputProcessor::SameString(Alphas(Loop), "AirConditioner:VariableRefrigerantFlow")){
-                            ValidateComponent(Alphas(Loop),"heat_pump_name", Alphas(Loop + 1), IsNotOK, CurrentModuleObject);
-                        }else {
-                            ValidateComponent(Alphas(Loop), Alphas(Loop + 1), IsNotOK, CurrentModuleObject);
-                        }
+						ValidateComponent(Alphas(Loop), Alphas(Loop + 1), IsNotOK, CurrentModuleObject);
                         if ( IsNotOK ) {
 							ShowContinueError( "Occurs on " + CurrentModuleObject + '=' + Alphas( 1 ) );
 							ErrFound = true;
