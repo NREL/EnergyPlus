@@ -1069,6 +1069,8 @@ namespace WaterThermalTanks {
 		using IntegratedHeatPump::GetDWHCoilCapacityIHP;
 		using IntegratedHeatPump::GetIHPDWHCoilPLFFPLR;
 		using IntegratedHeatPump::GetCoilInletNodeIHP;
+		using IntegratedHeatPump::GetDWHCoilInletNodeIHP;
+		using IntegratedHeatPump::GetDWHCoilOutletNodeIHP;
 		using IntegratedHeatPump::IHPOperationMode;
 		using IntegratedHeatPump::IntegratedHeatPumps;
 
@@ -2152,7 +2154,7 @@ namespace WaterThermalTanks {
 						// set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
 						if ( bIsVScoil ) {
 							if ( HPWH.bIsIHP ) {
-								HPWH.FanOutletNode = GetCoilInletNodeIHP( HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag );
+								HPWH.FanOutletNode = GetDWHCoilInletNodeIHP( HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag );
 							}
 							else {
 								HPWH.FanOutletNode = GetCoilInletNodeVariableSpeed( HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag );
@@ -2213,7 +2215,13 @@ namespace WaterThermalTanks {
 
 					int DXCoilAirOutletNodeNum( 0 );
 					if ( ( HPWH.DXCoilNum > 0 ) && ( bIsVScoil ) ) {
-						DXCoilAirOutletNodeNum = GetCoilOutletNodeVariableSpeed( HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag );
+						if (HPWH.bIsIHP)  {
+							DXCoilAirOutletNodeNum = GetDWHCoilOutletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+						}
+						else{
+							DXCoilAirOutletNodeNum = GetCoilOutletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+						};
+						
 					} else if ( HPWH.DXCoilNum > 0 ) {
 						DXCoilAirOutletNodeNum = DXCoil( HPWH.DXCoilNum ).AirOutNode;
 					}

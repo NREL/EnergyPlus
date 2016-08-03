@@ -1760,6 +1760,107 @@ namespace EnergyPlus {
 
 		}
 
+
+		int
+			GetDWHCoilInletNodeIHP(
+			std::string const & CoilType, // must match coil types in this module
+			std::string const & CoilName, // must match coil names for the coil type
+			bool & ErrorsFound // set to true if problem
+			) {
+			// FUNCTION INFORMATION:
+			//       AUTHOR         Bo Shen
+			//       DATE WRITTEN   July 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS FUNCTION:
+			// This function looks up the given coil and returns the inlet node.  If
+			// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
+			// as zero.
+
+			// Using/Aliasing
+			using InputProcessor::FindItemInList;
+
+			// Return value
+			int NodeNumber(0); // returned outlet node of matched coil
+
+			// FUNCTION LOCAL VARIABLE DECLARATIONS:
+			int WhichCoil;
+
+			// Obtains and Allocates WatertoAirHP related parameters from input file
+			if (GetCoilsInputFlag) { //First time subroutine has been entered
+				GetIHPInput();
+				//    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
+				GetCoilsInputFlag = false;
+			}
+
+			WhichCoil = FindItemInList(CoilName, IntegratedHeatPumps);
+			if (WhichCoil != 0) {
+				NodeNumber = IntegratedHeatPumps(WhichCoil).ODAirInletNodeNum;
+			}
+
+			if (WhichCoil == 0) {
+				ShowSevereError(
+					"GetCoilInletNodeIHP: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName +
+					"\"");
+				ErrorsFound = true;
+				NodeNumber = 0;
+			}
+
+			return NodeNumber;
+
+		}
+
+		int
+			GetDWHCoilOutletNodeIHP(
+			std::string const & CoilType, // must match coil types in this module
+			std::string const & CoilName, // must match coil names for the coil type
+			bool & ErrorsFound // set to true if problem
+			) {
+			// FUNCTION INFORMATION:
+			//       AUTHOR         Bo Shen
+			//       DATE WRITTEN   July 2016
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS FUNCTION:
+			// This function looks up the given coil and returns the outlet node.  If
+			// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
+			// as zero.
+
+			// Using/Aliasing
+			using InputProcessor::FindItemInList;
+
+			// Return value
+			int NodeNumber(0); // returned outlet node of matched coil
+
+			// FUNCTION LOCAL VARIABLE DECLARATIONS:
+			int WhichCoil;
+
+			// Obtains and Allocates WatertoAirHP related parameters from input file
+			if (GetCoilsInputFlag) { //First time subroutine has been entered
+				GetIHPInput();
+				//    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
+				GetCoilsInputFlag = false;
+			}
+
+			WhichCoil = FindItemInList(CoilName, IntegratedHeatPumps);
+			if (WhichCoil != 0) {
+				NodeNumber = IntegratedHeatPumps(WhichCoil).ODAirOutletNodeNum;
+			}
+
+			if (WhichCoil == 0) {
+				ShowSevereError(
+					"GetCoilInletNodeIHP: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName +
+					"\"");
+				ErrorsFound = true;
+				NodeNumber = 0;
+			}
+
+			return NodeNumber;
+
+		}
+
 		int
 		GetIHPDWHCoilPLFFPLR(
 			std::string const & CoilType, // must match coil types in this module
