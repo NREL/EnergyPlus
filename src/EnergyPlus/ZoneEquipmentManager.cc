@@ -4504,7 +4504,6 @@ namespace ZoneEquipmentManager {
 		MCPTM = 0.0;
 		MixingMassFlowZone = 0.0;
 		MixingMassFlowXHumRat = 0.0;
-		CrossMixingFlag = false;
 		CrossMixingReportFlag = false;
 		MixingReportFlag = false;
 		if ( Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0 ) MixingMassFlowCO2 = 0.0;
@@ -4935,7 +4934,7 @@ namespace ZoneEquipmentManager {
 		for ( j = 1; j <= TotCrossMixing; ++j ) {
 			n = CrossMixing( j ).ZonePtr;
 			m = CrossMixing( j ).FromZone;
-			TD = MTC( j );
+			TD = CrossMixing( j ).DeltaTemperature;
 			// Get scheduled delta temperature
 			if ( CrossMixing( j ).DeltaTempSchedPtr > 0 ) {
 				TD = GetCurrentScheduleValue( CrossMixing( j ).DeltaTempSchedPtr );
@@ -5019,36 +5018,33 @@ namespace ZoneEquipmentManager {
 					CrossMixingReportFlag( j ) = true; // set reporting flag
 				}
 
-				if ( ( ( TD <= 0.0 ) && ( ! CrossMixingFlag( n ) && ! CrossMixingFlag( m ) ) ) || ( ( TD > 0.0 ) && ( TZM - TZN >= TD ) ) ) {
-					//                                      SET COEFFICIENTS .
-					CrossMixingFlag( n ) = true;
-					CrossMixingFlag( m ) = true;
-
+				if ( ( TD <= 0.0 ) || ( ( TD > 0.0 ) && ( TZM - TZN >= TD ) ) ) {
+						//                                      SET COEFFICIENTS .
 					Tavg = ( TZN + TZM ) / 2.0;
 					Wavg = ( ZHumRat( n ) + ZHumRat( m ) ) / 2.0;
 					AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing );
 					CpAir = PsyCpAirFnWTdb( Wavg, Tavg );
-					MCPxN = MVFC( j ) * CpAir * AirDensity;
+					MCPxN = CrossMixing( j ).DesiredAirFlowRate * CpAir * AirDensity;
 					MCPM( n ) += MCPxN;
 
-					MCPxM = MVFC( j ) * CpAir * AirDensity;
+					MCPxM = CrossMixing( j ).DesiredAirFlowRate * CpAir * AirDensity;
 					MCPM( m ) += MCPxM;
 					MCPTM( n ) += MCPxM * TZM;
 					MCPTM( m ) += MCPxN * TZN;
 
 					// Now to determine the moisture conditions
-					MixingMassFlowZone( m ) += MVFC( j ) * AirDensity;
-					MixingMassFlowXHumRat( m ) += MVFC( j ) * AirDensity * ZHumRat( n );
+					MixingMassFlowZone( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity;
+					MixingMassFlowXHumRat( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZHumRat( n );
 
-					MixingMassFlowZone( n ) += MVFC( j ) * AirDensity;
-					MixingMassFlowXHumRat( n ) += MVFC( j ) * AirDensity * ZHumRat( m );
+					MixingMassFlowZone( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity;
+					MixingMassFlowXHumRat( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZHumRat( m );
 					if ( Contaminant.CO2Simulation ) {
-						MixingMassFlowCO2( m ) += MVFC( j ) * AirDensity * ZoneAirCO2( n );
-						MixingMassFlowCO2( n ) += MVFC( j ) * AirDensity * ZoneAirCO2( m );
+						MixingMassFlowCO2( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirCO2( n );
+						MixingMassFlowCO2( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirCO2( m );
 					}
 					if ( Contaminant.GenericContamSimulation ) {
-						MixingMassFlowGC( m ) += MVFC( j ) * AirDensity * ZoneAirGC( n );
-						MixingMassFlowGC( n ) += MVFC( j ) * AirDensity * ZoneAirGC( m );
+						MixingMassFlowGC( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirGC( n );
+						MixingMassFlowGC( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirGC( m );
 					}
 				}
 			}

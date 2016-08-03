@@ -217,8 +217,6 @@ namespace DataHeatBalFanSys {
 
 	Array1D< Real64 > LoadCorrectionFactor; // PH 3/3/04
 
-	Array1D_bool CrossMixingFlag; // TRUE when a zone is mixing
-
 	Array1D< Real64 > AIRRAT; // "air power capacity"  PH 3/5/04
 	Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
@@ -340,7 +338,6 @@ namespace DataHeatBalFanSys {
 		ZoneThermostatSetPointHi.deallocate();
 		ZoneThermostatSetPointLo.deallocate();
 		LoadCorrectionFactor.deallocate(); 
-		CrossMixingFlag.deallocate(); 
 		AIRRAT.deallocate(); 
 		ZTM1.deallocate(); 
 		ZTM2.deallocate(); 

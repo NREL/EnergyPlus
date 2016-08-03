@@ -56,180 +56,96 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef EMSManager_hh_INCLUDED
-#define EMSManager_hh_INCLUDED
+// EnergyPlus::HeatBalanceMovableInsulation Unit Tests
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+
+using namespace EnergyPlus::HeatBalanceMovableInsulation;
 
 namespace EnergyPlus {
 
-//note there are routines that lie outside of the Module at the end of this file
+	TEST_F( EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulation)
+	{
 
-namespace EMSManager {
+		int SurfNum;
+		Real64 HMovInsul;
+		int RoughIndexMovInsul;
+		Real64 AbsExt;
+		
+		SurfNum = 1;
+		DataSurfaces::Surface.allocate( SurfNum );
+		DataSurfaces::Surface( SurfNum ).SchedMovInsulExt = -1;
+		DataSurfaces::Surface( SurfNum ).MaterialMovInsulExt = 1;
+		
+		DataHeatBalance::Material.allocate( 1 );
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+		DataHeatBalance::Material( 1 ).Roughness = 1;
+		DataHeatBalance::Material( 1 ).Group = 0;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.75;
+		DataHeatBalance::Material( 1 ).Trans = 0.25;
+		DataHeatBalance::Material( 1 ).ReflectSolBeamFront = 0.20;
+		
+		AbsExt = 0.0;
+		EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt );
+		EXPECT_EQ( 0.75, AbsExt );
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	extern int const iTemperatureSetPoint; // integer for node setpoint control type
-	extern int const iTemperatureMinSetPoint; // integer for node setpoint control type
-	extern int const iTemperatureMaxSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioMinSetPoint; // integer for node setpoint control type
-	extern int const iHumidityRatioMaxSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateMinSetPoint; // integer for node setpoint control type
-	extern int const iMassFlowRateMaxSetPoint; // integer for node setpoint control type
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::WindowGlass;
+		EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
 
-	// DERIVED TYPE DEFINITIONS:
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::GlassEquivalentLayer;
+		EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
+		
+	}
 
-	// MODULE VARIABLE TYPE DECLARATIONS:
-
-	// MODULE VARIABLE DECLARATIONS:
-	extern bool GetEMSUserInput; // Flag to prevent input from being read multiple times
-	extern bool ZoneThermostatActuatorsHaveBeenSetup;
-	extern bool FinishProcessingUserInput; // Flag to indicate still need to process input
-
-	// SUBROUTINE SPECIFICATIONS:
-
-	// Functions
-	void
-	clear_state();
+	TEST_F( EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulation)
+	{
+		
+		int SurfNum;
+		Real64 HMovInsul;
+		Real64 AbsExt;
+		
+		SurfNum = 1;
+		DataSurfaces::Surface.allocate( SurfNum );
+		DataSurfaces::Surface( SurfNum ).SchedMovInsulInt = -1;
+		DataSurfaces::Surface( SurfNum ).MaterialMovInsulInt = 1;
+		
+		DataHeatBalance::Material.allocate( 1 );
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+		DataHeatBalance::Material( 1 ).Roughness = 1;
+		DataHeatBalance::Material( 1 ).Group = 0;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.75;
+		DataHeatBalance::Material( 1 ).Trans = 0.25;
+		DataHeatBalance::Material( 1 ).ReflectSolBeamFront = 0.20;
+		
+		AbsExt = 0.0;
+		EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsExt );
+		EXPECT_EQ( 0.75, AbsExt );
+		
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::WindowGlass;
+		EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
+		
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::GlassEquivalentLayer;
+		EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
+		
+	}
 	
-	void
-	CheckIfAnyEMS();
-
-	// MODULE SUBROUTINES:
-
-	void
-	ManageEMS(
-		int const iCalledFrom, // indicates where subroutine was called from, parameters in DataGlobals.
-		bool & anyProgramRan, // true if any Erl programs ran for this call 
-		Optional_int_const ProgramManagerToRun = _ // specific program manager to run
-	);
-
-	void
-	InitEMS( int const iCalledFrom ); // indicates where subroutine was called from, parameters in DataGlobals.
-
-	void
-	ReportEMS();
-
-	void
-	GetEMSInput();
-
-	void
-	ProcessEMSInput( bool const reportErrors ); // .  If true, then report out errors ,otherwise setup what we can
-
-	void
-	GetVariableTypeAndIndex(
-		std::string const & VarName,
-		std::string const & VarKeyName,
-		int & VarType,
-		int & VarIndex
-	);
-
-	void
-	EchoOutActuatorKeyChoices();
-
-	void
-	EchoOutInternalVariableChoices();
-
-	void
-	SetupNodeSetPointsAsActuators();
-
-	void
-	UpdateEMSTrendVariables();
-
-	void
-	CheckIfNodeSetPointManagedByEMS(
-		int const NodeNum, // index of node being checked.
-		int const SetPointType,
-		bool & ErrorFlag
-	);
-
-	bool
-	CheckIfNodeMoreInfoSensedByEMS( 
-		int const nodeNum, // index of node being checked.
-		std::string const & varName
-	);
-
-	void
-	SetupPrimaryAirSystemAvailMgrAsActuators();
-
-	void
-	SetupWindowShadingControlActuators();
-
-	void
-	SetupThermostatActuators();
-
-	void
-	SetupSurfaceConvectionActuators();
-
-	void
-	SetupSurfaceConstructionActuators();
-
-	void
-	SetupSurfaceOutdoorBoundaryConditionActuators();
-
-	void
-	SetupZoneInfoAsInternalDataAvail();
-
-	void
-	checkForUnusedActuatorsAtEnd();
-
-} // EMSManager
-
-//Moved these setup EMS actuator routines out of module to solve circular use problems between
-//  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
-
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	Real64 & rValue
-);
-
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	int & iValue
-);
-
-void
-SetupEMSActuator(
-	std::string const & cComponentTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cControlTypeName,
-	std::string const & cUnits,
-	bool & lEMSActuated,
-	bool & lValue
-);
-
-void
-SetupEMSInternalVariable(
-	std::string const & cDataTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cUnits,
-	Real64 & rValue
-);
-
-void
-SetupEMSInternalVariable(
-	std::string const & cDataTypeName,
-	std::string const & cUniqueIDName,
-	std::string const & cUnits,
-	int & iValue
-);
-
-} // EnergyPlus
-
-#endif
+	
+}
