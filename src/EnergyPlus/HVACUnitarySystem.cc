@@ -72,6 +72,7 @@
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -11156,6 +11157,7 @@ namespace HVACUnitarySystem {
 		// Using/Aliasing
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
+		using General::SafeDivide;
 		using PlantUtilities::SafeCopyPlantNode;
 
 		// Locals
@@ -11175,7 +11177,6 @@ namespace HVACUnitarySystem {
 		Real64 HeatRecOutletTemp; // Heat reclaim outlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
 		Real64 CpHeatRec; // Heat reclaim water inlet specIFic heat [J/kg-K]
-		Real64 HeatRecInletEnth; // Heat reclaim water inlet enthalpy [J/kg]
 		Real64 ReportingConstant;
 
 		ReportingConstant = TimeStepSys * SecInHour;
@@ -11186,7 +11187,6 @@ namespace HVACUnitarySystem {
 
 		// Inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
-		HeatRecInletEnth = Node( HeatRecInNode ).Enthalpy;
 
 		// Set heat recovery mass flow rates
 		HeatRecMassFlowRate = Node( HeatRecInNode ).MassFlowRate;
@@ -11198,9 +11198,14 @@ namespace HVACUnitarySystem {
 			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
-			if ( HeatRecOutletTemp > UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp ) HeatRecOutletTemp = UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp;
+			// coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by the coil
+			if ( HeatRecOutletTemp > UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp ) {
+				HeatRecOutletTemp = max( HeatRecInletTemp, UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp );
+				QHeatRec = HeatRecMassFlowRate * CpHeatRec * ( HeatRecOutletTemp - HeatRecInletTemp );
+			}
 		} else {
 			HeatRecOutletTemp = HeatRecInletTemp;
+			QHeatRec = 0.0;
 		}
 
 		SafeCopyPlantNode( HeatRecInNode, HeatRecOutNode );

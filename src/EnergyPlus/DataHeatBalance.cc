@@ -625,10 +625,6 @@ namespace DataHeatBalance {
 
 	Array1D< Real64 > const GasSpecificHeatRatio( 10, { 1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // Gas specific heat ratios.  Used for gasses in low pressure
 
-	//Variables Dimensioned to Number of Zones
-	Array1D< Real64 > MVFC; // Design Mixing Flow Rate [m3/s] (Cross Zone Mixing)
-	Array1D< Real64 > MTC; // Control Temperature For Mixing [C] (Cross Zone Mixing)
-
 	Real64 ZeroPointerVal( 0.0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
@@ -888,8 +884,6 @@ namespace DataHeatBalance {
 		CosIncAng.deallocate();
 		BackSurfaces.deallocate();
 		OverlapAreas.deallocate();
-		MVFC.deallocate();
-		MTC.deallocate();
 		ZeroPointerVal = 0.0;
 		ZonePreDefRep.deallocate();
 		BuildingPreDefRep = ZonePreDefRepType();

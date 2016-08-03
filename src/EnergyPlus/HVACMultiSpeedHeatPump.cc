@@ -3262,7 +3262,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 HeatRecOutletTemp; // Heat reclaim outlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
-		Real64 HeatRecInletEnth; // Heat reclaim water inlet enthalpy [J/kg]
 
 		// Begin routine
 		HeatRecInNode = MSHeatPump( MSHeatPumpNum ).HeatRecInletNodeNum;
@@ -3270,7 +3269,6 @@ namespace HVACMultiSpeedHeatPump {
 
 		// Inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
-		HeatRecInletEnth = Node( HeatRecInNode ).Enthalpy;
 
 		// Set heat recovery mass flow rates
 		HeatRecMassFlowRate = Node( HeatRecInNode ).MassFlowRate;
@@ -3282,9 +3280,13 @@ namespace HVACMultiSpeedHeatPump {
 			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
-			if ( HeatRecOutletTemp > MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp ) HeatRecOutletTemp = MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp;
+			if ( HeatRecOutletTemp > MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp ) {
+				HeatRecOutletTemp = max( HeatRecInletTemp, MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp );
+				QHeatRec = HeatRecMassFlowRate * CpHeatRec * ( HeatRecOutletTemp - HeatRecInletTemp );
+			}
 		} else {
 			HeatRecOutletTemp = HeatRecInletTemp;
+			QHeatRec = 0.0;
 		}
 
 		SafeCopyPlantNode( HeatRecInNode, HeatRecOutNode );
