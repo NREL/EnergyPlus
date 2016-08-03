@@ -862,6 +862,8 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						EMSActuatorUsed( ActuatorNum ).ErlVariableNum = VariableNum;
+						//initialize Erl variable for actuator to null
+						ErlVariable( VariableNum ).Value = Null;
 						if ( ActuatorNum > numActuatorsUsed ) {
 							// Initialize variables for the ExternalInterface variables
 							ExternalInterfaceInitializeErlVariable( VariableNum, SetErlValueNumber( rNumericArgs( 1 ) ), lNumericFieldBlanks( 1 ) );
