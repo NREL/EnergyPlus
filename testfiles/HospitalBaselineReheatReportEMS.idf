@@ -57774,8 +57774,8 @@
     AHU2_OAMinOAFracSchedule,!- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ,                        !- Mechanical Ventilation Controller Name
-    No,                      !- Time of Day Economizer Control Schedule Name
-    ,                        !- High Humidity Control
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
     ,                        !- Humidistat Control Zone Name
     ,                        !- High Humidity Outdoor Air Flow Ratio
     ,                        !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
@@ -58348,8 +58348,8 @@
     AHU1_OAMinOAFracSchedule,!- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ,                        !- Mechanical Ventilation Controller Name
-    No,                      !- Time of Day Economizer Control Schedule Name
-    ,                        !- High Humidity Control
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
     ,                        !- Humidistat Control Zone Name
     ,                        !- High Humidity Outdoor Air Flow Ratio
     ,                        !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
@@ -58924,8 +58924,8 @@
     AHU3_OAMinOAFracSchedule,!- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ,                        !- Mechanical Ventilation Controller Name
-    No,                      !- Time of Day Economizer Control Schedule Name
-    ,                        !- High Humidity Control
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
     ,                        !- Humidistat Control Zone Name
     ,                        !- High Humidity Outdoor Air Flow Ratio
     ,                        !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
@@ -59432,8 +59432,8 @@
     AHU5_OAMinOAFracSchedule,!- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ,                        !- Mechanical Ventilation Controller Name
-    No,                      !- Time of Day Economizer Control Schedule Name
-    ,                        !- High Humidity Control
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
     ,                        !- Humidistat Control Zone Name
     ,                        !- High Humidity Outdoor Air Flow Ratio
     ,                        !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
@@ -59972,8 +59972,8 @@
     AHU4_OAMinOAFracSchedule,!- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ,                        !- Mechanical Ventilation Controller Name
-    No,                      !- Time of Day Economizer Control Schedule Name
-    ,                        !- High Humidity Control
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
     ,                        !- Humidistat Control Zone Name
     ,                        !- High Humidity Outdoor Air Flow Ratio
     ,                        !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
@@ -60500,8 +60500,8 @@
     AHU6_OAMinOAFracSchedule,!- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ,                        !- Mechanical Ventilation Controller Name
-    No,                      !- Time of Day Economizer Control Schedule Name
-    ,                        !- High Humidity Control
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
     ,                        !- Humidistat Control Zone Name
     ,                        !- High Humidity Outdoor Air Flow Ratio
     ,                        !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
