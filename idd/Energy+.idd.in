@@ -45785,11 +45785,11 @@ CoilSystem:IntegratedHeatPump:AirSource,
        \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.
   A5, \field Dedicated Water Heating Coil Name
        \type object-list
-       \object-list HeatPumpWaterHeaterDXCoils
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
   A6, \field SCWH Coil Name
        \type object-list
-       \object-list HeatPumpWaterHeaterDXCoils
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
   A7, \field SCDWH Cooling Coil Name
        \type object-list
@@ -45797,7 +45797,7 @@ CoilSystem:IntegratedHeatPump:AirSource,
        \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
   A8, \field SCDWH Water Heating Coil Name
        \type object-list
-       \object-list HeatPumpWaterHeaterDXCoils
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   
   A9, \field SHDWH Heating Coil Name
        \type object-list
@@ -45805,7 +45805,7 @@ CoilSystem:IntegratedHeatPump:AirSource,
        \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.   
   A10, \field SHDWH Water Heating Coil Name
        \type object-list
-       \object-list HeatPumpWaterHeaterDXCoils
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
        \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   	   
   N1 , \field Indoor Temperature Limit for SCWH Mode
        \type real
