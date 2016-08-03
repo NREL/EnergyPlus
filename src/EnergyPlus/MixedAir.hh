@@ -81,8 +81,8 @@ namespace MixedAir {
 	extern int const LockoutWithHeatingPossible;
 	extern int const LockoutWithCompressorPossible;
 
-	// economizer control type
 	extern int const NoEconomizer;
+	// Changed by Amit as a part on New Feature Proposal
 	extern int const FixedDryBulb;
 	extern int const FixedEnthalpy;
 	extern int const DifferentialDryBulb;
@@ -90,7 +90,6 @@ namespace MixedAir {
 	extern int const FixedDewPointAndDryBulb;
 	extern int const ElectronicEnthalpy;
 	extern int const DifferentialDryBulbAndEnthalpy;
-	extern int const TimeOfDay;
 	// coil operation
 	extern int const On; // normal coil operation
 	extern int const Off; // signal coil shouldn't run

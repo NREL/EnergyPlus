@@ -178,6 +178,7 @@ namespace MixedAir {
 	int const LockoutWithCompressorPossible( 2 );
 
 	int const NoEconomizer( 0 );
+	// Changed by Amit as a part on New Feature Proposal
 	int const FixedDryBulb( 1 );
 	int const FixedEnthalpy( 2 );
 	int const DifferentialDryBulb( 3 );
@@ -185,7 +186,6 @@ namespace MixedAir {
 	int const FixedDewPointAndDryBulb( 5 );
 	int const ElectronicEnthalpy( 6 );
 	int const DifferentialDryBulbAndEnthalpy( 7 );
-	int const TimeOfDay( 8 );
 	// coil operation
 	int const On( 1 ); // normal coil operation
 	int const Off( 0 ); // signal coil shouldn't run
@@ -2190,13 +2190,11 @@ namespace MixedAir {
 			OAController( OutAirNum ).Econo = DifferentialDryBulbAndEnthalpy;
 		} else if ( SameString( AlphArray( 6 ), "ElectronicEnthalpy" ) ) {
 			OAController( OutAirNum ).Econo = ElectronicEnthalpy;
-		} else if ( SameString( AlphArray( 6 ), "TimeOfDay" ) ) {
-			OAController( OutAirNum ).Econo = TimeOfDay;
 		} else {
 			ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 6 ) + "=\"" + AlphArray( 6 ) + "\" value." );
 			ErrorsFound = true;
 		}
-		//Bypass choice
+		//Bypass choice - Added by Amit for new feature implementation
 		if ( SameString( AlphArray( 7 ), "ModulateFlow" ) ) {
 			OAController( OutAirNum ).EconBypass = false;
 		} else if ( SameString( AlphArray( 7 ), "MinimumFlowWithBypass" ) ) {
@@ -2206,6 +2204,12 @@ namespace MixedAir {
 			ErrorsFound = true;
 		}
 
+		//    IF((OAController(OutAirNum)%Econo > NoEconomizer) .AND. OAController(OutAirNum)%EconBypass) THEN
+		//      CALL ShowSevereError(TRIM(CurrentModuleObject)//'="'//TRIM(AlphArray(1))//'" invalid '//  &
+		//         TRIM(cAlphaFields(6))//'="'//TRIM(AlphArray(6))//'" and ')
+		//      CALL ShowContinueError(TRIM(cAlphaFields(7))//'="'//TRIM(AlphArray(7))//'" incompatible specifications.')
+		//      ErrorsFound = .TRUE.
+		//    END IF
 		if ( SameString( AlphArray( 9 ), "NoLockout" ) ) {
 			OAController( OutAirNum ).Lockout = NoLockoutPossible;
 		} else if ( SameString( AlphArray( 9 ), "LockoutWithHeating" ) ) {
@@ -2274,6 +2278,7 @@ namespace MixedAir {
 			ErrorsFound = true;
 		}
 
+		// Changed by Amit for new feature implementation
 		OAController( OutAirNum ).MinOAflowSch = AlphArray( 12 );
 		OAController( OutAirNum ).MinOAflowSchPtr = GetScheduleIndex( AlphArray( 12 ) );
 		if ( OAController( OutAirNum ).MinOAflowSchPtr == 0 && ( ! lAlphaBlanks( 12 ) ) ) {
@@ -2289,16 +2294,8 @@ namespace MixedAir {
 		}
 		OAController( OutAirNum ).VentilationMechanicalName = AlphArray( 14 );
 
-		//   Economizer control schedule
-		if ( lAlphaBlanks( 15 ) ) {
-			OAController( OutAirNum ).EconomizerOASchedPtr = ScheduleAlwaysOn;
-		} else {
-			OAController( OutAirNum ).EconomizerOASchedPtr = GetScheduleIndex( AlphArray( 15 ) );
-			if ( OAController( OutAirNum ).EconomizerOASchedPtr == 0 ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( 15 ) + "=\"" + AlphArray( 15 ) + "\" not found." );
-				ErrorsFound = true;
-			}
-		}
+		//   Check for a time of day economizer control schedule
+		OAController( OutAirNum ).EconomizerOASchedPtr = GetScheduleIndex( AlphArray( 15 ) );
 
 		//   High humidity control option can be used with any economizer flag
 		if ( SameString( AlphArray( 16 ), "Yes" ) ) {
@@ -2751,6 +2748,7 @@ namespace MixedAir {
 			if ( thisOAController.Econo > NoEconomizer ) {
 				equipName = thisOAController.Name;
 				// 90.1 descriptor for economizer controls
+				// Changed by Amit for New Feature implementation
 				if ( thisOAController.Econo == DifferentialEnthalpy ) {
 					PreDefTableEntry( pdchEcoKind, equipName, "DifferentialEnthalpy" );
 				} else if ( thisOAController.Econo == DifferentialDryBulb ) {
@@ -2766,6 +2764,7 @@ namespace MixedAir {
 				PreDefTableEntry( pdchEcoMinOA, equipName, thisOAController.MinOA );
 				PreDefTableEntry( pdchEcoMaxOA, equipName, thisOAController.MaxOA );
 				//EnergyPlus input echos for economizer controls
+				// Chnged by Amit for new feature implementation
 				if ( thisOAController.Econo == DifferentialDryBulb ) {
 					PreDefTableEntry( pdchEcoRetTemp, equipName, "Yes" );
 				} else {
@@ -4062,6 +4061,7 @@ namespace MixedAir {
 		bool AirLoopEconoLockout; // Economizer lockout flag
 		bool AirLoopNightVent; // Night Ventilation flag for air loop
 		bool EconomizerOperationFlag; // TRUE if OA economizer is active
+		Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
 		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 		Real64 OutAirSignal; // Used to set OA mass flow rate
 		static Array1D< Real64 > Par(4); // Par(1) = mixed air node number //Tuned Made static
@@ -4129,38 +4129,29 @@ namespace MixedAir {
 		}
 		OutAirSignal = min( max( OutAirSignal, OutAirMinFrac ), 1.0 );
 
-		// If no economizer or scheduled off, set to minimum and disable economizer and high humidity control
+		// If no economizer, set to minimum and disable economizer and high humidity control
 		if ( this->Econo == NoEconomizer ) {
 			OutAirSignal = OutAirMinFrac;
 			EconomizerOperationFlag = false;
+			EconomizerAirFlowScheduleValue = 0.0;
 			HighHumidityOperationFlag = false;
 		} else if ( this->MaxOA < SmallAirVolFlow ) {
 			OutAirSignal = OutAirMinFrac;
 			EconomizerOperationFlag = false;
+			EconomizerAirFlowScheduleValue = 0.0;
 			HighHumidityOperationFlag = false;
 		} else if ( AirLoopEconoLockout ) {
 			OutAirSignal = OutAirMinFrac;
 			EconomizerOperationFlag = false;
-			HighHumidityOperationFlag = false;
-		} else if ( GetCurrentScheduleValue( this->EconomizerOASchedPtr ) <= 0.0 ) {
-			// economizer schedule is off
-			OutAirSignal = OutAirMinFrac;
-			EconomizerOperationFlag = false;
+			EconomizerAirFlowScheduleValue = 0.0;
 			HighHumidityOperationFlag = false;
 		} else {
-
-			// Check time of day economizer schedule, enable economizer if schedule value > 0 (must be > 0 to get here)
-			if (this->Econo == TimeOfDay) {
-				EconomizerOperationFlag = true;
-				OutAirSignal = 1.0;
-			}
-
-			// Do the limit checks
+			//Changed by Amit for new implementation
+			// Otherwise do the limit checks
 			EconomizerOperationFlag = true;
 			// Outside air temp greater than mix air setpoint
 			if ( this->InletTemp > this->MixSetTemp ) {
-				OutAirSignal = OutAirMinFrac;
-				EconomizerOperationFlag = false;
+				OutAirSignal = 1.0;
 			}
 			// Return air temp limit
 			if ( this->Econo == DifferentialDryBulb ) {
@@ -4230,6 +4221,16 @@ namespace MixedAir {
 				HighHumidityOperationFlag = false;
 			}
 
+			// Check time of day economizer schedule, enable economizer if schedule value > 0
+			EconomizerAirFlowScheduleValue = 0.0;
+			if ( this->EconomizerOASchedPtr > 0 ) {
+				EconomizerAirFlowScheduleValue = GetCurrentScheduleValue( this->EconomizerOASchedPtr );
+				if ( EconomizerAirFlowScheduleValue > 0.0 ) {
+					EconomizerOperationFlag = true;
+					OutAirSignal = 1.0;
+				}
+			}
+
 		}
 
 		// OutAirSignal will not give exactly the correct mixed air temperature (equal to the setpoint) since
@@ -4249,7 +4250,7 @@ namespace MixedAir {
 		}
 
 		// Economizer choice "Bypass" forces minimum OA except when high humidity air flow is active based on indoor RH
-		if ( this->EconBypass && (! HighHumidityOperationFlag ) ) {
+		if ( this->EconBypass && EconomizerAirFlowScheduleValue == 0.0 ) {
 			OASignal = OutAirMinFrac;
 		}
 

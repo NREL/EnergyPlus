@@ -153,7 +153,7 @@ x 5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Sch
     - **FIXED** Schedule name was not correct in above report for air distribution effectiveness when not specified, now is blank.
     
 
-x 6. Change "Time of Day Economizer Control Schedule" to apply to any type of economizer control, and add a new Economizer Control Type = TimeOfDay.
+6. Change "Time of Day Economizer Control Schedule" to apply to any type of economizer control, and add a new Economizer Control Type = TimeOfDay.
 
 x 7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
 

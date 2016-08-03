@@ -55289,7 +55289,6 @@ Controller:OutdoorAir,
        \key FixedDewPointAndDryBulb
        \key ElectronicEnthalpy
        \key DifferentialDryBulbAndEnthalpy
-       \key TimeOfDay
        \key NoEconomizer
        \default NoEconomizer
   A7 , \field Economizer Control Action Type
@@ -55358,11 +55357,14 @@ Controller:OutdoorAir,
        \object-list ControllerMechanicalVentNames
        \note Optional field for defining outdoor ventilation air based on flow rate per unit floor
        \note area and flow rate per person. Simplified method of demand-controlled ventilation.
-  A15, \field Economizer Control Schedule Name
+  A15, \field Time of Day Economizer Control Schedule Name
        \type object-list
        \object-list ScheduleNames
-       \note Optional schedule to control economizer operation. If left blank, economizer is always available.
-       \note Schedule values greater than 0 indicate economizer control is enabled.
+       \note Optional schedule to simulate "push-button" type economizer control.
+       \note Schedule values greater than 0 indicate time-of-day economizer control is enabled.
+       \note Economizer control may be used with or without the high humidity control option.
+       \note When used together, high humidity control has priority over economizer control.
+       \note If the field Economizer Control Type = NoEconomizer, then this option is disabled.
   A16, \field High Humidity Control
        \type choice
        \key Yes
