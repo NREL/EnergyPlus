@@ -618,7 +618,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	SimulationManager::GetProjectData();
 	bool FoundError = false;

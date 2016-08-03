@@ -207,7 +207,7 @@ TEST_F( EnergyPlusFixture, CheckActuatorInit ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		OutAirNodeManager::SetOutAirNodes();
 		EMSManager::GetEMSInput();
 
@@ -867,7 +867,7 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -923,7 +923,7 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 

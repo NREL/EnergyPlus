@@ -370,7 +370,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output( ) );
 	bool ErrorsFound = false;
 	ScheduleManager::ProcessScheduleInput( );
