@@ -56,86 +56,96 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef HeatBalanceAirManager_hh_INCLUDED
-#define HeatBalanceAirManager_hh_INCLUDED
+// EnergyPlus::HeatBalanceMovableInsulation Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+
+using namespace EnergyPlus::HeatBalanceMovableInsulation;
 
 namespace EnergyPlus {
 
-namespace HeatBalanceAirManager {
+	TEST_F( EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulation)
+	{
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+		int SurfNum;
+		Real64 HMovInsul;
+		int RoughIndexMovInsul;
+		Real64 AbsExt;
+		
+		SurfNum = 1;
+		DataSurfaces::Surface.allocate( SurfNum );
+		DataSurfaces::Surface( SurfNum ).SchedMovInsulExt = -1;
+		DataSurfaces::Surface( SurfNum ).MaterialMovInsulExt = 1;
+		
+		DataHeatBalance::Material.allocate( 1 );
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+		DataHeatBalance::Material( 1 ).Roughness = 1;
+		DataHeatBalance::Material( 1 ).Group = 0;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.75;
+		DataHeatBalance::Material( 1 ).Trans = 0.25;
+		DataHeatBalance::Material( 1 ).ReflectSolBeamFront = 0.20;
+		
+		AbsExt = 0.0;
+		EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt );
+		EXPECT_EQ( 0.75, AbsExt );
 
-	//         Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::WindowGlass;
+		EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
 
-	// Get Input routines for module
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::GlassEquivalentLayer;
+		EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
+		
+	}
 
-	// Initialization routines for module
-
-	// Algorithms for the module
-	// Reporting routines for module
-
-	// Functions
-	void
-	clear_state();
-
-	void
-	ManageAirHeatBalance();
-
-	// Get Input Section of the Module
-	//******************************************************************************
-
-	void
-	GetAirHeatBalanceInput();
-
-	void
-	GetAirFlowFlag( bool & ErrorsFound ); // Set to true if errors found
-
-	void
-	SetZoneMassConservationFlag();  // sets the zone air mass flow variables
-
-	void
-	GetSimpleAirModelInputs( bool & ErrorsFound ); // IF errors found in input
-
-	//*****************************************************************************************
-	// This subroutine was moved from 'RoomAirManager' Module
-
-	void
-	GetRoomAirModelParameters( bool & errFlag ); // True if errors found during this input routine
-
-	// END of Get Input subroutines for the HBAir Module
-	//******************************************************************************
-
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
-
-	void
-	InitAirHeatBalance();
-
-	void
-	InitSimpleMixingConvectiveHeatGains();
-
-	// END Initialization Section of the Module
-	//******************************************************************************
-
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
-
-	void
-	CalcHeatBalanceAir();
-
-	// END Algorithm Section of the Module
-
-	void
-	ReportZoneMeanAirTemp();
-
-} // HeatBalanceAirManager
-
-} // EnergyPlus
-
-#endif
+	TEST_F( EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulation)
+	{
+		
+		int SurfNum;
+		Real64 HMovInsul;
+		Real64 AbsExt;
+		
+		SurfNum = 1;
+		DataSurfaces::Surface.allocate( SurfNum );
+		DataSurfaces::Surface( SurfNum ).SchedMovInsulInt = -1;
+		DataSurfaces::Surface( SurfNum ).MaterialMovInsulInt = 1;
+		
+		DataHeatBalance::Material.allocate( 1 );
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+		DataHeatBalance::Material( 1 ).Roughness = 1;
+		DataHeatBalance::Material( 1 ).Group = 0;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.75;
+		DataHeatBalance::Material( 1 ).Trans = 0.25;
+		DataHeatBalance::Material( 1 ).ReflectSolBeamFront = 0.20;
+		
+		AbsExt = 0.0;
+		EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsExt );
+		EXPECT_EQ( 0.75, AbsExt );
+		
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::WindowGlass;
+		EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
+		
+		AbsExt = 0.0;
+		DataHeatBalance::Material( 1 ).Group = DataHeatBalance::GlassEquivalentLayer;
+		EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsExt );
+		EXPECT_EQ( 0.55, AbsExt );
+		
+	}
+	
+	
+}

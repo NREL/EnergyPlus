@@ -3583,7 +3583,7 @@
   Output:Variable,SPACE5-1 Exhaust Fan Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,*,Zone Infiltration Standard Density Volume Flow Rate,hourly;
-  Output:Variable,*,Zone Mixing Standard Density Air Volume Flow Rate,hourly;
+  Output:Variable,*,Zone Mixing Standard Density Volume Flow Rate,hourly;
   Output:Variable,*,Zone Air Mass Balance Supply Mass Flow Rate,hourly;
   Output:Variable,*,Zone Air Mass Balance Exhaust Mass Flow Rate,hourly;
   Output:Variable,*,Zone Air Mass Balance Return Mass Flow Rate,hourly;

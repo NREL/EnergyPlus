@@ -76,6 +76,7 @@
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <DataRuntimeLanguage.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -176,9 +177,42 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 
 
-		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
+		EXPECT_NEAR( DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
 
-		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001 );
+		EXPECT_NEAR( DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001 );
+
+}
+
+TEST_F( EnergyPlusFixture, CheckActuatorInit ) {
+		// this test checks that new actuators have the Erl variable associated with them set to Null right away, issue #5710
+		std::string const idf_objects = delimited_string( {
+		"Version,8.6;",
+
+		"OutdoorAir:Node, Test node;",
+
+		"EnergyManagementSystem:Actuator,",
+		"TempSetpointLo,          !- Name",
+		"Test node,  !- Actuated Component Unique Name",
+		"System Node Setpoint,    !- Actuated Component Type",
+		"Temperature Minimum Setpoint;    !- Actuated Component Control Type",
+
+		"EnergyManagementSystem:ProgramCallingManager,",
+		"Dual Setpoint Test Manager,  !- Name",
+		"EndSystemTimestepBeforeHVACReporting,  !- EnergyPlus Model Calling Point",
+		"DualSetpointTestControl;  !- Program Name 1",
+
+		"EnergyManagementSystem:Program,",
+		"DualSetpointTestControl,",
+		"Set TempSetpointLo = 16.0;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		OutAirNodeManager::SetOutAirNodes();
+		EMSManager::GetEMSInput();
+
+		// now check that Erl variable is Null
+		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( 1 ).Value.Type, DataRuntimeLanguage::ValueNull );
 
 }
 

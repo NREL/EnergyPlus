@@ -4797,7 +4797,10 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 
 			// Check for outside movable insulation
-			if ( Surface( SurfNum ).MaterialMovInsulExt > 0 ) EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughSurf, AbsThermSurf );
+			if ( Surface( SurfNum ).MaterialMovInsulExt > 0 ) {
+				EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughSurf, AbsThermSurf );
+				if ( HMovInsul > 0 ) AbsThermSurf = Material( Surface( SurfNum ).MaterialMovInsulExt ).AbsorpThermal; // Movable outside insulation present
+			}
 
 			// Check for exposure to wind (exterior environment)
 			if ( Surface( SurfNum ).ExtWind ) {
