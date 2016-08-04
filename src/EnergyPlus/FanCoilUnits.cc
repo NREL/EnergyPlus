@@ -3181,7 +3181,6 @@ namespace FanCoilUnits {
 				// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 PLR; // operating part-load ratio
 		Real64 QUnitOut; // fan coil delivered capacity [W]
-		Real64 mdot; // water flow rate passed to fan coil unit [kg/s]
 
 		// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 100% of flow before iterating
 		PLRMin = 0.0;
