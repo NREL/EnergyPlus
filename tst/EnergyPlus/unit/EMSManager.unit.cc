@@ -929,14 +929,14 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
 	ErlValueType ReturnValue;
 	bool seriousErrorFound = false;
 	EMSManager::FinishProcessingUserInput = false;
-	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); // we just check the logic and don't throw the fatal errors.
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( InputProcessor::FindItemInList("SETNODESETPOINTTEST", ErlStack) ).Instruction( 1 ).Argument2, seriousErrorFound ); // we just check the logic and don't throw the fatal errors.
 	EXPECT_TRUE ( seriousErrorFound );
 
 	// next run a small program that sets the global variable value
 	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
 	// now check that it worked, should stay false
 	seriousErrorFound = false;
-	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); 
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( InputProcessor::FindItemInList("SETNODESETPOINTTEST", ErlStack) ).Instruction( 1 ).Argument2, seriousErrorFound );
 	EXPECT_FALSE ( seriousErrorFound );
 }
 
