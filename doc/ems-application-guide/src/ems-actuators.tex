@@ -6,4 +6,6 @@ Internal to EnergyPlus are two separate lists of actuators:~ those that are avai
 
 Actuators override things inside EnergyPlus whenever the actuator's Erl variable is set to a value other than ``Null.''~ Null is a special built-in variable used to deactivate an actuator. Once an actuator starts overriding, it will continue to do so until the actuator's Erl variable is set to Null. You should set the actuators to Null whenever you want the EMS to revert to normal operation.
 
+Beginning with version 8.6, EnergyPlus checks the list of actuators that are being used in the EMS to see if they all were in fact used.  Because there is no need to declare Erl variables, it is relatively easy for a simple spelling mistake to go undetected.  If the Erl variable name for the actuator (in the IDF input object for EnergyManagementSystem:Actuator) is not exactly correct in the Erl program, then the program could be setting the value of a separate local variable rather than the intended actuator.  To help detect this, the program now checks the acutators to see if they were ever set to anything, even Null.  A warning is issued to identify each actuator that was not used. 
+
 The rest of this section provides details about specific actuators.

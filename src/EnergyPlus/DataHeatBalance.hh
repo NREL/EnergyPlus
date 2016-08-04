@@ -607,10 +607,6 @@ namespace DataHeatBalance {
 
 	extern Array1D< Real64 > const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
-	//Variables Dimensioned to Number of Zones
-	extern Array1D< Real64 > MVFC; // Design Mixing Flow Rate [m3/s] (Cross Zone Mixing)
-	extern Array1D< Real64 > MTC; // Control Temperature For Mixing [C] (Cross Zone Mixing)
-
 	extern Real64 ZeroPointerVal;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:

@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
@@ -146,4 +147,139 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf )
+	{
+
+		Real64 surfTemp;
+		DataSurfaces::SurfaceData testSurface;
+		DataHeatBalance::ZoneData testZone;
+		int cntWarmupSurfTemp = 0;
+		testSurface.Name = "TestSurface";
+		testZone.Name = "TestZone";
+		testZone.InternalHeatGains = 2.5;
+		testZone.NominalInfilVent = 0.5;
+		testZone.NominalMixing = 0.7;
+
+		// no error
+		surfTemp = 26;
+		DataGlobals::WarmupFlag = true;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = true;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		EXPECT_TRUE( compare_err_stream( "", true ) );
+
+		// to hot - first time
+		surfTemp = 201;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = false;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string01 = delimited_string( {
+			"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+			"   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+			"   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+			"   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+			"   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+			"   **   ~~~   ** ...Zone is part of HVAC controlled system."
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string01, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+		// to hot - subsequent times
+		surfTemp = 201;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = true;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string02 = delimited_string( {
+			"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string02, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+
+		// to cold - first time
+		surfTemp = -101;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = false;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string03 = delimited_string( {
+			"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+			"   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
+			"   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+			"   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
+			"   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+			"   **   ~~~   ** ...Zone is part of HVAC controlled system."
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string03, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+		// to cold - subsequent times
+		surfTemp = -101;
+		DataGlobals::WarmupFlag = false;
+		testSurface.LowTempErrCount = 0;
+		testSurface.HighTempErrCount = 0;
+		testZone.TempOutOfBoundsReported = true;
+		testZone.FloorArea = 1000;
+		testZone.IsControlled = true;
+		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
+		std::string const error_string04 = delimited_string( {
+			"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00"
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string04, true ) );
+		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFactors)
+	{
+
+		DataSurfaces::TotSurfaces = 1;
+		DataGlobals::NumOfZones = 1;
+		DataHeatBalance::TotMaterials = 1;
+		DataHeatBalance::TotConstructs = 1;
+		
+		DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+		DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+		DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+		DataHeatBalance::Construct.allocate(DataHeatBalance::TotConstructs);
+		DataHeatBalance::Material.allocate(DataHeatBalance::TotMaterials);
+
+		DataSurfaces::Surface( 1 ).HeatTransSurf = true;
+		DataSurfaces::Surface( 1 ).Construction = 1;
+		DataSurfaces::SurfaceWindow( 1 ).ShadingFlag = 0;
+		DataHeatBalance::Construct( 1 ).InsideAbsorpThermal = 0.9;
+		DataHeatBalance::Construct( 1 ).TransDiff = 0.0;
+		DataSurfaces::Surface( 1 ).MaterialMovInsulInt = 1;
+		DataHeatBalance::Material( 1 ).AbsorpThermal = 0.2;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.5;
+		
+		DataGlobals::NumOfZones = 0; // Reset this to skip part of the code in the unit tested routine
+		
+		DataSurfaces::Surface( 1 ).SchedMovInsulInt = -1;	// According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+
+		ComputeIntThermalAbsorpFactors();
+		
+		EXPECT_EQ( 0.2, DataHeatBalance::ITABSF( 1 ) );
+		
+	}
+	
 }
