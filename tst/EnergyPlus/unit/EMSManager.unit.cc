@@ -848,41 +848,34 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
 	std::string const idf_objects = delimited_string( {
 		"Version,8.6;",
 
-		"OutdoorAir:Node, Test node 1;",
-
-		"EnergyManagementSystem:Actuator,",
-		"TempSetpoint1,          !- Name",
-		"Test node 1,  !- Actuated Component Unique Name",
-		"System Node Setpoint,    !- Actuated Component Type",
-		"Temperature Setpoint;    !- Actuated Component Control Type",
+		"EnergyManagementSystem:GlobalVariable,",
+		"TempSetpoint1;          !- Name",
 
 		"EnergyManagementSystem:Program,",
-		"SetNodeSetpointTest,",
+		"InitVariableTest,",
 		"Set TempSetpoint1 = 21.0;"
 
 		"EnergyManagementSystem:ProgramCallingManager,",
 		"Test Program Manager 1,  !- Name",
 		"BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
-		"SetNodeSetpointTest;  !- Program Name 1",
+		"InitVariableTest;  !- Program Name 1",
 
 	} );
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
-
-	OutAirNodeManager::SetOutAirNodes();
 
 	EMSManager::CheckIfAnyEMS();
 	EMSManager::FinishProcessingUserInput = true;
 	bool anyRan;
 	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
 	// Expect the variable to not yet be initialized
-	EXPECT_FALSE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
+	EXPECT_FALSE ( ErlVariable( 25 ).Value.initialized );
 	// next run a small program that sets the value
 	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 	// check that it worked and the value came thru
-	EXPECT_NEAR( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.Number, 21.0, 0.0000001 );
+	EXPECT_NEAR( ErlVariable( 25 ).Value.Number, 21.0, 0.0000001 );
 	// check of state to see if now initialized
-	EXPECT_TRUE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
+	EXPECT_TRUE ( ErlVariable( 25 ).Value.initialized );
 
 }
 
