@@ -405,12 +405,12 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest )
 	DataHeatBalFanSys::ZoneAirHumRat( 5 ) = 0.001;
 
 	DataHeatBalance::AirFlowFlag = 1;
-	ScheduleManager::Schedule( 1 ).CurrentValue = 1.0;
-	ScheduleManager::Schedule( 2 ).CurrentValue = 18.0;
-	ScheduleManager::Schedule( 3 ).CurrentValue = 100.0;
-	ScheduleManager::Schedule( 4 ).CurrentValue = 2.0;
-	ScheduleManager::Schedule( 5 ).CurrentValue = -100.0;
-	ScheduleManager::Schedule( 6 ).CurrentValue = 100.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MIXINGAVAILSCHED") ).CurrentValue = 1.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MININDOORTEMP") ).CurrentValue = 18.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MAXINDOORTEMP") ).CurrentValue = 100.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("DELTATEMP") ).CurrentValue = 2.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MINOUTDOORTEMP") ).CurrentValue = -100.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MAXOUTDOORTEMP") ).CurrentValue = 100.0;
 	DataEnvironment::OutBaroPress = 101325.0;
 
 	InitSimpleMixingConvectiveHeatGains( );
