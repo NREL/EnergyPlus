@@ -655,7 +655,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 	SurfaceGeometry::GetSurfaceData( FoundError ); // setup zone geometry and get zone data
 	EXPECT_FALSE( FoundError ); // expect no errors
 
-	compare_err_stream( "" ); // just for debugging
+//	compare_err_stream( "" ); // just for debugging
 
 	SurfaceGeometry::SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
 	EXPECT_FALSE( FoundError );
@@ -667,7 +667,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 	DataGlobals::TimeStep = 4;
 	DataGlobals::HourOfDay = 9;
 
-	compare_err_stream( "" ); // just for debugging
+//	compare_err_stream( "" ); // just for debugging
 
 	DataSurfaces::ShadingTransmittanceVaries = true;
 	DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
