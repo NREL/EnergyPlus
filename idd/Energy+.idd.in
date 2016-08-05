@@ -32664,7 +32664,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key OutdoorAir:Mixer
         \note Currently only one type OutdoorAir:Mixer object is available.
         \note This field should be left blank if the FanCoil is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    A8 , \field Outdoor Air Mixer Name
         \type object-list
         \object-list OutdoorAirMixers
@@ -32672,7 +32672,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note This optional field specifies the name of the OutdoorAir:Mixer object.
         \note When used, this name needs to match name of the OutdoorAir:Mixer object.
         \note This field should be left blank if the FanCoil is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    A9 , \field Supply Air Fan Object Type
         \required-field
         \type choice
@@ -32880,7 +32880,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \key OutdoorAir:Mixer
         \note Currently only one OutdoorAir:Mixer object type is available.
         \note This field should be left blank if the PTAC is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    A6 , \field Outdoor Air Mixer Name
         \type object-list
         \object-list OutdoorAirMixers
@@ -32888,7 +32888,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \note This optional field specifies the name of the OutdoorAir:Mixer object.
         \note When used, this name needs to match name of the OutdoorAir:Mixer object.
         \note This field should be left blank if the PTAC is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
@@ -33037,7 +33037,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \key OutdoorAir:Mixer
         \note Currently only one OutdoorAir:Mixer object type is available.
         \note This field should be left blank if the PTHP is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    A6 , \field Outdoor Air Mixer Name
         \type object-list
         \object-list OutdoorAirMixers
@@ -33045,7 +33045,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note This optional field specifies the name of the OutdoorAir:Mixer object.
         \note When used, this name needs to match name of the OutdoorAir:Mixer object.
         \note This field should be left blank if the PTHP is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
@@ -33229,7 +33229,7 @@ ZoneHVAC:WaterToAirHeatPump,
         \key OutdoorAir:Mixer
         \note Currently only one OutdoorAir:Mixer object type is available.
         \note This field should be left blank if the WSHP is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    A6,  \field Outdoor Air Mixer Name
         \type object-list
         \object-list OutdoorAirMixers
@@ -33237,7 +33237,7 @@ ZoneHVAC:WaterToAirHeatPump,
         \note This optional field specifies the name of the OutdoorAir:Mixer object.
         \note When used, this name needs to match name of the OutdoorAir:Mixer object.
         \note This field should be left blank if the WSHP is connected to central
-        \note dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
    N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
@@ -34277,7 +34277,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note Currently only one type OutdoorAir:Mixer object is available.
         \note If this field is blank, and outside air mixer is not used.
         \note This field should be left blank if the VRF terminal unit is connected to 
-        \note central dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note central dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
   A10,  \field Outside Air Mixer Object Name
         \type object-list
         \object-list OutdoorAirMixers
@@ -34285,7 +34285,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note This optional field specifies the name of the OutdoorAir:Mixer object.
         \note When used, this name needs to match name of the OutdoorAir:Mixer object.
         \note This field should be left blank if the VRF terminal unit is connected to 
-        \note central dedicated outdoor air through AirTerminal:SingleDuct:Mixer object.
+        \note central dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
   A11,  \field Cooling Coil Object Type
         \type choice
         \key Coil:Cooling:DX:VariableRefrigerantFlow
@@ -39792,8 +39792,8 @@ AirTerminal:SingleDuct:Mixer,
    A5, \field Mixer Primary Air Inlet Node Name
        \required-field
        \type node
-       \note The primary air (treated outdoor air) inlet node name of the mixer. This will be the 
-       \note outlet air node name of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum, providing
+       \note The primary air (treated outdoor air) inlet node name of the mixer. This will be an
+       \note outlet air node name of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum providing
        \note the connection to the DOA system. 
    A6, \field Mixer Secondary Air Inlet Node Name
        \required-field
