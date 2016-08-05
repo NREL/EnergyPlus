@@ -1191,9 +1191,36 @@ namespace HeatBalanceIntRadExchange {
 			ShowContinueError( "So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but" );
 			ShowContinueError( "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure." );
 
-			F = FixedF;
 			RowSum = sum( FixedF );
+			if ( RowSum > ( N +0.01 ) ) {
+				// Reciprocity enforced but there is more radiation than possible somewhere since the sum of one of the rows
+				// is now greater than unity.  This should not be allowed as it can cause issues with the heat balance.
+				// Correct this by finding the largest row summation and dividing all of the elements in the F matrix by
+				// this max summation.  This will provide a cap on radiation so that no row has a sum greater than unity
+				// and will still maintain reciprocity.
+				Array1D< Real64 > sumFixedF;
+				Real64 MaxFixedFRowSum;
+				sumFixedF.allocate( N );
+				sumFixedF = 0.0;
+				for ( i = 1; i <= N; ++i ) {
+					for ( j = 1; j <= N; ++j ) {
+						sumFixedF( i ) += FixedF( i, j );
+					}
+					if ( i == 1 ) {
+						MaxFixedFRowSum	= sumFixedF( i );
+					} else {
+						if ( sumFixedF( i ) > MaxFixedFRowSum ) MaxFixedFRowSum = sumFixedF( i );
+					}
+				}
+				if ( MaxFixedFRowSum < 1.0 ) {
+					ShowFatalError( " FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
+				} else {
+					FixedF *= ( 1.0 / MaxFixedFRowSum );
+				}
+				RowSum = sum( FixedF ); // needs to be recalculated
+			}
 			FinalCheckValue = FixedCheckValue = std::abs( RowSum - N );
+			F = FixedF;
 			Zone( ZoneNum ).EnforcedReciprocity = true;
 			return; // Do not iterate, stop with reciprocity satisfied.
 
