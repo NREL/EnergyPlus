@@ -210,8 +210,6 @@ namespace DataHeatBalFanSys {
 
 	extern Array1D< Real64 > LoadCorrectionFactor; // PH 3/3/04
 
-	extern Array1D_bool CrossMixingFlag; // TRUE when a zone is mixing
-
 	extern Array1D< Real64 > AIRRAT; // "air power capacity"  PH 3/5/04
 	extern Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	extern Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
