@@ -118,9 +118,6 @@ namespace HeatBalanceAirManager {
 	InitAirHeatBalance();
 
 	void
-	AllocateAirHeatBalArrays();
-
-	void
 	InitSimpleMixingConvectiveHeatGains();
 
 	// END Initialization Section of the Module

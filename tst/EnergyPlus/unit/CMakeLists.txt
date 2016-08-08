@@ -52,6 +52,7 @@ set( test_src
   General.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
   HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
@@ -60,6 +61,8 @@ set( test_src
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
+  HVACManager.unit.cc
+  HVACInterfaceManager.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc

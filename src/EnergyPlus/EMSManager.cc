@@ -767,6 +767,7 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						Sensor( SensorNum ).VariableNum = VariableNum;
+						ErlVariable( VariableNum ).Value.initialized = true; 
 					}
 				}
 
@@ -861,6 +862,8 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						EMSActuatorUsed( ActuatorNum ).ErlVariableNum = VariableNum;
+						//initialize Erl variable for actuator to null
+						ErlVariable( VariableNum ).Value = Null;
 						if ( ActuatorNum > numActuatorsUsed ) {
 							// Initialize variables for the ExternalInterface variables
 							ExternalInterfaceInitializeErlVariable( VariableNum, SetErlValueNumber( rNumericArgs( 1 ) ), lNumericFieldBlanks( 1 ) );
@@ -2132,6 +2135,23 @@ namespace EMSManager {
 
 	}
 
+	void
+	checkForUnusedActuatorsAtEnd()
+	{
+		// call at end of simulation to check if any of the user's actuators were never initialized.  
+		// Could be a mistake we want to help users catch // Issue #4404.
+		for ( int actuatorUsedLoop = 1; actuatorUsedLoop <= numActuatorsUsed; ++actuatorUsedLoop ) {
+			if ( ! ErlVariable( EMSActuatorUsed( actuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
+				ShowWarningError( "checkForUnusedActuatorsAtEnd: Unused EMS Actuator detected, suggesting possible unintended programming error or spelling mistake." );
+				ShowContinueError( "Check Erl programs related to EMS actuator variable name = " + EMSActuatorUsed( actuatorUsedLoop ).Name );
+				ShowContinueError( "EMS Actuator type name = " + EMSActuatorUsed( actuatorUsedLoop ).ComponentTypeName );
+				ShowContinueError( "EMS Actuator unique component name = " + EMSActuatorUsed( actuatorUsedLoop ).UniqueIDName );
+				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( actuatorUsedLoop ).ControlTypeName );
+			}
+		}
+	
+	}
+	
 } // EMSManager
 
 //Moved these setup EMS actuator routines out of module to solve circular use problems between

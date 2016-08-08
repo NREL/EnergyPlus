@@ -176,6 +176,9 @@ namespace EMSManager {
 	void
 	SetupZoneInfoAsInternalDataAvail();
 
+	void
+	checkForUnusedActuatorsAtEnd();
+
 } // EMSManager
 
 //Moved these setup EMS actuator routines out of module to solve circular use problems between

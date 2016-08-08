@@ -227,7 +227,8 @@ namespace RuntimeLanguageProcessor {
 	WriteTrace(
 		int const StackNum,
 		int const InstructionNum,
-		ErlValueType const & ReturnValue
+		ErlValueType const & ReturnValue,
+		bool const seriousErrorFound // if true then also call energyplus error severe->fatal with Erl program line info
 	);
 
 	//******************************************************************************************
@@ -256,7 +257,10 @@ namespace RuntimeLanguageProcessor {
 	NewExpression();
 
 	ErlValueType
-	EvaluateExpression( int const ExpressionNum );
+	EvaluateExpression( 
+		int const ExpressionNum,
+		bool & seriousErrorFound
+	);
 
 	void
 	GetRuntimeLanguageUserInput();
