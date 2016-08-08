@@ -2080,8 +2080,8 @@ namespace SingleDuct {
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( MinAirFlowFracDes - MinAirFlowFracUser ) / MinAirFlowFracUser) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
-						ShowContinueError( "User-Specified Minimum Cooling Air Flow Fraction of " + RoundSigDigits( MaxHeatAirVolFlowRateUser, 5 ) + " [m3/s]" );
-						ShowContinueError( "differs from Design Size Minimum Cooling Air Flow Fraction of " + RoundSigDigits( MaxHeatAirVolFlowRateDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "User-Specified Minimum Cooling Air Flow Fraction of " + RoundSigDigits( MinAirFlowFracUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from Design Size Minimum Cooling Air Flow Fraction of " + RoundSigDigits( MinAirFlowFracDes, 5 ) + " [m3/s]" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -2134,8 +2134,8 @@ namespace SingleDuct {
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( FixedMinAirDes - FixedMinAirUser ) / FixedMinAirUser ) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
-						ShowContinueError( "User-Specified Minimum Cooling Air Flow Rate of " + RoundSigDigits( MaxHeatAirVolFlowRateUser, 5 ) + " [m3/s]" );
-						ShowContinueError( "differs from Design Size Minimum Cooling Air Flow Rate of " + RoundSigDigits( MaxHeatAirVolFlowRateDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "User-Specified Minimum Cooling Air Flow Rate of " + RoundSigDigits( FixedMinAirUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from Design Size Minimum Cooling Air Flow Rate of " + RoundSigDigits( FixedMinAirDes, 5 ) + " [m3/s]" );
 						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 					}
@@ -2212,7 +2212,8 @@ namespace SingleDuct {
 				MaxAirVolFlowRateDuringReheatDes = Sys( SysNum ).MaxAirVolFractionDuringReheat * Sys( SysNum ).MaxAirVolFlowRate;
 				MaxAirVolFractionDuringReheatUser = Sys( SysNum ).MaxAirVolFractionDuringReheat;
 				if ( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
-					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, 
+						"Maximum Flow per Zone Floor Area during Reheat (from alternate user input) [m3/s-m2]",
 						MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
 				}
 				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Flow Fraction during Reheat []",
@@ -2242,7 +2243,7 @@ namespace SingleDuct {
 					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
 						MaxAirVolFlowRateDuringReheatUser / Sys( SysNum ).ZoneFloorArea );
 				}
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow Fraction during Reheat []",
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Maximum Flow Fraction during Reheat (from alternate user input) []",
 					MaxAirVolFractionDuringReheatDes );
 				Sys( SysNum ).MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
 				if ( DisplayExtraWarnings ) {
@@ -2299,8 +2300,6 @@ namespace SingleDuct {
 			}
 			ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow Fraction during Reheat []",
 				Sys( SysNum ).ZoneMinAirFrac );
-			Sys( SysNum ).MaxAirVolFlowRateDuringReheat = max( Sys( SysNum ).MaxAirVolFlowRateDuringReheat, 0.0 );
-			Sys( SysNum ).MaxAirVolFractionDuringReheat = max( Sys( SysNum ).MaxAirVolFractionDuringReheat, 0.0 );
 			// zero the ReverseActioWithLimits inputs
 			Sys( SysNum ).MaxAirVolFlowRateDuringReheat = max( Sys( SysNum ).MaxAirVolFlowRateDuringReheat, 0.0 );
 			Sys( SysNum ).MaxAirVolFractionDuringReheat = max( Sys( SysNum ).MaxAirVolFractionDuringReheat, 0.0 );
