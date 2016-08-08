@@ -416,13 +416,13 @@ namespace MoistureBalanceEMPDManager {
 			ZoneNum = Surface( SurfNum ).Zone;
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			Real64 const rv_air_in_initval = min( PsyRhovFnTdbWPb_fast( MAT( ZoneNum ), max( ZoneAirHumRat( ZoneNum ), 1.0e-5 ), OutBaroPress ), PsyRhovFnTdbRh( MAT( ZoneNum ), 1.0, "InitMoistureBalanceEMPD" ) );
-			RVSurfaceOld(SurfNum) = rv_air_in_initval;
-			RVSurface(SurfNum) = rv_air_in_initval;
-			RVSurfLayer(SurfNum) = rv_air_in_initval;
-			RVSurfLayerOld(SurfNum) = rv_air_in_initval;
-			RVDeepLayer(SurfNum) = rv_air_in_initval;
-			RVdeepOld(SurfNum) = rv_air_in_initval;
-			RVwall(SurfNum) = rv_air_in_initval;
+			RVSurfaceOld( SurfNum ) = rv_air_in_initval;
+			RVSurface( SurfNum ) = rv_air_in_initval;
+			RVSurfLayer( SurfNum ) = rv_air_in_initval;
+			RVSurfLayerOld( SurfNum ) = rv_air_in_initval;
+			RVDeepLayer( SurfNum ) = rv_air_in_initval;
+			RVdeepOld( SurfNum ) = rv_air_in_initval;
+			RVwall( SurfNum ) = rv_air_in_initval;
 		}
 		if ( ! InitEnvrnFlag ) return;
 		//Initialize the report variable
@@ -654,7 +654,7 @@ namespace MoistureBalanceEMPDManager {
 			else {
 					RH_surf_layer = RH_surf_layer_tmp;
 			}
-		
+
 		}
 		else if (RH_surf_layer_old < RH_deep_layer_old && RH_surf_layer_old > RHZone) {
 			if (RH_surf_layer_tmp > RH_deep_layer_old) {

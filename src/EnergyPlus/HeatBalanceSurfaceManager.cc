@@ -5289,7 +5289,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			// check for saturation conditions of air
 			Real64 const HConvIn_surf( HConvInFD( SurfNum ) = HConvIn( SurfNum ) );
 			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb_fast( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
-			HMassConvInFD(SurfNum) = HConvIn_surf / ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
+			HMassConvInFD( SurfNum ) = HConvIn_surf / ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
 
 			// Perform heat balance on the inside face of the surface ...
 			// The following are possibilities here:
@@ -5739,7 +5739,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				RhoVaporSurfIn( SurfNum ) = RVSurface( SurfNum );
 				Real64 const FD_Area_fac( HMassConvInFD( SurfNum ) * surface.Area );
 				SumHmAW( ZoneNum ) += FD_Area_fac * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
-				Real64 const MAT_zone(MAT(ZoneNum));
+				Real64 const MAT_zone( MAT( ZoneNum ) );
 				SumHmARa(ZoneNum) += FD_Area_fac * PsyRhoAirFnPbTdbW(OutBaroPress, MAT_zone, PsyWFnTdbRhPb(MAT_zone, PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)), OutBaroPress));  //surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C( surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
 				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoVaporSurfIn( SurfNum );
 			}
