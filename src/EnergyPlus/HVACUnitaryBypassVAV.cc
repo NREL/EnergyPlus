@@ -1261,20 +1261,10 @@ namespace HVACUnitaryBypassVAV {
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
-		using DataGlobals::InitConvTemp;
 		using DataGlobals::AnyPlantInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitCBVAV" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InNode; // Inlet node number in CBVAV loop
@@ -1329,7 +1319,7 @@ namespace HVACUnitaryBypassVAV {
 					CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
 
 					if ( CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
+						FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
 						CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound ) * FluidDensity;
 					}
 
@@ -1411,7 +1401,7 @@ namespace HVACUnitaryBypassVAV {
 							ErrorsFound = true;
 						}
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
+							FluidDensity = GetDensityGlycol( PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( CBVAV( CBVAVNum ).LoopNum ).FluidIndex, RoutineName );
 							CBVAV( CBVAVNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
 						}
 					}
