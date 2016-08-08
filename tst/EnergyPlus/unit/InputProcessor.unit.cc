@@ -2556,7 +2556,7 @@ namespace EnergyPlus {
 
 		// Container size is 4500 here!
 		EXPECT_EQ( 6, NumAlphas );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FANANDCOILAVAILSCHED", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.000000000000000" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FANANDCOILAVAILSCHED", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.00000000000000" } ), Alphas2 ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false } ), lAlphaBlanks2 ) );
 
 		EXPECT_EQ( 0, NumNumbers );
