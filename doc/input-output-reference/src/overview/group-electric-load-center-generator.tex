@@ -636,7 +636,7 @@ This field contains the fraction of inverter thermal losses that enter the zone 
 
 \paragraph{Field: Inverter Efficiency}\label{field-inverter-efficiency}
 
-This field contains the value for inverter efficiency. In the simple model, efficiency is a constant. This is the so-called 1-term model. Input data for different types of inverters is available at http://www.gosolarcalifornia.org/equipment/inverter\_tests/summaries where the CEC Efficiency would be the value to enter here.
+This field contains the value for inverter efficiency. In the simple model, efficiency is a constant. This is the so-called 1-term model. Input data for different types of inverters is available at \url{http://www.gosolarcalifornia.org/equipment/inverter_tests/summaries} where the CEC Efficiency would be the value to enter here.
 
 An example IDF showing how this object is used is provided below:
 
@@ -722,7 +722,7 @@ ElectricLoadCenter:Inverter:FunctionOfPower,
 
 This input object is used to model conversion from Direct Current (DC) to Alternating Current (AC) in an electric load center that contains photovoltaic modules. Such a load center has an array of photovoltaic modules that feed an inverter DC power and the inverter produces AC power. This input object is for an inverter model where efficiency is interpolated using a look up table.
 
-This object was designed for use with data contained in the Inverter Performance Test Summaries available at http://www.gosolarcalifornia.org/equipment/inverter\_tests/summaries. All of the data needed for this object can be found there by make and model of inverter. The core of the data set is a 3x6 matrix of efficiency at different voltage and power levels. These form the look up table used in the model. Note that EnergyPlus PV models currently model only power and not the voltage and current situation. Therefore, only the nominal voltage data are used. This is the middle row of data in the Go Solar summaries.
+This object was designed for use with data contained in the Inverter Performance Test Summaries available at \url{http://www.gosolarcalifornia.org/equipment/inverter_tests/summaries}. All of the data needed for this object can be found there by make and model of inverter. The core of the data set is a 3x6 matrix of efficiency at different voltage and power levels. These form the look up table used in the model. Note that EnergyPlus PV models currently model only power and not the voltage and current situation. Therefore, only the nominal voltage data are used. This is the middle row of data in the Go Solar summaries.
 
 \subsubsection{Inputs}\label{inputs-5-008}
 
@@ -3401,11 +3401,11 @@ This field contains the coefficient r\(_{3}\) in the equation above.
 
 \subsubsection{Field: Stack Coolant Flow Rate}\label{field-stack-coolant-flow-rate}
 
-The stack cooler is assumed to have a closed water circulation loop that is used to extract heat from the stack and move it to a cogeneration heat exchanger and/or an air cooler. This field is used to enter the flow rate of coolant in this loop.
+The stack cooler is assumed to have a closed water circulation loop that is used to extract heat from the stack and move it to a cogeneration heat exchanger and/or an air cooler. This field is used to enter the mass flow rate of coolant in this loop in kg/s.
 
 \subsubsection{Field: Stack Cooler U-Factor Times Area Value}\label{field-stack-cooler-u-factor-times-area-value}
 
-This is the heat transfer coefficient between the stack and the coolant.
+This is the heat transfer coefficient between the stack and the coolant in W/K.
 
 \subsubsection{Field: Fs-cogen Adjustment Factor}\label{field-fs-cogen-adjustment-factor}
 
@@ -3417,11 +3417,11 @@ This field provides the value for an adjustment factor, \({F_{s - cogen}}\) , us
 
 \subsubsection{Field: Stack Cogeneration Exchanger Area}\label{field-stack-cogeneration-exchanger-area}
 
-This field provides the value for the cogeneration heat exchanger area, \({A_{s - cogen}}\)
+This field provides the value for the cogeneration heat exchanger area, \({A_{s - cogen}}\) in m2.
 
 \subsubsection{Field: Stack Cogeneration Exchanger Nominal Flow Rate}\label{field-stack-cogeneration-exchanger-nominal-flow-rate}
 
-This field provides the value for \(\dot N_{s - cogen}^0\) in the following relation for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) :
+This field provides the value in kg/s for \(\dot N_{s - cogen}^0\) in the following relation for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) :
 
 \begin{equation}
 {h_{s - cogen}} = h_{s - cogen}^0 \cdot {\left( {\frac{{{{\dot N}_{s - cogen}}}}{{\dot N_{s - cogen}^0}}} \right)^{{n_s}}}
@@ -3429,7 +3429,7 @@ This field provides the value for \(\dot N_{s - cogen}^0\) in the following rela
 
 \subsubsection{Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient}\label{field-stack-cogeneration-exchanger-nominal-heat-transfer-coefficient}
 
-This field provides the value for \(h_{s - cogen}^0\) in the relation above for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) .
+This field provides the value for \(h_{s - cogen}^0\) in the relation above for the cogeneration heat exchanger convection coefficient, \({h_{s - cogen}}\) in W/m2-K.
 
 \subsubsection{Field: Stack Cogeneration Exchanger Nominal Heat Transfer Coefficient Exponent}\label{field-stack-cogeneration-exchanger-nominal-heat-transfer-coefficient-exponent}
 
@@ -3437,9 +3437,9 @@ This field provides the value for \({n_s}\) is the relation above for the cogene
 
 \subsubsection{Field: Stack Cooler Pump Power}\label{field-stack-cooler-pump-power}
 
-This field is the power used by the stack cooler s circulating pump in Watts. It is a constant power draw whenever the stack cooler is active.
+This field is the power used by the stack cooler's circulating pump in Watts. It is a constant power draw whenever the stack cooler is active.
 
-\subsubsection{Field: Stack Cooler Pump Heat loss}\label{field-stack-cooler-pump-heat-loss}
+\subsubsection{Field: Stack Cooler Pump Heat Loss Fraction}\label{field-stack-cooler-pump-heat-loss}
 
 This field is the fraction of the pump power consumption that is lost to the surround zone.
 
@@ -3769,7 +3769,7 @@ Generator:FuelCell:AuxiliaryHeater,
   ;                                               !- Minimum Heating Capacity in Kmol per Second
 \end{lstlisting}
 
-Generator:FuelCell:ExhaustGasToWaterHeatExchanger
+\subsection{Generator:FuelCell:ExhaustGasToWaterHeatExchanger}
 
 This object is used to describe the exhaust gas heat exchanger subsystem of the FC used to recovery thermal energy.
 

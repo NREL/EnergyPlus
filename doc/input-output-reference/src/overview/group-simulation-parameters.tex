@@ -470,7 +470,7 @@ Input is Yes or No. The default is No. If Yes, simulation of carbon dioxide conc
 
 \paragraph{Field: Outdoor Carbon Dioxide Schedule Name}\label{field-outdoor-carbon-dioxide-schedule-name}
 
-This field specifies the name of a schedule that contains outdoor air carbon dioxide level values in units of ppm. One source of monthly average CO\(_{2}\) levels in the atmosphere is available at [NOAA's website](http://www.esrl.noaa.gov/gmd/ccgg/trends/) or via [ftp](ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_mm_mlo.txt).
+This field specifies the name of a schedule that contains outdoor air carbon dioxide level values in units of ppm. One source of monthly average CO\(_{2}\) levels in the atmosphere is available at \href{http://www.esrl.noaa.gov/gmd/ccgg/trends/}{NOAA's website} or via \href{ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_mm_mlo.txt}{ftp}.
 
 \paragraph{Field: Generic Contaminant Concentration}\label{field-generic-contaminant-concentration}
 
@@ -531,7 +531,7 @@ This object is used to control some details of EnergyPlus's solar, shadowing and
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method-000}
 
-This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword DetailedTimestepIntegration. The later method is useful modeling dynamic fenestration and shading surfaces.
+This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword TimestepFrequency. The TimestepFrequency method must be used for modeling dynamic fenestration and shading surfaces.
 
 \paragraph{Field: Calculation Frequency}\label{field-calculation-frequency}
 

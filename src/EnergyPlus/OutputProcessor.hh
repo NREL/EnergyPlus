@@ -937,10 +937,24 @@ namespace OutputProcessor {
 	);
 
 	void
-	WriteRealData(
+	WriteNumericData(
 		int const reportID, // The variable's reporting ID
 		std::string const & creportID, // variable ID in characters
 		Real64 const repValue // The variable's value
+	);
+
+	void
+	WriteNumericData(
+		int const reportID, // The variable's reporting ID
+		std::string const & creportID, // variable ID in characters
+		int32_t const repValue // The variable's value
+	);
+
+	void
+	WriteNumericData(
+		int const reportID, // The variable's reporting ID
+		std::string const & creportID, // variable ID in characters
+		int64_t const repValue // The variable's value
 	);
 
 	void
@@ -960,14 +974,6 @@ namespace OutputProcessor {
 		int const minValueDate, // The date the minimum value occurred
 		int const MaxValue, // The variable's maximum value during the reporting interval
 		int const maxValueDate // The date the maximum value occurred
-	);
-
-	void
-	WriteIntegerData(
-		int const reportID, // the reporting ID of the data
-		std::string const & reportIDString, // the reporting ID of the data (character)
-		Optional_int_const IntegerValue = _, // the value of the data
-		Optional< Real64 const > RealValue = _ // the value of the data
 	);
 
 	int
