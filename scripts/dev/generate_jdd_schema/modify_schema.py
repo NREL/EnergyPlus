@@ -13,7 +13,7 @@ def change_version(schema):
     schema["jdd_build"] = "${CMAKE_VERSION_BUILD}"
     loc = schema['properties']['Version']['properties']['version_identifier']
     loc['default'] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"
-    loc['type'] = "number"
+    loc['type'] = "string"
 
 
 def change_schedule_compact(schema):
