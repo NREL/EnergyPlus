@@ -1062,8 +1062,11 @@ namespace EnergyPlus {
 		for ( int i = 0; i < alphas_fields.size(); ++i ) {
 			std::string const field = alphas_fields[ i ];
 			if ( field == "name" ) {
-				Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
-//				Alphas( i + 1 ) = obj.key(); // TODO, make name retain case (i.e. make name fields exist in schema)
+                if ( object_in_schema->at( "name" ).find( "retaincase" ) != object_in_schema->at( "name" ).end() ) {
+					Alphas( i + 1 ) = obj.key();
+				} else {
+					Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
+				}
 				if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = obj.key().empty();
 				if ( present( AlphaFieldNames ) ) AlphaFieldNames()( i + 1 ) = field;
 				NumAlphas++;

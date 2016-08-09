@@ -120,6 +120,8 @@ def parse_idd(data):
                 root['properties'][obj_name] = {}
                 root['properties'][obj_name]['patternProperties'] = {}
                 root['properties'][obj_name]['patternProperties']['.*'] = obj_data
+                if 'name' in obj_data:
+                    root['properties'][obj_name]['name'] = obj_data.pop('name')
 
             root['properties'][obj_name]['legacy_idd'] = obj_data.pop('legacy_idd')
             root['properties'][obj_name]['type'] = 'object'
@@ -290,6 +292,9 @@ def parse_obj(data):
                         if 'required' not in root:
                             root['required'] = []
                         root['required'].append(field_name)
+
+            else:
+                root['name'] = field_data
 
             if comma_or_semicolon == TOKEN_SEMICOLON:
                 return root

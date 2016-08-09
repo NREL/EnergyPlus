@@ -13,7 +13,7 @@ def change_version(schema):
     schema["jdd_build"] = "${CMAKE_VERSION_BUILD}"
     loc = schema['properties']['Version']['properties']['version_identifier']
     loc['default'] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"
-    loc['type'] = "string"
+    loc['type'] = "number"
 
 
 def change_schedule_compact(schema):
@@ -81,10 +81,12 @@ def change_utility_cost(schema):
 def change_special_cased_name_fields(schema):
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
-    schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('zone_terminal_unit_name')
     del schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
+    schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['name'] = \
+         schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('zone_terminal_unit_name')
 
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
-    schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('heat_pump_name')
     del schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
+    schema['properties']['AirConditioner:VariableRefrigerantFlow']['name'] = \
+        schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('heat_pump_name')
