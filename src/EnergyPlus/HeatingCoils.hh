@@ -132,9 +132,9 @@ namespace HeatingCoils {
 		Real64 OutletAirEnthalpy;
 		Real64 HeatingCoilLoad; // Total Load on the Coil [J]
 		Real64 HeatingCoilRate; // Total Coil Rate on the Coil [W]
-		Real64 GasUseLoad; // Gas Usage of Coil [J]
+		Real64 FuelUseLoad; // Gas Usage of Coil [J]
 		Real64 ElecUseLoad; // Electric Usage of Coil [J]
-		Real64 GasUseRate; // Gas Usage of Coil [W]
+		Real64 FuelUseRate; // Gas Usage of Coil [W]
 		Real64 ElecUseRate; // Electric Usage of Coil [W]
 		Real64 Efficiency; // HeatingCoil Efficiency Value
 		Real64 NominalCapacity; // Nominal Capacity of Coil [W]
@@ -187,9 +187,9 @@ namespace HeatingCoils {
 			OutletAirEnthalpy( 0.0 ),
 			HeatingCoilLoad( 0.0 ),
 			HeatingCoilRate( 0.0 ),
-			GasUseLoad( 0.0 ),
+			FuelUseLoad( 0.0 ),
 			ElecUseLoad( 0.0 ),
-			GasUseRate( 0.0 ),
+			FuelUseRate( 0.0 ),
 			ElecUseRate( 0.0 ),
 			Efficiency( 0.0 ),
 			NominalCapacity( 0.0 ),

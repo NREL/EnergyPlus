@@ -500,7 +500,7 @@ namespace PackagedTerminalHeatPump {
 
 		if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 			{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).ACHeatCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				PTUnit( PTUnitNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
 			} else if ( ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) {
 				PTUnit( PTUnitNum ).ElecPower = FanElecPower + DXElecCoolingPower;
@@ -963,7 +963,7 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).SuppHeatCoilType = SuppHeatCoilType;
 				if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) || SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 					if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) ) {
-						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGas;
+						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingFuel;
 					} else if ( SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingElectric;
 					}
@@ -1499,7 +1499,7 @@ namespace PackagedTerminalHeatPump {
 			if ( SameString( Alphas( 9 ), "Coil:Heating:Gas" ) || SameString( Alphas( 9 ), "Coil:Heating:Electric" ) || SameString( Alphas( 9 ), "Coil:Heating:Water" ) || SameString( Alphas( 9 ), "Coil:Heating:Steam" ) ) {
 				PTUnit( PTUnitNum ).ACHeatCoilType = Alphas( 9 );
 				if ( SameString( Alphas( 9 ), "Coil:Heating:Gas" ) || SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) {
-					if ( SameString( Alphas( 9 ), "Coil:Heating:Gas" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingGas;
+					if ( SameString( Alphas( 9 ), "Coil:Heating:Gas" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingFuel;
 					if ( SameString( Alphas( 9 ), "Coil:Heating:Electric" ) ) PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingElectric;
 					PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, ACHeatCoilName, ErrorsFound );
 					errFlag = false;
@@ -2120,7 +2120,7 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).SuppHeatCoilType = SuppHeatCoilType;
 				if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) || SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 					if ( SameString( Alphas( 13 ), "Coil:Heating:Gas" ) ) {
-						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingGas;
+						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingFuel;
 					} else if ( SameString( Alphas( 13 ), "Coil:Heating:Electric" ) ) {
 						PTUnit( PTUnitNum ).SuppHeatCoilType_Num = Coil_HeatingElectric;
 					}
@@ -2656,7 +2656,7 @@ namespace PackagedTerminalHeatPump {
 
 			//Set the heatpump design supplemental heating capacity
 			//  Get from coil module.
-			if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingElectric ) {
+			if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingFuel || PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingElectric ) {
 				errFlag = false;
 				PTUnit( PTUnitNum ).DesignSuppHeatingCapacity = GetHeatingCoilCapacity( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {
@@ -3251,7 +3251,7 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		if ( PTUnit( PTUnitNum ).ACHeatCoilCap == AutoSize ) {
-			if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas ) {
+			if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingFuel ) {
 				PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
 			} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 				PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
@@ -4243,7 +4243,7 @@ namespace PackagedTerminalHeatPump {
 				// If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
 				SupHeaterLoad = 0.0;
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -4433,7 +4433,7 @@ namespace PackagedTerminalHeatPump {
 		if ( HeatingLoad ) {
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				QCoilReq = PTUnit( PTUnitNum ).ACHeatCoilCap * PartLoadFrac;
-				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex, QActual, False, OpMode, PartLoadFrac );
 				} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 					//       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
@@ -4476,7 +4476,7 @@ namespace PackagedTerminalHeatPump {
 			//   heating coil is off
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				QCoilReq = 0.0;
-				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex );
 				} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -4508,7 +4508,7 @@ namespace PackagedTerminalHeatPump {
 		if ( PTUnit( PTUnitNum ).SuppHeatCoilIndex > 0 ) {
 			if ( SupHeaterLoad < SmallLoad ) {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, True, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -4521,7 +4521,7 @@ namespace PackagedTerminalHeatPump {
 				}}
 			} else {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, True, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					MaxHotWaterFlow = PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow;
@@ -5905,7 +5905,7 @@ namespace PackagedTerminalHeatPump {
 				// If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
 				SupHeaterLoad = 0.0;
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -6311,7 +6311,7 @@ namespace PackagedTerminalHeatPump {
 			if ( HeatingLoad ) {
 				if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 					QCoilReq = PTUnit( PTUnitNum ).ACHeatCoilCap * PartLoadFrac;
-					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 						SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex, QActual, false, OpMode, PartLoadFrac );
 					} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 						//       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
@@ -6332,7 +6332,7 @@ namespace PackagedTerminalHeatPump {
 				//   heating coil is off
 				if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 					QCoilReq = 0.0;
-					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
+					if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingFuel || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
 						SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex );
 					} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 						mdot = 0.0;
@@ -6357,7 +6357,7 @@ namespace PackagedTerminalHeatPump {
 		if ( PTUnit( PTUnitNum ).SuppHeatCoilIndex > 0 ) {
 			if ( SupHeaterLoad < SmallLoad ) {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, true, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
@@ -6370,7 +6370,7 @@ namespace PackagedTerminalHeatPump {
 				}}
 			} else {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
-				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, true, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					MaxHotWaterFlow = PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow;
