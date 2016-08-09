@@ -296,39 +296,47 @@ The calculation is performed by simulating the sub-components in the order given
 
 From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\) . The subroutine \emph{CalcSeriesPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
-·~~~~~~~~If the unit is scheduled off, the primary and secondary flow rates are set to zero.
-
-·~~~~~~~~If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the constant total air flow input by the user.
-
-·~~~~~~~~If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to the difference between the fixed total air flow rate and the primary air flow rate.
-
-·~~~~~~~~Otherwise, the zone needs cooling and the unit is active.
-
-§~We determine the fan temperature rise: the secondary air flow is set to the max total air flow, primary air flow to zero, and the mixer and fan are simulated. The fan delta T is the difference between the temperature at the fan's outlet node and inlet node.
-
-§~We calculate the unit air outlet temperature needed to meet the zone cooling load: \({T_{out}} = C{p_h} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})\)
-
-§~The temperature needed at the outlet of the mixer is then: \({T_{mix}} = {T_{out}} - \Delta {T_{fan}}\)
-
-§~We can then set the primary air flow rate.
-
-·~~~~~~~~If \({T_{mix}} \le {T_{in,pri}}\) then \({\dot m_{pri}} = {\dot m_{pri,max}}\)
-
-·~~~~~~~~else if \({T_{mix}} \ge {T_{in,pri}}\) and \({T_{mix}} \ge {T_{in,sec}}\) then \({\dot m_{pri}} = {\dot m_{pri,min}}\)
-
-·~~~~~~~~otherwise \({\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})\) , subject to the constraints that the flow rate can't be bigger than the max and min allowed.
+\begin{itemize}
+  \item
+    If the unit is scheduled off, the primary and secondary flow rates are set to zero.
+  \item
+    If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the constant total air flow input by the user.
+  \item
+    If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to the difference between the fixed total air flow rate and the primary air flow rate.
+  \item
+    Otherwise, the zone needs cooling and the unit is active.
+    \begin{itemize}
+      \item 
+        We determine the fan temperature rise: the secondary air flow is set to the max total air flow, primary air flow to zero, and the mixer and fan are simulated. The fan delta T is the difference between the temperature at the fan's outlet node and inlet node.
+      \item
+        We calculate the unit air outlet temperature needed to meet the zone cooling load: \({T_{out}} = C{p_h} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})\)
+      \item
+        The temperature needed at the outlet of the mixer is then: \({T_{mix}} = {T_{out}} - \Delta {T_{fan}}\)
+      \item
+        We can then set the primary air flow rate.
+    \end{itemize}
+  \item
+    If \({T_{mix}} \le {T_{in,pri}}\) then \({\dot m_{pri}} = {\dot m_{pri,max}}\)
+  \item
+    else if \({T_{mix}} \ge {T_{in,pri}}\) and \({T_{mix}} \ge {T_{in,sec}}\) then \({\dot m_{pri}} = {\dot m_{pri,min}}\)
+  \item
+    otherwise \({\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})\), subject to the constraints that the flow rate can't be bigger than the max and min allowed.
+\end{itemize}
 
 The air flow rates are now determined and we can fire the air mixer (Call \emph{SimAir-Mixer}) and fan (Call \emph{SimulateFanComponents}) component simulations. Finally we simulate the heating coil:
 
-·~~~~~~~~for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
+\begin{itemize}
+  \item
+    for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
 
 \begin{equation}
-({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}
+  ({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}
 \end{equation}
 
 to within the heating convergence tolerance.
-
-·~~~~~~~~For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+  \item
+    For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+\end{itemize}
 
 Finally the unit sensible output is calculated:
 
@@ -342,33 +350,40 @@ where \emph{PsyHFnTdb} is the EnergyPlus function giving enthalpy as a function 
 
 From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\) . The subroutine \emph{CalcParallelPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
-·~~~~~~~~If the unit is scheduled off, the primary and secondary flow rates are set to zero.
-
-·~~~~~~~~If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the max secondary air flow input by the user.
-
-·~~~~~~~~If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to max secondary air flow input by the user.
-
-·~~~~~~~~Otherwise, the zone needs cooling and the unit is active.
-
-§~We determine the fan temperature rise: the secondary air flow is set to the max secondary air flow, primary air flow to zero, and the fan and mixer are simulated. The fan delta T is defined as the difference between the temperature at the mixer outlet node and the fan inlet node.
-
-§~Assuming that the fan is off, we calculate the primary air flow needed to meet the cooling demand.
+\begin{itemize}
+  \item
+    If the unit is scheduled off, the primary and secondary flow rates are set to zero.
+  \item
+    If there is no primary air flow (or less than .001 kg/s), the primary air flow is set to zero and the secondary air flow is set to the max secondary air flow input by the user.
+  \item
+    If the zone temperature is in the deadband or the zone load is less than 1 watt or the zone needs heating, the primary air flow rate is set to the minimum flow rate specified by the input and the secondary air flow rate is set to max secondary air flow input by the user.
+  \item
+    Otherwise, the zone needs cooling and the unit is active.
+  \begin{itemize}
+    \item
+      We determine the fan temperature rise: the secondary air flow is set to the max secondary air flow, primary air flow to zero, and the fan and mixer are simulated. The fan delta T is defined as the difference between the temperature at the mixer outlet node and the fan inlet node.
+    \item
+      Assuming that the fan is off, we calculate the primary air flow needed to meet the cooling demand.
 
 \begin{equation}
-{\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
+  {\dot m_{pri}} = {\dot Q_{z,req}}/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
 \end{equation}
 
 The flow rate is constrained to be between the min and max primary air flow rates. If this calculated primary flow rate is greater than the fan-on flow rate, the secondary flow rate is set to zero and we are done. Otherwise, the fan is on and we need to recalculate the primary air flow rate.
 
 \begin{equation}
-{\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
+  {\dot m_{pri}} = ({\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{sec}}\cdot ({T_{in,sec}} + \Delta {T_{fan}} - {T_z}))/({c_{p,air}}\cdot ({T_{in,pri}} - {T_z}))
 \end{equation}
 
 The secondary flow rate is set to the user input fixed flow rate. The primary air flow rate is constrained to be between the min and max primary flow rated.
+  \end{itemize}
+\end{itemize}
 
 The air flow rates are now determined and we can fire the fan (Call \emph{SimulateFanComponents}) and air mixer (Call \emph{SimAirMixer}) component simulations. Finally we simulate the heating coil:
 
-·~~~~~~~~for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
+\begin{itemize}
+  \item
+    for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
 
 \begin{equation}
 ({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}
@@ -376,7 +391,9 @@ The air flow rates are now determined and we can fire the fan (Call \emph{Simula
 
 to within the heating convergence tolerance.
 
-·~~~~~~~~For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+  \item
+    For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+\end{itemize}
 
 Finally the unit sensible output is calculated:
 

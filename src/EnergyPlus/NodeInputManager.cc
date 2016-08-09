@@ -1108,9 +1108,6 @@ namespace NodeInputManager {
 		// Input is the existing node data plus environment variables. Output is
 		// stored in MoreNodeInfo.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutBaroPress;
@@ -1123,7 +1120,6 @@ namespace NodeInputManager {
 		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyTdpFnWPb;
 		using Psychrometrics::PsyCpAirFnWTdb;
-		using DataGlobals::InitConvTemp;
 		using OutputProcessor::ReqReportVariables;
 		using OutputProcessor::ReqRepVars;
 		using OutputProcessor::NumOfReqVariables;
@@ -1136,18 +1132,9 @@ namespace NodeInputManager {
 		using FluidProperties::NumOfGlycols;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMoreNodeInfo" );
 		static std::string const NodeReportingCalc( "NodeReportingCalc:" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iNode; // node loop index
@@ -1171,15 +1158,13 @@ namespace NodeInputManager {
 		Real64 SteamDensity;
 		Real64 EnthSteamInDry;
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
-		//  REAL(r64)     :: rRhoVapor
-		//  INTEGER,save :: Count=0
 		Real64 rho;
 		Real64 Cp;
 		Real64 rhoStd;
 
 		if ( CalcMoreNodeInfoMyOneTimeFlag ) {
 			RhoAirStdInit = StdRhoAir;
-			RhoWaterStdInit = RhoH2O( InitConvTemp );
+			RhoWaterStdInit = RhoH2O( DataGlobals::InitConvTemp );
 			NodeWetBulbRepReq.allocate( NumOfNodes );
 			NodeWetBulbSchedPtr.allocate( NumOfNodes );
 			NodeRelHumidityRepReq.allocate( NumOfNodes );
@@ -1311,7 +1296,7 @@ namespace NodeInputManager {
 					Cp = CPCW( Node( iNode ).Temp );
 				} else {
 					Cp = GetSpecificHeatGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
-					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
+					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], DataGlobals::InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 					rho = GetDensityGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 				}
 

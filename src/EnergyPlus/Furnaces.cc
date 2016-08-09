@@ -4439,7 +4439,7 @@ namespace Furnaces {
 					}
 					Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).HeatingCoilName, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, RoutineName );
 						Furnace( FurnaceNum ).MaxHeatCoilFluidFlow *= rho;
 					}
 				} else if ( Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingSteam ) {
@@ -4479,7 +4479,7 @@ namespace Furnaces {
 					}
 					Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).SuppHeatCoilName, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, CWInitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, RoutineName );
 						Furnace( FurnaceNum ).MaxSuppCoilFluidFlow *= rho;
 					}
 				} else if ( Furnace( FurnaceNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) {
@@ -4514,6 +4514,12 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).MaxCoolAirMassFlow = Furnace( FurnaceNum ).MaxCoolAirVolFlow * StdRhoAir;
 			Furnace( FurnaceNum ).MaxHeatAirMassFlow = Furnace( FurnaceNum ).MaxHeatAirVolFlow * StdRhoAir;
 			Furnace( FurnaceNum ).MaxNoCoolHeatAirMassFlow = Furnace( FurnaceNum ).MaxNoCoolHeatAirVolFlow * StdRhoAir;
+			Furnace( FurnaceNum ).WSHPRuntimeFrac = 0.0;
+			Furnace( FurnaceNum ).CompPartLoadRatio = 0.0;
+			Furnace( FurnaceNum ).CoolingCoilSensDemand = 0.0;
+			Furnace( FurnaceNum ).CoolingCoilLatentDemand = 0.0;
+			Furnace( FurnaceNum ).HeatingCoilSensDemand = 0.0;
+
 			Furnace( FurnaceNum ).SenLoadLoss = 0.0;
 			if ( Furnace( FurnaceNum ).Humidistat ) {
 				Furnace( FurnaceNum ).LatLoadLoss = 0.0;
@@ -4528,7 +4534,7 @@ namespace Furnaces {
 						SimulateWaterCoilComponents( Furnace( FurnaceNum ).HeatingCoilName, FirstHVACIteration, Furnace( FurnaceNum ).HeatingCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).HeatingCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNum ).FluidIndex, RoutineName );
 							Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}
@@ -4553,7 +4559,7 @@ namespace Furnaces {
 						SimulateWaterCoilComponents( Furnace( FurnaceNum ).SuppHeatCoilName, FirstHVACIteration, Furnace( FurnaceNum ).SuppHeatCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).SuppHeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, InitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidName, CWInitConvTemp, PlantLoop( Furnace( FurnaceNum ).LoopNumSupp ).FluidIndex, RoutineName );
 							Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}

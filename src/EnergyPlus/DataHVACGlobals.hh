@@ -123,7 +123,7 @@ namespace DataHVACGlobals {
 	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
 	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
 	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil
-
+	extern int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing; // identifies desiccant performance data face velocity autosisizing input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser

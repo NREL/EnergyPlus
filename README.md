@@ -15,9 +15,9 @@ This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole buildin
 
 EnergyPlus is typically released twice annually, usually in March and September.  It is recommended all use of EnergyPlus is production workflows use these formal, public releases.  Iteration **(pre-)releases** may be created during a development cycle, however users should generally avoid these, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.  If an interim release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will accompany this type of release.
 
-# License & Contributing Development [![](https://img.shields.io/badge/license-BSD--3-orange.svg)](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt)
+# License & Contributing Development [![](https://img.shields.io/badge/license-BSD--3--like-orange.svg)](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt)
 
-EnergyPlus is available under the BSD-3 license.  For more information, check out the [license file](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt).  The EnergyPlus team accepts contributions to EnergyPlus source, utilities, test files, documentation, and other materials distributed with the program.  We are currently refining our contribution policy, so if you are interested in contributing, please start with a ticket on the [Helpdesk](http://energyplus.helpserve.com) to begin the conversation.
+EnergyPlus is available under a BSD-3-like license.  For more information, check out the [license file](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt).  The EnergyPlus team accepts contributions to EnergyPlus source, utilities, test files, documentation, and other materials distributed with the program.  The current EnergyPlus contribution policy is now available on the EnergyPlus [contribution policy page](https://www.energyplus.net/contributing). If you are interested in contributing, please start there, but feel free to reach out to the team.
 
 # Building EnergyPlus [![](https://img.shields.io/badge/dashboard-online-green.svg)](http://nrel.github.io/EnergyPlusBuildResults/)
 

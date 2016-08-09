@@ -87,9 +87,9 @@ TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 	Real64 SourceMassFlowRate = SourceMassFlowRateOrig;
 	Real64 Qheatpump = 0.0;
 	Real64 Qsource = 0.0;
-	
+
 	// Mixed Tank
-	
+
 	// Test case without HPWH
 	WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
 	// Qsource is non zero and calculated relative to the tank setpoint.
@@ -98,7 +98,7 @@ TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 	EXPECT_DOUBLE_EQ(Qheatpump, 0.0);
 	// SourceMassFlowRate is unchanged
 	EXPECT_DOUBLE_EQ(SourceMassFlowRateOrig, SourceMassFlowRate);
-	
+
 	// Test case with HPWH
 	DeltaT = 5.0;
 	WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
@@ -108,7 +108,7 @@ TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 	EXPECT_DOUBLE_EQ(SourceMassFlowRateOrig * Cp * DeltaT, Qheatpump);
 	// SourceMassFlowRate is zero
 	EXPECT_DOUBLE_EQ(SourceMassFlowRate, 0.0);
-	
+
 }
 
 TEST_F( EnergyPlusFixture, WaterThermalTankData_GetDeadBandTemp )
@@ -1035,5 +1035,199 @@ TEST_F( EnergyPlusFixture, HPWHSizing )
 	WaterThermalTanks::SimHeatPumpWaterHeater( "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex );
 	EXPECT_EQ( Fans::Fan( 1 ).MaxAirFlowRate, WaterThermalTanks::HPWaterHeater( 1 ).OperatingAirFlowRate );
 	EXPECT_EQ( Fans::Fan( 1 ).MaxAirFlowRate, DXCoils::DXCoil( 1 ).RatedAirVolFlowRate( 1 ) );
+
+}
+
+TEST_F( EnergyPlusFixture, WaterThermalTank_CalcTempIntegral )
+{
+
+	Real64 Ti = 57.22; // Initial tank temperature (C)
+	Real64 Tf = 52.22; // Final tank temperature (C)
+	Real64 Ta = 19.72; // Ambient environment temperature (C)
+	Real64 T1 = 14.44; // Temperature of flow 1 (C)
+	Real64 T2 = 0.00; // Temperature of flow 2 (C)
+	Real64 m = 148.67; // Mass of tank fluid (kg)
+	Real64 Cp = 4183.9; // Specific heat of fluid (J/kg deltaC)
+	Real64 m1 = 0.06761; // Mass flow rate 1 (kg/s)
+	Real64 m2 = 0.00; // Mass flow rate 2 (kg/s)
+	Real64 UA = 5.0; // Heat loss coefficient to ambient environment (W/deltaC)
+	Real64 Q = 0.0; // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+	Real64 t = 269.2; // Time elapsed from Ti to Tf (s)
+
+	EXPECT_NEAR( 14716.6, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t ), 0.1 );
+
+	EXPECT_NEAR( 0.0, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, 0.0 ), 0.1 ); // elapsed time is zero
+
+	EXPECT_NEAR( 15403.6, WaterThermalTanks::CalcTempIntegral( Ti, Ti, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t ), 0.1 ); // final tank temperature same as initial tank temperature
+
+	EXPECT_NEAR( 15461.9, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, 0., 0., 0., 1000.0, t ), 0.1 ); // UA, m1, m2 all zero, Q = 1000W
+
+	EXPECT_NEAR( 14772.5, WaterThermalTanks::CalcTempIntegral( Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, 1000.0, t ), 0.1 ); // Q = 1000W
+}
+
+TEST_F( EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning )
+{
+	std::string const idf_objects = delimited_string( {
+		"  Schedule:Constant, DummySch, , 1.0;",
+
+		"  WaterHeater:HeatPump:PumpedCondenser,",
+		"    Zone4HeatPumpWaterHeater,!- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    DummySch,                !- Compressor Setpoint Temperature Schedule Name",
+		"    2.0,                     !- Dead Band Temperature Difference {deltaC}",
+		"    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
+		"    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
+		"    autocalculate,           !- Condenser Water Flow Rate {m3/s}",
+		"    autocalculate,           !- Evaporator Air Flow Rate {m3/s}",
+		"    OutdoorAirOnly,          !- Inlet Air Configuration",
+		"    Zone4AirOutletNode,      !- Air Inlet Node Name",
+		"    Zone4AirInletNode,       !- Air Outlet Node Name",
+		"    ,                        !- Outdoor Air Node Name",
+		"    ,                        !- Exhaust Air Node Name",
+		"    ,                        !- Inlet Air Temperature Schedule Name",
+		"    ,                        !- Inlet Air Humidity Schedule Name",
+		"    SPACE4-1,                !- Inlet Air Zone Name",
+		"    WaterHeater:Mixed,       !- Tank Object Type",
+		"    Zone4HPWHTank,           !- Tank Name",
+		"    ,                        !- Tank Use Side Inlet Node Name",
+		"    ,                        !- Tank Use Side Outlet Node Name",
+
+		"    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type",
+		"    Zone4HPWHDXCoil,         !- DX Coil Name",
+		"    5.0,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}",
+		"    ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}",
+		"    Outdoors,                !- Compressor Location",
+		"    ,                        !- Compressor Ambient Temperature Schedule Name",
+		"    Fan:OnOff,               !- Fan Object Type",
+		"    Zone4HPWHFan,            !- Fan Name",
+		"    DrawThrough,             !- Fan Placement",
+		"    15.0,                    !- On Cycle Parasitic Electric Load {W}",
+		"    5.0,                     !- Off Cycle Parasitic Electric Load {W}",
+		"    ;                        !- Parasitic Heat Rejection Location",
+
+		"  WaterHeater:Mixed,",
+		"    Zone4HPWHTank,           !- Name",
+		"    0.3785,                  !- Tank Volume {m3}",
+		"    DummySch,                !- Setpoint Temperature Schedule Name",
+		"    2.0,                     !- Deadband Temperature Difference {deltaC}",
+		"    82.2222,                 !- Maximum Temperature Limit {C}",
+		"    CYCLE,                   !- Heater Control Type",
+		"    5000,                    !- Heater Maximum Capacity {W}",
+		"    0,                       !- Heater Minimum Capacity {W}",
+		"    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}",
+		"    ,                        !- Heater Ignition Delay {s}",
+		"    ELECTRICITY,             !- Heater Fuel Type",
+		"    0.95,                    !- Heater Thermal Efficiency",
+		"    ,                        !- Part Load Factor Curve Name",
+		"    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+		"    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type",
+		"    0,                       !- Off Cycle Parasitic Heat Fraction to Tank",
+		"    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
+		"    ELECTRICITY,             !- On Cycle Parasitic Fuel Type",
+		"    0,                       !- On Cycle Parasitic Heat Fraction to Tank",
+		"    Schedule,                !- Ambient Temperature Indicator",
+		"    DummySch,                !- Ambient Temperature Schedule Name",
+		"    ,                        !- Ambient Temperature Zone Name",
+		"    ,                        !- Ambient Temperature Outdoor Air Node Name",
+		"    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+		"    1.0,                     !- Off Cycle Loss Fraction to Zone",
+		"    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+		"    1.0,                     !- On Cycle Loss Fraction to Zone",
+		"    0.00379,                 !- Peak Use Flow Rate {m3/s}",
+		"    DummySch,                !- Use Flow Rate Fraction Schedule Name",
+		"    ,                        !- Cold Water Supply Temperature Schedule Name",
+		"    ,                        !- Use Side Inlet Node Name",
+		"    ,                        !- Use Side Outlet Node Name",
+		"    ,                        !- Use Side Effectiveness",
+		"    Zone4WaterOutletNode,    !- Source Side Inlet Node Name",
+		"    Zone4WaterInletNode,     !- Source Side Outlet Node Name",
+		"    0.95;                    !- Source Side Effectiveness",
+
+		"  Coil:WaterHeating:AirToWaterHeatPump:Pumped,",
+		"    Zone4HPWHDXCoil,         !- Name",
+		"    4000.0,                  !- Rated Heating Capacity {W}",
+		"    3.2,                     !- Rated COP {W/W}",
+		"    0.6956,                  !- Rated Sensible Heat Ratio",
+		"    29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}",
+		"    22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}",
+		"    55.72,                   !- Rated Condenser Inlet Water Temperature {C}",
+		"    autocalculate,           !- Rated Evaporator Air Flow Rate {m3/s}",
+		"    autocalculate,           !- Rated Condenser Water Flow Rate {m3/s}",
+		"    No,                      !- Evaporator Fan Power Included in Rated COP",
+		"    No,                      !- Condenser Pump Power Included in Rated COP",
+		"    No,                      !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP",
+		"    150.0,                   !- Condenser Water Pump Power {W}",
+		"    0.1,                     !- Fraction of Condenser Pump Heat to Water",
+		"    Zone4AirOutletNode,      !- Evaporator Air Inlet Node Name",
+		"    Zone4DXCoilAirOutletNode,!- Evaporator Air Outlet Node Name",
+		"    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
+		"    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
+		"    100.0,                   !- Crankcase Heater Capacity {W}",
+		"    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
+		"    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
+		"    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
+		"    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name",
+		"    ,                        !- Heating Capacity Function of Water Flow Fraction Curve Name",
+		"    HPWHHeatingCapFTemp,     !- Heating COP Function of Temperature Curve Name",
+		"    ,                        !- Heating COP Function of Air Flow Fraction Curve Name",
+		"    ,                        !- Heating COP Function of Water Flow Fraction Curve Name",
+		"    HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name",
+
+		"  Fan:OnOff,",
+		"    Zone4HPWHFan,            !- Name",
+		"    ,  !- Availability Schedule Name",
+		"    0.7,                     !- Fan Total Efficiency",
+		"    100.0,                   !- Pressure Rise {Pa}",
+		"    0.2685,                  !- Maximum Flow Rate {m3/s}",
+		"    0.9,                     !- Motor Efficiency",
+		"    1.0,                     !- Motor In Airstream Fraction",
+		"    Zone4DXCoilAirOutletNode,!- Air Inlet Node Name",
+		"    Zone4AirInletNode;       !- Air Outlet Node Name",
+
+		"  Curve:Biquadratic,",
+		"    HPWHHeatingCapFTemp,     !- Name",
+		"    0.369827,                !- Coefficient1 Constant",
+		"    0.043341,                !- Coefficient2 x",
+		"    -0.00023,                !- Coefficient3 x**2",
+		"    0.000466,                !- Coefficient4 y",
+		"    0.000026,                !- Coefficient5 y**2",
+		"    -0.00027,                !- Coefficient6 x*y",
+		"    0.0,                     !- Minimum Value of x",
+		"    40.0,                    !- Maximum Value of x",
+		"    20.0,                    !- Minimum Value of y",
+		"    90.0,                    !- Maximum Value of y",
+		"    ,                        !- Minimum Curve Output",
+		"    ,                        !- Maximum Curve Output",
+		"    Temperature,             !- Input Unit Type for X",
+		"    Temperature,             !- Input Unit Type for Y",
+		"    Dimensionless;           !- Output Unit Type",
+
+		"  Curve:Quadratic,",
+		"    HPWHPLFFPLR,             !- Name",
+		"    0.75,                    !- Coefficient1 Constant",
+		"    0.25,                    !- Coefficient2 x",
+		"    0.0,                     !- Coefficient3 x**2",
+		"    0.0,                     !- Minimum Value of x",
+		"    1.0;                     !- Maximum Value of x",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	bool ErrorsFound = false;
+	ASSERT_FALSE( ErrorsFound );
+	EXPECT_TRUE( WaterThermalTanks::GetWaterThermalTankInputData( ErrorsFound ) );
+	ASSERT_TRUE( ErrorsFound );
+
+	std::string const error_string = delimited_string( {
+		"   ** Severe  ** WaterHeater:HeatPump:PumpedCondenser=\"ZONE4HEATPUMPWATERHEATER\":",
+		"   **   ~~~   ** When Inlet Air Configuration=\"OUTDOORAIRONLY\".",
+		"   **   ~~~   ** Outdoor Air Node Name and Exhaust Air Node Name must be specified.",
+		"   ** Severe  ** WaterHeater:HeatPump:PumpedCondenser=\"ZONE4HEATPUMPWATERHEATER\":",
+		"   **   ~~~   ** Heat pump water heater fan outlet node name does not match next connected component.",
+		"   **   ~~~   ** Fan outlet node name = ZONE4AIRINLETNODE"
+	} );
+
+	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 }

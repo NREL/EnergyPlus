@@ -266,7 +266,6 @@ namespace HeatBalanceAirManager {
 
 		// FLOW:
 
-		CrossMixingFlag.dimension( NumOfZones, false );
 		GetAirFlowFlag( ErrorsFound );
 
 		SetZoneMassConservationFlag();
@@ -474,11 +473,7 @@ namespace HeatBalanceAirManager {
 		int i;
 		int Loop;
 		int Loop1;
-		int JDay;
-		int Hr;
 		Array1D_bool RepVarSet;
-		Array1D_bool OverLap;
-		int TS;
 		bool IsNotOK;
 		bool IsBlank;
 		int ZoneNum;
@@ -1953,8 +1948,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( Mixing( Loop ).ZonePtr ) ) {
 					RepVarSet( Mixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
@@ -2276,8 +2271,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( CrossMixing( Loop ).ZonePtr ) ) {
 					RepVarSet( CrossMixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
@@ -2288,53 +2283,28 @@ namespace HeatBalanceAirManager {
 					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 				}
 			}
+			if ( CrossMixing( Loop ).FromZone > 0 ) {
+				if ( RepVarSet( CrossMixing( Loop ).FromZone ) ) {
+					RepVarSet( CrossMixing( Loop ).FromZone ) = false;
+					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+				}
+			}
+
+
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "ZoneCrossMixing", CrossMixing( Loop ).Name, "Air Exchange Flow Rate", "[m3/s]", CrossMixing( Loop ).EMSSimpleMixingOn, CrossMixing( Loop ).EMSimpleMixingFlowRate );
 			}
 
-		}
-
-		// Detect invalid Crossmixings
-		if ( TotCrossMixing > 1 && ! ErrorsFound ) {
-			SVals1.allocate( NumOfTimeStepInHour, 24 );
-			SVals1 = 0.0;
-			SVals2.allocate( NumOfTimeStepInHour, 24 );
-			SVals2 = 0.0;
-			OverLap.dimension( TotCrossMixing, false );
-			for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
-				for ( Loop1 = 1; Loop1 <= TotCrossMixing; ++Loop1 ) {
-
-					if ( Loop == Loop1 ) continue;
-
-					if ( CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).FromZone && CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).ZonePtr ) continue; // Reciprocal cross mixing is OK
-
-					if ( ! ( CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).ZonePtr || CrossMixing( Loop ).ZonePtr == CrossMixing( Loop1 ).FromZone || CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).FromZone || CrossMixing( Loop ).FromZone == CrossMixing( Loop1 ).ZonePtr ) ) continue; // Any other overlap is not OK | if the schedules overlap
-
-					for ( JDay = 1; JDay <= 366; ++JDay ) {
-						GetScheduleValuesForDay( CrossMixing( Loop ).SchedPtr, SVals1, JDay );
-						if ( ! any_gt( SVals1, 0.0 ) ) continue;
-						GetScheduleValuesForDay( CrossMixing( Loop1 ).SchedPtr, SVals2, JDay );
-						if ( ! any_gt( SVals2, 0.0 ) ) continue;
-						if ( OverLap( Loop ) && OverLap( Loop1 ) ) continue; // Already problem for these Cross Mixings
-						for ( Hr = 1; Hr <= 24; ++Hr ) {
-							for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-								if ( SVals1( TS, Hr ) == 0.0 || SVals2( TS, Hr ) == 0.0 ) continue;
-								ShowSevereError( RoutineName + "Overlapping Cross Mixings found" );
-								ShowContinueError( "Cross Mixing with receiving zone " + Zone( CrossMixing( Loop ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop ).FromZone ).Name );
-								ShowContinueError( "overlaps with Cross Mixing with receiving zone " + Zone( CrossMixing( Loop1 ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop1 ).FromZone ).Name );
-								OverLap( Loop ) = true;
-								OverLap( Loop1 ) = true;
-								ErrorsFound = true;
-								goto HrLoop_exit;
-							}
-						}
-						HrLoop_exit: ;
-					}
-				}
-			}
-			SVals1.deallocate();
-			SVals2.deallocate();
-			OverLap.deallocate();
 		}
 
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
@@ -2513,8 +2483,8 @@ namespace HeatBalanceAirManager {
 					if ( RepVarSet( ZoneNumA ) ) {
 						RepVarSet( ZoneNumA ) = false;
 						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumA ).MixVolume, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumA ).MixMass, "System", "Sum", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumA ).MixMdot, "System", "Average", Zone( ZoneNumA ).Name );
 						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumA ).MixHeatLoss, "System", "Sum", Zone( ZoneNumA ).Name );
@@ -2533,8 +2503,8 @@ namespace HeatBalanceAirManager {
 					if ( RepVarSet( ZoneNumB ) ) {
 						RepVarSet( ZoneNumB ) = false;
 						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumB ).MixVolume, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumB ).MixMass, "System", "Sum", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumB ).MixMdot, "System", "Average", Zone( ZoneNumB ).Name );
 						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumB ).MixHeatLoss, "System", "Sum", Zone( ZoneNumB ).Name );
@@ -2795,18 +2765,18 @@ namespace HeatBalanceAirManager {
 			}
 			// Set up zone air mass balance output variables
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
 				if ( ZoneAirMassFlow.BalanceMixing && ( ( MassConservation( ZoneNum ).NumSourceZonesMixingObject + MassConservation( ZoneNum ).NumReceivingZonesMixingObject ) > 0 ) ) {
-					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
 				}
 				if ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) {
 					if ( ZoneAirMassFlow.InfiltrationZoneType == AllZones || (MassConservation( ZoneNum ).NumSourceZonesMixingObject > 0 ) ) {
 						if ( MassConservation( ZoneNum ).InfiltrationPtr > 0 ) {
-							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]", MassConservation( Infiltration( Loop ).ZonePtr ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status []", MassConservation( Mixing( Loop ).ZonePtr ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status []", MassConservation( ZoneNum ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
 						}
 					}
 				}
@@ -3063,8 +3033,6 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   February 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for  initializations within the
@@ -3073,42 +3041,6 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool FirstCall( true );
-
-		// FLOW:
-
-		// Do the Begin Simulation initializations
-		if ( FirstCall ) {
-			AllocateAirHeatBalArrays(); // Allocate the Module Arrays
-			FirstCall = false;
-		}
-
-		// Do the Begin Environment initializations
-		if ( BeginEnvrnFlag ) {
-			MVFC = 0.0;
-			MTC = 0.0;
-		}
-
 		// Do the Begin Day initializations
 		if ( BeginDayFlag ) {
 
@@ -3116,50 +3048,6 @@ namespace HeatBalanceAirManager {
 
 		// Do the following initializations (every time step):
 		InitSimpleMixingConvectiveHeatGains();
-
-	}
-
-	void
-	AllocateAirHeatBalArrays()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Liesen
-		//       DATE WRITTEN   February 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine allocates the arrays at execution time
-
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger variable allocation.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// FLOW:
-
-		// Use the total number of zones to allocate variables to avoid a zone number limit
-		MVFC.dimension( NumOfZones, 0.0 );
-		MTC.dimension( NumOfZones, 0.0 );
 
 	}
 
@@ -3211,10 +3099,6 @@ namespace HeatBalanceAirManager {
 		Real64 ZoneMixingFlowSum;  // sum of zone mixing flows for a zone
 		int NumOfMixingObjects;    // number of mixing objects for a receiving zone
 
-		//  Zero out time step variables
-		MTC = 0.0;
-		MVFC = 0.0;
-
 		// Select type of airflow calculation
 
 		{ auto const SELECT_CASE_var( AirFlowFlag );
@@ -3250,8 +3134,6 @@ namespace HeatBalanceAirManager {
 				NZ = CrossMixing( Loop ).ZonePtr;
 				CrossMixing( Loop ).DesiredAirFlowRate = CrossMixing( Loop ).DesignLevel * GetCurrentScheduleValue( CrossMixing( Loop ).SchedPtr );
 				if ( CrossMixing( Loop ).EMSSimpleMixingOn ) CrossMixing( Loop ).DesiredAirFlowRate = CrossMixing( Loop ).EMSimpleMixingFlowRate;
-				MTC( Loop ) = CrossMixing( Loop ).DeltaTemperature;
-				MVFC( Loop ) = CrossMixing( Loop ).DesiredAirFlowRate;
 			}
 
 			//Note - do each Pair a Single time, so must do increment reports for both zones

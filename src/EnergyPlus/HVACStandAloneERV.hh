@@ -180,7 +180,7 @@ namespace HVACStandAloneERV {
 			ExhaustAirFanType_Num( 0 ),
 			SupplyAirVolFlow( 0.0 ),
 			ExhaustAirVolFlow( 0.0 ),
-			ControllerNameDefined( true ),
+			ControllerNameDefined( false ),
 			ControlledZoneNum( 0 ),
 			ControllerIndex( 0 ),
 			MaxSupAirMassFlow( 0.0 ),
