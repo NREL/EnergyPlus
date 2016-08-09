@@ -132,8 +132,8 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
 				continue;
 			}
-			json obj_loc = schema[ "properties" ][ obj_name ];
-			json loc = obj_loc[ "legacy_idd" ];
+			json const &obj_loc = schema[ "properties" ][ obj_name ];
+			json const &loc = obj_loc[ "legacy_idd" ];
 			json obj = parse_object( idf, index, success, loc, obj_loc );
 			if ( !success ) print_out_line_error( idf, true );
 			u64toa( root[ obj_name ].size() + 1, s );
@@ -257,19 +257,19 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 
 void IdfParser::add_missing_field_value( std::string & field_name, json & root, json & extensible, json const & obj_loc,
                                          json const & loc, int legacy_idd_index ) {
-	json tmp;
+	json const * tmp;
 	int ext_size = 0;
 	if ( obj_loc.find( "patternProperties" ) != obj_loc.end() ) {
-		tmp = obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
+		tmp = & obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
 	} else if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
-		tmp = obj_loc[ "properties" ][ field_name ];
+		tmp = & obj_loc[ "properties" ][ field_name ];
 	}
 	if ( legacy_idd_index >= loc[ "fields" ].size() ) {
-		tmp = tmp[ "extensions" ][ "items" ][ "properties" ];
+		tmp = & tmp->at( "extensions" )[ "items" ][ "properties" ];
 		ext_size = static_cast<int>(loc[ "extensibles" ].size());
 	}
-	if ( tmp.find( field_name ) != tmp.end() ) {
-		auto const obj_field = tmp[ field_name ];
+	if ( tmp->find( field_name ) != tmp->end() ) {
+		auto const obj_field = tmp->at( field_name );
 		if ( !ext_size ) {
 			root[ field_name ] = "";
 		} else {
