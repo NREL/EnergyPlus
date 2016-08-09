@@ -39,7 +39,7 @@ A unique identifying name for each coil.
 
 #### Field: Fuel Type
 
-
+This field designates the appropriate fuel type for the coil. Valid fuel types are: PropaneGas, FuelOil#1, FuelOil#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. 
 
 #### Field: Availability Schedule Name
 
