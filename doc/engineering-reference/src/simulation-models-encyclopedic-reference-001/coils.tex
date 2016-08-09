@@ -6707,7 +6707,7 @@ Keith C. Rice, 2011, DOE/ORNL Heat Pump Design Model:
 
 S.A. Klein 2011, User Manual of Engineering Equation Solver V8
 
-\subsubsection{Secondary Coils of DX Systems and Heat Pumps}\label{secondary-coils-of-dx-systems-and-heat-pumps}
+\subsection{Secondary Coils of DX Systems and Heat Pumps}\label{secondary-coils-of-dx-systems-and-heat-pumps}
 
 \subsubsection{Overview}\label{overview-15}
 
@@ -6728,7 +6728,7 @@ The secondary coil performance calculation is invoked using inputs in the DX coi
 \textbf{Cooling Operating Mode:} the primary DX cooling coil of a DX system serving a primary zone is on and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects. This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. The heat rejected by the secondary coil (condenser) of a DX system or heat pump operating in cooling mode is given by:
 
 \begin{equation}
-  Q_{cond} = Q_{Evap}+P_{CompCondFan}
+  Q_{Cond} = Q_{Evap}+P_{CompCondFan}
 \end{equation}
 
 where
@@ -6736,11 +6736,11 @@ where
 \begin{itemize}
 \tightlist
 \item
-  \(Q\_\rm{Evap}\) is the cooling load delivered by the primary DX cooling coil system, W 
+  \(Q_{Evap}\) is the cooling load delivered by the primary DX cooling coil system, W 
 \item
-  \(P\_\rm{CompCondFan}\) is the compressor and evaporator fan electric power input of a heat pump in heating mode, W
+  \(P_{CompCondFan}\) is the compressor and evaporator fan electric power input of a heat pump in heating mode, W
 \item
-  \(Q\_\rm{cond}\) is the heat rejected by the secondary coil (condenser) of a DX system or heat pump, W
+  \(Q_{Cond}\) is the heat rejected by the secondary coil (condenser) of a DX system or heat pump, W
 \end{itemize}
 
 Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in \protect\hyperlink{SchematicDXAndSecondary}{Figure}. Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked. New input field required as add-on to the DX cooling coil objects is ``\emph{Zone Name for Secondary Coil (condenser) Placement}''.
@@ -6754,7 +6754,7 @@ Heat rejected by a secondary coil (condenser) calculated at each time step becom
 \textbf{Heating Operating Mode:} When a heat pump operates in heating mode then energy is extracted from the secondary zone. The total energy extracted is estimated by rearranging the equation above as follows:
 
 \begin{equation}
-Q_\text{Evap} = Q_\text{cond} - P_\text{CompCondFan}
+Q_{Evap} = Q_{Cond} - P_{CompCondFan}
 \end{equation}
 
 where
@@ -6762,11 +6762,11 @@ where
 \begin{itemize}
 \tightlist
 \item
-  (Q\_\text{cond}) is the heat delivered by the primary heating DX coil to the primary zone, W
+  \(Q_{Cond}\) is the heat delivered by the primary heating DX coil to the primary zone, W
 \item
-  (P\_\text{CompCondFan}) is the compressor and condenser fan electric power input of a DX system or heat pump in cooling mode, W
+  \(P_{CompCondFan}\) is the compressor and condenser fan electric power input of a DX system or heat pump in cooling mode, W
 \item
-  (Q\_\text{Evap}) is the energy extracted by secondary coil (evaporator) from the secondary zone, W
+  \(Q_{Evap}\) is the energy extracted by secondary coil (evaporator) from the secondary zone, W
 \end{itemize}
 
 The total energy extracted from a secondary zone may contain sensible and latent components. The secondary coil model checks for the coil inlet and full load outlet air condition to determine whether dehumidification will occur. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and the secondary air flow fraction. If the secondary coil operation is dry, then the SHR is set to 1.0. In addition, the model assumes that defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to outside. Thus defrosting energy is not included in the zone energy balance. The heat extracted from the secondary zone may contain sensible and latent components and the secondary coil model does the sensible/latent heat split calculation.
@@ -6776,7 +6776,7 @@ The total energy extracted from a secondary zone may contain sensible and latent
 The SHR calculation method uses user specified SHR modifying curves for temperature and flow fraction. The modifying curves correct the rated SHR value for a given secondary DX coil (evaporator) entering air temperatures and air mass flow fraction for a given speed. If these SHR modifying curves are not specified a constant SHR will be assumed. These two curves are a biquadratic SHR modifier curve for temperature (SHRFT), and a quadratic SHR correction curve for flow fraction (SHRFFF). The SHR is given by:
 
 \begin{equation}
-SHR = SHR_\text{rated}\cdot SHRFT\left(T_\text{wb,secondaryZone},T_\text{db,primaryCoil}\right)\cdot SHRFFF(FF)
+SHR = SHR_{rated}\cdot SHRFT\left(T_{wb,secondaryZone},T_{db,primaryCoil}\right)\cdot SHRFFF(FF)
 \end{equation}
 
 where
@@ -6784,11 +6784,13 @@ where
 \begin{itemize}
 \tightlist
 \item
-  (SHRFT) is the sensible heat ratio modifier normalized biquadratic curve as a function of secondary DX coil entering air wet-bulb and primary DX coil entering air dry-bulb temperatures, (-). The secondary DX coil (evaporator) entering air wet-bulb temperature is the secondary zone air wet-bulb temperature.
+  \(SHRFT\) is the sensible heat ratio modifier normalized biquadratic curve as a function of secondary DX coil entering air wet-bulb and primary DX coil entering air dry-bulb temperature. The secondary DX coil (evaporator) entering air wet-bulb temperature is the secondary zone air wet-bulb temperature.
 \item
-  (SHRFFF) is the sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction. Flow fraction is the ratio of actual to rated mass flow rate of air through the secondary DX coil, (-).
+  \(SHRFFF\) is the sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction. 
 \item
-  (SHR\_\text{rated}) is the sensible heat ratio at rated condition, (-).
+  \(FF\), flow fraction,  is the ratio of actual to rated mass flow rate of air through the secondary DX coil.
+\item
+  \(SHR_{rated}\) is the sensible heat ratio at rated conditions.
 \end{itemize}
 
 For multispeed secondary DX coils when the system is cycling between two speeds of \emph{n} and \emph{n}-1 the operating SHR is weighted using \emph{SpeedRatio} as follows:
@@ -6802,11 +6804,11 @@ where
 \begin{itemize}
 \tightlist
 \item
-  (SHR\_n) is the sensible heat ratio at speed n determined from user specified rated SHR, and SHR modifier curves at speed \emph{n}, (-)
+  \(SHR_n\) is the sensible heat ratio at speed n determined from user specified rated SHR, and SHR modifier curves at speed \emph{n},
 \item
-  (SHR\_\{n-1\}) is the sensible heat ratio at speed \emph{n}-1 determined from user specified rated SHR, and \emph{SHR} modifier curves at speed \emph{n}-1, (-).
+  \(SHR_{n-1}\) is the sensible heat ratio at speed \emph{n}-1 determined from user specified rated SHR, and \emph{SHR} modifier curves at speed \emph{n}-1,
 \item
-  \emph{SpeedRatio} is a parameter that relates performance between successive compressor speeds, (-).
+  \(SpeedRatio\) is a parameter that relates performance between successive compressor speeds,
 \end{itemize}
 
 \subsubsection{Sensible and Latent Split}\label{sensible-and-latent-split}
@@ -6814,54 +6816,69 @@ where
 The air enthalpy difference across the secondary DX coil (evaporator) at full load is given by:
 
 \begin{equation}
-h_\text{Delta} = \frac{\left(Q_\text{Evap}/PLR\right)}{\dot{m}_\text{cond}}
+  h_{Delta} = \frac{\left(Q_{Evap}/PLR\right)}{\dot{m}_{Cond}}
 \end{equation}
 
 The coil outlet enthalpy is calculated as follows:
 
 \begin{equation}
-h_\text{Outlet} = h_\text{Inlet}-h_\text{Delta}
+  h_{Outlet} = h_{Inlet}-h_{Delta}
 \end{equation}
 
-Using the SHR calculated above and secondary DX coil outlet temperature is given by:
+Using the SHR calculated above, the secondary DX coil outlet humidity ratio and dry-bulb temperature are given by:
 
 \begin{equation}
-T_\text{OutletNode} = T_\text{ZoneAirNode} -  \frac{\left(Q_\text{Evap}/PLR\right)\cdot SHR}{\dot{m}_\text{cond}c_p}
+  h_{T_{in},\omega_{out}} = h_{Inlet} - \left(1.0 - SHR\right) \cdot \frac{\left(Q_{Evap}/PLR\right)\cdot SHR}{\dot{m}_{Cond}\cdot c_p}
+\end{equation}
+
+\begin{equation}
+  \omega_{Outlet} = \omega( T_{Inlet}, h_{T_{in},\omega_{out}} )
+\end{equation}
+
+\begin{equation}
+  T_{Outlet} = T( h_{Outlet}, \omega_{Outlet} )
 \end{equation}
 
 Calculate the saturated outlet temperature at the outlet enthalpy and check the secondary outlet air condition if super-saturation has occurred:
 
 \begin{equation}
-T_\text{OutletNode, Sat} = T_\text{SAT}\left(h_\text{Outlet}, P_\text{Tot}\right)
+  T_{Outlet, Sat} = T_{SAT}\left(h_{Outlet}, P_{Tot}\right)
 \end{equation}
 
-IF(\(T_\text{OutletNode} > T_\text{OutletNode, Sat}\)) Then \\
-    \(\omega_\text{OutletNode} > \omega_\text{InletNode}\) \\
-ELSE \\
-    (\(T_\text{OutletNode} = T_\text{OutletNode, Sat}\) \\
-    The coil outlet humidity ratio is determined using psychrometric functions as follows. \\
-    \(\omega_\text{OutletNode} = \omega\left(T_\text{OutletNode,Sat},h_\text{Outlet}\right)\) \\
-ENDIF
+If \(T_{Outlet} \leq T_{Outlet, Sat}\), then
 
-where
+\begin{equation}
+  T_{Outlet} = T_{Outlet, Sat}
+\end{equation}
 
-\(h\_\text{Inlet}\) is the enthalpy of air entering the passive coil (J/kg)
+\begin{equation}
+  \omega_{Outlet} = \omega\left(T_{Outlet,Sat},h_{Outlet}\right)
+\end{equation}
 
-\(h\_\text{Outlet}\) is the enthalpy of air leaving the passive coil, (J/kg) 
+where:
+\begin{itemize}
 
-\(\dot{m}_{\text{sec}}\) is the secondary DX coil mass flow rate, (kg/s) 
+  \item \(h_{Inlet}\) is the enthalpy of air entering the passive coil (J/kg)
 
-PLR is the primary DX cooling coil compressor part-load ratio, (-)
+  \item \(h_{Outlet}\) is the enthalpy of air leaving the passive coil (J/kg) 
 
-\(P_{Tot}\) is the total pressure at the inlet of secondary DX coil, (Pa)
+  \item \(h_{T_{in},\omega_{out}}\) is the enthalpy of air at the leaving humidity ratio and the entering dry bulb temerature
 
-\(T\_\text{OutletNode}\) is the secondary coil outlet air temperature, (degC) 
+  \item \(\dot{m}_{sec}\) is the secondary DX coil mass flow rate (kg/s) 
 
-\(T\_\text{OutletNode,Sat}\) is the secondary coil saturated air temperature at the outlet enthalpy, (degC)
+  \item PLR is the primary DX cooling coil compressor part-load ratio
 
-\(\omega\_\text{InletNode}\) is the secondary coil inlet node air humidity ratio, (kgH2O/kgDryair) 
+  \item \(P_{Tot}\) is the total pressure at the inlet of secondary DX coil (Pa)
 
-\(\omega\_\text{OutletNode}\) is the secondary coil outlet node air humidity ratio, (kgH2O/kgDryair)
+  \item \(T_{Outlet}\) is the secondary coil outlet air temperature (degC) 
+
+  \item \(T_{Outlet,Sat}\) is the secondary coil saturated air temperature at the outlet enthalpy (degC)
+
+  \item \(\omega_{Inlet}\) is the secondary coil inlet node air humidity ratio (kgH2O/kgDryair) 
+
+  \item \(\omega_{Outlet}\) is the secondary coil outlet node air humidity ratio (kgH2O/kgDryair)
+
+\end{itemize}
 
 Reference: Dixon, Erin Elizabeth, ``Energy Model Development and Heating Energy Investigation of the Nested Thermal Envelope Design (NTED (tm))'' (2010). Theses and dissertations. Paper 974.
 
