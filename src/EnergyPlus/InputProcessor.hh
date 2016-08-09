@@ -109,6 +109,7 @@ private:
 	size_t cur_line_num = 1;
 	size_t index_into_cur_line = 0;
 	size_t beginning_of_line_index = 0;
+	char s[ 129 ];
 };
 
 class State {
@@ -123,6 +124,7 @@ class State {
 	unsigned cur_obj_count = 0;
 	bool is_in_extensibles = false, does_key_exist = true, need_new_object_name = true;
 	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
+	char s[ 129 ];
 
 public:
 	void initialize( json & parsed_schema );
@@ -169,6 +171,9 @@ public:
 namespace EnergyPlus {
 
 	class InputProcessor {
+	private:
+		static char s[ 129 ];
+
 	public:
 		static IdfParser idf_parser;
 		static State state;

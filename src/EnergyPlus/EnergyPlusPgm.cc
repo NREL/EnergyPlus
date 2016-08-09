@@ -267,7 +267,7 @@ EnergyPlusPgm( std::string const & filepath )
 	using DataEnvironment::IgnoreDiffuseRadiation;
 	// routine modules
 	using namespace FileSystem;
-		using namespace OutputProcessor;
+	using namespace OutputProcessor;
 	using namespace SimulationManager;
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;

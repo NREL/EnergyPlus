@@ -18,6 +18,8 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
+#include <milo/dtoa.hpp>
+#include <milo/itoa.hpp>
 
 using json = nlohmann::json;
 #include <iomanip>
@@ -26,6 +28,7 @@ json EnergyPlus::InputProcessor::jdf = json();
 json EnergyPlus::InputProcessor::schema = json();
 IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
 State EnergyPlus::InputProcessor::state = State();
+char EnergyPlus::InputProcessor::s[] = { 0 };
 std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
@@ -44,6 +47,9 @@ json IdfParser::decode( std::string const & idf, json const & schema, bool & suc
 }
 
 std::string IdfParser::encode( json const & root, json const & schema ) {
+	std::string end_of_field( "," + EnergyPlus::DataStringGlobals::NL + "  " );
+	std::string end_of_object( ";" + EnergyPlus::DataStringGlobals::NL + EnergyPlus::DataStringGlobals::NL );
+
 	std::string encoded;
 
 	for ( auto obj = root.begin(); obj != root.end(); ++obj ) {
@@ -54,28 +60,24 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 			for ( int i = 0; i < legacy_idd.size(); i++ ) {
 				std::string entry = legacy_idd[ i ];
 				if ( obj_in.value().find( entry ) == obj_in.value().end() ) {
-					if ( entry == "name" ) encoded += ",\n  " + obj_in.key();
+					if ( entry == "name" ) encoded += end_of_field + obj_in.key();
 					else skipped_fields++;
 					continue;
 				}
 				for ( int j = 0; j < skipped_fields; j++ ) encoded += ",\n  ";
 				skipped_fields = 0;
-				encoded += ",\n  ";
+				encoded += end_of_field;
 				auto const & val = obj_in.value()[ entry ];
 				if ( val.is_string() ) {
 					encoded += val.get < std::string >();
 				} else {
-					std::stringstream ss;
-					ss.clear();
-					ss.str("");
-					ss << std::setprecision(15) << std::fixed << val.get < double >();
-					encoded += ss.str();
-//					encoded += std::to_string( val.get < double >() );
+					dtoa( val.get < double >(), s );
+					encoded += s;
 				}
 			}
 
 			if ( obj_in.value().find( "extensions" ) == obj_in.value().end() ) {
-				encoded += ";\n\n";
+				encoded += end_of_object;
 				continue;
 			}
 
@@ -89,22 +91,18 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 						skipped_fields++;
 						continue;
 					}
-					for ( int j = 0; j < skipped_fields; j++ ) encoded += ",\n  ";
+					for ( int j = 0; j < skipped_fields; j++ ) encoded += end_of_field;
 					skipped_fields = 0;
-					encoded += ",\n  ";
+					encoded += end_of_field;
 					if ( cur_extension_obj[ tmp ].is_string() ) {
 						encoded += cur_extension_obj[ tmp ];
 					} else {
-//						encoded += std::to_string( cur_extension_obj[ tmp ].get < double >() );
-						std::stringstream ss;
-						ss.clear();
-						ss.str("");
-						ss << std::setprecision(15) << std::fixed << cur_extension_obj[ tmp ].get < double >();
-						encoded += ss.str();
+						dtoa( cur_extension_obj[ tmp ].get < double >(), s );
+						encoded += s;
 					}
 				}
 			}
-			encoded += ";\n\n";
+			encoded += end_of_object;
 		}
 	}
 	return encoded;
@@ -138,15 +136,13 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			json loc = obj_loc[ "legacy_idd" ];
 			json obj = parse_object( idf, index, success, loc, obj_loc );
 			if ( !success ) print_out_line_error( idf, true );
-			std::string name = "";
+			u64toa( root[ obj_name ].size() + 1, s );
+			std::string name = obj_name + " " + s;
 			if ( !obj.is_null() ) {
 				if ( obj.find( "name" ) != obj.end() ) {
 					name = obj[ "name" ].get < std::string >();
 					obj.erase( "name" );
 				}
-			}
-			if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
-                name = obj_name + " " + std::to_string( root[ obj_name ].size() + 1 );
 			}
 			root[ obj_name ][ name ] = obj;
 		}
@@ -593,11 +589,11 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				cur_obj_count = 0;
 				need_new_object_name = false;
 				if ( cur_obj_name.find( "Parametric:" ) != std::string::npos ) {
-					errors.push_back( "You must run Parametric Preprocesor for \"" + cur_obj_name + "\" at line " +
-					                  std::to_string( line_num + 1 ) );
+					u64toa( line_num + 1, s );
+					errors.push_back( "You must run Parametric Preprocesor for \"" + cur_obj_name + "\" at line " + s );
 				} else if ( cur_obj_name.find( "Template" ) != std::string::npos ) {
-					errors.push_back( "You must run the ExpandObjects program for \"" + cur_obj_name + "\" at line " +
-					                  std::to_string( line_num + 1 ) );
+					u64toa( line_num + 1, s );
+					errors.push_back( "You must run the ExpandObjects program for \"" + cur_obj_name + "\" at line " + s );
 				}
 			}
 
@@ -605,9 +601,11 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				if ( stack.back().find( key ) != stack.back().end() ) {
 					stack.push_back( stack.back()[ key ] );
 				} else {
+					u64toa( line_num, s );
+					std::string lin_num( s );
+					u64toa( line_index, s );
 					errors.push_back( "Key \"" + key + "\" in object \"" + cur_obj_name + "\" at line "
-					                  + std::to_string( line_num ) + " (index " + std::to_string( line_index ) +
-					                  ") not found in schema" );
+					                  + lin_num + " (index " + s + ") not found in schema" );
 					does_key_exist = false;
 				}
 			}
@@ -652,10 +650,12 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 			if ( is_in_extensibles ) {
 				for ( auto & it : extensible_required ) {
 					if ( !it.second ) {
+						u64toa( line_num, s );
+						std::string lin_num( s );
+						u64toa( line_index, s );
 						errors.push_back(
 						"Required extensible field \"" + it.first + "\" in object \"" + cur_obj_name
-						+ "\" ending at line " + std::to_string( line_num ) + " (index "
-						+ std::to_string( line_index ) + ") was not provided" );
+						+ "\" ending at line " + lin_num + " (index " + s + ") was not provided" );
 					}
 					it.second = false;
 				}
@@ -663,10 +663,12 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				cur_obj_count++;
 				for ( auto & it : obj_required ) {
 					if ( !it.second ) {
+						u64toa( line_num, s );
+						std::string lin_num( s );
+						u64toa( line_index, s );
 						errors.push_back(
 						"Required field \"" + it.first + "\" in object \"" + cur_obj_name
-						+ "\" ending at line " + std::to_string( line_num ) + " (index "
-						+ std::to_string( line_index ) + ") was not provided" );
+						+ "\" ending at line " + lin_num + " (index " + s + ") was not provided" );
 					}
 					it.second = false;
 				}
@@ -675,15 +677,15 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				const auto & loc = stack.back();
 				if ( loc.find( "minProperties" ) != loc.end() &&
 				     cur_obj_count < loc[ "minProperties" ].get < unsigned >() ) {
+					u64toa( line_num, s );
 					errors.push_back(
-					"minProperties for object \"" + cur_obj_name + "\" at line " + std::to_string( line_num ) +
-					" was not met" );
+					"minProperties for object \"" + cur_obj_name + "\" at line " + s + " was not met" );
 				}
 				if ( loc.find( "maxProperties" ) != loc.end() &&
 				     cur_obj_count > loc[ "maxProperties" ].get < unsigned >() ) {
+					u64toa( line_num, s );
 					errors.push_back(
-					"maxProperties for object \"" + cur_obj_name + "\" at line " + std::to_string( line_num ) +
-					" was exceeded" );
+					"maxProperties for object \"" + cur_obj_name + "\" at line " + s + " was exceeded" );
 				}
 				obj_required.clear();
 				extensible_required.clear();
@@ -716,7 +718,8 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 				}
 			}
 			if ( i == enum_array.size() ) {
-				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + std::to_string( line_num )
+				u64toa( line_num, s );
+				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
 				                  + ": \"" + parsed.get < std::string >() + "\" was not found in the enum" );
 			}
 		} else {
@@ -724,8 +727,11 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 				if ( enum_array[ i ].get < int >() == parsed.get < int >() ) break;
 			}
 			if ( i == enum_array.size() ) {
-				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + std::to_string( line_num )
-				                  + ": \"" + std::to_string( parsed.get < int >() ) + "\" was not found in the enum" );
+				i64toa( parsed.get < int >(), s );
+				std::string parsed_val( s );
+				u64toa( line_num, s );
+				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
+				                  + ": \"" + parsed_val + "\" was not found in the enum" );
 			}
 		}
 	}
@@ -749,9 +755,12 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 			}
 		}
 		if ( loc.find( "type" ) != loc.end() && loc[ "type" ] != "number" ) {
-			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + std::to_string( line_num )
+			dtoa( val, s );
+			std::string parsed_val( s );
+			u64toa( line_num, s );
+			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + s
 			                    + ", type == " + loc[ "type" ].get < std::string >()
-			                    + " but parsed value = " + std::to_string( val ) );
+			                    + " but parsed value = " + parsed_val );
 		}
 	}
 	else if ( parsed.is_string() ) {
@@ -763,12 +772,13 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 					break;
 			}
 			if ( i == loc[ "anyOf" ].size() ) {
+				u64toa( line_num, s );
 				warnings.push_back( "type == string was not found in anyOf in object \"" + cur_obj_name
-				                    + "\" at line " + std::to_string( line_num ) );
+				                    + "\" at line " + s );
 			}
 		} else if ( loc.find( "type" ) != loc.end() && loc[ "type" ] != "string" && ! parsed.get< std::string >().empty() ) {
-				errors.push_back( "In object \"" + cur_obj_name + "\", at line " + std::to_string( line_num ) +
-				                  ": type needs to be string" );
+			u64toa( line_num, s );
+			errors.push_back( "In object \"" + cur_obj_name + "\", at line " + s + ": type needs to be string" );
 		}
 	}
 }
@@ -1088,12 +1098,8 @@ namespace EnergyPlus {
 						if ( default_val.is_string() ) {
 							val = default_val.get < std::string >();
 						} else {
-//							val = std::to_string( default_val.get < double >() );
-							std::stringstream ss;
-							ss.clear();
-							ss.str("");
-							ss << std::setprecision(15) << std::fixed << default_val.get < double >();
-							val = ss.str();
+							dtoa( default_val.get < double >(), s );
+							val = s;
 						}
 						if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = true;
 					} else {
@@ -1106,16 +1112,12 @@ namespace EnergyPlus {
 						Alphas( i + 1 ) = MakeUPPERCase( val );
 					}
 				} else {
-//					std::string num_val = std::to_string( it.value().get < double >() );
-					std::stringstream ss;
-					ss.clear();
-					ss.str("");
                     if ( it.value().is_number_integer() ) {
-						ss << it.value().get< int >();
+						i64toa( it.value().get < int >(), s );
 					} else {
-						ss << std::setprecision(14) << std::fixed << it.value().get< double >();
+						dtoa( it.value().get < double >(), s );
 					}
-					Alphas( i + 1 ) = ss.str();
+					Alphas( i + 1 ) = s;
 					if ( present( AlphaBlank ) ) AlphaBlank()( i + 1 ) = false;
 				}
 				NumAlphas++;
@@ -1145,16 +1147,12 @@ namespace EnergyPlus {
 								if ( default_val.is_string() ) {
 									val = default_val.get < std::string >();
 								} else {
-//									val = std::to_string( default_val.get < double >() );
-									std::stringstream ss;
-									ss.clear();
-									ss.str("");
 									if ( default_val.is_number_integer() ) {
-										ss << default_val.get< int >();
+										i64toa( default_val.get < int >(), s );
 									} else {
-										ss << std::setprecision(15) << std::fixed << default_val.get < double >();
+										dtoa( default_val.get < double >(), s );
 									}
-									val = ss.str();
+									val = s;
 								}
 								if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = true;
 							} else {
@@ -1166,17 +1164,12 @@ namespace EnergyPlus {
 								Alphas( alphas_index + 1 ) = MakeUPPERCase( val );
 							}
 						} else {
-//							Alphas( alphas_index + 1 ) = std::to_string( val );
-							std::stringstream ss;
-							ss.clear();
-							ss.str("");
 							if ( extension_obj[ field ].is_number_integer() ) {
-								ss << extension_obj[ field ].get< int >();
+								i64toa( extension_obj[ field ].get < int >(), s );
 							} else {
-								ss << std::setprecision(14) << std::fixed << extension_obj[ field ].get< double >();
+								dtoa( extension_obj[ field ].get < double >(), s );
 							}
-//							ss << std::setprecision(14) << std::fixed << val;
-							Alphas( alphas_index + 1 ) = ss.str();
+							Alphas( alphas_index + 1 ) = s;
 							if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = false;
 						}
 						NumAlphas++;
