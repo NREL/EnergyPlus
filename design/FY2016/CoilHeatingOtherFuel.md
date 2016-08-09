@@ -1,5 +1,5 @@
-TITLE OF FEATURE
-================
+Other Fuel Heating Coils
+========================
 
 **Noel Merket, NREL**
 
