@@ -1224,7 +1224,7 @@ namespace HeatBalanceIntRadExchange {
 			ShowContinueError( "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure." );
 
 			RowSum = sum( FixedF );
-			if ( RowSum > ( N +0.01 ) ) {
+			if ( RowSum > ( N + 0.01 ) ) {
 				// Reciprocity enforced but there is more radiation than possible somewhere since the sum of one of the rows
 				// is now greater than unity.  This should not be allowed as it can cause issues with the heat balance.
 				// Correct this by finding the largest row summation and dividing all of the elements in the F matrix by
@@ -1244,6 +1244,7 @@ namespace HeatBalanceIntRadExchange {
 						if ( sumFixedF( i ) > MaxFixedFRowSum ) MaxFixedFRowSum = sumFixedF( i );
 					}
 				}
+				sumFixedF.deallocate();
 				if ( MaxFixedFRowSum < 1.0 ) {
 					ShowFatalError( " FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
 				} else {
