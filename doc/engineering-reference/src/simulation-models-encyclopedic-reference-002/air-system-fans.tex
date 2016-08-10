@@ -232,13 +232,15 @@ By plotting the normalized fan static efficiency (\emph{static efficiency / maxi
 
 This model uses a continuous function to represent the normalized fan efficiency (\emph{η\(_{fan}\)}) variation. The normalized exponential-conditioned skew-normal functional relationship is:
 
-\(\frac{{{\eta_{fan}}({x_{fan}})}}{{{\eta_{fan,\max }}}} = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ()
+\begin{equation}
+\frac{{{\eta_{fan}}({x_{fan}})}}{{{\eta_{fan,\max }}}} = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}
+\end{equation}
 
 where
 
 x\(_{fan}\) = log\(_{10}\)(Eu / Eu\(_{max}\))
 
-Z\(_{1}\) = (x\(_{fan}\) - a\(_{fan}\)) / b\(_{fan}\);~ Z\(_{2}\) = ((e\(^{(c}\)fan\(^{\*x}\)fan\(^{)}\)*d\(_{fan}\)*x\(_{fan}\)) - a\(_{fan}\)) / b\(_{fan}\);~ Z\(_{3}\) = -a\(_{fan}\) / b\(_{fan}\)
+Z\(_{1}\) = (x\(_{fan}\) - a\(_{fan}\)) / b\(_{fan}\);~ Z\(_{2}\) = ((e\(^{(c}\)fan\(^{*x}\)fan\(^{)}\)*d\(_{fan}\)*x\(_{fan}\)) - a\(_{fan}\)) / b\(_{fan}\);~ Z\(_{3}\) = -a\(_{fan}\) / b\(_{fan}\)
 
 For conceptual design when only rough estimates are needed, a generic curve (also shown in Figure~\ref{fig:normalized-efficiency-curves-for-eight-fans}) can be used and then one only needs to know the maximum efficiency (\emph{η\(_{fan,max}\)}) and \emph{Eu} at that maximum (\emph{Eu\(_{max}\)}) to entirely model the fan efficiency and hence fan power. The dimensionless coefficients for the generic normalized fan efficiency curve are as follows:
 

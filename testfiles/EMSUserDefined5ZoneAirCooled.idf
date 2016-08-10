@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.6;
 
   Building,
     Building,                !- Name
@@ -4242,7 +4242,8 @@
     Space4ATU_DesignAirMdot, !- <none>
     Space5ATU_DesignAirMdot, !- <none>
     Zone_Tsp_Cool,           !- <none>
-    Zone_Tsp_Heat;           !- <none>
+    Zone_Tsp_Heat,           !- <none>
+    tot_heat_Power;
 
   EnergyManagementSystem:InternalVariable,
     Space1ATU_HeatAirMdot,   !- Name
@@ -5232,7 +5233,7 @@
   EnergyManagementSystem:Program,
     Space5ATU_ModelOutput,   !- Name
     Set Space5ATU_PrimAir_Tout = Air_Tout,  !- Program Line 1
-    Set Space54ATU_PrimAir_Wout = Air_Wout,  !- Program Line 2
+    Set Space5ATU_PrimAir_Wout = Air_Wout,  !- Program Line 2
     Set Space5ATU_PrimAir_MdotOut = Air_MdotOut,  !- <none>
     Set Space5ATU_PrimAir_MdotIn = Air_MdotOut,  !- <none>
     Set Space5ATU_tot_heat_Power = HWCoil_heat_Power,  !- <none>

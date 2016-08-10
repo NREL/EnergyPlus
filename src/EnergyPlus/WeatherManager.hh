@@ -865,6 +865,13 @@ namespace WeatherManager {
 		bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
 	);
 
+	Real64
+	interpolateWindDirection(
+		Real64 const prevHrWindDir,
+		Real64 const curHrWindDir,
+		Real64 const curHrWeight
+	);
+
 	void
 	SetDayOfWeekInitialValues(
 		int const EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)

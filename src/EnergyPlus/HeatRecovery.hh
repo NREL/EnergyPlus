@@ -666,9 +666,29 @@ namespace HeatRecovery {
 
 	};
 
+	struct HeatExchCondNumericFieldData {
+		// Members
+		Array1D_string NumericFieldNames;
+
+		// Default Constructor
+		HeatExchCondNumericFieldData()
+		{}
+	};
+
+	struct BalDesDehumPerfNumericFieldData {
+		// Members
+		Array1D_string NumericFieldNames;
+
+		// Default Constructor
+		BalDesDehumPerfNumericFieldData()
+		{}
+	};
+
 	// Object Data
 	extern Array1D< HeatExchCond > ExchCond;
 	extern Array1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
+	extern Array1D< HeatExchCondNumericFieldData > HeatExchCondNumericFields;
+	extern Array1D< HeatExchCondNumericFieldData > BalDesDehumPerfNumericFields;
 
 	// Functions
 
