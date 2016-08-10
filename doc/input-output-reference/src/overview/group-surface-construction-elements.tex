@@ -248,7 +248,7 @@ This material is used to describe the nine moisture material properties
 that are used in the EMPD (Effective Moisture Penetration Depth) heat
 balance solution algorithm. The EMPD algorithm is a simplified, lumped
 moisture model that simulates moisture storage and release from interior
-surfaces. The model uses ``actual'' convective mass transfer
+surfaces. The model uses convective mass transfer
 coefficients that are determined by existing heat and mass transfer
 relationships, e.g.~the Lewis relation. The EMPD model includes two
 fictitious layers of material with uniform moisture content: a surface
@@ -260,7 +260,7 @@ transfer impacts the zone humidity, and also impacts the zone
 temperature through latent-to-sensible conversion from the heat of
 adsorption.
 
-This moisture model will be used when the appropriate EMPD moisture
+This moisture model is used when the appropriate EMPD moisture
 materials are specified and the Solution Algorithm parameter is set to
 MoisturePenetrationDepthConductionTransferFunction.
 
@@ -291,13 +291,13 @@ estimated as:
 
 \[ \delta_{perm,air} = \frac {2 \times 10^{-7} \cdot T^{0.81}} {P_{ambient}} \]
 
-where \(T\) is the temperature and \(P_{ambient}\) the ambient
-atmospheric pressure.
+where \(T\) is the temperature {[}C{]} and \(P_{ambient}\) the ambient
+atmospheric pressure {[}Pa{]}.
 
 \paragraph{Fields: Moisture equilibrium
 	constants}\label{fields-moisture-equilibrium-constants}
 
-The next four fields, coefficients ``a'', ``b'', ``c'', and ``d'', help
+The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d}, help
 define the sorption isotherm curve used for building materials under
 equilibrium conditions. They are used to define the relationship between
 the material's moisture content and the surface air relative humidity
@@ -312,7 +312,7 @@ where
 material's moisture content and the surface air relative humidity
 
 \(u\) = Moisture content defined as the mass fraction of water contained
-in a material {[}kg/kg{]}
+in a material, per mass of dry material {[}kg/kg{]}
 
 \(\phi\) = Surface air relative humidity {[}0 to 1{]},
 
@@ -347,7 +347,7 @@ where
 
 If this field is left blank or set to \texttt{autocalculate}, 
 the above equation will be used to calculate the surface layer penetration depth 
-assuming a $\tau_{surf}$ of one day.
+assuming a $\tau_{surf}$ of 24 hours.
 
 \paragraph{Field: Deep Layer Penetration
 	Depth}\label{field-deep-layer-penetration-depth}
@@ -371,6 +371,8 @@ If this field is left blank or set to \texttt{autocalculate},
 the above equation will be used to calculate the deep layer penetration depth 
 assuming a $\tau_{surf}$ of three weeks.
 
+To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. 
+
 \paragraph{Field: Coating Layer
 	Thickness}\label{field-coating-layer-thickness}
 
@@ -393,7 +395,7 @@ This input is optional, and an input of zero implies no coating.
 Below are two IDF examples:
 
 This set of inputs can be used for aerated concrete (assuming linear
-sorption curve). Density, input elsewhere, is :
+sorption curve). Density, input elsewhere, is 650 kg/m\^{}3:
 
 \begin{lstlisting}
 MaterialProperty:MoisturePenetrationDepth:Settings,
@@ -427,7 +429,7 @@ Concrete,            !- Name
 \end{lstlisting}
 
 Finally, here are values representing the empirical whole-house inputs
-from Woods et al., 2014 (see Engineering Reference). Density is
+from Woods et al., 2014 (see Engineering Reference). Density is 800
 kg/m\^{}3:
 
 \begin{lstlisting}

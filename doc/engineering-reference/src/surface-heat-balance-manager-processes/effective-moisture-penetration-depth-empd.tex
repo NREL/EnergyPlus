@@ -2,9 +2,7 @@
 
 \subsection{Overview}\label{overview-014}
 
-The Effective Moisture Penetration Depth (EMPD) model estimates moisture adsorption and desorption from building surfaces and calculates the effect of this adsorption/desorption on each zone. The EMPD model is a simplified, lumped approach that simulates the effect of the materials on the zone humidity with two fictitious layers of material with uniform moisture content: a surface layer, which accounts for short-term moisture buffering, and a deep layer, which accounts for more slowly responding moisture buffering. The model calculates the moisture transfer between the air and the surface layer and between the surface layer and the deep layer. This moisture transfer impacts the zone humidity, and also impacts the zone temperature through latent-to-sensible conversion from the heat of adsorption.
-
-The EMPD (Effective Moisture Penetration Depth) model is a simplified, lumped approach to simulate surface moisture adsorption and desorption.
+The EMPD (Effective Moisture Penetration Depth) model is a simplified, lumped approach to simulate surface moisture adsorption and desorption. It estimates moisture adsorption and desorption from building surfaces and calculates the effect this adsorption/desorption has on the humidity in each zone. There are two fictitious layers of material with uniform moisture content: a surface layer, which accounts for short-term moisture buffering, and a deep layer, which accounts for more slowly responding moisture buffering. The model calculates the moisture transfer between the air and the surface layer and between the surface layer and the deep layer. This moisture transfer impacts the zone humidity, and also impacts the zone temperature through latent-to-sensible conversion from the heat of adsorption.
 
 \subsection{EMPD Model Description}\label{empd-model-description}
 
@@ -20,9 +18,9 @@ This is generally a reasonable assumption for buildings, with daily internal lat
 u = a \phi^b + c \phi^d
 \end{equation}
 
-where $a$, $b$, $c$, and $d$ are fitting parameters and phi is relative humidity.
+where $a$, $b$, $c$, and $d$ are fitting parameters and \phi is relative humidity.
 
-This surface layer (1) exchanges moisture with the zone air based on the difference between the zone air vapor density and the material vapor density. The model converts the surface layer moisture content to a vapor density ($\rho_v$) through the material's sorption curve:
+This surface layer (labeled with subscript 1 below) exchanges moisture with the zone air based on the difference between the zone air vapor density and the material vapor density. The model converts the surface layer moisture content to a vapor density ($\rho_v$) through the material's sorption curve:
 
 \begin{equation}
 \rho_{v1} = \frac {0.622 \rho_{air} u_{1}} {\frac{du}{d\phi} \frac{P}{P_{sat}} - u_{1}}
@@ -31,8 +29,6 @@ This surface layer (1) exchanges moisture with the zone air based on the differe
 where
 
 $\frac{du}{d\phi}$ = slope of the moisture sorption curve, kg/kg-RH
-
-and
 
 $P_{sat}$ = saturated vapor pressure
 
@@ -78,7 +74,7 @@ Finally, the boundary layer mass-transfer resistance is calculated by converting
 R_{MT,BL} = \frac{\rho_{air} Cp_{air}}{h_{conv}}
 \end{equation}
 
-Behind the surface layer is a deep layer of thickness $d_{EMPD,2}$. The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
+Behind the surface layer is a deep layer (labeled with subscipt 2 below) of thickness $d_{EMPD,2}$. The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
 
 \begin{equation}
 j_{2} = \frac {\rho_{v,1} - \rho_{v,2}} {R_{MT,2}}
@@ -93,7 +89,11 @@ R_{MT,2} = \frac {d_{EMPD,1} + d_{EMPD,2}} {2 \bar R_{water} T \delta_{perm} }
 These moisture fluxes are used to update the moisture content (or equivalent RH, $\phi$) of each layer:
 
 \begin{equation}
-\phi_{2}(t) = \frac {\phi_{2}(t-\delta t) + Flux_{deep} \cdot TimeStep} {\rho_{matl} d_{EMPD,deep} \frac {du}{d\phi}}
+\phi_{1}(t) = \phi_{1}(t-\delta t) - \frac { j_{zone} j_{2} \cdot TimeStep} {\rho_{matl} d_{EMPD,2} \frac {du}{d\phi}}
+\end{equation}
+
+\begin{equation}
+\phi_{2}(t) = \phi_{2}(t-\delta t) + \frac { j_{2} \cdot TimeStep} {\rho_{matl} d_{EMPD,2} \frac {du}{d\phi}}
 \end{equation}
 
 where
@@ -107,11 +107,11 @@ $\frac {du}{d\phi}$ = slope of moisture curve (change in moisture content / chan
 The equivalent RH and equivalent vapor density are related with:
 
 \begin{equation}
-\phi_{surflayer} = \frac {\rho_{v,surflayer} \bar R_{water}} {P_{sat}(T)}
+\rho_{v,1} = \frac {\phi_{1} P_{sat}(T)} {\bar R_{water}}
 \end{equation}
 
 \begin{equation}
-\phi_{deeplayer} = \frac {\rho_{v,deeplayer} \bar R_{water}} {P_{sat}(T)}
+\rho_{v,2} = \frac {\phi_{2} P_{sat}(T)} {\bar R_{water}}
 \end{equation}
 
 The zone flux is used, along with the area of the particular surface, to update the zone humidity ratio, as discussed in \ref{moisture-predictor-corrector}.
@@ -119,7 +119,7 @@ The zone flux is used, along with the area of the particular surface, to update 
 The zone flux is also used to calculate the sensible heat released (during adsorption) or absorbed (during desorption) at the material surface:
 
 \begin{equation}
-Q_{flux} = Flux_{zone} h_{fg}
+Q_{flux} = j_{zone} h_{fg}
 \end{equation}
 
 where $h_{fg}$ is the enthalpy of vaporization of water, assumed to be 2500 kJ/kg. This is added to the heat balance calculations at the interior surface.
@@ -130,10 +130,11 @@ For further information on the EMPD model, see References below.
 \begin{align*}  
   A  &= \text{surface area} \bracketunits{m^{2}} \\
   d &= \text{penetration depth} \bracketunits{m} \\
-  Flux &= \text{water mass flux} \bracketunits{\frac{kg}{m^{2}}} \\
+  j &= \text{water mass flux} \bracketunits{\frac{kg}{m^{2} \cdot s}} \\
   \bar R_{water} &= \text{universal gas constant for water,} \; 452.61 \bracketunits{\frac{J}{kg \cdot K}}   \\
+  R_{MT} &= \text{Mass transfer resistance} \bracketunits{s/m} \\
   T &= \text{temperature} \bracketunits{K} \\
-  u &= \text{moisture content} \bracketunits{\frac{kg}{m^{3}}}
+  u &= \text{moisture content} \bracketunits{\frac{kg}{kg}}
 \end{align*}
 
 \subsubsection{Greek letters}\label{greek-letters}
@@ -146,11 +147,10 @@ For further information on the EMPD model, see References below.
 
 \subsubsection{Subscripts}\label{subscripts-and-superscripts}
 \begin{align*}
-	surflayer &= \text{surface layer node} \\
-	deeplayer &= \text{deep layer node} \\
-	surface &= \text{at the surface-air interface} \\
-	MT &= \text{mass transfer} \\
-	BL &= \text{boundary layer}
+	1 &= \text{surface layer node} \\
+	2 &= \text{deep layer node} \\
+	BL &= \text{boundary layer} \\
+	matl &= \text{solid material} \\
 \end{align*}
 
 \subsection{References}\label{references-019}
