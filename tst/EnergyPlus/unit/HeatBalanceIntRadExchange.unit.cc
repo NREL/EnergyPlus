@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
@@ -124,4 +125,45 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagTest)
+	{
+	
+		bool DidMIChange;
+		int SurfNum;
+		
+		DataHeatBalance::Construct.allocate( 1 );
+		DataHeatBalance::Material.allocate( 1 );
+		DataSurfaces::Surface.allocate( 1 );
+		
+		SurfNum = 1;
+		DataSurfaces::Surface( 1 ).MaterialMovInsulInt = 1;
+		DataSurfaces::Surface( 1 ).MovInsulIntPresent = false;
+		DataSurfaces::Surface( 1 ).MovInsulIntPresentPrevTS = false;
+		DataSurfaces::Surface( 1 ).Construction = 1;
+		DataSurfaces::Surface( 1 ).MaterialMovInsulInt = 1;
+		DataHeatBalance::Construct( 1 ).InsideAbsorpThermal = 0.9;
+		DataHeatBalance::Material( 1 ).AbsorpThermal = 0.5;
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+		DataSurfaces::Surface( 1 ).SchedMovInsulInt = -1;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.25;
+		
+		// Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
+		//         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
+		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
+		EXPECT_TRUE( DidMIChange );
+
+		// Test 2: Movable insulation present and was also present in previous time step.  This should result in a false value since nothing has changed.
+		DataSurfaces::Surface( 1 ).MovInsulIntPresentPrevTS = true;
+		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
+		EXPECT_TRUE( !DidMIChange );
+
+		// Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
+  		// 		   construction are the same so nothing has actually changed.  This should result in a false value.
+		DataSurfaces::Surface( 1 ).MovInsulIntPresentPrevTS = false;
+		DataHeatBalance::Material( 1 ).AbsorpThermal = DataHeatBalance::Construct( 1 ).InsideAbsorpThermal;
+		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
+		EXPECT_TRUE( !DidMIChange );
+		
+	}
+	
 }
