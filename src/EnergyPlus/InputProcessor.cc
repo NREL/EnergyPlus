@@ -142,6 +142,9 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 				if ( obj.find( "name" ) != obj.end() ) {
 					name = obj[ "name" ].get < std::string >();
 					obj.erase( "name" );
+					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
+						name = name + " " + s;
+					}
 				}
 			}
 			root[ obj_name ][ name ] = obj;
@@ -597,7 +600,7 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				}
 			}
 
-			if ( stack.back().find( "properties" ) == stack.back().end() and key != "" ) {
+			if ( stack.back().find( "properties" ) == stack.back().end() ) {
 				if ( stack.back().find( key ) != stack.back().end() ) {
 					stack.push_back( stack.back()[ key ] );
 				} else {
@@ -605,11 +608,10 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 					std::string lin_num( s );
 					u64toa( line_index, s );
 					errors.push_back( "Key \"" + key + "\" in object \"" + cur_obj_name + "\" at line "
-					                  + lin_num + " (index " + s + ") not found in schema" );
+									  + lin_num + " (index " + s + ") not found in schema" );
 					does_key_exist = false;
 				}
 			}
-
 
 			if ( !is_in_extensibles ) {
 				auto req = obj_required.find( key );
@@ -673,7 +675,7 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 					it.second = false;
 				}
 			} else { // must be at the very end of an object now
-				if ( cur_obj_name != "Version" ) stack.pop_back();
+//				if ( cur_obj_name != "Version" ) stack.pop_back();
 				const auto & loc = stack.back();
 				if ( loc.find( "minProperties" ) != loc.end() &&
 				     cur_obj_count < loc[ "minProperties" ].get < unsigned >() ) {
@@ -690,8 +692,9 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				obj_required.clear();
 				extensible_required.clear();
 				need_new_object_name = true;
+                stack.pop_back();
 			}
-			stack.pop_back();
+            stack.pop_back();
 			last_seen_event = event;
 			break;
 		}

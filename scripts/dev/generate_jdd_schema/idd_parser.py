@@ -114,14 +114,11 @@ def parse_idd(data):
             if obj_name is None or obj_name == "":
                 return root
             obj_data = parse_obj(data)
-            if obj_name == 'Version':
-                root['properties'][obj_name] = obj_data
-            else:
-                root['properties'][obj_name] = {}
-                root['properties'][obj_name]['patternProperties'] = {}
-                root['properties'][obj_name]['patternProperties']['.*'] = obj_data
-                if 'name' in obj_data:
-                    root['properties'][obj_name]['name'] = obj_data.pop('name')
+            root['properties'][obj_name] = {}
+            root['properties'][obj_name]['patternProperties'] = {}
+            root['properties'][obj_name]['patternProperties']['.*'] = obj_data
+            if 'name' in obj_data:
+                root['properties'][obj_name]['name'] = obj_data.pop('name')
 
             root['properties'][obj_name]['legacy_idd'] = obj_data.pop('legacy_idd')
             root['properties'][obj_name]['type'] = 'object'
