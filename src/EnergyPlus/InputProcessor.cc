@@ -1329,7 +1329,7 @@ namespace EnergyPlus {
 		}
 
 		if ( !found ) {
-			ShowWarningError("Didn't find name, need to probably use search key");
+			// ShowWarningError("Didn't find name, need to probably use search key");
 			return -1;
 		}
 		return object_item_num;
@@ -1373,7 +1373,7 @@ namespace EnergyPlus {
 
 
 		if ( !found ) {
-			ShowWarningError("Didn't find name, need to probably use search key");
+			// ShowWarningError("Didn't find name, need to probably use search key");
 			return -1;
 		}
 		return object_item_num;
