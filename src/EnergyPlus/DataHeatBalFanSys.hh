@@ -181,6 +181,8 @@ namespace DataHeatBalFanSys {
 
 	extern Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
 	// temperature at source
+	extern Array1D< Real64 > CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
+	// temperature at the user specified location
 	extern Array1D< Real64 > QHTRadSysSurf; // Current radiant heat flux at a surface due to the presence
 	// of high temperature radiant heaters
 	extern Array1D< Real64 > QHWBaseboardSurf; // Current radiant heat flux at a surface due to the presence

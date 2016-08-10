@@ -189,6 +189,8 @@ namespace DataHeatBalFanSys {
 
 	Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
 	// temperature at source
+	Array1D< Real64 > CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
+	// temperature at user specified location
 	Array1D< Real64 > QHTRadSysSurf; // Current radiant heat flux at a surface due to the presence
 	// of high temperature radiant heaters
 	Array1D< Real64 > QHWBaseboardSurf; // Current radiant heat flux at a surface due to the presence
@@ -319,6 +321,7 @@ namespace DataHeatBalFanSys {
 		TCondFDSourceNode.deallocate();
 		QPVSysSource.deallocate(); 
 		CTFTsrcConstPart.deallocate(); 
+		CTFTuserConstPart.deallocate();
 		QHTRadSysSurf.deallocate();
 		QHWBaseboardSurf.deallocate(); 
 		QSteamBaseboardSurf.deallocate(); 
