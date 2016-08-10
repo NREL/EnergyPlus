@@ -814,6 +814,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     samestring('AirTerminal:SingleDuct:SupplySideMixer',InArgs(3))) then
                     OutArgs(3)='AirTerminal:SingleDuct:Mixer'
                 endif
+              
+              CASE('OTHEREQUIPMENT')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                OutArgs(2) = 'None'
+                OutArgs(3:11) = InArgs(2:10)
+                CurArgs = CurArgs+1
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
