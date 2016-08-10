@@ -1503,7 +1503,7 @@ namespace HeatBalanceSurfaceManager {
 			}
 			if ( Construct( Surface( loop ).Construction ).SourceSinkPresent ) {
 				SetupOutputVariable( "Surface Internal Source Location Temperature [C]", TempSource( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Internal User Specified Location Temperature [C]", TempUserLoc( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Internal Temp Location Temperature [C]", TempUserLoc( loop ), "Zone", "State", Surface( loop ).Name );
 			}
 			if ( Surface( loop ).Class == SurfaceClass_Window ) { // CurrentModuleObject='Windows'
 				SetupOutputVariable( "Surface Shading Device Is On Time Fraction []", SurfaceWindow( loop ).FracTimeShadingDeviceOn, "Zone", "Average", Surface( loop ).Name );

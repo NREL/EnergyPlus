@@ -141,6 +141,7 @@ namespace HeatBalFiniteDiffManager {
 	using DataHeatBalSurface::QRadSWInAbs;
 	using DataHeatBalSurface::QRadSWOutMvIns;
 	using DataHeatBalSurface::TempSource;
+	using DataHeatBalSurface::TempUserLoc;
 	using DataHeatBalSurface::OpaqSurfInsFaceConductionFlux;
 	using DataHeatBalSurface::OpaqSurfOutsideFaceConductionFlux;
 	using DataHeatBalSurface::OpaqSurfOutsideFaceConduction;
@@ -2183,6 +2184,11 @@ namespace HeatBalFiniteDiffManager {
 						SurfaceFD( Surf ).SourceNodeNum = i;
 					}
 
+					if ( construct.SourceSinkPresent && ( Lay == construct.TempAfterLayer ) ) {
+						TempUserLoc( Surf ) = TDT_i; // Transfer node temp to DataHeatBalSurface module
+					}
+					
+					
 				} // End of R-layer and Regular check
 
 				TDT( i ) = TDT_i;
