@@ -186,11 +186,7 @@ namespace HeatBalanceIntRadExchange {
 		using General::InterpSlatAng; // Function for slat angle interpolation
 		using namespace DataTimings;
 		using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
-<<<<<<< HEAD
-=======
-		using InputProcessor::SameString;
 		using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
->>>>>>> NREL/develop
 
 		// Argument array dimensioning
 
@@ -469,12 +465,12 @@ namespace HeatBalanceIntRadExchange {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   July 2016
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// To determine if any changes in interior movable insulation have happened.
 		// If there have been changes due to a schedule change AND a change in properties,
 		// then the matrices which are used to calculate interior radiation must be recalculated.
-				
+
 		MovableInsulationChange = false;
 		if ( Surface( SurfNum ).MaterialMovInsulInt > 0 ) {
 			Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
@@ -491,7 +487,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 	}
-	
+
 	void
 	InitInteriorRadExchange()
 	{

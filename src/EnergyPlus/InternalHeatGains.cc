@@ -2094,15 +2094,9 @@ namespace InternalHeatGains {
 			}
 			OtherEqObjects( Item ).Name = AlphaName( 1 );
 
-<<<<<<< HEAD
-			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = InputProcessor::FindItemInList( AlphaName( 3 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 2 ), ZoneList );
-=======
-			Item1 = FindItemInList( AlphaName( 3 ), Zone );
-			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( AlphaName( 3 ), ZoneList );
->>>>>>> NREL/develop
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 3 ), ZoneList );
 			if ( Item1 > 0 ) {
 				OtherEqObjects( Item ).StartPtr = TotOthEquip + 1;
 				++TotOthEquip;
