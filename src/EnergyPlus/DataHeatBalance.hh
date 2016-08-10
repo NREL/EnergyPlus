@@ -1700,6 +1700,7 @@ namespace DataHeatBalance {
 		Real64 LostEnergy; // Lost energy (converted to work) [J]
 		Real64 TotGainEnergy; // Total heat gain [J]
 		std::string EndUseSubcategory; // user defined name for the end use category
+		int OtherEquipFuelType; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
 
 		// Default Constructor
 		ZoneEquipData() :
@@ -1730,7 +1731,9 @@ namespace DataHeatBalance {
 			ConGainEnergy( 0.0 ),
 			LatGainEnergy( 0.0 ),
 			LostEnergy( 0.0 ),
-			TotGainEnergy( 0.0 )
+			TotGainEnergy( 0.0 ),
+			EndUseSubcategory( "" ),
+			OtherEquipFuelType( 0 )
 		{}
 
 	};
@@ -3132,6 +3135,8 @@ namespace DataHeatBalance {
 		Real64 SteamLostRate;
 		Real64 SteamTotGainRate;
 		// Other Equipment
+		Real64 OtherPower;
+		Real64 OtherConsump;
 		Real64 OtherRadGain;
 		Real64 OtherConGain;
 		Real64 OtherLatGain;
@@ -3263,6 +3268,8 @@ namespace DataHeatBalance {
 			SteamLatGainRate( 0.0 ),
 			SteamLostRate( 0.0 ),
 			SteamTotGainRate( 0.0 ),
+			OtherPower( 0.0 ),
+			OtherConsump( 0.0 ),
 			OtherRadGain( 0.0 ),
 			OtherConGain( 0.0 ),
 			OtherLatGain( 0.0 ),

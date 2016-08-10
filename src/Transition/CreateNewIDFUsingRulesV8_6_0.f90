@@ -802,6 +802,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDDO
 
               !! Changes for this version can go here
+              CASE('OTHEREQUIPMENT')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                OutArgs(2) = 'None'
+                OutArgs(3:11) = InArgs(2:10)
+                CurArgs = CurArgs+1
+
               CASE('MATERIALPROPERTY:MOISTUREPENETRATIONDEPTH:SETTINGS')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
