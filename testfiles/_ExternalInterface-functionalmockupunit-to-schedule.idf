@@ -1168,6 +1168,7 @@
 
   OtherEquipment,
     OthEquSen_ZoneOne,       !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     FMU_OthEquSen_ZoneOne,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -1182,6 +1183,7 @@
 
   OtherEquipment,
     OthEquLat_ZoneOne,       !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     FMU_OthEquLat_ZoneOne,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

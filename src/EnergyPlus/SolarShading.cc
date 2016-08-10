@@ -6230,7 +6230,7 @@ namespace SolarShading {
 									// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 									HMovInsul = 0.0;
 									if ( Surface( BackSurfNum ).MaterialMovInsulInt > 0 ) {
-										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulExt );
+										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulInt );
 										if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 											HMovInsul = 0.0;
 										} else { // Movable insulation present
@@ -6708,7 +6708,7 @@ namespace SolarShading {
 									// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 									HMovInsul = 0.0;
 									if ( Surface( BackSurfNum ).MaterialMovInsulInt > 0 ) {
-										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulExt );
+										MovInsulSchedVal = GetCurrentScheduleValue( Surface( BackSurfNum ).SchedMovInsulInt );
 										if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 											HMovInsul = 0.0;
 										} else { // Movable insulation present
@@ -9846,7 +9846,7 @@ namespace SolarShading {
 						// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 						HMovInsul = 0.0;
 						if ( Surface( HeatTransSurfNum ).MaterialMovInsulInt > 0 ) {
-							MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulExt );
+							MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulInt );
 							if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 								HMovInsul = 0.0;
 							} else { // Movable insulation present
@@ -10406,7 +10406,7 @@ namespace SolarShading {
 				// HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
 				HMovInsul = 0.0;
 				if ( Surface( HeatTransSurfNum ).MaterialMovInsulInt > 0 ) {
-					MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulExt );
+					MovInsulSchedVal = GetCurrentScheduleValue( Surface( HeatTransSurfNum ).SchedMovInsulInt );
 					if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 						HMovInsul = 0.0;
 					} else { // Movable insulation present

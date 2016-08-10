@@ -20444,16 +20444,34 @@ OtherEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-  A2 , \field Zone or ZoneList Name
+  A2 , \field Fuel Type
+       \required-field
+       \type choice
+       \key None
+       \key Electricity
+       \key NaturalGas
+       \key PropaneGas
+       \key FuelOil#1
+       \key FuelOil#2
+       \key Diesel
+       \key Gasoline
+       \key Coal
+       \key OtherFuel1
+       \key OtherFuel2
+       \key Steam
+       \key DistrictHeating
+       \key DistrictCooling
+       \default None
+  A3 , \field Zone or ZoneList Name
        \required-field
        \type object-list
        \object-list ZoneAndZoneListNames
-  A3 , \field Schedule Name
+  A4 , \field Schedule Name
        \required-field
        \type object-list
        \object-list ScheduleNames
        \note units in Schedule should be fraction applied to design level of other equipment, generally (0.0 - 1.0)
-  A4 , \field Design Level Calculation Method
+  A5 , \field Design Level Calculation Method
        \note The entered calculation method is used to create the maximum amount of other equipment.
        \note to set a loss, use a negative value in the following fields.
        \note for this set of attributes
@@ -20492,12 +20510,29 @@ OtherEquipment,
        \minimum 0.0
        \maximum 1.0
        \default 0
-  N6 ; \field Fraction Lost
+  N6 , \field Fraction Lost
        \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
+  N7 , \field Carbon Dioxide Generation Rate
+       \note CO2 generation rate per unit of power input
+       \type real
+       \units m3/s-W
+       \ip-units (ft3/min)/(Btu/h)
+       \default 0.0
+       \minimum 0.0
+       \maximum 4.0E-7
+       \note The default value assumes the equipment is fully vented.
+  A6 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
+       \type alpha
+       \retaincase
+       \default General
 
 ElectricEquipment:ITE:AirCooled,
    \memo This object describes air-cooled electric information technology equipment (ITE) which has

@@ -98,6 +98,12 @@ namespace HeatBalanceIntRadExchange {
 		Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
 		std::string const & CalledFrom = ""
 	);
+	
+	void
+	UpdateMovableInsulationFlag(
+		bool & MovableInsulationChange, // set to true if there is a change in the movable insulation state
+		int const SurfNum // surface number of surface being investigated
+	);
 
 	void
 	InitInteriorRadExchange();
