@@ -12,7 +12,7 @@ The EMPD concept is based on the assumption of cyclical variations in humidity, 
 \int_{{t_1}}^{{t_2}} {\frac{{du}}{{dt }}} dt  = 0
 \end{equation}
 
-This is generally a reasonable assumption for buildings, with daily internal latent gains. The EMPD model uses a thin material layer of constant thickness at each material surface. The moisture content is assumed constant across this thickness, termed the \emph{surface penetration depth} ($d_{EMPD,surf}$). For most building materials, the equilibrium moisture sorption isotherm can be defined by the following general equation (Kerestecioglu et al. 1988):
+This is generally a reasonable assumption for buildings, with daily internal latent gains. The EMPD model uses a thin material layer of constant thickness at each material surface. The moisture content is assumed constant across this thickness, termed the \emph{surface penetration depth}. For most building materials, the equilibrium moisture sorption isotherm can be defined by the following general equation (Kerestecioglu et al. 1988):
 
 \begin{equation}
 u = a \phi^b + c \phi^d
@@ -34,11 +34,17 @@ $P_{sat}$ = saturated vapor pressure
 
 $\rho_{air}$ = dry-air density
 
-The moisture flux between the material and the zone air $j_{zone}$ is the difference in vapor densities divided by the overall mass transfer resistance, which is the sum of the diffusive resistance of the surface layer, the diffusive resistance of any coating, and the convective resistance of the air boundary layer:
+The moisture flux between the material and the zone air, $j_{zone}$, is the difference in vapor densities divided by the overall mass transfer resistance, which is the sum of the diffusive resistance of the surface layer, the diffusive resistance of any coating, and the convective resistance of the air boundary layer:
 
 \begin{equation}
-j_{zone} = \frac{\rho_{v1} - \rho_{v,zoneair}}{R_{MT1} + R_{MT,coating} + R_{MT,BL}}
+j_{zone} = \frac{\rho_{v1} - \rho_{v,zone}}{R_{MT1} + R_{MT,coating} + R_{MT,BL}}
 \end{equation}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/EMPDschematic.png}
+\caption{Nodal network for effective moisture pentration depth model \protect \label{fig:Nodal-network-for-effective-moisture-penetration-depth-model}}
+\end{figure}
 
 The surface layer resistance is calculated with:
 
@@ -89,7 +95,7 @@ R_{MT,2} = \frac {d_{EMPD,1} + d_{EMPD,2}} {2 \bar R_{water} T \delta_{perm} }
 These moisture fluxes are used to update the moisture content (or equivalent RH, $\phi$) of each layer:
 
 \begin{equation}
-\phi_{1}(t) = \phi_{1}(t-\delta t) - \frac { j_{zone} j_{2} \cdot TimeStep} {\rho_{matl} d_{EMPD,2} \frac {du}{d\phi}}
+\phi_{1}(t) = \phi_{1}(t-\delta t) - \frac { (j_{zone} + j_{2}) \cdot TimeStep} {\rho_{matl} d_{EMPD,2} \frac {du}{d\phi}}
 \end{equation}
 
 \begin{equation}
@@ -102,7 +108,7 @@ $\rho_{matl}$ = Material dry density, kg/m^3
 
 $TimeStep$ = Simulation timestep, s
 
-$\frac {du}{d\phi}$ = slope of moisture curve (change in moisture content / change in RH), kg/m^3-RH
+$\frac {du}{d\phi}$ = slope of moisture curve (change in moisture content / change in RH), kg/kg \cdot RH
 
 The equivalent RH and equivalent vapor density are related with:
 
@@ -151,6 +157,7 @@ For further information on the EMPD model, see References below.
 	2 &= \text{deep layer node} \\
 	BL &= \text{boundary layer} \\
 	matl &= \text{solid material} \\
+	zone &= \text{zone air} \\
 \end{align*}
 
 \subsection{References}\label{references-019}

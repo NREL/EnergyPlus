@@ -297,9 +297,9 @@ atmospheric pressure {[}Pa{]}.
 \paragraph{Fields: Moisture equilibrium
 	constants}\label{fields-moisture-equilibrium-constants}
 
-The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d}, help
+The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d}, 
 define the sorption isotherm curve used for building materials under
-equilibrium conditions. They are used to define the relationship between
+equilibrium conditions. They define the relationship between
 the material's moisture content and the surface air relative humidity
 (ref: Effective Moisture Penetration Depth (EMPD) Model in the
 Engineering Reference):
@@ -325,7 +325,11 @@ that participates in short-term moisture transfer and storage. This
 layer has a uniform moisture content, and can be considered a
 \emph{lumped-capacitance}. The penetration depth is based on the amount
 of material that interacts with the zone air when subject to a cyclic
-relative humidity variation. The surface penetration depth can be
+relative humidity variation. It also impacts the mass transfer resistance
+between the zone air and this layer, with thinner depths resulting in lower
+mass transfer resistances (ref: Effective Moisture Penetration Depth (EMPD) Model
+in the Engineering Reference). For this reason very small values can lead to
+instabilities depending on the timestep.The surface penetration depth can be
 estimated with the following equation:
 
 \[ d_{EMPD,surf} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{surf}}{\rho_{material} \frac{du}{d\phi} \pi}} \]
@@ -348,6 +352,7 @@ where
 If this field is left blank or set to \texttt{autocalculate}, 
 the above equation will be used to calculate the surface layer penetration depth 
 assuming a $\tau_{surf}$ of 24 hours.
+To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. If calculating d_{EMPD,surf}, the assumed value of tau_{surf} should not be less than 4x the simulation timestep to ensure an accurate and stable solution.
 
 \paragraph{Field: Deep Layer Penetration
 	Depth}\label{field-deep-layer-penetration-depth}
@@ -369,9 +374,8 @@ layer.
 
 If this field is left blank or set to \texttt{autocalculate}, 
 the above equation will be used to calculate the deep layer penetration depth 
-assuming a $\tau_{surf}$ of three weeks.
+assuming a $\tau_{deep}$ of three weeks. To use a period different than 3 weeks, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{deep}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}.
 
-To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. 
 
 \paragraph{Field: Coating Layer
 	Thickness}\label{field-coating-layer-thickness}
