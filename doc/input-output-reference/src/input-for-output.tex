@@ -733,7 +733,7 @@ This field contains the name of a schedule containing values that are multiplied
 
 The use of this field is required for evaluations using source energy factors that change throughout the year such as Time Dependent Valuation (TDV), the method used to show compliance with to California's Title 24 under the ACM (Alternative Compliance Method). Data files containing TDV factors are in the DataSets\textbackslash{}TDV\textbackslash{} directory. An example file for use with TDV file is in the ExampleFiles directory and is named 5zoneTDV.IDF. When using these TDV files with EnergyPlus it is important that a consistent weather file be used. It is also important that the day of the week for January 1 is set to Tuesday since all the TDV and related weather files use 1991 as the year of reference. Also note that the values in the TDV datasets files are in non SI units of measure. The source energy factor field should contain the value of 0.293 for electricity and 0.01 for natural gas to account for the non-standard units used in the files. A summary report that provides a breakdown of the facility energy use in terms of source energy can be obtained by selecting the `\emph{AllSummary}' or `\emph{SourceEnergyEndUseComponentsSummary}' keywords in the `Output:Table:SummaryReports' reporting object. To learn more about TDV see:
 
-http://www.energy.ca.gov/title24/2005standards/archive/rulemaking/documents/tdv/index.html
+\url{http://www.energy.ca.gov/title24/2005standards/archive/rulemaking/documents/tdv/index.html}
 
 \textbf{WARNING}
 

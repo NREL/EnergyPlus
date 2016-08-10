@@ -7,20 +7,19 @@
 !                          Regular roof.  No Windows.
 !
 ! Highlights:              Very basic test to see that EnergyPlus "works".
-!                          Custom Range RunPeriod - actual weather.
 !
 !
-! Simulation Location/Run: Windsor Ontario Canada WMO=716280, 2 design days, 1 run period,
+! Simulation Location/Run: Denver Centennial  Golden CO USA WMO=724666, 2 design days, 1 run period,
 !                          Run Control executes two design days (see RUN PERIOD object)
 !
-! Location:                Windsor CAN
+! Location:                Denver, CO
 !
-! Design Days:             Windsor CAN Annual Heating 99%, MaxDB=-13.7°C
-!                          Windsor CAN Annual Cooling (DB=>MWB) 1%, MaxDB=30.3°C MWB=22.2°C
+! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5ï¿½C
+!                          Denver Centennial  Golden CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32ï¿½C MWB=15.5ï¿½C
 !
-! Run Period (Weather File): Full Annual Simulation, Windsor Ontario Canada (2 years, actual weather)
+! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
 !
-! Run Control:             No zone or system sizing no design day run control (only weather file simulation)
+! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
 !
 ! Building: Fictional 1 zone building with resistive walls.
 !
@@ -113,63 +112,53 @@
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    No,                      !- Run Simulation for Sizing Periods
+    Yes,                     !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-  RunPeriod:CustomRange,
-    Windsor-1956-1957,       !- Name
+  RunPeriod,
+    ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    1956,                    !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    1957,                    !- End Year
-    Thursday,                !- Day of Week for Start Day
-    No,                      !- Use Weather File Holidays and Special Days
-    No,                      !- Use Weather File Daylight Saving Period
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
   Site:Location,
-    Windsor_ON_CAN Design_Conditions,  !- Name
-    42.27,                   !- Latitude {deg}
-    -82.97,                  !- Longitude {deg}
-    -5.00,                   !- Time Zone {hr}
-    190.00;                  !- Elevation {m}
+    Denver Centennial  Golden   N_CO_USA Design_Conditions,  !- Name
+    39.74,                   !- Latitude {deg}
+    -105.18,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1829.00;                 !- Elevation {m}
 
- !  WMO=715380 Time Zone=NAE: (GMT-05:00) Eastern Time (US & Canada)
+ !  WMO=724666 Time Zone=NAM: (GMT-07:00) Mountain Time (US & Canada)
  !  Data Source=ASHRAE 2009 Annual Design Conditions
-
-  RunPeriodControl:DaylightSavingTime,
-    2nd Sunday in March,     !- Start Date
-    1st Sunday in November;  !- End Date
-
- ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
- ! Windsor_ON_CAN Extreme Annual Wind Speeds, 1%=11.4m/s, 2.5%=10m/s, 5%=8.9m/s
- ! Windsor_ON_CAN Extreme Annual Temperatures, Max Drybulb=-19.5°C Min Drybulb=34.5°C
- ! Windsor_ON_CAN Annual Heating Design Conditions Wind Speed=5m/s Wind Dir=240
- ! Coldest Month=JAN
- ! Windsor_ON_CAN Annual Heating 99%, MaxDB=-13.7°C
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
+ ! Coldest Month=DEC
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5ï¿½C
 
   SizingPeriod:DesignDay,
-    Windsor Ann Htg 99% Condns DB,  !- Name
-    1,                       !- Month
+    Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name
+    12,                      !- Month
     21,                      !- Day of Month
     WinterDesignDay,         !- Day Type
-    -13.7,                   !- Maximum Dry-Bulb Temperature {C}
+    -15.5,                   !- Maximum Dry-Bulb Temperature {C}
     0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    -13.7,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    -15.5,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    5,                       !- Wind Speed {m/s}
-    240,                     !- Wind Direction {deg}
+    81198.,                  !- Barometric Pressure {Pa}
+    3,                       !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -180,28 +169,28 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Windsor Annual Cooling Design Conditions Wind Speed=5.4m/s Wind Dir=230
+ ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=JUL
- ! Windsor_ON_CAN Annual Cooling (DB=>MWB) 1%, MaxDB=30.3°C MWB=22.2°C
+ ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32ï¿½C MWB=15.5ï¿½C
 
   SizingPeriod:DesignDay,
-    Windsor Ann Clg 1% Condns DB=>MWB,  !- Name
+    Denver Centennial  Golden   N Ann Clg 1% Condns DB=>MWB,  !- Name
     7,                       !- Month
     21,                      !- Day of Month
     SummerDesignDay,         !- Day Type
-    30.3,                    !- Maximum Dry-Bulb Temperature {C}
-    9.3,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    32,                      !- Maximum Dry-Bulb Temperature {C}
+    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    22.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    15.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    5.4,                     !- Wind Speed {m/s}
-    230,                     !- Wind Direction {deg}
+    81198.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    0,                       !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -369,73 +358,13 @@
     15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
-! Ontario Statuary Holidays
-! source=http://en.wikipedia.org/wiki/Public_holidays_in_Canada#Ontario
-! Ontario - 5 nationwide and 4 provincial statutory holidays plus one common municipal holiday.
-
-  RunPeriodControl:SpecialDays,
-    New Years Day,           !- Name
-    January 1,               !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  RunPeriodControl:SpecialDays,
-    Christmas,               !- Name
-    December 25,             !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  RunPeriodControl:SpecialDays,
-    Boxing Day,              !- Name
-    December 26,             !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  RunPeriodControl:SpecialDays,
-    Canada Day,              !- Name
-    July 4,                  !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  RunPeriodControl:SpecialDays,
-    Labour Day,              !- Name
-    1st Monday in September, !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  RunPeriodControl:SpecialDays,
-    Remembrance Day,         !- Name
-    November 11,             !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  RunPeriodControl:SpecialDays,
-    Thanksgiving,            !- Name
-    2nd Monday in October,   !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  ! Ontario Holidays
-
-  RunPeriodControl:SpecialDays,
-    Family Day,              !- Name
-    3rd Monday in February,  !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  RunPeriodControl:SpecialDays,
-    Civic Public Holiday,    !- Name
-    1st Monday in August,    !- Start Date
-    1,                       !- Duration {days}
-    Holiday;                 !- Special Day Type
-
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   Output:Variable,*,Site Daylight Saving Time Status,daily;
 
   Output:Variable,*,Site Day Type Index,daily;
 
-  Output:Variable,*,Zone Mean Air Temperature,daily;
+  Output:Variable,*,Zone Mean Air Temperature,hourly;
 
   Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;
 
@@ -456,6 +385,10 @@
   Output:Variable,*,Other Equipment Total Heating Energy,monthly;
 
   Output:Variable,*,Zone Other Equipment Total Heating Energy,monthly;
+  
+  Output:Variable,*,Other Equipment FuelOil#2 Rate,hourly; !- Zone Average [W]
+  
+  Output:Variable,*,Other Equipment Total Heating Rate,hourly; !- Zone Average [W]
 
   Output:VariableDictionary,IDF;
 
@@ -468,6 +401,8 @@
   Output:Meter:MeterFileOnly,EnergyTransfer:Building,hourly;
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Facility,hourly;
+
+  Output:Meter,FuelOil#2:Facility,hourly; !- [J]
 
   OutputControl:Table:Style,
     ALL;                     !- Column Separator
@@ -490,9 +425,9 @@
 
   OtherEquipment,
     Test 352a,               !- Name
-    None,                    !- Fuel Type
+    FuelOil#2,               !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
-    AlwaysOn,                !- Schedule Name
+    OthEqSch,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     352,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
@@ -505,7 +440,7 @@
     Test 352 minus,          !- Name
     None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
-    AlwaysOn,                !- Schedule Name
+    OthEqSch,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     -352,                    !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
@@ -516,3 +451,14 @@
 
   Schedule:Constant,AlwaysOn,On/Off,1.0;
 
+  Schedule:Compact,
+    OthEqSch,
+    Fraction,
+    Through 12/31,
+    For: AllDays,
+    Until: 4:00, 0.1,
+    Until: 8:00, 0.4,
+    Until: 12:00, 0.6,
+    Until: 16:00, 0.8,
+    Until: 20:00, 1.0,
+    Until: 24:00, 0.5;
