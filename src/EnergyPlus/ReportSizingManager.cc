@@ -86,6 +86,7 @@
 #include <WaterCoils.hh>
 #include <Fans.hh>
 #include <DesiccantDehumidifiers.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -1693,8 +1694,38 @@ namespace ReportSizingManager {
 							}
 							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
 							RetFanNum = PrimaryAirSystem( CurSysNum ).RetFanNum;
-							PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
+							PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ); //? what is this doing, a function with no left hand side?
 							FanCoolLoad = FanDesHeatGain( SupFanNum, DesVolFlow ) + ( 1.0 - OutAirFrac ) * FanDesHeatGain( RetFanNum, DesVolFlow );
+							switch ( PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum ){
+								case DataAirSystems::structArrayLegacyFanModels: {
+									FanCoolLoad = FanDesHeatGain( PrimaryAirSystem( CurSysNum ).SupFanNum, DesVolFlow );
+									break;
+								}
+								case DataAirSystems::objectVectorOOFanSystemModel: {
+									FanCoolLoad = HVACFan::fanObjs[ PrimaryAirSystem( CurSysNum ).supFanVecIndex ]->getFanDesignHeatGain( DesVolFlow );
+									break;
+								}
+								case DataAirSystems::fanModelTypeNotYetSet: {
+									// do nothing
+									break;
+								}
+							} // end switch
+
+							switch ( PrimaryAirSystem( CurSysNum ).retFanModelTypeEnum ){
+								case DataAirSystems::structArrayLegacyFanModels: {
+									FanCoolLoad += ( 1.0 - OutAirFrac ) * FanDesHeatGain( PrimaryAirSystem( CurSysNum ).RetFanNum, DesVolFlow );
+									break;
+								}
+								case DataAirSystems::objectVectorOOFanSystemModel: {
+									FanCoolLoad += ( 1.0 - OutAirFrac ) * HVACFan::fanObjs[ PrimaryAirSystem( CurSysNum ).retFanVecIndex ]->getFanDesignHeatGain( DesVolFlow );
+									break;
+								}
+								case DataAirSystems::fanModelTypeNotYetSet: {
+									// do nothing
+									break;
+								}
+							} // end switch
+
 							PrimaryAirSystem( CurSysNum ).FanDesCoolLoad = FanCoolLoad;
 							PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) + FanCoolLoad ) );
 							if ( TotCapTempModFac > 0.0 ) {
