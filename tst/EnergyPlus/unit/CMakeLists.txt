@@ -37,6 +37,7 @@ set( test_src
   DXCoils.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
+  ElectricBaseboardRadiator.unit.cc
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
