@@ -797,6 +797,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(2) = 'None'
                 OutArgs(3:11) = InArgs(2:10)
                 CurArgs = CurArgs+1
+              
+              CASE('COIL:HEATING:GAS')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:2) = InArgs(1:2)
+                OutArgs(3) = 'NaturalGas'
+                OutArgs(3:11) = InArgs(2:10)
+                CurArgs = CurArgs + 1
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
