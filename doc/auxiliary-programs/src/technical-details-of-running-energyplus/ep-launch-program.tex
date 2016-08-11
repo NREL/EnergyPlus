@@ -186,8 +186,6 @@ The ``View'' menu also accesses the ``Options'' menu item shown in Figure~\ref{f
 
 \textbf{Number of Simultaneous Processes} - Select the maximum number of simulations that should be able to be run at the same time. For a computer with multiple processors or multiple cores, this will allow better utilization of the computers power. The value selected should correspond to the number of processors/cores but higher or lower number can be used as well.
 
-\textbf{Disable Multi-Threading} - Check this box if you wish to disable the built in multi-threading capabilities of EnergyPlus. Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation. This multithreading may not be desirable when running more than one simulation at a time on the same computer (because it can actually run more slowly). When this check box is checked multi-threading is turned off. The check box sets the \textbf{EP\_OMP\_NUM\_THREADS} environmental variable to 1. The multi-threading capability of EnergyPlus can also be controlled using the \textbf{ProgramControl} object field called Number of Threads Allowed. That field takes precedence over the setting of the checkbox. Also note that when multiple simulations are started from EP-Launch, this automatically disables multithreading by setting the EP\_OMP\_NUM\_THREADS environmental variable to 1 whether this box is checked or not. The ProgramControl object is described in the Input Output Reference document.
-
 \subsubsection{Interface Options}\label{interface-options}
 
 \textbf{Extra Wide Window} - Select this option to make the main EP-Launch window wider. This is useful when files are used with very long file path names.
