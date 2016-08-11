@@ -196,7 +196,7 @@ namespace DataHVACGlobals {
 	extern int const CoilDX_MultiSpeedCooling;
 	extern int const CoilDX_MultiSpeedHeating;
 
-	extern int const Coil_HeatingFuel;
+	extern int const Coil_HeatingGasOrOtherFuel;
 	extern int const Coil_HeatingGas_MultiStage;
 	extern int const Coil_HeatingElectric;
 	extern int const Coil_HeatingElectric_MultiStage;

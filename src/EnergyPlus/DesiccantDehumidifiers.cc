@@ -150,7 +150,7 @@ namespace DesiccantDehumidifiers {
 	using DataHVACGlobals::DrawThru;
 	using DataHVACGlobals::Coil_HeatingWater;
 	using DataHVACGlobals::Coil_HeatingSteam;
-	using DataHVACGlobals::Coil_HeatingFuel;
+	using DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
 	using DataHVACGlobals::Coil_HeatingElectric;
 	using DataHeatBalance::HeatReclaimDXCoil;
 	// Use statements for access to subroutines in other modules
@@ -507,7 +507,7 @@ namespace DesiccantDehumidifiers {
 
 			if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) {
 				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
-				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingFuel;
+				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
 				ValidateComponent( DesicDehum( DesicDehumNum ).RegenCoilType, DesicDehum( DesicDehumNum ).RegenCoilName, ErrorsFound2, CurrentModuleObject + '=' + Alphas( 1 ) );
 				if ( ErrorsFound2 ) ErrorsFound = true;
 				GetHeatingCoilIndex( DesicDehum( DesicDehumNum ).RegenCoilName, DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2 );
@@ -880,7 +880,7 @@ namespace DesiccantDehumidifiers {
 			if ( ! lAlphaBlanks( 10 ) ) {
 				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) {
 					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
-					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingFuel;
+					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
 					ErrorsFound2 = false;
 					ValidateComponent( RegenCoilType, RegenCoilName, ErrorsFound2, DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 					if ( ErrorsFound2 ) ErrorsFoundGeneric = true;
@@ -2745,7 +2745,7 @@ namespace DesiccantDehumidifiers {
 		RegenCoilActual = 0.0;
 		if ( RegenCoilLoad > SmallLoad ) {
 			{ auto const SELECT_CASE_var( DesicDehum( DesicDehumNum ).RegenCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( DesicDehum( DesicDehumNum ).RegenCoilName, FirstHVACIteration, RegenCoilLoad, DesicDehum( DesicDehumNum ).RegenCoilIndex, RegenCoilActual );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				MaxHotWaterFlow = DesicDehum( DesicDehumNum ).MaxCoilFluidFlow;
@@ -2796,7 +2796,7 @@ namespace DesiccantDehumidifiers {
 			}}
 		} else {
 			{ auto const SELECT_CASE_var( DesicDehum( DesicDehumNum ).RegenCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( DesicDehum( DesicDehumNum ).RegenCoilName, FirstHVACIteration, RegenCoilLoad, DesicDehum( DesicDehumNum ).RegenCoilIndex, RegenCoilActual );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				mdot = 0.0;

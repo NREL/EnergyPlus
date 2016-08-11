@@ -164,7 +164,7 @@ namespace HVACMultiSpeedHeatPump {
 	using DataHVACGlobals::BlowThru;
 	using DataHVACGlobals::Coil_HeatingWater;
 	using DataHVACGlobals::Coil_HeatingSteam;
-	using DataHVACGlobals::Coil_HeatingFuel;
+	using DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
 	using DataHVACGlobals::Coil_HeatingElectric;
 	using DataHVACGlobals::Coil_HeatingGas_MultiStage;
 	using DataHVACGlobals::Coil_HeatingElectric_MultiStage;

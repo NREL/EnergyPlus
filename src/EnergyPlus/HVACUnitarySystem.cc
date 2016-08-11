@@ -846,7 +846,7 @@ namespace HVACUnitarySystem {
 					InitComponentNodes( 0.0, UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow, UnitarySystem( UnitarySysNum ).SuppCoilFluidInletNode, UnitarySystem( UnitarySysNum ).SuppCoilFluidOutletNodeNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopNum, UnitarySystem( UnitarySysNum ).SuppCoilLoopSide, UnitarySystem( UnitarySysNum ).SuppCoilBranchNum, UnitarySystem( UnitarySysNum ).SuppCoilCompNum );
 				}
 			}
-			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingFuel || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric ) {
+			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric ) {
 //				SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, 1.0, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, _, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
 //				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetHeatingCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ), UnitarySystem( UnitarySysNum ).HeatingCoilName, InitUnitarySystemsErrFlag );
 			}
@@ -3547,7 +3547,7 @@ namespace HVACUnitarySystem {
 
 				if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
-			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingFuel || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingDesuperheater ) {
+			} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingDesuperheater ) {
 				errFlag = false;
 				if ( errFlag ) {
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
@@ -3907,7 +3907,7 @@ namespace HVACUnitarySystem {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilTypeAlphaNum ) + " = " + Alphas( iHeatingCoilTypeAlphaNum ) );
 				ErrorsFound = true;
-			} // IF (UnitarySystem(UnitarySysNum)%HeatingCoilType_Num == Coil_HeatingFuel .OR. &, etc.
+			} // IF (UnitarySystem(UnitarySysNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
 			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
 				UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil = true;
@@ -4792,7 +4792,7 @@ namespace HVACUnitarySystem {
 			if ( ! lAlphaBlanks( iSuppHeatCoilTypeAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).SuppCoilExists = true;
 
-				if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingFuel || UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingElectric || UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingDesuperheater ) {
+				if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingGasOrOtherFuel || UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingElectric || UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num == Coil_HeatingDesuperheater ) {
 
 					UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 					if ( errFlag ) {
@@ -4995,7 +4995,7 @@ namespace HVACUnitarySystem {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Illegal " + cAlphaFields( iSuppHeatCoilTypeAlphaNum ) + " = " + Alphas( iSuppHeatCoilTypeAlphaNum ) );
 					ErrorsFound = true;
-				} // IF (UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingFuel .OR. &, etc.
+				} // IF (UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
 			} // IF(.NOT. lAlphaBlanks(iSuppHeatCoilTypeAlphaNum))THEN
 
@@ -5975,7 +5975,7 @@ namespace HVACUnitarySystem {
 			}
 
 			if ( ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) ||
-				( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingFuel && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) ) {
+				( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel && UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) ) {
 				Index = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
 				if ( Index > 0 ) {
 					if ( DesignSpecMSHP( Index ).SingleModeFlag ) {
@@ -7921,7 +7921,7 @@ namespace HVACUnitarySystem {
 
 			SimCoilUserDefined( CompName, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, AirLoopNum, HeatingActive, CoolingActive );
 
-		} else if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+		} else if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 			if ( present( HeatCoilLoad ) ) {
 				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, HeatCoilLoad, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, false, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio );
 			} else {
@@ -8066,7 +8066,7 @@ namespace HVACUnitarySystem {
 
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num );
 
-		if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+		if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 			{ auto const SELECT_CASE_var1( UnitarySystem( UnitarySysNum ).ControlType );
 			if ( SELECT_CASE_var1 == SetPointBased ) {
 				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, _, true, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio );
@@ -8166,7 +8166,7 @@ namespace HVACUnitarySystem {
 		CompName = UnitarySystem( UnitarySysNum ).SuppHeatCoilName;
 		CoilType_Num = UnitarySystem ( UnitarySysNum ).SuppHeatCoilType_Num;
 
-		if ( ( CoilType_Num == Coil_HeatingFuel ) || ( CoilType_Num == Coil_HeatingElectric ) ) {
+		if ( ( CoilType_Num == Coil_HeatingGasOrOtherFuel ) || ( CoilType_Num == Coil_HeatingElectric ) ) {
 			SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, _, _, UnitarySystem( UnitarySysNum ).FanOpMode, UnitarySystem( UnitarySysNum ).SuppHeatPartLoadFrac );
 			//                             QCoilReq=(UnitarySystem(UnitarySysNum)%DesignSuppHeatingCapacity*UnitarySystem(UnitarySysNum)%SuppHeatPartLoadFrac)
 
@@ -9362,7 +9362,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).HeatingCoilSensDemand = ReqOutput;
 					SimVariableSpeedCoils( "", UnitarySystem( UnitarySysNum ).HeatingCoilIndex, FanOpMode, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, CompOn, CycRatio, SpeedNum, SpeedRatio, SensLoad, dummy );
 
-				} else if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
+				} else if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
 
 					SimulateHeatingCoilComponents( CompName, FirstHVACIteration, 0.0, CompIndex, _, _, FanOpMode );
 
@@ -9456,7 +9456,7 @@ namespace HVACUnitarySystem {
 							if ( OutletTemp > DesOutTemp && SensibleLoad ) break;
 						}
 
-					} else if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+					} else if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 
 						SimulateHeatingCoilComponents( CompName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).DesignHeatingCapacity, CompIndex, _, _, FanOpMode );
 
@@ -9536,7 +9536,7 @@ namespace HVACUnitarySystem {
 								PartLoadFrac = CycRatio;
 							}
 
-						} else if ( SELECT_CASE_var == Coil_HeatingFuel ) {
+						} else if ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) {
 
 							SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, ReqOutput, CompIndex, _, true, FanOpMode, PartLoadFrac );
 							PartLoadFrac = ReqOutput / FullOutput;
@@ -9771,7 +9771,7 @@ namespace HVACUnitarySystem {
 
 				{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num );
 
-				if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
+				if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
 					SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, QCoilActual, SuppHeatingCoilFlag, FanOpMode, PartLoadFrac ); // QCoilReq= 0.0d0,  &
 					PartLoadFrac = QCoilActual / UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity;
 
@@ -9812,7 +9812,7 @@ namespace HVACUnitarySystem {
 
 					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num );
 
-					if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+					if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 
 						//                                  CompIndex=CompIndex, QCoilReq= UnitarySystem(UnitarySysNum)%DesignSuppHeatingCapacity,  &
 						SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, QCoilActual, SuppHeatingCoilFlag, FanOpMode, PartLoadFrac );
@@ -9848,7 +9848,7 @@ namespace HVACUnitarySystem {
 
 						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num );
 
-						if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
+						if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
 
 							Par( 1 ) = double( UnitarySysNum );
 							if ( FirstHVACIteration ) {

@@ -206,7 +206,7 @@ namespace DataHVACGlobals {
 	int const CoilDX_MultiSpeedCooling( 8 );
 	int const CoilDX_MultiSpeedHeating( 9 );
 
-	int const Coil_HeatingFuel( 10 );
+	int const Coil_HeatingGasOrOtherFuel( 10 );
 	int const Coil_HeatingGas_MultiStage( 11 );
 	int const Coil_HeatingElectric( 12 );
 	int const Coil_HeatingElectric_MultiStage( 13 );

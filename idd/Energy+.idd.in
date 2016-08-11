@@ -24048,7 +24048,6 @@ AirflowNetwork:Distribution:Component:Coil,
       \type choice
       \key Coil:Cooling:DX:SingleSpeed
       \key Coil:Heating:Gas
-      \key Coil:Heating:OtherFuel
       \key Coil:Heating:Electric
       \key Coil:Heating:DX:SingleSpeed
       \key Coil:Cooling:Water
@@ -32944,7 +32943,6 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \required-field
         \type choice
         \key Coil:Heating:Gas
-        \key Coil:Heating:OtherFuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -33134,7 +33132,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \required-field
         \type choice
         \key Coil:Heating:Gas
-        \key Coil:Heating:OtherFuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -33320,7 +33317,6 @@ ZoneHVAC:WaterToAirHeatPump,
         \required-field
         \type choice
         \key Coil:Heating:Gas
-        \key Coil:Heating:OtherFuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -33711,7 +33707,6 @@ ZoneHVAC:UnitVentilator,
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
         \key Coil:Heating:Gas
-        \key Coil:Heating:OtherFuel
         \key Coil:Heating:Steam
    A16, \field Heating Coil Name
         \type object-list
@@ -33779,7 +33774,6 @@ ZoneHVAC:UnitHeater,
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
         \key Coil:Heating:Gas
-        \key Coil:Heating:OtherFuel
         \key Coil:Heating:Steam
    A8 , \field Heating Coil Name
         \required-field
@@ -34028,7 +34022,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34044,7 +34037,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34060,7 +34052,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34076,7 +34067,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34092,7 +34082,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34108,7 +34097,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34124,7 +34112,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34140,7 +34127,6 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
        \type choice
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -38519,7 +38505,6 @@ ZoneHVAC:VentilatedSlab,
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
   A28, \field Heating Coil Name
        \type object-list
@@ -38814,7 +38799,6 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
   A6,  \field Reheat Coil Name
        \required-field
@@ -38959,7 +38943,6 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
   A8 , \field Reheat Coil Name
        \required-field
@@ -39081,7 +39064,6 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
   A8,  \field Heating Coil Name
        \required-field
@@ -39171,7 +39153,6 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
   A6,  \field Reheat Coil Name
        \required-field
@@ -39255,7 +39236,6 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
   A10, \field Reheat Coil Name
        \required-field
@@ -39337,7 +39317,6 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
-       \key Coil:Heating:OtherFuel
        \key Coil:Heating:Steam
   A10, \field Reheat Coil Name
        \required-field
@@ -44094,7 +44073,7 @@ Coil:Heating:Electric:MultiStage,
        \autosizable
 
 Coil:Heating:Gas,
-       \memo Gas heating coil. If the coil is located directly in an air loop branch or
+       \memo Gas or other fuel heating coil. If the coil is located directly in an air loop branch or
        \memo outdoor air equipment list, then it is controlled on leaving air temperature and
        \memo the Temperature Setpoint Node Name must be specified. If the coil is contained within
        \memo another component such as an air terminal unit, zone HVAC equipment, or unitary
@@ -44110,29 +44089,42 @@ Coil:Heating:Gas,
        \note If this field is blank, the system is always available.
        \type object-list
        \object-list ScheduleNames
-  N1 , \field Gas Burner Efficiency
+  A3 , \field Fuel Type
+       \required-field
+       \type choice
+       \key Gas
+       \key NaturalGas
+       \key PropaneGas
+       \key Diesel
+       \key Gasoline
+       \key FuelOil#1
+       \key FuelOil#2
+       \key OtherFuel1
+       \key OtherFuel2
+       \default Gas
+  N1 , \field Burner Efficiency
        \maximum 1.0
        \minimum 0.0
        \default 0.8
   N2 , \field Nominal Capacity
        \units W
        \autosizable
-  A3 , \field Air Inlet Node Name
+  A4 , \field Air Inlet Node Name
        \required-field
        \type node
-  A4 , \field Air Outlet Node Name
+  A5 , \field Air Outlet Node Name
        \required-field
        \type node
-  A5 , \field Temperature Setpoint Node Name
+  A6 , \field Temperature Setpoint Node Name
        \type node
        \note optional, used if coil is temperature control and not load-base controlled
   N3 , \field Parasitic Electric Load
        \units W
-       \note parasitic electric load associated with the gas coil operation
+       \note parasitic electric load associated with the coil operation
        \note such as an inducer fan, etc..  This will be modified by the part load ratio to reflect
        \note the time of operation in a timestep.
        \ip-units W
-  A6 , \field Part Load Fraction Correlation Curve Name
+  A7 , \field Part Load Fraction Correlation Curve Name
        \type object-list
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
@@ -44142,10 +44134,10 @@ Coil:Heating:Gas,
        \note PLR = part load ratio (sensible heating load/steady state heating capacity)
        \note Coil runtime fraction = Part Load Ratio / PLF
        \note This part load degradation is for coil performance & will
-       \note increase the gas consumption of the coil due to transient coil operation.
-  N4 ; \field Parasitic Gas Load
+       \note increase the fuel consumption of the coil due to transient coil operation.
+  N4 ; \field Parasitic Fuel Load
        \units W
-       \note parasitic gas load associated with the gas coil operation (i.e., standing pilot)
+       \note parasitic fuel load associated with the coil operation (i.e., standing pilot)
 
 Coil:Heating:Gas:MultiStage,
        \memo Gas heating coil, multi-stage. If the coil is located directly in an air loop
@@ -44260,70 +44252,6 @@ Coil:Heating:Gas:MultiStage,
        \note such as an inducer fan, etc.  This will be modified by the part
        \note load ratio to reflect the time of operation in a timestep.
        \ip-units W
-
-Coil:Heating:OtherFuel,
-      \memo Other fuel heating coil. If the coil is located directly in an air loop branch or
-      \memo outdoor air equipment list, then it is controlled on leaving air temperature and
-      \memo the Temperature Setpoint Node Name must be specified. If the coil is contained within
-      \memo another component such as an air terminal unit, zone HVAC equipment, or unitary
-      \memo system, then the coil is controlled by the parent component and the setpoint node name
-      \memo is not entered.
-  A1 , \field Name
-      \required-field
-      \type alpha
-      \reference HeatingCoilName
-      \reference AFNCoilNames
-  A2 , \field Availability Schedule Name
-      \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-      \note If this field is blank, the system is always available.
-      \type object-list
-      \object-list ScheduleNames
-  A3 , \field Fuel Type
-      \required-field
-      \type choice
-      \key PropaneGas
-      \key Diesel
-      \key Gasoline
-      \key FuelOil#1
-      \key FuelOil#2
-      \key OtherFuel1
-      \key OtherFuel2
-  N1 , \field Burner Efficiency
-      \maximum 1.0
-      \minimum 0.0
-      \default 0.8
-  N2 , \field Nominal Capacity
-      \units W
-      \autosizable
-  A3 , \field Air Inlet Node Name
-      \required-field
-      \type node
-  A4 , \field Air Outlet Node Name
-      \required-field
-      \type node
-  A5 , \field Temperature Setpoint Node Name
-      \type node
-      \note optional, used if coil is temperature control and not load-base controlled
-  N3 , \field Parasitic Electric Load
-      \units W
-      \note parasitic electric load associated with the gas coil operation
-      \note such as an inducer fan, etc..  This will be modified by the part load ratio to reflect
-      \note the time of operation in a timestep.
-      \ip-units W
-  A6 , \field Part Load Fraction Correlation Curve Name
-      \type object-list
-      \object-list QuadraticCubicCurves
-      \object-list UniVariateTables
-      \note quadratic curve, PLF = a + b*PLR + c*PLR**2
-      \note cubic curve, PLF = a + b*PLR + c*PLR**2 + d*PLR**3
-      \note PLF = part load fraction
-      \note PLR = part load ratio (sensible heating load/steady state heating capacity)
-      \note Coil runtime fraction = Part Load Ratio / PLF
-      \note This part load degradation is for coil performance & will
-      \note increase the gas consumption of the coil due to transient coil operation.
-  N4 ; \field Parasitic Fuel Load
-      \units W
-      \note parasitic fuel load associated with the coil operation (i.e., standing pilot)
 
 Coil:Heating:Desuperheater,
        \memo Desuperheater air heating coil. The heating energy provided by this coil is reclaimed

@@ -71,6 +71,7 @@
 #include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
+#include <DataGlobalConstants.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -120,6 +121,7 @@ namespace HeatingCoils {
 	using namespace DataLoopNode;
 	using namespace DataGlobals;
 	using namespace DataHVACGlobals;
+	using namespace DataGlobalConstants;
 	using DataEnvironment::StdRhoAir;
 	using DataHeatBalance::NumRefrigeratedRacks;
 	using DataHeatBalance::HeatReclaimRefrigeratedRack;
@@ -309,7 +311,7 @@ namespace HeatingCoils {
 			CalcElectricHeatingCoil( CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac );
 		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage ) {
 			CalcMultiStageElectricHeatingCoil( CoilNum, SpeedRatio, PartLoadRatio, StageNum, OpMode ); //Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
-		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingFuel ) {
+		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGasOrOtherFuel ) {
 			CalcGasHeatingCoil( CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac );
 		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
 			CalcMultiStageGasHeatingCoil( CoilNum, SpeedRatio, PartLoadRatio, StageNum, OpMode ); //Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
@@ -451,6 +453,7 @@ namespace HeatingCoils {
 			CoilNum = ElecCoilNum;
 
 			CurrentModuleObject = "Coil:Heating:Electric";
+			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
 			GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -509,6 +512,7 @@ namespace HeatingCoils {
 			CoilNum = NumElecCoil + ElecCoilNum;
 
 			CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
+			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
 			GetObjectItem( CurrentModuleObject, ElecCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -575,6 +579,7 @@ namespace HeatingCoils {
 		for ( GasCoilNum = 1; GasCoilNum <= NumGasCoil; ++GasCoilNum ) {
 
 			CoilNum = NumElecCoil + NumElecCoilMultiStage + GasCoilNum;
+			HeatingCoilEquipConditions & coil = HeatingCoil( CoilNum );
 
 			CurrentModuleObject = "Coil:Heating:Gas";
 
@@ -595,51 +600,59 @@ namespace HeatingCoils {
 			if ( errFlag ) {
 				ErrorsFound = true;
 			}
-			HeatingCoil( CoilNum ).Name = Alphas( 1 );
-			HeatingCoil( CoilNum ).Schedule = Alphas( 2 );
+			coil.Name = Alphas( 1 );
+			coil.Schedule = Alphas( 2 );
 			if ( lAlphaBlanks( 2 ) ) {
-				HeatingCoil( CoilNum ).SchedPtr = ScheduleAlwaysOn;
+				coil.SchedPtr = ScheduleAlwaysOn;
 			} else {
-				HeatingCoil( CoilNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
-				if ( HeatingCoil( CoilNum ).SchedPtr == 0 ) {
+				coil.SchedPtr = GetScheduleIndex( Alphas( 2 ) );
+				if ( coil.SchedPtr == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
 					ErrorsFound = true;
 				}
 			}
 
-			HeatingCoil( CoilNum ).HeatingCoilType = "Heating";
-			HeatingCoil( CoilNum ).HeatingCoilModel = "Gas";
-			HeatingCoil( CoilNum ).HCoilType_Num = Coil_HeatingFuel;
+			coil.HeatingCoilType = "Heating";
+			coil.HeatingCoilModel = "Gas";
+			coil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
-			HeatingCoil( CoilNum ).Efficiency = Numbers( 1 );
-			HeatingCoil( CoilNum ).NominalCapacity = Numbers( 2 );
-			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			coil.FuelType_Num = AssignResourceTypeNum( Alphas( 3 ) );
+			if ( !( coil.FuelType_Num == iRT_Natural_Gas || coil.FuelType_Num == iRT_Propane || coil.FuelType_Num == iRT_Diesel || coil.FuelType_Num == iRT_Gasoline || coil.FuelType_Num == iRT_FuelOil_1 || coil.FuelType_Num == iRT_FuelOil_2 || coil.FuelType_Num == iRT_OtherFuel1 || coil.FuelType_Num == iRT_OtherFuel2 ) || coil.FuelType_Num == 0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 3 ) + " entered =" + Alphas( 3 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
+				ErrorsFound = true;
+			}
+			std::string const FuelType( GetResourceTypeChar( coil.FuelType_Num ) );
 
-			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
+			coil.Efficiency = Numbers( 1 );
+			coil.NominalCapacity = Numbers( 2 );
+			coil.AirInletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			coil.AirOutletNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 4 ), Alphas( 5 ), "Air Nodes" );
 
-			//parasitic electric load associated with the gas heating coil
-			HeatingCoil( CoilNum ).ParasiticElecLoad = Numbers( 3 );
+			coil.TempSetPointNodeNum = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
-			HeatingCoil( CoilNum ).PLFCurveIndex = GetCurveIndex( Alphas( 6 ) ); // convert curve name to number
+			//parasitic electric load associated with the fuel heating coil
+			coil.ParasiticElecLoad = Numbers( 3 );
 
-			//parasitic gas load associated with the gas heating coil (standing pilot light)
-			HeatingCoil( CoilNum ).ParasiticGasCapacity = Numbers( 4 );
+			coil.PLFCurveIndex = GetCurveIndex( Alphas( 7 ) ); // convert curve name to number
 
-			// Setup Report variables for the Gas Coils
-			// CurrentModuleObject = "Coil:Heating:Gas"
-			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).FuelUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Gas Rate [W]", HeatingCoil( CoilNum ).FuelUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", HeatingCoil( CoilNum ).RTF, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Ancillary Gas Rate [W]", HeatingCoil( CoilNum ).ParasiticGasRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Ancillary Gas Energy [J]", HeatingCoil( CoilNum ).ParasiticGasLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
+			//parasitic fuel load associated with the gas heating coil (standing pilot light)
+			coil.ParasiticFuelCapacity = Numbers( 4 );
 
+			// Setup Report variables for the Fuel Coils
+			// CurrentModuleObject = "Coil:Heating:OtherFuel"
+
+			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", coil.HeatingCoilLoad, "System", "Sum", coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", coil.HeatingCoilRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil " + FuelType + " Energy [J]", coil.FuelUseLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil " + FuelType + " Rate [W]", coil.FuelUseRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Electric Energy [J]", coil.ElecUseLoad, "System", "Sum", coil.Name, _, "Electricity", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Power [W]", coil.ElecUseRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Runtime Fraction []", coil.RTF, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Rate [W]", coil.ParasiticFuelRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Energy [J]", coil.ParasiticFuelLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
+			
 		}
 
 		// Get the data for for gas heating coils
@@ -648,6 +661,7 @@ namespace HeatingCoils {
 			CoilNum = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + GasCoilNum;
 
 			CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
+			HeatingCoil( CoilNum ).FuelType_Num = iRT_Natural_Gas;
 
 			GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -682,7 +696,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).HeatingCoilModel = "GasMultiStage";
 			HeatingCoil( CoilNum ).HCoilType_Num = Coil_HeatingGas_MultiStage;
 
-			HeatingCoil( CoilNum ).ParasiticGasCapacity = Numbers( 1 );
+			HeatingCoil( CoilNum ).ParasiticFuelCapacity = Numbers( 1 );
 
 			HeatingCoil( CoilNum ).NumOfStages = Numbers( 2 );
 
@@ -721,8 +735,8 @@ namespace HeatingCoils {
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
 			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 			SetupOutputVariable( "Heating Coil Runtime Fraction []", HeatingCoil( CoilNum ).RTF, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Ancillary Gas Rate [W]", HeatingCoil( CoilNum ).ParasiticGasRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Ancillary Gas Energy [J]", HeatingCoil( CoilNum ).ParasiticGasLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Ancillary Gas Rate [W]", HeatingCoil( CoilNum ).ParasiticFuelRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Ancillary Gas Energy [J]", HeatingCoil( CoilNum ).ParasiticFuelLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
 
 		}
 
@@ -732,6 +746,7 @@ namespace HeatingCoils {
 			CoilNum = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + DesuperheaterCoilNum;
 
 			CurrentModuleObject = "Coil:Heating:Desuperheater";
+			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
 
 			GetObjectItem( CurrentModuleObject, DesuperheaterCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -1283,7 +1298,7 @@ namespace HeatingCoils {
 			PreDefTableEntry( pdchHeatCoilType, HeatingCoil( CoilNum ).Name, "Coil:Heating:Electric:MultiStage" );
 			PreDefTableEntry( pdchHeatCoilNomCap, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages ) );
 			PreDefTableEntry( pdchHeatCoilNomEff, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).MSEfficiency( HeatingCoil( CoilNum ).NumOfStages ) );
-		} else if ( SELECT_CASE_var == Coil_HeatingFuel ) {
+		} else if ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) {
 			PreDefTableEntry( pdchHeatCoilType, HeatingCoil( CoilNum ).Name, "Coil:Heating:Gas" );
 			PreDefTableEntry( pdchHeatCoilNomCap, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).NominalCapacity );
 			PreDefTableEntry( pdchHeatCoilNomEff, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).Efficiency );
@@ -1753,7 +1768,7 @@ namespace HeatingCoils {
 			//The HeatingCoilLoad is the change in the enthalpy of the Heating
 			HeatingCoil( CoilNum ).FuelUseLoad = HeatingCoilLoad / Effic;
 			HeatingCoil( CoilNum ).ElecUseLoad = HeatingCoil( CoilNum ).ParasiticElecLoad * PartLoadRat;
-			HeatingCoil( CoilNum ).ParasiticGasRate = HeatingCoil( CoilNum ).ParasiticGasCapacity * ( 1.0 - PartLoadRat );
+			HeatingCoil( CoilNum ).ParasiticFuelRate = HeatingCoil( CoilNum ).ParasiticFuelCapacity * ( 1.0 - PartLoadRat );
 
 			// Control coil output to meet a setpoint temperature.
 		} else if ( ( AirMassFlow > 0.0 && HeatingCoil( CoilNum ).NominalCapacity > 0.0 ) && ( GetCurrentScheduleValue( HeatingCoil( CoilNum ).SchedPtr ) > 0.0 ) && ( QCoilReq == SensedLoadFlagValue ) && ( std::abs( TempSetPoint - TempAirIn ) > TempControlTol ) ) {
@@ -1780,7 +1795,7 @@ namespace HeatingCoils {
 			//The HeatingCoilLoad is the change in the enthalpy of the Heating
 			HeatingCoil( CoilNum ).FuelUseLoad = HeatingCoilLoad / Effic;
 			HeatingCoil( CoilNum ).ElecUseLoad = HeatingCoil( CoilNum ).ParasiticElecLoad * PartLoadRat;
-			HeatingCoil( CoilNum ).ParasiticGasRate = HeatingCoil( CoilNum ).ParasiticGasCapacity * ( 1.0 - PartLoadRat );
+			HeatingCoil( CoilNum ).ParasiticFuelRate = HeatingCoil( CoilNum ).ParasiticFuelCapacity * ( 1.0 - PartLoadRat );
 
 		} else { // If not running Conditions do not change across coil from inlet to outlet
 
@@ -1789,7 +1804,7 @@ namespace HeatingCoils {
 			PartLoadRat = 0.0;
 			HeatingCoil( CoilNum ).FuelUseLoad = 0.0;
 			HeatingCoil( CoilNum ).ElecUseLoad = 0.0;
-			HeatingCoil( CoilNum ).ParasiticGasRate = HeatingCoil( CoilNum ).ParasiticGasCapacity;
+			HeatingCoil( CoilNum ).ParasiticFuelRate = HeatingCoil( CoilNum ).ParasiticFuelCapacity;
 		}
 
 		HeatingCoil( CoilNum ).RTF = PartLoadRat;
@@ -1830,7 +1845,7 @@ namespace HeatingCoils {
 				}
 				HeatingCoil( CoilNum ).ElecUseLoad = HeatingCoil( CoilNum ).ParasiticElecLoad * HeatingCoil( CoilNum ).RTF;
 				HeatingCoil( CoilNum ).FuelUseLoad = HeatingCoil( CoilNum ).NominalCapacity / Effic * HeatingCoil( CoilNum ).RTF;
-				HeatingCoil( CoilNum ).ParasiticGasRate = HeatingCoil( CoilNum ).ParasiticGasCapacity * ( 1.0 - HeatingCoil( CoilNum ).RTF );
+				HeatingCoil( CoilNum ).ParasiticFuelRate = HeatingCoil( CoilNum ).ParasiticFuelCapacity * ( 1.0 - HeatingCoil( CoilNum ).RTF );
 				// Fan power will also be modified by the heating coil's part load fraction
 				// OnOffFanPartLoadFraction passed to fan via DataHVACGlobals (cycling fan only)
 				if ( FanOpMode == CycFanCycCoil ) {
@@ -1985,7 +2000,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).HeatingCoilLoad = MSHPMassFlowRateHigh * ( HSFullLoadOutAirEnth - InletAirEnthalpy ) * PartLoadRat + MSHPMassFlowRateLow * ( LSFullLoadOutAirEnth - InletAirEnthalpy ) * ( 1.0 - PartLoadRat );
 				EffAvg = ( EffHS * PartLoadRat ) + ( EffLS * ( 1.0 - PartLoadRat ) );
 				HeatingCoil( CoilNum ).FuelUseLoad = HeatingCoil( CoilNum ).HeatingCoilLoad / EffAvg;
-				HeatingCoil( CoilNum ).ParasiticGasRate = 0.0;
+				HeatingCoil( CoilNum ).ParasiticFuelRate = 0.0;
 
 				OutletAirEnthalpy = InletAirEnthalpy + HeatingCoil( CoilNum ).HeatingCoilLoad / HeatingCoil( CoilNum ).InletAirMassFlowRate;
 				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
@@ -2044,7 +2059,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).FuelUseLoad = HeatingCoil( CoilNum ).HeatingCoilLoad / EffLS;
 				//   parasitics are calculated when the coil is off (1-PLR)
 				HeatingCoil( CoilNum ).ElecUseLoad = HeatingCoil( CoilNum ).MSParasiticElecLoad( StageNumLS ) * ( 1.0 - PartLoadRat );
-				HeatingCoil( CoilNum ).ParasiticGasRate = HeatingCoil( CoilNum ).ParasiticGasCapacity * ( 1.0 - PartLoadRat );
+				HeatingCoil( CoilNum ).ParasiticFuelRate = HeatingCoil( CoilNum ).ParasiticFuelCapacity * ( 1.0 - PartLoadRat );
 				ElecHeatingCoilPower = HeatingCoil( CoilNum ).ElecUseLoad;
 
 				HeatingCoil( CoilNum ).OutletAirTemp = OutletAirTemp;
@@ -2067,7 +2082,7 @@ namespace HeatingCoils {
 			HeatingCoil( CoilNum ).ElecUseLoad = 0.0;
 			HeatingCoil( CoilNum ).HeatingCoilLoad = 0.0;
 			HeatingCoil( CoilNum ).FuelUseLoad = 0.0;
-			HeatingCoil( CoilNum ).ParasiticGasRate = HeatingCoil( CoilNum ).ParasiticGasCapacity;
+			HeatingCoil( CoilNum ).ParasiticFuelRate = HeatingCoil( CoilNum ).ParasiticFuelCapacity;
 			ElecHeatingCoilPower = 0.0;
 			PartLoadRat = 0.0;
 
@@ -2108,7 +2123,7 @@ namespace HeatingCoils {
 				}
 				HeatingCoil( CoilNum ).ElecUseLoad = HeatingCoil( CoilNum ).MSParasiticElecLoad( StageNum ) * HeatingCoil( CoilNum ).RTF;
 				HeatingCoil( CoilNum ).FuelUseLoad = ( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) / EffLS ) * HeatingCoil( CoilNum ).RTF;
-				HeatingCoil( CoilNum ).ParasiticGasRate = HeatingCoil( CoilNum ).ParasiticGasCapacity * ( 1.0 - HeatingCoil( CoilNum ).RTF );
+				HeatingCoil( CoilNum ).ParasiticFuelRate = HeatingCoil( CoilNum ).ParasiticFuelCapacity * ( 1.0 - HeatingCoil( CoilNum ).RTF );
 				// Fan power will also be modified by the heating coil's part load fraction
 				// OnOffFanPartLoadFraction passed to fan via DataHVACGlobals (cycling fan only)
 				if ( FanOpMode == CycFanCycCoil ) {
@@ -2412,7 +2427,7 @@ namespace HeatingCoils {
 		HeatingCoil( CoilNum ).FuelUseLoad *= ReportingConstant;
 		HeatingCoil( CoilNum ).ElecUseLoad *= ReportingConstant;
 
-		HeatingCoil( CoilNum ).ParasiticGasLoad = HeatingCoil( CoilNum ).ParasiticGasRate * ReportingConstant;
+		HeatingCoil( CoilNum ).ParasiticFuelLoad = HeatingCoil( CoilNum ).ParasiticFuelRate * ReportingConstant;
 
 	}
 
@@ -2606,7 +2621,7 @@ namespace HeatingCoils {
 		}
 
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).NominalCapacity;
@@ -2625,7 +2640,7 @@ namespace HeatingCoils {
 				ShowSevereError( "GetCoilCapacity: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			} else if ( FoundType > 0 ) {
 				ShowSevereError( "GetCoilCapacity: Invalid coil type for capacity, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
-				ShowContinueError( "...only " + cAllCoilTypes( Coil_HeatingElectric ) + ", " + cAllCoilTypes( Coil_HeatingFuel ) + " or " + cAllCoilTypes( Coil_HeatingDesuperheater ) + " are valid in this context." );
+				ShowContinueError( "...only " + cAllCoilTypes( Coil_HeatingElectric ) + ", " + cAllCoilTypes( Coil_HeatingGasOrOtherFuel ) + " or " + cAllCoilTypes( Coil_HeatingDesuperheater ) + " are valid in this context." );
 			}
 			ShowContinueError( "... returning Coil Capacity as -1000." );
 			ErrorsFound = true;
@@ -2692,7 +2707,7 @@ namespace HeatingCoils {
 		WhichCoil = 0;
 		AvailSchIndex = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = HeatingCoil( WhichCoil ).SchedPtr;
@@ -2766,7 +2781,7 @@ namespace HeatingCoils {
 		WhichCoil = 0;
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirInletNodeNum;
@@ -2841,7 +2856,7 @@ namespace HeatingCoils {
 		WhichCoil = 0;
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirOutletNodeNum;
@@ -3011,7 +3026,7 @@ namespace HeatingCoils {
 		WhichCoil = 0;
 		NodeNumber = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).TempSetPointNodeNum;
@@ -3086,7 +3101,7 @@ namespace HeatingCoils {
 		WhichCoil = 0;
 		TypeNum = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				TypeNum = HeatingCoil( WhichCoil ).HCoilType_Num;
@@ -3159,7 +3174,7 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 		} else {
 			WhichCoil = 0;
@@ -3229,7 +3244,7 @@ namespace HeatingCoils {
 		}
 
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
 			if ( WhichCoil != 0 ) {
 				IndexNum = HeatingCoil( WhichCoil ).PLFCurveIndex;

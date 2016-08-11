@@ -176,7 +176,7 @@ namespace HVACUnitaryBypassVAV {
 	int const CoilDX_CoolingTwoStageWHumControl( 3 ); // Coil:Cooling:DX:TwoStageWithHumidityControlMode
 	// formerly (v3 and beyond) Coil:DX:MultiMode:CoolingEmpirical
 	int const CoilDX_HeatingEmpirical( 4 ); // Coil:DX:HeatingEmpirical
-	int const Coil_HeatingFuel( 5 ); // Coil:Gas:Heating
+	int const Coil_HeatingGasOrOtherFuel( 5 ); // Coil:Gas:Heating
 	int const Coil_HeatingElectric( 6 ); // Coil:Electric:Heating
 
 	// Dehumidification control modes (DehumidControlMode) for Multimode units only
@@ -929,7 +929,7 @@ namespace HVACUnitaryBypassVAV {
 					if ( DXCoilErrFlag ) ShowContinueError( "...occurs in " + CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
 
 				} else if ( SameString( Alphas( 16 ), "Coil:Heating:Gas" ) ) {
-					CBVAV( CBVAVNum ).HeatCoilType_Num = Coil_HeatingFuel;
+					CBVAV( CBVAVNum ).HeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
 					CBVAV( CBVAVNum ).MinOATCompressor = -999.9;
 					CBVAV( CBVAVNum ).HeatingCoilInletNode = GetCoilInletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
 					CBVAV( CBVAVNum ).HeatingCoilOutletNode = GetCoilOutletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );
@@ -2318,7 +2318,7 @@ namespace HVACUnitaryBypassVAV {
 				//     simulate DX heating coil with compressor off when cooling load is required
 				SimDXCoil( CBVAV( CBVAVNum ).HeatCoilName, Off, FirstHVACIteration, CBVAV( CBVAVNum ).HeatCoilIndex, ContFanCycCoil, 0.0, OnOffAirFlowRatio );
 			}
-		} else if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) { // not a DX heating coil
+		} else if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) { // not a DX heating coil
 			if ( CBVAV( CBVAVNum ).HeatCoolMode == HeatingMode ) {
 				CpAir = PsyCpAirFnWTdb( Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).HumRat, Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).Temp );
 				QHeater = Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).MassFlowRate * CpAir * ( CBVAV( CBVAVNum ).CoilTempSetPoint - Node( CBVAV( CBVAVNum ).HeatingCoilInletNode ).Temp );
@@ -3139,7 +3139,7 @@ namespace HVACUnitaryBypassVAV {
 		QCoilActual = 0.0;
 		if ( HeatCoilLoad > SmallLoad ) {
 			{ auto const SELECT_CASE_var( CBVAV( CBVAVNum ).HeatCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( CBVAV( CBVAVNum ).HeatCoilName, FirstHVACIteration, HeatCoilLoad, CBVAV( CBVAVNum ).HeatCoilIndex, QCoilActual, true, FanMode );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				// simulate the heating coil at maximum hot water flow rate
@@ -3189,7 +3189,7 @@ namespace HVACUnitaryBypassVAV {
 			}}
 		} else {
 			{ auto const SELECT_CASE_var( CBVAV( CBVAVNum ).HeatCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( CBVAV( CBVAVNum ).HeatCoilName, FirstHVACIteration, HeatCoilLoad, CBVAV( CBVAVNum ).HeatCoilIndex, QCoilActual, true, FanMode );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				mdot = 0.0;
