@@ -279,7 +279,7 @@ void IdfParser::add_missing_field_value( std::string & field_name, json & root, 
 		tmp = & tmp->at( "extensions" )[ "items" ][ "properties" ];
 		ext_size = static_cast<int>(loc[ "extensibles" ].size());
 	}
-	if ( tmp->find( field_name ) != tmp->end() || field_name == "name" ) {
+	if ( tmp->find( field_name ) != tmp->end() || obj_loc.find( field_name ) != obj_loc.end() ) {
 		if ( !ext_size ) {
 			root[ field_name ] = "";
 		} else {
