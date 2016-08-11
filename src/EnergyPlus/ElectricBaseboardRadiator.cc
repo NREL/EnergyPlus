@@ -505,6 +505,15 @@ namespace ElectricBaseboardRadiator {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
 				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
 			}
+			// search zone equipment list structure for zone index
+			for ( int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				for ( int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList( ctrlZone ).NumOfEquipTypes; ++zoneEquipTypeNum ) {
+					if ( DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipType_Num( zoneEquipTypeNum ) == DataZoneEquipment::BBElectric_Num && DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipName( zoneEquipTypeNum ) == ElecBaseboard( BaseboardNum ).EquipName ) {
+						ElecBaseboard( BaseboardNum ).ZonePtr = ctrlZone;
+					}
+				}
+			}
+
 		}
 
 		if ( ErrorsFound ) {
@@ -1093,7 +1102,7 @@ namespace ElectricBaseboardRadiator {
 
 		for ( BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum ) {
 
-			if ( ElecBaseboard( BaseboardNum ).ZonePtr > 0 ) {
+			if ( ElecBaseboard( BaseboardNum ).ZonePtr > 0 ) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
 				ZoneNum = ElecBaseboard( BaseboardNum ).ZonePtr;
 				QElecBaseboardToPerson( ZoneNum ) += QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribPerson;
 
@@ -1121,7 +1130,6 @@ namespace ElectricBaseboardRadiator {
 					}
 				}
 			}
-
 		}
 
 	}
