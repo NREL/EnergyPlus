@@ -132,6 +132,14 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
 				continue;
 			}
+
+
+            if (obj_name == "WeatherProperty:SkyTemperature") {
+                int dafkldj = 10;
+            }
+
+
+
 			json const &obj_loc = schema[ "properties" ][ obj_name ];
 			json const &loc = obj_loc[ "legacy_idd" ];
 			json obj = parse_object( idf, index, success, loc, obj_loc );
@@ -271,8 +279,7 @@ void IdfParser::add_missing_field_value( std::string & field_name, json & root, 
 		tmp = & tmp->at( "extensions" )[ "items" ][ "properties" ];
 		ext_size = static_cast<int>(loc[ "extensibles" ].size());
 	}
-	if ( tmp->find( field_name ) != tmp->end() ) {
-		auto const obj_field = tmp->at( field_name );
+	if ( tmp->find( field_name ) != tmp->end() || field_name == "name" ) {
 		if ( !ext_size ) {
 			root[ field_name ] = "";
 		} else {
