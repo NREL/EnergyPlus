@@ -150,7 +150,7 @@ This field is only valid when the user selects ``surfaceweighted'' for the MRT c
 
 \paragraph{Field: Work Efficiency Schedule Name}\label{field-work-efficiency-schedule-name}
 
-This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero correspondsto all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts thethermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort..
+This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero corresponds to all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts the thermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort..
 
 \paragraph{Field: Clothing Insulation Calculation Method}\label{field-clothing-insulation-calculation-method}
 
@@ -370,7 +370,7 @@ People specific outputs include:
   Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{People Occupant Count {[]}}{People Occupant Count }}\label{people-occupant-count}
+\paragraph{People Occupant Count {[]}}\label{people-occupant-count}
 
 This field is the number of people for this PEOPLE object during the timestep in question.
 
@@ -406,13 +406,13 @@ These output variables are the total amount of heat gain for this People object 
 
 \paragraph{People Air Temperature {[}C{]}}\label{people-air-temperature-c}
 
-This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; othwesie, it is set to average zone air temperature.
+This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; otherwise, it is set to average zone air temperature.
 
 \paragraph{People Air Relative Humidity {[}\%{]}}\label{people-air-relative-humidity}
 
-This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Relative Humidity'' is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; othwesie, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
+This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Relative Humidity'' is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; otherwise, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
 
-\paragraph{\texorpdfstring{Zone People Occupant Count {[]}}{Zone People Occupant Count }}\label{zone-people-occupant-count}
+\paragraph{Zone People Occupant Count {[]}}\label{zone-people-occupant-count}
 
 This field is the total number of people within the zone during the timestep in question.
 
@@ -456,7 +456,7 @@ This output variable is the operative temperature as defined by the thermal comf
 
 Note for all Thermal Comfort reporting:~ Though the published values for thermal comfort ``vote'' have a discrete scale (e.g. --3 to +3 or --4 to +4), the calculations in EnergyPlus are carried out on a continuous scale and, thus, reporting may be ``off the scale'' with specific conditions encountered in the space. This is not necessarily an error in EnergyPlus -- rather a different approach that does not take the ``limits'' of the discrete scale values into account.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Fanger Model PMV {[]}}{Zone Thermal Comfort Fanger Model PMV }}\label{zone-thermal-comfort-fanger-model-pmv}
+\paragraph{Zone Thermal Comfort Fanger Model PMV {[]}}\label{zone-thermal-comfort-fanger-model-pmv}
 
 This field is the ``predicted mean vote'' (PMV) calculated using the Fanger thermal comfort model.
 
@@ -468,31 +468,31 @@ This field is the ``predicted percentage of dissatisfied'' (PPD) calculated usin
 
 This output variable is the calculation of the clothing surface temperature using the Fanger thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Effective Temperature PMV {[]}}{Zone Thermal Comfort Pierce Model Effective Temperature PMV }}\label{zone-thermal-comfort-pierce-model-effective-temperature-pmv}
+\paragraph{Zone Thermal Comfort Pierce Model Effective Temperature PMV {[]}}\label{zone-thermal-comfort-pierce-model-effective-temperature-pmv}
 
 This field is the ``predicted mean vote'' (PMV) calculated using the effective temperature and the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV {[]}}{Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV }}\label{zone-thermal-comfort-pierce-model-standard-effective-temperature-pmv}
+\paragraph{Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV {[]}}\label{zone-thermal-comfort-pierce-model-standard-effective-temperature-pmv}
 
 This field is the ``predicted mean vote'' (PMV) calculated using the ``standard'' effective temperature and the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Discomfort Index {[]}}{Zone Thermal Comfort Pierce Model Discomfort Index }}\label{zone-thermal-comfort-pierce-model-discomfort-index}
+\paragraph{Zone Thermal Comfort Pierce Model Discomfort Index {[]}}\label{zone-thermal-comfort-pierce-model-discomfort-index}
 
 This field is the ``discomfort index'' calculated using the the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Pierce Model Thermal Sensation Index {[]}}{Zone Thermal Comfort Pierce Model Thermal Sensation Index }}\label{zone-thermal-comfort-pierce-model-thermal-sensation-index}
+\paragraph{Zone Thermal Comfort Pierce Model Thermal Sensation Index {[]}}\label{zone-thermal-comfort-pierce-model-thermal-sensation-index}
 
 This field is the ``thermal sensation index'' (PMV) calculated using the Pierce two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort KSU Model Thermal Sensation Vote {[]}}{Zone Thermal Comfort KSU Model Thermal Sensation Vote }}\label{zone-thermal-comfort-ksu-model-thermal-sensation-vote}
+\paragraph{Zone Thermal Comfort KSU Model Thermal Sensation Vote {[]}}\label{zone-thermal-comfort-ksu-model-thermal-sensation-vote}
 
 This field is the ``thermal sensation vote'' (TSV) calculated using the KSU two-node thermal comfort model.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort ASHRAE 55 Adaptive Model 90\% Acceptability Status {[]}}{Zone Thermal Comfort ASHRAE 55 Adaptive Model 90\% Acceptability Status }}\label{zone-thermal-comfort-ashrae-55-adaptive-model-90-acceptability-status}
+\paragraph{Zone Thermal Comfort ASHRAE 55 Adaptive Model 90\% Acceptability Status {[]}}\label{zone-thermal-comfort-ashrae-55-adaptive-model-90-acceptability-status}
 
 This field is to report whether the operative temperature falls into the 90\% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort ASHRAE 55 Adaptive Model 80\% Acceptability Status {[]}}{Zone Thermal Comfort ASHRAE 55 Adaptive Model 80\% Acceptability Status }}\label{zone-thermal-comfort-ashrae-55-adaptive-model-80-acceptability-status}
+\paragraph{Zone Thermal Comfort ASHRAE 55 Adaptive Model 80\% Acceptability Status {[]}}\label{zone-thermal-comfort-ashrae-55-adaptive-model-80-acceptability-status}
 
 This field is to report whether the operative temperature falls into the 80\% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
@@ -674,8 +674,8 @@ An example IDF with an electric low temperature radiant system is shown below.
 
 \begin{lstlisting}
 ComfortViewFactorAngles,
-  South Zone Angle Factors,                                                                                                    !- name of angle factor list
-  Sourth Zone,          !- Zone Name
+  South Zone Angle Factors, !- name of angle factor list
+  South Zone,           !- Zone Name
   Zn001:Flr001,         !- Surface name 1
   0.75,                 !- Angle factor for surface 1
   Zn001:Wall001,        !- Surface name 2
@@ -900,7 +900,7 @@ Lights,
 
 \subsubsection{Outputs}\label{outputs-2-012}
 
-If daylighting controls are operating in the zone, all of the Lights objects with a Fraction Replaceble~ greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting.
+If daylighting controls are operating in the zone, all of the Lights objects with a Fraction Replaceable greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting.
 
 Lights objects have output variables for individual objects and for zone totals.
 
@@ -1051,7 +1051,7 @@ As described in the Lights Outputs, values for lights will show up on the follow
 \begin{longtable}[c]{>{\raggedright}p{3.0in}p{1.5in}p{1.5in}}
 \caption{Distribution of Lights to Meters \label{table:distribution-of-lights-to-meters}} \tabularnewline
 \toprule 
-Meter Name & Scope & Lights Specfics \tabularnewline
+Meter Name & Scope & Lights Specifics \tabularnewline
 \midrule
 \endfirsthead
 
@@ -1276,7 +1276,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 \paragraph{Field: Carbon Dioxide Generation Rate}\label{field-carbon-dioxide-generation-rate-1}
 
-This numeric input field specifies carbon dioxide generation rate with units of m3/s-W. The default value of 0.0 assumes the equipment is fully vented to outdoors. In the absence of better information, the user might consider using a value of 3.45E-8 m3/s-W which assumes the equipment is not vented to outdoors. This value is converted from natural gas CO\(_{2}\) emission rate at 11.7 lbs CO\(_{2}\) per therm. The CO\(_{2}\) emission rate is provided by U.S. Energy Information Administration, ``Frequently Asked Questions - Environment, Questions About Environmental Emissions'',~ http://tonto.eia.doe.gov/ask/environment\_faqs.asp\#CO2\_quantity, January 2010. The maximum value for this input field is 3.45E-7 m3/s-W.
+This numeric input field specifies carbon dioxide generation rate with units of m3/s-W. The default value of 0.0 assumes the equipment is fully vented to outdoors. In the absence of better information, the user might consider using a value of 3.45E-8 m3/s-W which assumes the equipment is not vented to outdoors. This value is converted from natural gas CO\(_{2}\) emission rate at 11.7 lbs CO\(_{2}\) per therm. The CO\(_{2}\) emission rate is provided by U.S. Energy Information Administration, ``Frequently Asked Questions - Environment, Questions About Environmental Emissions'', \url{http://tonto.eia.doe.gov/ask/environment_faqs.asp#CO2_quantity}, January 2010. The maximum value for this input field is 3.45E-7 m3/s-W.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2-001}
 
@@ -1605,7 +1605,7 @@ This input is the maximum water volumetric flow rate in m3/s going between the p
 
 \paragraph{Field: Pool Miscellaneous Equipment Power}\label{field-pool-miscellaneous-equipment-power}
 
-This input defines the power consumption rate of miscellaneous equipment such as the filtering and chlorination technology associated with the pool. The units for this input are in power consumption per flow rate of water through the pool from the heater or W/(kg/s). This field will be multiplied by the flow rate of water through the pool to determine the power consumption of this equipment. Any heat generated by this equipment is assumed to have no effect on the pool water itself.
+This input defines the power consumption rate of miscellaneous equipment such as the filtering and chlorination technology associated with the pool. The units for this input are in power consumption per flow rate of water through the pool from the heater or W/(m3/s). This field will be multiplied by the flow rate of water through the pool to determine the power consumption of this equipment. Any heat generated by this equipment is assumed to have no effect on the pool water itself.
 
 \paragraph{Field: Setpoint Temperature Schedule}\label{field-setpoint-temperature-schedule}
 
@@ -1641,7 +1641,7 @@ SwimmingPool:Indoor,
   Pool Water Inlet Node,    !- Water Inlet Node (Plant/Heater)
   Pool Water Outlet Node,   !- Water Outlet Node (Plant/Heater)
   0.1,                   !- Maximum flow rate from water heating system {m3/s}
-  0.6,                   !- Miscellaneous Equipment Power Factor
+  0.6,                   !- Miscellaneous Equipment Power Factor {W/(m3/s)}
   PoolSetpointTempSched, !- Pool Water Setpoint Temperature Schedule
   15,                    !- Maximum Number of People in Pool
   PoolOccupancySched,    !- Pool People Schedule
@@ -1730,11 +1730,11 @@ This is the amount of heating provided by the plant loop to the pool in Joules o
 
 The pool cover may block some or all of short- and long-wavelength radiation incident on the pool. To account for this and to not have the cover result in energy that is not accounted for by the model, the radiation that is blocked by the cover is converted to a convective gain (or loss) to/from the zone air. This output field reports this value.
 
-\paragraph{\texorpdfstring{Indoor Pool Current Activity Factor {[]}}{Indoor Pool Current Activity Factor }}\label{indoor-pool-current-activity-factor}
+\paragraph{Indoor Pool Current Activity Factor {[]}}\label{indoor-pool-current-activity-factor}
 
 This is the current activity factor as defined by the user input schedule.
 
-\paragraph{\texorpdfstring{Indoor Pool Current Cover Factor {[]}}{Indoor Pool Current Cover Factor }}\label{indoor-pool-current-cover-factor}
+\paragraph{Indoor Pool Current Cover Factor {[]}}\label{indoor-pool-current-cover-factor}
 
 This is the current cover factor as defined by the user input schedule.
 
@@ -1748,13 +1748,17 @@ This is the amount of evaporative heat loss (latent) to the zone from the pool i
 
 \subsection{OtherEquipment}\label{otherequipment}
 
-Other Equipment object is provided as an additional source for heat gains or losses directly to the zone.~ That is to say, a loss can be entered by putting a negative value into the Design Level field(s). Note, too, that this object does not have an end-use component -- gains or losses do not show up in the bottom energy lines (except as influencing overall zone gains or losses).
+Other Equipment object is provided as an additional source for heat gains or losses directly to the zone with a fuel type that is configurable. If a fuel type is specified, the energy is attributed to the appropriate end use. Otherwise, a loss can be entered by putting a negative value into the Design Level field and this object will not have an end-use component -- gains or losses do not show up in the bottom energy lines (except as influencing overall zone gains or losses).
 
 \subsubsection{Inputs}\label{inputs-8-010}
 
 \paragraph{Field: Name}\label{field-name-8-008}
 
 The name of the OtherEquipment object.
+
+\paragraph{Field: Fuel Type}\label{field-fuel-use-type}
+
+This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains. 
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-6}
 
@@ -1794,15 +1798,15 @@ With this choice, the method used will be a factor of equipment level (watts) pe
 
 \paragraph{Field: Design Level}\label{field-design-level-4}
 
-This field (in Watts) is typically used to represent the maximum energy input to other equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the other equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. This value can be negative to denote a loss. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
+This field (in Watts) is typically used to represent the maximum energy input to other equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the other equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
 
 \paragraph{Field: Power per Zone Floor Area}\label{field-power-per-zone-floor-area-3}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
 
 \paragraph{Field: Power per Person}\label{field-power-per-person-3}
 
-This factor (watts/person) is used, along with the number of occupants (people) to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss. The choice from the method field should be ``\textbf{Watts/Person}'' or ``\textbf{Power/Person}''.
+This factor (watts/person) is used, along with the number of occupants (people) to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. The choice from the method field should be ``\textbf{Watts/Person}'' or ``\textbf{Power/Person}''.
 
 \paragraph{Heat Gains/Losses from Other Equipment:}\label{heat-gainslosses-from-other-equipment}
 
@@ -1826,27 +1830,39 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 This field is a decimal number between 0.0 and 1.0 and is used to characterize the amount of ``lost'' heat being given off by other equipment in a zone. The number specified in this field will be multiplied by the total energy consumed by other equipment to give the amount of heat which is ``lost'' and does not impact the zone energy balances. This might correspond to input energy converted to mechanical work or heat that is vented to the atmosphere.
 
+\paragraph{Field: Carbon Dioxide Generation Rate}\label{field-carbon-dioxide-generation-rate-otherequip}
+
+This numeric input field specifies carbon dioxide generation rate with units of m3/s-W. The default value of 0.0 assumes the equipment is fully vented to outdoors. The maximum value for this input field is 3.45E-7 m3/s-W.
+
+\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-otherequip}
+
+Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table. The following special tags will also place the end-use in specific rows in the LEED Summary table EAp2-4/5. Performance Rating Method Compliance:  Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
+
+
 IDF Examples
 
 \begin{lstlisting}
 OtherEquipment,
-  BASE-1 OthEq 1, !- Name
-  BASE-1,         !- Zone Name
-  ALWAYSON,       !- SCHEDULE Name
-  EquipmentLevel, !- Design Level calculation method
-  6766.,          !- Design Level {W}
-  ,               !- Power per Zone Floor Area {watts/m2}
-  ,               !- Power per Person {watts/person}
-  0,              !- Fraction Latent
-  0.3,            !- Fraction Radiant
-  0;              !- Fraction Lost
+	BASE-1 OthEq 1, !- Name
+	PropaneGas,  !- Fuel Use Type
+	BASE-1, !- Zone Name 
+	ALWAYSON, !- SCHEDULE Name
+	EquipmentLevel, !- Design Level calculation method
+	6766., !- Design Level {W}
+	, !- Power per Zone Floor Area {watts/m2}
+	, !- Power per Person {watts/person}
+	0, !- Fraction Latent
+	0.3, !- Fraction Radiant
+	0, !- Fraction Lost
+	1.2E-7, !- Carbon Dioxide Generation Rate
+	SubCategory1; !- End-Use Subcategory
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-5-004}
 
 Each type of equipment object has output variables for individual objects and for zone totals.
 
-Electric Equipment
+\textbf{Electric Equipment}
 
 \begin{itemize}
 \item
@@ -2062,6 +2078,10 @@ Electric Equipment
 
 \begin{itemize}
 \item
+  Zone,Average,Other Equipment Fuel Rate {[}W{]}
+\item
+  Zone,Sum,Other Equipment Fuel Energy {[}J{]}
+\item
   Zone,Sum,Other Equipment Radiant Heating Energy {[}J{]}
 \item
   Zone,Average,Other Equipment Radiant Heating Rate {[}W{]}
@@ -2113,7 +2133,7 @@ The electric equipment electric power consumption in Watts (for power) or Joules
 
 \paragraph{Gas Equipment Gas Energy {[}J{]}}\label{gas-equipment-gas-energy-j}
 
-The gas equipment natural gas consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the electricity meters that are associated with the zone -- Gas:Facility, Gas:Buidling, Gas:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:Gas: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:Gas.
+The gas equipment natural gas consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the gas meters that are associated with the zone -- Gas:Facility, Gas:Buidling, Gas:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:Gas: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:Gas.
 
 \paragraph{Hot Water Equipment District Heating Rate {[}W{]}}\label{hot-water-equipment-district-heating-rate-w}
 
@@ -2127,7 +2147,11 @@ The hot water equipment district heating consumption in Watts (for power) or Jou
 
 The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone -- DistrictHeating:Facility, DistrictHeating:Buidling, DistrictHeating:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment: DistrictHeating: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment: DistrictHeating.
 
-Note that zone energy consumption is not reported for OTHER EQUIPMENT and does not go on any meter.
+\paragraph{Other Equipment Fuel Rate {[}W{]}}\label{otherequip-fuel-rate}
+
+\paragraph{Other Equipment Fuel Energy {[}J{]}}\label{otherequip-fuel-energy}
+
+The other equipment fuel consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the appropriate fuel meters that are associated with the zone -- \textless{}Fuel Type\textgreater{}:Facility, \textless{}Fuel Type\textgreater{}:Buidling, \textless{}Fuel Type\textgreater{}:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:\textless{}Fuel Type\textgreater{}: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:\textless{}Fuel Type\textgreater{}.
 
 \subsection{ElectricEquipment:ITE:AirCooled}\label{electricequipmentiteaircooled}
 
@@ -2521,9 +2545,9 @@ The dewpoint temperature of the air entering the ITE.
 
 The dry-bulb temperature of the air leaving the ITE.
 
-\paragraph{\texorpdfstring{Zone ITE Average Supply Heat Index {[]}}{Zone ITE Average Supply Heat Index }}\label{zone-ite-average-supply-heat-index}
+\paragraph{Zone ITE Average Supply Heat Index {[]}}\label{zone-ite-average-supply-heat-index}
 
-\paragraph{\texorpdfstring{ITE Supply Heat Index {[]}}{ITE Supply Heat Index }}\label{ite-supply-heat-index}
+\paragraph{ITE Supply Heat Index {[]}}\label{ite-supply-heat-index}
 
 The supply heat index (SHI) for this equipment. SHI is a dimensionless measure of recirculation of hot air into the cold air intake of the ITE. SHI = (Tin -- Tsupply)/(Tout-Tsupply) where Tin is the dry-bulb temperature of the air entering the ITE, Tout is the dry-bulb temperature of the air leaving the ITE, and Tsupply is the dry-bulb temperature at the Supply Air Node. If a Supply Air Node Name is not specified for this object, then this output will not be reported.
 
@@ -2561,7 +2585,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Above Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-above-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Envionmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-below-operating-range-time-hr}
 
@@ -2571,7 +2595,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Below Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-below-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Envionmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-above-operating-range-time-hr}
 
@@ -2581,7 +2605,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Above Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-above-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Envionmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-below-operating-range-time-hr}
 
@@ -2591,7 +2615,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Below Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-below-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Envionmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \subsection{ZoneContaminantSourceAndSink:CarbonDioxide}\label{zonecontaminantsourceandsinkcarbondioxide}
 
@@ -2636,7 +2660,7 @@ HVAC,Average, Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{
 
 \paragraph{Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 
-This output is the net carbond dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
+This output is the net carbon dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
 
 \paragraph{Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{zone-contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 

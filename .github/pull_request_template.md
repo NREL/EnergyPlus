@@ -25,10 +25,12 @@ This will not be exhaustively relevant to every PR.
    - [ ] If any virtual classes, ensure virtual destructor included, other things
  - IDD changes:
    - [ ] Verify naming conventions and styles, memos and notes and defaults
+   - [ ] Open windows IDF Editor with modified IDD to check for errors
    - [ ] If transition, add rules to spreadsheet
    - [ ] If transition, add transition source
    - [ ] If transition, update idfs
  - [ ] If new idf included, locally check the err file and other outputs
  - [ ] Documentation changes in place
- - [ ] ExpandObjects changes??
+ - [ ] Changed docs build successfully
+ - [ ] ExpandObjects changes?
  - [ ] If output changes, including tabular output structure, add to output rules file for interfaces

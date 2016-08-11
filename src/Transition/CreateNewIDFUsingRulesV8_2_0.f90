@@ -364,7 +364,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(11)="No"
                 endif
                 ! the net effect here is the addition of 1 field
-                OutArgs(12:)=InArgs(11:)
+                OutArgs(12:15)=InArgs(11:14)
                 CurArgs = CurArgs + 1
       
               CASE('PLANTLOOP', 'CONDENSERLOOP')

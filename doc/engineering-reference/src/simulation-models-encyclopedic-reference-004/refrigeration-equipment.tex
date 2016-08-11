@@ -4,13 +4,12 @@
 
 EnergyPlus can model refrigerated case equipment consisting of a compressor rack, multiple refrigerated cases and walk-in coolers, secondary loop equipment, and~ optional heat reclaim air and water heating coils. The refrigerated case equipment models perform four major functions:
 
-n~calculate the electric consumption of refrigerated cases and walk-in coolers connected to a compressor rack
-
-n~determine the impact of refrigerated cases and walk-in coolers on zone cooling and dehumidification loads (i.e., case credits), including the effects of HVAC duct configuration
-
-n~calculate the electric consumption and COP of the compressor rack, and the electric and water (if applicable) consumption related to cooling the compressor rack's condenser.
-
-n~determine the total amount of heat rejected by the compressor rack's condenser and store this information for use by waste heat recovery models (e.g., using Desuperheater heating coil (object: Coil:Heating:Desuperheater) as an air reheat coil for high humidity control in a supermarket)
+\begin{itemize}
+  \item calculate the electric consumption of refrigerated cases and walk-in coolers connected to a compressor rack
+  \item determine the impact of refrigerated cases and walk-in coolers on zone cooling and dehumidification loads (i.e., case credits), including the effects of HVAC duct configuration
+  \item calculate the electric consumption and COP of the compressor rack, and the electric and water (if applicable) consumption related to cooling the compressor rack's condenser.
+  \item determine the total amount of heat rejected by the compressor rack's condenser and store this information for use by waste heat recovery models (e.g., using Desuperheater heating coil (object: Coil:Heating:Desuperheater) as an air reheat coil for high humidity control in a supermarket)
+\end{itemize}
 
 The case and walk-in models account for nearly all performance aspects of typical supermarket refrigeration equipment. Refrigerated case and walk-in performance are based on the combined effects of evaporator load, fan operation, lighting, defrost type, and anti-sweat heater operation. Optional air and water heating coils can be modeled to reclaim available waste heat (superheat) from the compressor rack.
 
@@ -32,13 +31,12 @@ A detailed refrigeration system object models compressor and condenser performan
 
 Four classes of secondary refrigeration loops can be modeled:
 
-n~a separate water loop is used to remove heat rejected by the condenser,
-
-n~a lower-temperature refrigeration system rejects heat to a higher-temperature refrigeration system via a cascade condenser,
-
-n~a fluid, such as a brine or glycol solution, is cooled in a secondary evaporator and is then circulated to chill the refrigerated cases and walk-ins, and
-
-n~a refrigerant, such as CO\(_{2}\), is partially evaporated in the refrigerated cases and walk-ins in a liquid-overfeed circuit, and then condensed in a secondary evaporator.
+\begin{itemize}
+  \item a separate water loop is used to remove heat rejected by the condenser,
+  \item a lower-temperature refrigeration system rejects heat to a higher-temperature refrigeration system via a cascade condenser,
+  \item a fluid, such as a brine or glycol solution, is cooled in a secondary evaporator and is then circulated to chill the refrigerated cases and walk-ins, and
+  \item a refrigerant, such as CO\(_{2}\), is partially evaporated in the refrigerated cases and walk-ins in a liquid-overfeed circuit, and then condensed in a secondary evaporator.
+\end{itemize}
 
 The first two classes of secondary loops are modeled using Refrigeration:System objects with Refrigeration:Condenser:WaterCooled and Refrigeration:Condenser:Cascade objects, respectively.~ Figure~\ref{fig:typical-detailed-refrigeration-system} shows how cascade condensers and secondary evaporators are treated as a refrigeration load on a primary detailed system. The second two classes are modeled with a Refrigeration:SecondarySystem object described later in this section.
 
@@ -1789,7 +1787,7 @@ Capacity\(_{AtMaxVolFlow}\) ~~~ = Secondary loop capacity corresponding to the m
 
 Capacity\(_{Max}\) ~~~~~~~~~~~ ~ = Maximum secondary evaporator capacity (W)
 
-\subsubsection{\texorpdfstring{Secondary Evaporator in a Two-Phase Secondary Loop~ (Liquid-Overfeed Loop, e.g., CO\(_{2}\))}{Secondary Evaporator in a Two-Phase Secondary Loop~ (Liquid-Overfeed Loop, e.g., CO\_\{2\})}}\label{secondary-evaporator-in-a-two-phase-secondary-loop-liquid-overfeed-loop-e.g.-coux5f2}
+\subsubsection{Secondary Evaporator in a Two-Phase Secondary Loop~ (Liquid-Overfeed Loop, e.g., CO\(_{2}\))}\label{secondary-evaporator-in-a-two-phase-secondary-loop-liquid-overfeed-loop-e.g.-coux5f2}
 
 For a two-phase system, the secondary evaporator effectiveness is not calculated. Both the evaporating and condensing sides of the heat exchanger are assumed to operate at fixed temperatures.~ If the capacity of the secondary evaporator is not input, it will be calculated as the sum of the rated loads plus the rated pump power.
 
@@ -1885,25 +1883,23 @@ Flow\(_{Needed}\) = Flow rate needed to meet the loop refrigeration load, , outp
 
 The needed flow rate is used to determine the number of pumps required and the total pumping power, which produces a new estimate for the total load. A few iterations converge upon the final secondary loop load for each time step.~ The total load on the heat exchanger is therefore the sum of the refrigeration loads, any pipe heat gains, and the portion of the pump power that is absorbed by the circulating fluid.
 
-\subsection{\texorpdfstring{Transcritical CO\(_{2}\) Refrigeration System}{Transcritical CO\_\{2\} Refrigeration System}}\label{transcritical-coux5f2-refrigeration-system}
+\subsection{Transcritical CO\(_{2}\) Refrigeration System}\label{transcritical-co2-refrigeration-system}
 
 The Refrigeration:TranscriticalSystem object allows users to model detailed transcritical carbon dioxide (CO\(_{2}\)) booster refrigeration systems used in supermarkets.~ The object allows for modeling either a single stage system with medium-temperature loads or a two stage system with both medium- and low-temperature loads.
 
 The input objects required to model a detailed transcritical CO\(_{2}\) refrigeration system include the following:
 
-n~One Refrigeration:TranscriticalSystem object,
-
-n~At least one refrigeration load object which may include any combination of the following:
-
-n~Refrigeration:Case,
-
-n~Refrigeration:WalkIn,
-
-n~Refrigeration:CaseAndWalkInList (may include both cases and/or walk-in cooler names),
-
-n~At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
-
-n~One Refrigeration:GasCooler:AirCooled object,
+\begin{itemize}
+  \item One Refrigeration:TranscriticalSystem object,
+  \item At least one refrigeration load object which may include any combination of the following:
+  \begin{itemize}
+    \item Refrigeration:Case,
+    \item Refrigeration:WalkIn,
+    \item Refrigeration:CaseAndWalkInList (may include both cases and/or walk-in cooler names),
+  \end{itemize}
+  \item At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
+  \item One Refrigeration:GasCooler:AirCooled object,
+\end{itemize}
 
 Output variables are available to describe the total heat exchange between all the refrigeration objects and the zones containing these objects.
 
@@ -1917,7 +1913,7 @@ The Refrigeration:TranscriticalSystem object coordinates the energy flows betwee
 
 The inputs for the refrigeration system object, in addition to the names of the other refrigeration objects described above, include a name for this system, the minimum condensing temperature, and the refrigeration system working fluid.~ Optional input fields are also provided for users seeking to keep track of refrigerant inventory and suction pipe heat gains.
 
-\subsubsection{\texorpdfstring{Transcritical CO\(_{2}\) Refrigeration Cycles}{Transcritical CO\_\{2\} Refrigeration Cycles}}\label{transcritical-coux5f2-refrigeration-cycles}
+\subsubsection{Transcritical CO\(_{2}\) Refrigeration Cycles}\label{transcritical-co2-refrigeration-cycles}
 
 Transcritical CO\(_{2}\) refrigeration cycles are characterized by a subcritical evaporation process and a supercritical ``gas cooling'' process.~ In the subcritical evaporation process which occurs in the evaporator, the CO\(_{2}\) changes phase from a liquid and vapor mixture to a superheated vapor.~ In doing so, the CO\(_{2}\) absorbs heat, thereby creating the cooling effect.~ This process is similar to the evaporation process in a standard vapor-compression refrigeration cycle.
 
@@ -1939,7 +1935,7 @@ EnergyPlus is capable of modeling the transcritical booster refrigeration cycle.
 
 Carbon dioxide exits the gas cooler at Location~1 and passes through the suction line heat exchanger, exiting at Location~2, during which the refrigerant is cooled by the suction gas.~ An intermediate expansion occurs between Locations~2 and~3, and saturated CO\(_{2}\) enters the receiver.~ Saturated liquid CO\(_{2}\) exits the receiver at Location~6, which is then expanded and fed to the medium-temperature loads (between Locations~7 and~8) and the low-temperature loads (between Locations~9 and~10).~ Saturated vapor CO\(_{2}\) exits the receiver bypass at Location~4 and is expanded to the medium-temperature pressure level at Location~5.~ Carbon dioxide vapor exiting the low temperature loads is compressed to the medium-temperature pressure level (Location~10 to 11).~ The CO\(_{2}\) from the discharge of the low pressure compressors, the outlet of the medium-temperature loads and the outlet of the receiver bypass are then combined at Location~13.~ The CO\(_{2}\) suction gas then passes through the suction line heat exchanger where the refrigerant is heated, exiting at Location~14.~ The carbon dioxide is finally compressed to the gas cooler pressure level at Location~15 and heat is rejected to the surroundings in the gas cooler between Locations~15 and~1.
 
-\subsubsection{\texorpdfstring{CO\(_{2}\) Compressor Performance Modeling}{CO\_\{2\} Compressor Performance Modeling}}\label{coux5f2-compressor-performance-modeling}
+\subsubsection{CO\(_{2}\) Compressor Performance Modeling}\label{coux5f2-compressor-performance-modeling}
 
 To model the performance of the CO\(_{2}\) compressors during subcritical and transcritical operation, cubic polynomials are used to curve fit manufacturers' performance data.~ This technique is similar to that described in AHRI Standard 540 (AHRI 2004).~ For subcritical operation, the power consumption and cooling capacity of a CO\(_{2}\) compressor is a function of the saturated suction temperature, \emph{t\(_{ss}\)} (°C), and the saturated discharge temperature, \emph{t\(_{sd}\)} (°C), as follows:
 
@@ -1971,7 +1967,7 @@ Once the corrected capacity is calculated for each compressor, the compressors a
 
 Only one gas cooler is allowed per transcritical refrigeration system. However, multiple refrigeration systems can reject heat through the same gas cooler.~ Currently, only air-cooled gas coolers are modeled.~ The gas cooler performance is modeled to determine the gas cooler pressure, gas cooler outlet temperature and outlet enthalpy of the refrigerant, and the auxiliary power consumption for the fans.
 
-\paragraph{\texorpdfstring{Optimal Gas Cooler Pressure for Transcritical CO\(_{2}\) Cycles}{Optimal Gas Cooler Pressure for Transcritical CO\_\{2\} Cycles}}\label{optimal-gas-cooler-pressure-for-transcritical-coux5f2-cycles}
+\paragraph{Optimal Gas Cooler Pressure for Transcritical CO\(_{2}\) Cycles}\label{optimal-gas-cooler-pressure-for-transcritical-coux5f2-cycles}
 
 When the compressor discharge conditions are such that the CO\(_{2}\) is in the supercritical region, then the high-side operating pressure is independent of the gas cooler exit temperature (Sawalha 2008).~ Thus, for a given gas cooler exit temperature, there is an optimum pressure to achieve the maximum coefficient of performance (COP).~ Figure~\ref{fig:cop-of-co_2-transcritical-cycle-vs.-discharge} illustrates the variation in COP of a transcritical CO\(_{2}\) cycle with discharge pressure at different gas cooler exit temperatures.
 

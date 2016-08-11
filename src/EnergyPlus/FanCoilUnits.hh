@@ -406,6 +406,19 @@ namespace FanCoilUnits {
 	);
 
 	void
+	TightenWaterFlowLimits(
+		int const FanCoilNum, // Unit index in fan coil array
+		bool const CoolingLoad, // true if zone requires cooling
+		bool const HeatingLoad, // true if zone requires heating
+		int const WaterControlNode, // water control node, either cold or hot water
+		int const ControlledZoneNum, // controlling zone index
+		bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // zone load [W]
+		Real64 & MinWaterFlow, // minimum water flow rate
+		Real64 & MaxWaterFlow // maximum water flow rate
+	);
+
+	void
 	Calc4PipeFanCoil(
 		int const FanCoilNum, // Unit index in fan coil array
 		int const ControlledZoneNum, // ZoneEquipConfig index

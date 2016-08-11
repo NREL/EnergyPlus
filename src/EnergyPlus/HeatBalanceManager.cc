@@ -4739,38 +4739,19 @@ namespace HeatBalanceManager {
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   April 1997
 		//       MODIFIED       June 2011, Daeho Kang for individual zone maximums & convergence outputs
-		//       RE-ENGINEERED  na
+		//       				July 2016, Rick Strand for movable insulation bug fix
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is the main driver for record keeping within the
 		// heat balance.
 
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger record keeping events.
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::ReportDetailedWarmupConvergence;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//  CHARACTER(len=MaxNameLength) :: ZoneName
 		int ZoneNum;
+		int SurfNum;
 		static bool FirstWarmupWrite( true );
 
 		// Formats
@@ -4779,7 +4760,6 @@ namespace HeatBalanceManager {
 
 		// FLOW:
 
-		// Always do the following record keeping (every time step):
 		// Record Maxs & Mins for individual zone
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZTAV( ZoneNum ) > MaxTempZone( ZoneNum ) ) {
@@ -4826,14 +4806,12 @@ namespace HeatBalanceManager {
 
 		}
 
-		// There is no hourly record keeping in the heat balance.
-
-		// There is no daily record keeping in the heat balance.
-
-		// There is no environment level record keeping in the heat balance.
-
-		// There is no simulation level record keeping in the heat balance.
-
+		// Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
+		// exchange algorithm knows whether there has been a change in interior movable insulation or not.
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			DataSurfaces::Surface( SurfNum ).MovInsulIntPresentPrevTS = DataSurfaces::Surface( SurfNum ).MovInsulIntPresent;
+		}
+		
 	}
 
 	void

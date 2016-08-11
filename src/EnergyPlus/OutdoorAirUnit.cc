@@ -123,17 +123,11 @@ namespace OutdoorAirUnit {
 	// algorithm that adjusts the hot or cold water flow to meet the setpoint
 	// condition.
 
-	// REFERENCES:
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
 	using DataGlobals::BeginTimeStepFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::ZoneSizingCalc;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
@@ -151,9 +145,6 @@ namespace OutdoorAirUnit {
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
 	using General::TrimSigDigits;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// component types addressed by this module
 	std::string const cMO_OutdoorAirUnit( "ZoneHVAC:OutdoorAirUnit" );
@@ -1032,7 +1023,7 @@ namespace OutdoorAirUnit {
 
 					if ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterSimpleHeating ) {
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow = GetWaterCoilMaxFlowRate( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentName, errFlag );
-						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, HWInitConvTemp, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
 						InitComponentNodes( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterInletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterOutletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum );
@@ -1461,11 +1452,13 @@ namespace OutdoorAirUnit {
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
-				if ( OutAirUnit( OAUnitNum ).ExtFan ) SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
 			} else if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-				if ( OutAirUnit( OAUnitNum ).ExtFan ) SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+			}
+			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 			}
 
 		} else { // System On
@@ -1502,6 +1495,7 @@ namespace OutdoorAirUnit {
 
 			if ( OutAirUnit( OAUnitNum ).FanPlace == BlowThru ) {
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 				DesOATemp = Node( SFanOutletNode ).Temp;
 			} else if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
 				DesOATemp = Node( OutsideAirNode ).Temp;
@@ -1562,10 +1556,14 @@ namespace OutdoorAirUnit {
 				OutAirUnit( OAUnitNum ).FanCorTemp = ( Node( OutletNode ).Temp - OutAirUnit( OAUnitNum ).CompOutSetTemp );
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
 
 				OutAirUnit( OAUnitNum ).FanEffect = false;
 			}
-			if ( OutAirUnit( OAUnitNum ).ExtFan ) SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
+				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
+			}
 		} // ...end of system ON/OFF IF-THEN block
 
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
@@ -1611,8 +1609,6 @@ namespace OutdoorAirUnit {
 			OutAirUnit( OAUnitNum ).LatCoolingRate = 0.0;
 			OutAirUnit( OAUnitNum ).LatHeatingRate = LatLoadMet;
 		}
-
-		OutAirUnit( OAUnitNum ).ElecFanRate = FanElecPower;
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;

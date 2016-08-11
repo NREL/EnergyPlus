@@ -20434,16 +20434,34 @@ OtherEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-  A2 , \field Zone or ZoneList Name
+  A2 , \field Fuel Type
+       \required-field
+       \type choice
+       \key None
+       \key Electricity
+       \key NaturalGas
+       \key PropaneGas
+       \key FuelOil#1
+       \key FuelOil#2
+       \key Diesel
+       \key Gasoline
+       \key Coal
+       \key OtherFuel1
+       \key OtherFuel2
+       \key Steam
+       \key DistrictHeating
+       \key DistrictCooling
+       \default None
+  A3 , \field Zone or ZoneList Name
        \required-field
        \type object-list
        \object-list ZoneAndZoneListNames
-  A3 , \field Schedule Name
+  A4 , \field Schedule Name
        \required-field
        \type object-list
        \object-list ScheduleNames
        \note units in Schedule should be fraction applied to design level of other equipment, generally (0.0 - 1.0)
-  A4 , \field Design Level Calculation Method
+  A5 , \field Design Level Calculation Method
        \note The entered calculation method is used to create the maximum amount of other equipment.
        \note to set a loss, use a negative value in the following fields.
        \note for this set of attributes
@@ -20482,12 +20500,29 @@ OtherEquipment,
        \minimum 0.0
        \maximum 1.0
        \default 0
-  N6 ; \field Fraction Lost
+  N6 , \field Fraction Lost
        \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
+  N7 , \field Carbon Dioxide Generation Rate
+       \note CO2 generation rate per unit of power input
+       \type real
+       \units m3/s-W
+       \ip-units (ft3/min)/(Btu/h)
+       \default 0.0
+       \minimum 0.0
+       \maximum 4.0E-7
+       \note The default value assumes the equipment is fully vented.
+  A6 ; \field End-Use Subcategory
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
+       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
+       \type alpha
+       \retaincase
+       \default General
 
 ElectricEquipment:ITE:AirCooled,
    \memo This object describes air-cooled electric information technology equipment (ITE) which has
@@ -23824,6 +23859,43 @@ AirflowNetwork:MultiZone:WindPressureCoefficientValues,
       \units dimensionless
       \note Enter the WPC Value corresponding to the 36th wind direction.
 
+AirflowNetwork:ZoneControl:PressureController,
+      \memo This object is used to control a zone to a specified indoor pressure 
+      \memo using the AirflowNetwork model. The specified pressure setpoint is used
+      \memo to control the zone exhaust fan flow rate in a controlled zone or 
+      \memo the relief air flow rate in an air loop.
+      \unique-object
+ A1 , \field Name
+      \required-field
+      \reference AirflowNetworkZoneControlPressureControllerNames
+ A2 , \field Control Zone Name
+      \required-field
+      \type object-list
+      \object-list ZoneNames
+ A3 , \field Control Object Type
+      \required-field
+      \type choice
+      \key AirflowNetwork:MultiZone:Component:ZoneExhaustFan
+      \key AirflowNetwork:Distribution:Component:ReliefAirFlow
+      \note The current selection is AirflowNetwork:MultiZone:Component:ZoneExhaustFan 
+      \note or AirflowNetwork:Distribution:Component:ReliefAirFlow.
+ A4 , \field Control Object Name
+      \note Control names are names of individual control objects 
+      \required-field
+      \type object-list
+      \object-list AFNReliefAirFlowNames
+      \object-list FansZoneExhaust
+ A5 , \field Pressure Control Availability Schedule Name
+      \note Availability schedule name for pressure controller. Schedule value > 0 means the 
+      \note pressure controller is enabled. If this field is blank, then pressure controller is 
+      \note always enabled.
+      \type object-list
+      \object-list ScheduleNames
+ A6 ; \field Pressure Setpoint Schedule Name
+      \required-field
+      \type object-list
+      \object-list ScheduleNames
+
 AirflowNetwork:Distribution:Node,
       \min-fields 4
       \memo This object represents an air distribution node in the AirflowNetwork model.
@@ -24110,6 +24182,73 @@ AirflowNetwork:Distribution:Component:ConstantPressureDrop,
       \type real
       \minimum> 0.0
       \note Enter the pressure drop across this component.
+
+AirflowNetwork:Distribution:Component:OutdoorAirFlow,
+      \min-fields 3
+      \memo This object includes the outdoor air flow rate set by the Controller:OutdoorAir
+      \memo object in the airflow network. 
+      \unique-object
+ A1 , \field Name
+      \required-field
+      \reference AFNOutdoorAirFlowNames
+ N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
+      \required-field
+      \type real
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ A2 ; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
+
+AirflowNetwork:Distribution:Component:ReliefAirFlow,
+      \min-fields 3
+      \memo This object allows variation of air flow rate to perform pressure. 
+      \unique-object
+ A1 , \field Name
+      \required-field
+      \reference AFNReliefAirFlowNames
+ N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
+      \required-field
+      \type real
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor air flow rate.
+ A2 ; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
 
 AirflowNetwork:Distribution:Linkage,
       \min-fields 4
@@ -32284,13 +32423,13 @@ ZoneControl:ContaminantController,
        \min-fields 4
   A1 , \field Name
        \required-field
-  A2 , \field Controlled Zone Name
+  A2 , \field Zone Name
        \required-field
        \type object-list
        \object-list ZoneNames
   A3 , \field Carbon Dioxide Control Availability Schedule Name
        \note Availability schedule name for CO2 controller. Schedule value > 0 means the CO2
-       \note controller is enabled. If this field is blank, then CO2  controller is always enabled.
+       \note controller is enabled. If this field is blank, then CO2 controller is always enabled.
        \type object-list
        \object-list ScheduleNames
   A4 , \field Carbon Dioxide Setpoint Schedule Name
@@ -34104,7 +34243,8 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note if AirConditioner:VariableRefrigerantFlow
         \note is used to model VRF outdoor unit
         \note Supply Air Fan Object Type must be Fan:VariableVolume if
-        \note AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+        \note AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl or
+        \note AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR
         \note is used to model VRF outdoor unit
         \default Fan:ConstantVolume
   A8 ,  \field Supply Air Fan Object Name
@@ -34128,7 +34268,8 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note to model VRF outdoor unit
         \note Cooling Coil Type must be
         \note Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
-        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl or
+        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR
         \note is used to model VRF outdoor unit
         \note This field may be left blank if heating-only mode is used
   A12,  \field Cooling Coil Object Name
@@ -34146,7 +34287,8 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note to model VRF outdoor unit
         \note Heating Coil Type must be
         \note Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
-        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl or
+        \note if AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR
         \note is used to model VRF outdoor unit
         \note This field may be left blank if cooling-only mode is used
   A14,  \field Heating Coil Object Name
@@ -43640,7 +43782,8 @@ Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo This is a key object in the new physics based VRF model applicable for Fluid
        \memo Temperature Control. It describes the the indoor unit coil of the system at cooling mode.
        \memo Used with ZoneHVAC:TerminalUnit:VariableRefrigerantFlow.
-       \memo Outdoor unit is modeled separately, see AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl.
+       \memo Outdoor unit is modeled separately, see AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+       \memo or AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR
        \min-fields 6
   A1,  \field Name
        \required-field
@@ -43691,7 +43834,8 @@ Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo This is a key object in the new physics based VRF model applicable for Fluid
        \memo Temperature Control. It describes the the indoor unit coil of the system at heating mode.
        \memo Used with ZoneHVAC:TerminalUnit:VariableRefrigerantFlow.
-       \memo Outdoor unit is modeled separately, see AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl.
+       \memo Outdoor unit is modeled separately, see AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
+       \memo or AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR
        \min-fields 5
   A1,  \field Name
        \required-field
@@ -54077,7 +54221,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo Temperature Control
        \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
        \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-       \min-fields 9
+       \extensible:3 - repeat last three fields, remembering to remove ; from "inner" fields.
+       \min-fields 11
   A1 , \field Heat Pump Name
        \required-field
        \type alpha
@@ -54101,6 +54246,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   N1 , \field Rated Evaporative Capacity
        \type real
        \units W
+       \autosizable
        \minimum> 0.0
        \default 40000
        \note Enter the total evaporative capacity in watts at rated conditions
@@ -54337,7 +54483,9 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note First index represents minimal capacity operation
        \note Last index represents full capacity operation
   N32, \field Compressor Speed at Loading Index 1
+       \required-field
        \type real
+       \begin-extensible
        \note Minimum compressor speed
        \units rev/min
        \minimum> 0
@@ -54352,6 +54500,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
   N33, \field Compressor Speed at Loading Index 2
+       \required-field
        \type real
        \units rev/min
        \minimum> 0
@@ -54449,6 +54598,532 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
 
+AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
+       \memo This is a key object in the new physics based VRF Heat Recovery (HR) model applicable for Fluid
+       \memo Temperature Control. It describes the VRF HR system excluding the performance of indoor units.
+       \memo Indoor units are modeled separately in the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+       \extensible:3 repeat last three fields (changing numbering, please), remembering to remove ";" from "inner" fields.
+       \min-fields 11
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \note Enter a unique name for this variable refrigerant flow heat pump
+  A2 , \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note Enter the name of a schedule that defines the availability of the unit
+       \note Schedule values of 0 denote the unit is off. All other values denote the unit is available
+       \note If this field is left blank, the unit is available the entire simulation
+  A3 , \field Zone Terminal Unit List Name
+       \required-field
+       \type object-list
+       \object-list ZoneTerminalUnitListNames
+       \note Enter the name of a ZoneTerminalUnitList. This list connects zone terminal units to this
+       \note heat pump
+  A4 , \field Refrigerant Type
+       \type object-list
+       \object-list FluidNames
+       \default R410A
+  N1 , \field Rated Evaporative Capacity
+       \type real
+       \units W
+       \autosizable
+       \minimum> 0.0
+       \default 40000
+       \note Enter the total evaporative capacity in watts at rated conditions
+       \note This is the capacity corresponding to the max compressor speed at rated conditions
+       \note The actual evaporative capacity is obtained by multiplying the
+       \note rated capacity with the modification factor calculated by Evaporative
+       \note Capacity Multiplier Function of Temperature Curve
+  N2 , \field Rated Compressor Power Per Unit of Rated Evaporative Capacity
+       \type real
+       \units dimensionless
+       \minimum> 0.0
+       \default 0.35
+       \note Enter the rated compressor power per Watt of rated evaporative capacity [W/W]
+       \note Rated compressor power corresponds to the max compressor speed at rated conditions
+       \note The actual compressor power is obtained by multiplying the
+       \note rated power with the modification factor calculated by Compressor
+       \note Power Multiplier Function of Temperature Curve
+  N3 , \field Minimum Outdoor Air Temperature in Cooling Only Mode
+       \type real
+       \units C
+       \default -6.0
+       \note Enter the minimum outdoor temperature allowed for cooling operation
+       \note Cooling is disabled below this temperature
+  N4 , \field Maximum Outdoor Air Temperature in Cooling Only Mode
+       \type real
+       \units C
+       \default 43.0
+       \note Enter the maximum outdoor temperature allowed for cooling operation
+       \note Cooling is disabled above this temperature
+  N5 , \field Minimum Outdoor Air Temperature in Heating Only Mode
+       \type real
+       \units C
+       \default -20.0
+       \note Enter the minimum outdoor temperature allowed for heating operation
+       \note Heating is disabled below this temperature
+  N6 , \field Maximum Outdoor Air Temperature in Heating Only Mode
+       \type real
+       \units C
+       \default 16.0
+       \note Enter the maximum outdoor temperature allowed for heating operation
+       \note Heating is disabled below this temperature
+  N7 , \field Minimum Outdoor Temperature in Heat Recovery Mode
+       \type real
+       \units C
+       \default -20.0
+       \note The minimum outdoor temperature below which heat
+       \note recovery mode will not operate.
+  N8 , \field Maximum Outdoor Temperature in Heat Recovery Mode
+       \type real
+       \units C
+       \default 43.0
+       \note The maximum outdoor temperature above which heat
+       \note recovery mode will not operate.
+  A5 , \field Refrigerant Temperature Control Algorithm for Indoor Unit
+       \type choice
+       \key ConstantTemp
+       \key VariableTemp
+       \default VariableTemp
+  N9 , \field Reference Evaporating Temperature for Indoor Unit
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is ConstantTemp
+       \note Evaporating temperature is the refrigerant temperature, not air temperature
+       \type real
+       \units C
+       \default 6.0
+  N10, \field Reference Condensing Temperature for Indoor Unit
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is ConstantTemp
+       \note Condensing temperature is the refrigerant temperature, not air temperature
+       \type real
+       \units C
+       \default 44.0
+  N11, \field Variable Evaporating Temperature Minimum for Indoor Unit
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is VariableTemp
+       \note Evaporating temperature is the refrigerant temperature, not air temperature
+       \type real
+       \units C
+       \default 4.0
+  N12, \field Variable Evaporating Temperature Maximum for Indoor Unit
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is VariableTemp
+       \note Evaporating temperature is the refrigerant temperature, not air temperature
+       \type real
+       \units C
+       \default 13.0
+  N13, \field Variable Condensing Temperature Minimum for Indoor Unit
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is VariableTemp
+       \note Condensing temperature is the refrigerant temperature, not air temperature
+       \type real
+       \units C
+       \default 42.0
+  N14, \field Variable Condensing Temperature Maximum for Indoor Unit
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is VariableTemp
+       \note Condensing temperature is the refrigerant temperature, not air temperature
+       \type real
+       \units C
+       \default 46.0
+  N15, \field Outdoor Unit Evaporator Reference Superheating
+       \type real
+       \units deltaC
+       \default 3
+  N16, \field Outdoor Unit Condenser Reference Subcooling
+       \type real
+       \units deltaC
+       \default 5
+  N17, \field Outdoor Unit Evaporator Rated Bypass Factor
+       \type real
+       \units dimensionless
+       \minimum> 0
+       \default 0.4
+  N18, \field Outdoor Unit Condenser Rated Bypass Factor
+       \type real
+       \units dimensionless
+       \minimum> 0
+       \default 0.2
+  N19, \field Difference between Outdoor Unit Evaporating Temperature and Outdoor Air Temperature in Heat Recovery Mode
+       \type real
+       \units deltaC
+       \default 5
+  N20, \field Outdoor Unit Heat Exchanger Capacity Ratio
+       \note Enter the rated capacity ratio between the main and supplementary outdoor unit heat exchangers [W/W]
+       \type real
+       \units dimensionless
+       \minimum> 0
+       \default 0.3
+  N21, \field Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
+       \note Enter the outdoor unit fan power per Watt of rated evaporative capacity [W/W]
+       \units dimensionless
+       \minimum> 0.0
+       \default 4.25E-3
+       \type real
+  N22, \field Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity
+       \note Enter the outdoor unit fan flow rate per Watt of rated evaporative capacity [W/W]
+       \units m3/s-W
+       \minimum> 0.0
+       \default 7.50E-5
+       \type real
+  A6 , \field Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
+       \required-field
+       \type object-list
+       \object-list QuadraticCurves
+       \object-list UniVariateTables
+  A7 , \field Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
+       \required-field
+       \type object-list
+       \object-list QuadraticCurves
+       \object-list UniVariateTables
+  N23, \field Diameter of Main Pipe for Suction Gas 
+       \note used to calculate the piping loss
+       \type real
+       \units m
+       \minimum 0.0
+       \default 0.0762
+  N24, \field Diameter of Main Pipe for Discharge Gas
+       \note used to calculate the piping loss
+       \type real
+       \units m
+       \minimum 0.0
+       \default 0.0762
+  N25, \field Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+       \note used to calculate the heat loss of the main pipe
+       \type real
+       \units m
+       \minimum 0.0
+       \default 30.0
+  N26, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+       \note used to calculate the refrigerant pressure drop of the main pipe
+       \type real
+       \units m
+       \minimum 0.0
+       \default 36.0
+  N27, \field Height Difference Between Outdoor Unit and Indoor Units
+       \note Difference between outdoor unit height and indoor unit height
+       \note Positive means outdoor unit is higher than indoor unit
+       \note Negative means outdoor unit is lower than indoor unit
+       \type real
+       \units m
+       \default 5.0
+  N28, \field Main Pipe Insulation Thickness
+       \type real
+       \units m
+       \minimum 0.0
+       \default 0.02
+  N29, \field Main Pipe Insulation Thermal Conductivity
+       \type real
+       \units W/m-K
+       \minimum 0.0
+       \default 0.032
+  N30, \field Crankcase Heater Power per Compressor
+       \type real
+       \units W
+       \default 33.0
+       \note Enter the value of the resistive heater located in the compressor(s). This heater
+       \note is used to warm the refrigerant and oil when the compressor is off
+  N31, \field Number of Compressors
+       \type integer
+       \units dimensionless
+       \default 2
+       \note Enter the total number of compressor. This input is used only for crankcase
+       \note heater calculations.
+  N32, \field Ratio of Compressor Size to Total Compressor Capacity
+       \type real
+       \units W/W
+       \default 0.5
+       \note Enter the ratio of the first stage compressor to total compressor capacity
+       \note All other compressors are assumed to be equally sized. This inputs is used
+       \note only for crankcase heater calculations
+  N33, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater
+       \type real
+       \units C
+       \default 5.0
+       \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled
+  A8, \field Defrost Strategy
+       \type choice
+       \key ReverseCycle
+       \key Resistive
+       \default Resistive
+       \note Select a defrost strategy.
+       \note Reverse cycle reverses the operating mode from heating to
+       \note cooling to melt frost formation on the condenser coil
+       \note The resistive strategy uses a resistive heater
+       \note to melt the frost.
+  A9, \field Defrost Control
+       \type choice
+       \key Timed
+       \key OnDemand
+       \default Timed
+       \note Choose a defrost control type
+       \note Either use a fixed Timed defrost period or select
+       \note OnDemand to defrost only when necessary
+  A10, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+       \type object-list
+       \object-list LinearCurves
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note A valid performance curve must be used if ReverseCycle defrost strategy is selected
+  N34, \field Defrost Time Period Fraction
+       \type real
+       \minimum 0.0
+       \default 0.058333
+       \note Fraction of time in defrost mode
+       \note Only applicable if timed defrost control is specified
+  N35, \field Resistive Defrost Heater Capacity
+       \type real
+       \minimum 0.0
+       \default 0.0
+       \autosizable
+       \units W
+       \note Enter the size of the resistive defrost heating element
+       \note Only applicable if resistive defrost strategy is specified
+       \ip-units W
+  N36, \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+       \type real
+       \units C
+       \default 5.0
+       \note Enter the maximum outdoor temperature above which the defrost operation is disabled
+  N37, \field Initial Heat Recovery Cooling Capacity Fraction
+       \type real
+       \units W/W
+       \default 1
+       \note This is used to describe the transition from Cooling Only mode to Heat Recovery mode
+       \note Enter the fractional capacity available at the start
+       \note of heat recovery mode. The capacity exponentially approaches
+       \note the steady-state value according to the inputs for
+       \note Heat Recovery Cooling Capacity Modifier and Heat Recovery
+       \note Cooling Capacity Time Constant
+  N38, \field Heat Recovery Cooling Capacity Time Constant
+       \type real
+       \units hr
+       \default 0
+       \note This is used to describe the transition from Cooling Only mode to Heat Recovery mode
+       \note Enter the time constant used to model the transition
+       \note from cooling only mode to heat recovery mode
+  N39, \field Initial Heat Recovery Cooling Energy Fraction
+       \type real
+       \units W/W
+       \default 1
+       \note This is used to describe the transition from Cooling Only mode to Heat Recovery mode
+       \note Enter the fractional electric consumption rate at the start
+       \note of heat recovery mode. The electric consumption rate exponentially
+       \note approaches the steady-state value according to the inputs for
+       \note Heat Recovery Cooling Energy Modifier and Heat Recovery
+       \note Cooling Energy Time Constant
+  N40, \field Heat Recovery Cooling Energy Time Constant
+       \type real
+       \units hr
+       \default 0
+       \note This is used to describe the transition from Cooling Only mode to Heat Recovery mode
+       \note Enter the time constant used to model the transition
+       \note from cooling only mode to heat recovery mode
+  N41, \field Initial Heat Recovery Heating Capacity Fraction
+       \type real
+       \units W/W
+       \default 1
+       \note This is used to describe the transition from Heating Only mode to Heat Recovery mode
+       \note Enter the fractional capacity available at the start
+       \note of heat recovery mode. The capacity exponentially approaches
+       \note the steady-state value according to the inputs for
+       \note Heat Recovery Heating Capacity Modifier and Heat Recovery
+       \note Heating Capacity Time Constant
+  N43, \field Heat Recovery Heating Capacity Time Constant
+       \type real
+       \units hr
+       \default 0
+       \note This is used to describe the transition from Heating Only mode to Heat Recovery mode
+       \note Enter the time constant used to model the transition
+       \note from cooling only mode to heat recovery mode
+  N43, \field Initial Heat Recovery Heating Energy Fraction
+       \type real
+       \units W/W
+       \default 1
+       \note This is used to describe the transition from Heating Only mode to Heat Recovery mode
+       \note Enter the fractional electric consumption rate at the start
+       \note of heat recovery mode. The electric consumption rate exponentially
+       \note approaches the steady-state value according to the inputs for
+       \note Heat Recovery Cooling Energy Modifier and Heat Recovery
+       \note Cooling Energy Time Constant
+  N44, \field Heat Recovery Heating Energy Time Constant
+       \type real
+       \units hr
+       \default 0
+       \note This is used to describe the transition from Heating Only mode to Heat Recovery mode
+       \note Enter the time constant used to model the transition
+       \note from cooling only mode to heat recovery mode
+  N45, \field Compressor maximum delta Pressure
+       \type real
+       \units Pa
+       \default 4500000.0
+       \minimum 0.0
+       \maximum 50000000.0
+  N46, \field Compressor Inverter Efficiency
+       \type real
+       \units dimensionless
+       \minimum> 0
+       \maximum 1.0
+       \default 0.95
+       \note Efficiency of the compressor inverter
+  N47, \field Compressor Evaporative Capacity Correction Factor
+       \type real
+       \units dimensionless
+       \minimum> 0
+       \default 1.0
+       \note Describe the evaporative capacity difference because of system configuration 
+       \note difference between test bed and real system.
+  N48, \field Number of Compressor Loading Index Entries
+       \required-field
+       \type integer
+       \default 2
+       \minimum 2
+       \note Load index describe the compressor operational state, 
+       \note either a single compressor or multiple compressors, at different load levels. 
+       \note First index represents minimal capacity operation
+       \note Last index represents full capacity operation
+  N49, \field Compressor Speed at Loading Index 1
+       \required-field
+       \type real
+       \note Minimum compressor speed
+       \begin-extensible
+       \units rev/min
+       \minimum> 0
+  A11, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A12, \field Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N50, \field Compressor Speed at Loading Index 2
+       \required-field
+       \type real
+       \units rev/min
+       \minimum> 0
+  A13, \field Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A14, \field Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N51, \field Compressor Speed at Loading Index 3
+       \type real
+       \units rev/min
+       \minimum> 0
+  A15, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A16, \field Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N52, \field Compressor Speed at Loading Index 4
+       \type real
+       \units rev/min
+       \minimum> 0
+  A17, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A18, \field Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N53, \field Compressor Speed at Loading Index 5
+       \type real
+       \units rev/min
+       \minimum> 0
+  A19, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A20, \field Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N54, \field Compressor Speed at Loading Index 6
+       \type real
+       \units rev/min
+       \minimum> 0
+  A21, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A22, \field Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N55, \field Compressor Speed at Loading Index 7
+       \type real
+       \units rev/min
+       \minimum> 0
+  A23, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A24, \field Loading Index 7 list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N56, \field Compressor Speed at Loading Index 8
+       \type real
+       \units rev/min
+       \minimum> 0
+  A25, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A26, \field Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N57, \field Compressor Speed at Loading Index 9
+       \type real
+       \units rev/min
+       \minimum> 0
+  A27, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A28, \field Loading Index 9 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables       
+  N58, \field Compressor Speed at Loading Index 10
+       \type real
+       \units rev/min
+       \minimum> 0
+  A29, \field Loading Index 10 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A30, \field Loading Index 10 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  N59, \field Compressor Speed at Loading Index 11
+       \type real
+       \units rev/min
+       \minimum> 0
+  A31, \field Loading Index 11 Evaporative Capacity Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+  A32; \field Loading Index 11 Compressor Power Multiplier Function of Temperature Curve Name
+       \type object-list
+       \object-list BiQuadraticCurves
+       \object-list BiVariateTables
+ 
 ZoneTerminalUnitList,
           \memo List of variable refrigerant flow (VRF) terminal units served by a given VRF condensing
           \memo unit. See ZoneHVAC:TerminalUnit:VariableRefrigerantFlow and
@@ -66007,7 +66682,7 @@ WaterHeater:Mixed,
        \type node
   N19, \field Source Side Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   N20, \field Use Side Design Flow Rate
@@ -66286,7 +66961,7 @@ WaterHeater:Stratified,
        \type node
   N26, \field Source Side Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of
@@ -67174,7 +67849,7 @@ ThermalStorage:ChilledWater:Mixed,
        \type node
   N8, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
   A12, \field Source Side Availability Schedule Name
@@ -67308,7 +67983,7 @@ ThermalStorage:ChilledWater:Stratified,
        \type node
   N13, \field Source Side Heat Transfer Effectiveness
        \type real
-       \minimum 0.0
+       \minimum> 0.0
        \maximum 1.0
        \default 1.0
        \note The source side effectiveness in the stratified tank model is a simplified analogy of
@@ -71173,11 +71848,11 @@ AvailabilityManager:HybridVentilation,
        \object-list HVACTemplateSystems
        \note If this field is left blank, hybrid ventilation managers will be
        \note simulated for zone equipment control
-  A3 , \field Controlled Zone Name
+  A3 , \field Control Zone Name
        \required-field
        \type object-list
        \object-list ZoneNames
-       \note the controlled zone name should be a zone where a thermostat or humidistat is located
+       \note the zone name should be a zone where a thermostat or humidistat is located
        \note served by an air primary loop.
   A4 , \field Ventilation Control Mode Schedule Name
        \required-field
@@ -78333,6 +79008,8 @@ ElectricLoadCenter:Distribution,
        \note Controls timing and magnitude of discharging storage
        \note Required field if Storage Operation Scheme is set to TrackChargeDischargeSchedules.
        \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
+       \type object-list
+       \object-list ScheduleNames
   N6,  \field Storage Control Utility Demand Target
        \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses.
        \note Required field for FacilityDemandLeveling storage operation scheme

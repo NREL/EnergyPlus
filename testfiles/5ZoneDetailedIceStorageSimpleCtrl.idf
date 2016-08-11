@@ -3744,4 +3744,3 @@ Schedule:Compact,
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,1.00;       !- Field 3
-

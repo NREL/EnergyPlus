@@ -607,10 +607,6 @@ namespace DataHeatBalance {
 
 	extern Array1D< Real64 > const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
-	//Variables Dimensioned to Number of Zones
-	extern Array1D< Real64 > MVFC; // Design Mixing Flow Rate [m3/s] (Cross Zone Mixing)
-	extern Array1D< Real64 > MTC; // Control Temperature For Mixing [C] (Cross Zone Mixing)
-
 	extern Real64 ZeroPointerVal;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
@@ -1520,7 +1516,7 @@ namespace DataHeatBalance {
 		bool Show55Warning; // show the warning messages about ASHRAE 55-2004
 		Real64 CO2RateFactor; // Carbon Dioxide Generation Rate [m3/s-W]
 		// Report variables
-		Real64 NumOcc; // Number of occupants []
+		Real64 NumOcc; // Number of occupants at current timestep []
 		Real64 TemperatureInZone; // Temperature in zone (C)
 		Real64 RelativeHumidityInZone; // Relative humidity in zone
 		Real64 RadGainRate; // Radiant heat gain [W]
@@ -1704,6 +1700,7 @@ namespace DataHeatBalance {
 		Real64 LostEnergy; // Lost energy (converted to work) [J]
 		Real64 TotGainEnergy; // Total heat gain [J]
 		std::string EndUseSubcategory; // user defined name for the end use category
+		int OtherEquipFuelType; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
 
 		// Default Constructor
 		ZoneEquipData() :
@@ -1734,7 +1731,9 @@ namespace DataHeatBalance {
 			ConGainEnergy( 0.0 ),
 			LatGainEnergy( 0.0 ),
 			LostEnergy( 0.0 ),
-			TotGainEnergy( 0.0 )
+			TotGainEnergy( 0.0 ),
+			EndUseSubcategory( "" ),
+			OtherEquipFuelType( 0 )
 		{}
 
 	};
@@ -3136,6 +3135,8 @@ namespace DataHeatBalance {
 		Real64 SteamLostRate;
 		Real64 SteamTotGainRate;
 		// Other Equipment
+		Real64 OtherPower;
+		Real64 OtherConsump;
 		Real64 OtherRadGain;
 		Real64 OtherConGain;
 		Real64 OtherLatGain;
@@ -3267,6 +3268,8 @@ namespace DataHeatBalance {
 			SteamLatGainRate( 0.0 ),
 			SteamLostRate( 0.0 ),
 			SteamTotGainRate( 0.0 ),
+			OtherPower( 0.0 ),
+			OtherConsump( 0.0 ),
 			OtherRadGain( 0.0 ),
 			OtherConGain( 0.0 ),
 			OtherLatGain( 0.0 ),

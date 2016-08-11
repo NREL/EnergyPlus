@@ -68,7 +68,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,8.5;
+  Version,8.6;
 
   Timestep,6;
 
@@ -6630,6 +6630,10 @@
 
   EnergyManagementSystem:Subroutine,
     DoCurveandTableTests,    !- Name
+    Set dum1 = 0.0,
+    Set dum2 = 0.0,
+    Set dum3 = 0.0,
+    Set dum4 = 0.0,
     Set dummy = DX10Ton_CapFT_ptr,  !- Program Line 1
     Set CapFT_result = @CurveValue DX10Ton_CapFT_ptr 18.0 30.0 dum1 dum2 dum3,  !- Program Line 2
     Set CapFT_result = @CurveValue DX10Ton_CapFT_ptr 17.0 46.0 dum1 dum2 dum3,  !- <none>
@@ -6794,7 +6798,9 @@
     Set phi2 = @RadToDeg phiRad2,  !- <none>
     Set A = (2 + 2) * 3,     !- <none>
     Set B = (2 + 2) * (1+2), !- <none>
-    Set C = (2 + 2) / (3 + 1);  !- <none>
+    Set C = (2 + 2) / (3 + 1),  !- <none>
+    Set D = myuninitvar,
+    Set D = myuninitvar2 + myuninitvar3;
 
   EnergyManagementSystem:Subroutine,
     DoRandomNumberTests,     !- Name

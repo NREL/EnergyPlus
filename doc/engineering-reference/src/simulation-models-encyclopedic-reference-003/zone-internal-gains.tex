@@ -161,35 +161,24 @@ For each time step, the air inlet temperature is calculated depending on the typ
 TAirIn:
 
 \begin{itemize}
-\tightlist
-\item
-  If Air Node Connection Type = AdjustedSupply
+    \tightlist
+  \item
+    If Air Node Connection Type = AdjustedSupply
+    \begin{itemize}
+      \item RecircFrac = RecircFracDesign \* RecircfLoadTAir(SchCPULoading TAirSupply)
+      \item TAirIn = TAirSupply \* (1 – RecircFrac) +TAirZone \* RecircFrac
+    \end{itemize}
+  \item
+    If Air Node Connection Type = ZoneAirNode
+    \begin{itemize}
+      \item   TAirIn = TAirZone
+    \end{itemize}
+  \item
+    If Air Node Connection Type = RoomAirModel
+    \begin{itemize}
+      \item TAirIn = TRoomAirNodeIn
+    \end{itemize}
 \end{itemize}
-
-\begin{lstlisting}
--   RecircFrac = RecircFracDesign \* RecircfLoadTAir(SchCPULoading TAirSupply)
--   TAirIn = TAirSupply \* (1 – RecircFrac) +TAirZone \* RecircFrac
-\end{lstlisting}
-
-\begin{itemize}
-\tightlist
-\item
-  If Air Node Connection Type = ZoneAirNode
-\end{itemize}
-
-\begin{lstlisting}
--   TAirIn = TAirZone
-\end{lstlisting}
-
-\begin{itemize}
-\tightlist
-\item
-  If Air Node Connection Type = RoomAirModel
-\end{itemize}
-
-\begin{lstlisting}
--   TAirIn = TRoomAirNodeIn
-\end{lstlisting}
 
 Using the air inlet temperature, the CPU power consumption, air flow rate, fan power consumption, and power supply power consumption are calculated.
 
@@ -214,24 +203,18 @@ QUPS = PUPS * UPSLossFracToZone
 QConv:
 
 \begin{itemize}
-\tightlist
-\item
-  If Air Node Connection Type = AdjustedSupply OR ZoneAirNode
+    \tightlist
+  \item
+    If Air Node Connection Type = AdjustedSupply OR ZoneAirNode
+    \begin{itemize}
+      \item   QConv = QAir + QUPS
+    \end{itemize}
+  \item
+    If Air Node Connection Type = RoomAirModel
+    \begin{itemize}
+      \item   QConv = QUPS
+    \end{itemize}
 \end{itemize}
-
-\begin{lstlisting}
--   QConv = QAir + QUPS
-\end{lstlisting}
-
-\begin{itemize}
-\tightlist
-\item
-  If Air Node Connection Type = RoomAirModel
-\end{itemize}
-
-\begin{lstlisting}
--   QConv = QUPS
-\end{lstlisting}
 
 TAirOut = TAirIn + QAir / (VAir * RhoAir * CpAir)
 

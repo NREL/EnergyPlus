@@ -600,13 +600,13 @@ The convergence tolerance is used to check the sum of the mass flow rates by app
 
 where
 
-\emph{r}~~~~ = the ratio of C\(_{n}\) for the current iteration to its value for the previous iteration {[}dimensionless{]}
+\(r\) = the ratio of \(C_{n}\) for the current iteration to its value for the previous iteration {[}dimensionless{]}
 
-\emph{C\(_{n}\)}~ = Correction value at the n\(_{th}\) node {[}Pa{]}
+\(C_{n}\) = Correction value at the n\(_{th}\) node {[}Pa{]}
 
-\emph{P\(_{n}\)} = Estimated pressure at the n\(_{th}\) node {[}Pa{]}
+\(P_{n}\) = Estimated pressure at the n\(_{th}\) node {[}Pa{]}
 
-\emph{P\(_{n}\)\(^{\*}\)} = Corrected pressure at the n\(_{th}\) node used in the next iteration {[}Pa{]}
+\(P_{n}^{*}\) = Corrected pressure at the n\(_{th}\) node used in the next iteration {[}Pa{]}
 
 This method is similar to a Steffensen iteration (Conte and de Boor 1972) which is used as a fixed-point iteration method for individual nonlinear equations.
 
@@ -1089,6 +1089,20 @@ If the closing probability check is performed and the closing probability is gre
 CP \textgreater{} random number (random number is between 0 and 1)
 
 Otherwise, the result will be false.
+
+\subsection{Pressure Control}\label{pressure-control}
+
+Pressure control is achieved by varying either zone exhaust fan flow rate in a controlled zone or relief air flow rate in an AirLoop. It requires an AirLoop with an OA mixer to reach the pressure setpoint by adjusting a relief air flow, or an OA mixer and an exhaust fan in a controlled zone to reach the pressure setpoint by adjusting an exhaust fan flow rate. The calculation logic is shown below:
+
+1. The AirflowNetwork model will run twice with zero and maximum flow rates for either the controlled zone exhaust fan or relief air flow rate. The controlled zone pressures are the return values.
+
+	In general, the zero flow rate of either exhaust fan or relief node will generate the maximum zone pressure, while the maximum flow rate of either exhaust fan or relief node will produce the minimum zone pressure. 
+
+2. If the setpoint pressure is between the maximum zone pressure caused by zero exhaust fan or relief node flow rate and the minimum zone pressure caused by maximum exhaust fan flow rate or outdoor air flow rate, then the AirflowNetwork model will use Regula Falsi to find a solution with calculated zone exhaust fan flow rate or relief node flow rate. Otherwise, the pressure setpoint will not be met. 
+
+3. If both maximum and minimum pressures are higher than the setpoint, the maximum exhaust or outdoor flow rate will be forced. 
+
+4. If both maximum and minimum pressures are lower than the setpoint, then zero flow rate will be forced.
 
 \subsection{References}\label{references-004}
 

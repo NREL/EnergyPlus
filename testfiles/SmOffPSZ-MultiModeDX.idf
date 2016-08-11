@@ -58,7 +58,7 @@
 !             the same as in SmOffPSZ.
 !
 
-  Version,8.5;
+  Version,8.6;
 
   Building,
     Small Office,            !- Name
@@ -1403,6 +1403,7 @@
 
   OtherEquipment,
     BASE-1 OthEq 1,          !- Name
+    None,                    !- Fuel Type
     BASE-1,                  !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

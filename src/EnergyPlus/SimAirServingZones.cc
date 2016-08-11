@@ -2140,7 +2140,6 @@ namespace SimAirServingZones {
 
 		// Using/Aliasing
 		using HVACInterfaceManager::UpdateHVACInterface;
-		using MixedAir::SimOAController;
 		using General::GetPreviousHVACTime;
 		using DataConvergParams::CalledFromAirSystemSupplySideDeck1;
 		using DataConvergParams::CalledFromAirSystemSupplySideDeck2;

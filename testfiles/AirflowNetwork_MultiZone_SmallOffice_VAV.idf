@@ -128,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.5;
+  Version,8.6;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -3422,7 +3422,7 @@
   AvailabilityManager:HybridVentilation,
     Hybrid ventilation controller 1,  !- Name
     VAV Sys 1,               !- HVAC Air Loop Name
-    NORTH ZONE,              !- Controlled Zone Name
+    NORTH ZONE,              !- Control Zone Name
     Hybrid Control Mode Schedule,  !- Ventilation Control Mode Schedule Name
     Yes,                     !- Use Weather File Rain Indicators
     40.0,                    !- Maximum Wind Speed {m/s}

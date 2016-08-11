@@ -74,13 +74,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER DifLfn
   INTEGER xCount
   INTEGER Num
-!  INTEGER Num1
-!  INTEGER Num2
-!  INTEGER Num3
-!  INTEGER Num4
-!  INTEGER Num5
   INTEGER, EXTERNAL :: GetNewUnitNumber
-!  INTEGER, EXTERNAL :: FindNumber
   INTEGER Arg
   LOGICAL, SAVE :: FirstTime=.true.
   CHARACTER(len=30) UnitsArg
@@ -109,8 +103,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: FileExist
   CHARACTER(len=MaxNameLength) :: CreatedOutputName
   LOGICAL, ALLOCATABLE, DIMENSION(:) :: DeleteThisRecord
-!  REAL :: TestValue
-!  INTEGER :: NArgs
   INTEGER :: COutArgs
   CHARACTER(len=16) :: UnitsField
   LOGICAL :: ScheduleTypeLimitsAnyNumber
@@ -119,20 +111,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutScheduleName
 
   LOGICAL :: ErrFlag
-
-  REAL :: IndirectOldFieldFive
-  REAL :: IndirectOldFieldSix
-  REAL :: IndirectNewFieldThirteen
-  CHARACTER(len=10) :: IndirectNewFieldString
-
-  INTEGER :: HeightFieldNum
-  INTEGER :: TankSearchNum
-  INTEGER :: HeaterNum
-  CHARACTER(len=MaxNameLength) :: ThisObjectType
-  CHARACTER(len=MaxNameLength) :: ThisObjectName
-  CHARACTER(len=MaxNameLength) :: LookingForTankName
-
-  INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -446,6 +424,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     CurArgs = CurArgs-1
                 END DO
 
+              ! It is debatable whether I should actually improve this to make it more like the report variables
+              ! I think it is much less likely that these will change between versions
+              ! So for now I'll just change them on a version by version basis.
+              CASE ('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                SELECT CASE ( MakeUPPERCase ( InArgs(4) ) )
+                CASE ('OUTDOOR AIR DRYBLUB TEMPERATURE')
+				  nodiff = .true.
+				  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Drybulb Temperature'
+                CASE ('OUTDOOR AIR WETBLUB TEMPERATURE')
+                  nodiff = .true.
+                  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Wetbulb Temperature'
+                END SELECT
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -876,6 +871,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
                 ENDDO
 
+              !! Changes for this version can go here
+              CASE('OTHEREQUIPMENT')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                OutArgs(2) = 'None'
+                OutArgs(3:11) = InArgs(2:10)
+                CurArgs = CurArgs+1
+
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
                     WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
@@ -981,38 +985,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   ENDDO
 
   IF (ArgFileBeingDone .and. .not. LatestVersion .and. .not. ExitBecauseBadFile) THEN
-    ! If this is true, then there was a "arg IDF File" on the command line and some files need to be
-                         ! renamed.
+    ! If this is true, then there was a "arg IDF File" on the command line and some files need to be renamed
     ErrFlag=.false.
     CALL copyfile(TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension),TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'old',ErrFlag)
-!    SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'" "'//  &
-!                                    TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'old"')
     CALL copyfile(TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'new',TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension),ErrFlag)
-!    SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'new" "'//  &
-!                                  TRIM(FileNamePath)//'.'//TRIM(ArgIDFExtension)//'"')
     INQUIRE(File=TRIM(FileNamePath)//'.rvi',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.rvi',TRIM(FileNamePath)//'.rviold',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.rvi" "'//TRIM(FileNamePath)//'.rviold"')
     ENDIF
     INQUIRE(File=TRIM(FileNamePath)//'.rvinew',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.rvinew',TRIM(FileNamePath)//'.rvi',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.rvinew" "'//TRIM(FileNamePath)//'.rvi"')
     ENDIF
     INQUIRE(File=TRIM(FileNamePath)//'.mvi',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.mvi',TRIM(FileNamePath)//'.mviold',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.mvi" "'//TRIM(FileNamePath)//'.mviold"')
     ENDIF
     INQUIRE(File=TRIM(FileNamePath)//'.mvinew',EXIST=FileExist)
     IF (FileExist) THEN
       CALL copyfile(TRIM(FileNamePath)//'.mvinew',TRIM(FileNamePath)//'.mvi',ErrFlag)
-!      SysResult=SystemQQ('copy "'//TRIM(FileNamePath)//'.mvinew" "'//TRIM(FileNamePath)//'.mvi"')
     ENDIF
   ENDIF
 
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
-

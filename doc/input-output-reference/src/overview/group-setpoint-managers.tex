@@ -277,7 +277,7 @@ The minimum supply air temperature (in \(^{o}\)C) that is allowed for this syste
 
 The maximum supply air temperature (in \(^{o}\)C) that is allowed for this system (as set by this setpoint manager)
 
-\paragraph{Field: Control Zone Name}\label{field-control-zone-name}
+\paragraph{Field: Control Zone Name}\label{field-control-zone-name-2016-06-16}
 
 The name of the control zone for this single zone reheat system. The heating or cooling load for this zone determines the supply air temperature setpoint.
 
@@ -937,11 +937,11 @@ SetpointManager:WarmestTemperatureFlow,
 
 \subsubsection{Outputs}\label{outputs-032}
 
-\paragraph{\texorpdfstring{Setpoint Manager Warmest Temperature Critical Zone Number {[]}}{Setpoint Manager Warmest Temperature Critical Zone Number }}\label{setpoint-manager-warmest-temperature-critical-zone-number}
+\paragraph{Setpoint Manager Warmest Temperature Critical Zone Number {[]}}\label{setpoint-manager-warmest-temperature-critical-zone-number}
 
 This is the number of the zone that was the critical zone for the setpoint manager.
 
-\paragraph{\texorpdfstring{Setpoint Manager Warmest Temperature Turndown Flow Fraction {[]}}{Setpoint Manager Warmest Temperature Turndown Flow Fraction }}\label{setpoint-manager-warmest-temperature-turndown-flow-fraction}
+\paragraph{Setpoint Manager Warmest Temperature Turndown Flow Fraction {[]}}\label{setpoint-manager-warmest-temperature-turndown-flow-fraction}
 
 This is the fraction that flow was reduced by the setpoint manager. This is the actual air flow rate divided by the maximum air flow rate.
 
@@ -1536,7 +1536,7 @@ SetpointManager:SingleZone:OneStageCooling,
   DX Cooling Coil 3 Outlet Node ; !- Setpoint Node or NodeList Name
 \end{lstlisting}
 
-\subsection{SetpointManager:SingleZoneOneStageHeating}\label{setpointmanagersinglezoneonestageheating}
+\subsection{SetpointManager:SingleZone:OneStageHeating}\label{setpointmanagersinglezoneonestageheating}
 
 The singe-zone, one-stage heating setpoint manager allows a component to be controlled based on thermostatic control using the object ZoneControl:Thermostat:StagedDualSetpoint. This setpoint manager differs from other parts of EnergyPlus that control based on predicted loads to setpoint. This setpoint manager allows modeling on/off cycling of heating coils in continuous fan air handlers. This setpoint manger detects if the zone is calling for a heating stage and applies one setpoint value if heating is called for and another setpoint value if heating is not called for.
 

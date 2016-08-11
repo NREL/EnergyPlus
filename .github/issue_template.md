@@ -6,6 +6,7 @@ Please change this line to a description of the defect, with useful supporting i
 Some additional details for this issue (if relevant):
  - Platform (Operating system, version)
  - Version of EnergyPlus (if using an intermediate build, include SHA)
+ - Unmethours link or helpdesk ticket number
 
 ### Checklist
 Add to this list or remove from it as applicable.  This is a simple templated set of guidelines.
