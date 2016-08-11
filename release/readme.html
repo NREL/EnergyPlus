@@ -18,8 +18,8 @@
 <body bgcolor="#FFFFFF">
 <h1 align="left"><b>Installing EnergyPlus</b></h1>
 <img align="right" alt="ep.gif (6134 bytes)" height="203" src="ep.gif" width="300"><br>
-<b>Version 8.5.0<br>
-31 March 2016<br></b>
+<b>Version 8.6.0<br>
+30 September 2016<br></b>
 <h5 align="center"><i>EnergyPlus is a trademark of the US Department of Energy.</i></h5>
 <hr>
 <h2>EnergyPlus</h2>
@@ -28,8 +28,8 @@
 engine without a 'user friendly' graphical interface . . . EnergyPlus reads input and writes output as text files.</p>
 <p>Utilities and tools for creating, editing, and running input files that come with EnergyPlus include IDF Editor and EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development.  For the latest tools, please see <a href="https://energyplus.net/interfaces">this EnergyPlus website for third party interfaces</a>.
 <p>A number of third-party tools are available to create EnergyPlus input files (IDF).  For the latest tools, please see <a href="https://energyplus.net/input-files">this EnergyPlus website for third party IDF creation tools</a>.  Some of these may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older files to current EnergyPlus version (you may need to use the Multiple Version Conversions set -- see below.</p>
-<h3>What's going on in V8.5?</h3>
-<p><i>Will there be any considerable difference between version 8.3 and 8.4?</i></p>
+<h3>What's going on in V8.6?</h3>
+<p><i>Will there be any considerable difference between version 8.5 and 8.6?</i></p>
 <blockquote>
 <p class=MsoNormal>Yes.... and no.&nbsp; The basic structure of EnergyPlus is still as it has been but there are some significant changes that you will want to be aware of:</p>
 <p>As always, there are a number of new features and bug fixes. The highlights of features for this version are listed below&mdash;see <a href="https://github.com/NREL/EnergyPlus/releases/latest">EnergyPlus Features Page</a> for a complete list of new features added in this and previous versions:</p>
@@ -38,28 +38,19 @@ engine without a 'user friendly' graphical interface . . . EnergyPlus reads inpu
 <p><i>How about IDF and IDD? Do they remain unchanged?</i></p>
 <blockquote>
 <p class=MsoNormal>There are a few key changes in the V8.4 IDD. For best results, use the transition program to transfer from the earlier V8.4 files. Use the IDFVersionUpdater program for best results.
-<p><i>Is version 8.5 backward compatible? Can I run v8.4 file in v8.5?</i></p>
+<p><i>Is version 8.5 backward compatible? Can I run v8.5 file in v8.6?</i></p>
 <blockquote>
 <p class=MsoNormal>There have been changes in the following objects which require conversion. Either read and follow the Rules spreadsheet or use the IDFVersionUpdater utility.  The "Rules" spreadsheet that contains information on exact object
 changes that you can do by hand.  The updater program is described more fully in the Auxiliary Programs document. 
 For the v8.5 release, the following objects require conversion (from V8.4):
-<li>AirTerminal:SingleDuct:SeriesPIU:Reheat</li>
-<li>AirTerminal:SingleDuct:ParallelPIU:Reheat</li>
-<li>AirTerminal:SingleDuct:ConstantVolume:Reheat</li>
-<li>AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat</li>
-<li>AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction</li>
-<li>AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan</li>
-<li>UnitarySystemPerformance:Multispeed</li>
-<li>ElectricLoadCenter:Transformer</li>
-<li>EnergyManagementSystem:InternalVariable</li>
-<li>EnergyManagementSystem:Actuator</li>
+<li>INSERT TRANSITIONED OBJECTS HERE</li>
 </blockquote>
 <p class=MsoNormal>In addition, as happens in every EnergyPlus release, there are new checks on user input. Even if your file ran in an earlier version, it may not run in the newer version after conversion due to newer checks on the validity of input.</p>
 </blockquote>
 <h3>Multiple Version Conversions</h3>
 <p>The install includes the IDFVersionUpdater program and the necessary programs to convert from the previous version (including .rvi and .mvi files) to the current version. For older versions, you will need to visit the helpdesk and download the multiple conversion set of programs. The HelpDesk downloads area: <a href="http://energyplus.helpserve.com/Knowledgebase/List/Index/46/converting-older-version-files">Converting Older Files</a> will contain the necessary readmes and zip/tar files of programs to convert IDFs from V1.0 to the current version.</p>
 <h3>Documentation</h3>
-<p>The EnergyPlus documentation is included in pdf form in the installer.  Big Ladder Software is also hosting html versions of the EnergyPlus Documentation <a href="http://bigladdersoftware.com/epx/docs/">online</a>
+<p>The EnergyPlus documentation is included in pdf form in the installer.  The pdfs are also available <a href="https://energyplus.net/documentation">online</a>.  Big Ladder Software is also hosting html versions of the EnergyPlus Documentation <a href="http://bigladdersoftware.com/epx/docs/">online</a>
 <p>There are some other documents of interest available on the web site including:</p>
 <ul>
 <li>Testing and Validation Reports: <a href="https://energyplus.net/testing">EnergyPlus Testing and Validation Reports
@@ -70,7 +61,7 @@ For the v8.5 release, the following objects require conversion (from V8.4):
 <p>A small subset of weather files that are available on the web site are also installed in the WeatherData folder. EnergyPlus uses these files directly for annual simulations.&nbsp;The Weather
 Converter program that is part of EnergyPlus can read these weather files and provide .csv (comma separated variable) as well as statistics reports about the included (or other) files.&nbsp;
 <b>Weather data</b> for more than 2100 locations in more than 100 countries can be downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
-<h3>Highlights of this release (V8.5.0)</h3>
+<h3>Highlights of this release (V8.6.0)</h3>
 <p>The highlights &ndash; improved and new features &ndash; are displayed by category.</p>
 <blockquote>
 <h4>Core changes to EnergyPlus</h4>
@@ -83,20 +74,14 @@ Converter program that is part of EnergyPlus can read these weather files and pr
 </ul>
 <h4>New Features</h4>
 <ul>
- <li>Improved Scalable Pump Sizing</li>
- <li>Add conduction finite difference node heat flux output</li>
- <li>Improved economizer integration and single mode option for multi-speed coils</li>
- <li>Add HeatExchanger:AirToAir:SensibleAndLatent as a valid air loop main branch component</li>
- <li>Add Humidifier as valid component to OA subsystem</li>
- <li>Add new ASHRAE single-zone VAV fan control for fan coil units</li>
- <li>EnergyPlus Documentation now based on LaTeX</li>
+ <li>INSERT NEW FEATURE TITLES HERE</li>
 </ul>
 <h4>Platforms</h4>
 <ul>
-<li>Windows 7 & 8</li>
+<li>Windows 7 &amp; 8</li>
 <li>Linux (Ubuntu 14.04 and compatible) 64 bit versions; (32-bit and RHEL-compatible versions may be available via Helpdesk)</li>
 <li>Mac OSX 10.9 64 bit versions</li>
-<li>EnergyPlus V8.5 has been tested on all of these platforms</li>
+<li>EnergyPlus V8.6 has been tested on all of these platforms</li>
 <li><i>EnergyPlus does intensive computations, and based on configuration, can write massive amounts of data to disk.  For best performance, computers should have a substantial amount of memory and high speed hard drives.</i></li>
 </ul>
 <p>And many other enhancements throughout.</p>
