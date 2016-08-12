@@ -135,8 +135,6 @@ namespace EnergyPlus {
 		// Test whether Sys (VAV Terminal Unit) picks up 0.22 min air frac from Sizing:Zone input and also picks up max reheat flow rate
 		//	set by the 0.4 max reheat fraction in Sizing:Zone
 
-		int ZoneNum( 1 );
-		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
 
 		InitializePsychRoutines();
@@ -316,8 +314,6 @@ namespace EnergyPlus {
 
 		// Test whether all blank inputs for min cool flow and max heat and reheat flow yield sensible results
 
-		int ZoneNum( 1 );
-		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
 
 		InitializePsychRoutines();
@@ -497,8 +493,6 @@ namespace EnergyPlus {
 
 		// Test user input at the terminal unit level and make sure it overrides any defaults or input coming from Sizing:Zone
 
-		int ZoneNum( 1 );
-		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
 
 		InitializePsychRoutines();
@@ -679,8 +673,6 @@ namespace EnergyPlus {
 		// Test all blank inputs for min cool flow and max heat and reheat flow and there have been no sizing calculations.
 		// What will happen? It is suposed to autocalculate inputs anyway!
 
-		int ZoneNum( 1 );
-		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
 
 		InitializePsychRoutines();
@@ -829,8 +821,6 @@ namespace EnergyPlus {
 		// Test FixedFlowRate input for Zone Minimum Air Flow Input Method. Does it pick up the default from Sizing:Zone?
 		// Test max heating input in Sizing:Zone - use Heating Maximum Air Flow input and Design Day sizing
 
-		int ZoneNum( 1 );
-		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
 
 		InitializePsychRoutines();
