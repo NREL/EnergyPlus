@@ -1,31 +1,33 @@
 !-Generator IDFEditor 1.44
 !-Option SortedOrder
-
+!
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-
-
+!
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-
-! DOAToWaterToAirSupply.idf
+! PTAC_ConnectedToDOAS.idf
 !
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum
-!                          Illustrates the use of a dedicated outdoor air system  (DOAS) with water to air heatpumps (WLHP)
-!                          The DOAS air is ducted to the outlet side of the WLHP units and mixed with the WLHP outlet
-!                          through the use of supply side mixer terminal units.
-! Highlights:              DOAS ducted to outlet side of zonal water to air heat pumps using AirTerminal:SingleDuct:Mixer
+!                          Illustrates the use of a dedicated outdoor air system (DOAS) with Packaged Terminal AirConditioner (PTAC)
+!                          The DOAS air is ducted to the inlet side of the PTAC and mixed with zone recirculating air through the
+!                          use of inlet side mixer terminal units for zones: SPACE1-1, SPACE2-1 and SPACE3-1. The DOAS air is ducted
+!                          to the outlet side of the PTAC and mixed with the PTAC outlet through the use of supply side mixer
+!                          terminal units for zones: SPACE4-1 and SPACE5-1.
 !
-! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
-!                          Run Control executes the run periods using the weather file
+! Highlights:              DOAS ducted to inlet and supply side of ZoneHVAC:PackagedTerminalAirConditioner using AirTerminal:SingleDuct:Mixer
 !
-! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
+!                          Run Control executes the design days only.
 !
-! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
+! Location:                Miami, FL USA
 !
-! Run Control:             Zone and System sizing with weather file run control (no design days run)
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+!
+! Run Period (Weather File): Winter 1/14, Summer 7/7.
+!
+! Run Control:             Zone sizing required, No System sizing required (Run Control executes 2 design days)
 !
 ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
 !           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
@@ -33,7 +35,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -83,10 +85,9 @@
 ! Natural Ventilation:            None
 ! Compact Schedules:              Yes
 !
-! HVAC:                           Water to air heat pumps in each zone and a dedicated outdoor air system with
+! HVAC:                           Packaged terminal air conditioner in each zone and a dedicated outdoor air system with
 !                                 heat recovery and standard VAV fan. There are no central HVAC heating or cooling coils.
-!                                 There is no conventional central plant. There is a single water loop running between the
-!                                 zone WLHPs and a ground heat exchanger.
+!                                 There is no conventional central plant. 
 !
 ! Zonal Equipment:                Yes
 ! Central Air Handling Equipment: Yes
@@ -106,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 Version,
-    8.4;                     !- Version Identifier
+    8.6;                     !- Version Identifier
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
@@ -114,7 +115,7 @@ Version,
 SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
-    Yes,                     !- Do Plant Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
@@ -157,37 +158,37 @@ Timestep,
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
+ !  Data Source=ASHRAE 2009 Annual Design Conditions
 
-!
-Site:Location,
-    CHICAGO_IL_USA TMY2-94846,  !- Name
-    41.78,                   !- Latitude {deg}
-    -87.75,                  !- Longitude {deg}
-    -6.00,                   !- Time Zone {hr}
-    190.00;                  !- Elevation {m}
+  Site:Location,
+    Miami Intl Ap FL USA WMO=722020,  !- Name
+    25.82,                   !- Latitude {deg}
+    -80.30,                  !- Longitude {deg}
+    -5.00,                   !- Time Zone {hr}
+    11.00;                   !- Elevation {m}
 
+ ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
+ ! Coldest Month=January
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
 
-!-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
-
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-SizingPeriod:DesignDay,
-    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
+  SizingPeriod:DesignDay,
+    Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
     1,                       !- Month
     21,                      !- Day of Month
     WinterDesignDay,         !- Day Type
-    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    8.7,                     !- Maximum Dry-Bulb Temperature {C}
     0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    8.7,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    4.9,                     !- Wind Speed {m/s}
-    270,                     !- Wind Direction {deg}
+    101217.,                 !- Barometric Pressure {Pa}
+    3.8,                     !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -196,27 +197,30 @@ SizingPeriod:DesignDay,
     ,                        !- Diffuse Solar Day Schedule Name
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    0.0;                     !- Sky Clearness
+    0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
-SizingPeriod:DesignDay,
-    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
+ ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
+ ! Hottest Month=July
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+
+  SizingPeriod:DesignDay,
+    Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
     7,                       !- Month
     21,                      !- Day of Month
     SummerDesignDay,         !- Day Type
-    31.5,                    !- Maximum Dry-Bulb Temperature {C}
-    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    33.2,                    !- Maximum Dry-Bulb Temperature {C}
+    6.7,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    25.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99063.,                  !- Barometric Pressure {Pa}
-    5.3,                     !- Wind Speed {m/s}
-    230,                     !- Wind Direction {deg}
+    101217.,                 !- Barometric Pressure {Pa}
+    4.5,                     !- Wind Speed {m/s}
+    140,                     !- Wind Direction {deg}
     No,                      !- Rain Indicator
     No,                      !- Snow Indicator
     No,                      !- Daylight Saving Time Indicator
@@ -225,8 +229,7 @@ SizingPeriod:DesignDay,
     ,                        !- Diffuse Solar Day Schedule Name
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1.0;                     !- Sky Clearness
-
+    1.00;                    !- Sky Clearness
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
@@ -261,38 +264,19 @@ RunPeriod,
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========
 
-Site:GroundTemperature:BuildingSurface,
-    21.5,                    !- January Ground Temperature {C}
-    21.4,                    !- February Ground Temperature {C}
-    21.5,                    !- March Ground Temperature {C}
-    21.5,                    !- April Ground Temperature {C}
-    22.0,                    !- May Ground Temperature {C}
-    22.9,                    !- June Ground Temperature {C}
-    23.0,                    !- July Ground Temperature {C}
-    23.1,                    !- August Ground Temperature {C}
-    23.1,                    !- September Ground Temperature {C}
-    22.2,                    !- October Ground Temperature {C}
-    21.7,                    !- November Ground Temperature {C}
-    21.6;                    !- December Ground Temperature {C}
+  Site:GroundTemperature:BuildingSurface,22.03,22.03,22.13,22.30,22.43,22.52,22.62,22.77,22.78,22.55,22.44,22.20;
 
 
-!-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:DEEP ===========
+!-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:DAYLIGHTSAVINGTIME ===========
+! WMO=722020 Time Zone=NAE (GMT-05:00) Eastern Time (US & Canada)
+! Data Source=ASHRAE 2005 Annual Design Conditions
 
-Site:GroundTemperature:Deep,
-    16.5,                    !- January Deep Ground Temperature {C}
-    16.5,                    !- February Deep Ground Temperature {C}
-    16.5,                    !- March Deep Ground Temperature {C}
-    16.5,                    !- April Deep Ground Temperature {C}
-    16.5,                    !- May Deep Ground Temperature {C}
-    16.5,                    !- June Deep Ground Temperature {C}
-    16.5,                    !- July Deep Ground Temperature {C}
-    16.5,                    !- August Deep Ground Temperature {C}
-    16.5,                    !- September Deep Ground Temperature {C}
-    16.5,                    !- October Deep Ground Temperature {C}
-    16.5,                    !- November Deep Ground Temperature {C}
-    16.5;                    !- December Deep Ground Temperature {C}
+  RunPeriodControl:DaylightSavingTime,
+    1st Sunday in April,     !- Start Date
+    Last Sunday in October;  !- End Date
 
 
+  
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========
 
 ScheduleTypeLimits,
@@ -554,6 +538,13 @@ Schedule:Compact,
     Until: 24:00,            !- Field 3
     0.0;                     !- Field 4
 
+Schedule:Compact,
+    ContsFanSch,             !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,            !- Field 3
+    1.0;                     !- Field 4
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
 
@@ -2342,37 +2333,37 @@ ZoneInfiltration:DesignFlowRate,
 
 DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    Sum,                     !- Outdoor Air Method
+    0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
 DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    Sum,                     !- Outdoor Air Method
+    0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
 DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    Sum,                     !- Outdoor Air Method
+    0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
 DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    Sum,                     !- Outdoor Air Method
+    0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
 DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    Sum,                     !- Outdoor Air Method
+    0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
 
@@ -2389,8 +2380,8 @@ DesignSpecification:ZoneAirDistribution,
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:PARAMETERS ===========
 
 Sizing:Parameters,
-    1.2,                     !- Heating Sizing Factor
-    1.2;                     !- Cooling Sizing Factor
+    1.0,                     !- Heating Sizing Factor
+    1.0;                     !- Cooling Sizing Factor
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:ZONE ===========
@@ -2398,7 +2389,7 @@ Sizing:Parameters,
 Sizing:Zone,
     SPACE1-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.8,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
@@ -2418,7 +2409,11 @@ Sizing:Zone,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    13.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE2-1,                !- Zone or ZoneList Name
@@ -2443,7 +2438,11 @@ Sizing:Zone,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    12.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE3-1,                !- Zone or ZoneList Name
@@ -2468,12 +2467,16 @@ Sizing:Zone,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    13.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE4-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    13.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
@@ -2493,12 +2496,16 @@ Sizing:Zone,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    12.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 Sizing:Zone,
     SPACE5-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    12.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    14.5,                    !- Zone Cooling Design Supply Air Temperature {C}
     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
@@ -2518,8 +2525,11 @@ Sizing:Zone,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ZoneAirDistribution;     !- Design Specification Zone Air Distribution Object Name
-
+    ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    13.8,                    !- Dedicated Outside Air Low Setpoint for Design
+    15.6;                    !- Dedicated Outside Air High Setpoint for Design
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:SYSTEM ===========
 
@@ -2561,15 +2571,6 @@ Sizing:System,
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     OnOff;                   !- Central Cooling Capacity Control Method
-
-
-!-   ===========  ALL OBJECTS IN CLASS: SIZING:PLANT ===========
-
-Sizing:Plant,
-    Chilled Water Condenser Loop,  !- Plant or Condenser Loop Name
-    Condenser,               !- Loop Type
-    29.4,                    !- Design Loop Exit Temperature {C}
-    5.6;                     !- Loop Design Temperature Difference {deltaC}
 
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:THERMOSTAT ===========
@@ -2618,241 +2619,359 @@ ThermostatSetpoint:DualSetpoint,
     Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name
 
 
-!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:WATERTOAIRHEATPUMP ===========
+!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER ===========
 
-! Set heat pump outdoor air to zero, because zone is served by dedicated outdoor air system (DOAS)
-ZoneHVAC:WaterToAirHeatPump,
-    SPACE1-1 Heat Pump,      !- Name
+! Set PTAC outdoor air to zero, because zone is served by dedicated outdoor air system (DOAS)
+  ZoneHVAC:PackagedTerminalAirConditioner,
+    SPACE1-1 PTAC,           !- Name
     FanAvailSched,           !- Availability Schedule Name
-    SPACE1-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE1-1 Heat Pump Outlet,  !- Air Outlet Node Name
+    SPACE1-1 PTAC Inlet,     !- Air Inlet Node Name
+    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name
     ,                        !- Outdoor Air Mixer Object Type
     ,                        !- Outdoor Air Mixer Name
-    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    Autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE1-1 Supply Fan,     !- Supply Air Fan Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
-    SPACE1-1 HP Heating Mode,!- Heating Coil Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
-    SPACE1-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-    SPACE1-1 HP Supp Coil,   !- Supplemental Heating Coil Name
-    50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
-    20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    SPACE1-1 Heating Coil,   !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    SPACE1-1 PTAC CCoil,     !- Cooling Coil Name
     BlowThrough,             !- Fan Placement
-    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
+    ContsFanSch;             !- Supply Air Fan Operating Mode Schedule Name
 
-ZoneHVAC:WaterToAirHeatPump,
-    SPACE2-1 Heat Pump,      !- Name
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+
+  Coil:Cooling:DX:SingleSpeed,
+    SPACE1-1 PTAC CCoil,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    SPACE2-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE2-1 Heat Pump Outlet,  !- Air Outlet Node Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    Autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    SPACE1-1 Zone Unit Fan Outlet, !- Air Inlet Node Name
+    SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name
+    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:QUADRATIC ===========
+
+  Curve:Quadratic,
+    HPACCoolCapFFF,          !- Name
+    0.8,                     !- Coefficient1 Constant
+    0.2,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    HPACEIRFFF,              !- Name
+    1.1552,                  !- Coefficient1 Constant
+    -0.1808,                 !- Coefficient2 x
+    0.0256,                  !- Coefficient3 x**2
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    HPACPLFFPLR,             !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:CUBIC ===========
+
+  Curve:Cubic,
+    FanEffRatioCurve,        !- Name
+    0.33856828,              !- Coefficient1 Constant
+    1.72644131,              !- Coefficient2 x
+    -1.49280132,             !- Coefficient3 x**2
+    0.42776208,              !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0.3,                     !- Minimum Curve Output
+    1.0;                     !- Maximum Curve Output
+
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:BIQUADRATIC ===========
+
+  Curve:Biquadratic,
+    HPACCoolCapFT,           !- Name
+    0.942587793,             !- Coefficient1 Constant
+    0.009543347,             !- Coefficient2 x
+    0.000683770,             !- Coefficient3 x**2
+    -0.011042676,            !- Coefficient4 y
+    0.000005249,             !- Coefficient5 y**2
+    -0.000009720,            !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    18.0,                    !- Minimum Value of y
+    46.11111,                !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPACEIRFT,               !- Name
+    0.342414409,             !- Coefficient1 Constant
+    0.034885008,             !- Coefficient2 x
+    -0.000623700,            !- Coefficient3 x**2
+    0.004977216,             !- Coefficient4 y
+    0.000437951,             !- Coefficient5 y**2
+    -0.000728028,            !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    18.0,                    !- Minimum Value of y
+    46.11111,                !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  ZoneHVAC:PackagedTerminalAirConditioner,
+    SPACE2-1 PTAC,           !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE2-1 PTAC Inlet,     !- Air Inlet Node Name
+    SPACE2-1 Supply Inlet,   !- Air Outlet Node Name
     ,                        !- Outdoor Air Mixer Object Type
     ,                        !- Outdoor Air Mixer Name
-    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    Autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE2-1 Supply Fan,     !- Supply Air Fan Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
-    SPACE2-1 HP Heating Mode,!- Heating Coil Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
-    SPACE2-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-    SPACE2-1 HP Supp Coil,   !- Supplemental Heating Coil Name
-    50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
-    20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    SPACE2-1 Heating Coil,   !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    SPACE2-1 PTAC CCoil,     !- Cooling Coil Name
     BlowThrough,             !- Fan Placement
-    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
+    ContsFanSch;             !- Supply Air Fan Operating Mode Schedule Name
 
-ZoneHVAC:WaterToAirHeatPump,
-    SPACE3-1 Heat Pump,      !- Name
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+
+  Coil:Cooling:DX:SingleSpeed,
+    SPACE2-1 PTAC CCoil,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    SPACE3-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE3-1 Heat Pump Outlet,  !- Air Outlet Node Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    Autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    SPACE2-1 Zone Unit Fan Outlet, !- Air Inlet Node Name
+    SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name
+    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name
+
+  ZoneHVAC:PackagedTerminalAirConditioner,
+    SPACE3-1 PTAC,           !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE3-1 PTAC Inlet,     !- Air Inlet Node Name
+    SPACE3-1 Supply Inlet,   !- Air Outlet Node Name
     ,                        !- Outdoor Air Mixer Object Type
     ,                        !- Outdoor Air Mixer Name
-    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    Autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE3-1 Supply Fan,     !- Supply Air Fan Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
-    SPACE3-1 HP Heating Mode,!- Heating Coil Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
-    SPACE3-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-    SPACE3-1 HP Supp Coil,   !- Supplemental Heating Coil Name
-    50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
-    20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    SPACE3-1 Heating Coil,   !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    SPACE3-1 PTAC CCoil,     !- Cooling Coil Name
     BlowThrough,             !- Fan Placement
-    CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
+    ContsFanSch;             !- Supply Air Fan Operating Mode Schedule Name
 
-ZoneHVAC:WaterToAirHeatPump,
-    SPACE4-1 Heat Pump,      !- Name
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+
+  Coil:Cooling:DX:SingleSpeed,
+    SPACE3-1 PTAC CCoil,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    SPACE4-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE4-1 Heat Pump Outlet,  !- Air Outlet Node Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    Autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    SPACE3-1 Zone Unit Fan Outlet, !- Air Inlet Node Name
+    SPACE3-1 Cooling Coil Outlet,  !- Air Outlet Node Name
+    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name
+
+  ZoneHVAC:PackagedTerminalAirConditioner,
+    SPACE4-1 PTAC,           !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE4-1 PTAC Inlet,     !- Air Inlet Node Name
+    SPACE4-1 PTAC Outlet,    !- Air Outlet Node Name
     ,                        !- Outdoor Air Mixer Object Type
     ,                        !- Outdoor Air Mixer Name
-    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    Autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE4-1 Supply Fan,     !- Supply Air Fan Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
-    SPACE4-1 HP Heating Mode,!- Heating Coil Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
-    SPACE4-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-    SPACE4-1 HP Supp Coil,   !- Supplemental Heating Coil Name
-    50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
-    20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    SPACE4-1 Heating Coil,   !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    SPACE4-1 PTAC CCoil,     !- Cooling Coil Name
     BlowThrough,             !- Fan Placement
     CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
 
-ZoneHVAC:WaterToAirHeatPump,
-    SPACE5-1 Heat Pump,      !- Name
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+
+  Coil:Cooling:DX:SingleSpeed,
+    SPACE4-1 PTAC CCoil,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    SPACE5-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE5-1 Heat Pump Outlet,  !- Air Outlet Node Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    Autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    SPACE4-1 Zone Unit Fan Outlet, !- Air Inlet Node Name
+    SPACE4-1 Cooling Coil Outlet,  !- Air Outlet Node Name
+    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name
+
+  ZoneHVAC:PackagedTerminalAirConditioner,
+    SPACE5-1 PTAC,      !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    SPACE5-1 PTAC Inlet,     !- Air Inlet Node Name
+    SPACE5-1 PTAC Outlet,    !- Air Outlet Node Name
     ,                        !- Outdoor Air Mixer Object Type
     ,                        !- Outdoor Air Mixer Name
-    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    Autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate {m3/s}
-    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    Autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE5-1 Supply Fan,     !- Supply Air Fan Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
-    SPACE5-1 HP Heating Mode,!- Heating Coil Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
-    SPACE5-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
-    SPACE5-1 HP Supp Coil,   !- Supplemental Heating Coil Name
-    50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
-    20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    SPACE5-1 Heating Coil,   !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    SPACE5-1 PTAC CCoil,     !- Cooling Coil Name
     BlowThrough,             !- Fan Placement
     CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
 
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+
+  Coil:Cooling:DX:SingleSpeed,
+    SPACE5-1 PTAC CCoil,     !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    Autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    SPACE5-1 Zone Unit Fan Outlet, !- Air Inlet Node Name
+    SPACE5-1 Cooling Coil Outlet,  !- Air Outlet Node Name
+    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:MIXER ===========
 
 AirTerminal:SingleDuct:Mixer,
     SPACE1-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
-    SPACE1-1 Heat Pump,      !- ZoneHVAC Unit Object Name
-    SPACE1-1 Supply Inlet,   !- Mixer Outlet Node Name
-    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE1-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Unit Object Type
+    SPACE1-1 PTAC,       !- ZoneHVAC Unit Object Name
+    SPACE1-1 PTAC Inlet, !- Mixer Outlet Node Name
+    SPACE1-1 Air Terminal Mixer Primary Inlet,   !- Mixer Primary Air Inlet Node Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                   !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
-    SPACE2-1 Heat Pump,      !- ZoneHVAC Unit Object Name
-    SPACE2-1 Supply Inlet,   !- Mixer Outlet Node Name
-    SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE2-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
-
+    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Unit Object Type
+    SPACE2-1 PTAC,       !- ZoneHVAC Unit Object Name
+    SPACE2-1 PTAC Inlet, !- Mixer Outlet Node Name
+    SPACE2-1 Air Terminal Mixer Primary Inlet,   !- Mixer Primary Air Inlet Node Name
+    SPACE2-1 Air Terminal Mixer Secondary Inlet, !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                   !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
-    SPACE3-1 Heat Pump,      !- ZoneHVAC Unit Object Name
-    SPACE3-1 Supply Inlet,   !- Mixer Outlet Node Name
-    SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE3-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
-
+    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Unit Object Type
+    SPACE3-1 PTAC,       !- ZoneHVAC Unit Object Name
+    SPACE3-1 PTAC Inlet, !- Mixer Outlet Node Name
+    SPACE3-1 Air Terminal Mixer Primary Inlet,   !- Mixer Primary Air Inlet Node Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet, !- Mixer Secondary Air Inlet Node Name
+    InletSide;                                   !- Mixer Connection Type
 
 AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
-    SPACE4-1 Heat Pump,      !- ZoneHVAC Unit Object Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC Unit Object Type
+    SPACE4-1 PTAC,           !- ZoneHVAC Unit Object Name
     SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE4-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
+    SPACE4-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
     SupplySide;              !- Mixer Connection Type
-
 
 AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
-    SPACE5-1 Heat Pump,      !- ZoneHVAC Unit Object Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- ZoneHVAC Unit Object Type
+    SPACE5-1 PTAC,           !- ZoneHVAC Unit Object Name
     SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE5-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
+    SPACE5-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
     SupplySide;              !- Mixer Connection Type
-
-
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
 ZoneHVAC:AirDistributionUnit,
     SPACE1-1 DOAS ATU,       !- Name
-    SPACE1-1 Supply Inlet,   !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
+    SPACE1-1 PTAC Inlet,     !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
     SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
     SPACE2-1 DOAS ATU,       !- Name
-    SPACE2-1 Supply Inlet,   !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
+    SPACE2-1 PTAC Inlet,     !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
     SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
     SPACE3-1 DOAS ATU,       !- Name
-    SPACE3-1 Supply Inlet,   !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
+    SPACE3-1 PTAC Inlet,     !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
     SPACE3-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
     SPACE4-1 DOAS ATU,       !- Name
     SPACE4-1 Supply Inlet,   !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
     SPACE4-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
@@ -2870,8 +2989,8 @@ ZoneHVAC:EquipmentList,
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-    SPACE1-1 Heat Pump,      !- Zone Equipment 2 Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type
+    SPACE1-1 PTAC,           !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
@@ -2881,8 +3000,8 @@ ZoneHVAC:EquipmentList,
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-    SPACE2-1 Heat Pump,      !- Zone Equipment 2 Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type
+    SPACE2-1 PTAC,           !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
@@ -2892,8 +3011,8 @@ ZoneHVAC:EquipmentList,
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-    SPACE3-1 Heat Pump,      !- Zone Equipment 2 Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type
+    SPACE3-1 PTAC,           !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
@@ -2903,8 +3022,8 @@ ZoneHVAC:EquipmentList,
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-    SPACE4-1 Heat Pump,      !- Zone Equipment 2 Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type
+    SPACE4-1 PTAC,           !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
@@ -2914,8 +3033,8 @@ ZoneHVAC:EquipmentList,
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-    SPACE5-1 Heat Pump,      !- Zone Equipment 2 Name
+    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 2 Object Type
+    SPACE5-1 PTAC,           !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
@@ -2926,7 +3045,7 @@ ZoneHVAC:EquipmentConnections,
     SPACE1-1,                !- Zone Name
     SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-    SPACE1-1 Heat Pump Inlet,!- Zone Air Exhaust Node or NodeList Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Zone Air Node,  !- Zone Air Node Name
     SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
 
@@ -2934,7 +3053,7 @@ ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
     SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-    SPACE2-1 Heat Pump Inlet,!- Zone Air Exhaust Node or NodeList Name
+    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
     SPACE2-1 Return Outlet;  !- Zone Return Air Node Name
 
@@ -2942,7 +3061,7 @@ ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
     SPACE3-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-    SPACE3-1 Heat Pump Inlet,!- Zone Air Exhaust Node or NodeList Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
     SPACE3-1 Return Outlet;  !- Zone Return Air Node Name
 
@@ -2950,7 +3069,7 @@ ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
     SPACE4-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE4-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-    SPACE4-1 Heat Pump Inlet,!- Zone Air Exhaust Node or NodeList Name
+    SPACE4-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
     SPACE4-1 Return Outlet;  !- Zone Return Air Node Name
 
@@ -2958,10 +3077,112 @@ ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
     SPACE5-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-    SPACE5-1 Heat Pump Inlet,!- Zone Air Exhaust Node or NodeList Name
+    SPACE5-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
     SPACE5-1 Return Outlet;  !- Zone Return Air Node Name
 
+!-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
+
+Fan:OnOff,
+    SPACE1-1 Supply Fan,     !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    75,                      !- Pressure Rise {Pa}
+    autosize,                !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Airstream Fraction
+    SPACE1-1 PTAC Inlet,       !- Air Inlet Node Name
+    SPACE1-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
+
+Fan:OnOff,
+    SPACE2-1 Supply Fan,     !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    75,                      !- Pressure Rise {Pa}
+    autosize,                !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Airstream Fraction
+    SPACE2-1 PTAC Inlet,       !- Air Inlet Node Name
+    SPACE2-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
+
+Fan:OnOff,
+    SPACE3-1 Supply Fan,     !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    75,                      !- Pressure Rise {Pa}
+    autosize,                !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Airstream Fraction
+    SPACE3-1 PTAC Inlet,       !- Air Inlet Node Name
+    SPACE3-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
+
+Fan:OnOff,
+    SPACE4-1 Supply Fan,     !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    75,                      !- Pressure Rise {Pa}
+    autosize,                !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Airstream Fraction
+    SPACE4-1 PTAC Inlet,       !- Air Inlet Node Name
+    SPACE4-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
+
+Fan:OnOff,
+    SPACE5-1 Supply Fan,     !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    75,                      !- Pressure Rise {Pa}
+    autosize,                !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Airstream Fraction
+    SPACE5-1 PTAC Inlet,       !- Air Inlet Node Name
+    SPACE5-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
+
+
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+
+Coil:Heating:Gas,
+    SPACE1-1 Heating Coil,   !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.8,                     !- Gas Burner Efficiency
+    autosize,                !- Nominal Capacity {W}
+    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name
+    SPACE1-1 Supply Inlet;   !- Air Outlet Node Name
+
+Coil:Heating:Gas,
+    SPACE2-1 Heating Coil,   !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.8,                     !- Gas Burner Efficiency
+    autosize,                !- Nominal Capacity {W}
+    SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name
+    SPACE2-1 Supply Inlet;   !- Air Outlet Node Name
+
+Coil:Heating:Gas,
+    SPACE3-1 Heating Coil,   !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.8,                     !- Gas Burner Efficiency
+    autosize,                !- Nominal Capacity {W}
+    SPACE3-1 Cooling Coil Outlet,  !- Air Inlet Node Name
+    SPACE3-1 Supply Inlet;   !- Air Outlet Node Name
+
+Coil:Heating:Gas,
+    SPACE4-1 Heating Coil,   !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.8,                     !- Gas Burner Efficiency
+    autosize,                !- Nominal Capacity {W}
+    SPACE4-1 Cooling Coil Outlet,  !- Air Inlet Node Name
+    SPACE4-1 PTAC Outlet;    !- Air Outlet Node Name
+
+Coil:Heating:Gas,
+    SPACE5-1 Heating Coil,   !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    0.8,                     !- Gas Burner Efficiency
+    autosize,                !- Nominal Capacity {W}
+    SPACE5-1 Cooling Coil Outlet,  !- Air Inlet Node Name
+    SPACE5-1 PTAC Outlet;    !- Air Outlet Node Name
+
+! ************** DOAS System providing OA to the inlet side of the PTAC ********************
+! ********** Central OA is Fed Directly to PTAC inlet and mixed with re-circ air ***********
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:VARIABLEVOLUME ===========
 
@@ -2983,369 +3204,6 @@ Fan:VariableVolume,
     0,                       !- Fan Power Coefficient 5
     DOAS Mixed Air Outlet,   !- Air Inlet Node Name
     DOAS Supply Fan Outlet;  !- Air Outlet Node Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
-
-Fan:OnOff,
-    SPACE1-1 Supply Fan,     !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    75,                      !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Airstream Fraction
-    SPACE1-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE1-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
-
-Fan:OnOff,
-    SPACE2-1 Supply Fan,     !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    75,                      !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Airstream Fraction
-    SPACE2-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE2-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
-
-Fan:OnOff,
-    SPACE3-1 Supply Fan,     !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    75,                      !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Airstream Fraction
-    SPACE3-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE3-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
-
-Fan:OnOff,
-    SPACE4-1 Supply Fan,     !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    75,                      !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Airstream Fraction
-    SPACE4-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE4-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
-
-Fan:OnOff,
-    SPACE5-1 Supply Fan,     !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    75,                      !- Pressure Rise {Pa}
-    autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1,                       !- Motor In Airstream Fraction
-    SPACE5-1 Heat Pump Inlet,!- Air Inlet Node Name
-    SPACE5-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
-
-Coil:Heating:Gas,
-    SPACE1-1 HP Supp Coil,   !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
-    autosize,                !- Nominal Capacity {W}
-    SPACE1-1 Heating Coil Outlet,  !- Air Inlet Node Name
-    SPACE1-1 Heat Pump Outlet;  !- Air Outlet Node Name
-
-Coil:Heating:Gas,
-    SPACE2-1 HP Supp Coil,   !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
-    autosize,                !- Nominal Capacity {W}
-    SPACE2-1 Heating Coil Outlet,  !- Air Inlet Node Name
-    SPACE2-1 Heat Pump Outlet;  !- Air Outlet Node Name
-
-Coil:Heating:Gas,
-    SPACE3-1 HP Supp Coil,   !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
-    autosize,                !- Nominal Capacity {W}
-    SPACE3-1 Heating Coil Outlet,  !- Air Inlet Node Name
-    SPACE3-1 Heat Pump Outlet;  !- Air Outlet Node Name
-
-Coil:Heating:Gas,
-    SPACE4-1 HP Supp Coil,   !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
-    autosize,                !- Nominal Capacity {W}
-    SPACE4-1 Heating Coil Outlet,  !- Air Inlet Node Name
-    SPACE4-1 Heat Pump Outlet;  !- Air Outlet Node Name
-
-Coil:Heating:Gas,
-    SPACE5-1 HP Supp Coil,   !- Name
-    FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
-    autosize,                !- Nominal Capacity {W}
-    SPACE5-1 Heating Coil Outlet,  !- Air Inlet Node Name
-    SPACE5-1 Heat Pump Outlet;  !- Air Outlet Node Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT ===========
-
-Coil:Cooling:WaterToAirHeatPump:EquationFit,
-    SPACE1-1 HP Cooling Mode,!- Name
-    SPACE1-1 HP Cooling Water Inlet,  !- Water Inlet Node Name
-    SPACE1-1 HP Cooling Water Outlet,  !- Water Outlet Node Name
-    SPACE1-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
-    SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
-Coil:Cooling:WaterToAirHeatPump:EquationFit,
-    SPACE2-1 HP Cooling Mode,!- Name
-    SPACE2-1 HP Cooling Water Inlet,  !- Water Inlet Node Name
-    SPACE2-1 HP Cooling Water Outlet,  !- Water Outlet Node Name
-    SPACE2-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
-    SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
-Coil:Cooling:WaterToAirHeatPump:EquationFit,
-    SPACE3-1 HP Cooling Mode,!- Name
-    SPACE3-1 HP Cooling Water Inlet,  !- Water Inlet Node Name
-    SPACE3-1 HP Cooling Water Outlet,  !- Water Outlet Node Name
-    SPACE3-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
-    SPACE3-1 Cooling Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
-Coil:Cooling:WaterToAirHeatPump:EquationFit,
-    SPACE4-1 HP Cooling Mode,!- Name
-    SPACE4-1 HP Cooling Water Inlet,  !- Water Inlet Node Name
-    SPACE4-1 HP Cooling Water Outlet,  !- Water Outlet Node Name
-    SPACE4-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
-    SPACE4-1 Cooling Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
-Coil:Cooling:WaterToAirHeatPump:EquationFit,
-    SPACE5-1 HP Cooling Mode,!- Name
-    SPACE5-1 HP Cooling Water Inlet,  !- Water Inlet Node Name
-    SPACE5-1 HP Cooling Water Outlet,  !- Water Outlet Node Name
-    SPACE5-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
-    SPACE5-1 Cooling Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
-    -9.149069561,            !- Total Cooling Capacity Coefficient 1
-    10.87814026,             !- Total Cooling Capacity Coefficient 2
-    -1.718780157,            !- Total Cooling Capacity Coefficient 3
-    0.746414818,             !- Total Cooling Capacity Coefficient 4
-    0.0,                     !- Total Cooling Capacity Coefficient 5
-    -5.462690012,            !- Sensible Cooling Capacity Coefficient 1
-    17.95968138,             !- Sensible Cooling Capacity Coefficient 2
-    -11.87818402,            !- Sensible Cooling Capacity Coefficient 3
-    -0.980163419,            !- Sensible Cooling Capacity Coefficient 4
-    0.767285761,             !- Sensible Cooling Capacity Coefficient 5
-    0.0,                     !- Sensible Cooling Capacity Coefficient 6
-    -3.205409884,            !- Cooling Power Consumption Coefficient 1
-    -0.976409399,            !- Cooling Power Consumption Coefficient 2
-    3.97892546,              !- Cooling Power Consumption Coefficient 3
-    0.938181818,             !- Cooling Power Consumption Coefficient 4
-    0.0,                     !- Cooling Power Consumption Coefficient 5
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
-
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT ===========
-
-Coil:Heating:WaterToAirHeatPump:EquationFit,
-    SPACE1-1 HP Heating Mode,!- Name
-    SPACE1-1 HP Heating Water Inlet,  !- Water Inlet Node Name
-    SPACE1-1 HP Heating Water Outlet,  !- Water Outlet Node Name
-    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name
-    SPACE1-1 Heating Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
-
-Coil:Heating:WaterToAirHeatPump:EquationFit,
-    SPACE2-1 HP Heating Mode,!- Name
-    SPACE2-1 HP Heating Water Inlet,  !- Water Inlet Node Name
-    SPACE2-1 HP Heating Water Outlet,  !- Water Outlet Node Name
-    SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name
-    SPACE2-1 Heating Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
-
-Coil:Heating:WaterToAirHeatPump:EquationFit,
-    SPACE3-1 HP Heating Mode,!- Name
-    SPACE3-1 HP Heating Water Inlet,  !- Water Inlet Node Name
-    SPACE3-1 HP Heating Water Outlet,  !- Water Outlet Node Name
-    SPACE3-1 Cooling Coil Outlet,  !- Air Inlet Node Name
-    SPACE3-1 Heating Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
-
-Coil:Heating:WaterToAirHeatPump:EquationFit,
-    SPACE4-1 HP Heating Mode,!- Name
-    SPACE4-1 HP Heating Water Inlet,  !- Water Inlet Node Name
-    SPACE4-1 HP Heating Water Outlet,  !- Water Outlet Node Name
-    SPACE4-1 Cooling Coil Outlet,  !- Air Inlet Node Name
-    SPACE4-1 Heating Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
-
-Coil:Heating:WaterToAirHeatPump:EquationFit,
-    SPACE5-1 HP Heating Mode,!- Name
-    SPACE5-1 HP Heating Water Inlet,  !- Water Inlet Node Name
-    SPACE5-1 HP Heating Water Outlet,  !- Water Outlet Node Name
-    SPACE5-1 Cooling Coil Outlet,  !- Air Inlet Node Name
-    SPACE5-1 Heating Coil Outlet,  !- Air Outlet Node Name
-    Autosize,                !- Rated Air Flow Rate {m3/s}
-    Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
-    -1.361311959,            !- Heating Capacity Coefficient 1
-    -2.471798046,            !- Heating Capacity Coefficient 2
-    4.173164514,             !- Heating Capacity Coefficient 3
-    0.640757401,             !- Heating Capacity Coefficient 4
-    0.0,                     !- Heating Capacity Coefficient 5
-    -2.176941116,            !- Heating Power Consumption Coefficient 1
-    0.832114286,             !- Heating Power Consumption Coefficient 2
-    1.570743399,             !- Heating Power Consumption Coefficient 3
-    0.690793651,             !- Heating Power Consumption Coefficient 4
-    0.0;                     !- Heating Power Consumption Coefficient 5
-
 
 !-   ===========  ALL OBJECTS IN CLASS: HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT ===========
 
@@ -3493,106 +3351,6 @@ AirLoopHVAC:ReturnPath,
 !-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
 
 Branch,
-    SPACE1-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE1-1 HP Cooling Mode,!- Component 1 Name
-    SPACE1-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE1-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE1-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE1-1 HP Heating Mode,!- Component 1 Name
-    SPACE1-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE1-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE2-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE2-1 HP Cooling Mode,!- Component 1 Name
-    SPACE2-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE2-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE2-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE2-1 HP Heating Mode,!- Component 1 Name
-    SPACE2-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE2-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE3-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE3-1 HP Cooling Mode,!- Component 1 Name
-    SPACE3-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE3-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE3-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE3-1 HP Heating Mode,!- Component 1 Name
-    SPACE3-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE3-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE4-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE4-1 HP Cooling Mode,!- Component 1 Name
-    SPACE4-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE4-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE4-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE4-1 HP Heating Mode,!- Component 1 Name
-    SPACE4-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE4-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE5-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE5-1 HP Cooling Mode,!- Component 1 Name
-    SPACE5-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE5-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
-    SPACE5-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
-    SPACE5-1 HP Heating Mode,!- Component 1 Name
-    SPACE5-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE5-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
-
-Branch,
     DOAS Main Branch,        !- Name
     autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
@@ -3607,171 +3365,11 @@ Branch,
     DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
     Active;                  !- Component 2 Branch Control Type
 
-Branch,
-    Condenser Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Pump:VariableSpeed,      !- Component 1 Object Type
-    Cond Circ Pump,          !- Component 1 Name
-    Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
-
-Branch,
-    Condenser Supply GHE Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    GroundHeatExchanger:Vertical,  !- Component 1 Object Type
-    Vertical Ground Heat Exchanger,  !- Component 1 Name
-    GHE Inlet Node,          !- Component 1 Inlet Node Name
-    GHE Outlet Node,         !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
-
-Branch,
-    Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    Condenser Supply Side Bypass,  !- Component 1 Name
-    Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
-
-Branch,
-    Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    Condenser Supply Outlet, !- Component 1 Name
-    Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
-
-Branch,
-    Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    Condenser Demand Inlet Pipe,  !- Component 1 Name
-    Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
-
-Branch,
-    Condenser Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    Condenser Demand Side Bypass,  !- Component 1 Name
-    Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
-
-Branch,
-    Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    Condenser Demand Outlet Pipe,  !- Component 1 Name
-    Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
-
-
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
 BranchList,
     DOAS Branches,           !- Name
     DOAS Main Branch;        !- Branch 1 Name
-
-BranchList,
-    Condenser Demand Side Branches,  !- Name
-    Condenser Demand Inlet Branch,  !- Branch 1 Name
-    SPACE1-1 HP Cooling Mode Branch,  !- Branch 2 Name
-    SPACE1-1 HP Heating Mode Branch,  !- Branch 3 Name
-    SPACE2-1 HP Cooling Mode Branch,  !- Branch 4 Name
-    SPACE2-1 HP Heating Mode Branch,  !- Branch 5 Name
-    SPACE3-1 HP Cooling Mode Branch,  !- Branch 6 Name
-    SPACE3-1 HP Heating Mode Branch,  !- Branch 7 Name
-    SPACE4-1 HP Cooling Mode Branch,  !- Branch 8 Name
-    SPACE4-1 HP Heating Mode Branch,  !- Branch 9 Name
-    SPACE5-1 HP Cooling Mode Branch,  !- Branch 10 Name
-    SPACE5-1 HP Heating Mode Branch,  !- Branch 11 Name
-    Condenser Demand Bypass Branch,  !- Branch 12 Name
-    Condenser Demand Outlet Branch;  !- Branch 13 Name
-
-BranchList,
-    Condenser Supply Side Branches,  !- Name
-    Condenser Supply Inlet Branch,  !- Branch 1 Name
-    Condenser Supply GHE Branch,  !- Branch 2 Name
-    Condenser Supply Bypass Branch,  !- Branch 3 Name
-    Condenser Supply Outlet Branch;  !- Branch 4 Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: CONNECTOR:SPLITTER ===========
-
-Connector:Splitter,
-    Condenser Demand Splitter,  !- Name
-    Condenser Demand Inlet Branch,  !- Inlet Branch Name
-    SPACE1-1 HP Cooling Mode Branch,  !- Outlet Branch 1 Name
-    SPACE1-1 HP Heating Mode Branch,  !- Outlet Branch 2 Name
-    SPACE2-1 HP Cooling Mode Branch,  !- Outlet Branch 3 Name
-    SPACE2-1 HP Heating Mode Branch,  !- Outlet Branch 4 Name
-    SPACE3-1 HP Cooling Mode Branch,  !- Outlet Branch 5 Name
-    SPACE3-1 HP Heating Mode Branch,  !- Outlet Branch 6 Name
-    SPACE4-1 HP Cooling Mode Branch,  !- Outlet Branch 7 Name
-    SPACE4-1 HP Heating Mode Branch,  !- Outlet Branch 8 Name
-    SPACE5-1 HP Cooling Mode Branch,  !- Outlet Branch 9 Name
-    SPACE5-1 HP Heating Mode Branch,  !- Outlet Branch 10 Name
-    Condenser Demand Bypass Branch;  !- Outlet Branch 11 Name
-
-Connector:Splitter,
-    Condenser Supply Splitter,  !- Name
-    Condenser Supply Inlet Branch,  !- Inlet Branch Name
-    Condenser Supply GHE Branch,  !- Outlet Branch 1 Name
-    Condenser Supply Bypass Branch;  !- Outlet Branch 2 Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: CONNECTOR:MIXER ===========
-
-Connector:Mixer,
-    Condenser Demand Mixer,  !- Name
-    Condenser Demand Outlet Branch,  !- Outlet Branch Name
-    SPACE1-1 HP Cooling Mode Branch,  !- Inlet Branch 1 Name
-    SPACE1-1 HP Heating Mode Branch,  !- Inlet Branch 2 Name
-    SPACE2-1 HP Cooling Mode Branch,  !- Inlet Branch 3 Name
-    SPACE2-1 HP Heating Mode Branch,  !- Inlet Branch 4 Name
-    SPACE3-1 HP Cooling Mode Branch,  !- Inlet Branch 5 Name
-    SPACE3-1 HP Heating Mode Branch,  !- Inlet Branch 6 Name
-    SPACE4-1 HP Cooling Mode Branch,  !- Inlet Branch 7 Name
-    SPACE4-1 HP Heating Mode Branch,  !- Inlet Branch 8 Name
-    SPACE5-1 HP Cooling Mode Branch,  !- Inlet Branch 9 Name
-    SPACE5-1 HP Heating Mode Branch,  !- Inlet Branch 10 Name
-    Condenser Demand Bypass Branch;  !- Inlet Branch 11 Name
-
-Connector:Mixer,
-    Condenser Supply Mixer,  !- Name
-    Condenser Supply Outlet Branch,  !- Outlet Branch Name
-    Condenser Supply GHE Branch,  !- Inlet Branch 1 Name
-    Condenser Supply Bypass Branch;  !- Inlet Branch 2 Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: CONNECTORLIST ===========
-
-ConnectorList,
-    Condenser Supply Side Connectors,  !- Name
-    Connector:Splitter,      !- Connector 1 Object Type
-    Condenser Supply Splitter,  !- Connector 1 Name
-    Connector:Mixer,         !- Connector 2 Object Type
-    Condenser Supply Mixer;  !- Connector 2 Name
-
-ConnectorList,
-    Condenser Demand Side Connectors,  !- Name
-    Connector:Splitter,      !- Connector 1 Object Type
-    Condenser Demand Splitter,  !- Connector 1 Name
-    Connector:Mixer,         !- Connector 2 Object Type
-    Condenser Demand Mixer;  !- Connector 2 Name
-
 
 !-   ===========  ALL OBJECTS IN CLASS: NODELIST ===========
 
@@ -3801,195 +3399,6 @@ NodeList,
 OutdoorAir:NodeList,
     DOAS Outdoor Air Inlet;  !- Node or NodeList Name 1
 
-
-!-   ===========  ALL OBJECTS IN CLASS: PIPE:ADIABATIC ===========
-
-Pipe:Adiabatic,
-    Condenser Supply Side Bypass,  !- Name
-    Cond Supply Bypass Inlet Node,  !- Inlet Node Name
-    Cond Supply Bypass Outlet Node;  !- Outlet Node Name
-
-Pipe:Adiabatic,
-    Condenser Supply Outlet, !- Name
-    Condenser Supply Exit Pipe Inlet Node,  !- Inlet Node Name
-    Condenser Supply Outlet Node;  !- Outlet Node Name
-
-Pipe:Adiabatic,
-    Condenser Demand Inlet Pipe,  !- Name
-    Condenser Demand Inlet Node,  !- Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node;  !- Outlet Node Name
-
-Pipe:Adiabatic,
-    Condenser Demand Side Bypass,  !- Name
-    Cond Demand Bypass Inlet Node,  !- Inlet Node Name
-    Cond Demand Bypass Outlet Node;  !- Outlet Node Name
-
-Pipe:Adiabatic,
-    Condenser Demand Outlet Pipe,  !- Name
-    Condenser Demand Exit Pipe Inlet Node,  !- Inlet Node Name
-    Condenser Demand Outlet Node;  !- Outlet Node Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: PUMP:VARIABLESPEED ===========
-
-Pump:VariableSpeed,
-    Cond Circ Pump,          !- Name
-    Condenser Supply Inlet Node,  !- Inlet Node Name
-    Condenser Pump Outlet Node,  !- Outlet Node Name
-    0.004,                   !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    25,                      !- Rated Power Consumption {W}
-    0.87,                    !- Motor Efficiency
-    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
-    0,                       !- Coefficient 1 of the Part Load Performance Curve
-    1,                       !- Coefficient 2 of the Part Load Performance Curve
-    0,                       !- Coefficient 3 of the Part Load Performance Curve
-    0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
-    INTERMITTENT;            !- Pump Control Type
-
-
-!-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:VERTICAL ===========
-
-GroundHeatExchanger:Vertical,
-    Vertical Ground Heat Exchanger,  !- Name
-    GHE Inlet Node,          !- Inlet Node Name
-    GHE Outlet Node,         !- Outlet Node Name
-    0.00033000,              !- Design Flow Rate {m3/s}
-    24,                      !- Number of Bore Holes
-    76.2,                    !- Bore Hole Length {m}
-    0.635080E-01,            !- Bore Hole Radius {m}
-    0.692626E+00,            !- Ground Thermal Conductivity {W/m-K}
-    0.234700E+07,            !- Ground Thermal Heat Capacity {J/m3-K}
-    13.375,                  !- Ground Temperature {C}
-    0.692626E+00,            !- Grout Thermal Conductivity {W/m-K}
-    0.391312E+00,            !- Pipe Thermal Conductivity {W/m-K}
-    2.66667E-02,             !- Pipe Out Diameter {m}
-    2.53977E-02,             !- U-Tube Distance {m}
-    2.41285E-03,             !- Pipe Thickness {m}
-    2,                       !- Maximum Length of Simulation
-    0.0005,                  !- G-Function Reference Ratio {dimensionless}
-    35,                      !- Number of Data Pairs of the G Function
-    -15.2996,                !- G-Function Ln(T/Ts) Value 1
-    -0.348322,               !- G-Function G Value 1
-    -14.201,                 !- G-Function Ln(T/Ts) Value 2
-    0.022208,                !- G-Function G Value 2
-    -13.2202,                !- G-Function Ln(T/Ts) Value 3
-    0.412345,                !- G-Function G Value 3
-    -12.2086,                !- G-Function Ln(T/Ts) Value 4
-    0.867498,                !- G-Function G Value 4
-    -11.1888,                !- G-Function Ln(T/Ts) Value 5
-    1.357839,                !- G-Function G Value 5
-    -10.1816,                !- G-Function Ln(T/Ts) Value 6
-    1.852024,                !- G-Function G Value 6
-    -9.1815,                 !- G-Function Ln(T/Ts) Value 7
-    2.345656,                !- G-Function G Value 7
-    -8.6809,                 !- G-Function Ln(T/Ts) Value 8
-    2.593958,                !- G-Function G Value 8
-    -8.5,                    !- G-Function Ln(T/Ts) Value 9
-    2.679,                   !- G-Function G Value 9
-    -7.8,                    !- G-Function Ln(T/Ts) Value 10
-    3.023,                   !- G-Function G Value 10
-    -7.2,                    !- G-Function Ln(T/Ts) Value 11
-    3.32,                    !- G-Function G Value 11
-    -6.5,                    !- G-Function Ln(T/Ts) Value 12
-    3.681,                   !- G-Function G Value 12
-    -5.9,                    !- G-Function Ln(T/Ts) Value 13
-    4.071,                   !- G-Function G Value 13
-    -5.2,                    !- G-Function Ln(T/Ts) Value 14
-    4.828,                   !- G-Function G Value 14
-    -4.5,                    !- G-Function Ln(T/Ts) Value 15
-    6.253,                   !- G-Function G Value 15
-    -3.963,                  !- G-Function Ln(T/Ts) Value 16
-    7.894,                   !- G-Function G Value 16
-    -3.27,                   !- G-Function Ln(T/Ts) Value 17
-    11.82,                   !- G-Function G Value 17
-    -2.864,                  !- G-Function Ln(T/Ts) Value 18
-    15.117,                  !- G-Function G Value 18
-    -2.577,                  !- G-Function Ln(T/Ts) Value 19
-    18.006,                  !- G-Function G Value 19
-    -2.171,                  !- G-Function Ln(T/Ts) Value 20
-    22.887,                  !- G-Function G Value 20
-    -1.884,                  !- G-Function Ln(T/Ts) Value 21
-    26.924,                  !- G-Function G Value 21
-    -1.191,                  !- G-Function Ln(T/Ts) Value 22
-    38.004,                  !- G-Function G Value 22
-    -0.497,                  !- G-Function Ln(T/Ts) Value 23
-    49.919,                  !- G-Function G Value 23
-    -0.274,                  !- G-Function Ln(T/Ts) Value 24
-    53.407,                  !- G-Function G Value 24
-    -0.051,                  !- G-Function Ln(T/Ts) Value 25
-    56.632,                  !- G-Function G Value 25
-    0.196,                   !- G-Function Ln(T/Ts) Value 26
-    59.825,                  !- G-Function G Value 26
-    0.419,                   !- G-Function Ln(T/Ts) Value 27
-    62.349,                  !- G-Function G Value 27
-    0.642,                   !- G-Function Ln(T/Ts) Value 28
-    64.524,                  !- G-Function G Value 28
-    0.873,                   !- G-Function Ln(T/Ts) Value 29
-    66.412,                  !- G-Function G Value 29
-    1.112,                   !- G-Function Ln(T/Ts) Value 30
-    67.993,                  !- G-Function G Value 30
-    1.335,                   !- G-Function Ln(T/Ts) Value 31
-    69.162,                  !- G-Function G Value 31
-    1.679,                   !- G-Function Ln(T/Ts) Value 32
-    70.476,                  !- G-Function G Value 32
-    2.028,                   !- G-Function Ln(T/Ts) Value 33
-    71.361,                  !- G-Function G Value 33
-    2.275,                   !- G-Function Ln(T/Ts) Value 34
-    71.79,                   !- G-Function G Value 34
-    3.003,                   !- G-Function Ln(T/Ts) Value 35
-    72.511;                  !- G-Function G Value 35
-
-
-!-   ===========  ALL OBJECTS IN CLASS: CONDENSERLOOP ===========
-
-CondenserLoop,
-    Chilled Water Condenser Loop,  !- Name
-    Water,                   !- Fluid Type
-    ,                        !- User Defined Fluid Type
-    Tower Loop Operation,    !- Condenser Equipment Operation Scheme Name
-    Condenser Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
-    80,                      !- Maximum Loop Temperature {C}
-    1,                       !- Minimum Loop Temperature {C}
-    0.00400000,              !- Maximum Loop Flow Rate {m3/s}
-    0,                       !- Minimum Loop Flow Rate {m3/s}
-    autocalculate,           !- Condenser Loop Volume {m3}
-    Condenser Supply Inlet Node,  !- Condenser Side Inlet Node Name
-    Condenser Supply Outlet Node,  !- Condenser Side Outlet Node Name
-    Condenser Supply Side Branches,  !- Condenser Side Branch List Name
-    Condenser Supply Side Connectors,  !- Condenser Side Connector List Name
-    Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
-    Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
-    Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
-    Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    SequentialLoad;          !- Load Distribution Scheme
-
-
-!-   ===========  ALL OBJECTS IN CLASS: CONDENSEREQUIPMENTLIST ===========
-
-CondenserEquipmentList,
-    All Towers,              !- Name
-    GroundHeatExchanger:Vertical,  !- Equipment 1 Object Type
-    Vertical Ground Heat Exchanger;  !- Equipment 1 Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: PLANTEQUIPMENTOPERATION:UNCONTROLLED ===========
-
-PlantEquipmentOperation:Uncontrolled,
-    Year Round Tower Operation,  !- Name
-    All Towers;              !- Equipment List Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: CONDENSEREQUIPMENTOPERATIONSCHEMES ===========
-
-CondenserEquipmentOperationSchemes,
-    Tower Loop Operation,    !- Name
-    PlantEquipmentOperation:Uncontrolled,  !- Control Scheme 1 Object Type
-    Year Round Tower Operation,  !- Control Scheme 1 Name
-    HVACTemplate-Always 1;   !- Control Scheme 1 Schedule Name
-
-
 !-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGER:SCHEDULED ===========
 
 AvailabilityManager:Scheduled,
@@ -4012,18 +3421,6 @@ SetpointManager:Scheduled,
     Temperature,             !- Control Variable
     Always 21.1,             !- Schedule Name
     DOAS Mixed Air Outlet;   !- Setpoint Node or NodeList Name
-
-
-!-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:FOLLOWGROUNDTEMPERATURE ===========
-
-SetpointManager:FollowGroundTemperature,
-    MyCondenserControl,      !- Name
-    Temperature,             !- Control Variable
-    Site:GroundTemperature:Deep,  !- Reference Ground Temperature Object Type
-    0,                       !- Offset Temperature Difference {deltaC}
-    80.0,                    !- Maximum Setpoint Temperature {C}
-    10.0,                    !- Minimum Setpoint Temperature {C}
-    Condenser Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
@@ -4050,15 +3447,45 @@ Output:Variable,
     *,                       !- Key Value
     Site Outdoor Air Drybulb Temperature,  !- Variable Name
     hourly;                  !- Reporting Frequency
-
+  
 Output:Variable,
-    SPACE1-1 Heat Pump Outlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
+    *,                       !- Key Value
+    Site Outdoor Air Wetbulb Temperature,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+  
+Output:Variable,
+    *,                       !- Key Value
+    Zone Air Temperature,    !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heat Pump Outlet,  !- Key Value
-    System Node Temperature, !- Variable Name
+    *,                       !- Key Value
+    Zone Air Relative Humidity,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    *,                       !- Key Value
+    Zone Air System Sensible Cooling Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    *,                       !- Key Value
+    Zone Air System Sensible Heating Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    *,                       !- Key Value
+    Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    *,                       !- Key Value
+    Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+Output:Variable,
+    *,                       !- Key Value
+    Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
@@ -4082,22 +3509,22 @@ Output:Variable,
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heat Pump Inlet,!- Key Value
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Key Value
     System Node Mass Flow Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heat Pump Inlet,!- Key Value
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Key Value
     System Node Temperature, !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heating Coil Outlet,  !- Key Value
+    SPACE1-1 PTAC Inlet,       !- Key Value
     System Node Mass Flow Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heating Coil Outlet,  !- Key Value
+    SPACE1-1 PTAC Inlet,       !- Key Value
     System Node Temperature, !- Variable Name
     hourly;                  !- Reporting Frequency
 
@@ -4162,106 +3589,41 @@ Output:Variable,
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 HP Heating Mode,!- Key Value
-    Heating Coil Heating Rate,  !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Cooling Mode,!- Key Value
+    SPACE1-1 PTAC CCoil,     !- Key Value
     Cooling Coil Total Cooling Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 HP Cooling Mode,!- Key Value
+    SPACE1-1 PTAC CCoil,     !- Key Value
     Cooling Coil Sensible Cooling Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heat Pump,      !- Key Value
-    Zone Water to Air Heat Pump Total Heating Rate,  !- Variable Name
+    SPACE1-1 PTAC,      !- Key Value
+    Zone Packaged Terminal Air Conditioner Total Heating Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heat Pump,      !- Key Value
-    Zone Water to Air Heat Pump Total Cooling Rate,  !- Variable Name
+    SPACE1-1 PTAC,      !- Key Value
+    Zone Packaged Terminal Air Conditioner Total Cooling Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heat Pump,      !- Key Value
-    Zone Water to Air Heat Pump Sensible Heating Rate,  !- Variable Name
+    SPACE1-1 PTAC,      !- Key Value
+    Zone Packaged Terminal Air Conditioner Sensible Heating Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 Heat Pump,      !- Key Value
-    Zone Water to Air Heat Pump Sensible Cooling Rate,  !- Variable Name
+    SPACE1-1 PTAC,      !- Key Value
+    Zone Packaged Terminal Air Conditioner Sensible Cooling Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    SPACE1-1 HP Cooling Water Inlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Cooling Water Inlet,  !- Key Value
-    System Node Temperature, !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Cooling Water Outlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Cooling Water Outlet,  !- Key Value
-    System Node Temperature, !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Heating Water Inlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Heating Water Inlet,  !- Key Value
-    System Node Temperature, !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Heating Water Outlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Heating Water Outlet,  !- Key Value
-    System Node Temperature, !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    SPACE1-1 HP Supp Coil,   !- Key Value
+    SPACE1-1 Heating Coil,   !- Key Value
     Heating Coil Air Heating Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
 Output:Variable,
-    Condenser Supply Inlet Node,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    Condenser Supply Inlet Node,  !- Key Value
-    System Node Temperature, !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    Condenser Supply Outlet Node,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
-    Condenser Supply Outlet Node,  !- Key Value
-    System Node Temperature, !- Variable Name
-    hourly;                  !- Reporting Frequency
-
-Output:Variable,
     DOAS Mixed Air Outlet,   !- Key Value
     System Node Mass Flow Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
@@ -4310,10 +3672,128 @@ Output:Variable,
     DOAS Relief Air Outlet,  !- Key Value
     System Node Temperature, !- Variable Name
     hourly;                  !- Reporting Frequency
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DIAGNOSTICS ===========
 
 Output:Diagnostics,
     displayallwarnings;      !- Key 1
 
+  Output:Variable,
+    DOAS Return Air Outlet,     !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE1-1 Return Outlet,     !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE2-1 Return Outlet,     !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE3-1 Return Outlet,     !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE4-1 Return Outlet,     !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE5-1 Return Outlet,     !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE1-1 PTAC,              !- Key Value
+    Zone Packaged Terminal Air Conditioner Fan Part Load Ratio, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE1-1 PTAC,              !- Key Value
+    Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    DOAS Supply Path Inlet,     !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE1-1 Air Terminal Mixer Primary Inlet,   !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE2-1 Air Terminal Mixer Primary Inlet,   !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE3-1 Air Terminal Mixer Primary Inlet,   !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE4-1 Air Terminal Mixer Primary Inlet,   !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE5-1 Air Terminal Mixer Primary Inlet,   !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE2-1 Air Terminal Mixer Secondary Inlet, !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE3-1 Air Terminal Mixer Secondary Inlet, !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE4-1 PTAC Outlet,       !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE5-1 PTAC Outlet,       !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE1-1 Supply Inlet,      !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE2-1 Supply Inlet,      !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE3-1 Supply Inlet,      !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE4-1 Supply Inlet,      !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
+
+  Output:Variable,
+    SPACE5-1 Supply Inlet,      !- Key Value
+    System Node Mass Flow Rate, !- Variable Name
+    hourly;                     !- Reporting Frequency
