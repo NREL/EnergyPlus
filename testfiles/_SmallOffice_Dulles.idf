@@ -3087,6 +3087,7 @@
   Coil:Heating:Gas,
     HeatingCoil_SouthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_SouthZone_1stFloor,  !- Air Inlet Node Name
@@ -3095,6 +3096,7 @@
   Coil:Heating:Gas,
     ReheatCoil_SouthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_SouthZone_1stFloor,  !- Air Inlet Node Name
@@ -3103,6 +3105,7 @@
   Coil:Heating:Gas,
     HeatingCoil_NorthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_NorthZone_1stFloor,  !- Air Inlet Node Name
@@ -3111,6 +3114,7 @@
   Coil:Heating:Gas,
     ReheatCoil_NorthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_NorthZone_1stFloor,  !- Air Inlet Node Name
@@ -3119,6 +3123,7 @@
   Coil:Heating:Gas,
     HeatingCoil_SouthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_SouthZone_2ndFloor,  !- Air Inlet Node Name
@@ -3127,6 +3132,7 @@
   Coil:Heating:Gas,
     ReheatCoil_SouthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_SouthZone_2ndFloor,  !- Air Inlet Node Name
@@ -3135,6 +3141,7 @@
   Coil:Heating:Gas,
     HeatingCoil_NorthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
@@ -3143,6 +3150,7 @@
   Coil:Heating:Gas,
     ReheatCoil_NorthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name

@@ -2691,6 +2691,7 @@
   Coil:Heating:Gas,
     SPACE1-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     19243,                   !- Nominal Capacity {W}
     SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name
@@ -2699,6 +2700,7 @@
   Coil:Heating:Gas,
     SPACE2-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     14751,                   !- Nominal Capacity {W}
     SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name
@@ -2707,6 +2709,7 @@
   Coil:Heating:Gas,
     SPACE3-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     25204,                   !- Nominal Capacity {W}
     SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name
@@ -2715,6 +2718,7 @@
   Coil:Heating:Gas,
     SPACE4-1 Zone Coil,      !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     20350,                   !- Nominal Capacity {W}
     SPACE4-1 Zone Coil Air In Node,  !- Air Inlet Node Name
@@ -2723,6 +2727,7 @@
   Coil:Heating:Gas,
     Main heating Coil 1,     !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     4438.1,                  !- Nominal Capacity {W}
     Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name
@@ -2732,6 +2737,7 @@
   Coil:Heating:Gas,
     Desiccant Process Heating Coil,  !- Name
     Constant,                !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     1000000,                 !- Nominal Capacity {W}
     Desiccant Supply Fan Outlet Node,  !- Air Inlet Node Name
@@ -2741,6 +2747,7 @@
   Coil:Heating:Gas,
     Desiccant Regen Coil,    !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     1,                       !- Gas Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Regen Coil Inlet Node,   !- Air Inlet Node Name
@@ -2952,6 +2959,7 @@
   Coil:Heating:Gas,
     OA Desiccant Regen Coil, !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.80,                    !- Gas Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     OA Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name

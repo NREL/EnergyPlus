@@ -2107,6 +2107,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil AHU1,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU1,  !- Air Inlet Node Name
@@ -2292,6 +2293,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil AHU2,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU2,  !- Air Inlet Node Name
@@ -2477,6 +2479,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil AHU3,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU3,  !- Air Inlet Node Name
@@ -2662,6 +2665,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil AHU4,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU4,  !- Air Inlet Node Name
@@ -2847,6 +2851,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil AHU5,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU5,  !- Air Inlet Node Name

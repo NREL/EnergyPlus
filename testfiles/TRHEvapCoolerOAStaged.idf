@@ -1376,6 +1376,7 @@
   Coil:Heating:Gas,
     Reheat Coil Zone 1,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     6000,                    !- Nominal Capacity {W}
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
@@ -1384,6 +1385,7 @@
   Coil:Heating:Gas,
     Reheat Coil Zone 3,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     8000,                    !- Nominal Capacity {W}
     Zone 3 Reheat Air Inlet Node,  !- Air Inlet Node Name

@@ -3986,6 +3986,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN1,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN1,  !- Air Inlet Node Name
@@ -4320,6 +4321,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN3,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN3,  !- Air Inlet Node Name
@@ -4654,6 +4656,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN5,   !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN5,  !- Air Inlet Node Name
@@ -4988,6 +4991,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN7,   !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN7,  !- Air Inlet Node Name
@@ -5322,6 +5326,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN9,   !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN9,  !- Air Inlet Node Name
@@ -5656,6 +5661,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN11,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN11,  !- Air Inlet Node Name
@@ -5990,6 +5996,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN13,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN13,  !- Air Inlet Node Name
@@ -6324,6 +6331,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN15,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN15,  !- Air Inlet Node Name
@@ -6658,6 +6666,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN17,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN17,  !- Air Inlet Node Name
@@ -6992,6 +7001,7 @@
   Coil:Heating:Gas,
     Main Heating Coil ZN19,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN19,  !- Air Inlet Node Name

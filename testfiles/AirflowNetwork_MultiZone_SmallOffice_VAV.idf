@@ -3234,6 +3234,7 @@
   Coil:Heating:Gas,
     Main Heating Coil 1,     !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -3243,6 +3244,7 @@
   Coil:Heating:Gas,
     Reheat Coil Zone 1,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone 1 Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -3251,6 +3253,7 @@
   Coil:Heating:Gas,
     Reheat Coil Zone 2,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     1.0,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone 2 Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -3259,6 +3262,7 @@
   Coil:Heating:Gas,
     Reheat Coil Zone 3,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     1.0,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone 3 Coil Air Inlet Node,  !- Air Inlet Node Name

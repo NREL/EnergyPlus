@@ -2938,6 +2938,7 @@
   Coil:Heating:Gas,
     FURNACE HEATING COIL 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     60000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name

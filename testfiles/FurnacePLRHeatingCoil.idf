@@ -1376,6 +1376,7 @@
   Coil:Heating:Gas,
     Furnace Coil,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -1388,6 +1389,7 @@
   Coil:Heating:Gas,
     Furnace Coil 2,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node 2,  !- Air Inlet Node Name

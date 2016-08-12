@@ -1308,6 +1308,7 @@
   Coil:Heating:Gas,
     AHU 1 Heating Coil,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     AHU 1 Supply Fan Outlet, !- Air Inlet Node Name

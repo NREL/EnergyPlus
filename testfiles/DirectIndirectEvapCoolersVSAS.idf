@@ -4662,6 +4662,7 @@
   Coil:Heating:Gas,
     FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -4931,6 +4932,7 @@
   Coil:Heating:Gas,
     FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -5225,6 +5227,7 @@
   Coil:Heating:Gas,
     FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -5519,6 +5522,7 @@
   Coil:Heating:Gas,
     FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name

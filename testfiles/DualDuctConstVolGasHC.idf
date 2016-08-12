@@ -1998,6 +1998,7 @@
   Coil:Heating:Gas,
     Main Heating Coil,       !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     Heating Coil Inlet Node, !- Air Inlet Node Name

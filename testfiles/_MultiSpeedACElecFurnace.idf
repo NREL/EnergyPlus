@@ -2059,6 +2059,7 @@
   Coil:Heating:Gas,
     Supp Gas Heating Coil 1, !- Name
     Off,                     !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     45000,                   !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name

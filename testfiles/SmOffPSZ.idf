@@ -2201,6 +2201,7 @@
   Coil:Heating:Gas,
     Main Heating Coil 1,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name
@@ -2210,6 +2211,7 @@
   Coil:Heating:Gas,
     Main Heating Coil 2,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 2 Outlet Node,  !- Air Inlet Node Name
@@ -2219,6 +2221,7 @@
   Coil:Heating:Gas,
     Main Heating Coil 3,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 3 Outlet Node,  !- Air Inlet Node Name
@@ -2228,6 +2231,7 @@
   Coil:Heating:Gas,
     Main Heating Coil 4,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 4 Outlet Node,  !- Air Inlet Node Name

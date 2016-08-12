@@ -2613,6 +2613,7 @@
   Coil:Heating:Gas,
     DOAS Heating Coil,       !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     DOAS Cooling Coil Outlet,!- Air Inlet Node Name

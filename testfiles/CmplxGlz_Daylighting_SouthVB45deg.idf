@@ -86372,6 +86372,7 @@
   Coil:Heating:Gas,
     SYS-1 Heating Coil,      !- Name
     ALWAYSON,                !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.7407407,               !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SYS-1 Cooling Coil Outlet,  !- Air Inlet Node Name

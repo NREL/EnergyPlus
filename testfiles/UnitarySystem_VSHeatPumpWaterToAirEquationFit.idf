@@ -3900,6 +3900,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -4083,6 +4084,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil 2,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 2 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -4266,6 +4268,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil 3,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 3 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -4449,6 +4452,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil 4,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 4 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -4632,6 +4636,7 @@
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil 5,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name

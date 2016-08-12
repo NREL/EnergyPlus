@@ -1392,6 +1392,7 @@
   Coil:Heating:Gas,
     PSZ-AC_1:1_HeatC,        !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.78,                    !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_1:1_CoolC-PSZ-AC_1:1_HeatCNode,  !- Air Inlet Node Name
@@ -1401,6 +1402,7 @@
   Coil:Heating:Gas,
     PSZ-AC_2:2_HeatC,        !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_2:2_CoolC-PSZ-AC_2:2_HeatCNode,  !- Air Inlet Node Name

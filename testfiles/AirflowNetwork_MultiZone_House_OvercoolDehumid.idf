@@ -2228,6 +2228,7 @@
   Coil:Heating:Gas,
     Heating Coil 1,          !- Name
     HVACAvailSched,          !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     25000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -2236,6 +2237,7 @@
   Coil:Heating:Gas,
     Reheat Coil,             !- Name
     HVACAvailSched,          !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     25000,                   !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name

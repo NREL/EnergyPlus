@@ -3039,6 +3039,7 @@ Fan:OnOff,
 Coil:Heating:Gas,
     SPACE1-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE1-1 Heating Coil Outlet,  !- Air Inlet Node Name
@@ -3047,6 +3048,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE2-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE2-1 Heating Coil Outlet,  !- Air Inlet Node Name
@@ -3055,6 +3057,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE3-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE3-1 Heating Coil Outlet,  !- Air Inlet Node Name
@@ -3063,6 +3066,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE4-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE4-1 Heating Coil Outlet,  !- Air Inlet Node Name
@@ -3071,6 +3075,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE5-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE5-1 Heating Coil Outlet,  !- Air Inlet Node Name

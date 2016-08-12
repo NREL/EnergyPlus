@@ -7007,6 +7007,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:01_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:01_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7015,6 +7016,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:02_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:02_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7023,6 +7025,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:03_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:03_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7031,6 +7034,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:04_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:04_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7039,6 +7043,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:05_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:05_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7047,6 +7052,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:06_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:06_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7055,6 +7061,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:07_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:07_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7063,6 +7070,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:08_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:08_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7071,6 +7079,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:09_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:09_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7079,6 +7088,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:10_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:10_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7087,6 +7097,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:11_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:11_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7095,6 +7106,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:12_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:12_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7103,6 +7115,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:13_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:13_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7111,6 +7124,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:14_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:14_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7119,6 +7133,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:15_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:15_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7127,6 +7142,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:16_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:16_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7135,6 +7151,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:17_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:17_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7143,6 +7160,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:18_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:18_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7151,6 +7169,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:19_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:19_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7159,6 +7178,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:20_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:20_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7167,6 +7187,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:21_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:21_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7175,6 +7196,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:22_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:22_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7183,6 +7205,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:23_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:23_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -7191,6 +7214,7 @@
   Coil:Heating:Gas,
     SPLITSYSTEMAC:24_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:24_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name

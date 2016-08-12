@@ -2619,6 +2619,7 @@
   Coil:Heating:Gas,
     Zone5UnitVentHeatingCoil,!- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.77,                    !- Gas Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Zone5UnitVentFanOutletNode,  !- Air Inlet Node Name

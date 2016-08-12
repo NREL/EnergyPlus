@@ -1885,6 +1885,7 @@
   Coil:Heating:Gas,
     PSZ-AC:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -1893,6 +1894,7 @@
   Coil:Heating:Gas,
     PSZ-AC:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.78,                    !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -1901,6 +1903,7 @@
   Coil:Heating:Gas,
     PSZ-AC:3_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -1909,6 +1912,7 @@
   Coil:Heating:Gas,
     PSZ-AC:4_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
