@@ -323,6 +323,7 @@ namespace ChillerElectricEIR {
 		Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
 		Real64 BasinHeaterPower; // Basin heater power (W)
 		Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
+		Real64 EvapWaterConsump; // Evap cooler water consumption (m3)
 
 		// Default Constructor
 		ReportEIRVars() :
@@ -355,7 +356,8 @@ namespace ChillerElectricEIR {
 			CondenserFanPowerUse( 0.0 ),
 			CondenserFanEnergyConsumption( 0.0 ),
 			BasinHeaterPower( 0.0 ),
-			BasinHeaterConsumption( 0.0 )
+			BasinHeaterConsumption( 0.0 ),
+			EvapWaterConsump( 0.0 )
 		{}
 
 	};

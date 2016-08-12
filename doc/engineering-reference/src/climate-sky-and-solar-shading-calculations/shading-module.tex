@@ -6,7 +6,7 @@ When assessing heat gains in buildings due to solar radiation, it is necessary t
 
 The shadow algorithm is based on coordinate transformation methods similar to Groth and Lokmanhekim and the shadow overlap method of Walton.
 
-Using the \textbf{ShadowCalculation} object, you can set how often the shadowing calculations are performed. Having them calculated each day is obviously the most accurate but may also be the most time consuming.~ Using a greater length of time (number of days) before calculating again can yield speedier results.~ For lengths of time greater than one day, the solar position values (e.g.~equation of time, sun position angles) are averaged over that time period for the shadowing calculations.
+Using the \textbf{ShadowCalculation} object, you can set how often the shadowing calculations are performed. Calculating them every timestep (TimestepFrequency options) is obviously the most accurate but is also be the most time consuming.~ Using a greater length of time (number of days) before calculating again can yield speedier results.~ For lengths of time greater than one day, the solar position values (e.g.~equation of time, sun position angles) are averaged over that time period for the shadowing calculations. For dynamic shading, TimestepFrequency is required to capture changes in shading transmittance.
 
 \begin{figure}[hbtp] % fig 38
 \centering
