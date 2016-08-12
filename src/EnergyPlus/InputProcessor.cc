@@ -133,13 +133,6 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 				continue;
 			}
 
-
-            if (obj_name == "WeatherProperty:SkyTemperature") {
-                int dafkldj = 10;
-            }
-
-
-
 			json const &obj_loc = schema[ "properties" ][ obj_name ];
 			json const &loc = obj_loc[ "legacy_idd" ];
 			json obj = parse_object( idf, index, success, loc, obj_loc );
