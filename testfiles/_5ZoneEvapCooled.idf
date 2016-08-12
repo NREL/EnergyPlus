@@ -3571,7 +3571,3 @@
 
   Output:Diagnostics,
     ReportDetailedWarmupConvergence;  !- Key 1
-
-  ProgramControl,
-    1;                       !- Number of Threads Allowed
-
