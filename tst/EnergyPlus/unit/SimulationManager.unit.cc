@@ -56,18 +56,36 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+// Google Test Headers
+#include <gtest/gtest.h>
 
-//#define TIMER_CPU_TIME
-#define TIMER_F90_EPTIME
+// EnergyPlus Headers
+#include <SimulationManager.hh>
 
-#if defined(TIMER_F90_EPTIME)
-#  define TSTART(x) x=epelapsedtime()
-#  define TSTOP(x)  x=epelapsedtime()
-#  define TSTAMP(x) x=epelapsedtime()
-#elif defined(TIMER_CPU_TIME)
-#  define TSTART(x) CPU_TIME(x)
-#  define TSTOP(x)  CPU_TIME(x)
-#  define TSTAMP(x) CPU_TIME(x)
-#else
-  NEED_TO_SPECIFY_TIMER
-#endif
+#include "Fixtures/EnergyPlusFixture.hh"
+
+using namespace EnergyPlus;
+using namespace ObjexxFCL;
+
+TEST_F( EnergyPlusFixture, CheckThreading )
+{
+	std::string const idf_objects = delimited_string( {
+	"Version,8.6;",
+
+	"ProgramControl,",
+	"	1;",
+
+	} );
+
+	//std::string const error_string = delimited_string({
+	//	"   ** Severe  ** IP: IDF line~1 Did not find \"ProgramControl\" in list of Objects",
+	//	"   And another here",
+	//	"   Look, this is the third line.",
+	//});
+
+	EXPECT_TRUE( process_idf( idf_objects , true ) );
+
+
+
+	//EXPECT_TRUE( compare_err_stream( error_string, true ) );
+}

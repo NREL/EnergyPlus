@@ -211,7 +211,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
 		"  0.1,",
 		"  0.2,",
 		"  0.05;",
-		
+
 	} );
 
 	ASSERT_FALSE(process_idf(idf_objects));
