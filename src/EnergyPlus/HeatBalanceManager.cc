@@ -89,6 +89,7 @@
 #include <DataSystemVariables.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
+#include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
 #include <EMSManager.hh>
@@ -104,6 +105,7 @@
 #include <ScheduleManager.hh>
 #include <SolarShading.hh>
 #include <SurfaceGeometry.hh>
+#include <SurfaceOctree.hh>
 #include <UtilityRoutines.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
@@ -339,6 +341,18 @@ namespace HeatBalanceManager {
 		// Get the heat balance input at the beginning of the simulation only
 		if ( ManageHeatBalanceGetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+
+			// Surface octree setup
+			//  The surface octree holds live references to surfaces so it must be updated
+			//   if in the future surfaces are altered after this point
+			if ( TotSurfaces >= DaylightingManager::octreeCrossover ) { // Octree can be active
+				if ( GetNumObjectsFound( "Daylighting:Controls" ) > 0 ) { // Daylighting is active
+					surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+				}
+			}
+
+			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
+
 			ManageHeatBalanceGetInputFlag = false;
 		}
 
@@ -353,7 +367,8 @@ namespace HeatBalanceManager {
 		// the HVAC system (called from the Air Heat Balance) and the zone (simulated
 		// in the Surface Heat Balance Manager).  In the future, this may be improved.
 		ManageSurfaceHeatBalance();
-		ManageEMS( emsCallFromEndZoneTimestepBeforeZoneReporting ); // EMS calling point
+		bool anyRan;
+		ManageEMS( emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan ); // EMS calling point
 		RecKeepHeatBalance(); // Do any heat balance related record keeping
 
 		// This call has been moved to the FanSystemModule and does effect the output file
@@ -362,7 +377,7 @@ namespace HeatBalanceManager {
 
 		ReportHeatBalance(); // Manage heat balance reporting until the new reporting is in place
 
-		ManageEMS( emsCallFromEndZoneTimestepAfterZoneReporting ); // EMS calling point
+		ManageEMS( emsCallFromEndZoneTimestepAfterZoneReporting, anyRan ); // EMS calling point
 
 		UpdateEMSTrendVariables();
 
@@ -373,7 +388,7 @@ namespace HeatBalanceManager {
 				DayOfSim = 0; // Reset DayOfSim if Warmup converged
 				DayOfSimChr = "0";
 
-				ManageEMS( emsCallFromBeginNewEvironmentAfterWarmUp ); // calling point
+				ManageEMS( emsCallFromBeginNewEvironmentAfterWarmUp, anyRan ); // calling point
 			}
 
 		}
@@ -4755,38 +4770,19 @@ namespace HeatBalanceManager {
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   April 1997
 		//       MODIFIED       June 2011, Daeho Kang for individual zone maximums & convergence outputs
-		//       RE-ENGINEERED  na
+		//       				July 2016, Rick Strand for movable insulation bug fix
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is the main driver for record keeping within the
 		// heat balance.
 
-		// METHODOLOGY EMPLOYED:
-		// Uses the status flags to trigger record keeping events.
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataSystemVariables::ReportDetailedWarmupConvergence;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//  CHARACTER(len=MaxNameLength) :: ZoneName
 		int ZoneNum;
+		int SurfNum;
 		static bool FirstWarmupWrite( true );
 
 		// Formats
@@ -4795,7 +4791,6 @@ namespace HeatBalanceManager {
 
 		// FLOW:
 
-		// Always do the following record keeping (every time step):
 		// Record Maxs & Mins for individual zone
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZTAV( ZoneNum ) > MaxTempZone( ZoneNum ) ) {
@@ -4842,14 +4837,12 @@ namespace HeatBalanceManager {
 
 		}
 
-		// There is no hourly record keeping in the heat balance.
-
-		// There is no daily record keeping in the heat balance.
-
-		// There is no environment level record keeping in the heat balance.
-
-		// There is no simulation level record keeping in the heat balance.
-
+		// Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
+		// exchange algorithm knows whether there has been a change in interior movable insulation or not.
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			DataSurfaces::Surface( SurfNum ).MovInsulIntPresentPrevTS = DataSurfaces::Surface( SurfNum ).MovInsulIntPresent;
+		}
+		
 	}
 
 	void

@@ -1756,8 +1756,8 @@ operator ==( MArray3< A, T > const & a, MArray3< A, T > const & b )
 	Array3D< bool > r( Array3D< bool >::shape( a ) );
 	Array3D< bool >::size_type l( 0u );
 	for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2, ++l ) {
-			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
+		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
+			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3, ++l ) {
 				r[ l ] = ( a( i1, i2, i3 ) == b( i1, i2, i3 ) );
 			}
 		}

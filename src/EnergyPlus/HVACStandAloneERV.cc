@@ -295,7 +295,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
-		using MixedAir::SetOAControllerData;
+		using MixedAir::OAController;
 		using MixedAir::CheckOAControllerName;
 		using DataHeatBalance::Zone;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -355,7 +355,6 @@ namespace HVACStandAloneERV {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		int OutAirNum; // total number of CONTROLLER:OUTSIDE AIR objects
 		int NumERVCtrlrs; // total number of CONTROLLER:STAND ALONE ERV objects
 		int ERVControllerNum; // index to ERV controller
 		int WhichERV; // used in controller GetInput
@@ -592,14 +591,17 @@ namespace HVACStandAloneERV {
 			} else {
 				// Verify controller name in Stand Alone ERV object matches name of valid controller object
 				VerifyName( Alphas( 6 ), StandAloneERV, &StandAloneERVData::ControllerName, StandAloneERVNum - 1, IsNotOK, IsBlank, "ZoneHVAC:EnergyRecoveryVentilator:Controller Name" );
+				StandAloneERV( StandAloneERVNum ).ControllerNameDefined = true;
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 6 ) = "xxxxx";
+					StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 				}
 
 				if ( GetObjectItemNum( "ZoneHVAC:EnergyRecoveryVentilator:Controller", StandAloneERV( StandAloneERVNum ).ControllerName ) <= 0 ) {
 					ShowSevereError( CurrentModuleObject + " controller type ZoneHVAC:EnergyRecoveryVentilator:Controller not found = " + Alphas( 6 ) );
 					ErrorsFound = true;
+					StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 				}
 			}
 
@@ -728,7 +730,7 @@ namespace HVACStandAloneERV {
 
 		}
 
-		OutAirNum = GetNumObjectsFound( "Controller:OutdoorAir" );
+		int OutAirNum = 0;
 		CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator:Controller";
 		NumERVCtrlrs = GetNumObjectsFound( CurrentModuleObject );
 
@@ -737,16 +739,18 @@ namespace HVACStandAloneERV {
 
 			IsNotOK = false;
 			IsBlank = false;
-			CheckOAControllerName( Alphas( 1 ), OutAirNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			CheckOAControllerName( Alphas( 1 ), ERVControllerNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 
 			++OutAirNum;
-			SetOAControllerData( OutAirNum, ErrorsFound, Alphas( 1 ) );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, CurrentModuleObject );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, ControllerStandAloneERV );
+			auto & thisOAController( OAController( OutAirNum ) );
+
+			thisOAController.Name = Alphas( 1 );
+			thisOAController.ControllerType = CurrentModuleObject;
+			thisOAController.ControllerType_Num = ControllerStandAloneERV;
 			WhichERV = FindItemInList( Alphas( 1 ), StandAloneERV, &StandAloneERVData::ControllerName );
 			if ( WhichERV != 0 ) {
 				AirFlowRate = StandAloneERV( WhichERV ).SupplyAirVolFlow;
@@ -756,31 +760,31 @@ namespace HVACStandAloneERV {
 				ErrorsFound = true;
 				AirFlowRate = -1000.0;
 			}
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
+			thisOAController.MaxOA = AirFlowRate;
+			thisOAController.MinOA = AirFlowRate;
 			//    OAController(OutAirNum)%TempLim = Numbers(1)
 			if ( lNumericBlanks( 1 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, BlankNumeric );
+				thisOAController.TempLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, Numbers( 1 ) );
+				thisOAController.TempLim = Numbers( 1 );
 			}
 			//    OAController(OutAirNum)%TempLowLim = Numbers(2)
 			if ( lNumericBlanks( 2 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, BlankNumeric );
+				thisOAController.TempLowLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, Numbers( 2 ) );
+				thisOAController.TempLowLim = Numbers( 2 );
 			}
 			//    OAController(OutAirNum)%EnthLim = Numbers(3)
 			if ( lNumericBlanks( 3 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, BlankNumeric );
+				thisOAController.EnthLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, Numbers( 3 ) );
+				thisOAController.EnthLim = Numbers( 3 );
 			}
 			//    OAController(OutAirNum)%DPTempLim = Numbers(4)
 			if ( lNumericBlanks( 4 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, BlankNumeric );
+				thisOAController.DPTempLim = BlankNumeric;
 			} else {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, Numbers( 4 ) );
+				thisOAController.DPTempLim = Numbers( 4 );
 			}
 
 			if ( WhichERV != 0 ) {
@@ -788,20 +792,20 @@ namespace HVACStandAloneERV {
 			} else {
 				NodeNumber = 0;
 			}
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, NodeNumber );
+			thisOAController.OANode = NodeNumber;
 			// set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
 			// with the assumption that equipment is bypassed....(moved from module MixedAir)
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, NodeNumber );
+			thisOAController.InletNode = NodeNumber;
 
 			if ( WhichERV != 0 ) {
 				NodeNumber = StandAloneERV( WhichERV ).ExhaustAirInletNode;
 			} else {
 				NodeNumber = 0;
 			}
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, NodeNumber );
+			thisOAController.RetNode = NodeNumber;
 
 			if ( ! lAlphaBlanks( 2 ) ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, GetCurveIndex( Alphas( 2 ) ) );
+				thisOAController.EnthalpyCurvePtr = GetCurveIndex( Alphas( 2 ) );
 				if ( GetCurveIndex( Alphas( 2 ) ) == 0 ) {
 					ShowSevereError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "..." + cAlphaFields( 2 ) + " not found:" + Alphas( 2 ) );
@@ -824,56 +828,56 @@ namespace HVACStandAloneERV {
 
 			// Changed by AMIT for new implementation of the controller:outside air
 			if ( Alphas( 3 ) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "EXHAUSTAIRENTHALPYLIMIT" ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "DIFFERENTIALDRYBULBANDENTHALPY" );
+				thisOAController.Econo = MixedAir::DifferentialDryBulbAndEnthalpy;
 			} else if ( Alphas( 3 ) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "NOEXHAUSTAIRENTHALPYLIMIT" ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "DIFFERENTIALDRYBULB" );
+				thisOAController.Econo = MixedAir::DifferentialDryBulb;
 			} else if ( Alphas( 3 ) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "EXHAUSTAIRENTHALPYLIMIT" ) {
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "DIFFERENTIALENTHALPY" );
+				thisOAController.Econo = MixedAir::DifferentialEnthalpy;
 			} else if ( Alphas( 3 ) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas( 4 ) == "NOEXHAUSTAIRENTHALPYLIMIT" ) {
 				if ( ( ! lNumericBlanks( 1 ) ) || ( ! lNumericBlanks( 3 ) ) || ( ! lNumericBlanks( 4 ) ) || ( ! lAlphaBlanks( 2 ) ) ) {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else if ( ( ! lAlphaBlanks( 3 ) ) && ( ! lAlphaBlanks( 4 ) ) ) {
 				if ( ( lNumericBlanks( 1 ) ) && ( lNumericBlanks( 3 ) ) && ( lNumericBlanks( 4 ) ) && lAlphaBlanks( 2 ) ) {
 					ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "... Invalid " + cAlphaFields( 3 ) + cAlphaFields( 4 ) + " = " + Alphas( 3 ) + Alphas( 4 ) );
 					ShowContinueError( "... Assumed NO EXHAUST AIR TEMP LIMIT and NO EXHAUST AIR ENTHALPY LIMIT." );
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+					thisOAController.Econo = MixedAir::NoEconomizer;
 				} else {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else if ( ( lAlphaBlanks( 3 ) ) && ( ! lAlphaBlanks( 4 ) ) ) {
 				if ( ( lNumericBlanks( 1 ) ) && ( lNumericBlanks( 3 ) ) && ( lNumericBlanks( 4 ) ) && lAlphaBlanks( 2 ) ) {
 					ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "... Invalid " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
 					ShowContinueError( "... Assumed  NO EXHAUST AIR ENTHALPY LIMIT." );
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+					thisOAController.Econo = MixedAir::NoEconomizer;
 				} else {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else if ( ( ! lAlphaBlanks( 3 ) ) && ( lAlphaBlanks( 4 ) ) ) {
 				if ( ( lNumericBlanks( 1 ) ) && ( lNumericBlanks( 3 ) ) && ( lNumericBlanks( 4 ) ) && lAlphaBlanks( 2 ) ) {
 					ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( "... Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 					ShowContinueError( "... Assumed NO EXHAUST AIR TEMP LIMIT " );
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+					thisOAController.Econo = MixedAir::NoEconomizer;
 				} else {
 					// This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
 					// ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "ECONOMIZER STRATEGY PRESENT" );
+					thisOAController.Econo = MixedAir::FixedDryBulb;
 				}
 			} else { //NO Economizer
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, "NOECONOMIZER" );
+				thisOAController.Econo = MixedAir::NoEconomizer;
 			}
 
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, false );
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, "MINIMUMFLOWWITHBYPASS" );
+			thisOAController.FixedMin = false;
+			thisOAController.EconBypass = true;
 
 			//   Initialize to one in case high humidity control is NOT used
 			HighRHOARatio = 1.0;
@@ -882,7 +886,7 @@ namespace HVACStandAloneERV {
 			if ( SameString( Alphas( 6 ), "Yes" ) ) {
 
 				HStatZoneNum = FindItemInList( Alphas( 7 ), Zone );
-				SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HStatZoneNum );
+				thisOAController.HumidistatZoneNum = HStatZoneNum;
 
 				// Get the node number for the zone with the humidistat
 				if ( HStatZoneNum > 0 ) {
@@ -891,7 +895,7 @@ namespace HVACStandAloneERV {
 					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum != HStatZoneNum ) continue;
 						//         Find the controlled zone number for the specified humidistat location
-						SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, ZoneEquipConfig( ControlledZoneNum ).ZoneNode );
+						thisOAController.NodeNumofHumidistatZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 						ZoneNodeFound = true;
 						break; // found zone node
 					}
@@ -940,9 +944,9 @@ namespace HVACStandAloneERV {
 				}
 
 				if ( SameString( Alphas( 8 ), "Yes" ) ) {
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, false );
+					thisOAController.ModifyDuringHighOAMoisture = false;
 				} else {
-					SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, true );
+					thisOAController.ModifyDuringHighOAMoisture = true;
 				}
 
 			} else if ( ! SameString( Alphas( 6 ), "No" ) && NumAlphas > 4 && ( ! lAlphaBlanks( 5 ) ) ) {
@@ -951,13 +955,13 @@ namespace HVACStandAloneERV {
 				ShowContinueError( "... " + cAlphaFields( 6 ) + " is assumed to be \"No\" and the simulation continues." );
 			} // IF(SameString(Alphas(6),'Yes'))THEN
 
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HighRHOARatio );
+			thisOAController.HighRHOAFlowRatio = HighRHOARatio;
 			if ( WhichERV != 0 ) {
 				StandAloneERV( WhichERV ).HighRHOAFlowRatio = HighRHOARatio;
 			}
 
 			//   Check for a time of day outside air schedule
-			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, GetScheduleIndex( Alphas( 5 ) ) );
+			thisOAController.EconomizerOASchedPtr = GetScheduleIndex( Alphas( 5 ) );
 
 			if ( WhichERV != 0 ) {
 				StandAloneERV( WhichERV ).EconomizerOASchedPtr = GetScheduleIndex( Alphas( 5 ) );
@@ -1069,7 +1073,7 @@ namespace HVACStandAloneERV {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::ERVStandAlone_Num;
 		using MixedAir::SimOAController;
-		using DataAirLoop::OAControllerInfo;
+		using MixedAir::OAController;
 
 		// Locals
 		static Array1D_bool MySizeFlag;
@@ -1181,7 +1185,7 @@ namespace HVACStandAloneERV {
 
 			if ( GetCurrentScheduleValue( StandAloneERV( StandAloneERVNum ).SupplyAirFanSchPtr ) > 0 || ( ZoneCompTurnFansOn && ! ZoneCompTurnFansOff ) ) {
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					if ( OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
+					if ( OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
 						Node( SupInletNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignSAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxSupAirMassFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
 					} else {
 						Node( SupInletNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignSAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxSupAirMassFlow );
@@ -1197,7 +1201,7 @@ namespace HVACStandAloneERV {
 
 			if ( GetCurrentScheduleValue( StandAloneERV( StandAloneERVNum ).ExhaustAirFanSchPtr ) > 0 ) {
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					if ( OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
+					if ( OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive ) {
 						Node( ExhInNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignEAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxExhAirMassFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
 					} else {
 						Node( ExhInNode ).MassFlowRate = min( StandAloneERV( StandAloneERVNum ).DesignEAFanMassFlowRate, StandAloneERV( StandAloneERVNum ).MaxExhAirMassFlow );
@@ -1254,9 +1258,10 @@ namespace HVACStandAloneERV {
 		using ScheduleManager::GetScheduleMaxValue;
 		using HeatRecovery::SetHeatExchangerData;
 		using Fans::SetFanData;
-		using MixedAir::SetOAControllerData;
+		using MixedAir::OAController;
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
+		using Fans::SimulateFanComponents;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1347,8 +1352,8 @@ namespace HVACStandAloneERV {
 				ReportSizingOutput( "ZoneHVAC:EnergyRecoveryVentilator", StandAloneERV( StandAloneERVNum ).Name, "Design Size Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes );
 
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-					SetOAControllerData( StandAloneERV( StandAloneERVNum ).ControllerIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
-					SetOAControllerData( StandAloneERV( StandAloneERVNum ).ControllerIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, SupplyAirVolFlowDes );
+					OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).MaxOA = SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
+					OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MinOA = SupplyAirVolFlowDes;
 				}
 			} else {
 				if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow > 0.0 && SupplyAirVolFlowDes > 0.0 ) {
@@ -1397,6 +1402,18 @@ namespace HVACStandAloneERV {
 				}
 			}
 		}
+
+		// simulate the fan to size using the flow rate specified above
+		// (i.e., ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;)
+		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex > 0 ) {
+			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
+		}		
+		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex > 0 ) {
+			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
+		}			
+
+		// now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
+		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
 
 		// Check heat exchanger flow rate or set flow rate if autosized in heat exchanger object
 		IsAutoSize = false;
@@ -1523,7 +1540,7 @@ namespace HVACStandAloneERV {
 		using Psychrometrics::PsyHFnTdbW;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using General::RoundSigDigits;
-		using DataAirLoop::OAControllerInfo;
+		using MixedAir::OAController;
 		using DataHeatBalance::ZoneAirMassFlow;
 
 		// Locals
@@ -1566,8 +1583,8 @@ namespace HVACStandAloneERV {
 
 		// Get stand alone ERV's controller economizer and high humidity control status
 		if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
-			EconomizerFlag = OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).EconoActive;
-			HighHumCtrlFlag = OAControllerInfo( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive;
+			EconomizerFlag = OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).EconoActive;
+			HighHumCtrlFlag = OAController( StandAloneERV( StandAloneERVNum ).ControllerIndex ).HighHumCtrlActive;
 		} else {
 			EconomizerFlag = false;
 			HighHumCtrlFlag = false;

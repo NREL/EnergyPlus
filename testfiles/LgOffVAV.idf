@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.6;
 
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
@@ -3251,6 +3251,7 @@
 
   OtherEquipment,
     BASE-1 OthEq 1,          !- Name
+    None,                    !- Fuel Type
     BASE-1,                  !- Zone or ZoneList Name
     ALWAYSON,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

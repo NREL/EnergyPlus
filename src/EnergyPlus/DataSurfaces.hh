@@ -59,15 +59,21 @@
 #ifndef DataSurfaces_hh_INCLUDED
 #define DataSurfaces_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array2D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataBSDFWindow.hh>
 #include <DataGlobals.hh>
 #include <DataVectorTypes.hh>
+#include <Shape.hh>
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Vector4.hh>
+
+// C++ Headers
+#include <cstddef>
+#include <vector>
 
 namespace EnergyPlus {
 
@@ -87,16 +93,19 @@ namespace DataSurfaces {
 	// Parameters to indicate surface shape for use with the Surface
 	// derived type (see below):
 
-	extern int const Triangle;
-	extern int const Quadrilateral;
-	extern int const Rectangle;
-	extern int const Polygonal;
-	extern int const RectangularDoorWindow;
-	extern int const RectangularOverhang;
-	extern int const RectangularLeftFin;
-	extern int const RectangularRightFin;
-	extern int const TriangularWindow;
-	extern int const TriangularDoor;
+	enum class SurfaceShape : int {
+		None = 0,
+		Triangle,
+		Quadrilateral,
+		Rectangle,
+		RectangularDoorWindow,
+		RectangularOverhang,
+		RectangularLeftFin,
+		RectangularRightFin,
+		TriangularWindow,
+		TriangularDoor,
+		Polygonal
+	};
 
 	// Parameters to indicate exterior boundary conditions for use with
 	// the Surface derived type (see below):
@@ -311,6 +320,9 @@ namespace DataSurfaces {
 	extern int const WindowBSDFModel; // indicates complex fenestration window 6 implementation
 	extern int const WindowEQLModel; // indicates equivalent layer winodw model implementation
 
+	// Parameters for PierceSurface
+	extern std::size_t const nVerticesBig; // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// Definitions used for scheduled surface gains
@@ -411,6 +423,8 @@ namespace DataSurfaces {
 	// zone-side of shade plus gap air convection to zone) + (IR and
 	// convection from frame) + (IR and convection from divider if no
 	// interior shade) (W)
+	extern Array1D< Real64 > WinHeatTransfer; // Total heat transfer through the window = WinTransSolar + conduction
+	// through glazing and frame
 	extern Array1D< Real64 > WinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
 	extern Array1D< Real64 > WinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
 
@@ -460,13 +474,115 @@ namespace DataSurfaces {
 	extern Array1D< Real64 > WinHeatLossRepEnergy; // Energy of WinHeatLossRep [J]
 	extern Array1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
 	extern Array1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
+	extern Array1D< Real64 > WinHeatTransferRepEnergy; // Energy of WinHeatTransfer [J]
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
 	// Types
 
+	// Y Slab for Surface2D for PierceSurface support of Nonconvex and Many-Vertex Surfaces
+	struct Surface2DSlab
+	{
+
+	public: // Types
+
+		using Vertex = ObjexxFCL::Vector2< Real64 >;
+		using Vertices = ObjexxFCL::Array1D< Vertex >;
+		using Edge = Vertices::size_type; // The Surface2D vertex and edge index
+		using EdgeXY = Real64; // The edge x/y inverse slope
+		using Edges = std::vector< Edge >;
+		using EdgesXY = std::vector< EdgeXY >;
+
+	public: // Creation
+
+		// Constructor
+		Surface2DSlab( Real64 const yl, Real64 const yu ) :
+			xl( 0.0 ),
+			xu( 0.0 ),
+			yl( yl ),
+			yu( yu )
+		{}
+
+	public: // Data
+
+		Real64 xl, xu; // Lower and upper x coordinates of slab bounding box
+		Real64 yl, yu; // Lower and upper y coordinates of slab
+		Edges edges; // Left-to-right ordered edges crossing the slab
+		EdgesXY edgesXY; // Edge x/y inverse slopes
+
+	}; // Surface2DSlab
+
+	// Projected 2D Surface Representation for Fast Computational Geometry Operations
+	struct Surface2D
+	{
+
+	public: // Types
+
+		using Vector2D = Vector2< Real64 >;
+		using Edge = Vector2D;
+		using Vertices = Array1D< Vector2D >;
+		using Vectors = Array1D< Vector2D >;
+		using Edges = Vectors;
+		using Slab = Surface2DSlab;
+		using Slabs = std::vector< Surface2DSlab >;
+		using SlabYs = std::vector< Real64 >;
+		using size_type = Vertices::size_type;
+
+	public: // Creation
+
+		// Default constructor
+		Surface2D()
+		{}
+
+		// Constructor
+		Surface2D( ShapeCat const shapeCat, int const axis, Vertices const & v, Vector2D const & vl, Vector2D const & vu );
+
+	public: // Predicates
+
+		// Bounding box contains a point?
+		bool
+		bb_contains( Vector2D const & v ) const
+		{
+			return ( vl.x <= v.x ) && ( v.x <= vu.x ) && ( vl.y <= v.y ) && ( v.y <= vu.y );
+		}
+
+	public: // Comparison
+
+		// Equality
+		friend
+		bool
+		operator ==( Surface2D const & a, Surface2D const & b )
+		{
+			return eq( a.vertices, b.vertices );
+		}
+
+		// Inequality
+		friend
+		bool
+		operator !=( Surface2D const & a, Surface2D const & b )
+		{
+			 return !( a == b );
+		}
+
+	public: // Data
+
+		int axis = 0; // Axis of projection (0=x, 1=y, 2=z)
+		Vertices vertices; // Vertices
+		Vector2D vl = Vector2D( 0.0 ), vu = Vector2D( 0.0 ); // Bounding box lower and upper corner vertices
+		Vectors edges; // Edge vectors around the vertices
+		Real64 s1 = 0.0, s3 = 0.0; // Rectangle side widths squared
+		SlabYs slabYs; // Y coordinates of slabs
+		Slabs slabs; // Y slice slabs for fast nonconvex and many vertex intersections
+
+	}; // Surface2D
+
 	struct SurfaceData
 	{
+
+		// Types
+		using Vertices = Array1D< Vector >;
+		using Plane = Vector4< Real64 >;
+
 		// Members
 		std::string Name; // User supplied name of the surface (must be unique)
 		int Construction; // Pointer to the construction in the Construct derived type
@@ -475,7 +591,7 @@ namespace DataSurfaces {
 		int ConstructionStoredInputValue; // holds the original value for Construction per surface input
 		int Class;
 		// Geometry related parameters
-		int Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
+		SurfaceShape Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
 		//                Rectangular Window/Door=4,Rectangular Overhang=5,
 		//                Rectangular Left Fin=6,Rectangular Right Fin=7,
 		//                Triangular Window=8)
@@ -559,8 +675,10 @@ namespace DataSurfaces {
 		int MaterialMovInsulInt; // Pointer to the material used for interior movable insulation
 		int SchedMovInsulExt; // Schedule for exterior movable insulation
 		int SchedMovInsulInt; // Schedule for interior movable insulation
+		bool MovInsulIntPresent; // True when movable insulation is present
+		bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
 		// Vertices
-		Array1D< Vector > Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
+		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
 		Vector lcsy;
@@ -574,6 +692,10 @@ namespace DataSurfaces {
 		Real64 CosTilt; // Cosine of surface tilt angle
 		bool IsConvex; // true if the surface is convex.
 		bool IsDegenerate; // true if the surface is degenerate.
+		// Precomputed parameters for PierceSurface performance
+		ShapeCat shapeCat; // Shape category
+		Plane plane; // Plane
+		Surface2D surface2d; // 2D projected surface for efficient intersection testing
 		// Window Parameters (when surface is Window)
 		int WindowShadingControlPtr; // Pointer to shading control (windows only)
 		int ShadedConstruction; // Shaded construction (windows only)
@@ -642,7 +764,7 @@ namespace DataSurfaces {
 			EMSConstructionOverrideValue( 0 ),
 			ConstructionStoredInputValue( 0 ),
 			Class( 0 ),
-			Shape( 0 ),
+			Shape( SurfaceShape::None ),
 			Sides( 0 ),
 			Area( 0.0 ),
 			GrossArea( 0.0 ),
@@ -691,6 +813,8 @@ namespace DataSurfaces {
 			MaterialMovInsulInt( 0 ),
 			SchedMovInsulExt( 0 ),
 			SchedMovInsulInt( 0 ),
+			MovInsulIntPresent( false ),
+			MovInsulIntPresentPrevTS( false ),
 			Centroid( 0.0, 0.0, 0.0 ),
 			lcsx( 0.0, 0.0, 0.0 ),
 			lcsy( 0.0, 0.0, 0.0 ),
@@ -704,6 +828,8 @@ namespace DataSurfaces {
 			CosTilt( 0.0 ),
 			IsConvex( true ),
 			IsDegenerate( false ),
+			shapeCat( ShapeCat::Unknown ),
+			plane( 0.0, 0.0, 0.0, 0.0 ),
 			WindowShadingControlPtr( 0 ),
 			ShadedConstruction( 0 ),
 			StormWinConstruction( 0 ),
@@ -753,11 +879,31 @@ namespace DataSurfaces {
 			GenericContam( 0.0 )
 		{}
 
+	public: // Methods
+
+		// Set Precomputed Parameters
+		void
+		set_computed_geometry();
+
 		void
 		SetOutBulbTempAt();
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+	private: // Methods
+
+		// Computed Shape Category
+		ShapeCat
+		computed_shapeCat() const;
+
+		// Computed Plane
+		Plane
+		computed_plane() const;
+
+		// Computed axis-projected 2D surface
+		Surface2D
+		computed_surface2d() const;
 
 	};
 
@@ -899,7 +1045,6 @@ namespace DataSurfaces {
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
 		Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
 		Real64 RetHeatGainToZoneAir; // Convective heat gain to return air sent to zone [W]
-		Real64 DividerConduction; // Conduction through divider from outside to inside face (W)
 		Real64 OtherConvHeatGain; // other convective = total conv - standard model prediction for EQL window model (W)
 		int BlindNumber; // Blind number for a window with a blind
 		Array1D< Real64 > EffShBlindEmiss; // Effective emissivity of interior blind or shade
@@ -1096,7 +1241,6 @@ namespace DataSurfaces {
 			ConvHeatFlowNatural( 0.0 ),
 			ConvHeatGainToZoneAir( 0.0 ),
 			RetHeatGainToZoneAir( 0.0 ),
-			DividerConduction( 0.0 ),
 			OtherConvHeatGain( 0.0 ),
 			BlindNumber( 0 ),
 			EffShBlindEmiss( MaxSlatAngs, 0.0 ),
@@ -1201,7 +1345,7 @@ namespace DataSurfaces {
 			ConvHeatFlowNatural = 0.0;
 			ConvHeatGainToZoneAir = 0.0;
 			RetHeatGainToZoneAir = 0.0;
-			DividerConduction = 0.0;
+			DividerHeatGain = 0.0;
 			BlTsolBmBm = 0.0;
 			BlTsolBmDif = 0.0;
 			BlTsolDifDif = 0.0;
@@ -1691,6 +1835,9 @@ namespace DataSurfaces {
 
 	void
 	SetSurfaceOutBulbTempAt();
+
+	void
+	CheckSurfaceOutBulbTempAt();
 
 	void
 	SetSurfaceWindSpeedAt();

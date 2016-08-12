@@ -425,7 +425,8 @@ namespace DXCoils {
 		int & CompIndex,
 		Optional_int_const SpeedNum, // Speed number for multispeed cooling coil onlyn
 		Optional_int_const FanOpMode, // Fan operation mode
-		Optional_int_const CompOp // Compressor on/off; 1=on, 0=off
+		Optional_int_const CompOp, // Compressor on/off; 1=on, 0=off
+		Optional_int_const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 	)
 	{
 
@@ -465,6 +466,7 @@ namespace DXCoils {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilNum; // index of fan coil unit being simulated
+		int SingleModeOper; // SingleMode Operation
 
 		// FLOW
 
@@ -495,6 +497,12 @@ namespace DXCoils {
 			}
 		}
 
+		if ( present( SingleMode ) ) {
+			SingleModeOper = SingleMode;
+		} else {
+			SingleModeOper = 0;
+		}
+
 		CurDXCoilNum = DXCoilNum;
 
 		// Initialize the DX coil unit
@@ -508,10 +516,10 @@ namespace DXCoils {
 			CalcMultiSpeedDXCoil( DXCoilNum, SpeedRatio, CycRatio );
 
 		} else if ( SELECT_CASE_var == CoilDX_MultiSpeedCooling ) {
-			if ( present( SpeedNum ) ) CalcMultiSpeedDXCoilCooling( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp ); //Autodesk:OPTIONAL FanOpMode, CompOp used without PRESENT check
+			if ( present( SpeedNum ) ) CalcMultiSpeedDXCoilCooling( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleModeOper ); //Autodesk:OPTIONAL FanOpMode, CompOp used without PRESENT check
 
 		} else if ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) {
-			if ( present( SpeedNum ) ) CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode ); //Autodesk:OPTIONAL FanOpMode used without PRESENT check
+			if ( present( SpeedNum ) ) CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, SingleModeOper ); //Autodesk:OPTIONAL FanOpMode used without PRESENT check
 
 		} else {
 			ShowSevereError( "Error detected in DX Coil=" + CompName );
@@ -2201,12 +2209,12 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 10 ) ); // convert curve name to number
-			if ( SameString( Alphas( 11 ), "ReverseCycle" ) && SameString( Alphas( 12 ), "OnDemand" ) ) {
+			if ( SameString( Alphas( 11 ), "ReverseCycle" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 10 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
 						ShowContinueError( "...required " + cAlphaFields( 10 ) + " is blank." );
-						ShowContinueError( "...field is required because " + cAlphaFields( 11 ) + " is \"ReverseCycle\" and " + cAlphaFields( 12 ) + " is \"OnDemand\"." );
+						ShowContinueError( "...field is required because " + cAlphaFields( 11 ) + " is \"ReverseCycle\"." );
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...not found " + cAlphaFields( 10 ) + "=\"" + Alphas( 10 ) + "\"." );
@@ -4980,6 +4988,7 @@ namespace DXCoils {
 			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
 			DXCoil( DXCoilNum ).RatedSHR( 1 ) = Numbers( 2 );
 			DXCoil( DXCoilNum ).SH = Numbers( 3 );
+			// @@ DXCoil( DXCoilNum ).RateBFVRFIUEvap = 0.0592; there will be a new field for this, which will be handled in a separate issue to update VRF-HP idd. It is not hanlded here to avoide tranistion issues for VRF-HP.
 
 			int indexSHCurve = GetCurveIndex( Alphas( 5 ) ); // convert curve name to index number
 			// Verify curve name and type
@@ -5068,6 +5077,7 @@ namespace DXCoils {
 
 			DXCoil( DXCoilNum ).RatedTotCap( 1 ) = Numbers( 1 );
 			DXCoil( DXCoilNum ).SC = Numbers( 2 );
+			//@@ DXCoil( DXCoilNum ).RateBFVRFIUCond = 0.136;
 
 			int indexSCCurve = GetCurveIndex( Alphas( 5 ) ); // convert curve name to index number
 			// Verify curve name and type
@@ -5396,7 +5406,8 @@ namespace DXCoils {
 		Numbers2.deallocate();
 		lAlphaBlanks2.deallocate();
 		lNumericBlanks2.deallocate();
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyEMSRan;
+		ManageEMS( emsCallFromComponentGetInput, anyEMSRan );
 
 	}
 
@@ -5537,29 +5548,18 @@ namespace DXCoils {
 		if ( CrankcaseHeaterReportVarFlag ) {
 			if ( AirLoopInputsFilled ) {
 				//     Set report variables for DX cooling coils that will have a crankcase heater (all DX coils not used in a HP AC unit)
-				for ( DXCoilNumTemp = 1; DXCoilNumTemp <= NumDoe2DXCoils + NumDXMulModeCoils; ++DXCoilNumTemp ) {
-					if ( DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower ) {
-						SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNumTemp ).Name );
-						SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNumTemp ).Name, _, "Electric", "COOLING", _, "Plant" );
-						DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower = false;
+				for ( DXCoilNumTemp = 1; DXCoilNumTemp <= NumDXCoils; ++DXCoilNumTemp ) {
+					if ( ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) || ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_CoolingSingleSpeed ) || ( DXCoil( DXCoilNumTemp ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) ) {
+						if ( DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower ) {
+							SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterPower, "System", "Average", DXCoil( DXCoilNumTemp ).Name );
+							SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", DXCoil( DXCoilNumTemp ).CrankcaseHeaterConsumption, "System", "Sum", DXCoil( DXCoilNumTemp ).Name, _, "Electric", "COOLING", _, "Plant" );
+							DXCoil( DXCoilNumTemp ).ReportCoolingCoilCrankcasePower = false;
+						}
 					}
 				}
 				CrankcaseHeaterReportVarFlag = false;
 			} //(AirLoopInputsFilled)THEN
 		} //(CrankcaseHeaterReportVarFlag)THEN
-
-		// Find the companion upstream coil (DX cooling coil) that is used with DX heating coils (Multispeed HP units only)
-		if ( DXCoil( DXCoilNum ).FindCompanionUpStreamCoil ) {
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
-				DXCoil( DXCoilNum ).CompanionUpstreamDXCoil = GetHPCoolingCoilIndex( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoilNum );
-				if ( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil > 0 ) {
-					DXCoil( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil ).ReportCoolingCoilCrankcasePower = false;
-					DXCoil( DXCoilNum ).FindCompanionUpStreamCoil = false;
-				}
-			} else {
-				DXCoil( DXCoilNum ).FindCompanionUpStreamCoil = false;
-			}
-		} //IF(DXCoil(DXCoilNum)%FindCompanionUpStreamCoil)THEN
 
 		if ( ! SysSizingCalc && MySizeFlag( DXCoilNum ) ) {
 			// for each coil, do the sizing once.
@@ -5581,12 +5581,16 @@ namespace DXCoils {
 				if ( ErrorsFound ) {
 					ShowFatalError( "Preceding condition causes termination." );
 				}
+				
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
-				RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
-				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
-					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total cooling capacity is out of range." );
-					ShowContinueError( "Min Rated Vol Flow Per Watt=[" + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "], Rated Vol Flow Per Watt=[" + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) + "], Max Rated Vol Flow Per Watt=[" + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "]. See Input Output Reference Manual for valid range." );
+				if( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Cooling ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
+					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
+						ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total cooling capacity is out of range." );
+						ShowContinueError( "Min Rated Vol Flow Per Watt=[" + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "], Rated Vol Flow Per Watt=[" + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) + "], Max Rated Vol Flow Per Watt=[" + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "]. See Input Output Reference Manual for valid range." );
+					}
 				}
+
 				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 				// get high speed rated coil bypass factor
 				DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
@@ -5643,11 +5647,14 @@ namespace DXCoils {
 				RatedHeatPumpIndoorAirTemp = 21.11; // 21.11C or 70F
 				RatedHeatPumpIndoorHumRat = 0.00881; // Humidity ratio corresponding to 70F dry bulb/60F wet bulb
 				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName );
+				
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
-				RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
-				if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
-					ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ": Rated air volume flow rate per watt of rated total heating capacity is out of range." );
-					ShowContinueError( "Min Rated Vol Flow Per Watt=[" + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "], Rated Vol Flow Per Watt=[" + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) + "], Max Rated Vol Flow Per Watt=[" + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "]. See Input-Output Reference Manual for valid range." );
+				if( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
+					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
+					if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxRatedVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
+						ShowSevereError( "Sizing: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ": Rated air volume flow rate per watt of rated total heating capacity is out of range." );
+						ShowContinueError( "Min Rated Vol Flow Per Watt=[" + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "], Rated Vol Flow Per Watt=[" + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) + "], Max Rated Vol Flow Per Watt=[" + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "]. See Input-Output Reference Manual for valid range." );
+					}
 				}
 
 			}
@@ -6113,6 +6120,7 @@ namespace DXCoils {
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					PrintFlag = false;
+					Node( DXCoil( DXCoilNum ).WaterInNode ).Temp = DXCoil( DXCoilNum ).RatedInletWaterTemp; // set the rated water inlet node for HPWHs for use in CalcHPWHDXCoil
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
@@ -10481,7 +10489,8 @@ Label50: ;
 		Real64 const CycRatio, // cycling part load ratio
 		int const SpeedNum, // Speed number
 		int const FanOpMode, // Sets fan control to CycFanCycCoil or ContFanCycCoil
-		int const CompOp // Compressor on/off; 1=on, 0=off
+		int const CompOp, // Compressor on/off; 1=on, 0=off
+		int const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 	)
 	{
 
@@ -10652,12 +10661,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
-		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( MSHPMassFlowRateHigh == 0.0 ) ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
-			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
-			ShowContinueErrorTimeStamp( "" );
-			ShowContinueError( "AirMassFlow = " + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio = " + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow = " + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh = " + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-			ShowFatalError( "Preceding condition(s) causes termination." );
+			if ( MSHPMassFlowRateLow == 0.0 && SpeedNum > 1 ) {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ",SpeedNum=" + RoundSigDigits( double( SpeedNum ), 0 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			} else {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			}
 		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
 			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
@@ -10689,10 +10705,10 @@ Label50: ;
 			CrankcaseHeatingPower = 0.0;
 		}
 
-		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( SpeedRatio > 0.0 || CycRatio > 0.0 ) && ( CompOp == On ) ) {
+		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( ( SpeedRatio > 0.0 && SingleMode == 0 ) || CycRatio > 0.0 ) && ( CompOp == On ) ) {
 
 			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, RoutineName );
-			if ( SpeedNum > 1 ) {
+			if ( SpeedNum > 1 && SingleMode == 0 ) {
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 500 cfm/ton) at low speed
 				AirVolumeFlowRate = MSHPMassFlowRateLow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, RoutineName );
@@ -10871,9 +10887,13 @@ Label50: ;
 					OutletAirHumRat = HSOutletAirHumRat;
 					OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
 				} else {
-					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
-					// Average outlet HR
-					OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
+					if ( FanOpMode == ContFanCycCoil ) {
+						Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
+						// Average outlet HR
+						OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
+					} else {
+						OutletAirHumRat = ( HSOutletAirHumRat * SpeedRatio ) + ( LSOutletAirHumRat * ( 1.0 - SpeedRatio ) );
+					}
 					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 					if ( OutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
@@ -10928,16 +10948,16 @@ Label50: ;
 			} else if ( CycRatio > 0.0 ) {
 
 				if ( FanOpMode == CycFanCycCoil ) AirMassFlow /= CycRatio;
-				if ( FanOpMode == ContFanCycCoil ) AirMassFlow = MSHPMassFlowRateLow;
+				if ( FanOpMode == ContFanCycCoil ) AirMassFlow = MSHPMassFlowRateHigh;
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 500 cfm/ton) at low speed
-				AirVolumeFlowRate = MSHPMassFlowRateLow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, RoutineName );
+				AirVolumeFlowRate = MSHPMassFlowRateHigh / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, RoutineName );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
-				VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS );
+				VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNum );
 				if ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap( DXCT ) ) ) {
-					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ) == 0 ) {
-						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + '.' );
+					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNum ) == 0 ) {
+						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNum ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
 						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
@@ -10946,24 +10966,24 @@ Label50: ;
 					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
-				if ( DXCoil( DXCoilNum ).CondenserType( SpeedNumLS ) == EvapCooled ) {
+				if ( DXCoil( DXCoilNum ).CondenserType( SpeedNum ) == EvapCooled ) {
 					// Outdoor wet-bulb temp from DataEnvironment + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
-					CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - DXCoil( DXCoilNum ).MSEvapCondEffect( SpeedNumLS ) );
+					CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - DXCoil( DXCoilNum ).MSEvapCondEffect( SpeedNum ) );
 					CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, RoutineName );
 				}
 
-				RatedCBFLS = DXCoil( DXCoilNum ).MSRatedCBF( SpeedNumLS );
-				CBFLS = AdjustCBF( RatedCBFLS, DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS ), MSHPMassFlowRateLow );
+				RatedCBFLS = DXCoil( DXCoilNum ).MSRatedCBF( SpeedNum );
+				CBFLS = AdjustCBF( RatedCBFLS, DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNum ), MSHPMassFlowRateHigh );
 
 				// Adjust low speed coil bypass factor for actual flow rate.
 				// CBF = AdjustCBF(DXCoil(DXCoilNum)%RatedCBF2,DXCoil(DXCoilNum)%RatedAirMassFlowRate2,AirMassFlow)
 				// get low speed total capacity and SHR at current conditions
-				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioLS, MSHPMassFlowRateLow, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ), CBFLS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumLS ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumLS ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure );
+				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioLS, MSHPMassFlowRateHigh, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNum ), CBFLS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNum ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNum ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  Node(DXCoil(DXCoilNum)%AirInNode)%Press)
 				hDelta = TotCapLS / AirMassFlow;
 				// Adjust CBF for off-nominal flow
-				CBF = AdjustCBF( DXCoil( DXCoilNum ).MSRatedCBF( SpeedNumLS ), DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS ), AirMassFlow );
+				CBF = AdjustCBF( DXCoil( DXCoilNum ).MSRatedCBF( SpeedNum ), DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNum ), AirMassFlow );
 				// Calculate new apparatus dew point conditions
 				hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBF );
 				tADP = PsyTsatFnHPb( hADP, OutdoorPressure, RoutineName );
@@ -10980,7 +11000,7 @@ Label50: ;
 				//cr8918    SHR = MIN((hTinwADP-hADP)/(InletAirEnthalpy-hADP),1.0d0)
 
 				// get the part load factor that will account for cycling losses
-				PLF = CurveValue( DXCoil( DXCoilNum ).MSPLFFPLR( SpeedNumLS ), CycRatio );
+				PLF = CurveValue( DXCoil( DXCoilNum ).MSPLFFPLR( SpeedNum ), CycRatio );
 				if ( FanOpMode == CycFanCycCoil && CycRatio == 1.0 && PLF != 1.0 ) {
 					if ( DXCoil( DXCoilNum ).PLFErrIndex == 0 ) {
 						ShowWarningMessage( "The PLF curve value for DX cooling coil " + DXCoil( DXCoilNum ).Name + " =" + RoundSigDigits( PLF, 2 ) + " for part-load ratio = 1" );
@@ -11020,10 +11040,10 @@ Label50: ;
 				//  If constant fan with cycling compressor, call function to determine "effective SHR"
 				//  which includes the part-load degradation on latent capacity
 				if ( FanOpMode == ContFanCycCoil ) {
-					QLatRated = DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ) * ( 1.0 - DXCoil( DXCoilNum ).MSRatedSHR( SpeedNumLS ) );
+					QLatRated = DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNum ) * ( 1.0 - DXCoil( DXCoilNum ).MSRatedSHR( SpeedNum ) );
 					QLatActual = TotCapLS * ( 1.0 - SHR );
 					SHRUnadjusted = SHR;
-					SHR = CalcEffectiveSHR( DXCoilNum, SHR, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, QLatRated, QLatActual, InletAirDryBulbTemp, InletAirWetBulbC, SpeedNumLS );
+					SHR = CalcEffectiveSHR( DXCoilNum, SHR, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, QLatRated, QLatActual, InletAirDryBulbTemp, InletAirWetBulbC, SpeedNum );
 					// Calculate full load output conditions
 					if ( SHR > 1.0 ) SHR = 1.0;
 					hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
@@ -11041,9 +11061,9 @@ Label50: ;
 				OutletAirHumRat = LSOutletAirHumRat;
 				OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
 				// get low speed EIR at current conditions
-				EIRTempModFacLS = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( SpeedNumLS ), InletAirWetBulbC, CondInletTemp );
-				EIRFlowModFacLS = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( SpeedNumLS ), AirMassFlowRatioLS );
-				EIRLS = 1.0 / DXCoil( DXCoilNum ).MSRatedCOP( SpeedNumLS ) * EIRTempModFacLS * EIRFlowModFacLS;
+				EIRTempModFacLS = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( SpeedNum ), InletAirWetBulbC, CondInletTemp );
+				EIRFlowModFacLS = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( SpeedNum ), AirMassFlowRatioLS );
+				EIRLS = 1.0 / DXCoil( DXCoilNum ).MSRatedCOP( SpeedNum ) * EIRTempModFacLS * EIRFlowModFacLS;
 
 				// get the eletrical power consumption
 				DXCoil( DXCoilNum ).ElecCoolingPower = TotCapLS * EIRLS * DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction;
@@ -11086,15 +11106,15 @@ Label50: ;
 				DXCoil( DXCoilNum ).OutletAirEnthalpy = OutletAirEnthalpy;
 				DXCoil( DXCoilNum ).OutletAirHumRat = OutletAirHumRat;
 				DXCoil( DXCoilNum ).OutletAirTemp = OutletAirDryBulbTemp;
-				CondAirMassFlow = RhoAir * DXCoil( DXCoilNum ).MSEvapCondAirFlow( SpeedNumLS ) * DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction;
-				EvapCondPumpElecPower = DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( SpeedNumLS ) * DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction;
+				CondAirMassFlow = RhoAir * DXCoil( DXCoilNum ).MSEvapCondAirFlow( SpeedNum ) * DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction;
+				EvapCondPumpElecPower = DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( SpeedNum ) * DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction;
 
 				// Waste heat
 				if ( DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
-					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ) == 0 ) {
-						MSHPWasteHeat = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNum ) == 0 ) {
+						MSHPWasteHeat = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNum ) * DXCoil( DXCoilNum ).ElecCoolingPower;
 					} else {
-						MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecCoolingPower;
+						MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNum ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNum ) * DXCoil( DXCoilNum ).ElecCoolingPower;
 					}
 				}
 				// Energy use for other fuel types
@@ -11176,7 +11196,8 @@ Label50: ;
 		Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
 		Real64 const CycRatio, // cycling part load ratio
 		int const SpeedNum, // Speed number
-		int const FanOpMode // Fan operation mode
+		int const FanOpMode, // Fan operation mode
+		int const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 	)
 	{
 
@@ -11299,12 +11320,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
-		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( MSHPMassFlowRateHigh == 0.0 ) ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
-			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
-			ShowContinueErrorTimeStamp( "" );
-			ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-			ShowFatalError( "Preceding condition(s) causes termination." );
+			if ( MSHPMassFlowRateLow == 0.0 && SpeedNum > 1 ) {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ",SpeedNum=" + RoundSigDigits( double( SpeedNum ), 0 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			} else {
+				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0" );
+				ShowContinueErrorTimeStamp( "" );
+				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+				ShowFatalError( "Preceding condition(s) causes termination." );
+			}
 		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
 			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
@@ -11363,9 +11391,9 @@ Label50: ;
 		DXCoil( DXCoilNum ).PartLoadRatio = 0.0;
 		HeatReclaimDXCoil( DXCoilNum ).AvailCapacity = 0.0;
 
-		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( ( CycRatio > 0.0 ) || ( SpeedRatio > 0.0 ) ) && OutdoorDryBulb > DXCoil( DXCoilNum ).MinOATCompressor ) {
+		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( ( CycRatio > 0.0 ) || ( SpeedRatio > 0.0 && SingleMode == 0 ) ) && OutdoorDryBulb > DXCoil( DXCoilNum ).MinOATCompressor ) {
 
-			if ( SpeedNum > 1 ) {
+			if ( SpeedNum > 1 && SingleMode == 0 ) {
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton) at low speed
 				AirVolumeFlowRate = MSHPMassFlowRateLow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, RoutineName );
@@ -11588,16 +11616,16 @@ Label50: ;
 				DXCoil( DXCoilNum ).CrankcaseHeaterPower = 0.0;
 
 				// Stage 1
-			} else if ( CycRatio > 0.0 ) {
+			}  else if ( CycRatio > 0.0 || ( CycRatio > 0.0 && SingleMode == 1 ) ) {
 
 				// for cycling fan, reset mass flow to full on rate
 				if ( FanOpMode == CycFanCycCoil ) AirMassFlow /= CycRatio;
-				if ( FanOpMode == ContFanCycCoil ) AirMassFlow = MSHPMassFlowRateLow;
+				if ( FanOpMode == ContFanCycCoil ) AirMassFlow = MSHPMassFlowRateHigh;
 				// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton)
 				AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat, RoutineName );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  AirVolumeFlowRate = AirMassFlow/PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
-				VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS );
+				VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNum );
 
 				if ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap( DXCT ) ) ) {
 					if ( DXCoil( DXCoilNum ).ErrIndex1 == 0 ) {
@@ -11614,18 +11642,18 @@ Label50: ;
 				// Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
 				// to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
 				// advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-				if ( ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNumLS ) == Quadratic ) || ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNumLS ) == Cubic ) ) {
-					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumLS ), OutdoorDryBulb );
-				} else if ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNumLS ) == BiQuadratic ) {
-					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumLS ), InletAirDryBulbTemp, OutdoorDryBulb );
+				if ( ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNum ) == Quadratic ) || ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNum ) == Cubic ) ) {
+					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNum ), OutdoorDryBulb );
+				} else if ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNum ) == BiQuadratic ) {
+					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNum ), InletAirDryBulbTemp, OutdoorDryBulb );
 				}
 
 				//  Get total capacity modifying factor (function of mass flow) for off-rated conditions
 				//    AirMassFlowRatio = AirMassFlow/DXCoil(DXCoilNum)%MSRatedAirMassFlowRate(SpeedNumLS)
 				//    TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum)%MSCCapFFlow(SpeedNumLS),AirMassFlowRatio)
-				TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumLS ), AirMassFlowRatioLS );
+				TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNum ), AirMassFlowRatioLS );
 				// Calculate total heating capacity for off-rated conditions
-				TotCap = DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ) * TotCapFlowModFac * TotCapTempModFac;
+				TotCap = DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNum ) * TotCapFlowModFac * TotCapTempModFac;
 
 				// Calculating adjustment factors for defrost
 				// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
@@ -11755,10 +11783,10 @@ Label50: ;
 					OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 				}
 				if ( DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
-					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ) == 0 ) {
-						MSHPWasteHeat = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNum ) == 0 ) {
+						MSHPWasteHeat = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNum ) * DXCoil( DXCoilNum ).ElecHeatingPower;
 					} else {
-						MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS ) * DXCoil( DXCoilNum ).ElecHeatingPower;
+						MSHPWasteHeat = CurveValue( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNum ), OutdoorDryBulb, InletAirDryBulbTemp ) * DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNum ) * DXCoil( DXCoilNum ).ElecHeatingPower;
 					}
 				}
 				if ( DXCoil( DXCoilNum ).FuelType != FuelTypeElectricity ) {
@@ -14668,31 +14696,33 @@ Label50: ;
 		// calculate end time of current time step to determine if error messages should be printed
 		CurrentEndTime = CurrentTime + SysTimeElapsed;
 
+		// The following checks are not necessary for VRF-FluidTCtrl model. (1) OAT check is already performed in the VRF OU routines (2) VRF-FluidTCtrl
+		// model is physics based, not system curve based, and thus doesn't require special performance curves for operations at low inlet temperatures (zrp_Jul2016)
 		//   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
 		//   Wait for next time step to print warnings. If simulation iterates, print out
 		//   the warning for the last iteration only. Must wait for next time step to accomplish this.
 		//   If a warning occurs and the simulation down shifts, the warning is not valid.
-		if ( DXCoil( DXCoilNum ).PrintLowAmbMessage ) { // .AND. &
-			if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
-				if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).LowAmbBuffer1 );
-					ShowContinueError( DXCoil( DXCoilNum ).LowAmbBuffer2 );
-					ShowContinueError( "... Operation at low inlet temperatures may require special performance curves." );
-				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet temperature error continues...", DXCoil( DXCoilNum ).LowAmbErrIndex, DXCoil( DXCoilNum ).LowTempLast, DXCoil( DXCoilNum ).LowTempLast, _, "[C]", "[C]" );
-			}
-		}
-
-		if ( DXCoil( DXCoilNum ).PrintHighAmbMessage ) { // .AND. &
-			if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
-				if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).HighAmbBuffer1 );
-					ShowContinueError( DXCoil( DXCoilNum ).HighAmbBuffer2 );
-					ShowContinueError( "... Operation at high inlet temperatures may require special performance curves." );
-				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - High condenser inlet temperature error continues...", DXCoil( DXCoilNum ).HighAmbErrIndex, DXCoil( DXCoilNum ).HighTempLast, DXCoil( DXCoilNum ).HighTempLast, _, "[C]", "[C]" );
-			}
-		}
+		// if ( DXCoil( DXCoilNum ).PrintLowAmbMessage ) { // .AND. &
+		// 	if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
+		// 		if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
+		// 			ShowWarningMessage( DXCoil( DXCoilNum ).LowAmbBuffer1 );
+		// 			ShowContinueError( DXCoil( DXCoilNum ).LowAmbBuffer2 );
+		// 			ShowContinueError( "... Operation at low inlet temperatures may require special performance curves." );
+		// 		}
+		// 		ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet temperature error continues...", DXCoil( DXCoilNum ).LowAmbErrIndex, DXCoil( DXCoilNum ).LowTempLast, DXCoil( DXCoilNum ).LowTempLast, _, "[C]", "[C]" );
+		// 	}
+		// }
+        // 
+		// if ( DXCoil( DXCoilNum ).PrintHighAmbMessage ) { // .AND. &
+		// 	if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
+		// 		if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
+		// 			ShowWarningMessage( DXCoil( DXCoilNum ).HighAmbBuffer1 );
+		// 			ShowContinueError( DXCoil( DXCoilNum ).HighAmbBuffer2 );
+		// 			ShowContinueError( "... Operation at high inlet temperatures may require special performance curves." );
+		// 		}
+		// 		ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - High condenser inlet temperature error continues...", DXCoil( DXCoilNum ).HighAmbErrIndex, DXCoil( DXCoilNum ).HighTempLast, DXCoil( DXCoilNum ).HighTempLast, _, "[C]", "[C]" );
+		// 	}
+		// }
 
 		if ( DXCoil( DXCoilNum ).PrintLowOutTempMessage ) {
 			if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
@@ -14751,25 +14781,27 @@ Label50: ;
 				CBF = 0.0;
 			}
 
-			// check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-			if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! WarmupFlag ) {
-				DXCoil( DXCoilNum ).PrintLowAmbMessage = true;
-				DXCoil( DXCoilNum ).LowTempLast = OutdoorDryBulb;
-				if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
-					DXCoil( DXCoilNum ).LowAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser inlet temperature below " + RoundSigDigits( DXCoil( DXCoilNum ).MinOATCompressor, 2 ) + " C. Condenser inlet temperature = " + RoundSigDigits( OutdoorDryBulb, 2 );
-					DXCoil( DXCoilNum ).LowAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString();
-				}
-			}
-
-			// check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-			if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! WarmupFlag ) {
-				DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
-				DXCoil( DXCoilNum ).HighTempLast = OutdoorDryBulb;
-				if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
-					DXCoil( DXCoilNum ).HighAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser inlet temperature above " + RoundSigDigits( DXCoil( DXCoilNum ).MaxOATCompressor, 2 ) + " C. Condenser temperature = " + RoundSigDigits( OutdoorDryBulb, 2 );
-					DXCoil( DXCoilNum ).HighAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString();
-				}
-			}
+			// The following checks are not necessary for VRF-FluidTCtrl model. (1) OAT check is already performed in the VRF OU routines (2) VRF-FluidTCtrl
+			// model is physics based, not system curve based, and thus doesn't require special performance curves for operations at low inlet temperatures (zrp_Jul2016)
+			// // check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
+			// if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! WarmupFlag ) {
+			// 	DXCoil( DXCoilNum ).PrintLowAmbMessage = true;
+			// 	DXCoil( DXCoilNum ).LowTempLast = OutdoorDryBulb;
+			// 	if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
+			// 		DXCoil( DXCoilNum ).LowAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser inlet temperature below " + RoundSigDigits( DXCoil( DXCoilNum ).MinOATCompressor, 2 ) + " C. Condenser inlet temperature = " + RoundSigDigits( OutdoorDryBulb, 2 );
+			// 		DXCoil( DXCoilNum ).LowAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString();
+			// 	}
+			// }
+            // 
+			// // check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
+			// if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! WarmupFlag ) {
+			// 	DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
+			// 	DXCoil( DXCoilNum ).HighTempLast = OutdoorDryBulb;
+			// 	if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
+			// 		DXCoil( DXCoilNum ).HighAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser inlet temperature above " + RoundSigDigits( DXCoil( DXCoilNum ).MaxOATCompressor, 2 ) + " C. Condenser temperature = " + RoundSigDigits( OutdoorDryBulb, 2 );
+			// 		DXCoil( DXCoilNum ).HighAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString();
+			// 	}
+			// }
 
 			//  Get total capacity modifying factor (function of temperature) for off-rated conditions
 			//  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
@@ -15314,9 +15346,9 @@ Label50: ;
 			C1Tevap = DXCoil( CoilIndex ).C1Te;
 			C2Tevap = DXCoil( CoilIndex ).C2Te;
 			C3Tevap = DXCoil( CoilIndex ).C3Te;
-			BF = 0.0592;
-
-			// Coil sensible heat transfer minimum value
+			BF = DXCoil( CoilIndex ).RateBFVRFIUEvap;
+			
+			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = Tin - QinSenPerFlowRate / 1005;
 			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
@@ -15415,10 +15447,9 @@ Label50: ;
 			C1Tcond = DXCoil( CoilIndex ).C1Tc;
 			C2Tcond = DXCoil( CoilIndex ).C2Tc;
 			C3Tcond = DXCoil( CoilIndex ).C3Tc;
-
-			BF = 0.136;
-
-			// Coil sensible heat transfer minimum value
+			BF = DXCoil( CoilIndex ).RateBFVRFIUCond;
+			
+			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = QinSenPerFlowRate / 1005 + Tin;
 			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
@@ -15611,14 +15642,14 @@ Label50: ;
 		bool ErrorsFound( false );       // Flag for errors
 		int const FlagCoolMode( 0 );     // Flag for cooling mode
 		int const FlagHeatMode( 1 );     // Flag for heating mode
-		Real64 const BFC_rate( 0.0592 ); // Bypass factor at cooling mode (-)
-		Real64 const BFH_rate( 0.1360 ); // Bypass factor at heating mode (-)
 		Real64 const SH_rate( 3 );       // Super heating at cooling mode, default 3(C)
 		Real64 const SC_rate( 5 );       // Subcooling at heating mode, default 5 (C)
 		Real64 const Te_rate( 6 );       // Evaporating temperature at cooling mode, default 6 (C)
 		Real64 const Tc_rate( 44 );      // Condensing temperature at heating mode, default 44 (C)
 		int CoilNum;       // index to VRFTU cooling or heating coil
 		Real64 BF_real;    // Bypass factor (-)
+		Real64 BFC_rate;   // Bypass factor at cooling mode (-)
+		Real64 BFH_rate;   // Bypass factor at heating mode (-)
 		Real64 SHSC_real;  // Super heating or Subcooling (C)
 		Real64 TeTc_real;  // Evaporating temperature or condensing temperature (C)
 		Real64 Ts;         // Air temperature at coil surface (C)
@@ -15631,10 +15662,13 @@ Label50: ;
 			GetDXCoilIndex( CoilName, CoilNum, ErrorsFound );
 		}
 
-		if ( OperationMode == FlagCoolMode ) {
-			//Cooling: OperationMode 0
+		BFC_rate = DXCoil( CoilNum ).RateBFVRFIUEvap;
+		BFH_rate = DXCoil( CoilNum ).RateBFVRFIUCond;
 
-			if ( present( BF ) ) {
+		if( OperationMode == FlagCoolMode ) {
+		//Cooling: OperationMode 0
+			
+			if( present( BF ) ) {
 				BF_real = BF;
 			} else {
 				BF_real = BFC_rate;
@@ -15649,10 +15683,10 @@ Label50: ;
 			} else {
 				SHSC_real = SH_rate;
 			}
-
+			
 			// Coil capacity at rated conditions
-			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, 24, Te_rate, SH_rate, BFC_rate, Q_rate, Ts );
-
+			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, 26, Te_rate, SH_rate, BFC_rate, Q_rate, Ts );
+			
 			// Coil capacity at given conditions
 			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, Tinlet, TeTc_real, SHSC_real, BF_real, Q_real, Ts );
 

@@ -4,7 +4,7 @@
 !                          illustrates the use of a dedicated outdoor air system  (DOAS) with four pipe fan coils. The DOAS
 !                          air is ducted to the inlet side of the four pipe fan coil units and mixed with zone recirculated air
 !                          through the use of an inlet side mixer terminal units.
-! Highlights:              DOAS ducted to four pipe fan coils using AirTerminal:SingleDuct:InletSideMixer
+! Highlights:              DOAS ducted to four pipe fan coils using AirTerminal:SingleDuct:Mixer
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -98,7 +98,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.4;
+  Version,8.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2250,47 +2250,52 @@
     0,                       !- Minimum Hot Water Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:MIXER ===========
 
-  AirTerminal:SingleDuct:InletSideMixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE1-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-    SPACE1-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-    SPACE1-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type
+    SPACE1-1 Fan Coil,       !- ZoneHVAC Unit Object Name
+    SPACE1-1 Fan Coil Inlet, !- Mixer Outlet Node Name
+    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-  AirTerminal:SingleDuct:InletSideMixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-    SPACE2-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-    SPACE2-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-    SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE2-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type
+    SPACE2-1 Fan Coil,       !- ZoneHVAC Unit Object Name
+    SPACE2-1 Fan Coil Inlet, !- Mixer Outlet Node Name
+    SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE2-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-  AirTerminal:SingleDuct:InletSideMixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-    SPACE3-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-    SPACE3-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-    SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE3-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type
+    SPACE3-1 Fan Coil,       !- ZoneHVAC Unit Object Name
+    SPACE3-1 Fan Coil Inlet, !- Mixer Outlet Node Name
+    SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-  AirTerminal:SingleDuct:InletSideMixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-    SPACE4-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-    SPACE4-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE4-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type
+    SPACE4-1 Fan Coil,       !- ZoneHVAC Unit Object Name
+    SPACE4-1 Fan Coil Inlet, !- Mixer Outlet Node Name
+    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE4-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-  AirTerminal:SingleDuct:InletSideMixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Terminal Unit Object Type
-    SPACE5-1 Fan Coil,       !- ZoneHVAC Terminal Unit Name
-    SPACE5-1 Fan Coil Inlet, !- Terminal Unit Outlet Node Name
-    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE5-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:FourPipeFanCoil,!- ZoneHVAC Unit Object Type
+    SPACE5-1 Fan Coil,       !- ZoneHVAC Unit Object Name
+    SPACE5-1 Fan Coil Inlet, !- Mixer Outlet Node Name
+    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE5-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 ! SPACE1-1 Supply Inlet,   !- Air Distribution Unit Outlet Node Name
@@ -2298,31 +2303,31 @@
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 DOAS ATU,       !- Name
     SPACE1-1 Fan Coil Inlet, !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE2-1 DOAS ATU,       !- Name
     SPACE2-1 Fan Coil Inlet, !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE3-1 DOAS ATU,       !- Name
     SPACE3-1 Fan Coil Inlet, !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE3-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE4-1 DOAS ATU,       !- Name
     SPACE4-1 Fan Coil Inlet, !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE4-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE5-1 DOAS ATU,       !- Name
     SPACE5-1 Fan Coil Inlet, !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE5-1 DOAS Air Terminal;  !- Air Terminal Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========

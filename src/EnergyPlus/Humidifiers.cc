@@ -110,14 +110,9 @@ namespace Humidifiers {
 
 	// REFERENCES: ASHRAE HVAC 2 Toolkit, page 4-112
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
@@ -128,11 +123,8 @@ namespace Humidifiers {
 	using DataEnvironment::OutHumRat;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SetPointErrorFlag;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	int const Humidifier_Steam_Electric( 1 );
 	int const Humidifier_Steam_Gas( 2 );
@@ -141,8 +133,6 @@ namespace Humidifiers {
 
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
-
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumHumidifiers( 0 ); // number of humidifiers of all types
@@ -157,12 +147,8 @@ namespace Humidifiers {
 	int const FixedInletWaterTemperature( 1 );
 	int const VariableInletWaterTemperature( 2 );
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
 	// Object Data
 	Array1D< HumidifierData > Humidifier;
-
-	// Functions
 
 	// Clears the global data in Humidifiers.
 	// Needed for unit tests, should not be normally called.
@@ -513,8 +499,8 @@ namespace Humidifiers {
 				SetupOutputVariable( "Humidifier Electric Power [W]", Humidifier( HumNum ).ElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Electric Energy [J]", Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
 			} else if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Gas ) {
-				SetupOutputVariable( "Humidifier Gas USe Thermal Efficiency []", Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Gas USe Rate [W]", Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Thermal Efficiency []", Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Rate [W]", Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Gas Use Energy [J]", Humidifier( HumNum ).GasUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "GAS", "HUMIDIFIER", _, "System" );
 				SetupOutputVariable( "Humidifier Auxiliary Electric Power [W]", Humidifier( HumNum ).AuxElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Auxiliary Electric Energy [J]", Humidifier( HumNum ).AuxElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
@@ -794,7 +780,7 @@ namespace Humidifiers {
 			}
 
 			if ( !HardSizeNoDesRun ) {
-				NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / RhoH2O( InitConvTemp );
+				NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / RhoH2O( DataGlobals::InitConvTemp );
 				if ( NomCapVolDes < 0.0 ) NomCapVolDes = 0.0;	// No humidity demand
 
 				if ( IsAutoSize ) {
@@ -817,7 +803,7 @@ namespace Humidifiers {
 				}
 			}
 
-			NomCap = RhoH2O( InitConvTemp ) * NomCapVol;
+			NomCap = RhoH2O( DataGlobals::InitConvTemp ) * NomCapVol;
 			RefrigerantIndex = FindRefrigerant( fluidNameSteam );
 			WaterIndex = FindGlycol( fluidNameWater );
 			SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom );
@@ -1001,7 +987,7 @@ namespace Humidifiers {
 		HumRatSatOut = 0.0;
 		HumRatSatApp = 0.0;
 		WaterInEnthalpy = 2676125.0; // At 100 C
-		WaterDens = RhoH2O( InitConvTemp );
+		WaterDens = RhoH2O( DataGlobals::InitConvTemp );
 		WaterAddNeededMax = min( WaterAddNeeded, NomCap );
 		if ( WaterAddNeededMax > 0.0 ) {
 			//   ma*W1 + mw = ma*W2
@@ -1130,7 +1116,7 @@ namespace Humidifiers {
 		HumRatSatOut = 0.0;
 		HumRatSatApp = 0.0;
 		WaterInEnthalpy = 2676125.0; // At 100 C
-		WaterDens = RhoH2O( InitConvTemp );
+		WaterDens = RhoH2O( DataGlobals::InitConvTemp );
 		WaterAddNeededMax = min( WaterAddNeeded, NomCap );
 		if ( WaterAddNeededMax > 0.0 ) {
 			//   ma*W1 + mw = ma*W2

@@ -68,6 +68,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -597,6 +598,7 @@ namespace DataPlant {
 		int IndexInLoopSidePumps; // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
 		Real64 TempDesCondIn;
 		Real64 TempDesEvapOut;
+		PlantComponent * compPtr;
 
 		// Default Constructor
 		CompData() :
@@ -629,7 +631,8 @@ namespace DataPlant {
 			FreeCoolCntrlNodeNum( 0 ),
 			IndexInLoopSidePumps( 0 ),
 			TempDesCondIn( 0.0 ),
-			TempDesEvapOut( 0.0 )
+			TempDesEvapOut( 0.0 ),
+			compPtr( nullptr )
 		{}
 
 	};
@@ -639,8 +642,6 @@ namespace DataPlant {
 		// Members
 		std::string Name; // Name of the branch
 		int ControlType;
-		Real64 MinVolFlowRate;
-		Real64 MaxVolFlowRate;
 		Real64 RequestedMassFlow;
 		bool HasConstantSpeedBranchPump; // true if branch has a constant speed branch pump
 		Real64 ConstantSpeedBranchMassFlow; // nominal flow rate if constant speed branch pump on
@@ -665,8 +666,6 @@ namespace DataPlant {
 		// Default Constructor
 		BranchData() :
 			ControlType( 0 ),
-			MinVolFlowRate( 0.0 ),
-			MaxVolFlowRate( 0.0 ),
 			RequestedMassFlow( 0.0 ),
 			HasConstantSpeedBranchPump( false ),
 			ConstantSpeedBranchMassFlow( 0.0 ),
@@ -803,33 +802,6 @@ namespace DataPlant {
 
 	};
 
-	struct PlantLocation
-	{
-		// Members
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
-
-		// Default Constructor
-		PlantLocation()
-		{}
-
-		// Member Constructor
-		PlantLocation(
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
-	};
-
 	struct PlantConvergencePoint
 	{
 		// Members
@@ -910,6 +882,11 @@ namespace DataPlant {
 		int errCount_LoadRemains;
 		int errIndex_LoadRemains;
 		Real64 LoopSideInlet_TankTemp;
+		Real64 LoopSideInlet_MdotCpDeltaT;
+		Real64 LoopSideInlet_McpDTdt;
+		Real64 LoopSideInlet_CapExcessStorageTime;
+		Real64 LoopSideInlet_CapExcessStorageTimeReport;
+		Real64 LoopSideInlet_TotalTime;
 		PlantConvergencePoint InletNode;
 		PlantConvergencePoint OutletNode;
 
@@ -955,6 +932,11 @@ namespace DataPlant {
 			errCount_LoadRemains( 0 ),
 			errIndex_LoadRemains( 0 ),
 			LoopSideInlet_TankTemp( 0.0 ),
+			LoopSideInlet_MdotCpDeltaT(0.0),
+			LoopSideInlet_McpDTdt(0.0),
+			LoopSideInlet_CapExcessStorageTime(0.0),
+			LoopSideInlet_CapExcessStorageTimeReport(0.0),
+			LoopSideInlet_TotalTime(0.0),
 			InletNode( 0.0, 0.0 ),
 			OutletNode( 0.0, 0.0 )
 		{}

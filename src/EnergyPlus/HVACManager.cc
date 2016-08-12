@@ -96,7 +96,6 @@
 #include <HVACStandAloneERV.hh>
 #include <IceThermalStorage.hh>
 #include <InternalHeatGains.hh>
-#include <ManageElectricPower.hh>
 #include <NodeInputManager.hh>
 #include <NonZoneEquipmentManager.hh>
 #include <OutAirNodeManager.hh>
@@ -120,6 +119,7 @@
 #include <ZoneEquipmentManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <ElectricPowerServiceManager.hh>
 
 namespace EnergyPlus {
 
@@ -300,7 +300,6 @@ namespace HVACManager {
 		using DataContaminantBalance::ZoneAirGCAvg;
 		using DataContaminantBalance::OutdoorGC;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using ManageElectricPower::ManageElectricLoadCenters;
 		using InternalHeatGains::UpdateInternalGainValues;
 		using ZoneEquipmentManager::CalcAirFlowSimple;
 		using DataGlobals::KindOfSim;
@@ -390,7 +389,8 @@ namespace HVACManager {
 		NumOfSysTimeSteps = 1;
 		FracTimeStepZone = TimeStepSys / TimeStepZone;
 
-		ManageEMS( emsCallFromBeginTimestepBeforePredictor ); //calling point
+		bool anyEMSRan;
+		ManageEMS( emsCallFromBeginTimestepBeforePredictor, anyEMSRan ); //calling point
 
 		SetOutAirNodes();
 
@@ -508,11 +508,12 @@ namespace HVACManager {
 			ManageWater();
 			// update electricity data for net, purchased, sold etc.
 			DummyLogical = false;
-			ManageElectricLoadCenters( false, DummyLogical, true );
+			facilityElectricServiceObj->manageElectricPowerService( false, DummyLogical, true );
+
 			// Update the plant and condenser loop capacitance model temperature history.
 			UpdateNodeThermalHistory();
 
-			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting ); // EMS calling point
+			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan ); // EMS calling point
 
 			// This is where output processor data is updated for System Timestep reporting
 			if ( ! WarmupFlag ) {
@@ -582,7 +583,7 @@ namespace HVACManager {
 				}
 				UpdateDataandReport( HVACTSReporting );
 			}
-			ManageEMS( emsCallFromEndSystemTimestepAfterHVACReporting ); // EMS calling point
+			ManageEMS( emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan ); // EMS calling point
 			//UPDATE SYSTEM CLOCKS
 			SysTimeElapsed += TimeStepSys;
 
@@ -656,7 +657,6 @@ namespace HVACManager {
 		using SystemAvailabilityManager::ManageSystemAvailability;
 		using ZoneEquipmentManager::ManageZoneEquipment;
 		using NonZoneEquipmentManager::ManageNonZoneEquipment;
-		using ManageElectricPower::ManageElectricLoadCenters;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using General::CreateSysTimeIntervalString;
@@ -796,7 +796,7 @@ namespace HVACManager {
 			ManageZoneEquipment( FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag );
 			// need to call non zone equipment so water use zone gains can be included in sizing calcs
 			ManageNonZoneEquipment( FirstHVACIteration, SimNonZoneEquipmentFlag );
-			ManageElectricLoadCenters( FirstHVACIteration, SimElecCircuitsFlag, false );
+			facilityElectricServiceObj->manageElectricPowerService( FirstHVACIteration, SimElecCircuitsFlag, false );
 			return;
 		}
 
@@ -808,8 +808,8 @@ namespace HVACManager {
 
 		// Before the HVAC simulation, call ManageSetPoints to set all the HVAC
 		// node setpoints
-
-		ManageEMS( emsCallFromBeforeHVACManagers ); // calling point
+		bool anyEMSRan = false;
+		ManageEMS( emsCallFromBeforeHVACManagers, anyEMSRan ); // calling point
 
 		ManageSetPoints();
 
@@ -820,7 +820,8 @@ namespace HVACManager {
 		// the system on/off flags
 		ManageSystemAvailability();
 
-		ManageEMS( emsCallFromAfterHVACManagers ); // calling point
+		ManageEMS( emsCallFromAfterHVACManagers, anyEMSRan ); // calling point
+		ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 		// first explicitly call each system type with FirstHVACIteration,
 
@@ -841,7 +842,7 @@ namespace HVACManager {
 		// true, then specific components must be resimulated.
 		while ( ( SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag ) && ( HVACManageIteration <= MaxIter ) ) {
 
-			ManageEMS( emsCallFromHVACIterationLoop ); // calling point id
+			ManageEMS( emsCallFromHVACIterationLoop, anyEMSRan ); // calling point id
 
 			// Manages the various component simulations
 			SimSelectedEquipment( SimAirLoopsFlag, SimZoneEquipmentFlag, SimNonZoneEquipmentFlag, SimPlantLoopsFlag, SimElecCircuitsFlag, FirstHVACIteration, SimWithPlantFlowUnlocked );
@@ -852,6 +853,11 @@ namespace HVACManager {
 			UpdateZoneInletConvergenceLog();
 
 			++HVACManageIteration; // Increment the iteration counter
+
+			if ( anyEMSRan && HVACManageIteration <= 2 ) {
+				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice 
+				SimAirLoopsFlag = true;
+			}
 
 		}
 		if ( AnyPlantInModel ) {
@@ -1525,7 +1531,6 @@ namespace HVACManager {
 		using NonZoneEquipmentManager::ManageNonZoneEquipment;
 		using SimAirServingZones::ManageAirLoops;
 		using PlantManager::ManagePlantLoops;
-		using ManageElectricPower::ManageElectricLoadCenters;
 		using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
 		using DataErrorTracking::AskForPlantCheckOnAbort;
 		using PlantUtilities::SetAllFlowLocks;
@@ -1595,13 +1600,12 @@ namespace HVACManager {
 			ManageZoneEquipment( FirstHVACIteration, SimZoneEquipment, SimAirLoops );
 			SimZoneEquipment = true; //needs to be simulated at least twice for flow resolution to propagate to this routine
 			ManageNonZoneEquipment( FirstHVACIteration, SimNonZoneEquipment );
-
-			ManageElectricLoadCenters( FirstHVACIteration, SimElecCircuits, false );
+			facilityElectricServiceObj->manageElectricPowerService( FirstHVACIteration, SimElecCircuitsFlag, false );
 
 			ManagePlantLoops( FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits );
 
 			AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
-			ManageElectricLoadCenters( FirstHVACIteration, SimElecCircuits, false );
+			facilityElectricServiceObj->manageElectricPowerService( FirstHVACIteration, SimElecCircuitsFlag, false );
 		} else {
 			FlowResolutionNeeded = false;
 			while ( ( SimAirLoops || SimZoneEquipment ) && ( IterAir <= MaxAir ) ) {
@@ -1622,7 +1626,7 @@ namespace HVACManager {
 				}
 				if ( SimZoneEquipment ) {
 					if ( ( IterAir == 1 ) && ( ! FlowMaxAvailAlreadyReset ) ) { // don't do reset if already done in FirstHVACIteration
-						ResetTerminalUnitFlowLimits();
+						// ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
 						FlowResolutionNeeded = true;
 					} else {
 						ResolveAirLoopFlowLimits();
@@ -1659,7 +1663,7 @@ namespace HVACManager {
 			}
 
 			if ( SimElecCircuits ) {
-				ManageElectricLoadCenters( FirstHVACIteration, SimElecCircuits, false );
+				facilityElectricServiceObj->manageElectricPowerService( FirstHVACIteration, SimElecCircuitsFlag, false );
 			}
 
 			if ( ! SimPlantLoops ) {
@@ -1675,7 +1679,7 @@ namespace HVACManager {
 			}
 
 			if ( SimElecCircuits ) {
-				ManageElectricLoadCenters( FirstHVACIteration, SimElecCircuits, false );
+				facilityElectricServiceObj->manageElectricPowerService( FirstHVACIteration, SimElecCircuitsFlag, false );
 			}
 
 		}
@@ -1798,6 +1802,7 @@ namespace HVACManager {
 							for ( ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesCooled; ++ZonesCooledIndex ) {
 								TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitCoolInletNodes( ZonesCooledIndex );
 								Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+								Node( TermInletNode ).MassFlowRateMinAvail = min( Node( TermInletNode ).MassFlowRateMaxAvail, Node( TermInletNode ).MassFlowRateMinAvail );
 							}
 						}
 						if ( ( Node( SupplyNode ).MassFlowRateSetPoint - Node( SupplyNode ).MassFlowRate ) < -HVACFlowRateToler * 0.01 ) {
@@ -1815,6 +1820,7 @@ namespace HVACManager {
 								for ( ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesCooled; ++ZonesCooledIndex ) {
 									TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitCoolInletNodes( ZonesCooledIndex );
 									Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+									Node( TermInletNode ).MassFlowRateMaxAvail = max(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
 								}
 							}
 						}
@@ -1832,6 +1838,7 @@ namespace HVACManager {
 							for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesHeated; ++ZonesHeatedIndex ) {
 								TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitHeatInletNodes( ZonesHeatedIndex );
 								Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+								Node( TermInletNode ).MassFlowRateMinAvail = min( Node( TermInletNode ).MassFlowRateMaxAvail, Node( TermInletNode ).MassFlowRateMinAvail );
 							}
 						}
 						if ( ( Node( SupplyNode ).MassFlowRateSetPoint - Node( SupplyNode ).MassFlowRate ) < -HVACFlowRateToler * 0.01 ) {
@@ -1849,6 +1856,7 @@ namespace HVACManager {
 								for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesHeated; ++ZonesHeatedIndex ) {
 									TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitHeatInletNodes( ZonesHeatedIndex );
 									Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+									Node( TermInletNode ).MassFlowRateMaxAvail = max( Node( TermInletNode ).MassFlowRateMaxAvail, Node( TermInletNode ).MassFlowRateMinAvail );
 								}
 							}
 						}
@@ -2125,7 +2133,6 @@ namespace HVACManager {
 		using DataHeatBalance::TotCrossMixing;
 		using DataHeatBalance::Mixing;
 		using DataHeatBalance::CrossMixing;
-		using DataHeatBalance::MVFC;
 		using DataHeatBalance::TotZoneAirBalance;
 		using DataHeatBalance::ZoneAirBalance;
 		using DataHeatBalance::AirBalanceQuadrature;
@@ -2365,17 +2372,29 @@ namespace HVACManager {
 					//           and to recalculate the report variable using end of time step temps and humrats
 					AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0, ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) / 2.0, BlankString );
 					CpAir = PsyCpAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0 );
-					ZnAirRpt( ZoneLoop ).MixVolume += MVFC( MixNum ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixVdotCurDensity += MVFC( MixNum ) * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixMass += MVFC( MixNum ) * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixMdot += MVFC( MixNum ) * AirDensity * ADSCorrectionFactor;
-					ZnAirRpt( ZoneLoop ).MixVdotStdDensity += MVFC( MixNum ) * ( AirDensity / StdRhoAir ) * ADSCorrectionFactor;
-					MixSenLoad( ZoneLoop ) += MVFC( MixNum ) * AirDensity * CpAir * ( MAT( ZoneLoop ) - MAT( CrossMixing( MixNum ).FromZone ) );
+					ZnAirRpt( ZoneLoop ).MixVolume += CrossMixing( MixNum ).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixVdotCurDensity += CrossMixing( MixNum ).DesiredAirFlowRate * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixMass += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixMdot += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixVdotStdDensity += CrossMixing( MixNum ).DesiredAirFlowRate * ( AirDensity / StdRhoAir ) * ADSCorrectionFactor;
+					MixSenLoad( ZoneLoop ) += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * CpAir * ( MAT( ZoneLoop ) - MAT( CrossMixing( MixNum ).FromZone ) );
 					H2OHtOfVap = PsyHgAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0 );
 					//       MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowZone(ZoneLoop)*(ZoneAirHumRat(ZoneLoop)- &
 					//                     ZoneAirHumRat(CrossMixing(MixNum)%FromZone))*H2OHtOfVap
-					MixLatLoad( ZoneLoop ) += MVFC( MixNum ) * AirDensity * ( ZoneAirHumRat( ZoneLoop ) - ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) * H2OHtOfVap;
+					MixLatLoad( ZoneLoop ) += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * ( ZoneAirHumRat( ZoneLoop ) - ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) * H2OHtOfVap;
 
+				}
+				if ( ( CrossMixing( MixNum ).FromZone == ZoneLoop ) && CrossMixingReportFlag( MixNum ) ) {
+					AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).ZonePtr ) ) / 2.0, ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).ZonePtr ) ) / 2.0, BlankString );
+					CpAir = PsyCpAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).ZonePtr ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).ZonePtr ) ) / 2.0 );
+					ZnAirRpt( ZoneLoop ).MixVolume += CrossMixing( MixNum ).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixVdotCurDensity += CrossMixing( MixNum ).DesiredAirFlowRate * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixMass += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixMdot += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
+					ZnAirRpt( ZoneLoop ).MixVdotStdDensity += CrossMixing( MixNum ).DesiredAirFlowRate * ( AirDensity / StdRhoAir ) * ADSCorrectionFactor;
+					MixSenLoad( ZoneLoop ) += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * CpAir * ( MAT( ZoneLoop ) - MAT( CrossMixing( MixNum ).ZonePtr ) );
+					H2OHtOfVap = PsyHgAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).ZonePtr ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).ZonePtr ) ) / 2.0 );
+					MixLatLoad( ZoneLoop ) += CrossMixing( MixNum ).DesiredAirFlowRate * AirDensity * ( ZoneAirHumRat( ZoneLoop ) - ZoneAirHumRat( CrossMixing( MixNum ).ZonePtr ) ) * H2OHtOfVap;
 				}
 			}
 

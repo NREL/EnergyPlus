@@ -80,18 +80,22 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
+#include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
+#include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -746,8 +750,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using Pipes::InitializePipes;
-		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -873,7 +875,7 @@ namespace PlantManager {
 					OutletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 					OutletNodeNumbers.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 
-					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).MaxVolFlowRate, TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); // Why is this Vdot and not mdot?
+					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound );
 
 					TempLoop.Branch( BranchNum ).Comp.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
 
@@ -889,22 +891,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_Pipe, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeSteam;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_PipeSteam, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeExterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeExterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Indoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeInterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeInterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Underground" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeUnderground;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeUnderground, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "PipingSystem:Underground:PipeCircuit" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
@@ -1012,22 +1019,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
 							this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Vertical" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgVertical, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory( TypeOf_GrndHtExchgSurface, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Pond" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = PondGroundHeatExchanger::PondGroundHeatExchangerData::factory( TypeOf_GrndHtExchgPond, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Slinky" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgSlinky, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1588,7 +1600,7 @@ namespace PlantManager {
 									//                            TempLoop%Branch(BranchNum)%Comp(CompNum)%CompNum, &
 									//                            0.0d0)
 								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-									InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
+									//InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
 								}
 							}
 						}
@@ -2035,6 +2047,12 @@ namespace PlantManager {
 			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
 				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
@@ -4518,6 +4536,21 @@ namespace PlantManager {
 			PlantLoop.allocate( 0 );
 		}
 
+	}
+
+	void
+	CheckOngoingPlantWarnings()
+	{
+		int LoopNum;
+		for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+			//Warning if the excess storage time is more than half of the total time
+			if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime > PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name + " Demand Side is storing excess heat the majority of the time.");
+			}
+			if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime > PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
+				ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name + " Supply Side is storing excess heat the majority of the time.");
+			}
+		}
 	}
 
 } // PlantManager

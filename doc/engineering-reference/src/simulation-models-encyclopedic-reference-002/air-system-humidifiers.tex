@@ -1,0 +1,247 @@
+\section{Air System Humidifiers }\label{air-system-humidifiers}
+
+\subsection{Overview}\label{overview-003}
+
+Air system humidifiers are components that add moisture to the supply air stream. They fall into 2 broad categories: spray type humidifiers which act like direct evaporative coolers, cooling the supply air as well as humidifying it; and dry steam humidifiers, which humidify the supply air stream while causing almost no change to the supply air stream temperature. The EnergyPlus electric and gas fired steam humidifier uses electrical energy and thermal energy, respectively, to convert ordinary tap water to steam which it then injects into the supply air stream by means of a blower fan. The actual electric dry steam unit might be an electrode-type humidifier or a resistance-type humidifier.
+
+\subsection{Electric and Gas Steam Humidifier}\label{electric-and-gas-steam-humidifier}
+
+The electric and gas steam humidifier models (object names: Humidifier:Steam:Electric and Humidifier:Steam:Gas) are based on moisture and enthalpy balance equations plus standard psychrometric relationships. The approach is similar to that taken in the ASHRAE HVAC 2 Toolkit, page 4-112 (ASHRAE 1993). EnergyPlus contains its own module of psychrometric routines; the psychrometric theory and relations are given in the 2001 edition of ASHRAE Fundamentals, Chapter 6 (ASHRAE 2001). The model contains both an ideal controller and the component. The control model assumes that there is a minimum humidity setpoint on the component air outlet node. This setpoint is established by a setpoint manager described elsewhere.
+
+\subsubsection{Model}\label{model-001}
+
+The component model is a forward model: its inputs are its inlet conditions; its outputs are its outlet conditions and its energy consumption. The inputs are the temperature, humidity ratio, and mass flow rate of the inlet air stream, which are known; and the water addition rate (kg/s) which is determined by the controller. The moisture mass balance and psychometric calculations are identical for both gas and electric dry steam humidifiers. The only difference is how a heat source (electric or gas) is used to generate the steam.
+
+\subsubsection{Controller}\label{controller}
+
+The controller first decides whether the humidifier is on or off. For the humidifier to be on:
+
+*~the humidifier schedule value must be nonzero;
+
+*~the inlet air mass flow must be greater than zero;
+
+*~the inlet air humidity ratio must be less than the minimum humidity ratio setpoint.
+
+If the humidifier is off, the water addition rate is set to zero. If the humidifier is on, the water addition rate needed to meet the humidity setpoint is calculated.
+
+\begin{equation}
+{\dot m_a} \cdot {w_{in}} + {\dot m_{w,add,needed}} = {\dot m_a} \cdot {w_{set}}
+\end{equation}
+
+where
+
+\({\dot m_a}\) ~ = the air mass flow rate {[}kg/s{]}
+
+\({w_{in}}\) = the inlet air humidity ratio {[}kg/kg{]}
+
+\({\dot m_{w,add,needed}}\) ~ = water addition rate needed to meet the setpoint {[}kg/s{]}
+
+\({w_{set}}\) = the humidity ratio setpoint {[}kg/kg{]}
+
+Equation is the moisture balance equation for the component. It is solved for \({\dot m_{w,add,needed}}\) ~(the other variables are known) which is passed to the humidifier component model as its desired inlet water addition rate.
+
+\subsubsection{Component}\label{component}
+
+The inputs to the component model are the air inlet conditions and mass flow rate and the water addition rate set by the controller. The outputs are the air outlet conditions. First the desired water addition rate is checked against component capacity.
+
+\begin{equation}
+{\dot m_{w,add,needed,{\rm{max}}}} = Min({\dot m_{w,add}},Ca{p_{nom}})
+\end{equation}
+
+where
+
+\(Ca{p_{nom}}\) ~ = the humidifier nominal capacity {[}kg/s{]}, a user input.
+
+If \({\dot m_{w,add,needed,{\rm{max}}}}\) ~is zero, the outlet conditions are set to the inlet conditions and the water addition rate is set to zero. If the humidifier is scheduled on the component power consumption is set to the standby power consumption: \({W_{hum}} = {W_{stby}}\) . Otherwise \({W_{hum}}\) ~ = 0.
+
+If \({\dot m_{w,add,needed,{\rm{max}}}}\) ~\textgreater{} 0, then the moisture and enthalpy balance equations
+
+\begin{equation}
+{\dot m_a} \cdot {w_{in}} + {\dot m_w} = {\dot m_a} \cdot {w_{out}}
+\end{equation}
+
+\begin{equation}
+{\dot m_a} \cdot {h_{in}} + {\dot m_w} \cdot {h_w} = {\dot m_a} \cdot {h_{out}}
+\end{equation}
+
+with \({\dot m_w}\) ~set equal to \({\dot m_{w,add,needed,{\rm{max}}}}\) ~are solved for \({w_{out}}\) ~and \({h_{out}}\) . Here
+
+\({\dot m_a}\) ~ = the air mass flow rate {[}kg/s{]}
+
+\({w_{in}}\) = the inlet air humidity ratio {[}kg/kg{]}
+
+\({\dot m_w}\) ~ = the inlet water addition rate {[}kg/s{]}
+
+\({w_{out}}\) ~ = the outlet air humidity ratio {[}kg/kg{]}
+
+\({h_{in}}\) ~ = the inlet air specific enthalpy {[}J/kg{]}
+
+\({h_w}\) ~ = the steam specific enthalpy = 2676125.~ {[}J/kg{]} at 100 \(^{o}\)C
+
+\({h_{out}}\) ~ = the outlet air specific enthalpy {[}J/kg{]}
+
+The outlet temperature is obtained from
+
+\begin{equation}
+{T_{out}} = PsyHFnTdbW({h_{out}},{w_{out}})
+\end{equation}
+
+where
+
+\({T_{out}}\) ~ = outlet air temperature {[}\(^{o}\)C{]},
+
+\(PsyHFnTdbW({h_{out}},{w_{out}})\) ~is an EnergyPlus psychrometric function.
+
+The humidity ratio at saturation at the outlet temperature is
+
+\begin{equation}
+{w_{out,sat}} = PsyWFnTdbRhPb({T_{out}},1.0,{P_{atmo}})
+\end{equation}
+
+where
+
+\({P_{atmo}}\) ~ = the barometric pressure {[}Pa{]},
+
+1.0 is the relative humidity at saturation,
+
+\(PsyWFnTdbRhPb\) ~is an EnergyPlus psychrometric function.
+
+IF \({w_{out}} \le {w_{out,sat}}\) ~then the outlet condition is below the saturation curve and the desired moisture addition rate can be met. \({\dot m_{w,add}}\) ~is set to \({\dot m_{w,add,needed,{\rm{max}}}}\) ~and the calculation of outlet conditions is done. But if \({w_{out}} > {w_{out,sat}}\) ~then it is assumed that this condition will be detected and the steam addition rate throttled back to bring the outlet conditions back to the saturation condition. We need to find the point where the line drawn between state 1 (inlet) and state 2 (our desired outlet) crosses the saturation curve. This will be the new outlet condition. Rather than iterate to obtain this point, we find it approximately by solving for the point where 2 lines cross: the first drawn from state 1 to state 2, the second from \({T_1}\) , \({w_{1,sat}}\) ~to \({T_2}\) , \({w_{2,sat}}\) ; where
+
+\({w_{1,sat}}\) ~is the inlet temperature {[}\(^{o}\)C{]},
+
+\({w_{2,sat}}\) ~is the humidity ratio at saturation at temperature \({w_{1,sat}}\) ~{[}kg/kg{]},
+
+\({T_2}\) ~is the desired outlet temperature {[}\(^{o}\)C{]},
+
+\({w_{2,sat}}\) ~is the humidity ratio at saturation at temperature \({T_2}\) ~{[}kg/kg{]}.
+
+The 2 lines are given by the equations:
+
+\begin{equation}
+w = {w_1} + (({w_2} - {w_1})/({T_2} - {T_1})) \cdot (T - {T_1})
+\end{equation}
+
+\begin{equation}
+w = {w_{1,sat}} + (({w_{2,sat}} - {w_{1,sat}})/({T_2} - {T_1})) \cdot (T - {T_1})
+\end{equation}
+
+Solving for the point (state 3) where the lines cross:
+
+\begin{equation}
+{w_3} = {w_1} + (({w_2} - {w_1}) \cdot ({w_{1,sat}} - {w_1}))/({w_2} - {w_{2,sat}} + {w_{1,sat}} - {w_1})
+\end{equation}
+
+\begin{equation}
+{T_3} = {T_1} + ({w_3} - {w_1}) \cdot (({T_2} - {T_1})/({w_2} - {w_1}))
+\end{equation}
+
+This point isn't quite on the saturation curve since we made a linear approximation of the curve, but the temperature should be very close to the correct outlet temperature. We will use this temperature as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy. Thus we set \({T_{out}}\) ~ = \({T_3}\) ~and
+
+\begin{equation}
+{w_{out}} = PsyWFnTdbRhPb({T_{out}},1.0,{P_{atmo}})
+\end{equation}
+
+\begin{equation}
+{h_{out}} = PsyHFnTdbW({T_{out}},{w_{out}})
+\end{equation}
+
+where \(PsyHFnTdbW\) ~is an EnergyPlus psychrometric function. The water addition rate is set to
+
+\begin{equation}
+{\dot m_{w,add}} = {\dot m_a} \cdot ({w_{out}} - {w_{in}})
+\end{equation}
+
+We now have the outlet conditions and the adjusted steam addition rate for the case where the desired outlet humidity results in an outlet state above the saturation curve. The energy consumption of the electric and gas steam humidifiers is calculated separately.
+
+The electric steam humidifier electric consumption is given by
+
+\begin{equation}
+{W_{hum}} = ({\dot m_{w,add}}/Ca{p_{nom}}) \cdot {W_{nom}} + {W_{fan}} + {W_{stby}}
+\end{equation}
+
+where
+
+\({W_{fan}}\) ~ = nominal fan power {[}W{]}, a user input,
+
+\({W_{stby}}\) ~ = standby power {[}W{]}, a user input.
+
+The gas steam humidifier performance calculation is done for fixed and variable entering water temperature. The calculation procedure for fixed and variable entering water temperature are as follows.
+
+\subsubsection{Fixed Inlet WaterTemperature:}\label{fixed-inlet-watertemperature}
+
+The gas steam humidifier gas consumption rate for fixed entering water temperature is given by:
+
+\begin{equation}
+\dot{Q}_{NG} = \frac{\dot{m}_{w,add}}{\dot{m}_{cap,nom}}Q_{NG,nom}
+\end{equation}
+
+The actual gas use rate accounting for gas fired humidifier thermal efficiency variation with part load ratio is given by:
+
+\begin{equation}
+Q_{NG} = \dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}}
+\end{equation}
+
+\begin{equation}
+\eta_{actual} = \eta_{rated} \times \rm{EffModCurveValue}\left(PLR\right)
+\end{equation}
+
+\begin{equation}
+\rm{PLR} = \frac{\dot{Q}_{NG}}{Q_{NG,nom}}
+\end{equation}
+
+where, EffModCurveValue = thermal efficiency modifier curve value as function of part load ratio. This curve is generated from manufacturer's part load performance data. PLR = part load ratio, (-). Q\_NG\_nom = nominal or rated gas use rate, (Watts). Q\_NG = actual gas use rate, (Watts). eta\_rated = nominal or rated thermal efficiency of gas fired steam humidifier, (-) eta\_actual = actual thermal efficiency of gas fired steam humidifier accounting for part load performance, (-).
+
+\subsubsection{Variable Inlet WaterTemperature:}\label{variable-inlet-watertemperature}
+
+The gas use rate is determined from the theoretical gas input rate and actual thermal efficiency. The actual thermal efficiency is the rated thermal efficiency corrected for part load ratio operation. At steady state the gas use rate is given by:
+
+\begin{equation}
+Q_{NG} = \frac{\dot{m}_w \left(h_{fg}+c_{p,w}\left(100-T_{w,inlet}\right)\right)}{\eta_{rated}}
+\end{equation}
+
+\begin{equation}
+\rm{PLR} = \frac{\dot{Q}_{NG}}{Q_{NG,nom}}
+\end{equation}
+
+\begin{equation}
+\eta_{actual} = \eta_{rated} \times \rm{EffModCurveValue}\left(PLR\right)
+\end{equation}
+
+\begin{equation}
+Q_{NG} = \dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}}
+\end{equation}
+
+where, T\_w\_inlet = temperature of water entering the gas steam humidifier, °C. This value depends on the water source.
+
+If the rated gas use rated input field is not autosized, then user specified thermal efficiency will be overridden with a value calculated from user specified rated gas use rate, nominal capacity (m3/s) and design conditions as follows:
+
+\begin{equation}
+ \eta_{rated} = \frac{\dot{V}_{cap,nom} \rho_w \PB{h_{fg}+c_{p,w}\Delta T_w}}{Q_{NG,nom}}
+\end{equation}
+
+The gas steam humidifier requires electric power input to the blower fan and associated control units. The auxiliary electric power input rate of the gas steam humidifier is given by:
+
+\begin{equation}
+W_{aux} = W_{fan} + W_{controls}
+\end{equation}
+
+where W\_fan = nominal fan power {[}W{]}, a user input, W\_controls = control electric power {[}W{]}, a user input.
+
+The water consumption rate is, in m3/s, for electric and steam humidifier at a reference temperature of 5.05 C is given by.
+
+\begin{equation}
+{\dot V_{cons}} = {\dot m_{w,add}}/{\rho_w}
+\end{equation}
+
+where
+
+\({\dot V_{cons}}\) ~ = the water consumption rate {[}m\(^{3}\){]},
+
+\({\rho_w}\) ~ = water density (998.2 kg/m\(^{3}\)).
+
+\subsubsection{References}\label{references-003}
+
+ASHRAE. 1993. HVAC 2 Toolkit: A Toolkit for Secondary HVAC System Energy Calculations. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.
+
+ASHRAE. 2001. 2001 ASHRAE Handbook Fundamentals. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.

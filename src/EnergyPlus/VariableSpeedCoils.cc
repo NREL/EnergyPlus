@@ -167,6 +167,7 @@ namespace VariableSpeedCoils {
 	// Identifier is VarSpeedCoil
 	int NumWatertoAirHPs( 0 ); // The Number of Water to Air Heat Pumps found in the Input
 
+	bool MyOneTimeFlag( true ); // one time allocation flag
 	bool GetCoilsInputFlag( true ); // Flag set to make sure you get input once
 	// LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag
 
@@ -218,7 +219,8 @@ namespace VariableSpeedCoils {
 	clear_state()
 	{
 		NumWatertoAirHPs = 0;
-		GetCoilsInputFlag = true ;
+		MyOneTimeFlag = true;
+		GetCoilsInputFlag = true;
 		SourceSideMassFlowRate = 0.0;
 		SourceSideInletTemp = 0.0;
 		SourceSideInletEnth = 0.0;
@@ -2564,7 +2566,6 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirInletNode; // Node Number of the air inlet
 		int WaterInletNode; // Node Number of the Water inlet
-		static bool MyOneTimeFlag( true ); // one time allocation flag
 		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
 		static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time
 		static Array1D_bool MyPlantScanFlag;
@@ -2755,8 +2756,8 @@ namespace VariableSpeedCoils {
 			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) ) {
 				WaterInletNode = VarSpeedCoil( DXCoilNum ).WaterInletNodeNum;
 
-				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
-				Cp = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
+				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
+				Cp = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
 
 				//    VarSpeedCoil(DXCoilNum)%DesignWaterMassFlowRate= &
 				//                             rho * VarSpeedCoil(DXCoilNum)%RatedWaterVolFlowRate

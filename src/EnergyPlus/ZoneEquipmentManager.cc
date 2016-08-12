@@ -84,6 +84,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataRoomAirModel.hh>
 #include <DataSizing.hh>
+#include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
@@ -187,15 +188,16 @@ namespace ZoneEquipmentManager {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-		namespace {
+	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
 	// These are purposefully not in the header file as an extern variable. No one outside of this should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-
+		bool reportDOASZoneSizingHeader( true );
 		bool InitZoneEquipmentOneTimeFlag( true );
 		bool InitZoneEquipmentEnvrnFlag( true );
+		bool FirstPassZoneEquipFlag( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 	}
 
 	Array1D< Real64 > AvgData; // scratch array for storing averaged data
@@ -219,8 +221,10 @@ namespace ZoneEquipmentManager {
 		AvgData.deallocate(); // scratch array for storing averaged data
 		DefaultSimOrder.deallocate();
 		NumOfTimeStepInDay = 0; // number of zone time steps in a day
-		GetZoneEquipmentInputFlag = true ;
+		GetZoneEquipmentInputFlag = true;
 		PrioritySimOrder.deallocate();
+		FirstPassZoneEquipFlag = true;
+		reportDOASZoneSizingHeader = true;
 	}
 
 	void
@@ -1033,6 +1037,9 @@ namespace ZoneEquipmentManager {
 		if ( ErrorsFound ) {
 			ShowFatalError( "SetUpZoneSizingArrays: Errors found in Sizing:Zone input" );
 		}
+
+		// Put Auto Sizing of Sizing:Zone inputs here!
+		AutoCalcDOASControlStrategy();
 
 		ZoneSizing.allocate( TotDesDays + TotRunDesPersDays, NumOfZones );
 		FinalZoneSizing.allocate( NumOfZones );
@@ -2380,7 +2387,8 @@ namespace ZoneEquipmentManager {
 		} else if ( SELECT_CASE_var == EndZoneSizingCalc ) {
 
 			// candidate EMS calling point to customize CalcFinalZoneSizing
-			ManageEMS( emsCallFromZoneSizing );
+			bool anyEMSRan;
+			ManageEMS( emsCallFromZoneSizing, anyEMSRan );
 
 			// now apply EMS overrides (if any)
 
@@ -3028,7 +3036,6 @@ namespace ZoneEquipmentManager {
 
 		static bool SupPathInletChanged( false );
 		static bool FirstCall; // indicates first call to supply air path components
-		static bool FirstPassZoneEquip( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 		static bool MyOneTimeFlag( true );
 		bool ErrorFlag;
 		static bool ValidSAMComp( false );
@@ -3123,7 +3130,7 @@ namespace ZoneEquipmentManager {
 				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
 
 				// Reset ZoneEqSizing data (because these may change from one equipment type to the next)
-				if ( FirstPassZoneEquip ) {
+				if ( FirstPassZoneEquipFlag ) {
 					ZoneEqSizing( ControlledZoneNum ).AirVolFlow = 0.0;
 					ZoneEqSizing( ControlledZoneNum ).MaxHWVolFlow = 0.0;
 					ZoneEqSizing( ControlledZoneNum ).MaxCWVolFlow = 0.0;
@@ -3366,7 +3373,7 @@ namespace ZoneEquipmentManager {
 			}
 		} // End of controlled zone loop
 		CurZoneEqNum = 0;
-		FirstPassZoneEquip = false;
+		FirstPassZoneEquipFlag = false;
 
 		//This is the call to the Supply Air Path after the components are simulated to update
 		//  the path inlets
@@ -4498,7 +4505,6 @@ namespace ZoneEquipmentManager {
 		MCPTM = 0.0;
 		MixingMassFlowZone = 0.0;
 		MixingMassFlowXHumRat = 0.0;
-		CrossMixingFlag = false;
 		CrossMixingReportFlag = false;
 		MixingReportFlag = false;
 		if ( Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0 ) MixingMassFlowCO2 = 0.0;
@@ -4929,7 +4935,7 @@ namespace ZoneEquipmentManager {
 		for ( j = 1; j <= TotCrossMixing; ++j ) {
 			n = CrossMixing( j ).ZonePtr;
 			m = CrossMixing( j ).FromZone;
-			TD = MTC( j );
+			TD = CrossMixing( j ).DeltaTemperature;
 			// Get scheduled delta temperature
 			if ( CrossMixing( j ).DeltaTempSchedPtr > 0 ) {
 				TD = GetCurrentScheduleValue( CrossMixing( j ).DeltaTempSchedPtr );
@@ -5013,36 +5019,33 @@ namespace ZoneEquipmentManager {
 					CrossMixingReportFlag( j ) = true; // set reporting flag
 				}
 
-				if ( ( ( TD <= 0.0 ) && ( ! CrossMixingFlag( n ) && ! CrossMixingFlag( m ) ) ) || ( ( TD > 0.0 ) && ( TZM - TZN >= TD ) ) ) {
-					//                                      SET COEFFICIENTS .
-					CrossMixingFlag( n ) = true;
-					CrossMixingFlag( m ) = true;
-
+				if ( ( TD <= 0.0 ) || ( ( TD > 0.0 ) && ( TZM - TZN >= TD ) ) ) {
+						//                                      SET COEFFICIENTS .
 					Tavg = ( TZN + TZM ) / 2.0;
 					Wavg = ( ZHumRat( n ) + ZHumRat( m ) ) / 2.0;
 					AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing );
 					CpAir = PsyCpAirFnWTdb( Wavg, Tavg );
-					MCPxN = MVFC( j ) * CpAir * AirDensity;
+					MCPxN = CrossMixing( j ).DesiredAirFlowRate * CpAir * AirDensity;
 					MCPM( n ) += MCPxN;
 
-					MCPxM = MVFC( j ) * CpAir * AirDensity;
+					MCPxM = CrossMixing( j ).DesiredAirFlowRate * CpAir * AirDensity;
 					MCPM( m ) += MCPxM;
 					MCPTM( n ) += MCPxM * TZM;
 					MCPTM( m ) += MCPxN * TZN;
 
 					// Now to determine the moisture conditions
-					MixingMassFlowZone( m ) += MVFC( j ) * AirDensity;
-					MixingMassFlowXHumRat( m ) += MVFC( j ) * AirDensity * ZHumRat( n );
+					MixingMassFlowZone( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity;
+					MixingMassFlowXHumRat( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZHumRat( n );
 
-					MixingMassFlowZone( n ) += MVFC( j ) * AirDensity;
-					MixingMassFlowXHumRat( n ) += MVFC( j ) * AirDensity * ZHumRat( m );
+					MixingMassFlowZone( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity;
+					MixingMassFlowXHumRat( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZHumRat( m );
 					if ( Contaminant.CO2Simulation ) {
-						MixingMassFlowCO2( m ) += MVFC( j ) * AirDensity * ZoneAirCO2( n );
-						MixingMassFlowCO2( n ) += MVFC( j ) * AirDensity * ZoneAirCO2( m );
+						MixingMassFlowCO2( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirCO2( n );
+						MixingMassFlowCO2( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirCO2( m );
 					}
 					if ( Contaminant.GenericContamSimulation ) {
-						MixingMassFlowGC( m ) += MVFC( j ) * AirDensity * ZoneAirGC( n );
-						MixingMassFlowGC( n ) += MVFC( j ) * AirDensity * ZoneAirGC( m );
+						MixingMassFlowGC( m ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirGC( n );
+						MixingMassFlowGC( n ) += CrossMixing( j ).DesiredAirFlowRate * AirDensity * ZoneAirGC( m );
 					}
 				}
 			}
@@ -5453,6 +5456,150 @@ namespace ZoneEquipmentManager {
 			}
 		}
 		MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
+	}
+
+	void
+	AutoCalcDOASControlStrategy()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS Function:
+		// This subroutine does the autosizing calculations for the Sizing:Zone
+		// DOAS input.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// See IO Ref for suggested values
+		
+		// Using/Aliasing
+
+		// FUNCTION ARGUMENT DEFINITIONS:
+		// na
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ZoneSizIndex;
+		bool ErrorsFound;
+
+		ErrorsFound = false;
+		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
+			if ( ZoneSizingInput( ZoneSizIndex ).AccountForDOAS ) {
+				if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOANeutralSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 21.1;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 23.9;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint
+							- 2.8;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint
+							+ 2.8;
+					}
+					ReportZoneSizingDOASInputs( ZoneSizingInput( ZoneSizIndex ).ZoneName, "NeutralSupplyAir",
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint, ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint  );
+				} else if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOANeutralDehumSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 14.4;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 22.2;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 14.4;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 22.2;
+					}
+					ReportZoneSizingDOASInputs( ZoneSizingInput( ZoneSizIndex ).ZoneName, "NeutralDehumidifiedSupplyAir",
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint, ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint );
+				} else if ( ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy == DOACoolSup ) {
+					if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = 12.2;
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = 14.4;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint == AutoSize &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint > 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint
+							- 2.2;
+					} else if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > 0.0 &&
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint == AutoSize ) {
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint
+							+ 2.2;
+					}
+					ReportZoneSizingDOASInputs( ZoneSizingInput( ZoneSizIndex ).ZoneName, "ColdSupplyAir",
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint, ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint );
+				}
+				if ( ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint > ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint ) {
+					ShowSevereError( "For Sizing:Zone = " + ZoneSizingInput( ZoneSizIndex ).ZoneName );
+					ShowContinueError( "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint" );
+					ErrorsFound = true;
+				}
+
+			}
+		}
+		if ( ErrorsFound ) {
+			ShowFatalError( "Errors found in DOAS sizing input. Program terminates." );
+		}
+	}
+
+	void
+	ReportZoneSizingDOASInputs(
+		std::string const & ZoneName, // the name of the zone
+		std::string const & DOASCtrlStrategy, // DOAS control strategy
+		Real64 const DOASLowTemp, // DOAS design low setpoint temperature [C]
+		Real64 const DOASHighTemp // DOAS design high setpoint temperature [C]
+		)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine writes the DOAS Sizing:Zone input for 1 zone to the eio file
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataPrecisionGlobals;
+		using DataGlobals::OutputFileInits;
+		using DataStringGlobals::VerString;
+		using General::RoundSigDigits;
+
+		// Formats
+		static gio::Fmt Format_990( "('! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature {C}, DOAS Design High Setpoint Temperature {C} ')" );
+		static gio::Fmt Format_991( "(' Zone Sizing DOAS Inputs',4(', ',A))" );
+
+		if ( reportDOASZoneSizingHeader ) {
+			gio::write( OutputFileInits, Format_990 );
+			reportDOASZoneSizingHeader = false;
+		}
+
+		gio::write( OutputFileInits, Format_991 ) << ZoneName << DOASCtrlStrategy << RoundSigDigits( DOASLowTemp, 3 ) << RoundSigDigits( DOASHighTemp, 3 );
+
+		// BSLLC Start
+		// if ( sqlite ) {
+		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, 
+		// 		PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
+		// }
+		// BSLLC Finish
+
 	}
 
 } // ZoneEquipmentManager

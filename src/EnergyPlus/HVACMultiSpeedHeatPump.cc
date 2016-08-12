@@ -1264,13 +1264,13 @@ namespace HVACMultiSpeedHeatPump {
 			MSHeatPump( MSHPNum ).DesignHeatRecFlowRate = Numbers( 6 );
 			if ( MSHeatPump( MSHPNum ).DesignHeatRecFlowRate > 0.0 ) {
 				MSHeatPump( MSHPNum ).HeatRecActive = true;
-				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = RhoH2O( InitConvTemp ) * MSHeatPump( MSHPNum ).DesignHeatRecFlowRate;
-				MSHeatPump( MSHPNum ).HeatRecInletNodeNum = GetOnlySingleNode( Alphas( 16 ), ErrorsFound, "MSHP Heat receovery", Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+				MSHeatPump( MSHPNum ).DesignHeatRecMassFlowRate = RhoH2O( CWInitConvTemp ) * MSHeatPump( MSHPNum ).DesignHeatRecFlowRate;
+				MSHeatPump( MSHPNum ).HeatRecInletNodeNum = GetOnlySingleNode( Alphas( 16 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
 				if ( MSHeatPump( MSHPNum ).HeatRecInletNodeNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", Missing " + cAlphaFields( 16 ) + '.' );
 					ErrorsFound = true;
 				}
-				MSHeatPump( MSHPNum ).HeatRecOutletNodeNum = GetOnlySingleNode( Alphas( 17 ), ErrorsFound, "MSHP Heat receovery", Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
+				MSHeatPump( MSHPNum ).HeatRecOutletNodeNum = GetOnlySingleNode( Alphas( 17 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 				if ( MSHeatPump( MSHPNum ).HeatRecOutletNodeNum == 0 ) {
 					ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", Missing " + cAlphaFields( 17 ) + '.' );
 					ErrorsFound = true;
@@ -1698,7 +1698,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound );
 
 				if ( MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound ) * rho;
 				}
 				// fill outlet node for coil
@@ -1732,7 +1732,7 @@ namespace HVACMultiSpeedHeatPump {
 				MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound );
 
 				if ( MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
 					MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound ) * rho;
 				}
 				// fill outlet node for coil
@@ -1875,7 +1875,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( ( MSHeatPump( MSHeatPumpNum ).HeatRecActive ) && ( ! MyPlantScantFlag( MSHeatPumpNum ) ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60.0, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, HWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 				MSHeatPump( MSHeatPumpNum ).DesignHeatRecMassFlowRate = MSHeatPump( MSHeatPumpNum ).DesignHeatRecFlowRate * rho;
 
@@ -1888,7 +1888,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).LoopNum ).FluidIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).CoilControlNode, MSHeatPump( MSHeatPumpNum ).CoilOutletNode, MSHeatPump( MSHeatPumpNum ).LoopNum, MSHeatPump( MSHeatPumpNum ).LoopSide, MSHeatPump( MSHeatPumpNum ).BranchNum, MSHeatPump( MSHeatPumpNum ).CompNum );
@@ -1914,7 +1914,7 @@ namespace HVACMultiSpeedHeatPump {
 
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, InitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidName, CWInitConvTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).SuppLoopNum ).FluidIndex, RoutineName );
 							MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 						InitComponentNodes( 0.0, MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow, MSHeatPump( MSHeatPumpNum ).SuppCoilControlNode, MSHeatPump( MSHeatPumpNum ).SuppCoilOutletNode, MSHeatPump( MSHeatPumpNum ).SuppLoopNum, MSHeatPump( MSHeatPumpNum ).SuppLoopSide, MSHeatPump( MSHeatPumpNum ).SuppBranchNum, MSHeatPump( MSHeatPumpNum ).SuppCompNum );
@@ -2163,8 +2163,7 @@ namespace HVACMultiSpeedHeatPump {
 
 		CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, On, 1, 0.0, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 
-		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
-		for ( auto & e : MSHeatPump ) {
+		auto & e = MSHeatPump( MSHeatPumpNum ); {
 			e.TotHeatEnergyRate = 0.0;
 			e.SensHeatEnergyRate = 0.0;
 			e.LatHeatEnergyRate = 0.0;
@@ -2172,7 +2171,7 @@ namespace HVACMultiSpeedHeatPump {
 			e.SensCoolEnergyRate = 0.0;
 			e.LatCoolEnergyRate = 0.0;
 		}
-
+		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
 		//!!LKL Discrepancy with < 0
 		if ( GetCurrentScheduleValue( MSHeatPump( MSHeatPumpNum ).AvaiSchedPtr ) == 0.0 ) {
 			Node( OutNode ).Temp = Node( InNode ).Temp;
@@ -3264,7 +3263,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 HeatRecOutletTemp; // Heat reclaim outlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
-		Real64 HeatRecInletEnth; // Heat reclaim water inlet enthalpy [J/kg]
 
 		// Begin routine
 		HeatRecInNode = MSHeatPump( MSHeatPumpNum ).HeatRecInletNodeNum;
@@ -3272,7 +3270,6 @@ namespace HVACMultiSpeedHeatPump {
 
 		// Inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
-		HeatRecInletEnth = Node( HeatRecInNode ).Enthalpy;
 
 		// Set heat recovery mass flow rates
 		HeatRecMassFlowRate = Node( HeatRecInNode ).MassFlowRate;
@@ -3284,9 +3281,13 @@ namespace HVACMultiSpeedHeatPump {
 			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
-			if ( HeatRecOutletTemp > MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp ) HeatRecOutletTemp = MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp;
+			if ( HeatRecOutletTemp > MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp ) {
+				HeatRecOutletTemp = max( HeatRecInletTemp, MSHeatPump( MSHeatPumpNum ).MaxHeatRecOutletTemp );
+				QHeatRec = HeatRecMassFlowRate * CpHeatRec * ( HeatRecOutletTemp - HeatRecInletTemp );
+			}
 		} else {
 			HeatRecOutletTemp = HeatRecInletTemp;
+			QHeatRec = 0.0;
 		}
 
 		SafeCopyPlantNode( HeatRecInNode, HeatRecOutNode );

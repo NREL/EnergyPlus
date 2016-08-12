@@ -305,20 +305,6 @@ namespace DataAirLoop {
 
 	};
 
-	struct OAControllerData
-	{
-		// Members
-		bool EconoActive; // if true economizer is active
-		bool HighHumCtrlActive; // if true high humidity control is active
-
-		// Default Constructor
-		OAControllerData() :
-			EconoActive( false ),
-			HighHumCtrlActive( false )
-		{}
-
-	};
-
 	struct OutsideAirSysProps
 	{
 		// Members
@@ -355,7 +341,6 @@ namespace DataAirLoop {
 	extern Array1D< AirLooptoZoneData > AirLoopZoneInfo;
 	extern Array1D< AirLoopControlData > AirLoopControlInfo;
 	extern Array1D< AirLoopFlowData > AirLoopFlow;
-	extern Array1D< OAControllerData > OAControllerInfo;
 	extern Array1D< OutsideAirSysProps > OutsideAirSys;
 
 	// Clears the global data in DataAirLoop.

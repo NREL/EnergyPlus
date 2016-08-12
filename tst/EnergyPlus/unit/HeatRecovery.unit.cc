@@ -118,6 +118,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Real64 Tnode = 0.0;
 	Real64 SetPointTemp = 19.0;
 	Real64 PartLoadRatio = 0.25;
+	int BalDesDehumPerfDataIndex = 1;
 
 	CurZoneEqNum = 0;
 	CurSysNum = 0;
@@ -156,6 +157,11 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Node( ExchCond( ExchNum ).SecInletNode ).Enthalpy = ExchCond( ExchNum ).SecInEnth;
 	Node( ExchCond( ExchNum ).SupInletNode ).MassFlowRate = ExchCond( ExchNum ).SupInMassFlow;
 	Node( ExchCond( ExchNum ).SecInletNode ).MassFlowRate = ExchCond( ExchNum ).SecInMassFlow;
+
+	HeatExchCondNumericFields.allocate( ExchNum );
+	HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( 5 );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
 
 	// HXUnitOn is false so expect outlet = inlet
 	InitHeatRecovery( ExchNum, CompanionCoilNum );
@@ -3883,10 +3889,122 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	InletNode = ExchCond( 1 ).SupInletNode;
 	OutletNode = ExchCond( 1 ).SupOutletNode;
 	Qhr_HeatingRateTot = ExchCond( 1 ).SupInMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
-	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 ); // Name of Heat Recovery Exchange On Main Air Loop
+	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 );
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
+
+}
+
+TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
+	
+	int ExchNum( 1 );
+	int BalDesDehumPerfDataIndex( 1 );
+	Real64 FaceVelocity;
+	Real64 SysVolFlow;
+
+	SysSizingRunDone = true;
+	DataSizing::NumSysSizInput = 1;
+	DataSizing::SysSizInput.allocate( NumSysSizInput );
+	DataSizing::CurSysNum = 1; // primary air system
+	DataSizing::CurOASysNum = 0; // no OA system 
+	DataSizing::CurZoneEqNum = 0; // size it based on system
+	DataSizing::SysSizInput( CurSysNum ).AirLoopNum = 1;
+
+	// initialize sizing required variables
+	ExchCond.allocate( ExchNum );
+	ExchCond( ExchNum ).ExchTypeNum = HX_DESICCANT_BALANCED;
+	ExchCond( ExchNum ).HeatExchPerfTypeNum = BALANCEDHX_PERFDATATYPE1;
+	ExchCond( ExchNum ).NomSupAirVolFlow = AutoSize;
+	ExchCond( ExchNum ).PerfDataIndex = BalDesDehumPerfDataIndex;
+
+	BalDesDehumPerfData.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfNumericFields.allocate( BalDesDehumPerfDataIndex );
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).Name = "DehumPerformanceData";
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
+
+	// autosize nominal vol flow and face velocity
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 1 ) = "Nominal Air Flow Rate";
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow = AutoSize;
+	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames( 2 ) = "Nominal Air Face Velocity";
+	BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel = AutoSize;
+
+	// initialize sizing variables
+	DataSizing::CurDuctType = DataHVACGlobals::Main;
+	FinalSysSizing.allocate( CurSysNum );
+	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+
+	// initialize UnitarySysEqSizing capacity flag to false; not unitary system
+	UnitarySysEqSizing.allocate( CurSysNum );
+	UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
+	UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
+
+	// calc heat recovery sizing
+	SizeHeatRecovery( ExchNum );
+	
+	// test autosized nominal vol flow rate
+	EXPECT_EQ( 1.0, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow ); // m3/s
+
+	// size nominal face velocity
+	SysVolFlow = BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow;
+	FaceVelocity = 4.30551 + 0.01969 * SysVolFlow;
+
+	// test autosized face velocity
+	EXPECT_EQ( FaceVelocity, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel ); // m/s
+}
+
+TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
+
+	int ExchNum = 1;
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.5;",
+
+		"  HeatExchanger:AirToAir:SensibleAndLatent,",
+		"    HEATRECOVERY HX IN ERV,  !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
+		"    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
+		"    0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
+		"    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
+		"    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
+		"    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
+		"    0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
+		"    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
+		"    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
+		"    ERV OA Inlet Node,       !- Supply Air Inlet Node Name",
+		"    HR Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
+		"    Zone 1 Exhaust Node,     !- Exhaust Air Inlet Node Name",
+		"    HR Sec aIR Outlet Node,  !- Exhaust Air Outlet Node Name",
+		"    50.0,                    !- Nominal Electric Power {W}",
+		"    No,                      !- Supply Air Outlet Temperature Control",
+		"    Rotary,                  !- Heat Exchanger Type",
+		"    None,                    !- Frost Control Type",
+		"    1.7;                     !- Threshold Temperature {C}",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	// get heat recovery heat exchanger generic
+	GetHeatRecoveryInput();
+
+	// initialize
+	DataSizing::CurZoneEqNum = 1;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+
+	// the HR HX is in Zone Equipment ERV
+	ZoneEqSizing.allocate( CurZoneEqNum );
+	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
+	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 1.0;
+
+	// size the HX nominal supply air volume flow rate 
+	SizeHeatRecovery( ExchNum );
+
+	// verify the name and autosized supply air flow rate
+	EXPECT_EQ( ExchCond( ExchNum ).Name, "HEATRECOVERY HX IN ERV" );
+	EXPECT_EQ( ExchCond( ExchNum ).NomSupAirVolFlow, 1.0 );
 
 }

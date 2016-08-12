@@ -113,7 +113,6 @@ namespace Pumps {
 	// Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
 	// Using/Aliasing
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::AnyEnergyManagementSystemInModel;
 	using DataGlobals::SecInHour;
 	using DataGlobals::BeginEnvrnFlag;
@@ -194,7 +193,7 @@ namespace Pumps {
 		NumPumpsFullLoad = 0;
 		GetInputFlag = true;
 		PumpMassFlowRate = 0.0 ;
-		PumpHeattoFluid= 0.0 ; 
+		PumpHeattoFluid= 0.0 ;
 		Power= 0.0 ;
 		ShaftPower= 0.0 ;
 		PumpEquip.deallocate();
@@ -766,7 +765,7 @@ namespace Pumps {
 			} else {
 				// Calc Condensate Pump Water Volume Flow Rate
 				SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameNoColon );
-				TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+				TempWaterDensity = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 				PumpEquip( PumpNum ).NomVolFlowRate = ( PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity ) / TempWaterDensity;
 			}
 
@@ -1209,7 +1208,7 @@ namespace Pumps {
 		if ( PumpEquip( PumpNum ).PumpInitFlag && BeginEnvrnFlag ) {
 			if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
 
-				TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+				TempWaterDensity = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 				SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineName );
 				PumpEquip( PumpNum ).NomVolFlowRate = ( PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity ) / TempWaterDensity;
 
@@ -1228,7 +1227,7 @@ namespace Pumps {
 				PumpEquip( PumpNum ).MassFlowRateMin = PumpEquip( PumpNum ).MinVolFlowRate * SteamDensity;
 
 			} else {
-				TempWaterDensity = GetDensityGlycol( PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidIndex, RoutineName );
+				TempWaterDensity = GetDensityGlycol( PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidIndex, RoutineName );
 				mdotMax = PumpEquip( PumpNum ).NomVolFlowRate * TempWaterDensity;
 				//mdotMin = PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
 				//see note above
@@ -1773,9 +1772,9 @@ namespace Pumps {
 
 		// Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
 		if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
-			TempWaterDensity = GetDensityGlycol( PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidIndex, RoutineName );
+			TempWaterDensity = GetDensityGlycol( PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidIndex, RoutineName );
 		} else {
-			TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+			TempWaterDensity = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 		}
 
 		// note: we assume pump impeller efficiency is 78% for autosizing
@@ -1821,7 +1820,7 @@ namespace Pumps {
 					if ( ! PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( PumpEquip( PumpNum ).LoopSideNum ).BranchPumpsExist ) {
 						// size pump to full flow of plant loop
 						if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
-							TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+							TempWaterDensity = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 							SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameSizePumps );
 							PumpEquip( PumpNum ).NomSteamVolFlowRate = PlantSizData( PlantSizNum ).DesVolFlowRate * PumpSizFac;
 							PumpEquip( PumpNum ).NomVolFlowRate = PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -1832,7 +1831,7 @@ namespace Pumps {
 						// Distribute sizes evenly across all branch pumps
 						DesVolFlowRatePerBranch = PlantSizData( PlantSizNum ).DesVolFlowRate / PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( PumpEquip( PumpNum ).LoopSideNum ).TotalPumps;
 						if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
-							TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+							TempWaterDensity = GetDensityGlycol( fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName );
 							SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameSizePumps );
 							PumpEquip( PumpNum ).NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
 							PumpEquip( PumpNum ).NomVolFlowRate = PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -1870,9 +1869,9 @@ namespace Pumps {
 		//  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
 		if ( PumpEquip( PumpNum ).NomPowerUseWasAutoSized ) {
 			if ( PumpEquip( PumpNum ).NomVolFlowRate >= SmallWaterVolFlow ) {
-				switch ( PumpEquip( PumpNum ).powerSizingMethod ) 
+				switch ( PumpEquip( PumpNum ).powerSizingMethod )
 				{
-		
+
 				case sizePowerPerFlow: {
 					TotalEffic = PumpEquip( PumpNum ).NomPumpHead / PumpEquip( PumpNum ).powerPerFlowScalingFactor;
 					break;

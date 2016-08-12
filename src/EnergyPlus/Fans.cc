@@ -956,7 +956,8 @@ namespace Fans {
 			SetupOutputVariable( "Fan Runtime Fraction []", Fan( FanNum ).FanRuntimeFraction, "System", "Average", Fan( FanNum ).FanName );
 		}
 
-		ManageEMS( emsCallFromComponentGetInput );
+		bool anyRan;
+		ManageEMS( emsCallFromComponentGetInput, anyRan );
 		MySizeFlag.dimension( NumFans, true );
 
 	}
@@ -1404,15 +1405,15 @@ namespace Fans {
 			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Motor Output Power [W]", Fan( FanNum ).MotorMaxOutPwr );
 			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design VFD Output Power [W]", Fan( FanNum ).VFDMaxOutPwr );
 			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Rated Power [W]", RatedPower );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Drive Ratio [-]", Fan( FanNum ).PulleyDiaRatio );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Drive Ratio []", Fan( FanNum ).PulleyDiaRatio );
 			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Belt Output Torque [Nm]", Fan( FanNum ).BeltMaxTorque );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Fan Efficiency  [-]", Fan( FanNum ).FanWheelEff );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Maximum Belt Efficiency [-]", Fan( FanNum ).BeltMaxEff );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Belt Efficiency [-]", Fan( FanNum ).BeltEff );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Maximum Motor Efficiency [-]", Fan( FanNum ).MotorMaxEff );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Motor Efficiency [-]", Fan( FanNum ).MotEff );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design VFD Efficiency [-]", Fan( FanNum ).VFDEff );
-			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Combined Efficiency [-]", Fan( FanNum ).FanEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Fan Efficiency  []", Fan( FanNum ).FanWheelEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Maximum Belt Efficiency []", Fan( FanNum ).BeltMaxEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Belt Efficiency []", Fan( FanNum ).BeltEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Maximum Motor Efficiency []", Fan( FanNum ).MotorMaxEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Motor Efficiency []", Fan( FanNum ).MotEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design VFD Efficiency []", Fan( FanNum ).VFDEff );
+			ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Combined Efficiency []", Fan( FanNum ).FanEff );
 
 			//cpw31Aug2010 Temporary code for debugging fan component model
 			//    WRITE(300,*) TRIM(RoundSigDigits(RhoAir,4))//','//TRIM(RoundSigDigits(FanVolFlow,4)) &

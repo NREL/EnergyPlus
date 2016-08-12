@@ -1,0 +1,162 @@
+\section{Zone Equipment Simulation}\label{zone-equipment-simulation}
+
+When the EnergyPlus HVAC simulation manager needs to simulate the zone equipment side of the air loop it calls \emph{ManageZoneEquipment}, the zone equipment simulation manager subroutine. Like the other managers, \emph{ManageZoneEquipment} has a very simple structure:
+
+\begin{lstlisting}
+IF (GetInputFlag) THEN
+  CALL GetZoneEquipment
+  GetInputFlag = .FALSE.
+END IF
+
+CALL InitZoneEquipment(FirstHVACIteration)
+
+IF (ZoneSizingCalc) THEN
+  CALL SizeZoneEquipment
+ELSE
+  CALL SimZoneEquipment(FirstHVACIteration, SimAir)
+END IF
+
+CALL RecordZoneEquipment(SimAir)
+ 
+CALL ReportZoneEquipment
+
+SimZone = .False.
+
+RETURN
+\end{lstlisting}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  If the user input data has not been input, get the data and store it in the zone equipment data structures
+\item
+  Perform zone equipment initialization calculations.
+\item
+  If calculation of the design zone air flow rates and loads needs to be done, do it. The results of this calculation are stored in the zone sizing data structures and used by the component automatic sizing algorithms and the central system sizing calculations.
+\item
+  Otherwise simulate all of the zone equipment.
+\item
+  Transfer the zone equipment outlet node data to the inlet nodes of the primary air systems and check for convergence (done in RecordZoneEquipment by calling UpdateHVACInterface).
+\end{enumerate}
+
+\subsection{Input data}\label{input-data-000}
+
+The input specifying a set of zone equipment consists of:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
+\def\labelenumiii{\roman{enumiii}.}
+  \item
+    the ZoneHVAC:EquipmentConnections object data;
+    \begin{enumerate}
+      \item the zone connection to the air loop – air inlet nodes, exhaust nodes, outlet node, zone node;
+      \item the components serving each zone – air terminal units, fan coils etc.;
+    \end{enumerate}
+  \item
+    zone supply air path data;
+    \begin{enumerate}
+      \item zone splitters and supply plenums;
+    \end{enumerate}
+  \item
+    zone return air path data;
+    \begin{enumerate}
+      \item zone mixer and return plenums;
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Initialization Calculations}\label{initialization-calculations-000}
+
+\subsubsection{One Time Calculations}\label{one-time-calculations-000}
+
+There are no one time calculations for zone equipment
+
+\subsubsection{Begin Environment Initializations}\label{begin-environment-initializations-000}
+
+For each controlled zone initialize the zone inlet, exhaust and zone nodes to standard conditions. Namely:
+
+\begin{equation}
+{T_{node}} = {20^{\rm{o}}}C
+\end{equation}
+
+\begin{equation}
+{W_{node}} = {W_{oa}}
+\end{equation}
+
+\begin{equation}
+{h_{node}} = {\mathop{\rm PsyHFnTdbW}\nolimits} {\rm{(}}20.0,{W_{oa}}{\rm{)}}
+\end{equation}
+
+\begin{equation}
+{\dot m_{node}} = 0
+\end{equation}
+
+\begin{equation}
+Q{u_{node}} = 1.0
+\end{equation}
+
+\begin{equation}
+{p_{node}} = {p_{oa}}
+\end{equation}
+
+where \emph{W\(_{oa}\)} is the humidity of the outside air; \({\rm{PsyHFnTdbW}}\) is the EnergyPlus psychrometric function for enthalpy \emph{h}, given temperature and humidity ratio; \emph{p\(_{oa}\)} is the pressure of the outside air; and \emph{Qu} is quality.
+
+\subsubsection{System Time Step Initializations}\label{system-time-step-initializations-000}
+
+For each controlled zone, set the exhaust nodes conditions equal to the zone node conditions; except set the exhaust nodes mass flow rate and min and max available mass flow rates to zero.
+
+\subsection{Simulation}\label{simulation-003}
+
+The subroutine \emph{SimZoneEquipment} does the actual simulation of all the zone equipment. Note that this includes components that are part of the demand side of an air loop as well as components that are independent of any air loop.
+
+For zone equipment components that are part of the demand side of an air loop the simulation sequence is effectively performed in the direction of the air flow. First the supply air plenums and zone splitters are simulated in their input order. Then the air terminal units are simulated followed by the zone return plenums and zone mixer. Each air terminal unit sets its inlet node to the air mass flow rate required to satisfy its zone load. These mass flow rates are then passed back upstream to the air loop demand-side inlet nodes at the end of each zone equipment simulation sequence. These demand-side inlet mass flow rates are then used as mass flow rate setpoints in the air loop supply-side simulation.
+
+If multiple air-conditioning components are attached to a zone, the components are simulated in the order specified by the user assigned priority given in the ZoneHVAC:EquipmentList object.
+
+For each full air loop there should be 1 supply air path for each primary air system outlet (i.e.~1 for single duct systems,~ 2 for dual duct systems). For each full air loop there should be one return air path. The supply air paths consist of any combination of zone splitters and zone supply air plenums as long as it forms a tree structure with the supply air path inlet node the root and the air terminal unit inlet nodes as the leaves. The return air path configuration is limited to a single mixer; there may be multiple return plenums.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
+\def\labelenumiii{\roman{enumiii}.}
+  \item
+    Loop over all the supply air paths.
+    \begin{enumerate}
+      \item
+        Loop over each component (supply plenum or zone splitter) on the supply air path and simulate each component. The components are simulated in input order.
+    \end{enumerate}
+  \item
+    Loop over all the controlled zones.
+    \begin{enumerate}
+      \item
+        Set the required system output.
+      \item
+        Loop over the components serving the zone in the user prioritized order.
+        \begin{enumerate}
+          \item
+            Simulate each component.
+          \item
+            Increment the required system output.
+        \end{enumerate}
+    \end{enumerate}
+  \item
+    Loop over all the supply air paths
+    \begin{enumerate}
+      \item
+        Loop over the components on each supply air path in reverse input order. This reverse order simulation passes the air terminal units inlet mass flows back upstream to the return air path inlet node.
+      \item
+        Check to see if the supply air path inlet node mass flow rate has changed. If it has set the \emph{SimAir} flag to \emph{true}. This signals the HVAC manager that the supply-side of the air loop needs to be resimulated.
+    \end{enumerate}
+  \item
+    Calculate the zone air flow mass balance -- the zone inlet and exhaust mass flow rates are summed and the zone node and return air node mass flow rates are determined by a mass balance for each zone.
+  \item
+    Calculate the conditions at each zone return air node. Here energy not included in the zone energy balance such as light-heat-to-return-air is added to the return nodes of the controlled zones.
+  \item
+    Loop over all of the return air paths.
+    \begin{enumerate}
+      \item
+        Loop over each component (return plenum or zone mixer) on the return air path and simulate each component.
+    \end{enumerate}
+\end{enumerate}
+
+This completes a single simulation sequence of all the zone equipment.

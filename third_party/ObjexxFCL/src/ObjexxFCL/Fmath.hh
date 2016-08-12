@@ -948,7 +948,7 @@ mod( T const & x, T const & y )
 // i(mod n) : float Arguments
 inline
 float
-mod( float const & i, float const & n )
+mod( float const i, float const n )
 {
 	assert( n != 0.0f );
 	return ( n == 0.0f ? 0.0f : std::fmod( i, n ) );
@@ -957,7 +957,7 @@ mod( float const & i, float const & n )
 // i(mod n) : double Arguments
 inline
 double
-mod( double const & i, double const & n )
+mod( double const i, double const n )
 {
 	assert( n != 0.0 );
 	return ( n == 0.0 ? 0.0 : std::fmod( i, n ) );

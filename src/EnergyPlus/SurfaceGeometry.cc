@@ -285,6 +285,7 @@ namespace SurfaceGeometry {
 		bool nonInternalMassSurfacesPresent;
 		bool DetailedWWR;
 
+
 		// Formats
 		static gio::Fmt Format_720( "(' Zone Information, ',A,28(',',A))" );
 		static gio::Fmt Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
@@ -667,6 +668,7 @@ namespace SurfaceGeometry {
 
 		// Do the Stratosphere check
 		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
 
 		//  IF (ALLOCATED(ZoneSurfacesCount)) DEALLOCATE(ZoneSurfacesCount)
 		//  IF (ALLOCATED(ZoneSubSurfacesCount)) DEALLOCATE(ZoneSubSurfacesCount)
@@ -1817,10 +1819,6 @@ namespace SurfaceGeometry {
 				SurfError = true;
 				ShowSevereError( RoutineName + "Zone " + Zone( ZoneNum ).Name + " has only one floor, wall or roof, and this surface has a window." );
 				ShowContinueError( "Add more floors, walls or roofs, or an internal mass surface." );
-			}
-			if ( ( OpaqueHTSurfs + InternalMassSurfs ) < 6 ) {
-				ShowWarningError( RoutineName + "The total number of floors, walls, roofs and internal mass surfaces in Zone " + Zone( ZoneNum ).Name );
-				ShowContinueError( "is < 6. This may cause an inaccurate zone heat balance calculation." );
 			}
 		}
 
@@ -8307,7 +8305,7 @@ namespace SurfaceGeometry {
 		//  REAL(r64) testval
 		//  INTEGER ploop
 		//  INTEGER vloop
-		int ThisShape( 0 );
+		SurfaceShape ThisShape( SurfaceShape::None );
 		bool BaseSurface; // True if a base surface or a detached shading surface
 		Real64 ThisSurfAz;
 		Real64 ThisSurfTilt;
@@ -8396,16 +8394,16 @@ namespace SurfaceGeometry {
 			Surface( ThisSurf ).Width = ThisWidth;
 			Surface( ThisSurf ).Height = ThisHeight; // For a horizontal surface this is actually length!
 			if ( Surface( ThisSurf ).Sides == 3 ) {
-				Surface( ThisSurf ).Shape = Triangle;
+				Surface( ThisSurf ).Shape = SurfaceShape::Triangle;
 			} else if ( Surface( ThisSurf ).Sides == 4 ) {
 				// Test for rectangularity
 				if ( isRectangle( ThisSurf ) ) {
-					Surface( ThisSurf ).Shape = Rectangle;
+					Surface( ThisSurf ).Shape = SurfaceShape::Rectangle;
 				} else {
-					Surface( ThisSurf ).Shape = Quadrilateral;
+					Surface( ThisSurf ).Shape = SurfaceShape::Quadrilateral;
 				}
 			} else { // Surface( ThisSurf ).Sides > 4
-				Surface( ThisSurf ).Shape = Polygonal;
+				Surface( ThisSurf ).Shape = SurfaceShape::Polygonal;
 				if ( std::abs( ThisHeight * ThisWidth - Surface( ThisSurf ).GrossArea ) > 0.001 ) {
 					Surface( ThisSurf ).Width = std::sqrt( Surface( ThisSurf ).GrossArea );
 					Surface( ThisSurf ).Height = Surface( ThisSurf ).Width;
@@ -8422,11 +8420,11 @@ namespace SurfaceGeometry {
 			if ( HeatTransSurf ) {
 
 				if ( Surface( ThisSurf ).Sides == 4 ) {
-					ThisShape = RectangularDoorWindow;
+					ThisShape = SurfaceShape::RectangularDoorWindow;
 				} else if ( Surface( ThisSurf ).Sides == 3 && Surface( ThisSurf ).Class == SurfaceClass_Window ) {
-					ThisShape = TriangularWindow;
+					ThisShape = SurfaceShape::TriangularWindow;
 				} else if ( Surface( ThisSurf ).Sides == 3 && Surface( ThisSurf ).Class == SurfaceClass_Door ) {
-					ThisShape = TriangularDoor;
+					ThisShape = SurfaceShape::TriangularDoor;
 				} else {
 					assert( false );
 				}
@@ -8437,12 +8435,12 @@ namespace SurfaceGeometry {
 					// left or right fin
 					if ( ThisSurfAz < 0.0 ) ThisSurfAz += 360.0;
 					if ( ThisSurfAz > Surface( Surface( ThisSurf ).BaseSurf ).Azimuth ) {
-						ThisShape = RectangularLeftFin;
+						ThisShape = SurfaceShape::RectangularLeftFin;
 					} else {
-						ThisShape = RectangularRightFin;
+						ThisShape = SurfaceShape::RectangularRightFin;
 					}
 				} else {
-					ThisShape = RectangularOverhang;
+					ThisShape = SurfaceShape::RectangularOverhang;
 				}
 
 			}
@@ -8450,7 +8448,7 @@ namespace SurfaceGeometry {
 			// Setting relative coordinates for shadowing calculations for subsurfaces
 			{ auto const SELECT_CASE_var( ThisShape );
 
-			if ( SELECT_CASE_var == RectangularDoorWindow ) { // Rectangular heat transfer subsurface
+			if ( SELECT_CASE_var == SurfaceShape::RectangularDoorWindow ) { // Rectangular heat transfer subsurface
 
 				PlaneEquation( Surface( Surface( ThisSurf ).BaseSurf ).Vertex, Surface( Surface( ThisSurf ).BaseSurf ).Sides, BasePlane, SError );
 				if ( SError ) {
@@ -8548,7 +8546,7 @@ namespace SurfaceGeometry {
 					}
 				}
 
-			} else if ( ( SELECT_CASE_var == TriangularWindow ) || ( SELECT_CASE_var == TriangularDoor ) ) {
+			} else if ( ( SELECT_CASE_var == SurfaceShape::TriangularWindow ) || ( SELECT_CASE_var == SurfaceShape::TriangularDoor ) ) {
 
 				PlaneEquation( Surface( Surface( ThisSurf ).BaseSurf ).Vertex, Surface( Surface( ThisSurf ).BaseSurf ).Sides, BasePlane, SError );
 				if ( SError ) {
@@ -8589,7 +8587,7 @@ namespace SurfaceGeometry {
 				Ypsv( 3 ) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
 				Zpsv( 3 ) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
 
-			} else if ( SELECT_CASE_var == RectangularOverhang ) {
+			} else if ( SELECT_CASE_var == SurfaceShape::RectangularOverhang ) {
 
 				Xp = Surface( ThisSurf ).Vertex( 2 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 2 ).y - BaseYLLC;
@@ -8616,7 +8614,7 @@ namespace SurfaceGeometry {
 				Zpsv( 2 ) = 0.0;
 				Zpsv( 3 ) = 0.0;
 
-			} else if ( SELECT_CASE_var == RectangularLeftFin ) {
+			} else if ( SELECT_CASE_var == SurfaceShape::RectangularLeftFin ) {
 
 				Xp = Surface( ThisSurf ).Vertex( 2 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 2 ).y - BaseYLLC;
@@ -8643,7 +8641,7 @@ namespace SurfaceGeometry {
 				Zpsv( 2 ) = 0.0;
 				Zpsv( 3 ) = 0.0;
 
-			} else if ( SELECT_CASE_var == RectangularRightFin ) {
+			} else if ( SELECT_CASE_var == SurfaceShape::RectangularRightFin ) {
 
 				Xp = Surface( ThisSurf ).Vertex( 2 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 2 ).y - BaseYLLC;
@@ -10496,9 +10494,9 @@ namespace SurfaceGeometry {
 						//          CALL ShowContinueError('...theta angle=['//TRIM(RoundSigDigits(Theta,6))//']')
 						//          CALL ShowContinueError('...last theta angle=['//TRIM(RoundSigDigits(LastTheta,6))//']')
 					}
-					SurfaceTmp( SurfNum ).IsConvex = false;
-					break;
 				}
+				SurfaceTmp( SurfNum ).IsConvex = false;
+				break;
 			}
 			PrevSignFlag = SignFlag;
 			LastTheta = Theta;

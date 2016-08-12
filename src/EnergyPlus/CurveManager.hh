@@ -103,7 +103,7 @@ namespace CurveManager {
 	extern int const DoubleExponentialDecay;
 	extern int const QuadLinear;
 	extern int const CubicLinear;
-	extern int const ChillerPartLoadCustom;
+	extern int const ChillerPartLoadWithLift;
 
 	// Interpolation Types
 	extern int const LinearInterpolationOfTable;
@@ -143,7 +143,7 @@ namespace CurveManager {
 	extern int const CurveType_DoubleExponentialDecay;
 	extern int const CurveType_QuadLinear;
 	extern int const CurveType_CubicLinear;
-	extern int const CurveType_ChillerPartLoadCustom;
+	extern int const CurveType_ChillerPartLoadWithLift;
 
 	extern Array1D_string const cCurveTypes;
 
@@ -291,6 +291,16 @@ namespace CurveManager {
 		Real64 CurveMax; // maximum value of curve output
 		bool CurveMinPresent; // If TRUE, then cap minimum curve output
 		bool CurveMaxPresent; // if TRUE, then cap maximum curve output
+		bool Var1MinPresent;  // uses data set limit to set Var1Min if false
+		bool Var1MaxPresent;  // uses data set limit to set Var1Max if false
+		bool Var2MinPresent;  // uses data set limit to set Var2Min if false
+		bool Var2MaxPresent;  // uses data set limit to set Var2Max if false
+		bool Var3MinPresent;  // uses data set limit to set Var3Min if false
+		bool Var3MaxPresent;  // uses data set limit to set Var3Max if false
+		bool Var4MinPresent;  // uses data set limit to set Var4Min if false
+		bool Var4MaxPresent;  // uses data set limit to set Var4Max if false
+		bool Var5MinPresent;  // uses data set limit to set Var5Min if false
+		bool Var5MaxPresent;  // uses data set limit to set Var5Max if false
 		Array1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
 		bool EMSOverrideOn; // if TRUE, then EMS is calling to override curve value
 		Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
@@ -340,6 +350,16 @@ namespace CurveManager {
 			CurveMax( 0.0 ),
 			CurveMinPresent( false ),
 			CurveMaxPresent( false ),
+			Var1MinPresent( false ),
+			Var1MaxPresent( false ),
+			Var2MinPresent( false ),
+			Var2MaxPresent( false ),
+			Var3MinPresent( false ),
+			Var3MaxPresent( false ),
+			Var4MinPresent( false ),
+			Var4MaxPresent( false ),
+			Var5MinPresent( false ),
+			Var5MaxPresent( false ),
 			EMSOverrideOn( false ),
 			EMSOverrideCurveValue( 0.0 ),
 			CurveOutput( 0.0 ),
@@ -412,6 +432,9 @@ namespace CurveManager {
 
 	void
 	GetCurveInput();
+
+	void
+	GetCurveInputData( bool & ErrorsFound );
 
 	void
 	InitCurveReporting();

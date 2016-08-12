@@ -106,6 +106,7 @@ namespace EMSManager {
 	void
 	ManageEMS(
 		int const iCalledFrom, // indicates where subroutine was called from, parameters in DataGlobals.
+		bool & anyProgramRan, // true if any Erl programs ran for this call 
 		Optional_int_const ProgramManagerToRun = _ // specific program manager to run
 	);
 
@@ -174,6 +175,9 @@ namespace EMSManager {
 
 	void
 	SetupZoneInfoAsInternalDataAvail();
+
+	void
+	checkForUnusedActuatorsAtEnd();
 
 } // EMSManager
 

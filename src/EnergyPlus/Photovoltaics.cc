@@ -727,7 +727,7 @@ namespace Photovoltaics {
 
 			//set up report variables CurrentModuleObject='Photovoltaics'
 			SetupOutputVariable( "Generator Produced DC Electric Power [W]", PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
-			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
 			SetupOutputVariable( "Generator PV Array Efficiency []", PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
 
 			// CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
@@ -2145,8 +2145,8 @@ namespace Photovoltaics {
 			Real64 const AM( 1.0 / ( std::cos( SolZen * DegToRadians ) + 0.5057 * std::pow( 96.08 - SolZen, -1.634 ) ) );
 			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		} else {
-			AbsoluteAirMass = 999.0;
-			// should maybe add a show warning msg.
+			Real64 const AM( 36.32 ); // evaluated above at SolZen = 89.9 issue #5528
+			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		}
 
 		return AbsoluteAirMass;

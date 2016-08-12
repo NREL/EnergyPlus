@@ -121,16 +121,11 @@ namespace UnitHeater {
 	// Rick Strand's unit heater module which was based upon Fred Buhl's fan coil
 	// module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataGlobals::DisplayExtraWarnings;
@@ -149,7 +144,6 @@ namespace UnitHeater {
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using namespace FluidProperties;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	std::string const cMO_UnitHeater( "ZoneHVAC:UnitHeater" );
 
@@ -161,9 +155,16 @@ namespace UnitHeater {
 
 	static std::string const fluidNameSteam( "STEAM" );
 
-	// DERIVED TYPE DEFINITIONS
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitUnitHeaterOneTimeFlag( true );
+		bool GetUnitHeaterInputFlag( true );
+	}
 
-	// MODULE VARIABLE DECLARATIONS:
 	bool HCoilOn; // TRUE if the heating coil (gas or electric especially) should be running
 	int NumOfUnitHeats; // Number of unit heaters in the input file
 	Real64 QZnReq; // heating or cooling needed by zone [watts]
@@ -188,6 +189,8 @@ namespace UnitHeater {
 		CheckEquipName.deallocate();
 		UnitHeat.deallocate();
 		UnitHeatNumericFields.deallocate();
+		InitUnitHeaterOneTimeFlag = true;
+		GetUnitHeaterInputFlag = true;
 	}
 
 	void
@@ -236,12 +239,11 @@ namespace UnitHeater {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitHeatNum; // index of unit heater being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 
 		// FLOW:
-		if ( GetInputFlag ) {
+		if ( GetUnitHeaterInputFlag ) {
 			GetUnitHeaterInput();
-			GetInputFlag = false;
+			GetUnitHeaterInputFlag = false;
 		}
 
 		// Find the correct Unit Heater Equipment
@@ -665,9 +667,6 @@ namespace UnitHeater {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdRhoAir;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -688,20 +687,10 @@ namespace UnitHeater {
 		using namespace DataZoneEnergyDemands;
 		using WaterCoils::SimulateWaterCoilComponents;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitUnitHeater" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -719,7 +708,7 @@ namespace UnitHeater {
 		// FLOW:
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitUnitHeaterOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumOfUnitHeats );
 			MySizeFlag.allocate( NumOfUnitHeats );
@@ -729,7 +718,7 @@ namespace UnitHeater {
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
 			MyZoneEqFlag = true;
-			MyOneTimeFlag = false;
+			InitUnitHeaterOneTimeFlag = false;
 
 		}
 
@@ -790,7 +779,7 @@ namespace UnitHeater {
 			Node( InNode ).MassFlowRateMin = 0.0;
 
 			if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
-				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				UnitHeat( UnitHeatNum ).MaxHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MaxVolHotWaterFlow;
 				UnitHeat( UnitHeatNum ).MinHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MinVolHotWaterFlow;
@@ -886,9 +875,6 @@ namespace UnitHeater {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace InputProcessor;
@@ -907,17 +893,8 @@ namespace UnitHeater {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeUnitHeater" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1091,8 +1068,8 @@ namespace UnitHeater {
 							}
 
 							if ( DesCoilLoad >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;

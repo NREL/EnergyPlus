@@ -95,7 +95,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.6;
 
   Timestep,6;
 
@@ -2150,7 +2150,7 @@
   AvailabilityManager:HybridVentilation,
     Hybrid ventilation controller,  !- Name
     ,                        !- HVAC Air Loop Name
-    North Zone,              !- Controlled Zone Name
+    North Zone,              !- Control Zone Name
     Hybrid Control Mode Schedule,  !- Ventilation Control Mode Schedule Name
     Yes,                     !- Use Weather File Rain Indicators
     40.0,                    !- Maximum Wind Speed {m/s}

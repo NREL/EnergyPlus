@@ -10,6 +10,8 @@ if(NOT PROFILE_USE)
 endif()
 
 SET( SRC
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
   Timer.h
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
@@ -198,6 +200,8 @@ SET( SRC
   EconomicTariff.hh
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
+  ElectricPowerServiceManager.hh
+  ElectricPowerServiceManager.cc
   EnergyPlus.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
@@ -326,8 +330,6 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  ManageElectricPower.cc
-  ManageElectricPower.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
   MicroCHPElectricGenerator.cc
@@ -372,7 +374,6 @@ SET( SRC
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
-  PierceSurface.cc
   PierceSurface.hh
   PipeHeatTransfer.cc
   PipeHeatTransfer.hh
@@ -382,6 +383,7 @@ SET( SRC
   PlantCentralGSHP.hh
   PlantChillers.cc
   PlantChillers.hh
+  PlantComponent.hh
   PlantComponentTemperatureSources.cc
   PlantComponentTemperatureSources.hh
   PlantCondLoopOperation.cc
@@ -405,6 +407,7 @@ SET( SRC
   PlantUtilities.hh
   PlantValves.cc
   PlantValves.hh
+  Platform.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -439,6 +442,7 @@ SET( SRC
   ScheduleManager.hh
   SetPointManager.cc
   SetPointManager.hh
+  Shape.hh
   SimAirServingZones.cc
   SimAirServingZones.hh
   SimulationManager.cc
@@ -469,6 +473,8 @@ SET( SRC
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
   SurfaceGroundHeatExchanger.hh
+  SurfaceOctree.cc
+  SurfaceOctree.hh
   SwimmingPool.cc
   SwimmingPool.hh
   SystemAvailabilityManager.cc
@@ -586,6 +592,7 @@ set_target_properties(
 install( TARGETS energyplusapi
   RUNTIME DESTINATION ./
   LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
 )
 
 if (MINGW)

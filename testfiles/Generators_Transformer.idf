@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2591,14 +2591,14 @@
     AlternatingCurrent,      !- Electrical Buss Type
     ,                        !- Inverter Object Name
     ,                        !- Electrical Storage Object Name
-    Transformer 2;           !- Transformer Object Name
+    ;                        !- Transformer Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ELECTRICLOADCENTER:Transformer ===========
 
   ElectricLoadCenter:Transformer,
     Transformer 2,           !- Name
     Always On,               !- Availability Schedule Name
-    PowerOutFromOnsiteGeneration,  !- Transformer Usage
+    PowerOutToGrid,  !- Transformer Usage
     ,                        !- Zone Name
     ,                        !- Radiative Fraction
     150000,                  !- Rated Capacity {VA}

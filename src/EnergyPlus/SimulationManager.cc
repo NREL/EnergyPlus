@@ -109,6 +109,7 @@ extern "C" {
 #include <DualDuct.hh>
 #include <EconomicLifeCycleCost.hh>
 #include <EconomicTariff.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <EMSManager.hh>
 #include <ExteriorEnergyUse.hh>
 #include <ExternalInterface.hh>
@@ -123,7 +124,6 @@ extern "C" {
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
-#include <ManageElectricPower.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -293,7 +293,6 @@ namespace SimulationManager {
 		using BranchInputManager::ManageBranchInput;
 		using BranchInputManager::TestBranchIntegrity;
 		using BranchInputManager::InvalidBranchDefinitions;
-		using ManageElectricPower::VerifyCustomMetersElecPowerMgr;
 		using MixedAir::CheckControllerLists;
 		using EMSManager::CheckIfAnyEMS;
 		using EMSManager::ManageEMS;
@@ -377,6 +376,7 @@ namespace SimulationManager {
 		CheckIfAnySlabs();
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
+		createFacilityElectricPowerServiceObject();
 
 		ManageBranchInput(); // just gets input and returns.
 
@@ -425,7 +425,7 @@ namespace SimulationManager {
 			SetupPollutionMeterReporting();
 			UpdateMeterReporting();
 			CheckPollutionMeterReporting();
-			VerifyCustomMetersElecPowerMgr();
+			facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
 			SetupPollutionCalculations();
 			InitDemandManagers();
 
@@ -452,8 +452,8 @@ namespace SimulationManager {
 			}
 
 			CreateEnergyReportStructure();
-
-			ManageEMS( emsCallFromSetupSimulation ); // point to finish setup processing EMS, sensor ready now
+			bool anyEMSRan;
+			ManageEMS( emsCallFromSetupSimulation, anyEMSRan ); // point to finish setup processing EMS, sensor ready now
 
 			ProduceRDDMDD();
 
@@ -518,7 +518,8 @@ namespace SimulationManager {
 				isFinalYear = true;
 			}
 
-			ManageEMS( emsCallFromBeginNewEvironment ); // calling point
+			bool anyEMSRan;
+			ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
@@ -632,6 +633,8 @@ namespace SimulationManager {
 			}
 		}
 
+		PlantManager::CheckOngoingPlantWarnings();
+
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
@@ -640,6 +643,8 @@ namespace SimulationManager {
 		SimCostEstimate();
 
 		ComputeTariff(); //     Compute the utility bills
+
+		EMSManager::checkForUnusedActuatorsAtEnd();
 
 		ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
