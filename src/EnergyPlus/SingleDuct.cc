@@ -2752,7 +2752,6 @@ namespace SingleDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int AirLoopNum; // Index to air loop
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		Real64 OAMassFlow; // outside air mass flow rate (kg/s)
 
@@ -2771,8 +2770,7 @@ namespace SingleDuct {
 			// Calculate outdoor air flow rate, zone multipliers are applied in GetInput
 			if ( AirLoopOAFrac > 0.0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Sys( SysNum ).OARequirementsPtr, Sys( SysNum ).ActualZoneNum, AirLoopControlInfo( AirLoopNum ).AirLoopDCVFlag, UseMinOASchFlag );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( Sys( SysNum ).InletNodeNum ).Press, Node( Sys( SysNum ).InletNodeNum ).Temp, Node( Sys( SysNum ).InletNodeNum ).HumRat );
-				OAMassFlow = OAVolumeFlowRate * RhoAir;
+				OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
 				// convert OA mass flow rate to supply air flow rate based on air loop OA fraction
 				SAMassFlow = OAMassFlow / AirLoopOAFrac;
