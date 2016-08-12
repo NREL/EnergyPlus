@@ -7,8 +7,8 @@
 !                          conditioned zones. Roof with no plenum. No ground contact with floor.
 !                          Outdoor air is modulated based on occupancy and floor area.
 !
-! Highlights:              This file performs zone pressure control by varying relief flow rate in an OA mixer. It also 
-!                          provides forced ventilation during system on period and natural ventilation during system off 
+! Highlights:              This file performs zone pressure control by varying relief flow rate in an OA mixer. It also
+!                          provides forced ventilation during system on period and natural ventilation during system off
 !                          period calculated by the AirflowNetwork model.
 !
 !
@@ -1721,22 +1721,18 @@
     OA Sys 1,                !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan 1,            !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
     Cooling Coil Air Inlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                  !- Component 2 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 3 Object Type
     DX Cooling Coil System 1,!- Component 3 Name
     Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Coil:Heating:Gas,        !- Component 4 Object Type
     Main Heating Coil 1,     !- Component 4 Name
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 4 Outlet Node Name
-    PASSIVE;                 !- Component 4 Branch Control Type
+    Air Loop Outlet Node;    !- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Typical Terminal Reheat 1,  !- Name
@@ -3032,11 +3028,11 @@
   Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
 
   Output:Variable,SupplyFanLink,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
-  
+
   Output:Variable,SupplyFanLink,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
 
   Output:Variable,OASystemFanLink,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
- 
+
   Output:Variable,OASystemFanLink,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
 
   Output:Variable,OASystemInletLink,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
