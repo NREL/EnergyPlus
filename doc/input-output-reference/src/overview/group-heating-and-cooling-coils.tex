@@ -1217,7 +1217,7 @@ This is the subcooling degrees of the VRF system operating at heating mode. This
 
 \subsection{Coil:Heating:Gas}\label{coilheatinggas-000}
 
-The gas heating coil is a simple capacity model with a user inputted gas burner efficiency. The default for the gas burner efficiency is 80\%. This coil will be simpler than shown in Figure~\ref{fig:example-air-loop-heating-cooling-coil} since it will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.
+The fuel heating coil is a simple capacity model with a user inputted gas burner efficiency. The default for the burner efficiency is 80\%. This coil will be simpler than shown in Figure~\ref{fig:example-air-loop-heating-cooling-coil} since it will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.
 
 \subsubsection{Inputs}\label{inputs-10-006}
 
@@ -1229,7 +1229,11 @@ A unique identifying name for each coil.
 
 Schedule that defines when the coil is available. If the schedule s value is 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
 
-\paragraph{Field: Gas Burner Efficiency}\label{field-gas-burner-efficiency}
+\paragraph{Field: Fuel Type}\label{field-gas-burner-efficiency}
+
+This field designates the appropriate fuel type for the coil. Valid fuel types are: Gas, NaturalGas, PropaneGas, FuelOil#1, FuelOil#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. NaturalGas is the default.
+
+\paragraph{Field: Burner Efficiency}\label{field-gas-burner-efficiency}
 
 This is user inputted gas burner efficiency (decimal, not percent) and is defaulted to 80\%.
 
@@ -1239,11 +1243,11 @@ This is the maximum capacity of the coil (W). This controlled coil will only pro
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-6}
 
-The name of the air inlet to the gas coil, i.e.~Heating Coil Air Inlet Node.
+The name of the air inlet to the coil, i.e.~Heating Coil Air Inlet Node.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-6-000}
 
-The name of the air outlet from the gas coil, i.e.~Heating Coil Air Outlet Node.
+The name of the air outlet from the coil, i.e.~Heating Coil Air Outlet Node.
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name-4}
 
@@ -1251,11 +1255,11 @@ If the coil is used in the air loop simulation and is temperature controlled usi
 
 \paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-1}
 
-This is the parasitic electric load associated with the gas coil operation, such as an inducer fan, etc.. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
+This is the parasitic electric load associated with the coil operation, such as an inducer fan, etc.. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name}
 
-This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of gas consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil). For any simulation timestep, the nominal gas consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined. The part-load curve accounts for efficiency losses due to transient coil operation.
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of fuel consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil). For any simulation timestep, the nominal fuel consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined. The part-load curve accounts for efficiency losses due to transient coil operation.
 
 The part-load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the heating coil runs continuously for the simulation timestep). For PLR values between 0 and 1 ( 0 \textless{} = PLR \textless{} 1), the following rules apply:
 
@@ -1269,9 +1273,9 @@ A typical part load fraction correlation for a conventional gas heating coil (e.
        PLF = 0.8 + 0.2(PLR)
 \end{lstlisting}
 
-\paragraph{Field: Parasitic Gas Load}\label{field-parasitic-gas-load}
+\paragraph{Field: Parasitic Fuel Load}\label{field-parasitic-gas-load}
 
-This numeric field is the parasitic gas load associated with the gas coil s operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the gas heating coil is not operating.
+This numeric field is the parasitic fuel load associated with the coil's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the heating coil is not operating.
 
 \subsubsection{Outputs}\label{outputs-9-002}
 
@@ -1283,7 +1287,7 @@ This numeric field is the parasitic gas load associated with the gas coil s oper
 \item
   HVAC,Sum,Heating Coil Gas Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Gas Rate {[}W{]}
+  HVAC,Average,Heating Coil <Fuel Type> Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Electric Energy {[}J{]}
 \item
@@ -1291,9 +1295,9 @@ This numeric field is the parasitic gas load associated with the gas coil s oper
 \item
   HVAC,Average,Heating Coil Runtime Fraction {[]}
 \item
-  HVAC,Sum,Heating Coil Ancillary Gas Energy {[}J{]}
+  HVAC,Sum,Heating Coil Ancillary <Fuel Type> Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Ancillary Gas Rate {[}W{]}
+  HVAC,Average,Heating Coil Ancillary <Fuel Type> Rate {[}W{]}
 \end{itemize}
 
 \paragraph{Heating Coil Air Heating Energy {[}J{]}}\label{heating-coil-air-heating-energy-j-2}
@@ -1304,11 +1308,11 @@ This field is the total heating output of the coil in Joules over the timestep b
 
 This field is the average heating rate output of the coil in Watts over the timestep being reported.
 
-\paragraph{Heating Coil Gas Energy {[}J{]}}\label{heating-coil-gas-energy-j}
+\paragraph{Heating Coil <Fuel Type> Energy {[}J{]}}\label{heating-coil-gas-energy-j}
 
-This field is the gas consumption of the heating coil in Joules over the timestep being reported, including the impacts of part-load performance if a part load fraction correlation is specified. This output is also added to a meter with Resource Type = Gas, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
+This field is the fuel consumption of the heating coil in Joules over the timestep being reported, including the impacts of part-load performance if a part load fraction correlation is specified. This output is also added to a meter with Resource Type = Gas, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Gas Rate {[}W{]}}\label{heating-coil-gas-rate-w}
+\paragraph{Heating Coil <Fuel Type> Rate {[}W{]}}\label{heating-coil-gas-rate-w}
 
 This field is the average gas consumption rate of the coil in Watts over the timestep being reported, including the impacts of part-load performance if a part load fraction correlation is specified.
 
@@ -1324,13 +1328,13 @@ This field is the average electric consumption rate of the heating coil auxiliar
 
 This field is the runtime fraction of the coil over the timestep being reported.
 
-\paragraph{Heating Coil Ancillary Gas Energy {[}J{]}}\label{heating-coil-ancillary-gas-energy-j}
+\paragraph{Heating Coil Ancillary <Fuel Type> Energy {[}J{]}}\label{heating-coil-ancillary-gas-energy-j}
 
-This field is the parasitic gas consumption of the heating coil in Joules over the timestep being reported (e.g., standing pilot light). The model assumes that the parasitic load is accumulated only for the portion of the simulation timestep where the gas heating coil is not operating. This output is also added to a meter with Resource Type = Gas, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
+This field is the parasitic fuel consumption of the heating coil in Joules over the timestep being reported (e.g., standing pilot light). The model assumes that the parasitic load is accumulated only for the portion of the simulation timestep where the gas heating coil is not operating. This output is also added to a meter with Resource Type = '<Fuel Type>', End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Ancillary Gas Rate {[}W{]}}\label{heating-coil-ancillary-gas-rate-w}
+\paragraph{Heating Coil Ancillary <Fuel Type> Rate {[}W{]}}\label{heating-coil-ancillary-gas-rate-w}
 
-This field is the average parasitic gas consumption rate of the heating coil (e.g., standing pilot light) in Watts over the timestep being reported. The model assumes that the parasitic load is present only for the portion of the simulation timestep where the gas heating coil is not operating.
+This field is the average parasitic gas consumption rate of the heating coil (e.g., standing pilot light) in Watts over the timestep being reported. The model assumes that the parasitic load is present only for the portion of the simulation timestep where the heating coil is not operating.
 
 \subsection{Coil:Heating:Gas:MultiStage}\label{coilheatinggasmultistage}
 
