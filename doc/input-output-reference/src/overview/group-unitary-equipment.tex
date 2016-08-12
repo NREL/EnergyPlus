@@ -99,7 +99,7 @@ This alpha field contains the identifying name given to the unitary system fan.
 
 This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. The first choice stands for ``blow through fan''. This means that the unit consists of a fan followed by the main cooling and heating coils and supplemental heating coil. The fan ``blows through'' the cooling and heating coils. The second choice stands for ``draw through fan''. This means that the unit consists of the main cooling/heating coil(s) followed by a fan, with the supplemental heater located at the outlet of the fan. The fan ``draws air through'' the cooling/heating coil(s). If this field is left blank, the default is blow through.
 
-\textbf{\emph{Field: Supply Air Fan Operating Mode Schedule Name}}
+\paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{supply-air-fan-operating-mode-schedule-name}
 
 This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
 
@@ -540,21 +540,21 @@ Water to air heat pump outputs
   HVAC,Average, Unitary System Water Coil Speed Level {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio}
+\paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the unitary system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state unitary system heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the unitary system's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff). When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio}
+\paragraph{Unitary System Compressor Part Load Ratio {[]}}\label{unitary-system-compressor-part-load-ratio}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the unitary system's DX heating or cooling coil at Speed 1. The runtime fraction for the unitary system compressor may be different from the compressor part-load ratio reported here due the part-load performance of the heating/cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate. When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Cycling Ratio {[]}}{Unitary System DX Coil Cycling Ratio }}\label{unitary-system-dx-coil-cycling-ratio}
+\paragraph{Unitary System DX Coil Cycling Ratio {[]}}\label{unitary-system-dx-coil-cycling-ratio}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the unitary system's DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the unitary system is cycling on and off its lowest speed (Speed 1) and 1.0 when the unitary system operates at speeds above 1.
 
 When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Ratio {[]}}{Unitary System DX Coil Speed Ratio }}\label{unitary-system-dx-coil-speed-ratio}
+\paragraph{Unitary System DX Coil Speed Ratio {[]}}\label{unitary-system-dx-coil-speed-ratio}
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( {[}Compressor Speed - Compressor speed at Speed i-1{]} / {[}Compressor speed at Speed i - Compressor speed at Speed i-1{]}). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
@@ -562,7 +562,7 @@ The physical meaning of the speed ratio is dependent on the compressor configura
 
 When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1 and 1 at Speed \textgreater{} 1.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Level {[]}}{Unitary System DX Coil Speed Level }}\label{unitary-system-dx-coil-speed-level}
+\paragraph{Unitary System DX Coil Speed Level {[]}}\label{unitary-system-dx-coil-speed-level}
 
 This output variable reports the maximum speed needed when the unitary system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the unitary system operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the unitary system operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the unitary system operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a single compressor. For multiple compressors, the unitary system operates at Speed 3 in the 40\% of a system timestep and at Speed 2 in the whole system timestep.
 
@@ -636,15 +636,15 @@ This output variable is the latent cooling requested from the zone humidistat in
 
 This output variable is the sensible heating requested from the zone thermostat in watts. This value is calculated using the unitary system outlet air and zone conditions, the specific heat of the zone air, and the supply air mass flow rate entering/leaving the system. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Water Coil Cycling Ratio {[]}}{Unitary System Water Coil Cycling Ratio }}\label{unitary-system-water-coil-cycling-ratio}
+\paragraph{Unitary System Water Coil Cycling Ratio {[]}}\label{unitary-system-water-coil-cycling-ratio}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed fan chilled water or hot water coil for the entire system timestep. The value is between 0.0 and 1.0 when the AHU is cycling on and off its lowest speed (fan speed 1) and 1.0 when the multispeed fan chilled water or hot water AHU operates at speed levels above 1.
 
-\paragraph{\texorpdfstring{Unitary System Water Coil Speed Ratio {[]}}{Unitary System Water Coil Speed Ratio }}\label{unitary-system-water-coil-speed-ratio}
+\paragraph{Unitary System Water Coil Speed Ratio {[]}}\label{unitary-system-water-coil-speed-ratio}
 
 This output variable is the ratio of time in a system timestep that the AHU fan is at rated speed between two consecutive speed levels ( {[}System Load -- Capacity at Fan Speed i-1{]} / {[}Capacity at Fan Speed i -- Capacity at Fan Speed i-1{]}). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation. AHU speed ratio depends on the system load and the supply air fan speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep.
 
-\paragraph{\texorpdfstring{Unitary System Water Coil Speed Level {[]}}{Unitary System Water Coil Speed Level }}\label{unitary-system-water-coil-speed-level}
+\paragraph{Unitary System Water Coil Speed Level {[]}}\label{unitary-system-water-coil-speed-level}
 
 This output variable reports the maximum speed needed when the system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the AHU operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed level is above the minimum (speed = 1), the system operation is determined by the speed ratio. For example, when the speed ratio is 0.4 and the speed lever is 3, then the supply air fan and water coil operate at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep.
 
@@ -1194,11 +1194,11 @@ Example of Heat/Cool Unitary System Specification
   HVAC,Average, Unitary System Compressor Part Load Ratio
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-2}
+\subsubsection{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-2}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state unitary system heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the system's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
-\subsubsection{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-1}
+\subsubsection{Unitary System Compressor Part Load Ratio {[]}}\label{unitary-system-compressor-part-load-ratio-1}
 
 This output variable is the ratio of the sensible cooling load to the steady-state cooling capacity of the unitary system's DX cooling coil. The runtime fraction for the DX cooling coil compressor may be different from the compressor part-load ratio reported here due the part-load performance of the cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
@@ -1461,11 +1461,11 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
   HVAC, Average, Unitary System Dehumidification Induced Heating Demand Rate {[}W{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-3}
+\paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-3}
 
 This output variable is the ratio of actual air mass flow rate through the heat pump to the heat pump's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the furnace is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state heat pump heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the heat pump fan may be different from the fan part-load ratio reported here due the part-load performance of the heat pump's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-2}
+\paragraph{Unitary System Compressor Part Load Ratio {[]}}\label{unitary-system-compressor-part-load-ratio-2}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the heat pump's DX heating or cooling coil. The runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due the part-load performance of the heating/cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate.
 
@@ -1925,21 +1925,21 @@ If heat recovery is specified:
   HVAC,Sum, Unitary System Heat Recovery Energy {[}J{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-4}
+\paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-4}
 
 This output variable is the ratio of actual air mass flow rate through the multispeed heat pump to the heat pump's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate) at Speed 1. For continuous fan operation mode, this variable is always 1.0 when the heat pump is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state heat pump heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the heat pump fan may be different from the fan part-load ratio reported here due the part-load performance of the heat pump's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff). When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-3}
+\paragraph{Unitary System Compressor Part Load Ratio {[]}}\label{unitary-system-compressor-part-load-ratio-3}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed heat pump's DX heating or cooling coil at Speed 1. The runtime fraction for the heat pump compressor may be different from the compressor part-load ratio reported here due the part-load performance of the heating/cooling coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate. When the speed number is greater than 1, the value is 1.0.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Cycling Ratio {[]}}{Unitary System DX Coil Cycling Ratio }}\label{unitary-system-dx-coil-cycling-ratio-1}
+\paragraph{Unitary System DX Coil Cycling Ratio {[]}}\label{unitary-system-dx-coil-cycling-ratio-1}
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed heat pump's DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the multispeed heat pump operates at speeds above 1.
 
 When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed.
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Ratio {[]}}{Unitary System DX Coil Speed Ratio }}\label{unitary-system-dx-coil-speed-ratio-1}
+\paragraph{Unitary System DX Coil Speed Ratio {[]}}\label{unitary-system-dx-coil-speed-ratio-1}
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( {[}Compressor Speed - Compressor speed at Speed i-1{]} / {[}Compressor speed at Speed i - Compressor speed at Speed i-1{]}). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
@@ -1947,7 +1947,7 @@ The physical meaning of the speed ratio is dependent on the compressor configura
 
 When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1, and 1 at Speed \textgreater{} 1
 
-\paragraph{\texorpdfstring{Unitary System DX Coil Speed Level {[]}}{Unitary System DX Coil Speed Level }}\label{unitary-system-dx-coil-speed-level-1}
+\paragraph{Unitary System DX Coil Speed Level {[]}}\label{unitary-system-dx-coil-speed-level-1}
 
 This output variable reports the maximum speed needed when the heat pump operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the heat pump operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the heat pump operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the heat pump operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a single compressor. For multiple compressors, the heat pump operates at Speed 3 in the 40\% of a system timestep and at Speed 2 in the whole system timestep.
 
@@ -2180,7 +2180,7 @@ Example of Heat-Only Furnace Specification
   HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-5}
+\paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-5}
 
 This output variable is the ratio of actual air mass flow rate through the furnace to the furnace's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the furnace is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating load to the furnace heating capacity. For the cycling fan mode, the runtime fraction for the furnace fan may be different from the fan part-load ratio reported here due the part-load performance of the furnace's heating coil (delay at start-up to reach steady-state heating output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
@@ -2355,7 +2355,7 @@ Example of Heat-Only Unitary System Specification
   HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-6}
+\paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-6}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the unitary system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating load to the unitary system heating capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the unitary system's heating coil (delay at start-up to reach steady-state heating output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
 
@@ -2792,11 +2792,11 @@ This output variable is the latent cooling requested from the zone humidistat in
 
 This output variable is the sensible heating requested from the zone thermostat in watts. This value is calculated using the unitary heat pump outlet air and zone conditions, the specific heat of the zone air, and the supply air mass flow rate entering/leaving the system. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-4}
+\paragraph{Unitary System Compressor Part Load Ratio {[]}}\label{unitary-system-compressor-part-load-ratio-4}
 
 This output variable is the ratio of actual load on the unitary system to the unitary system's steady state output.~ This ratio is based on the nominal capacity of the unit.
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-7}
+\paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-7}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the unitary system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule).
 
@@ -3215,11 +3215,11 @@ This output field is the electricity consumption rate of the CBVAV system in Wat
 
 This output field is the electricity consumption of the CBVAV system in Joules for the time period being reported. The consumption includes electricity used by the DX compressor (including crankcase heater), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), and the heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Fan Part Load Ratio {[]}}{Unitary System Fan Part Load Ratio }}\label{unitary-system-fan-part-load-ratio-8}
+\paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-8}
 
 This output field is the part-load ratio of the supply air fan, which will be either zero or 1 for each simulation timestep. For this system, the fan will operate continuously for the simulation timestep if the system is available (ref. Field: Availability schedule name) and there is a cooling or heating load to be met (i.e., fan part-load ratio will equal 1). When the system is available but there is no cooling or heating load to be met, the fan will either be off for the entire timestep or on for the entire timestep depending on the supply air fan operating mode schedule (ref. Field: Supply Air Fan Operating Mode Schedule Name). This value is set for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{\texorpdfstring{Unitary System Compressor Part Load Ratio {[]}}{Unitary System Compressor Part Load Ratio }}\label{unitary-system-compressor-part-load-ratio-5}
+\paragraph{Unitary System Compressor Part Load Ratio {[]}}\label{unitary-system-compressor-part-load-ratio-5}
 
 This output field is the part-load ratio of the compressor used by the DX coils (cooling and heating). The compressor part-load ratio is defined as the total coil load divided by the coil steady-state capacity (steady-state capacity of first stage for multi-mode coils). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 

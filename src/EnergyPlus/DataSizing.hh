@@ -298,6 +298,8 @@ namespace DataSizing {
 	extern char SizingFileColSep; // Character to separate columns in sizing outputs
 	extern int DataDesicDehumNum; // index to desiccant dehumidifier
 	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
+	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
+
 	// Types
 
 	struct ZoneSizingInputData

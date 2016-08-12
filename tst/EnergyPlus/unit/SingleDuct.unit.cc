@@ -66,10 +66,13 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <General.hh>
+#include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
+#include <DataSizing.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <HeatBalanceManager.hh>
@@ -84,7 +87,7 @@
 using namespace EnergyPlus;
 using namespace SimulationManager;
 using namespace DataSizing;
-
+using DataHeatBalance::Zone;
 
 TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	std::string const idf_objects = delimited_string( {
@@ -1296,5 +1299,54 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 	EXPECT_GT( SingleDuct::Sys( 2 ).ZoneFloorArea, 0.0 );
 	EXPECT_NEAR( SingleDuct::Sys( 2 ).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001 );
 	EXPECT_NEAR( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 2 ).MaxAirVolFractionDuringReheat, 0.0000000000001 );
+
+}
+
+TEST_F( EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir ) {
+
+	// AUTHOR: L. Gu, FSEC
+	// DATE WRITTEN: Jul. 2016
+	// TEST: #5366
+
+	Real64 SAMassFlow;
+	Real64 AirLoopOAFrac;
+
+	SingleDuct::Sys.allocate( 1 );
+	Zone.allocate( 1 );
+	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
+	DataAirLoop::AirLoopFlow.allocate( 1 );
+	DataAirLoop::AirLoopControlInfo.allocate( 1 );
+	DataSizing::OARequirements.allocate( 1 );
+	DataHeatBalance::ZoneIntGain.allocate( 1 );
+
+	Zone( 1 ).FloorArea = 10.0;
+	SingleDuct::Sys( 1 ).CtrlZoneNum = 1;
+	SingleDuct::Sys( 1 ).ActualZoneNum = 1;
+	SingleDuct::Sys( 1 ).NoOAFlowInputFromUser = false;
+	SingleDuct::Sys( 1 ).OARequirementsPtr = 1;
+
+	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
+	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 0.4;
+	DataAirLoop::AirLoopControlInfo( 1 ).AirLoopDCVFlag = true;
+
+	DataSizing::OARequirements( 1 ).Name = "CM DSOA WEST ZONE";
+	DataSizing::OARequirements( 1 ).OAFlowMethod = DataSizing::OAFlowSum;
+	DataSizing::OARequirements( 1 ).OAFlowPerPerson = 0.003149;
+	DataSizing::OARequirements( 1 ).OAFlowPerArea = 0.000407;
+	DataEnvironment::StdRhoAir = 1.20;
+	DataHeatBalance::ZoneIntGain( 1 ).NOFOCC = 0.1;
+
+	SingleDuct::CalcOAMassFlow( 1, SAMassFlow, AirLoopOAFrac );
+	EXPECT_NEAR( 0.0131547, SAMassFlow, 0.00001 );
+	EXPECT_NEAR( 0.4, AirLoopOAFrac, 0.00001 );
+
+	// Cleanup
+	SingleDuct::Sys.deallocate( );
+	Zone.deallocate( );
+	DataZoneEquipment::ZoneEquipConfig.deallocate( );
+	DataAirLoop::AirLoopFlow.deallocate( );
+	DataAirLoop::AirLoopControlInfo.deallocate( );
+	DataSizing::OARequirements.deallocate( );
+	DataHeatBalance::ZoneIntGain.deallocate( );
 
 }

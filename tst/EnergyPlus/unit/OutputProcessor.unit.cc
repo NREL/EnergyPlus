@@ -380,7 +380,7 @@ namespace EnergyPlus {
 
 			std::vector<std::string> testResult0 {"1", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.25168393, 1,10,4283136.25248438, 1,60", "2,9999.9,4283136.25168393, 1,10,4283136.25248438, 1,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.251683925, 1,10,4283136.252484382, 1,60", "2,9999.9,4283136.251683925, 1,10,4283136.252484382, 1,60" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -456,7 +456,7 @@ namespace EnergyPlus {
 
 			std::vector<std::string> testResult0 {"1", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12", "1,999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60", "2,9999.9,4283136.25168393,21, 1,10,4283136.25248438,21, 1,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12", "1,999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60", "2,9999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -532,7 +532,7 @@ namespace EnergyPlus {
 
 			std::vector<std::string> testResult0 {"1", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1", "1,999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60", "2,9999.9,4283136.25168393,12,21, 1,10,4283136.25248438,12,21, 1,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1", "1,999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60", "2,9999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -645,38 +645,38 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 0, ReportTimeStep, 0.0, 0, 0.0, 0, false ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
@@ -734,31 +734,31 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136.25168393, 1,10,4283136.25872118,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136.25168393,21, 1,10,4283136.25872118,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136.25168393,12,21, 1,10,4283136.25872118,12,21,24,60" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 0, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
@@ -877,37 +877,31 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( SQLiteFixture, OutputProcessor_writeIntegerData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_1 )
 		{
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 999, _ ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 999 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 0, _ ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", -999, _ ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -999 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-999" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", _, 999.9 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 999.9 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", _, 0.0) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.0 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", _, -999.9 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -999.9 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 999, 999.9 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", 0, 0.0) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteIntegerData, 1, "1", -999, -999.9 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-999.9" } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -920,9 +914,7 @@ namespace EnergyPlus {
 				{"4", "1", "1", "999.9"},
 				{"5", "1", "1", "0.0"},
 				{"6", "1", "1", "-999.9"},
-				{"7", "1", "1", "999.9"},
-				{"8", "1", "1", "0.0"},
-				{"9", "1", "1", "-999.9"}
+				{"7", "1", "1", "0.0"},
 			});
 
 			std::vector< std::vector<std::string> > reportExtendedData({});
@@ -1561,11 +1553,11 @@ namespace EnergyPlus {
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.987027" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027" } ) ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 0, true ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
@@ -1591,216 +1583,215 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( SQLiteFixture, OutputProcessor_writeRealData )
+		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_2 )
 		{
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 0.1 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.1 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.1" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", -0.1 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -0.1 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-0.1" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-2 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-2 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-002" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.01" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-02" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.01" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-3 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-3 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-003" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-03" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.001" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-4 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-4 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-004" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-04" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0001" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-5 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-5 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-005" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.00001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-05" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.00001" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-6 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-6 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-006" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.000001" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-06" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.000001" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-7 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-7 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-007" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-7" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-07" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-7" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-8 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-8 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-008" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-8" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-08" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-8" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-9 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-9 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-009" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-9" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-09" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-9" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-10 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-10 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-010" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-10" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-10" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-10" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-11 ) );
-			// this seems to always be low... not 1.0e-11
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-11 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,9.999999999999999E-012" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-11" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,9.999999999999999E-12" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-11" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-12 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-12 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-012" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-12" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-12" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-12" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-13 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-13 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-013" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-13" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-13" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-13" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-14 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-14 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-014" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-14" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-14" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-14" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-15 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-15 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-015" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-15" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-15" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-15" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-16 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-16 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-016" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-16" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-16" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-16" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e-16 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e-16 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E-016" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1e-16" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E-16" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1e-16" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e-19 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-19 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-019" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-19" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E-19" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-19" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 0.5 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.5 ); } );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.5" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 10.0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 10.0 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e2 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e2 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e3 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e3 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e4 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e4 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e5 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e5 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e6 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e6 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e7 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e7 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e8 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e8 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e9 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e9 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e10 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e10 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e11 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e11 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e12 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e12 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e13 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000." } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e13 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e14 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000" } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e14 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e15 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000000" } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e15 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e16 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000000" } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e16 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e17 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e17 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+017" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000000.0" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+17" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000000.0" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e16 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-10000000000000000" } ) ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e16 ); } );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-10000000000000000.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", -1.0e17 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e17 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E+017" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-100000000000000000.0" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1.000000000000000E+17" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-100000000000000000.0" } ) ) );
 		#endif
 
-			functionUsingSQLite( std::bind( WriteRealData, 1, "1", 1.0e25 ) );
+			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e25 ); } );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+025" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e25" } ) ) );
 		#else
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.000000000000000E+25" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e25" } ) ) );
 		#endif
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -2854,19 +2845,19 @@ namespace EnergyPlus {
 				"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"1,0.0",
-				"7,4995.",
+				"7,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
 				"2,0.0",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,Tuesday",
 				"3,0.0,0.0,24,60,0.0,24,60",
-				"9,4995.,4995.,24,60,4995.,24,60",
+				"9,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
 				"4,0.0,0.0,31,24,60,0.0,31,24,60",
-				"10,4995.,4995.,31,24,60,4995.,31,24,60",
+				"10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
 				"5,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
-				"11,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -2876,15 +2867,15 @@ namespace EnergyPlus {
 				"10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
-				"7,4995.",
+				"7,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,Tuesday",
-				"9,4995.,4995.,24,60,4995.,24,60",
+				"9,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
-				"10,4995.,4995.,31,24,60,4995.,31,24,60",
+				"10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
-				"11,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 		}
 
@@ -3048,19 +3039,19 @@ namespace EnergyPlus {
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"1,0.0",
 				"2,0.0",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
 				"3,0.0",
-				"9,4995.",
+				"9,4995.0",
 				",365,12,31, 0,Tuesday",
 				"4,0.0,0.0,24,60,0.0,24,60",
-				"10,4995.,4995.,24,60,4995.,24,60",
+				"10,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
 				"5,0.0,0.0,31,24,60,0.0,31,24,60",
-				"11,4995.,4995.,31,24,60,4995.,31,24,60",
+				"11,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
 				"6,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
-				"12,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -3070,15 +3061,15 @@ namespace EnergyPlus {
 				"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
-				"8,4995.",
+				"8,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
-				"9,4995.",
+				"9,4995.0",
 				",365,12,31, 0,Tuesday",
-				"10,4995.,4995.,24,60,4995.,24,60",
+				"10,4995.0,4995.0,24,60,4995.0,24,60",
 				",365,12",
-				"11,4995.,4995.,31,24,60,4995.,31,24,60",
+				"11,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
-				"12,4995.,4995.,12,31,24,60,4995.,12,31,24,60",
+				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 		}
@@ -3221,8 +3212,8 @@ namespace EnergyPlus {
 				"11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
-				"152,999.",
-				"153,999.",
+				"152,999.0",
+				"153,999.0",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -3356,11 +3347,11 @@ namespace EnergyPlus {
 
 			compare_eso_stream( delimited_string( {
 				"2,365,12,31, 0,24, 0.00,10.00,Tuesday",
-				"6,100.",
+				"6,100.0",
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
-				"6,200.",
+				"6,200.0",
 				"5,365",
-				"37,300.,100.,12,31,24,10,200.,12,31,24,20",
+				"37,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
 			} ) );
 
 		}

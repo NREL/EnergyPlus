@@ -569,6 +569,11 @@ namespace SingleDuct {
 		Optional< Real64 const > PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
 	);
 
+	void
+	GetATMixerTypeNum(
+		std::string const & ZoneEquipName,
+		int & ATMixerTypeNum
+	);
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
 
