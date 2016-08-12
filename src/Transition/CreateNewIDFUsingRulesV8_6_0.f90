@@ -112,6 +112,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
   LOGICAL :: ErrFlag
 
+  INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
