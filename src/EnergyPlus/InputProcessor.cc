@@ -31,19 +31,20 @@ State EnergyPlus::InputProcessor::state = State();
 char EnergyPlus::InputProcessor::s[] = { 0 };
 std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
 
-json IdfParser::decode( std::string const & idf, json const & schema ) {
+json && IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
-	return decode( idf, schema, success );
+	json && root = decode( idf, schema, success );
+	return std::move( root );
 }
 
-json IdfParser::decode( std::string const & idf, json const & schema, bool & success ) {
+json && IdfParser::decode( std::string const & idf, json const & schema, bool & success ) {
 	json root;
 	success = true;
-	if ( idf.empty() ) return root;
+	if ( idf.empty() ) return std::move( root );
 
 	size_t index = 0;
-	root = parse_idf( idf, index, success, schema );
-	return root;
+	json && root2 = parse_idf( idf, index, success, schema );
+	return std::move( root2 );
 }
 
 std::string IdfParser::encode( json const & root, json const & schema ) {
@@ -108,7 +109,7 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 	return encoded;
 }
 
-json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
+json && IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
 	json root;
 	Token token;
 
@@ -118,7 +119,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			break;
 		} else if ( token == Token::NONE ) {
 			success = false;
-			return root;
+			return std::move( root );
 		} else if ( token == Token::EXCLAMATION ) {
 			eat_comment( idf, index );
 		} else {
@@ -133,16 +134,9 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 				continue;
 			}
 
-
-            if (obj_name == "WeatherProperty:SkyTemperature") {
-                int dafkldj = 10;
-            }
-
-
-
 			json const &obj_loc = schema[ "properties" ][ obj_name ];
 			json const &loc = obj_loc[ "legacy_idd" ];
-			json obj = parse_object( idf, index, success, loc, obj_loc );
+			json && obj = parse_object( idf, index, success, loc, obj_loc );
 			if ( !success ) print_out_line_error( idf, true );
 			u64toa( root[ obj_name ].size() + 1, s );
 			std::string name = obj_name + " " + s;
@@ -151,20 +145,24 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 					name = obj[ "name" ].get < std::string >();
 					obj.erase( "name" );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
-						name = name + " " + s;
+						if ( obj_name != "RunPeriod" )
+							EnergyPlus::ShowFatalError("Duplicate names!!");
+						// name = name + " " + s;
 					}
 				}
 			}
-			root[ obj_name ][ name ] = obj;
+
+			root[ obj_name ][ name ] = std::move( obj );
 		}
 	}
 
-	return root;
+	return std::move( root );
 }
 
-json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
+json && IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
                               json const & loc, json const & obj_loc ) {
-	json root, extensible = json::object();
+	json root = json::object();
+	json extensible = json::object();
 	json array_of_extensions = json::array();
 	Token token;
 	index += 1;
@@ -176,9 +174,9 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		token = look_ahead( idf, index );
 		if ( token == Token::NONE ) {
 			success = false;
-			return root;
+			return std::move( root );
 		} else if ( token == Token::END ) {
-			return root;
+			return std::move( root );
 		} else if ( token == Token::COMMA || token == Token::SEMICOLON ) {
 			if ( !was_value_parsed ) {
 				int ext_size = 0;
@@ -223,13 +221,13 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		} else if ( legacy_idd_index >= loc[ "fields" ].size() ) {
 			if ( loc.find( "extensibles" ) == loc.end() ) {
 				success = false;
-				return root;
+				return std::move( root );
 			}
 			auto const size = loc[ "extensibles" ].size();
 			std::string const field_name = loc[ "extensibles" ][ extensible_index % size ];
-			auto val = parse_value( idf, index, success,
+			auto const && val = parse_value( idf, index, success,
 			                        obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field_name ] );
-			extensible[ field_name ] = val;
+			extensible[ field_name ] = std::move( val );
 			was_value_parsed = true;
 			extensible_index++;
 			if ( extensible_index && extensible_index % size == 0 ) {
@@ -242,7 +240,8 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			auto it = obj_loc.find( "patternProperties" );
 			if ( it == obj_loc.end() ) {
 				if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
-					root[ field ] = parse_value( idf, index, success, obj_loc[ "properties" ][ field ] );
+					auto const && val = parse_value( idf, index, success, obj_loc[ "properties" ][ field ] );
+					root[ field ] = std::move( val );
 				} else {
 					std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
 				}
@@ -254,16 +253,18 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				if ( field == "name" ) root[ field ] = parse_string( idf, index, success );
 				else std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
 			} else {
-				root[ field ] = parse_value( idf, index, success,
+				auto const && val = parse_value( idf, index, success,
 				                             obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ field ] );
+				root[ field ] = std::move( val );
 			}
-			if ( !success ) return root;
+			if ( !success ) return std::move( root );
 		}
 	}
 	if ( array_of_extensions.size() ) {
-		root[ "extensions" ] = array_of_extensions;
+		root[ "extensions" ] = std::move( array_of_extensions );
+		array_of_extensions = nullptr;
 	}
-	return root;
+	return std::move( root );
 }
 
 void IdfParser::add_missing_field_value( std::string & field_name, json & root, json & extensible, json const & obj_loc,
@@ -288,7 +289,7 @@ void IdfParser::add_missing_field_value( std::string & field_name, json & root, 
 	}
 }
 
-json IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
+json && IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
 	size_t save_i = index;
 	eat_whitespace( idf, save_i );
 	json val;
@@ -300,19 +301,19 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 		if ( idf[ save_i ] == '.' ) {
 			if ( is_double ) {
 				success = false;
-				return val;
+				return std::move( val );
 			}
 			is_double = true;
 		} else if ( idf[ save_i ] == '-' || idf[ save_i ] == '+' ) {
 			if ( is_sign && !is_scientific ) {
 				success = false;
-				return val;
+				return std::move( val );
 			}
 			is_sign = true;
 		} else if ( idf[ save_i ] == 'e' || idf[ save_i ] == 'E' ) {
 			if ( is_scientific ) {
 				success = false;
-				return val;
+				return std::move( val );
 			}
 			is_scientific = true;
 			is_double = true;
@@ -325,13 +326,13 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 
 	if ( num_str[ num_str.size() - 1 ] == 'e' || num_str[ num_str.size() - 1 ] == 'E' ) {
 		success = false;
-		return val;
+		return std::move( val );
 	}
 
 	Token token = look_ahead( idf, save_i );
 	if ( token != Token::SEMICOLON && token != Token::COMMA ) {
 		success = false;
-		return val;
+		return std::move( val );
 	}
 	if ( is_double ) {
         try {
@@ -347,48 +348,50 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 		}
 	}
 	index = save_i;
-	return val;
+	return std::move( val );
 }
 
-json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
+json && IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
 	json value;
-
-    if ( field_loc.find("type") != field_loc.end() ) {
-		if ( field_loc[ "type" ] == "number" || field_loc[ "type" ] == "integer" ) {
+	auto const & field_type = field_loc.find("type");
+    if ( field_type != field_loc.end() ) {
+		if ( field_type.value() == "number" || field_type.value() == "integer" ) {
 			value = parse_number( idf, index, success );
+			return std::move( value );
 		} else {
 			value = parse_string( idf, index, success );
+			return std::move( value );
 		}
-        return value;
 	} else {
 		switch (look_ahead(idf, index)) {
 			case Token::STRING: {
-				value = parse_string(idf, index, success);
-				if (field_loc.find("enum") != field_loc.end()) {
-					for (auto &s : field_loc["enum"]) {
-						if (icompare(s, value.get<std::string>())) {
+				auto const parsed_string = parse_string(idf, index, success);
+				auto const & enum_it = field_loc.find( "enum" );
+				if (enum_it != field_loc.end()) {
+					for ( auto const & s : enum_it.value() ) {
+						if ( icompare( s, parsed_string ) ) {
 							value = s;
-							break;
+							return std::move( value );
 						}
 					}
-				} else if (icompare(value.get<std::string>(), "Autosize") ||
-						   icompare(value.get<std::string>(), "Autocalculate")) {
-					value = field_loc["anyOf"][1]["enum"][0];
+				} else if ( icompare( parsed_string, "Autosize" ) || icompare( parsed_string, "Autocalculate" ) ) {
+					value = field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
+				} else {
+					value = parsed_string;
 				}
-				return value;
+				return std::move( value );
 			}
 			case Token::NUMBER: {
 				size_t save_line_index = index_into_cur_line;
 				size_t save_line_num = cur_line_num;
 				value = parse_number(idf, index, success);
-				if (!success) {
+				if ( !success ) {
 					cur_line_num = save_line_num;
 					index_into_cur_line = save_line_index;
 					success = true;
 					value = parse_string(idf, index, success);
-					return value;
 				}
-				return value;
+				return std::move( value );
 			}
 			case Token::NONE:
 			case Token::END:
@@ -398,7 +401,7 @@ json IdfParser::parse_value( std::string const & idf, size_t & index, bool & suc
 				break;
 		}
 		success = false;
-		return value;
+		return std::move( value );
 	}
 }
 
@@ -556,24 +559,24 @@ IdfParser::Token IdfParser::next_token( std::string const & idf, size_t & index 
 	return Token::NONE;
 }
 
-void State::initialize( json & parsed_schema ) {
+void State::initialize( json const * parsed_schema ) {
 	stack.clear();
 	schema = parsed_schema;
 	stack.push_back( schema );
-	json & loc = stack.back()[ "required" ];
+	json const & loc = stack.back()->at( "required" );
 	for ( auto & s : loc ) root_required.emplace( s.get < std::string >(), false );
 }
 
 void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index ) {
 	switch ( event ) {
 		case json::parse_event_t::object_start: {
-			if ( is_in_extensibles or stack.back().find( "patternProperties" ) == stack.back().end() ) {
-				if ( stack.back().find( "properties" ) != stack.back().end() )
-					stack.push_back( stack.back()[ "properties" ] );
+			if ( is_in_extensibles or stack.back()->find( "patternProperties" ) == stack.back()->end() ) {
+				if ( stack.back()->find( "properties" ) != stack.back()->end() )
+					stack.push_back( & stack.back()->at( "properties" ) );
 			} else {
-				stack.push_back( stack.back()[ "patternProperties" ][ ".*" ] );
-				if ( stack.back().find( "required" ) != stack.back().end() ) {
-					auto & loc = stack.back()[ "required" ];
+				stack.push_back( & stack.back()->at( "patternProperties" )[ ".*" ] );
+				if ( stack.back()->find( "required" ) != stack.back()->end() ) {
+					auto & loc = stack.back()->at( "required" );
 					obj_required.clear();
 					for ( auto & s : loc ) obj_required.emplace( s.get < std::string >(), false );
 				}
@@ -607,9 +610,9 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				}
 			}
 
-			if ( stack.back().find( "properties" ) == stack.back().end() ) {
-				if ( stack.back().find( key ) != stack.back().end() ) {
-					stack.push_back( stack.back()[ key ] );
+			if ( stack.back()->find( "properties" ) == stack.back()->end() ) {
+				if ( stack.back()->find( key ) != stack.back()->end() ) {
+					stack.push_back( & stack.back()->at( key ) );
 				} else {
 					u64toa( line_num, s );
 					std::string lin_num( s );
@@ -636,9 +639,9 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 		}
 
 		case json::parse_event_t::array_start: {
-			stack.push_back( stack.back()[ "items" ] );
-			if ( stack.back().find( "required" ) != stack.back().end() ) {
-				auto & loc = stack.back()[ "required" ];
+			stack.push_back( & stack.back()->at( "items" ) );
+			if ( stack.back()->find( "required" ) != stack.back()->end() ) {
+				auto & loc = stack.back()->at( "required" );
 				extensible_required.clear();
 				for ( auto & s : loc ) extensible_required.emplace( s.get < std::string >(), false );
 			}
@@ -683,15 +686,15 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				}
 			} else { // must be at the very end of an object now
 //				if ( cur_obj_name != "Version" ) stack.pop_back();
-				const auto & loc = stack.back();
-				if ( loc.find( "minProperties" ) != loc.end() &&
-				     cur_obj_count < loc[ "minProperties" ].get < unsigned >() ) {
+				const auto * loc = stack.back();
+				if ( loc->find( "minProperties" ) != loc->end() &&
+				     cur_obj_count < loc->at( "minProperties" ).get < unsigned >() ) {
 					u64toa( line_num, s );
 					errors.push_back(
 					"minProperties for object \"" + cur_obj_name + "\" at line " + s + " was not met" );
 				}
-				if ( loc.find( "maxProperties" ) != loc.end() &&
-				     cur_obj_count > loc[ "maxProperties" ].get < unsigned >() ) {
+				if ( loc->find( "maxProperties" ) != loc->end() &&
+				     cur_obj_count > loc->at( "maxProperties" ).get < unsigned >() ) {
 					u64toa( line_num, s );
 					errors.push_back(
 					"maxProperties for object \"" + cur_obj_name + "\" at line " + s + " was exceeded" );
@@ -716,11 +719,11 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 }
 
 void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
-	auto & loc = stack.back();
+	auto const * loc = stack.back();
 
-	if ( loc.find( "enum" ) != loc.end() ) {
+	if ( loc->find( "enum" ) != loc->end() ) {
 		int i;
-		auto const & enum_array = loc[ "enum" ];
+		auto const & enum_array = loc->at( "enum" );
 		if ( parsed.is_string() ) {
 			for ( i = 0; i < enum_array.size(); i++ ) {
 				if ( icompare( enum_array[ i ], parsed.get < std::string >() ) ) {
@@ -746,47 +749,46 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 		}
 	}
 	else if ( parsed.is_number() ) {
-		double val = parsed;
-		if ( loc.find( "anyOf" ) != loc.end() ) {
-			loc = loc[ "anyOf" ][ 0 ];
+		double val = parsed.get < double >();
+		if ( loc->find( "anyOf" ) != loc->end() ) {
+			loc = & loc->at( "anyOf" )[ 0 ];
 		}
-		if ( loc.find( "minimum" ) != loc.end() ) {
-			if ( loc.find( "exclusiveMinimum" ) != loc.end() && val <= loc[ "minimum" ].get < double >() ) {
+		if ( loc->find( "minimum" ) != loc->end() ) {
+			if ( loc->find( "exclusiveMinimum" ) != loc->end() && val <= loc->at( "minimum" ).get < double >() ) {
 				add_error( "exmin", val, line_num, prev_line_index + prev_key_len );
-			} else if ( val < loc[ "minimum" ].get < double >() ) {
+			} else if ( val < loc->at( "minimum" ).get < double >() ) {
 				add_error( "min", val, line_num, prev_line_index + prev_key_len );
 			}
 		}
-		if ( loc.find( "maximum" ) != loc.end() ) {
-			if ( loc.find( "exclusiveMaximum" ) != loc.end() && val >= loc[ "maximum" ].get < double >() ) {
+		if ( loc->find( "maximum" ) != loc->end() ) {
+			if ( loc->find( "exclusiveMaximum" ) != loc->end() && val >= loc->at( "maximum" ).get < double >() ) {
 				add_error( "exmax", val, line_num, prev_line_index + prev_key_len );
-			} else if ( val > loc[ "maximum" ].get < double >() ) {
+			} else if ( val > loc->at( "maximum" ).get < double >() ) {
 				add_error( "max", val, line_num, prev_line_index + prev_key_len );
 			}
 		}
-		if ( loc.find( "type" ) != loc.end() && loc[ "type" ] != "number" ) {
+		if ( loc->find( "type" ) != loc->end() && loc->at( "type" ) != "number" ) {
 			dtoa( val, s );
 			std::string parsed_val( s );
 			u64toa( line_num, s );
 			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-			                    + ", type == " + loc[ "type" ].get < std::string >()
+			                    + ", type == " + loc->at( "type" ).get < std::string >()
 			                    + " but parsed value = " + parsed_val );
 		}
 	}
 	else if ( parsed.is_string() ) {
-		if ( loc.find( "anyOf" ) != loc.end() ) {
+		if ( loc->find( "anyOf" ) != loc->end() ) {
 			int i;
-			for ( i = 0; i < loc[ "anyOf" ].size(); i++ ) {
-				if ( loc[ "anyOf" ][ i ].find( "type" ) != loc[ "anyOf" ][ i ].end() &&
-				     loc[ "anyOf" ][ i ][ "type" ] == "string" )
-					break;
+			for ( i = 0; i < loc->at( "anyOf" ).size(); i++ ) {
+				auto const & any_of_check = loc->at( "anyOf" )[ i ];
+				if ( any_of_check.find( "type" ) != any_of_check.end() && any_of_check[ "type" ] == "string" ) break;
 			}
-			if ( i == loc[ "anyOf" ].size() ) {
+			if ( i == loc->at( "anyOf" ).size() ) {
 				u64toa( line_num, s );
 				warnings.push_back( "type == string was not found in anyOf in object \"" + cur_obj_name
 				                    + "\" at line " + s );
 			}
-		} else if ( loc.find( "type" ) != loc.end() && loc[ "type" ] != "string" && ! parsed.get< std::string >().empty() ) {
+		} else if ( loc->find( "type" ) != loc->end() && loc->at( "type" ) != "string" && ! parsed.get< std::string >().empty() ) {
 			u64toa( line_num, s );
 			errors.push_back( "In object \"" + cur_obj_name + "\", at line " + s + ": type needs to be string" );
 		}
@@ -936,9 +938,9 @@ namespace EnergyPlus {
 		delete[] memblock;
 		InputProcessor::idf_parser.initialize(InputProcessor::schema);
 		json const user_input = InputProcessor::idf_parser.decode(input_file, InputProcessor::schema);
-		auto const user_input_dump = user_input.dump(4);
+		auto const user_input_dump = user_input.dump();
 
-		InputProcessor::state.initialize(InputProcessor::schema);
+		InputProcessor::state.initialize( & InputProcessor::schema );
 
 		json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index) -> bool {
 			InputProcessor::state.traverse(event, parsed, line_num, line_index);
@@ -1096,12 +1098,7 @@ namespace EnergyPlus {
 			if ( it != obj.value().end() ) {
 				std::string val;
 				if ( it.value().is_string() ) {
-					json schema_obj;
-					if ( object_in_schema->find( "patternProperties" ) != object_in_schema->end() ) {
-						schema_obj = object_in_schema->at( "patternProperties" )[ ".*" ][ "properties" ][ field ];
-					} else {
-						schema_obj = object_in_schema->at( "properties" )[ field ];
-					}
+					json const & schema_obj = object_in_schema->at( "patternProperties" )[ ".*" ][ "properties" ][ field ];
 					if ( it.value().get < std::string >().empty() &&
 					     schema_obj.find( "default" ) != schema_obj.end() ) {
 						auto const & default_val = schema_obj[ "default" ];
@@ -1144,7 +1141,7 @@ namespace EnergyPlus {
 			auto const & extensions = obj.value()[ "extensions" ];
 			int alphas_index = alphas_fields.size();
 			for ( auto it = extensions.begin(); it != extensions.end(); ++it ) {
-				auto const extension_obj = it.value();
+				auto const & extension_obj = it.value();
 				for ( auto i = 0; i < alphas_extensions.size(); i++ ) {
 					std::string const field = alphas_extensions[ i ];
 					if ( extension_obj.find( field ) != extension_obj.end() ) {
@@ -1231,11 +1228,11 @@ namespace EnergyPlus {
 			auto const & extensions = obj.value()[ "extensions" ];
 			int numerics_index = numerics_fields.size();
 			for ( auto it = extensions.begin(); it != extensions.end(); ++it ) {
-				auto const extension_obj = it.value();
+				auto const & extension_obj = it.value();
 				for ( auto i = 0; i < numerics_extensions.size(); i++ ) {
 					std::string const field = numerics_extensions[ i ];
 					if ( extension_obj.find( field ) != extension_obj.end() ) {
-						auto const val = extension_obj[ field ];
+						auto const & val = extension_obj[ field ];
 						if ( !val.is_string() ) {
 							if ( val.is_number_integer() ) {
 								Numbers( numerics_index + 1 ) = val.get < int >();
@@ -1271,7 +1268,7 @@ namespace EnergyPlus {
 							auto const & field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
 							if ( field_in_schema.find( field ) != field_in_schema.end() ) {
 								if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
-									auto const default_val = field_in_schema[ field ][ "default" ];
+									auto const & default_val = field_in_schema[ field ][ "default" ];
 									if ( default_val.is_number_integer() ) {
 										Numbers( numerics_index + 1 ) = default_val.get < int >();
 									} else if ( default_val.is_number_float() ) {
@@ -1866,7 +1863,7 @@ namespace EnergyPlus {
 			const json & legacy_idd = schema.at( "properties" ).at( object.key() ).at( "legacy_idd" );
 
 			size_t max_size = 0;
-			for ( auto const obj : object.value() ) {
+			for ( auto const & obj : object.value() ) {
 				if ( obj.find( "extensions" ) != obj.end() ) {
 					auto const size = obj[ "extensions" ].size();
 					if ( size > max_size ) max_size = size;
@@ -1874,7 +1871,7 @@ namespace EnergyPlus {
 			}
 
 			if ( legacy_idd.find( "alphas" ) != legacy_idd.end() ) {
-				json const alphas = legacy_idd[ "alphas" ];
+				json const & alphas = legacy_idd[ "alphas" ];
 				if ( alphas.find( "fields" ) != alphas.end() ) {
 					num_alpha += alphas[ "fields" ].size();
 				}
@@ -1883,7 +1880,7 @@ namespace EnergyPlus {
 				}
 			}
 			if ( legacy_idd.find( "numerics" ) != legacy_idd.end() ) {
-				json const numerics = legacy_idd[ "numerics" ];
+				json const & numerics = legacy_idd[ "numerics" ];
 				if ( numerics.find( "fields" ) != numerics.end() ) {
 					num_numeric += numerics[ "fields" ].size();
 				}
