@@ -40,9 +40,9 @@ public:
 
 	std::unordered_map < std::string, std::string > case_insensitive_keys;
 
-	json && decode( std::string const & idf, json const & schema );
+	json decode( std::string const & idf, json const & schema );
 
-	json && decode( std::string const & idf, json const & schema, bool & success );
+	json decode( std::string const & idf, json const & schema, bool & success );
 
 	std::string encode( json const & root, json const & schema );
 
@@ -50,17 +50,17 @@ public:
 		NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5, NUMBER = 6
 	};
 
-	json && parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
+	json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
 
-	json && parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
+	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
 	                   json const & obj_loc );
 
 	void add_missing_field_value( std::string & field_name, json & root, json & extensible, json const & obj_loc,
 	                              json const & loc, int legacy_idd_index );
 
-	json && parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
+	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
 
-	json && parse_number( std::string const & idf, size_t & index, bool & success );
+	json parse_number( std::string const & idf, size_t & index, bool & success );
 
 	std::string parse_string( std::string const & idf, size_t & index, bool & success );
 
@@ -125,6 +125,7 @@ class State {
 	bool is_in_extensibles = false, does_key_exist = true, need_new_object_name = true;
 	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
 	char s[ 129 ];
+	char s2[ 129 ];
 
 public:
 	void initialize( json const * parsed_schema );

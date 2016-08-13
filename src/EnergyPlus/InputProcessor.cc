@@ -31,20 +31,20 @@ State EnergyPlus::InputProcessor::state = State();
 char EnergyPlus::InputProcessor::s[] = { 0 };
 std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
 
-json && IdfParser::decode( std::string const & idf, json const & schema ) {
+json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
-	json && root = decode( idf, schema, success );
-	return std::move( root );
+	return decode( idf, schema, success );
 }
 
-json && IdfParser::decode( std::string const & idf, json const & schema, bool & success ) {
-	json root;
+json IdfParser::decode( std::string const & idf, json const & schema, bool & success ) {
 	success = true;
-	if ( idf.empty() ) return std::move( root );
+	if ( idf.empty() ) {
+		success = false;
+		return nullptr;
+	}
 
 	size_t index = 0;
-	json && root2 = parse_idf( idf, index, success, schema );
-	return std::move( root2 );
+	return parse_idf( idf, index, success, schema );
 }
 
 std::string IdfParser::encode( json const & root, json const & schema ) {
@@ -109,7 +109,7 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 	return encoded;
 }
 
-json && IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
+json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
 	json root;
 	Token token;
 
@@ -119,7 +119,7 @@ json && IdfParser::parse_idf( std::string const & idf, size_t & index, bool & su
 			break;
 		} else if ( token == Token::NONE ) {
 			success = false;
-			return std::move( root );
+			return root;
 		} else if ( token == Token::EXCLAMATION ) {
 			eat_comment( idf, index );
 		} else {
@@ -136,7 +136,7 @@ json && IdfParser::parse_idf( std::string const & idf, size_t & index, bool & su
 
 			json const &obj_loc = schema[ "properties" ][ obj_name ];
 			json const &loc = obj_loc[ "legacy_idd" ];
-			json && obj = parse_object( idf, index, success, loc, obj_loc );
+			json obj = parse_object( idf, index, success, loc, obj_loc );
 			if ( !success ) print_out_line_error( idf, true );
 			u64toa( root[ obj_name ].size() + 1, s );
 			std::string name = obj_name + " " + s;
@@ -156,10 +156,10 @@ json && IdfParser::parse_idf( std::string const & idf, size_t & index, bool & su
 		}
 	}
 
-	return std::move( root );
+	return root;
 }
 
-json && IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
+json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
                               json const & loc, json const & obj_loc ) {
 	json root = json::object();
 	json extensible = json::object();
@@ -174,9 +174,9 @@ json && IdfParser::parse_object( std::string const & idf, size_t & index, bool &
 		token = look_ahead( idf, index );
 		if ( token == Token::NONE ) {
 			success = false;
-			return std::move( root );
+			return root;
 		} else if ( token == Token::END ) {
-			return std::move( root );
+			return root;
 		} else if ( token == Token::COMMA || token == Token::SEMICOLON ) {
 			if ( !was_value_parsed ) {
 				int ext_size = 0;
@@ -221,11 +221,11 @@ json && IdfParser::parse_object( std::string const & idf, size_t & index, bool &
 		} else if ( legacy_idd_index >= loc[ "fields" ].size() ) {
 			if ( loc.find( "extensibles" ) == loc.end() ) {
 				success = false;
-				return std::move( root );
+				return root;
 			}
 			auto const size = loc[ "extensibles" ].size();
 			std::string const field_name = loc[ "extensibles" ][ extensible_index % size ];
-			auto const && val = parse_value( idf, index, success,
+			auto const val = parse_value( idf, index, success,
 			                        obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field_name ] );
 			extensible[ field_name ] = std::move( val );
 			was_value_parsed = true;
@@ -240,7 +240,7 @@ json && IdfParser::parse_object( std::string const & idf, size_t & index, bool &
 			auto it = obj_loc.find( "patternProperties" );
 			if ( it == obj_loc.end() ) {
 				if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
-					auto const && val = parse_value( idf, index, success, obj_loc[ "properties" ][ field ] );
+					auto const val = parse_value( idf, index, success, obj_loc[ "properties" ][ field ] );
 					root[ field ] = std::move( val );
 				} else {
 					std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
@@ -253,18 +253,18 @@ json && IdfParser::parse_object( std::string const & idf, size_t & index, bool &
 				if ( field == "name" ) root[ field ] = parse_string( idf, index, success );
 				else std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
 			} else {
-				auto const && val = parse_value( idf, index, success,
+				auto const val = parse_value( idf, index, success,
 				                             obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ field ] );
 				root[ field ] = std::move( val );
 			}
-			if ( !success ) return std::move( root );
+			if ( !success ) return root;
 		}
 	}
 	if ( array_of_extensions.size() ) {
 		root[ "extensions" ] = std::move( array_of_extensions );
 		array_of_extensions = nullptr;
 	}
-	return std::move( root );
+	return root;
 }
 
 void IdfParser::add_missing_field_value( std::string & field_name, json & root, json & extensible, json const & obj_loc,
@@ -289,7 +289,7 @@ void IdfParser::add_missing_field_value( std::string & field_name, json & root, 
 	}
 }
 
-json && IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
+json IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
 	size_t save_i = index;
 	eat_whitespace( idf, save_i );
 	json val;
@@ -301,19 +301,19 @@ json && IdfParser::parse_number( std::string const & idf, size_t & index, bool &
 		if ( idf[ save_i ] == '.' ) {
 			if ( is_double ) {
 				success = false;
-				return std::move( val );
+				return val;
 			}
 			is_double = true;
 		} else if ( idf[ save_i ] == '-' || idf[ save_i ] == '+' ) {
 			if ( is_sign && !is_scientific ) {
 				success = false;
-				return std::move( val );
+				return val;
 			}
 			is_sign = true;
 		} else if ( idf[ save_i ] == 'e' || idf[ save_i ] == 'E' ) {
 			if ( is_scientific ) {
 				success = false;
-				return std::move( val );
+				return val;
 			}
 			is_scientific = true;
 			is_double = true;
@@ -326,13 +326,13 @@ json && IdfParser::parse_number( std::string const & idf, size_t & index, bool &
 
 	if ( num_str[ num_str.size() - 1 ] == 'e' || num_str[ num_str.size() - 1 ] == 'E' ) {
 		success = false;
-		return std::move( val );
+		return val;
 	}
 
 	Token token = look_ahead( idf, save_i );
 	if ( token != Token::SEMICOLON && token != Token::COMMA ) {
 		success = false;
-		return std::move( val );
+		return val;
 	}
 	if ( is_double ) {
         try {
@@ -348,19 +348,17 @@ json && IdfParser::parse_number( std::string const & idf, size_t & index, bool &
 		}
 	}
 	index = save_i;
-	return std::move( val );
+	return val;
 }
 
-json && IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
+json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
 	json value;
 	auto const & field_type = field_loc.find("type");
     if ( field_type != field_loc.end() ) {
 		if ( field_type.value() == "number" || field_type.value() == "integer" ) {
-			value = parse_number( idf, index, success );
-			return std::move( value );
+			return parse_number( idf, index, success );
 		} else {
-			value = parse_string( idf, index, success );
-			return std::move( value );
+			return parse_string( idf, index, success );
 		}
 	} else {
 		switch (look_ahead(idf, index)) {
@@ -370,16 +368,13 @@ json && IdfParser::parse_value( std::string const & idf, size_t & index, bool & 
 				if (enum_it != field_loc.end()) {
 					for ( auto const & s : enum_it.value() ) {
 						if ( icompare( s, parsed_string ) ) {
-							value = s;
-							return std::move( value );
+							return s;
 						}
 					}
 				} else if ( icompare( parsed_string, "Autosize" ) || icompare( parsed_string, "Autocalculate" ) ) {
-					value = field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
-				} else {
-					value = parsed_string;
+					return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
 				}
-				return std::move( value );
+				return parsed_string;
 			}
 			case Token::NUMBER: {
 				size_t save_line_index = index_into_cur_line;
@@ -389,9 +384,9 @@ json && IdfParser::parse_value( std::string const & idf, size_t & index, bool & 
 					cur_line_num = save_line_num;
 					index_into_cur_line = save_line_index;
 					success = true;
-					value = parse_string(idf, index, success);
+					return parse_string(idf, index, success);
 				}
-				return std::move( value );
+				return value;
 			}
 			case Token::NONE:
 			case Token::END:
@@ -401,7 +396,7 @@ json && IdfParser::parse_value( std::string const & idf, size_t & index, bool & 
 				break;
 		}
 		success = false;
-		return std::move( value );
+		return value;
 	}
 }
 
@@ -615,10 +610,9 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 					stack.push_back( & stack.back()->at( key ) );
 				} else {
 					u64toa( line_num, s );
-					std::string lin_num( s );
-					u64toa( line_index, s );
+					u64toa( line_index, s2 );
 					errors.push_back( "Key \"" + key + "\" in object \"" + cur_obj_name + "\" at line "
-									  + lin_num + " (index " + s + ") not found in schema" );
+									  + s2 + " (index " + s + ") not found in schema" );
 					does_key_exist = false;
 				}
 			}
@@ -663,11 +657,10 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				for ( auto & it : extensible_required ) {
 					if ( !it.second ) {
 						u64toa( line_num, s );
-						std::string lin_num( s );
-						u64toa( line_index, s );
+						u64toa( line_index, s2 );
 						errors.push_back(
 						"Required extensible field \"" + it.first + "\" in object \"" + cur_obj_name
-						+ "\" ending at line " + lin_num + " (index " + s + ") was not provided" );
+						+ "\" ending at line " + s2 + " (index " + s + ") was not provided" );
 					}
 					it.second = false;
 				}
@@ -676,16 +669,14 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				for ( auto & it : obj_required ) {
 					if ( !it.second ) {
 						u64toa( line_num, s );
-						std::string lin_num( s );
-						u64toa( line_index, s );
+						u64toa( line_index, s2 );
 						errors.push_back(
 						"Required field \"" + it.first + "\" in object \"" + cur_obj_name
-						+ "\" ending at line " + lin_num + " (index " + s + ") was not provided" );
+						+ "\" ending at line " + s2 + " (index " + s + ") was not provided" );
 					}
 					it.second = false;
 				}
 			} else { // must be at the very end of an object now
-//				if ( cur_obj_name != "Version" ) stack.pop_back();
 				const auto * loc = stack.back();
 				if ( loc->find( "minProperties" ) != loc->end() &&
 				     cur_obj_count < loc->at( "minProperties" ).get < unsigned >() ) {
@@ -725,15 +716,16 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 		int i;
 		auto const & enum_array = loc->at( "enum" );
 		if ( parsed.is_string() ) {
+			auto const & parsed_string = parsed.get < std::string >();
 			for ( i = 0; i < enum_array.size(); i++ ) {
-				if ( icompare( enum_array[ i ], parsed.get < std::string >() ) ) {
+				if ( icompare( enum_array[ i ], parsed_string ) ) {
 					break;
 				}
 			}
 			if ( i == enum_array.size() ) {
 				u64toa( line_num, s );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-				                  + ": \"" + parsed.get < std::string >() + "\" was not found in the enum" );
+				                  + ": \"" + parsed_string + "\" was not found in the enum" );
 			}
 		} else {
 			for ( i = 0; i < enum_array.size(); i++ ) {
@@ -741,10 +733,9 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 			}
 			if ( i == enum_array.size() ) {
 				i64toa( parsed.get < int >(), s );
-				std::string parsed_val( s );
-				u64toa( line_num, s );
+				u64toa( line_num, s2 );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-				                  + ": \"" + parsed_val + "\" was not found in the enum" );
+				                  + ": \"" + s2 + "\" was not found in the enum" );
 			}
 		}
 	}
@@ -769,11 +760,10 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 		}
 		if ( loc->find( "type" ) != loc->end() && loc->at( "type" ) != "number" ) {
 			dtoa( val, s );
-			std::string parsed_val( s );
-			u64toa( line_num, s );
+			u64toa( line_num, s2 );
 			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + s
 			                    + ", type == " + loc->at( "type" ).get < std::string >()
-			                    + " but parsed value = " + parsed_val );
+			                    + " but parsed value = " + s2 );
 		}
 	}
 	else if ( parsed.is_string() ) {
