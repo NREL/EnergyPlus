@@ -1401,44 +1401,28 @@ namespace HVACVariableRefrigerantFlow {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-<<<<<<< HEAD
 		NumVRFCTU = InputProcessor::GetNumObjectsFound( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow" );
-=======
-		NumVRFCTU = GetNumObjectsFound( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow" );
->>>>>>> NREL/develop
 		if ( NumVRFCTU > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
-<<<<<<< HEAD
 		NumVRFCond_SysCurve = InputProcessor::GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow" );
-=======
-		NumVRFCond_SysCurve = GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow" );
->>>>>>> NREL/develop
 		if ( NumVRFCond_SysCurve > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
-<<<<<<< HEAD
 		NumVRFCond_FluidTCtrl_HP = InputProcessor::GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl" );
-=======
-		NumVRFCond_FluidTCtrl_HP = GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl" );
->>>>>>> NREL/develop
 		if ( NumVRFCond_FluidTCtrl_HP > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
-<<<<<<< HEAD
 		NumVRFCond_FluidTCtrl_HR = InputProcessor::GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR" );
-=======
-		NumVRFCond_FluidTCtrl_HR = GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR" );
->>>>>>> NREL/develop
 		if ( NumVRFCond_FluidTCtrl_HR > 0 ) {
 			InputProcessor::GetObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
@@ -2326,11 +2310,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).SH = rNumericArgs( 7 );
 			VRF( VRFNum ).SC = rNumericArgs( 8 );
 
-<<<<<<< HEAD
 			if( InputProcessor::SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
-=======
-			if( SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
->>>>>>> NREL/develop
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
 			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "ConstantTemp" ) ) {
 				VRF(VRFNum).AlgorithmIUCtrl = 2;
@@ -3222,11 +3202,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 					// Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
-<<<<<<< HEAD
 						if ( InputProcessor::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) ) ) {
-=======
-						if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) ) ) {
->>>>>>> NREL/develop
 							errFlag = false;
 							if ( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 								TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
@@ -3266,11 +3242,7 @@ namespace HVACVariableRefrigerantFlow {
 					} else {
 					// Algorithm Type: VRF model based on system curve
 
-<<<<<<< HEAD
 						if ( InputProcessor::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_Cooling ) ) ) {
-=======
-						if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_Cooling ) ) ) {
->>>>>>> NREL/develop
 							if( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 								TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
 							} else {
@@ -3326,11 +3298,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 					// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
 
-<<<<<<< HEAD
 						if ( InputProcessor::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) ) ) {
-=======
-						if ( SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) ) ) {
->>>>>>> NREL/develop
 							errFlag = false;
 							if ( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 								TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXHeatingCoilType, cAlphaArgs( 14 ), errFlag );
@@ -4439,7 +4407,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate );
-				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above
 				// (it is the "inlet" node flow rate)
 				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
 			}
@@ -5078,7 +5046,7 @@ namespace HVACVariableRefrigerantFlow {
 		DataZoneNumber = VRFTU( VRFTUNum ).ZoneNum;
 		if ( CurZoneEqNum > 0 ) {
 			if ( VRFTU( VRFTUNum ).HVACSizingIndex > 0 ) {
-				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;				
+				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;
 
 				SizingMethod = CoolingAirflowSizing;
 				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -6239,7 +6207,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
-				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above
 				// (it is the "inlet" node flow rate)
 				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
 			}
@@ -6291,7 +6259,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 		// calculate sensible load met
-		if ( VRFTU( VRFTUNum ).ATMixerExists ) {			
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
 				// Air terminal supply side mixer
 				MinHumRat = min( Node( ZoneNode ).HumRat, Node( ATMixOutNode ).HumRat );
@@ -7501,11 +7469,7 @@ namespace HVACVariableRefrigerantFlow {
 
 	}
 
-<<<<<<< HEAD
-		void
-=======
 	void
->>>>>>> NREL/develop
 	VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(
 		int const VRFTUNum, // Index to VRF terminal unit
 		Real64 & EvapTemp, // evaporating temperature
@@ -7538,10 +7502,7 @@ namespace HVACVariableRefrigerantFlow {
 		using HVACVariableRefrigerantFlow::VRF;
 		using HVACVariableRefrigerantFlow::VRFTU;
 		using Psychrometrics::PsyHFnTdbW;
-<<<<<<< HEAD
-=======
 		using SingleDuct::SimATMixer;
->>>>>>> NREL/develop
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -7640,11 +7601,7 @@ namespace HVACVariableRefrigerantFlow {
 		if ( this->OAMixerUsed ) {
 			SimOAMixer( this->OAMixerName, false, this->OAMixerIndex );
 
-<<<<<<< HEAD
 			OAMixerNum = InputProcessor::FindItemInList( this->OAMixerName, OAMixer );
-=======
-			OAMixerNum = FindItemInList( this->OAMixerName, OAMixer );
->>>>>>> NREL/develop
 			OAMixNode = OAMixer( OAMixerNum ).MixNode;
 			T_coil_in = Node( OAMixNode ).Temp;
 			W_coil_in = Node( OAMixNode ).HumRat;
@@ -8290,11 +8247,7 @@ namespace HVACVariableRefrigerantFlow {
 				// Q_h_TU_PL is greater than CompEvaporatingPWRSpdMin
 					CyclingRatio = Q_c_OU * C_cap_operation / CompEvaporatingCAPSpdMin;
 					this->EvaporatingTemp = max( CapMinTe, RefTLow );
-<<<<<<< HEAD
-				}
-=======
 			}
->>>>>>> NREL/develop
 
 				double CyclingRatioFrac = 0.85 + 0.15 * CyclingRatio;
 				double HPRTF = CyclingRatio / CyclingRatioFrac;
@@ -8529,11 +8482,7 @@ namespace HVACVariableRefrigerantFlow {
 			this->IUEvapHeatRate = TU_CoolingLoad;
 
 		// 4. Stop running
-<<<<<<< HEAD
 		} else {
-=======
-				} else {
->>>>>>> NREL/develop
 
 			this->OperatingMode = 0;
 			this->VRFOperationSimPath = 0;
@@ -8687,15 +8636,9 @@ namespace HVACVariableRefrigerantFlow {
 
 					HRInitialEIRFrac = this->HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
 					HREIRTC = this->HRHeatEIRTC; // Time constant used to recover from initial degradation in heating heat recovery
-<<<<<<< HEAD
 
 				} else {
 					// zone thermostats satisfied, condenser is off. Set values anyway
-=======
-					
-							} else {
-					//   zone thermostats satisfied, condenser is off. Set values anyway
->>>>>>> NREL/develop
 					// HRCAPFTConst = 1.0;
 					HRInitialCapFrac = 1.0;
 					HRCapTC = 1.0;
@@ -9192,12 +9135,6 @@ namespace HVACVariableRefrigerantFlow {
 		}
 		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
 		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
-<<<<<<< HEAD
-
-		// simulate OA Mixer
-		if ( this->OAMixerUsed ) SimOAMixer( this->OAMixerName, FirstHVACIteration, this->OAMixerIndex );
-=======
->>>>>>> NREL/develop
 
 		if ( this->ATMixerExists ) {
 			// There is an air terminal mixer
@@ -9205,7 +9142,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( this->ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( this->ATMixerPriNode ).MassFlowRate = min( Node( this->ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
-				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above
 				// (it is the "inlet" node flow rate)
 				SimATMixer( this->ATMixerName, FirstHVACIteration, this->ATMixerIndex );
 			}
@@ -9516,11 +9453,7 @@ namespace HVACVariableRefrigerantFlow {
 		if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
 			SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
 
-<<<<<<< HEAD
-			OAMixerNum = InputProcessor::FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );
-=======
-			OAMixerNum = FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );  // this not needed, why not use VRFTU( VRFTUNum ).OAMixerIndex var
->>>>>>> NREL/develop
+			OAMixerNum = InputProcessor::FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );  // this not needed, why not use VRFTU( VRFTUNum ).OAMixerIndex var
 			OAMixNode = OAMixer( OAMixerNum ).MixNode;
 			Tin = Node( OAMixNode ).Temp;
 			Win = Node( OAMixNode ).HumRat;
@@ -9659,11 +9592,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		T_dis = Par( 1 );
 		CondHeat = Par( 2 );
-<<<<<<< HEAD
 		CAPFT = Par( 3 );
-=======
-		CAPFT    = Par( 3 );
->>>>>>> NREL/develop
 
 		CAPSpd = CurveValue( CAPFT, T_dis, T_suc );
 		CompResidual = ( CondHeat - CAPSpd ) / CAPSpd;
