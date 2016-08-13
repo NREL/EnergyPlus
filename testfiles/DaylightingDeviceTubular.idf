@@ -1031,10 +1031,6 @@
     Standard Zone Air Node,  !- Zone Air Node Name
     Standard Zone Return Node;  !- Zone Return Air Node Name
 
-  ThermostatSetpoint:SingleHeatingOrCooling,
-    Heating Cooling Setpoint,!- Name
-    Zone Temp Sch;           !- Setpoint Temperature Schedule Name
-
   ZoneControl:Thermostat,
     Standard Zone Thermostat,!- Name
     Standard Zone,           !- Zone or ZoneList Name
