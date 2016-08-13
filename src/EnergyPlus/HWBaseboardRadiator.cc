@@ -609,6 +609,14 @@ namespace HWBaseboardRadiator {
 				ShowWarningError( RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
 				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
 			}
+			// search zone equipment list structure for zone index
+			for ( int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				for ( int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList( ctrlZone ).NumOfEquipTypes; ++zoneEquipTypeNum ) {
+					if ( DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipType_Num( zoneEquipTypeNum ) == DataZoneEquipment::BBElectric_Num && DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipName( zoneEquipTypeNum ) == HWBaseboard( BaseboardNum ).EquipID ) {
+						HWBaseboard( BaseboardNum ).ZonePtr = ctrlZone;
+					}
+				}
+			}
 		}
 
 		if ( ErrorsFound ) {
