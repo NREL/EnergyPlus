@@ -2452,18 +2452,7 @@ namespace DaylightingManager {
 		Array1D< Vector > TmpGndPt( NBasis, Vector( 0.0, 0.0, 0.0 ) ); // Temporary ground intersection list
 		Array2D< Vector > TmpHitPt( TotSurfaces, NBasis, Vector( 0.0, 0.0, 0.0 ) ); // Temporary HitPt
 
-		// find if reference point belongs to light tube of outgoing bsdf direction.  This works for entire window and not window
-		// elements.
-		// initialization for each reference point
-		//do iRefPoint = 1, NRefPt
-		//if (CalledFrom == CalledForRefPoint) then
-		//  RefPoint = ZoneDaylight(ZoneNum)%DaylRefPtAbsCoord(iRefPoint, 1:3)
-		//else
-		//  RefPoint = IllumMapCalc(MapNum)%MapRefPtAbsCoord(irefPoint, 1:3)
-		//end if
-
 		CFSRefPointPosFactor( RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW );
-		//end do
 
 		curWinEl = 0;
 		// loop through window elements. This will calculate sky, ground and reflection bins for each window element
@@ -2476,15 +2465,7 @@ namespace DaylightingManager {
 				Centroid = W2 + ( double( IX ) - 0.5 ) * W23 * DWX + ( double( IY ) - 0.5 ) * W21 * DWY;
 				RWin = Centroid;
 
-				//do iRefPoint = 1, NRefPt
-				//if (CalledFrom == CalledForRefPoint) then
-				//  RefPoint = ZoneDaylight(ZoneNum)%DaylRefPtAbsCoord(iRefPoint, 1:3)
-				//else
-				//  RefPoint = IllumMapCalc(MapNum)%MapRefPtAbsCoord(iRefPoint, 1:3)
-				//end if
-
 				CFSRefPointSolidAngle( RefPoint, RWin, WNorm, StateRefPoint, DaylghtGeomDescr, iWin, CurFenState, NTrnBasis, curWinEl, WinElArea );
-				//end do
 
 				NSky = 0;
 				NGnd = 0;
@@ -5110,15 +5091,6 @@ namespace DaylightingManager {
 
 		for ( ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum ) {
 			SurfNum = Shelf( ShelfNum ).Window;
-			//    IF (SurfNum > 0) THEN
-			//      IF (ZoneDaylight(Surface(SurfNum)%zone)%DaylightMethod == NoDaylighting) THEN
-			//        CALL ShowSevereError('DaylightingDevice:Shelf = '//TRIM(Shelf(ShelfNum)%Name)// &
-			//            ':  is not connected to a Zone that has Daylighting.  ')
-			//        CALL ShowContinueError('Add Daylighting:Controls ' //&
-			//            'to Zone named:  '//TRIM(Zone(Surface(SurfNum)%zone)%name) )
-			//          ErrorsFound = .TRUE.
-			//      ENDIF
-			//    ELSE ! SurfNum == 0
 			if ( SurfNum == 0 ) {
 				// should not come here (would have already been caught in shelf get input), but is an error
 				ShowSevereError( "DaylightingDevice:Shelf = " + Shelf( ShelfNum ).Name + ":  window not found " );
@@ -6014,9 +5986,6 @@ namespace DaylightingManager {
 
 								// We add the contribution from the solar disk if slats do not block beam solar
 								// TH CR 8010. DaylIllFacSunDisk needs to be interpolated!
-								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) DFSUHR(2) = DFSUHR(2) + &
-								//            VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,IL,2,HourOfDay) + &
-								//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 							}
 
@@ -6026,10 +5995,6 @@ namespace DaylightingManager {
 								BFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 
 								// TH CR 8010. DaylBackFacSunDisk needs to be interpolated!
-								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) THEN
-								//  BFSUHR(2) = BFSUHR(2) + &
-								//            VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylBackFacSunDisk(loop,IL,2,HourOfDay) + &
-								//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylBackFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
 									BFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 								}
@@ -6041,10 +6006,6 @@ namespace DaylightingManager {
 								SFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 
 								// TH CR 8010. DaylSourceFacSunDisk needs to be interpolated!
-								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) THEN
-								//  SFSUHR(2) = SFSUHR(2) + &
-								//           VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylSourceFacSunDisk(loop,IL,2,HourOfDay) + &
-								//           WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylSourceFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
 									SFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 								}
@@ -6250,7 +6211,6 @@ namespace DaylightingManager {
 				// Check if window is eligible for glare control
 				// TH 1/21/2010. Switchable glazings already in partially switched state
 				//  should be allowed to further dim to control glare
-				//IF (SurfaceWindow(IWin)%ShadingFlag < 10) CYCLE
 				if ( SurfaceWindow( IWin ).ShadingFlag < 10 && SurfaceWindow( IWin ).ShadingFlag != SwitchableGlazing ) continue;
 
 				ICtrl = Surface( IWin ).WindowShadingControlPtr;
@@ -6484,17 +6444,6 @@ namespace DaylightingManager {
 							// it is in shaded state and glare is ok - job is done, exit the window loop - IWin
 							break;
 						}
-						//   ELSE
-						//     ! glare still high at either ref pt. go to next window
-						//     !  clean up for switchable glazings
-						//     IF (SurfaceWindow(IWin)%ShadingFlag == SwitchableGlazing) THEN
-						//       ! Already in fully dark state
-						//       DO IL = 1,NREFPT
-						//         ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) = tmpSourceLumFromWinAtRefPt(IL,2,loop)
-						//         ZoneDaylight(ZoneNum)%IllumFromWinAtRefPt(IL,2,loop) = tmpIllumFromWinAtRefPt(IL,2,loop)
-						//         ZoneDaylight(ZoneNum)%BackLumFromWinAtRefPt(IL,2,loop) = tmpBackLumFromWinAtRefPt(IL,2,loop)
-						//       END DO
-						//     ENDIF
 					}
 
 				} // End of check if window glare control is active
@@ -8215,10 +8164,6 @@ namespace DaylightingManager {
 			WinLumSU += dirTrans * ElementLuminanceSun( iIncElem );
 
 			// For sun disk need to go throug outgoing directions and see which directions actually contain reference point
-			//if ((PosFac /= 0.0d0).and.(dOmega > 1e-6)) then
-			//WinLumSUdisk = WinLumSUdisk + dirTrans * ElementLuminanceSunDisk(iIncElem) * 14700.0d0 * sqrt(0.000068d0*PosFac) / &
-			//  (dOmega**0.8d0)
-			//end if
 		}
 
 		if ( zProjection > 0.0 ) {
@@ -8879,8 +8824,6 @@ namespace DaylightingManager {
 		for ( ILM = 1; ILM <= ZoneDaylight( ZoneNum ).MapCount; ++ILM ) {
 
 			MapNum = ZoneDaylight( ZoneNum ).ZoneToMap( ILM );
-			//    IllumMapCalc(MapNum)%DaylIllumAtMapPt  = 0.0
-			//    IllumMapCalc(MapNum)%GlareIndexAtMapPt = 0.0
 			NREFPT = IllumMapCalc( MapNum ).TotalMapRefPoints;
 
 			daylight_illum = 0.0;
@@ -8992,9 +8935,6 @@ namespace DaylightingManager {
 
 									// We add the contribution from the solar disk if slats do not block beam solar
 									// TH CR 8010, DaylIllFacSunDisk needs to be interpolated
-									//IF(.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) DFSUHR(2) = DFSUHR(2) + &
-									//  VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,ILB,2,HourOfDay) + &
-									//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,ILB,2,PreviousHour))
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
 										DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 									}
