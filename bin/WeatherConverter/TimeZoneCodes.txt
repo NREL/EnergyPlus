@@ -1,0 +1,99 @@
+Key	Display	Name	TimeZone	DST Start	DST End
+
+NAA	(GMT-04:00) Atlantic Time (Canada & Greenland)	North America / Atlantic	-4	2nd Sunday in March	1st Sunday in November
+NAB	(GMT-04:00) Atlantic Standard Time (Quebec - Lower North Shore)	North America / Blanc-Sablon	-4	N/A	N/A
+NAC	(GMT-06:00) Central Time (US & Canada)	North America / Central	-6	2nd Sunday in March	1st Sunday in November
+NAD	(GMT-07:00) Dawson Creek (Canada)	North America / Dawson Creek	-7	N/A	N/A
+NAE	(GMT-05:00) Eastern Time (US & Canada)	North America / Eastern	-5	2nd Sunday in March	1st Sunday in November
+NAF	(GMT-03:30) Newfoundland	North America / Newfoundland	-3.5	2nd Sunday in March	1st Sunday in November
+NAH	(GMT-10:00) Adak	North America / Adak	-10	2nd Sunday in March	1st Sunday in November
+NAI	(GMT-05:00) Indiana (East)	North America / Indiana	-5	N/A	N/A
+NAK	(GMT-09:00) Alaska	North America / Alaska	-9	2nd Sunday in March	1st Sunday in November
+NAM	(GMT-07:00) Mountain Time (US & Canada)	North America / Mountain	-7	2nd Sunday in March	1st Sunday in November
+NAP	(GMT-08:00) Pacific Time (US & Canada); Tijuana	North America / Pacific	-8	2nd Sunday in March	1st Sunday in November
+NAS	(GMT-06:00) Saskatchewan	North Amercia / Saskatchewan	-6	N/A	N/A
+NAZ	(GMT-07:00) Arizona	North America / Arizona	-7	N/A	N/A
+
+AEU	(GMT+08:45) Eucla	Australia / Eucla	8.75	Last Sunday in October	Last Sunday in March
+AFE	(GMT+03:00) Nairobi	Africa / East	3	N/A	N/A
+AFG	(GMT+04:30) Kabul	Afghanistan	4.5	N/A	N/A
+AFS	"(GMT+02:00) Harare, Pretoria"	South Africa	2	N/A	N/A
+AFW	(GMT+01:00) West Central Africa	Africa / West Central	1	N/A	N/A
+ANM	(GMT+13:00) McMurdo Station	Antarctica	12	Last Sunday in September	1st Sunday in April
+ANP	(GMT-04:00) Palmer Station	Antarctica	-4	N/A	N/A
+ANS	(GMT+13:00) South Pole	Antarctica	4	N/A	N/A
+ARC	(GMT+03:00) Baghdad	Arabian Peninsula / Baghdad	3	N/A	N/A
+ARN	"(GMT+04:00) Abu Dhabi, Muscat"	Arabian Peninsula / Abu Dhabi	4	N/A	N/A
+ASC	(GMT+06:00) Dhaka	Asia / Central	6	N/A	N/A
+ASE	(GMT+08:00) Irkutsk	Asia / East	8	N/A	N/A
+ASN	(GMT+07:00) Krasnoyarsk	Asia / North	7	N/A	N/A
+ASR	"(GMT+06:00) Almaty, Bishkek"	Asia / North Central	6	N/A	N/A
+ASV	(GMT+10:00) Vladivostok	Asia / Vladivostok	10	N/A	N/A
+ASW	"(GMT+05:00) Islamabad, Samarkand, Ashgabat"	Asia / West	5	N/A	N/A
+AUA	(GMT+09:30) Adelaide	Australia / South	9.5	1st Sunday in October	1st Sunday in April
+AUB	(GMT+10:00) Brisbane	Australia / Queensland	10	N/A	N/A
+AUC	(GMT+09:30) Darwin	Australia / Northern	9.5	N/A	N/A
+AUE	"(GMT+10:00) Canberra, Melbourne, Sydney, Hobart"	Australia / South East	10	1st Sunday in October	1st Sunday in April
+AUH	(GMT+10:30) Howe	Australia / Lord Howe Island	10.5	1st Sunday in October	1st Sunday in April
+AUN	(GMT+10:30) Norfolk	Pacific / Norfolk Island	11.5	N/A	N/A
+AUW	(GMT+08:00) Perth	Australia / West	8	Last Sunday in October	Last Sunday in March
+AZR	(GMT-01:00) Azores	Azores	-1	Last Sunday in March	Last Sunday in October
+CAM	(GMT-06:00) Central America	Central America	-6	N/A	N/A
+CAU	"(GMT+04:00) Baku, Tbilisi, Yerevan"	Caucasus	4	Last Sunday in March	Last Sunday in October
+CHN	"(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi"	China	8	N/A	N/A
+CVI	(GMT-01:00) Cape Verde Island	Cape Verde	-1	N/A	N/A
+EAS	(GMT-06:00) Easter Island	Easter Island	-6	2nd Sunday in October	2nd Sunday in March
+EGP	(GMT+02:00) Cairo	Egypt	2	N/A	N/A
+EKT	(GMT+05:00) Ekaterinburg	Ekaterinburg	5	N/A	N/A
+EUE	"(GMT+02:00) Bucharest, Sofija, Nicolosia, Helsinki, Riga, Tallinn, Vilnius, Athens, Istanbul, Minsk"	Europe / East	2	Last Sunday in March	Last Sunday in October
+EUW	"(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna, Belgrade, Bratislava, Budapest, Ljubljana, Prague, Sarajevo, Skopje, Warsaw, Zagreb, Brussels, Copenhagen, Madrid, Paris"	Europe / West	1	Last Sunday in March	Last Sunday in October
+FJI	"(GMT+12:00) Fiji, Marshall Islands"	Fiji	12	Last Sunday in October	Last Sunday in March
+FLK	(GMT-04:00) Stanley	Falkland Islands	-4	1st Sunday in September	1st Tuesday in April
+GMT	"(GMT) Greenwich Mean Time : Dublin, Edinburgh, Lisbon, London, Reykjavik"	GMT	0	Last Sunday in March	Last Sunday in October
+GRN	(GMT-03:00) Godthab	Greenland	-3	Last Sunday in March	Last Sunday in October
+GRW	"(GMT) Casablanca, Monrovia"	Greenwich / West	0	N/A	N/A
+GST	(GMT+04:00) Tbilisi	Georgia	4	N/A	N/A
+IND	"(GMT+05:30) Calcutta, Chennai, Mumbai, New Delhi, Sri Jayawardenepura"	India	5.5	N/A	N/A
+IRN	(GMT+03:30) Tehran	Iran	3.5	N/A	N/A
+IST	(GMT+02:00) Zion	Israel	2	N/A	N/A
+JPN	"(GMT+09:00) Osaka, Sapporo, Tokyo, Seoul"	Japan	9	N/A	N/A
+JRD	(GMT+02:00) Amman	Jordan	2	Last Thursday in March	Last Friday in October
+KOR	(GMT+09:00) Seoul	Korea	9	N/A	N/A
+MAG	(GMT+11:00) Magadan	Magadan	11	N/A	N/A
+MEC	(GMT-07:00) Chihuahua	Mexico / West	-7	1st Sunday in April	Last Sunday in October
+MET	(GMT-08:00) Tijuana	Mexico / Tijuana	-8	2nd Sunday in March	1st Sunday in November
+MEX	(GMT-06:00) Mexico City	Mexico	-6	1st Sunday in April	Last Sunday in October
+MLY	"(GMT+08:00) Kuala Lumpur, Singapore"	Malay Peninsula	8	N/A	N/A
+MNG	(GMT+08:00) Ulaan Bataar	Mongolia	8	N/A	N/A
+MYR	(GMT+06:30) Rangoon	Myanmar	6.5	N/A	N/A
+NPL	(GMT+05:45) Kathmandu	Nepal	5.75	N/A	N/A
+NWA	(GMT-03:00) Northwest Atlantic	North West Atlantic	-3	2nd Sunday in March	1st Sunday in November
+NZC	(GMT+12:45) Chatham	New Zealand / Chatham Islands	12.75	Last Sunday in September	1st Sunday in April
+NZL	"(GMT+12:00) Auckland, Wellington"	New Zealand	12	Last Sunday in September	1st Sunday in April
+PAR	(GMT-04:00) Paraguay	Paraguay	-4	3rd Sunday in October	2nd Sunday in March
+PCC	"(GMT+11:00) Solomon Is., New Caledonia"	Pacific Central	11	N/A	N/A
+PCG	(GMT-09:00) Gambier	Gambier	-9	N/A	N/A
+PCH	(GMT-10:00) Hawaii	Hawaiian	-10	N/A	N/A
+PCK	(GMT+14:00) Kiritimati	Kiritibati	14	N/A	N/A
+PCM	(GMT-11:00) Midway Island	Pacific / Midway	-11	N/A	N/A
+PCQ	(GMT-09:30) Marquesas	Pacific / Marquesas	-9.5	N/A	N/A
+PCS	(GMT-11:00) Samoa	Pacific / Samoa	-11	Last Saturday in September	1st Sunday in April
+PCT	(GMT+13:00) Nuku'alofa	Pacific / Tonga	13	N/A	N/A
+PCW	"(GMT+10:00) Guam, Port Moresby"	Pacific / West	10	N/A	N/A
+PIT	(GMT-08:00) Pitcairn	Pacific / Pitcairn	-8	N/A	N/A
+PSE	"(GMT+02:00) Gaza City, Bethlehem"	Palestine	2	4/1	3rd Friday of October
+RUK	(GMT+03:00) Kalilingrad	Russian / Kalilingrad	3	N/A	N/A
+RUN	"(GMT+07:00) Omsk, Novsoibirsk"	Russian / Central	7	N/A	N/A
+RUS	"(GMT+04:00) Moscow, St. Petersburg, Volgograd"	Russian	4	N/A	N/A
+SAB	(GMT-03:00) Brasilia	South America / Brazil	-3	3rd Sunday in October	3rd Sunday in February
+SAC	"(GMT-04:00) Santiago, Palmer Antarctica"	South America / Chile	-4	2nd Sunday in October	2nd Sunday in March
+SAE	(GMT-03:00) Buenos Aires	South America / Eastern	-3	N/A	N/A
+SAP	"(GMT-05:00) Bogota, Lima, Quito"	South America / Pacific	-5	N/A	N/A
+SAU	(GMT-03:00) Montevideo	South America / Uruguay	-3	1st Sunday in October	2nd Sunday in March
+SAV	(GMT-04:30) Caracas	South America / Venezuela	-4.5	N/A	N/A
+SAW	"(GMT-04:00) La Paz, Georgetown"	South America / Western	-4	N/A	N/A
+SAZ	(GMT-04:00) Cuiaba	South America / West Brazil	-4	3rd Sunday in October	3rd Sunday in February
+SEA	"(GMT+07:00) Bangkok, Hanoi, Jakarta"	South East Asia	7	N/A	N/A
+SGS	(GMT-02:00) South Georgia Island	South Atlantic	-2	N/A	N/A
+SYR	(GMT+02:00) Damascus	Syria	2	Last Friday in March	10/1
+YAK	(GMT+10:00) Yakutsk	Yakutsk	10	N/A	N/A

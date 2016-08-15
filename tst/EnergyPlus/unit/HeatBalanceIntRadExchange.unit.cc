@@ -123,6 +123,68 @@ namespace EnergyPlus {
 		
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
+		// Tests for correction of view factors based on GitHub Issue #5772
+
+		A( 1 ) = 20.0;
+		A( 2 ) = 180.0;
+		A( 3 ) = 180.0;
+		F( 1, 1 ) = 0.0;
+		F( 1, 2 ) = 0.5;
+		F( 1, 3 ) = 0.5;
+		F( 2, 1 ) = 0.1;
+		F( 2, 2 ) = 0.0;
+		F( 2, 3 ) = 0.9;
+		F( 3, 1 ) = 0.1;
+		F( 3, 2 ) = 0.9;
+		F( 3, 3 ) = 0.0;
+
+		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
+		EXPECT_NEAR( F( 1, 2 ), 0.07986, 0.001 );
+		EXPECT_NEAR( F( 2, 1 ), 0.71875, 0.001 );
+		EXPECT_NEAR( F( 3, 2 ), 0.28125, 0.001 );
+		
+		A( 1 ) = 100.0;
+		A( 2 ) = 100.0;
+		A( 3 ) = 200.0;
+		F( 1, 1 ) = 0.0;
+		F( 1, 2 ) = 1.0/3.0;
+		F( 1, 3 ) = 2.0/3.0;
+		F( 2, 1 ) = 1.0/3.0;
+		F( 2, 2 ) = 0.0;
+		F( 2, 3 ) = 2.0/3.0;
+		F( 3, 1 ) = 0.5;
+		F( 3, 2 ) = 0.5;
+		F( 3, 3 ) = 0.0;
+		
+		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
+		EXPECT_NEAR( F( 1, 2 ), 0.181818, 0.001 );
+		EXPECT_NEAR( F( 2, 3 ), 0.25, 0.001 );
+		EXPECT_NEAR( F( 3, 2 ), 0.5, 0.001 );
+		
+		A( 1 ) = 100.0;
+		A( 2 ) = 150.0;
+		A( 3 ) = 200.0;
+		F( 1, 1 ) = 0.0;
+		F( 1, 2 ) = 150.0/350.0;
+		F( 1, 3 ) = 200.0/350.0;
+		F( 2, 1 ) = 1.0/3.0;
+		F( 2, 2 ) = 0.0;
+		F( 2, 3 ) = 2.0/3.0;
+		F( 3, 1 ) = 0.4;
+		F( 3, 2 ) = 0.6;
+		F( 3, 3 ) = 0.0;
+
+		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
+		EXPECT_NEAR( F( 1, 2 ), 0.21466, 0.001 );
+		EXPECT_NEAR( F( 1, 3 ), 0.25445, 0.001 );
+		EXPECT_NEAR( F( 2, 1 ), 0.32199, 0.001 );
+		EXPECT_NEAR( F( 2, 3 ), 0.36832, 0.001 );
+		EXPECT_NEAR( F( 3, 1 ), 0.50890, 0.001 );
+		EXPECT_NEAR( F( 3, 2 ), 0.49110, 0.001 );
+
+		A.deallocate();
+		F.deallocate();
+		
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagTest)
