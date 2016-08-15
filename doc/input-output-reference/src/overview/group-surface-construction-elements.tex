@@ -352,7 +352,7 @@ where
 If this field is left blank or set to \texttt{autocalculate}, 
 the above equation will be used to calculate the surface layer penetration depth 
 assuming a $\tau_{surf}$ of 24 hours.
-To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. If calculating d_{EMPD,surf}, the assumed value of tau_{surf} should not be less than 4x the simulation timestep to ensure an accurate and stable solution.
+To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. If calculating $d_{EMPD,surf}$, the assumed value of $\tau_{surf}$ should not be less than 4x the simulation timestep to ensure an accurate and stable solution.
 
 \paragraph{Field: Deep Layer Penetration
 	Depth}\label{field-deep-layer-penetration-depth}
@@ -470,7 +470,7 @@ convective mass transfer coefficient.
 Units are kg of water per cubic meter of air.
 
 \paragraph{EMPD Surface Layer Moisture Content
-	{[}kg/m3{]}}\label{empd-surface-layer-moisture-content-kgm3}
+	{[}kg/kg{]}}\label{empd-surface-layer-moisture-content-kgkg}
 
 The moisture content, \emph{u}, of the fictitious surface layer. The
 surface layer node is not at the actual surface, but is instead at the
@@ -478,16 +478,16 @@ center of surface layer, which has a uniform moisture content. This node
 is separated from the inside face of the surface by a diffusive
 resistance, as described in the Engineering Reference.
 
-Units are kg of water per cubic meter of solid material (e.g., gypsum).
+Units are kg of water per kg of solid material (e.g., gypsum).
 
 \paragraph{EMPD Deep Layer Moisture Content
-	{[}kg/m3{]}}\label{empd-deep-layer-moisture-content-kgm3}
+	{[}kg/kg{]}}\label{empd-deep-layer-moisture-content-kgkg}
 
 The moisture content, \emph{u}, of the fictitious deep layer. The deep
 layer node interacts only with the surface layer node through a
 diffusive resistance.
 
-Units are kg of water per cubic meter of solid material.
+Units are kg of water per kg of solid material.
 
 \paragraph{EMPD Surface Layer Equivalent Relative Humidity
 	{[}\%{]}}\label{empd-surface-layer-equivalent-relative-humidity}
