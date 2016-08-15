@@ -72,8 +72,15 @@ The ZoneHVAC:AirDistributionUnit object gives further information on what air lo
   AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
 \item
   AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+\item
+  AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+\item
+  AirTerminal:SingleDuct:UserDefined
+\item
+  AirTerminal:SingleDuct:Mixer
+ 
 \end{itemize}
-
+   
 Connections between the air distribution unit, the supply air duct, and the zone are specified in the input syntax for the air distribution unit and the AirLoopHVAC:ZoneSplitter. The input syntax also explicitly defines an outlet identifier. This implies a connection to a zone through a NodeList for zone inlets (see the ZoneHVAC:EquipmentConnections statement). The air distribution unit is limited to one combined component-controller unit; because controls are normally based on the zone thermostat and can work in parallel or series in complex fashion. Since the control and the flow resolution can be complex, each air distribution unit is unique in addressing these combinations and therefore only one is allowed per zone.
 
 The Air Distribution unit also allows the user to specify leaks in the supply air duct system. These inputs are used in the EnergyPlus Simplified Duct Leakage Model (SDLM). This model simulates a specific configuration: supply leaks to a return plenum in a commercial VAV or CV system. The system must have a constant static pressure setpoint. Within these limitations SDLM allows the user to easily evaluate the energy penalty due to duct leakage.

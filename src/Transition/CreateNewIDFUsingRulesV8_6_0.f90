@@ -842,7 +842,39 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDDO
 
               !! Changes for this version can go here
+              CASE('AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER')
+                nodiff=.false.
+                ! object rename
+                ObjectName = "AirTerminal:SingleDuct:Mixer"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6)=InArgs(1:6)   ! No change to fields F1 - F6
+                CurArgs = CurArgs + 1      ! Add new input field F7: -> "Mixer Connection Type"
+                OutArgs(7)='InletSide'     ! Set field value to "InletSide"
 
+              CASE('AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER')
+                nodiff=.false.
+                ! object rename
+                ObjectName = "AirTerminal:SingleDuct:Mixer"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6)=InArgs(1:6)   ! No change to fields F1 - F6
+                CurArgs = CurArgs + 1      ! Add new input field F7: -> "Mixer Connection Type"
+                OutArgs(7)='SupplySide'    ! Set field value to "SupplySide"
+
+              CASE('ZONEHVAC:AIRDISTRIBUTIONUNIT')
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                if (samestring('AirTerminal:SingleDuct:InletSideMixer',InArgs(3)) .OR.   &
+                    samestring('AirTerminal:SingleDuct:SupplySideMixer',InArgs(3))) then
+                    OutArgs(3)='AirTerminal:SingleDuct:Mixer'
+                endif
+              
+              CASE('OTHEREQUIPMENT')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                OutArgs(2) = 'None'
+                OutArgs(3:11) = InArgs(2:10)
+                CurArgs = CurArgs+1
+              
                CASE('DAYLIGHTING:CONTROLS')
                  nodiff=.false.
                  CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -875,7 +907,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    CurArgs = 16
                  ENDIF
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-
                  ! create new object Daylighting:ReferencePoint
                  ObjectName='Daylighting:ReferencePoint'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -890,9 +921,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    ObjectName='Daylighting:ReferencePoint'
                    CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                    OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt2'
-                   OutArgs(2) = InArgs(1)
-                   OutArgs(3:5) = InArgs(6:8)
-                   CurArgs = 5
+                   OutArgs(2) = InArgs(1)                   OutArgs(3:5) = InArgs(6:8)                   CurArgs = 5
                    CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
                  ENDIF
 
