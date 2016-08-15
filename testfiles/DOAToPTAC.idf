@@ -22,8 +22,8 @@
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7ï¿½C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2ï¿½C MWB=25.3ï¿½C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7.
 !
@@ -169,7 +169,7 @@ Timestep,
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7ï¿½C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -201,7 +201,7 @@ Timestep,
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2ï¿½C MWB=25.3ï¿½C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -3144,6 +3144,7 @@ Fan:OnOff,
 Coil:Heating:Gas,
     SPACE1-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- Fuel Type
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name
@@ -3152,6 +3153,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE2-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- Fuel Type
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name
@@ -3160,6 +3162,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE3-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- Fuel Type
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE3-1 Cooling Coil Outlet,  !- Air Inlet Node Name
@@ -3168,6 +3171,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE4-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- Fuel Type
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE4-1 Cooling Coil Outlet,  !- Air Inlet Node Name
@@ -3176,6 +3180,7 @@ Coil:Heating:Gas,
 Coil:Heating:Gas,
     SPACE5-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- Fuel Type
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE5-1 Cooling Coil Outlet,  !- Air Inlet Node Name

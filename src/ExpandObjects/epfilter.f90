@@ -8993,6 +8993,7 @@ DO iZone = 1, numCompactZoneVAV
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + vzNameOff,' Reheat Coil')
     CALL AddToObjFld('Availability Schedule Name', base + vzReheatSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
       CALL AddToObjStr('Gas Burner Efficiency','0.8')
       CALL AddToObjStr('Nominal Capacity {W}', 'autosize')
     CALL AddToObjFld('Air Inlet Node Name', base + vzNameOff,' Damper Outlet')
@@ -9498,6 +9499,7 @@ DO iZone = 1, numCompactZoneFPVAV
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + fpvzNameOff,' Reheat Coil')
     CALL AddToObjFld('Availability Schedule Name', base + fpvzReheatSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
       CALL AddToObjStr('Gas Burner Efficiency','0.8')
       CALL AddToObjStr('Nominal Capacity {W}', 'autosize')
     IF (isFlowTypeSeries) THEN
@@ -9912,6 +9914,7 @@ DO iZone = 1, numCompactZoneHCVAV
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + hcvzNameOff,' Reheat Coil')
     CALL AddToObjFld('Availability Schedule Name', base + hcvzReheatSchedNameOff,' ')
+      CALL AddToObjStr('Fuel Type', 'Gas')
       CALL AddToObjStr('Gas Burner Efficiency','0.8')
       CALL AddToObjStr('Nominal Capacity {W}', 'autosize')
     CALL AddToObjFld('Air Inlet Node Name', base + hcvzNameOff,' Damper Outlet')
@@ -10895,6 +10898,7 @@ DO iSys = 1, numCompactSysVAV
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Availability Schedule Name', base + vsHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + vsHeatEffiencyOff,' ')
     CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
     CALL AddToObjFld('Air Inlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet')
@@ -11307,6 +11311,7 @@ DO iSys = 1, numCompactSysVAV
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Preheat Coil')
     CALL AddToObjFld('Availability Schedule Name', base + vsPreheatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + vsPreheatEffiencyOff,' ')
     CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
     IF (heatRecovery .EQ. htrecNone) THEN
@@ -12568,6 +12573,7 @@ DO iSys = 1, numCompactSysPVAV
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Availability Schedule Name', base + pvavsHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + pvavsHeatEffiencyOff,' ')
 !    CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
     CALL AddToObjFld('Nominal Capacity of the Coil {W}',base + pvavsHeatCoilCapOff, ' ')
@@ -14079,6 +14085,7 @@ DO iSys = 1, numCompactSysUnit
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Availability Schedule Name', base + usHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + usHeatEffiencyOff,' ')
     CALL AddToObjFld('Nominal Capacity of the Coil {W}', base + usHeatCoilCapOff,'')
     CALL AddToObjFld('Air Inlet Node Name', base + usAirHandlerNameOff, TRIM(heatCoilInlet))
@@ -14158,6 +14165,7 @@ DO iSys = 1, numCompactSysUnit
         CALL CreateNewObj('Coil:Heating:Gas')
         CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Reheat Coil')
         CALL AddToObjFld('Availability Schedule Name', base + usHeatAvailSchedNameOff,' ')
+        CALL AddToObjStr('Fuel Type', 'Gas')
         CALL AddToObjFld('Gas Burner Efficiency', base + usHeatEffiencyOff,'')
         CALL AddToObjFld('Nominal Capacity of the Coil {W}', base + usHeatCoilCapOff,'')
         CALL AddToObjFld('Air Inlet Node Name', base + usAirHandlerNameOff,TRIM(reheatCoilInlet))
@@ -15104,6 +15112,7 @@ DO iSys = 1, numCompactSysUnitHP
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Sup Heat Coil')
     CALL AddToObjFld('Availability Schedule Name', base + uhpsSuppHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + uhpsSuppHeatEfficiencyOff,' ')
     CALL AddToObjFld('Nominal Capacity of the Coil {W}', base + uhpsSuppHeatCoilCapOff,'')
     CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff, TRIM(supheatCoilInlet))
@@ -17140,6 +17149,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjStr('Name', TRIM(heatCoilObjectName))
     CALL AddToObjFld('Availability Schedule Name', base + ussHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + ussHeatEfficiencyOff,' ')
     CALL AddToObjFld('Nominal Capacity of the Coil {W}', base + ussHeatCoilCapOff,'')
     CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(heatCoilInlet))
@@ -17576,6 +17586,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjStr('Name', TRIM(supHeatCoilObjectName))
     CALL AddToObjFld('Availability Schedule Name', base + ussSuppReHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + ussSuppReHeatEfficiencyOff,' ')
     CALL AddToObjFld('Nominal Capacity of the Coil {W}', base + ussSuppReHeatCoilCapOff,'')
     CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(supheatCoilInlet))
@@ -18757,6 +18768,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL CreateNewObj('Coil:Heating:Gas')
       CALL AddToObjFld('Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjFld('Availability Schedule Name', base + cvzReheatSchedNameOff,' ')
+      CALL AddToObjStr('Fuel Type', 'Gas')
       CALL AddToObjStr('Gas Burner Efficiency','0.8')
       CALL AddToObjStr('Nominal Capacity {W}', 'autosize')
       IF (isZoneSupPlenBlank) THEN
@@ -19720,6 +19732,7 @@ DO iSys = 1, numCompactSysConstVol
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Availability Schedule Name', base + cvsHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + cvsHeatEffiencyOff,' ')
     CALL AddToObjFld('Nominal Capacity {W}',base + cvsHeatCoilCapOff,'')
     CALL AddToObjStr('Air Inlet Node Name',  TRIM(heatCoilInlet))
@@ -20113,6 +20126,7 @@ DO iSys = 1, numCompactSysConstVol
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil')
     CALL AddToObjFld('Availability Schedule Name', base + cvsPreheatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + cvsPreheatEffiencyOff,' ')
     CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
     IF (heatRecovery .EQ. htrecNone) THEN
@@ -21778,6 +21792,7 @@ DO iSys = 1, numCompactSysDualDuct
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Heating Coil')
     CALL AddToObjFld('Availability Schedule Name', base + ddsHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + ddsHeatEffiencyOff,' ')
     CALL AddToObjFld('Nominal Capacity {W}',base + ddsHeatCoilCapOff,'')
     CALL AddToObjStr('Air Inlet Node Name',  TRIM(heatCoilInlet))
@@ -22329,6 +22344,7 @@ DO iSys = 1, numCompactSysDualDuct
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Preheat Coil')
     CALL AddToObjFld('Availability Schedule Name', base + ddsPreheatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + ddsPreheatEffiencyOff,' ')
     CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
     IF (heatRecovery .EQ. htrecNone) THEN
@@ -25013,6 +25029,7 @@ DO iZone = 1, numCompactPTAC
       CALL CreateNewObj('Coil:Heating:Gas')
       CALL AddToObjFld('Name', base + ptaczNameOff,' PTAC Heating Coil')
       CALL AddToObjFld('Availability Schedule Name', base + ptaczHeatAvailSchedNameOff,'')
+      CALL AddToObjStr('Fuel Type', 'Gas')
       CALL AddToObjFld('Gas Burner Efficiency', base + ptaczHeatEfficiencyOff,'')
       CALL AddToObjFld('Nominal Capacity of the Coil {W}', base + ptaczHeatCoilCapOff,'')
       CALL AddToObjFld('Air Inlet Node Name', base + ptaczNameOff,' PTAC Cooling Coil Outlet')
@@ -25685,6 +25702,7 @@ DO iZone = 1, numCompactPTHP
       CALL CreateNewObj('Coil:Heating:Gas')
       CALL AddToObjFld('Name', base + pthpzNameOff,' PTHP Supp Heating Coil')
       CALL AddToObjFld('Availability Schedule Name', base + pthpzSuppHeatAvailSchedNameOff,'')
+      CALL AddToObjStr('Fuel Type', 'Gas')
       CALL AddToObjFld('Gas Burner Efficiency', base + pthpzSuppHeatEfficiencyOff,'')
       CALL AddToObjFld('Nominal Capacity of the Coil {W}', base + pthpzSuppHeatCoilCapOff,'')
       IF (isDrawThru) THEN
@@ -32273,6 +32291,7 @@ DO iSys = 1, numCompactDedOutAir
     CALL CreateNewObj('Coil:Heating:Gas')
     CALL AddToObjFld('Name', base + doasNameOff,' Heating Coil')
     CALL AddToObjFld('Availability Schedule Name', base + doasHeatAvailSchedNameOff,' ')
+    CALL AddToObjStr('Fuel Type', 'Gas')
     CALL AddToObjFld('Gas Burner Efficiency', base + doasHeatEffiencyOff,' ')
     CALL AddToObjStr('Nominal Capacity of the Coil {W}','autosize')
     CALL AddToObjStr('Air Inlet Node Name',  TRIM(heatCoilInlet))
@@ -33258,7 +33277,7 @@ END SUBROUTINE makeBasementErr
 
 !     NOTICE
 !
-!     Copyright © 1996-2010 The Board of Trustees of the University of Illinois
+!     Copyright ï¿½ 1996-2010 The Board of Trustees of the University of Illinois
 !     and The Regents of the University of California through Ernest Orlando Lawrence
 !     Berkeley National Laboratory.  All rights reserved.
 !
