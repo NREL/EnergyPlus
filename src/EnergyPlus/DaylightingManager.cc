@@ -4975,10 +4975,11 @@ namespace DaylightingManager {
 	bool
 	doesDayLightingUseDElight()
 	{
-		for (auto & znDayl : ZoneDaylight )
+		for ( auto & znDayl : ZoneDaylight ){
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
 				return true;
 			}
+		}
 		return false;
 	}
 
