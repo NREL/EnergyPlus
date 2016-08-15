@@ -1228,7 +1228,6 @@ TEST_F( EnergyPlusFixture, HPWHTestSPControl )
 	SetPredefinedTables();
 	ScheduleManager::UpdateScheduleValues();
 
-	bool ErrorsFound = false;
 	EXPECT_FALSE( WaterThermalTanks::GetWaterThermalTankInput() );
 
 	WaterThermalTanks::WaterThermalTankData & Tank = WaterThermalTanks::WaterThermalTank( 1 );
