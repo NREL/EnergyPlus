@@ -77,15 +77,11 @@ TEST_F( EnergyPlusFixture, CheckThreading )
 
 	} );
 
-	//std::string const error_string = delimited_string({
-	//	"   ** Severe  ** IP: IDF line~1 Did not find \"ProgramControl\" in list of Objects",
-	//	"   And another here",
-	//	"   Look, this is the third line.",
-	//});
+	ASSERT_TRUE( process_idf( idf_objects, false ) );
 
-	EXPECT_TRUE( process_idf( idf_objects , true ) );
+	std::string const error_string = delimited_string({
+		"   ** Severe  ** IP: IDF line~1 Did not find \"ProgramControl\" in list of Objects",
+	});
 
-
-
-	//EXPECT_TRUE( compare_err_stream( error_string, true ) );
+	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 }
