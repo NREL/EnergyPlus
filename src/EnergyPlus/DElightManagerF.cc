@@ -125,6 +125,15 @@ namespace DElightManagerF {
 	using namespace DataPrecisionGlobals;
 	using namespace DataDElight;
 
+	std::ostream * delightin_stream( nullptr ); // Internal stream used for delight input
+
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		delightin_stream = nullptr;
+	}
+
 	void
 	DElightInputGenerator()
 	{
@@ -228,6 +237,7 @@ namespace DElightManagerF {
 				ShowFatalError( "DElightInputGenerator: Could not open file \""+ outputDelightInFileName + "\" for output (write)." );
 			}
 		}
+		delightin_stream = gio::out_stream( unit );
 
 		// Start of DElight input file
 		gio::write( unit, Format_901 ) << CurrentDateTime;

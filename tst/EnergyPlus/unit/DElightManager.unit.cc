@@ -371,6 +371,7 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 	EXPECT_EQ( "ZN001:WALL001:WIN001", DElightComplexFene( 1 ).wndwName );
 	EXPECT_EQ( 0. , DElightComplexFene( 1 ).feneRota );
 
+	compare_delightin_stream( "" );
 
 }
 
