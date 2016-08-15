@@ -41,7 +41,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 5
 
-  Version,8.5;
+  Version,8.6;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -8621,7 +8621,11 @@
   EnergyManagementSystem:Subroutine,
     CalcBouyancyTerms,       !- Name
     Set DeltaT = Troof - Ta, !- Program Line 1
+    If  Troof > 10.0,
     Set ratioT = DeltaT / Troof,  !- Program Line 2
+    Else,
+    Set ratioT = DeltaT / 10.0,
+    ENDIF,
     Set ratioT = @ABS  ratioT,  !- <none>
     Set temp1  = 2.0 * g * CV_Height * ratioT,  !- <none>
     Set temp2 = temp1^0.5,   !- <none>

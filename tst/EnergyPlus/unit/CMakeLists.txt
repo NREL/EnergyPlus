@@ -14,6 +14,7 @@ set( test_src
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
@@ -34,9 +35,11 @@ set( test_src
   DesiccantDehumidifiers.unit.cc
   DisplacementVentMgr.unit.cc
   DOASEffectOnZoneSizing.unit.cc
+  DualDuct.unit.cc
   DXCoils.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
+  ElectricBaseboardRadiator.unit.cc
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -51,6 +54,8 @@ set( test_src
   General.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatBalanceMovableInsulation.unit.cc
+  HeatBalanceIntRadExchange.unit.cc
   HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
@@ -58,6 +63,8 @@ set( test_src
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
+  HVACManager.unit.cc
+  HVACInterfaceManager.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
@@ -67,6 +74,7 @@ set( test_src
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
+  InternalHeatGains.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MixedAir.unit.cc

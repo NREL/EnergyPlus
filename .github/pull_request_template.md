@@ -31,5 +31,6 @@ This will not be exhaustively relevant to every PR.
    - [ ] If transition, update idfs
  - [ ] If new idf included, locally check the err file and other outputs
  - [ ] Documentation changes in place
- - [ ] ExpandObjects changes??
+ - [ ] Changed docs build successfully
+ - [ ] ExpandObjects changes?
  - [ ] If output changes, including tabular output structure, add to output rules file for interfaces

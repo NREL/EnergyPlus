@@ -522,9 +522,9 @@ One or more ventilation objects (i.e., ZoneVentilation:DesignFlowRate and/or Zon
 
 More advanced ventilation calculations are possible using the EnergyPlus AirflowNetwork model.
 
-\subsubsection{Inputs}\label{inputs-2-005}
+\subsubsection{Inputs}\label{inputs-2016-06-17-0936}
 
-\paragraph{Field: Name}\label{field-name-2-004}
+\paragraph{Field: Name}\label{field-name-2016-06-16}
 
 The name of the ZoneVentilation:DesignFlowRate object.
 
@@ -534,7 +534,7 @@ This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneList) and a
 
 The name of the actual ventilation object becomes \textless{}Zone Name\textgreater{} \textless{}ZoneVentilation:DesignFlowRate Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
-\paragraph{Field: Schedule Name}\label{field-schedule-name-2}
+\paragraph{Field: Schedule Name}\label{field-schedule-name-2016-06-16}
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (V\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
 
@@ -825,7 +825,7 @@ More advanced ventilation calculations are possible using the EnergyPlus Airflow
 
 The name of the ZoneVentilation:WindandStackOpenArea object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-1-001}
+\paragraph{Field: Zone Name}\label{field-zone-name-2016-06-16}
 
 This field is the name of the zone (ref: Zone) and attaches a particular ventilation statement to a thermal zone in the building.
 
@@ -1177,7 +1177,7 @@ ZoneVentilation:DesignFlowRate objects used to calculate a combined zone outdoor
 
 \subsection{ZoneMixing}\label{zonemixing}
 
-In EnergyPlus, the ZoneMixing syntax is intended to allow simplified treatment of air exchange between zones. Note that this statement only affects the energy balance of the ``receiving'' zone and that this statement will not produce any effect on the ``source'' zone. Mixing statements can be complementary and include multiple zones, but the balancing of flows between zones is left to the user's discretion. The use of the Cross Mixing syntax (ref: Cross Mixing) can allow for automatic balancing of flows and energy flow rates between zones but is hindered by the limitation of only a single cross mixing statement per zone. The use of Refrigeration Door Mixing syntax (ref: Refrigeration Door Mixing) automatically balances the flow and energy between two zones and allows multiple mixing statements per zone. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation. Mixing is entered using the following syntax.
+ZoneMixing is intended to allow simplified treatment of air exchange between zones. Note that this statement only affects the energy balance of the ``receiving'' zone and that this statement will not produce any effect on the ``source'' zone. ZoneMixing statements can be complementary and include multiple zones, but the balancing of flows between zones is left to the user's discretion. Also see ZoneCrossMixing and ZoneRefrigerationDoorMixing. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
 
 \subsubsection{Inputs}\label{inputs-5-004}
 
@@ -1310,9 +1310,9 @@ ZoneMixing,
 \item
   HVAC,Sum,Zone Mixing Volume {[}m3{]}
 \item
-  HVAC,Sum,Zone Mixing Current Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Sum,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Sum,Zone Mixing Standard Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Sum,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Zone Mixing Mass {[}kg{]}
 \item
@@ -1335,11 +1335,11 @@ ZoneMixing,
 
 The air volume in m\(^{3}\) entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep.
 
-\paragraph{Zone Mixing Current Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-mixing-current-density-volumetric-flow-rate-m3s}
+\paragraph{Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}}\label{zone-mixing-current-density-volumetric-flow-rate-m3s}
 
 The air volumetric flow rate in m\(^{3}\)/s entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep using the density of air evaluated at current zone air conditions.
 
-\paragraph{Zone Mixing Standard Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-mixing-standard-density-volumetric-flow-rate-m3s}
+\paragraph{Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}}\label{zone-mixing-standard-density-volumetric-flow-rate-m3s}
 
 The air volumetric flow rate in m\(^{3}\)/s entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep using the density of air evaluated at standard conditions.
 
@@ -1373,13 +1373,9 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 \subsection{ZoneCrossMixing}\label{zonecrossmixing}
 
-The ZoneCrossMixing syntax is ideally suited for two zones that exchange an equal amount of air between each other and do not have any air exchange with other zones. As with Mixing (ref: Mixing), this is a simplified view of interzone airflow in EnergyPlus. The main difference between Mixing and Cross Mixing is that Cross Mixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones.
+ZoneCrossMixing is ideally suited for two zones that exchange an equal amount of air between each other. As with ZoneMixing, this is a simplified interzone airflow in EnergyPlus. The main difference between ZoneMixing and ZoneCrossMixing is that cross mixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. For refrigerated zones, see ZoneRefrigerationDoorMixing. More advanced mixing calculations are possible using the EnergyPlus AirflowNetwork model for multi-zone airflow with or without HVAC system operation.
 
-Cross Mixing can be entered once, in one of the mixing zones; or twice, once for each zone. The object should be entered once if Delta Temperature \textgreater{} 0.0 and it is desirable to have mixing only when the source zone~ is warmer than the receiving zone. This might be the case when the warmer zone is below the colder zone and the mixing is buoyancy driven. If the zones are next to each other, separated by an open doorway, it would be more suitable to input a cross mixing object for each zone. Then mixing would occur if the zone temperatures differed by Delta Temperature or greater regardless of which is the warmer zone.
-
-If Delta Temperature = 0.0, Cross Mixing can be entered either once or twice: the effect is exactly the same.
-
-Cross Mixing is entered using the following syntax.
+ZoneCrossMixing can be entered once (in one of the mixing zones), twice (once for each zone), or multiple times (exchanging with more than one zone). Each object will be modeled with its own control conditions. The object may be entered once if Delta Temperature \textgreater{} 0.0 and it is desirable to have mixing only when the source zone~ is warmer than the receiving zone. This might be the case when the warmer zone is below the colder zone and the mixing is buoyancy driven. If the zones are next to each other, separated by an open doorway, it would be more suitable to input a cross mixing object for each zone. Then mixing would occur if the zone temperatures differed by Delta Temperature or greater regardless of which is the warmer zone.
 
 \subsubsection{Inputs}\label{inputs-6-003}
 
@@ -1524,9 +1520,9 @@ ZoneCrossMixing,
 \item
   HVAC,Sum,Zone Mixing Volume {[}m3{]}
 \item
-  HVAC,Sum,Zone Mixing Current Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Sum,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Sum,Zone Mixing Standard Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Sum,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Zone Mixing Mass {[}kg{]}
 \item
@@ -1549,11 +1545,11 @@ ZoneCrossMixing,
 
 The air volume in m\(^{3}\) entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep.
 
-\paragraph{Zone Mixing Current Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-mixing-current-density-volumetric-flow-rate-m3s-1}
+\paragraph{Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}}\label{zone-mixing-current-density-volumetric-flow-rate-m3s-1}
 
 The air volumetric flow rate in m\(^{3}\)/s entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep using the density of air evaluated at current zone air conditions.
 
-\paragraph{Zone Mixing Standard Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-mixing-standard-density-volumetric-flow-rate-m3s-1}
+\paragraph{Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}}\label{zone-mixing-standard-density-volumetric-flow-rate-m3s-1}
 
 The air volumetric flow rate in m\(^{3}\)/s entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep using the density of air evaluated at standard conditions.
 
@@ -1587,11 +1583,9 @@ The total heat gain due to the sum of mixing, cross-mixing, and refrigeration-do
 
 \subsection{ZoneRefrigerationDoorMixing}\label{zonerefrigerationdoormixing}
 
-The ZoneRefrigerationDoorMixing syntax is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. They may also have mixed air from other zones, but only one object should be entered for any one pair of zones. As with Mixing (ref: Mixing), this is a simplified view of interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both Mixing and Cross Mixing. Like Cross Mixing, RefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Like Mixing, the refrigerated zone can exchange air with multiple zones.~ Unlike either of the other two mixing objects, the RefrigeratedDoorMixing always calculates the air exchange based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
+ZoneRefrigerationDoorMixing is ideally suited for two zones, at least one of which is refrigerated, that exchange an equal amount of dry air. As with ZoneMixing, this is a simplified interzone airflow in EnergyPlus. The ZoneRefrigerationDoorMixing approach shares some features of both ZoneMixing and ZoneCrossMixing. Like ZoneCrossMixing, ZoneRefrigerationDoorMixing has an energy effect on both the source and the receiving zone, thus maintaining both the air mass and energy balances in the two zones. Unlike the other two mixing objects, ZoneRefrigerationDoorMixing always calculates the air exchange rate based on the zone temperature and relative humidity. That is, the user does not specify the air flow rate. The user can moderate the flow through a door-opening schedule.
 
-Unlike, Cross Mixing, Refrigeration Door Mixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder.
-
-Refrigeration Door Mixing is entered using the following syntax.
+ZoneRefrigerationDoorMixing can only be entered once for any unique pair of zones. It doesn't matter which zone is listed first and the zones will automatically switch back and forth between source and receiving zones depending upon which zone is colder.
 
 \subsubsection{Inputs}\label{inputs-7-003}
 
@@ -1658,9 +1652,9 @@ ZoneRefrigerationDoorMixing,
 \item
   HVAC,Sum,Zone Mixing Volume {[}m3{]}
 \item
-  HVAC,Sum,Zone Mixing Current Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Sum,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Sum,Zone Mixing Standard Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Sum,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Zone Mixing Mass {[}kg{]}
 \item
@@ -1683,11 +1677,11 @@ ZoneRefrigerationDoorMixing,
 
 The air volume in m\(^{3}\) entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep.
 
-\paragraph{Zone Mixing Current Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-mixing-current-density-volumetric-flow-rate-m3s-2}
+\paragraph{Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}}\label{zone-mixing-current-density-volumetric-flow-rate-m3s-2}
 
 The air volumetric flow rate in m\(^{3}\)/s entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep using the density of air evaluated at current zone air conditions.
 
-\paragraph{Zone Mixing Standard Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-mixing-standard-density-volumetric-flow-rate-m3s-2}
+\paragraph{Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}}\label{zone-mixing-standard-density-volumetric-flow-rate-m3s-2}
 
 The air volumetric flow rate in m\(^{3}\)/s entering the zone due to the sum of mixing, cross-mixing, and refrigeration-door mixing during the hour or timestep using the density of air evaluated at standard conditions.
 
@@ -1874,9 +1868,9 @@ Current Earth Tube output variables:
 \item
   HVAC,Sum,Earth Tube Air Flow Volume {[}m3{]}
 \item
-  HVAC,Average,Earth Tube Air Current Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Average,Earth Tube Current Density Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Average,Earth Tube Air Standard Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Average,Earth Tube Standard Density Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Earth Tube Air Flow Mass {[}kg{]}
 \item
@@ -1909,11 +1903,11 @@ These are the energy and rate associated with the zone heating provided by the a
 
 The volume flow of air through the earth tube.
 
-\subsubsection{Earth Tube Air Current Density Volumetric Flow Rate {[}m3/s{]}}\label{earth-tube-air-current-density-volumetric-flow-rate-m3s}
+\subsubsection{Earth Tube Current Density Volume Flow Rate {[}m3/s{]}}\label{earth-tube-air-current-density-volumetric-flow-rate-m3s}
 
 The volume flow rate of air through the earth tube evaluating density at current zone conditions.
 
-\subsubsection{Earth Tube Air Standard Density Volumetric Flow Rate {[}m3/s{]}}\label{earth-tube-air-standard-density-volumetric-flow-rate-m3s}
+\subsubsection{Earth Tube Standard Density Volume Flow Rate {[}m3/s{]}}\label{earth-tube-air-standard-density-volumetric-flow-rate-m3s}
 
 The volume flow rate of air through the earth tube evaluating density at standard conditions.
 
@@ -2044,9 +2038,9 @@ ZoneCoolTower:Shower
 \item
   HVAC,Sum,Zone Cooltower Air Volume {[}m3{]}
 \item
-  HVAC,Average,Zone Cooltower Air Current Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Cooltower Current Density Air Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Average,Zone Cooltower Air Standard Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Cooltower Standard Density Air Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Zone Cooltower Air Mass {[}kg{]}
 \item
@@ -2085,11 +2079,11 @@ The sensible heat loss that occurs when the temperature at the exit of the coolt
 
 The latent heat loss that occurs when the humidity ratio at the exit of the cooltower is greater than that of the zone.
 
-\paragraph{Zone Cooltower Air Current Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-cooltower-air-current-density-volumetric-flow-rate-m3s}
+\paragraph{Zone Cooltower Current Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-cooltower-air-current-density-volumetric-flow-rate-m3s}
 
 The volumetric flow rate of the air leaving the cooltower evaluating density at current zone conditions.
 
-\paragraph{Zone Cooltower Air Standard Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-cooltower-air-standard-density-volumetric-flow-rate-m3s}
+\paragraph{Zone Cooltower Standard Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-cooltower-air-standard-density-volumetric-flow-rate-m3s}
 
 The volumetric flow rate of the air leaving the cooltower evaluating density at standard conditions.
 
@@ -2222,9 +2216,9 @@ Current ThermalChimney output variables:
 
 \begin{itemize}
 \item
-  HVAC,Average,Zone Thermal Chimney Current Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Thermal Chimney Current Density Air Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Average,Zone Thermal Chimney Standard Density Volumetric Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Thermal Chimney Standard Density Air Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Average,Zone Thermal Chimney Mass Flow Rate {[}kg/s{]}
 \item
@@ -2255,11 +2249,11 @@ The air volumetric flow of each zone enhanced by the thermal chimney.
 
 The air mass flow of each zone enhanced by the thermal chimney.
 
-\subsubsection{Zone Thermal Chimney Current Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-thermal-chimney-current-density-volumetric-flow-rate-m3s}
+\subsubsection{Zone Thermal Chimney Current Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-thermal-chimney-current-density-volumetric-flow-rate-m3s}
 
 The total air volumetric flow rate caused by the thermal chimney evaluating density at the current zone conditions.
 
-\subsubsection{Zone Thermal Chimney Standard Density Volumetric Flow Rate {[}m3/s{]}}\label{zone-thermal-chimney-standard-density-volumetric-flow-rate-m3s}
+\subsubsection{Zone Thermal Chimney Standard Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-thermal-chimney-standard-density-volumetric-flow-rate-m3s}
 
 The total air volumetric flow rate caused by the thermal chimney evaluating density at standard conditions.
 
@@ -2356,7 +2350,7 @@ This output variable represents the total zone mixing air mass flow rate of a re
 
 This output variable represents the total zone mixing source air mass flow rate of a source zone feeding one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single source zone.
 
-\paragraph{\texorpdfstring{Zone Air Mass Balance Infiltration Status {[]}}{Zone Air Mass Balance Infiltration Status }}\label{zone-air-mass-balance-infiltration-status}
+\paragraph{Zone Air Mass Balance Infiltration Status {[]}}\label{zone-air-mass-balance-infiltration-status}
 
 This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either \textbf{0} or \textbf{1}.~ If the value of this report variable is \textbf{0} then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for the current timestep.~ If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
 

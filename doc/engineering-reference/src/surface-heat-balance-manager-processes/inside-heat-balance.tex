@@ -70,7 +70,7 @@ Because the approximate view factors may not satisfy the basic requirements of r
 
 \begin{itemize}
 \item
-  If a user includes less than four surfaces in a zone, only reciprocity is enforced.
+  If a user includes less than four surfaces in a zone, the enforcement of "completeness" is not strictly possible because it is not possible to have a completed enclosure with less than four surfaces.  In this situation, reciprocity is enforced initially and then view factors from each surface are summed.  When dealing with this few surfaces, the result of using approximate view factors is that once reciprocity is enforced that the largest surface in the zone will end up having view factors that sum up to greater than unity.  This is not physically possible.  So, to correct this and maintain completeness for one surface, the entire view factor matrix is divided by the largest summation of view factors for any surface in the zone.  By dividing the entire view factor matrix by the same value, the reciprocity established by the standard algorithm is maintained and completeness for one surface is established.  All of the other surfaces will not have view factors that sum up to unity and thus will not satisfy completeness.  However, these other surfaces will not have view factors that sum up to greater than unity thus avoiding a physically impossible situation.
 \item
   If the area of one surface in a zone is greater than the sum of the areas of all other surfaces, reciprocity only is enforced, but sometimes, for very large surfaces, that enforcement becomes impossible, and the view factors are modified so that only the large surface is seen by very small surfaces.
 \end{itemize}
@@ -832,7 +832,7 @@ This algorithm gives the convection coefficients for air in a narrow vertical ca
 
 For a vertical cavity, the correlation from ISO 15099 is:
 
-\({\rm{NU1 = 0}}{\rm{.0673838 R}}{{\rm{a}}^{{\textstyle{{\rm{1}} \over {\rm{3}}}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ for 5E4 \textless{} Ra \textless{} 1E6
+\({\rm{NU1 = 0}}{\rm{.0673838 R}}{{\rm{a}}^{{\textstyle{\frac{{\rm{1}}}{{\rm{3}}}}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ for 5E4 \textless{} Ra \textless{} 1E6
 
 \({\rm{NU1 = 0}}{\rm{.028154 R}}{{\rm{a}}^{{\rm{0}}{\rm{.4134}}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ for 1E4 \textless{} Ra \textless{} 5E4
 

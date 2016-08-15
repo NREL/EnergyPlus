@@ -88,6 +88,7 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -193,6 +194,7 @@
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
@@ -285,6 +287,7 @@ namespace EnergyPlus {
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
+		DataErrorTracking::clear_state();
 		DataGenerators::clear_state();
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
@@ -385,6 +388,7 @@ namespace EnergyPlus {
 		VentilatedSlab::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();
+		WaterToAirHeatPumpSimple::clear_state();
 		WaterUse::clear_state();
 		WeatherManager::clear_state();
 		WindowAC::clear_state();

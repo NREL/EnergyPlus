@@ -2221,6 +2221,7 @@ namespace HeatBalanceSurfaceManager {
 
 					// Incident direct (unreflected) beam
 					QRadSWOutIncidentBeam( SurfNum ) = BeamSolar * SunlitFrac( TimeStep, HourOfDay, SurfNum2 ) * CosInc; // NOTE: SurfNum2
+
 					// Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
 					if ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) {
 						QRadSWOutIncidentSkyDiffuse( SurfNum ) = SkySolarInc;
@@ -3078,6 +3079,7 @@ namespace HeatBalanceSurfaceManager {
 		using namespace HeatBalanceMovableInsulation;
 		using General::InterpSw;
 		using General::InterpSlatAng;
+		using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3103,8 +3105,7 @@ namespace HeatBalanceSurfaceManager {
 		int ZoneNum; // Loop counter for Zones
 		int ShadeFlag; // Window shading flag
 		Real64 HMovInsul; // Conductance of movable insulation
-		int RoughIndexMovInsul; // Roughness index of movable insulation
-		Real64 AbsExt; // Solar absorptance of movable insulation
+		Real64 AbsInt; // Solar absorptance of movable insulation
 		Real64 DividerThermAbs; // Window divider thermal absorptance
 		int MatNumSh; // Shade layer material number
 		Real64 TauShIR; // Shade or blind IR transmittance
@@ -3121,10 +3122,10 @@ namespace HeatBalanceSurfaceManager {
 			ConstrNum = Surface( SurfNum ).Construction;
 			ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
 			ITABSF( SurfNum ) = Construct( ConstrNum ).InsideAbsorpThermal;
+			HMovInsul = 0.0;
 			if ( Construct( ConstrNum ).TransDiff <= 0.0 ) { // Opaque surface
-				RoughIndexMovInsul = 0;
-				if ( Surface( SurfNum ).MaterialMovInsulExt > 0 ) EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt );
-				if ( RoughIndexMovInsul > 0 ) ITABSF( SurfNum ) = Material( Surface( SurfNum ).MaterialMovInsulExt ).AbsorpThermal; // Movable outside insulation present
+				if ( Surface( SurfNum ).MaterialMovInsulInt > 0 ) EvalInsideMovableInsulation( SurfNum, HMovInsul, AbsInt );
+				if ( HMovInsul > 0.0 ) ITABSF( SurfNum ) = Material( Surface( SurfNum ).MaterialMovInsulInt ).AbsorpThermal; // Movable inside insulation present
 			}
 			// For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) ITABSF( SurfNum ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, SurfaceWindow( SurfNum ).EffShBlindEmiss ) + InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, SurfaceWindow( SurfNum ).EffGlassEmiss ); // For shades, following interpolation just returns value of first element in array
@@ -4530,7 +4531,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 	// FLOW:
 	MovInsulErrorFlag = false;
-	
+
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 		// Need to transfer any source/sink for a surface to the local array.  Note that
 		// the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
@@ -4773,7 +4774,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
-				
+
 			} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) {
 				if ( Surface( SurfNum ).ExtCavityPresent ) {
 					CalcExteriorVentedCavity( SurfNum );
@@ -4796,7 +4797,10 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 
 			// Check for outside movable insulation
-			if ( Surface( SurfNum ).MaterialMovInsulExt > 0 ) EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughSurf, AbsThermSurf );
+			if ( Surface( SurfNum ).MaterialMovInsulExt > 0 ) {
+				EvalOutsideMovableInsulation( SurfNum, HMovInsul, RoughSurf, AbsThermSurf );
+				if ( HMovInsul > 0 ) AbsThermSurf = Material( Surface( SurfNum ).MaterialMovInsulExt ).AbsorpThermal; // Movable outside insulation present
+			}
 
 			// Check for exposure to wind (exterior environment)
 			if ( Surface( SurfNum ).ExtWind ) {
@@ -4879,7 +4883,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			}
 
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-				
+
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
 			}
@@ -5432,13 +5436,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 					} else { // Movable insulation present
 
 						if ( construct.SourceSinkPresent ) {
-							
+
 						    ShowSevereError( "Interior movable insulation is not valid with embedded sources/sinks" );
 							ShowContinueError( "Construction " + construct.Name + " contains an internal source or sink but also uses" );
 							ShowContinueError( "interior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulInt ).Name + " for a surface with that construction." );
 							ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accommodate this combination." );
 							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
-							
+
 						}
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );
