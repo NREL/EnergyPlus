@@ -541,7 +541,7 @@ This numerical field specifies the ratio of the medium speed flow rate to the ma
 
 \paragraph{Field: Maximum Outdoor Air Flow Rate}\label{field-maximum-outdoor-air-flow-rate-002}
 
-If the fan coil unit uses outdoor air, this field specifies the outdoor air volumetric flow rate (m\(^{3}\)/sec). This flow rate should be less than or equal to the maximum airflow rate. A value of zero specifies no outdoor air.
+If the fan coil unit uses outdoor air, this field specifies the outdoor air volumetric flow rate (m\(^{3}\)/sec). This flow rate should be less than or equal to the maximum airflow rate. A value of zero specifies no outdoor air. This field is set to zero flow when the FanCoil is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Outdoor Air Schedule Name}\label{field-outdoor-air-schedule-name-000}
 
@@ -559,11 +559,17 @@ The name of the HVAC system node to which the fan coil unit sends its outlet air
 
 This field specifies the type of outdoor air mixer used by this fan coil unit. The outdoor air mixer component is part of the fan coil compound object. The only available outdoor air mixer type is:
 
-OutdoorAir:Mixer
+\begin{itemize}
+\tightlist
+\item
+  OutdoorAir:Mixer
+\end{itemize}
+
+This input field should be left blank when the FanCoil is connected to an \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer object is not simulated. 
 
 \paragraph{Field: Outdoor Air Mixer Name}\label{field-outdoor-air-mixer-name-000}
 
-The name of an outdoor air mixer component (object:OutdoorAir:Mixer) which composes part of the fan coil unit. Note that the return air node of the outdoor air mixer should be the same node as the air inlet node of the fan coil unit. In addition, the outdoor air mixer's mixed air node should be the same as the inlet air node of the fan coil unit's fan.
+The name of an outdoor air mixer component (object:OutdoorAir:Mixer) which composes part of the fan coil unit. Note that the return air node of the outdoor air mixer should be the same node as the air inlet node of the fan coil unit. In addition, the outdoor air mixer's mixed air node should be the same as the inlet air node of the fan coil unit's fan. This field should be left blank when the FanCoil is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-000}
 
@@ -2116,9 +2122,11 @@ This field specifies the type of outdoor air mixer used by this PTAC. The outdoo
   OutdoorAir:Mixer
 \end{itemize}
 
+This input field should be left blank when the PTAC is connected to an \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer object is not simulated. 
+
 \paragraph{Field: Outdoor Air Mixer Name}\label{field-outdoor-air-mixer-name-2}
 
-This alpha field defines the name of an outdoor air mixer component which composes part of the PTAC. The return air node of the outdoor air mixer should also be the same node as the air inlet node of the PTAC. Furthermore, the outdoor air mixer's mixed air node should be the same as the PTAC's fan inlet air node (for blow through fan placement) or the PTAC's DX cooling coil inlet node (for draw through fan placement).
+This alpha field defines the name of an outdoor air mixer component which composes part of the PTAC. The return air node of the outdoor air mixer should also be the same node as the air inlet node of the PTAC. Furthermore, the outdoor air mixer's mixed air node should be the same as the PTAC's fan inlet air node (for blow through fan placement) or the PTAC's DX cooling coil inlet node (for draw through fan placement). This field should be left blank when the PTAC is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Cooling Supply Air Flow Rate}\label{field-cooling-supply-air-flow-rate-002}
 
@@ -2134,15 +2142,15 @@ This numeric field defines the supply air flow rate leaving the air conditioner 
 
 \paragraph{Field: Cooling Outdoor Air Flow Rate}\label{field-cooling-outdoor-air-flow-rate-001}
 
-This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Cooling Outdoor Air Flow Rate cannot be greater than the air conditioner's supply air volumetric flow rate during cooling operation.
+This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Cooling Outdoor Air Flow Rate cannot be greater than the air conditioner's supply air volumetric flow rate during cooling operation. This field is set to zero flow when the PTAC is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Heating Outdoor Air Flow Rate}\label{field-heating-outdoor-air-flow-rate-001}
 
-This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the heating coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Heating Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Heating Outdoor Air Flow Rate cannot be greater than the air conditioner's supply air volumetric flow rate during heating operation.
+This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the heating coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Heating Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Heating Outdoor Air Flow Rate cannot be greater than the air conditioner's supply air volumetric flow rate during heating operation. This field is set to zero flow when the PTAC is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: No Load Outdoor Air Flow Rate}\label{field-no-load-outdoor-air-flow-rate-000}
 
-This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when neither cooling nor heating is required (i.e., cooling and heating coils are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the air conditioner's supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the air conditioner's supply air fan operating mode schedule specifies continuous fan operation. If the air conditioner's supply air fan operating mode schedule specifies continuous fan operation and the field `Supply air volumetric flow rate when no cooling or heating is needed' is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation {[}i.e., Cooling Outdoor Air Flow Rate{]} or heating operation {[}i.e., Heating Outdoor Air Flow Rate{]}) and this field is not used.
+This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when neither cooling nor heating is required (i.e., cooling and heating coils are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the air conditioner's supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the air conditioner's supply air fan operating mode schedule specifies continuous fan operation. If the air conditioner's supply air fan operating mode schedule specifies continuous fan operation and the field `Supply air volumetric flow rate when no cooling or heating is needed' is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation {[}i.e., Cooling Outdoor Air Flow Rate{]} or heating operation {[}i.e., Heating Outdoor Air Flow Rate{]}) and this field is not used. This input field is set to zero flow when the PTAC is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-5}
 
@@ -2446,9 +2454,11 @@ This field specifies the type of outdoor air mixer used by this PTHP. The outdoo
   OutdoorAir:Mixer
 \end{itemize}
 
+This input field should be left blank when the PTHP is connected to an \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer object is not simulated.
+
 \paragraph{Field: Outdoor Air Mixer Name}\label{field-outdoor-air-mixer-name-3}
 
-This alpha field defines the name of an outdoor air mixer component which composes part of the PTHP. Note that the return air node of the outdoor air mixer should also be the same node as the air inlet node of the PTHP. Furthermore, the outdoor air mixer's mixed air node should be the same as the PTHP's fan inlet air node (for blow through fan placement) or the PTHP's DX cooling coil inlet node (for draw through fan placement).
+This alpha field defines the name of an outdoor air mixer component which composes part of the PTHP. Note that the return air node of the outdoor air mixer should also be the same node as the air inlet node of the PTHP. Furthermore, the outdoor air mixer's mixed air node should be the same as the PTHP's fan inlet air node (for blow through fan placement) or the PTHP's DX cooling coil inlet node (for draw through fan placement). This field should be left blank when the PTHP is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Cooling Supply Air Flow Rate}\label{field-cooling-supply-air-flow-rate-1-001}
 
@@ -2465,14 +2475,15 @@ This numeric field defines the supply air flow rate leaving the heat pump in cub
 \paragraph{Field: Cooling Outdoor Air Flow Rate}\label{field-cooling-outdoor-air-flow-rate-1}
 
 This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Cooling Outdoor Air Flow Rate cannot be greater than the heat pump's supply air volumetric flow rate during cooling operation.
+This field is set to zero flow when the PTHP is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Heating Outdoor Air Flow Rate}\label{field-heating-outdoor-air-flow-rate-1}
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Heating Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Heating Outdoor Air Flow Rate cannot be greater than the heat pump's supply air volumetric flow rate during heating operation.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Heating Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Heating Outdoor Air Flow Rate cannot be greater than the heat pump's supply air volumetric flow rate during heating operation. This field is set to zero flow when the PTHP is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: No Load Outdoor Air Flow Rate}\label{field-no-load-outdoor-air-flow-rate-1}
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the heat pump's supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the heat pump's supply air fan operating mode schedule specifies continuous fan operation. If the heat pump's supply air fan operating mode schedule specifies continuous fan operation and the field `Supply air volumetric flow rate when no cooling or heating is needed' is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation {[}i.e., Cooling Outdoor Air Flow Rate{]} or heating operation {[}i.e., Heating Outdoor Air Flow Rate{]}) and this field is not used.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the outdoor air flow rate when no cooling/heating is needed is fixed; it cannot change during the simulation. In addition, the outdoor air flow rate when no cooling/heating is needed cannot be greater than the heat pump's supply air volumetric flow rate when no cooling/heating is needed. This field is only used when the heat pump's supply air fan operating mode schedule specifies continuous fan operation. If the heat pump's supply air fan operating mode schedule specifies continuous fan operation and the field `Supply air volumetric flow rate when no cooling or heating is needed' is set to zero or is left blank, then the model assumes that the outdoor air flow rate when no cooling/heating is needed is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation {[}i.e., Cooling Outdoor Air Flow Rate{]} or heating operation {[}i.e., Heating Outdoor Air Flow Rate{]}) and this field is not used. This field is set to zero flow when the heat pump is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-6}
 
@@ -2920,9 +2931,11 @@ This field specifies the type of outdoor air mixer used by this WaterToAirHeatPu
   OutdoorAir:Mixer
 \end{itemize}
 
+This input field should be left blank when the WaterToAirHeatPump is connected to an \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer object is not simulated.
+
 \paragraph{Field: Outdoor Air Mixer Name}\label{field-outdoor-air-mixer-name-4}
 
-This alpha field defines the name of an outdoor air mixer component which composes part of the zone WaterToAirHeatPump. The return air stream node of the outdoor air mixer should also be the same node as the air inlet node of the WaterToAirHeatPump. Furthermore, the outdoor air mixer's mixed air node should be the same as the WaterToAirHeatPump's fan inlet air node (for blow through fan placement) or the WaterToAirHeatPump's cooling coil inlet node (for draw through fan placement).
+This alpha field defines the name of an outdoor air mixer component which composes part of the zone WaterToAirHeatPump. The return air stream node of the outdoor air mixer should also be the same node as the air inlet node of the WaterToAirHeatPump. Furthermore, the outdoor air mixer's mixed air node should be the same as the WaterToAirHeatPump's fan inlet air node (for blow through fan placement) or the WaterToAirHeatPump's cooling coil inlet node (for draw through fan placement). This input field should be left blank when the WaterToAirHeatPump is connected to an \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer object is not simulated.
 
 \paragraph{Field: Cooling Supply Air Flow Rate}\label{field-cooling-supply-air-flow-rate-2-001}
 
@@ -2938,15 +2951,15 @@ This numeric field defines the supply air flow rate leaving the heat pump in cub
 
 \paragraph{Field: Cooling Outdoor Air Flow Rate}\label{field-cooling-outdoor-air-flow-rate-2}
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during cooling operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during cooling operation cannot be greater than the heat pump's supply air flow rate during cooling operation.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during cooling operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during cooling operation cannot be greater than the heat pump's supply air flow rate during cooling operation. This input field is set to zero flow when the WaterToAirHeatPump is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Heating Outdoor Air Flow Rate}\label{field-heating-outdoor-air-flow-rate-2}
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during heating operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during heating operation cannot be greater than the heat pump's supply air flow rate during heating operation.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX heating coil and/or supplemental heater are operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during heating operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during heating operation cannot be greater than the heat pump's supply air flow rate during heating operation. This input field is set to zero flow when the WaterToAirHeatPump is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: No Load Outdoor Air Flow Rate When No Cooling or Heating is Needed}\label{field-no-load-outdoor-air-flow-rate-when-no-cooling-or-heating-is-needed-000}
 
-This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the no load outdoor air flow rate cannot change during the simulation. In addition, the no load outdoor air flow rate cannot be greater than the heat pump's no load supply air flow rate. This field is only used when the heat pump's supply air fan operating mode schedule specifies continuous fan operation. If the heat pump's supply air fan operating mode schedule specifies continuous fan operation and the field ``No Load Supply Air Flow Rate'' is set to zero or is left blank, then the model assumes that the no load outdoor air flow rate is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation {[}i.e., Cooling outdoor air flow rate{]} or heating operation {[}i.e., Heating outdoor air flow rate{]}) and this field is not used.
+This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). Values must be greater than or equal to 0, or this field is autosizable. Note that the no load outdoor air flow rate cannot change during the simulation. In addition, the no load outdoor air flow rate cannot be greater than the heat pump's no load supply air flow rate. This field is only used when the heat pump's supply air fan operating mode schedule specifies continuous fan operation. If the heat pump's supply air fan operating mode schedule specifies continuous fan operation and the field ``No Load Supply Air Flow Rate'' is set to zero or is left blank, then the model assumes that the no load outdoor air flow rate is equal to the outdoor air flow rate when the cooling or heating coil was last operating (for cooling operation {[}i.e., Cooling outdoor air flow rate{]} or heating operation {[}i.e., Heating outdoor air flow rate{]}) and this field is not used. This input field is set to zero flow when the WaterToAirHeatPump is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-7}
 
@@ -3865,15 +3878,15 @@ This numeric field defines the terminal unit's operating volumetric air flow rat
 
 \paragraph{Field: Cooling Outdoor Air Flow Rate}\label{field-cooling-outdoor-air-flow-rate-3}
 
-This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode.
+This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in cooling mode. This input field is set to zero flow when the VRF terminal unit is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Heating Outdoor Air Flow Rate}\label{field-heating-outdoor-air-flow-rate-3}
 
-This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in heating mode.
+This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is operating in heating mode. This input field is set to zero flow when the VRF terminal unit is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: No Load Outdoor Air Flow Rate}\label{field-no-load-outdoor-air-flow-rate-2}
 
-This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is not operating in cooling or heating mode.
+This numeric field defines the outdoor air volumetric air flow rate in cubic meters per second. This volumetric air flow rate is used when the terminal unit is not operating in cooling or heating mode. This input field is set to zero flow when the VRF terminal unit is connected to an \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{field-supply-air-fan-operating-mode-schedule-name-7}
 
@@ -3881,31 +3894,31 @@ This alpha field defines the name of the supply air fan operating mode schedule.
 
 \paragraph{Field: Supply Air Fan Placement}\label{field-supply-air-fan-placement-000}
 
-This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. If this field is left blank, the default is blow through.
+This alpha field has two choices: \textit{BlowThrough} or \textit{DrawThrough}. If this field is left blank, the default is blow through.
 
-The first choice stands for ``blow through fan''. This means that the unit consists of a fan followed by the DX coils. The fan ``blows through'' the cooling and heating coils. If an outside air mixer is used, the fan inlet connects to the outside air mixer's mixed air node. If an outside air mixer is not used, the fan inlet connects to the zone exhaust node. For this configuration, the fan outlet always connects to the DX cooling coil inlet node (or if a DX cooling coil is not used, the DX heating coil inlet node).
+The first choice stands for ``blow through fan''. This means that the unit consists of a fan followed by the DX coils. The fan ``blows through'' the cooling and heating coils. If an outside air mixer is used, the fan inlet connects to the outdoor air mixer's mixed air node. If an outdoor air mixer is not used, the fan inlet connects to the zone exhaust node. For this configuration, the fan outlet always connects to the DX cooling coil inlet node (or if a DX cooling coil is not used, the DX heating coil inlet node).
 
 The second choice stands for ``draw through fan''. This means that the unit consists of the DX coil(s) followed by a fan. The fan ``draws air through'' the DX coil(s). In this case the fan inlet always connects to the DX heating coil outlet node (or if a DX heating coil is not use, the DX cooling coil outlet node) and the fan outlet node always connects to the zone inlet node.
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-8}
 
-This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textbf{Fan:OnOff} or \textbf{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff} or \textit{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
 
 \paragraph{Field: Supply Air Fan Object Name}\label{field-supply-air-fan-object-name}
 
 This alpha field defines the name of the terminal unit's supply air fan.
 
-\paragraph{Field: Outside Air Mixer Object Type}\label{field-outside-air-mixer-object-type}
+\paragraph{Field: Outdoor Air Mixer Object Type}\label{field-outdoor-air-mixer-object-type}
 
-This alpha field contains the identifying type of outside air mixer specified for the terminal unit. Outside air mixer type must be \textbf{OutsideAir:Mixer}. This field should be left blank when an outside air mixer is not simulated.
+This alpha field contains the identifying type of outdoor air mixer specified for the terminal unit. Outdoor air mixer type must be \textit{OutdoorAir:Mixer}. This input field should be left blank when the VRF terminal unit is connected to an \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer is not simulated.
 
-\paragraph{Field: Outside Air Mixer Object Name}\label{field-outside-air-mixer-object-name}
+\paragraph{Field: Outdoor Air Mixer Object Name}\label{field-outdoor-air-mixer-object-name}
 
-This alpha field defines the name of the terminal unit's outside air mixer. If this field is left blank, an outside air mixer is not simulated.
+This alpha field defines the name of the terminal unit's outdoor air mixer. This input field should be left blank when the VRF terminal unit is connected to an \textit{AirTerminal:SingleDuct:Mixer} object. If this field is left blank, an outdoor air mixer is not simulated.
 
 \paragraph{Field: DX Cooling Coil Object Type}\label{field-dx-cooling-coil-object-type}
 
-This choice field contains the identifying type of the terminal unit's DX cooling coil. The only valid DX cooling coil type is \textbf{Coil:Cooling:DX:VariableRefrigerantFlow}. This field should be left blank when a DX cooling coil is not simulated.
+This choice field contains the identifying type of the terminal unit's DX cooling coil. The only valid DX cooling coil type is \textit{Coil:Cooling:DX:VariableRefrigerantFlow}. This field should be left blank when a DX cooling coil is not simulated.
 
 \paragraph{Field: DX Cooling Coil Name}\label{field-dx-cooling-coil-name-1}
 
@@ -3913,7 +3926,7 @@ This alpha field defines the name of the terminal unit's DX cooling coil. If thi
 
 \paragraph{Field: DX Heating Coil Object Type}\label{field-dx-heating-coil-object-type}
 
-This choice field contains the identifying type of the terminal unit's DX heating coil. The only valid DX heating coil type is \textbf{Coil:Heating:DX:VariableRefrigerantFlow}. This field should be left blank when a DX heating coil is not simulated.
+This choice field contains the identifying type of the terminal unit's DX heating coil. The only valid DX heating coil type is \textit{Coil:Heating:DX:VariableRefrigerantFlow}. This field should be left blank when a DX heating coil is not simulated.
 
 \paragraph{Field: DX Heating Coil Object Name}\label{field-dx-heating-coil-object-name}
 
