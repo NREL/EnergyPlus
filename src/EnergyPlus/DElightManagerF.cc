@@ -59,6 +59,9 @@
 // C++ Headers
 #include <algorithm>
 #include <cmath>
+#include <ostream>
+#include <fstream>
+
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -615,7 +618,8 @@ namespace DElightManagerF {
 		} // Glass Type loop
 
 		if ( ErrorsFound ) ShowFatalError( "Problems with Daylighting:DElight input, see previous error messages" );
-		gio::close( unit );
+//		auto const stream_str = delightin_stream->str();
+//		gio::close( unit );
 		return;
 	}
 

@@ -312,6 +312,7 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DElightManagerF::clear_state();
 		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
@@ -490,7 +491,7 @@ namespace EnergyPlus {
 		auto const stream_str = this->delightin_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->eso_stream->str( std::string() );
+		if (reset_stream) this->delightin_stream->str(std::string());
 		return are_equal;
 	}
 
