@@ -11,7 +11,7 @@
 !                          Illustrates the use of a dedicated outdoor air system (DOAS) with AirLoop Unitary System as zone Equipment.
 !                          The DOAS air is ducted to the inlet side of Unitary System and mixed with zone recirculating air through the
 !                          use of inlet side mixer terminal units for zones: SPACE1-1, SPACE2-1 and SPACE3-1. The DOAS air is ducted
-!                          to the outlet side of the Unitary System and mixed with the Unitary System outlet through the use of supply 
+!                          to the outlet side of the Unitary System and mixed with the Unitary System outlet through the use of supply
 !                          side mixer terminal units for zones: SPACE4-1 and SPACE5-1.
 !
 ! Highlights:              DOAS ducted to inlet and supply side of AirLoopHVAC:UnitarySystem as Zone equipment using AirTerminal:SingleDuct:Mixer
@@ -87,7 +87,7 @@
 !
 ! HVAC:                           Unitary System as a zone equipment in each zone and a dedicated outdoor air system with
 !                                 heat recovery and standard VAV fan. There are no central HVAC heating or cooling coils.
-!                                 There is no conventional central plant. 
+!                                 There is no conventional central plant.
 !
 ! Zonal Equipment:                Yes, AirLoopHVAC:UnitarySystem
 ! Central Air Handling Equipment: Yes
@@ -276,7 +276,7 @@ RunPeriod,
     Last Sunday in October;  !- End Date
 
 
-  
+
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========
 
 ScheduleTypeLimits,
@@ -3447,18 +3447,15 @@ AirLoopHVAC:ReturnPath,
 
 Branch,
     DOAS Main Branch,        !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
-    DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    DOAS Supply Fan Outlet;  !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -3542,12 +3539,12 @@ Output:Variable,
     *,                       !- Key Value
     Site Outdoor Air Drybulb Temperature,  !- Variable Name
     hourly;                  !- Reporting Frequency
-  
+
 Output:Variable,
     *,                       !- Key Value
     Site Outdoor Air Wetbulb Temperature,  !- Variable Name
     hourly;                  !- Reporting Frequency
-  
+
 Output:Variable,
     *,                       !- Key Value
     Zone Air Temperature,    !- Variable Name

@@ -86,7 +86,7 @@
 !
 ! HVAC:                           Packaged terminal heat pump in each zone and a dedicated outdoor air system with
 !                                 heat recovery and standard VAV fan. There are no central HVAC heating or cooling coils.
-!                                 There is no conventional central plant. 
+!                                 There is no conventional central plant.
 !
 ! Zone HVAC Equipment:            ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:AirDistributionUnit
 ! Central DOAS:                   Yes (Provides dedicated OA to each terminal unit mixer AirTerminal:SingleDuct:Mixer)
@@ -3080,7 +3080,7 @@ ThermostatSetpoint:DualSetpoint,
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     BlowThrough,             !- Fan Placement
     CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
-	
+
   Coil:Heating:DX:SingleSpeed,
     SPACE5-1 HP Heating Mode,     !- Name
     FanAvailSched,           !- Availability Schedule Name
@@ -3576,18 +3576,15 @@ AirLoopHVAC:ReturnPath,
 
 Branch,
     DOAS Main Branch,        !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
-    DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    DOAS Supply Fan Outlet;  !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -3677,12 +3674,12 @@ Output:Variable,
     *,                       !- Key Value
     Site Outdoor Air Drybulb Temperature,  !- Variable Name
     hourly;                  !- Reporting Frequency
-  
+
 Output:Variable,
     *,                       !- Key Value
     Site Outdoor Air Wetbulb Temperature,  !- Variable Name
     hourly;                  !- Reporting Frequency
-  
+
 Output:Variable,
     *,                       !- Key Value
     Zone Air Temperature,    !- Variable Name
