@@ -4604,7 +4604,7 @@ Material:RoofVegetation,
   \memo only one material must be referenced per simulation though the same EcoRoof material could be
   \memo used in multiple constructions. New moisture redistribution scheme (2010) requires higher
   \memo number of timesteps per hour (minimum 12 recommended).
-  \min-fields 18
+  \min-fields 19
   A1 ,\field Name
       \required-field
       \type alpha
@@ -4617,7 +4617,6 @@ Material:RoofVegetation,
       \units m
       \default .2
   N2 ,\field Leaf Area Index
-      \required-field
       \units dimensionless
       \note Entire surface is assumed covered, so decrease LAI accordingly.
       \minimum> 0.001
@@ -4625,7 +4624,6 @@ Material:RoofVegetation,
       \default 1.0
       \type real
   N3 ,\field Leaf Reflectivity
-      \required-field
       \type real
       \units dimensionless
       \note Leaf reflectivity (albedo) is typically 0.18-0.25
@@ -4633,7 +4631,6 @@ Material:RoofVegetation,
       \minimum 0.05
       \default 0.22
   N4 ,\field Leaf Emissivity
-      \required-field
       \type real
       \minimum 0.8
       \maximum 1.0
@@ -4649,7 +4646,6 @@ Material:RoofVegetation,
       \type alpha
       \default Green Roof Soil
   A3 ,\field Roughness
-      \required-field
       \type choice
       \key VeryRough
       \key MediumRough
@@ -4660,7 +4656,6 @@ Material:RoofVegetation,
       \default MediumRough
   N6 ,\field Thickness
       \note thickness of the soil layer of the EcoRoof
-      \required-field
       \units m
       \type real
       \note Soil depths of 0.15m (6in) and 0.30m (12in) are common.
@@ -4669,7 +4664,6 @@ Material:RoofVegetation,
       \maximum 0.7
       \ip-units in
   N7 ,\field Conductivity of Dry Soil
-      \required-field
       \units W/m-K
       \type real
       \note Thermal conductivity of dry soil.
@@ -4678,7 +4672,6 @@ Material:RoofVegetation,
       \minimum  0.2
       \maximum 1.5
   N8 ,\field Density of Dry Soil
-      \required-field
       \units kg/m3
       \note Density of dry soil (the code modifies this as the soil becomes moist)
       \note Typical ecoroof soils range from 400 to 1000 (dry to wet)
@@ -4687,7 +4680,6 @@ Material:RoofVegetation,
       \maximum 2000
       \default 1100
   N9 ,\field Specific Heat of Dry Soil
-      \required-field
       \units J/kg-K
       \type real
       \note Specific heat of dry soil
@@ -6380,7 +6372,7 @@ WindowMaterial:Blind:EquivalentLayer,
 WindowMaterial:Screen:EquivalentLayer,
        \memo Equivalent layer window screen physical properties. Can only be
        \memo located on the exterior side of a window construction.
-       \min-fields 4
+       \min-fields 11
   A1 , \field Name
        \note Enter a unique name for this window screen material.
        \required-field
@@ -6391,7 +6383,6 @@ WindowMaterial:Screen:EquivalentLayer,
        \note This input field is the same as the material openness area fraction
        \note and can be autocalculated from the wire spacing and wire and diameter.
        \note Assumed to be the same for both sides of the screen.
-       \required-field
        \type real
        \units dimensionless
        \minimum 0
@@ -6446,7 +6437,6 @@ WindowMaterial:Screen:EquivalentLayer,
   N7 , \field Screen Infrared Transmittance
        \note The long-wave hemispherical transmittance of the screen material.
        \note Assumed to be the same for both sides of the screen.
-       \required-field
        \type real
        \units dimensionless
        \minimum 0
@@ -6833,165 +6823,133 @@ MaterialProperty:PhaseChange,
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N3,  \field Enthalpy 1
        \required-field
        \note for Temperature-enthalpy function corresponding to temperature 1
        \units J/kg
-       \default 0.0
   N4 , \field Temperature 2
        \required-field
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N5,  \field Enthalpy 2
        \required-field
        \note for Temperature-enthalpy function corresponding to temperature 2
        \units J/kg
        \type real
-       \default 0.0
   N6 , \field Temperature 3
        \required-field
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N7,  \field Enthalpy 3
        \required-field
        \note for Temperature-enthalpy function corresponding to temperature 3
        \units J/kg
        \type real
-       \default 0.0
   N8 , \field Temperature 4
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N9,  \field Enthalpy 4
        \note for Temperature-enthalpy function corresponding to temperature 4
        \units J/kg
        \type real
-       \default 0.0
   N10, \field Temperature 5
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N11, \field Enthalpy 5
        \note for Temperature-enthalpy function corresponding to temperature 5
        \units J/kg
        \type real
-       \default 0.0
   N12, \field Temperature 6
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N13, \field Enthalpy 6
        \note for Temperature-enthalpy function corresponding to temperature 6
        \units J/kg
        \type real
-       \default 0.0
   N14, \field Temperature 7
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N15, \field Enthalpy 7
        \note for Temperature-enthalpy function corresponding to temperature 7
        \units J/kg
        \type real
-       \default 0.0
   N16, \field Temperature 8
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N17, \field Enthalpy 8
        \note for Temperature-enthalpy function corresponding to temperature 8
        \units J/kg
        \type real
-       \default 0.0
   N18 , \field Temperature 9
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N19,  \field Enthalpy 9
        \note for Temperature-enthalpy function corresponding to temperature 1
        \units J/kg
-       \default 0.0
   N20 , \field Temperature 10
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N21,  \field Enthalpy 10
        \note for Temperature-enthalpy function corresponding to temperature 2
        \units J/kg
        \type real
-       \default 0.0
   N22 , \field Temperature 11
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N23,  \field Enthalpy 11
        \note for Temperature-enthalpy function corresponding to temperature 3
        \units J/kg
        \type real
-       \default 0.0
   N24 , \field Temperature 12
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N25,  \field Enthalpy 12
        \note for Temperature-enthalpy function corresponding to temperature 14
        \units J/kg
        \type real
-       \default 0.0
   N26, \field Temperature 13
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N27, \field Enthalpy 13
        \note for Temperature-enthalpy function corresponding to temperature 15
        \units J/kg
        \type real
-       \default 0.0
   N28, \field Temperature 14
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N29, \field Enthalpy 14
        \note for Temperature-enthalpy function corresponding to temperature 16
        \units J/kg
        \type real
-       \default 0.0
   N30, \field Temperature 15
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N31, \field Enthalpy 15
        \note for Temperature-enthalpy function corresponding to temperature 17
        \units J/kg
        \type real
-       \default 0.0
   N32, \field Temperature 16
        \note for Temperature-enthalpy function
        \units C
        \type real
-       \default 0.0
   N33; \field Enthalpy 16
        \note for Temperature-enthalpy function corresponding to temperature 16
        \units J/kg
        \type real
-       \default 0.0
 
 MaterialProperty:VariableThermalConductivity,
     \memo Additional properties for temperature dependent thermal conductivity
@@ -7009,110 +6967,91 @@ MaterialProperty:VariableThermalConductivity,
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N2,  \field Thermal Conductivity 1
        \required-field
        \note for Temperature-Thermal Conductivity function corresponding to temperature 1
        \units W/m-K
-       \default 0.0
   N3 , \field Temperature 2
        \required-field
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N4,  \field Thermal Conductivity 2
        \required-field
        \note for Temperature-Thermal Conductivity function corresponding to temperature 2
        \units W/m-K
        \type real
-       \default 0.0
   N5 , \field Temperature 3
        \required-field
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N6,  \field Thermal Conductivity 3
        \required-field
        \note for Temperature-Thermal Conductivity function corresponding to temperature 3
        \units W/m-K
        \type real
-       \default 0.0
   N7 , \field Temperature 4
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N8,  \field Thermal Conductivity 4
        \note for Temperature-Thermal Conductivity function corresponding to temperature 4
        \units W/m-K
        \type real
-       \default 0.0
   N9, \field Temperature 5
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N10, \field Thermal Conductivity 5
        \note for Temperature-Thermal Conductivity function corresponding to temperature 5
        \units W/m-K
        \type real
-       \default 0.0
   N11, \field Temperature 6
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N12, \field Thermal Conductivity 6
        \note for Temperature-Thermal Conductivity function corresponding to temperature 6
        \units W/m-K
        \type real
-       \default 0.0
   N13, \field Temperature 7
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N14, \field Thermal Conductivity 7
        \note for Temperature-Thermal Conductivity function corresponding to temperature 7
        \units W/m-K
        \type real
-       \default 0.0
   N15, \field Temperature 8
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N16, \field Thermal Conductivity 8
        \note for Temperature-Thermal Conductivity function corresponding to temperature 8
        \units W/m-K
        \type real
-       \default 0.0
   N17 , \field Temperature 9
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N18,  \field Thermal Conductivity 9
        \note for Temperature-Thermal Conductivity function corresponding to temperature 9
        \units W/m-K
-       \default 0.0
   N19 , \field Temperature 10
        \note for Temperature-Thermal Conductivity function
        \units C
        \type real
-       \default 0.0
   N20;  \field Thermal Conductivity 10
        \note for Temperature-Thermal Conductivity function corresponding to temperature 10
        \units W/m-K
        \type real
-       \default 0.0
 
 MaterialProperty:HeatAndMoistureTransfer:Settings,
     \memo HeatBalanceAlgorithm = CombinedHeatAndMoistureFiniteElement solution algorithm only.
     \memo Additional material properties for surfaces.
     \memo Has no effect with other HeatBalanceAlgorithm solution algorithms
+    \min-fields 3
   A1, \field Material Name
       \required-field
       \type object-list
@@ -7127,7 +7066,6 @@ MaterialProperty:HeatAndMoistureTransfer:Settings,
       \type real
   N2; \field Initial Water Content Ratio
       \note units are the water/material density ratio at the beginning of each run period.
-      \required-field
       \units kg/kg
       \minimum 0.0
       \default 0.2
@@ -8742,8 +8680,8 @@ GeometryTransform,
       \memo is to provide a single parameter that can be used to reshape the building description
       \memo contained in the rest of the input file.
      \unique-object
+     \min-fields 3
   A1, \field Plane of Transform
-      \required-field
       \type choice
       \key XY
       \default XY
@@ -9291,13 +9229,11 @@ BuildingSurface:Detailed,
        \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
        \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
   A7 , \field Sun Exposure
-       \required-field
        \type choice
        \key SunExposed
        \key NoSun
        \default SunExposed
   A8,  \field Wind Exposure
-       \required-field
        \type choice
        \key WindExposed
        \key NoWind
@@ -10470,13 +10406,11 @@ Wall:Detailed,
        \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
        \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
   A6 , \field Sun Exposure
-       \required-field
        \type choice
        \key SunExposed
        \key NoSun
        \default SunExposed
   A7,  \field Wind Exposure
-       \required-field
        \type choice
        \key WindExposed
        \key NoWind
@@ -10656,13 +10590,11 @@ RoofCeiling:Detailed,
        \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
        \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
   A6 , \field Sun Exposure
-       \required-field
        \type choice
        \key SunExposed
        \key NoSun
        \default SunExposed
   A7,  \field Wind Exposure
-       \required-field
        \type choice
        \key WindExposed
        \key NoWind
@@ -10844,13 +10776,11 @@ Floor:Detailed,
        \note If OtherSideCoefficients, specify name of SurfaceProperty:OtherSideCoefficients
        \note If OtherSideConditionsModel, specify name of SurfaceProperty:OtherSideConditionsModel
   A6 , \field Sun Exposure
-       \required-field
        \type choice
        \key SunExposed
        \key NoSun
        \default SunExposed
   A7,  \field Wind Exposure
-       \required-field
        \type choice
        \key WindExposed
        \key NoWind
@@ -12077,7 +12007,6 @@ WindowProperty:FrameAndDivider,
          \default 0.9
          \note Assumed same on outside and inside of frame
     A2 , \field Divider Type
-         \required-field
          \type choice
          \key DividedLite
          \key Suspended
@@ -12372,7 +12301,6 @@ Shading:Site:Detailed,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Number of Vertices
-       \required-field
        \note shown with 6 vertex coordinates -- extensible object
        \autocalculatable
        \default autocalculate
@@ -13486,7 +13414,6 @@ Shading:Building:Detailed,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Number of Vertices
-       \required-field
        \note shown with 6 vertex coordinates -- extensible object
        \autocalculatable
        \default autocalculate
@@ -14748,7 +14675,6 @@ Shading:Zone:Detailed,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Number of Vertices
-       \required-field
        \note shown with 6 vertex coordinates -- extensible object
        \autocalculatable
        \default autocalculate
@@ -15885,7 +15811,6 @@ SurfaceProperty:HeatTransferAlgorithm,
        \type object-list
        \object-list SurfaceNames
   A2 ; \field Algorithm
-       \required-field
        \type choice
        \key ConductionTransferFunction
        \key MoisturePenetrationDepthConductionTransferFunction
@@ -15917,7 +15842,6 @@ SurfaceProperty:HeatTransferAlgorithm:MultipleSurface,
        \key AllInteriorCeilings
        \key AllInteriorFloors
   A3 ; \field Algorithm
-       \required-field
        \type choice
        \key ConductionTransferFunction
        \key MoisturePenetrationDepthConductionTransferFunction
@@ -15939,7 +15863,6 @@ SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
        \required-field
        \type alpha
   A2 , \field Algorithm
-       \required-field
        \type choice
        \key ConductionTransferFunction
        \key MoisturePenetrationDepthConductionTransferFunction
@@ -15978,7 +15901,6 @@ SurfaceProperty:HeatTransferAlgorithm:Construction,
   A1 , \field Name
        \type alpha
   A2 , \field Algorithm
-       \required-field
        \type choice
        \key ConductionTransferFunction
        \key MoisturePenetrationDepthConductionTransferFunction
@@ -17203,12 +17125,12 @@ SurfaceProperties:VaporCoefficients,
       \memo Units are kg/Pa.s.m2
       \memo This will only work with the CombinedHeatAndMoistureFiniteElement algorithm for surfaces.
       \memo Other algorithms will ignore these coefficients
+      \min-fields 4
   A1, \field Surface Name
       \required-field
       \type object-list
       \object-list SurfaceNames
   A2, \field Constant External Vapor Transfer Coefficient
-      \required-field
       \type choice
       \key Yes
       \key No
@@ -17218,7 +17140,6 @@ SurfaceProperties:VaporCoefficients,
       \default 0
       \minimum 0.0
   A3, \field Constant Internal vapor Transfer Coefficient
-      \required-field
       \type choice
       \key Yes
       \key No
@@ -17936,6 +17857,7 @@ GroundHeatTransfer:Slab:Insulation,
     \memo This object supplies the information about insulation used around the slab.
     \memo There are two possible configurations: under the slab or vertical insulation
     \memo around the slab.
+    \min-fields 5
         N1, \field RINS: R value of under slab insulation
             \note This field provides the thermal resistance value
             \note of the under slab insulation. It should be zero
@@ -17969,7 +17891,6 @@ GroundHeatTransfer:Slab:Insulation,
         N5; \field IVINS: Flag: Is there vertical insulation
             \note Specifies if the vertical insulation configuration is being used.
             \note values: 1=yes vertical insulation 0=no under-slab insulation
-          \required-field
           \type choice
           \key 0
           \key 1
@@ -18185,6 +18106,7 @@ GroundHeatTransfer:Basement:Insulation,
 GroundHeatTransfer:Basement:SurfaceProps,
          \memo Specifies the soil surface properties for the Basement preprocessor ground
          \memo heat transfer simulation.
+         \min-fields 7
      N1, \field ALBEDO: Surface albedo for No snow conditions
          \minimum 0.0
           \maximum 1.0
@@ -18211,7 +18133,6 @@ GroundHeatTransfer:Basement:SurfaceProps,
          \units cm
      A1; \field PET: Flag, Potential evapotranspiration on?
           \note  Typically, PET is False
-          \required-field
          \type choice
           \key TRUE
           \key FALSE
@@ -18245,8 +18166,8 @@ GroundHeatTransfer:Basement:BldgData,
 GroundHeatTransfer:Basement:Interior,
        \memo Provides the information needed to simulate the inside boundary conditions for
        \memo the Basement preprocessor ground heat transfer simulation.
+       \min-fields 7
    A1, \field COND: Flag: Is the basement conditioned?
-          \required-field
        \type choice
           \key TRUE
           \key FALSE
@@ -18433,6 +18354,7 @@ RoomAirModelType,
       \memo Selects the type of room air model to be used in a given zone. If no RoomAirModelType
       \memo object is specified then the default Mixing model (all zone air at the same
       \memo temperature) will be used.
+      \min-fields 4
   A1, \field Name
       \required-field
       \type alpha
@@ -18441,32 +18363,31 @@ RoomAirModelType,
       \type object-list
       \object-list ZoneNames
   A3, \field Room-Air Modeling Type
-      \required-field
       \type choice
       \key Mixing
-      \note Complete mixing air model
       \key UserDefined
-      \note UserDefined Room Air Temperature Patterns
-      \note needs RoomAir:TemperaturePattern:UserDefined object referencing this Zone
       \key OneNodeDisplacementVentilation
-      \note Mundt roomair model for displacement ventilation with single floor air node
-      \note needs RoomAirSettings:OneNodeDisplacementVentilation object referencing this Zone
       \key ThreeNodeDisplacementVentilation
-      \note (ThreeNodeDisplacementVentilation = RoomAir modeling using UCSD three-node displacement ventilation model)
-      \note needs RoomAirSettings:ThreeNodeDisplacementVentilation object referencing this Zone
       \key CrossVentilation
-      \note (CrossVentilation = RoomAir modeling using UCSD two-zone cross ventilation model)
-      \note needs RoomAirSettings:CrossVentilation object referencing this Zone
       \key UnderFloorAirDistributionInterior
-      \note 2-Node UFAD model for interior zones
-      \note needs RoomAirSettings:UnderFloorAirDistributionInterior object referencing this Zone
       \key UnderFloorAirDistributionExterior
-      \note (UnderFloorAirDistributionExterior = RoomAir modeling using 2-Node UFAD model for exterior zones)
-      \note needs RoomAirSettings:UnderFloorAirDistributionExterior object referencing this Zone
       \key AirflowNetwork
-      \note (AirflowNetwork = RoomAir modeling using AirflowNetwork)
-      \note needs RoomAirSettings:AirflowNetwork object referencing this Zone
       \default Mixing
+      \note Mixing = Complete mixing air model
+      \note UserDefined = UserDefined Room Air Temperature Patterns
+      \note needs RoomAir:TemperaturePattern:UserDefined object referencing this Zone
+      \note OneNodeDisplacementVentilation = Mundt roomair model for displacement ventilation with single floor air node
+      \note needs RoomAirSettings:OneNodeDisplacementVentilation object referencing this Zone
+      \note ThreeNodeDisplacementVentilation = RoomAir modeling using UCSD three-node displacement ventilation model
+      \note needs RoomAirSettings:ThreeNodeDisplacementVentilation object referencing this Zone
+      \note CrossVentilation = RoomAir modeling using UCSD two-zone cross ventilation model
+      \note needs RoomAirSettings:CrossVentilation object referencing this Zone
+      \note UnderFloorAirDistributionInterior = 2-Node UFAD model for interior zones
+      \note needs RoomAirSettings:UnderFloorAirDistributionInterior object referencing this Zone
+      \note UnderFloorAirDistributionExterior = RoomAir modeling using 2-Node UFAD model for exterior zones
+      \note needs RoomAirSettings:UnderFloorAirDistributionExterior object referencing this Zone
+      \note AirflowNetwork = RoomAir modeling using AirflowNetwork
+      \note needs RoomAirSettings:AirflowNetwork object referencing this Zone
   A4; \field Air Temperature Coupling Strategy
       \type choice
       \key Direct
@@ -18999,6 +18920,7 @@ RoomAirSettings:OneNodeDisplacementVentilation,
 
 RoomAirSettings:ThreeNodeDisplacementVentilation,
        \memo The UCSD model for Displacement Ventilation
+       \min-fields 6
   A1 , \field Zone Name
        \note Name of Zone being described. Any existing zone name
        \required-field
@@ -19015,7 +18937,6 @@ RoomAirSettings:ThreeNodeDisplacementVentilation,
        \note Used only in the UCSD displacement ventilation model.
        \note Effective number of separate plumes per occupant in the occupied zone.
        \note Plumes that merge together in the occupied zone count as one.
-       \required-field
        \type real
        \minimum> 0.0
        \default 1.0
@@ -19039,7 +18960,6 @@ RoomAirSettings:ThreeNodeDisplacementVentilation,
        \note are set to negative values when the temperature difference is less than the
        \note threshold and the output 'DV Zone Is Mixed' is set to 1
        \units deltaC
-       \required-field
        \type real
        \minimum 0.0
        \default 0.4
@@ -19127,12 +19047,10 @@ RoomAirSettings:UnderFloorAirDistributionInterior,
        \note are set to zero values when the temperature difference is less than the
        \note threshold and the output 'UF Zone Is Mixed' is set to 1
        \units deltaC
-       \required-field
        \type real
        \minimum 0.0
        \default 0.4
   A2 , \field Floor Diffuser Type
-       \required-field
        \type choice
        \key Custom
        \key Swirl
@@ -19232,12 +19150,10 @@ RoomAirSettings:UnderFloorAirDistributionExterior,
        \note are set to zero values when the temperature difference is less than the
        \note threshold and the output 'UF Zone Is Mixed' is set to 1
        \units deltaC
-       \required-field
        \type real
        \minimum 0.0
        \default 0.4
   A2 , \field Floor Diffuser Type
-       \required-field
        \type choice
        \key Custom
        \key Swirl
@@ -19688,6 +19604,7 @@ People,
    \memo Sets internal gains and contaminant rates for occupants in the zone.
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
    \memo to all the zones in the ZoneList.
+   \min-fields 5
   A1 , \field Name
        \required-field
        \type alpha
@@ -19707,7 +19624,6 @@ People,
        \note Choices: People -- simply enter number of occupants.
        \note People per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Number of people
        \note Zone Floor Area per Person -- enter the number to apply.  Floor Area / Value = Number of people
-       \required-field
        \type choice
        \key People
        \key People/Area
@@ -19985,7 +19901,7 @@ Lights,
    \memo Sets internal gains for lights in the zone.
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
    \memo to all the zones in the ZoneList.
-       \min-fields 10
+       \min-fields 11
   A1 , \field Name
        \required-field
        \type alpha
@@ -20005,7 +19921,6 @@ Lights,
        \note Choices: LightingLevel => Lighting Level -- simply enter watts of lights
        \note Watts/Area => Watts per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Lights
        \note Watts/Person => Watts per Person -- enter the number to apply.  Value * Occupants = Lights
-       \required-field
        \type choice
        \key LightingLevel
        \key Watts/Area
@@ -20027,7 +19942,6 @@ Lights,
        \units W/person
        \ip-units W/person
   N4 , \field Return Air Fraction
-       \required-field
        \note Used only for sizing calculation if return-air-fraction
        \note coefficients are specified.
        \type real
@@ -20039,15 +19953,12 @@ Lights,
        \type real
        \minimum 0.0
        \maximum 1.0
-       \default 0
   N6 , \field Fraction Visible
        \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
-       \default 0
   N7 , \field Fraction Replaceable
-       \required-field
        \note For Daylighting:Controls and Daylighting:DElight:Controls,
        \note must be 0 or 1:  0 = no dimming control, 1 = full dimming control
        \type real
@@ -20085,6 +19996,7 @@ ElectricEquipment,
    \memo Sets internal gains for electric equipment in the zone.
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
    \memo to all the zones in the ZoneList.
+   \min-fields 10
   A1 , \field Name
        \required-field
        \type alpha
@@ -20104,7 +20016,6 @@ ElectricEquipment,
        \note Choices: EquipmentLevel => Equipment Level -- simply enter watts of equipment
        \note Watts/Area => Watts per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Equipment Level
        \note Watts/Person => Watts per Person -- enter the number to apply.  Value * Occupants = Equipment Level
-       \required-field
        \type choice
        \key EquipmentLevel
        \key Watts/Area
@@ -20126,19 +20037,16 @@ ElectricEquipment,
        \units W/person
        \ip-units W/person
   N4 , \field Fraction Latent
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N5 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N6 , \field Fraction Lost
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -20155,6 +20063,7 @@ ElectricEquipment,
 GasEquipment,
    \memo Sets internal gains and contaminant rates for gas equipment in the zone.
    \memo If you use a ZoneList in the Zone name field then this definition applies to all those zones.
+   \min-fields 10
   A1 , \field Name
        \required-field
        \type alpha
@@ -20173,7 +20082,6 @@ GasEquipment,
        \note Choices: EquipmentLevel => Design Level -- simply enter power input of equipment
        \note Watts/Area or Power/Area => Power per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Equipment Level
        \note Watts/Person or Power/Person => Power per Person -- enter the number to apply.  Value * Occupants = Equipment Level
-       \required-field
        \type choice
        \key EquipmentLevel
        \key Watts/Area
@@ -20197,19 +20105,16 @@ GasEquipment,
        \units W/Person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N5 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N6 , \field Fraction Lost
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -20238,6 +20143,7 @@ GasEquipment,
 HotWaterEquipment,
    \memo Sets internal gains for hot water equipment in the zone.
    \memo If you use a ZoneList in the Zone name field then this definition applies to all those zones.
+   \min-fields 10
   A1 , \field Name
        \required-field
        \type alpha
@@ -20256,7 +20162,6 @@ HotWaterEquipment,
        \note Choices: EquipmentLevel => Design Level -- simply enter power input of equipment
        \note Watts/Area or Power/Area => Power per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Equipment Level
        \note Watts/Person or Power/Person => Power per Person -- enter the number to apply.  Value * Occupants = Equipment Level
-       \required-field
        \type choice
        \key EquipmentLevel
        \key Watts/Area
@@ -20280,19 +20185,16 @@ HotWaterEquipment,
        \units W/Person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N5 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N6 , \field Fraction Lost
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -20308,6 +20210,7 @@ HotWaterEquipment,
 
 SteamEquipment,
    \memo Sets internal gains for steam equipment in the zone.
+   \min-fields 10
   A1 , \field Name
        \required-field
        \type alpha
@@ -20326,7 +20229,6 @@ SteamEquipment,
        \note Choices: EquipmentLevel => Design Level -- simply enter power input of equipment
        \note Watts/Area or Power/Area => Power per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Equipment Level
        \note Watts/Person or Power/Person => Power per Person -- enter the number to apply.  Value * Occupants = Equipment Level
-       \required-field
        \type choice
        \key EquipmentLevel
        \key Watts/Area
@@ -20350,19 +20252,16 @@ SteamEquipment,
        \units W/Person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N5 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N6 , \field Fraction Lost
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -20378,11 +20277,11 @@ SteamEquipment,
 
 OtherEquipment,
    \memo Sets internal gains or losses for "other" equipment in the zone.
+   \min-fields 11
   A1 , \field Name
        \required-field
        \type alpha
   A2 , \field Fuel Type
-       \required-field
        \type choice
        \key None
        \key Electricity
@@ -20415,7 +20314,6 @@ OtherEquipment,
        \note Choices: EquipmentLevel => Design Level -- simply enter power input of equipment
        \note Watts/Area or Power/Area => Power per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Equipment Level
        \note Watts/Person or Power/Person => Power per Person -- enter the number to apply.  Value * Occupants = Equipment Level
-       \required-field
        \type choice
        \key EquipmentLevel
        \key Watts/Area
@@ -20436,19 +20334,16 @@ OtherEquipment,
        \units W/Person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N5 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
   N6 , \field Fraction Lost
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -20486,7 +20381,6 @@ ElectricEquipment:ITE:AirCooled,
        \note The entered calculation method is used to specify the design power input
        \note Watts/Unit => Watts per Unit -- Design Power = Watts per Unit * Number of Units
        \note Watts/Area => Watts per Zone Floor Area -- Design Power = Watts per Zone Floor Area * Floor Area
-       \required-field
        \type choice
        \key Watts/Unit
        \key Watts/Area
@@ -20650,6 +20544,7 @@ ElectricEquipment:ITE:AirCooled,
 
 ZoneBaseboard:OutdoorTemperatureControlled,
        \memo Specifies outside temperature-controlled electric baseboard heating.
+       \min-fields 8
   A1 , \field Name
        \required-field
        \type alpha
@@ -20681,7 +20576,6 @@ ZoneBaseboard:OutdoorTemperatureControlled,
        \units C
        \type real
   N5 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -20693,6 +20587,9 @@ ZoneBaseboard:OutdoorTemperatureControlled,
 
 
 SwimmingPool:Indoor,
+       \memo Specifies an indoor swimming pools linked to a floor surface.
+       \memo The pool is assumed to cover the entire floor to which it is linked.
+       \min-fields 16
   A1,  \field Name
        \required-field
        \type alpha
@@ -20733,7 +20630,6 @@ SwimmingPool:Indoor,
        \maximum 1.0
        \default 0.0
   N5,  \field Cover Long-Wavelength Radiation Factor
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
