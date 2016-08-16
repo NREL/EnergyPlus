@@ -312,7 +312,7 @@ namespace HeatingCoils {
 		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage ) {
 			CalcMultiStageElectricHeatingCoil( CoilNum, SpeedRatio, PartLoadRatio, StageNum, OpMode ); //Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
 		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGasOrOtherFuel ) {
-			CalcGasHeatingCoil( CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac );
+			CalcFuelHeatingCoil( CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac );
 		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
 			CalcMultiStageGasHeatingCoil( CoilNum, SpeedRatio, PartLoadRatio, StageNum, OpMode ); //Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
 		} else if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingDesuperheater ) {
@@ -380,10 +380,10 @@ namespace HeatingCoils {
 		int CoilNum; // The HeatingCoil that you are currently loading input into
 		int NumElecCoil;
 		int NumElecCoilMultiStage;
-		int NumGasCoil;
+		int NumFuelCoil;
 		int NumGasCoilMultiStage;
 		int ElecCoilNum;
-		int GasCoilNum;
+		int FuelCoilNum;
 		int DesuperheaterCoilNum; // Index to desuperheater heating coil
 		int RemainingCoils; // Index for error checking DO loop for desuperheater coils on remaining heating coil
 		static int SourceIndexNum( 0 ); // Index to reclaim heating source (condenser) of a specific type
@@ -413,10 +413,10 @@ namespace HeatingCoils {
 
 		NumElecCoil = GetNumObjectsFound( "Coil:Heating:Electric" );
 		NumElecCoilMultiStage = GetNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
-		NumGasCoil = GetNumObjectsFound( "Coil:Heating:Fuel" );
+		NumFuelCoil = GetNumObjectsFound( "Coil:Heating:Fuel" );
 		NumGasCoilMultiStage = GetNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
 		NumDesuperheaterCoil = GetNumObjectsFound( "Coil:Heating:Desuperheater" );
-		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
+		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
 		if ( NumHeatingCoils > 0 ) {
 			HeatingCoil.allocate( NumHeatingCoils );
 			HeatingCoilNumericFields.allocate( NumHeatingCoils );
@@ -575,15 +575,15 @@ namespace HeatingCoils {
 
 		}
 
-		// Get the data for for gas heating coils
-		for ( GasCoilNum = 1; GasCoilNum <= NumGasCoil; ++GasCoilNum ) {
+		// Get the data for for fuel heating coils
+		for ( FuelCoilNum = 1; FuelCoilNum <= NumFuelCoil; ++FuelCoilNum ) {
 
-			CoilNum = NumElecCoil + NumElecCoilMultiStage + GasCoilNum;
+			CoilNum = NumElecCoil + NumElecCoilMultiStage + FuelCoilNum;
 			HeatingCoilEquipConditions & coil = HeatingCoil( CoilNum );
 
 			CurrentModuleObject = "Coil:Heating:Fuel";
 
-			GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -613,7 +613,7 @@ namespace HeatingCoils {
 			}
 
 			coil.HeatingCoilType = "Heating";
-			coil.HeatingCoilModel = "Gas";
+			coil.HeatingCoilModel = "Fuel";
 			coil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
 			coil.FuelType_Num = AssignResourceTypeNum( Alphas( 3 ) );
@@ -655,15 +655,15 @@ namespace HeatingCoils {
 			
 		}
 
-		// Get the data for for gas heating coils
-		for ( GasCoilNum = 1; GasCoilNum <= NumGasCoilMultiStage; ++GasCoilNum ) {
+		// Get the data for for gas multistage heating coils
+		for ( FuelCoilNum = 1; FuelCoilNum <= NumGasCoilMultiStage; ++FuelCoilNum ) {
 
-			CoilNum = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + GasCoilNum;
+			CoilNum = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + FuelCoilNum;
 
 			CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Natural_Gas;
 
-			GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -743,7 +743,7 @@ namespace HeatingCoils {
 		// Get the data for for desuperheater heating coils
 		for ( DesuperheaterCoilNum = 1; DesuperheaterCoilNum <= NumDesuperheaterCoil; ++DesuperheaterCoilNum ) {
 
-			CoilNum = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + DesuperheaterCoilNum;
+			CoilNum = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + DesuperheaterCoilNum;
 
 			CurrentModuleObject = "Coil:Heating:Desuperheater";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Electricity;
@@ -877,7 +877,7 @@ namespace HeatingCoils {
 		// perform error check to make sure duplicate heating sources are not used (i.e. 2 desuperheating coils cannot
 		// use the same heat source). This error check will be expanded in the future to check for duplicates in
 		// desuperheaters used for water heating purposed.
-		for ( CoilNum = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + 1; CoilNum <= NumHeatingCoils; ++CoilNum ) {
+		for ( CoilNum = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + 1; CoilNum <= NumHeatingCoils; ++CoilNum ) {
 			for ( RemainingCoils = CoilNum + 1; RemainingCoils <= NumHeatingCoils; ++RemainingCoils ) {
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == HeatingCoil( RemainingCoils ).ReclaimHeatingSource && HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum == HeatingCoil( RemainingCoils ).ReclaimHeatingSourceIndexNum ) {
 					SourceIndexNum = HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum;
@@ -1684,7 +1684,7 @@ namespace HeatingCoils {
 	}
 
 	void
-	CalcGasHeatingCoil(
+	CalcFuelHeatingCoil(
 		int const CoilNum, // index to heating coil
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
@@ -1818,7 +1818,7 @@ namespace HeatingCoils {
 				if ( PLF < 0.7 ) {
 					if ( HeatingCoil( CoilNum ).PLFErrorCount < 1 ) {
 						++HeatingCoil( CoilNum ).PLFErrorCount;
-						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", PLF curve values" );
+						ShowWarningError( "CalcFuelHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", PLF curve values" );
 						ShowContinueError( "The PLF curve value = " + TrimSigDigits( PLF, 5 ) + " for part-load ratio = " + TrimSigDigits( PartLoadRat, 5 ) );
 						ShowContinueError( "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues..." );
 						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );
@@ -1832,7 +1832,7 @@ namespace HeatingCoils {
 				if ( HeatingCoil( CoilNum ).RTF > 1.0 && std::abs( HeatingCoil( CoilNum ).RTF - 1.0 ) > 0.001 ) {
 					if ( HeatingCoil( CoilNum ).RTFErrorCount < 1 ) {
 						++HeatingCoil( CoilNum ).RTFErrorCount;
-						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );
+						ShowWarningError( "CalcFuelHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );
 						ShowContinueError( "The runtime fraction exceeded 1.0. [" + TrimSigDigits( HeatingCoil( CoilNum ).RTF, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction is set to 1.0 and the simulation continues..." );
 						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );
@@ -1890,7 +1890,7 @@ namespace HeatingCoils {
 		// Calculates the air-side performance and energy use of a multi stage gas heating coil.
 
 		// METHODOLOGY EMPLOYED:
-		// Uses the same methodology as the single speed Gas heating unit model (SUBROUTINE CalcGasHeatingCoil).
+		// Uses the same methodology as the single speed Gas heating unit model (SUBROUTINE CalcFuelHeatingCoil).
 		// In addition it assumes that the unit performance is obtained by interpolating between
 		// the performance at high stage and that at low stage. If the output needed is below
 		// that produced at low stage, the coil cycles between off and low stage.
@@ -2096,7 +2096,7 @@ namespace HeatingCoils {
 				if ( PLF < 0.7 ) {
 					if ( HeatingCoil( CoilNum ).PLFErrorCount < 1 ) {
 						++HeatingCoil( CoilNum ).PLFErrorCount;
-						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", PLF curve values" );
+						ShowWarningError( "CalcFuelHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", PLF curve values" );
 						ShowContinueError( "The PLF curve value = " + TrimSigDigits( PLF, 5 ) + " for part-load ratio = " + TrimSigDigits( PartLoadRat, 5 ) );
 						ShowContinueError( "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues..." );
 						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );
@@ -2110,7 +2110,7 @@ namespace HeatingCoils {
 				if ( HeatingCoil( CoilNum ).RTF > 1.0 && std::abs( HeatingCoil( CoilNum ).RTF - 1.0 ) > 0.001 ) {
 					if ( HeatingCoil( CoilNum ).RTFErrorCount < 1 ) {
 						++HeatingCoil( CoilNum ).RTFErrorCount;
-						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );
+						ShowWarningError( "CalcFuelHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );
 						ShowContinueError( "The runtime fraction exceeded 1.0. [" + TrimSigDigits( HeatingCoil( CoilNum ).RTF, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction is set to 1.0 and the simulation continues..." );
 						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );

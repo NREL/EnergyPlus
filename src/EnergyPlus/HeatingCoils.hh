@@ -298,7 +298,7 @@ namespace HeatingCoils {
 	);
 
 	void
-	CalcGasHeatingCoil(
+	CalcFuelHeatingCoil(
 		int const CoilNum, // index to heating coil
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
