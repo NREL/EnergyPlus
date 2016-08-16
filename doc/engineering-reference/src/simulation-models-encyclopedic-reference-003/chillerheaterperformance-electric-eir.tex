@@ -152,6 +152,27 @@ QEva{p_{c\lg }} = \dot QEva{p_{c\lg }} \cdot TimeStepSys \cdot 3600
 
 \(QCon{d_{c\lg }} = \dot QCon{d_{c\lg }} \cdot TimeStepSys \cdot 3600\) ~.
 
+Water consumption for the evaporative-cooled condenser is calculated using the difference in air humidity level across the evaporative media and the condenser air mass flow rate:
+
+\begin{equation}
+{V_{water}} = \frac{{{{\mathop m\limits^ \bullet  }_{_{air}}}\left( {{\omega_{evapcond,out}} - {\omega_{evapcond,in}}} \right)}}{{{\rho_{water}}}}\left( {PLR} \right)\left( {TimeStepSys} \right)\left( {3600.} \right)\,
+\end{equation}
+
+where
+
+\({V_{water}}\) ~~~~~~~~ = DX cooling coil evap condenser water consumption, m\(^{3}\)
+
+\({\mathop m\limits^ \bullet_{_{air}}}\) ~~~~~~~~~ = evaporative condenser air mass flow rate, kg/s
+
+\({\omega_{evapcond,in}}\) ~ = humidity ratio of outdoor air entering the evap condenser, kg/kg
+
+\({\omega_{evapcond,out}}\) = humidity ratio of air leaving the evap condenser, kg/kg
+
+\({\rho_{water}}\) ~~~~~~~~ = density of water at the outdoor dry-bulb temperature, kg/m\(^{3}\)
+
+\emph{TimeStepSys} = HVAC system simulation time step, hr
+
+
 \subsubsection{Heating-only mode and Simultaneous cooling-heating mode}\label{heating-only-mode-and-simultaneous-cooling-heating-mode}
 
 The following nomenclature is used in the heating equations:

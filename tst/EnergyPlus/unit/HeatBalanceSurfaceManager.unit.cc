@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
@@ -247,6 +248,38 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFactors)
+	{
 
+		DataSurfaces::TotSurfaces = 1;
+		DataGlobals::NumOfZones = 1;
+		DataHeatBalance::TotMaterials = 1;
+		DataHeatBalance::TotConstructs = 1;
+		
+		DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+		DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+		DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+		DataHeatBalance::Construct.allocate(DataHeatBalance::TotConstructs);
+		DataHeatBalance::Material.allocate(DataHeatBalance::TotMaterials);
 
+		DataSurfaces::Surface( 1 ).HeatTransSurf = true;
+		DataSurfaces::Surface( 1 ).Construction = 1;
+		DataSurfaces::SurfaceWindow( 1 ).ShadingFlag = 0;
+		DataHeatBalance::Construct( 1 ).InsideAbsorpThermal = 0.9;
+		DataHeatBalance::Construct( 1 ).TransDiff = 0.0;
+		DataSurfaces::Surface( 1 ).MaterialMovInsulInt = 1;
+		DataHeatBalance::Material( 1 ).AbsorpThermal = 0.2;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.5;
+		
+		DataGlobals::NumOfZones = 0; // Reset this to skip part of the code in the unit tested routine
+		
+		DataSurfaces::Surface( 1 ).SchedMovInsulInt = -1;	// According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+
+		ComputeIntThermalAbsorpFactors();
+		
+		EXPECT_EQ( 0.2, DataHeatBalance::ITABSF( 1 ) );
+		
+	}
+	
 }
