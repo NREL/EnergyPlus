@@ -24082,7 +24082,7 @@ AirflowNetwork:Distribution:Component:Coil,
       \required-field
       \type choice
       \key Coil:Cooling:DX:SingleSpeed
-      \key Coil:Heating:Gas
+      \key Coil:Heating:Fuel
       \key Coil:Heating:Electric
       \key Coil:Heating:DX:SingleSpeed
       \key Coil:Cooling:Water
@@ -32995,7 +32995,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
    A9 , \field Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -33195,7 +33195,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
    A13, \field Supplemental Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -33391,7 +33391,7 @@ ZoneHVAC:WaterToAirHeatPump,
    A13, \field Supplemental Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -33781,7 +33781,7 @@ ZoneHVAC:UnitVentilator,
         \type choice
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Steam
    A16, \field Heating Coil Name
         \type object-list
@@ -33848,7 +33848,7 @@ ZoneHVAC:UnitHeater,
         \type choice
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Steam
    A8 , \field Heating Coil Name
         \required-field
@@ -34096,7 +34096,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A2 , \field Component 1 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34111,7 +34111,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A4 , \field Component 2 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34126,7 +34126,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A6 , \field Component 3 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34141,7 +34141,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A8 , \field Component 4 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34156,7 +34156,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A10 , \field Component 5 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34171,7 +34171,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A12 , \field Component 6 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34186,7 +34186,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A14 , \field Component 7 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -34201,7 +34201,7 @@ ZoneHVAC:OutdoorAirUnit:EquipmentList,
   A16 , \field Component 8 Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
        \key Coil:Heating:Water
        \key Coil:Cooling:Water
@@ -38593,7 +38593,7 @@ ZoneHVAC:VentilatedSlab,
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
   A28, \field Heating Coil Name
        \type object-list
@@ -38887,7 +38887,7 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
   A6,  \field Reheat Coil Name
        \required-field
@@ -39031,7 +39031,7 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
   A8 , \field Reheat Coil Name
        \required-field
@@ -39152,7 +39152,7 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
   A8,  \field Heating Coil Name
        \required-field
@@ -39241,7 +39241,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
   A6,  \field Reheat Coil Name
        \required-field
@@ -39324,7 +39324,7 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
   A10, \field Reheat Coil Name
        \required-field
@@ -39405,7 +39405,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Steam
   A10, \field Reheat Coil Name
        \required-field
@@ -44166,7 +44166,7 @@ Coil:Heating:Electric:MultiStage,
        \minimum> 0.0
        \autosizable
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
        \memo Gas or other fuel heating coil. If the coil is located directly in an air loop branch or
        \memo outdoor air equipment list, then it is controlled on leaving air temperature and
        \memo the Temperature Setpoint Node Name must be specified. If the coil is contained within
@@ -51286,7 +51286,7 @@ Dehumidifier:Desiccant:NoFans,
        \note heating coil type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \note works with gas, electric, hot water and steam heating coils
@@ -51444,7 +51444,7 @@ Dehumidifier:Desiccant:System,
   A9,  \field Regeneration Air Heater Object Type
        \type choice
        \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \note works with gas, electric, hot water and steam heating coils.
@@ -52111,7 +52111,7 @@ AirLoopHVAC:UnitarySystem,
        \key Coil:Heating:WaterToAirHeatPump:ParameterEstimation
        \key Coil:Heating:WaterToAirHeatPump:EquationFit
        \key Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Gas:MultiStage
        \key Coil:Heating:Electric
        \key Coil:Heating:Electric:MultiStage
@@ -52198,7 +52198,7 @@ AirLoopHVAC:UnitarySystem,
        \note dehumidification is required any time the humidistat set point is exceeded.
   A18, \field Supplemental Heating Coil Object Type
        \type choice
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Coil:Heating:Electric
        \key Coil:Heating:Desuperheater
        \key Coil:Heating:Water
@@ -52614,7 +52614,7 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
    A10, \field Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -52709,7 +52709,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
    A10, \field Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -52748,7 +52748,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
         \note A ZoneControl:Humidistat object is also required.
    A15, \field Reheat Coil Object Type
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Desuperheater
         \key Coil:Heating:Water
@@ -52823,7 +52823,7 @@ AirLoopHVAC:UnitaryHeatOnly,
    A10, \field Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -52915,7 +52915,7 @@ AirLoopHVAC:UnitaryHeatCool,
    A10, \field Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -52957,7 +52957,7 @@ AirLoopHVAC:UnitaryHeatCool,
         \note A ZoneControl:Humidistat object is also required.
    A15, \field Reheat Coil Object Type
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Desuperheater
         \key Coil:Heating:Water
@@ -53063,7 +53063,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
    A12, \field Supplemental Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -53224,7 +53224,7 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
    A12, \field Supplemental Heating Coil Object Type
         \required-field
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -53431,7 +53431,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type choice
         \key Coil:Heating:DX:SingleSpeed
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -53575,7 +53575,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \object-list CoolingCoilsDXMultiSpeed
    A14, \field Supplemental Heating Coil Object Type
         \type choice
-        \key Coil:Heating:Gas
+        \key Coil:Heating:Fuel
         \key Coil:Heating:Electric
         \key Coil:Heating:Water
         \key Coil:Heating:Steam
@@ -73001,7 +73001,7 @@ SetpointManager:SingleZone:OneStageCooling,
        \type node
 
 SetpointManager:SingleZone:OneStageHeating,
-       \memo This object can be used with CoilSystem:Heating:DX, Coil:Heating:Gas,
+       \memo This object can be used with CoilSystem:Heating:DX, Coil:Heating:Fuel,
        \memo Coil:Heating:Electric to model on/off cycling control of single stage air systems.
        \memo Setpoints are modulated to run coil full on or full off depending on zone conditions.
        \memo Intended for use with ZoneControl:Thermostat:StagedDualSetpoint.
@@ -86181,7 +86181,7 @@ ComponentCost:LineItem,
        \key Construction
        \key Coil:DX
        \key Coil:Cooling:DX:SingleSpeed
-       \key Coil:Heating:Gas
+       \key Coil:Heating:Fuel
        \key Chiller:Electric
        \key Daylighting:Controls
        \key Shading:Zone:Detailed

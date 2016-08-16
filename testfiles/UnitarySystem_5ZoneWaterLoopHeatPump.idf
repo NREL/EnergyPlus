@@ -89,7 +89,7 @@
 ! Purchased Heating:              None
 ! Coils:                          Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
 !                                 Coil:Heating:WaterToAirHeatPump:ParameterEstimation
-!                                 Coil:Heating:Gas
+!                                 Coil:Heating:Fuel
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        Boiler:HotWater
 ! Chillers:                       Chiller:Electric
@@ -2030,7 +2030,7 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU1,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     2.0,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2126,7 +2126,7 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU1,  !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2309,7 +2309,7 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU2,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     2.0,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2402,7 +2402,7 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU2,  !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2585,7 +2585,7 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU3,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     2.0,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2678,7 +2678,7 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU3,  !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2861,7 +2861,7 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU4,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     2.0,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2954,7 +2954,7 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU4,  !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -3137,7 +3137,7 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU5,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     2.0,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -3230,7 +3230,7 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU5,  !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- FuelType

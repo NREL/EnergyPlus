@@ -916,7 +916,7 @@ namespace HVACUnitaryBypassVAV {
 				CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = FanVolFlow;
 			}
 
-			if ( SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) || SameString( Alphas( 16 ), "Coil:Heating:Gas" ) || SameString( Alphas( 16 ), "Coil:Heating:Electric" ) || SameString( Alphas( 16 ), "Coil:Heating:Water" ) || SameString( Alphas( 16 ), "Coil:Heating:Steam" ) ) {
+			if ( SameString( Alphas( 16 ), "Coil:Heating:DX:SingleSpeed" ) || SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) || SameString( Alphas( 16 ), "Coil:Heating:Electric" ) || SameString( Alphas( 16 ), "Coil:Heating:Water" ) || SameString( Alphas( 16 ), "Coil:Heating:Steam" ) ) {
 				CBVAV( CBVAVNum ).HeatCoilType = Alphas( 16 );
 				CBVAV( CBVAVNum ).HeatCoilName = Alphas( 17 );
 
@@ -928,7 +928,7 @@ namespace HVACUnitaryBypassVAV {
 					GetDXCoilIndex( CBVAV( CBVAVNum ).HeatCoilName, CBVAV( CBVAVNum ).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV( CBVAVNum ).HeatCoilType );
 					if ( DXCoilErrFlag ) ShowContinueError( "...occurs in " + CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
 
-				} else if ( SameString( Alphas( 16 ), "Coil:Heating:Gas" ) ) {
+				} else if ( SameString( Alphas( 16 ), "Coil:Heating:Fuel" ) ) {
 					CBVAV( CBVAVNum ).HeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
 					CBVAV( CBVAVNum ).MinOATCompressor = -999.9;
 					CBVAV( CBVAVNum ).HeatingCoilInletNode = GetCoilInletNode( CBVAV( CBVAVNum ).HeatCoilType, CBVAV( CBVAVNum ).HeatCoilName, ErrorsFound );

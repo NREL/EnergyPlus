@@ -83,7 +83,7 @@
 ! Solair Distribution:            None
 !
 ! HVAC:                           A unitary system of AirLoopHVAC:UnitaryHeatCool provides space cooling and heating.
-!                                 The system has a reheat coil as Coil:Heating:Gas.
+!                                 The system has a reheat coil as Coil:Heating:Fuel.
 !                                 Thermostat setting at 22.22C(72F) for space heating and 25.56C(78F) for space cooling.
 !                                 And the space relative humidity was kept at 45%.  The zone overcool constant range is
 !                                 2C and overcool control ratio is 3.0 [%/deltaC ]
@@ -96,8 +96,8 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! Cooling Coil:                   Coil:Cooling:DX:SingleSpeed
-! Heating Coil:                   Coil:Heating:Gas
-! Reeat Coil:                     Coil:Heating:Gas
+! Heating Coil:                   Coil:Heating:Fuel
+! Reeat Coil:                     Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1972,13 +1972,13 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Heating Coil 1,          !- Coil Name
-    Coil:Heating:Gas,        !- Coil Object Type
+    Coil:Heating:Fuel,        !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.000;                   !- Air Path Hydraulic Diameter {m}
 
   AirflowNetwork:Distribution:Component:Coil,
     Reheat Coil,             !- Coil Name
-    Coil:Heating:Gas,        !- Coil Object Type
+    Coil:Heating:Fuel,        !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.000;                   !- Air Path Hydraulic Diameter {m}
 
@@ -2168,12 +2168,12 @@
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     DrawThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Heating Coil 1,          !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 1,              !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,        !- Reheat Coil Object Type
     Reheat Coil;             !- Reheat Coil Name
 
   AirTerminal:SingleDuct:Uncontrolled,
@@ -2225,7 +2225,7 @@
     Return Air Mixer Outlet, !- Outlet Node Name
     Zone Outlet Node;        !- Inlet 1 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heating Coil 1,          !- Name
     HVACAvailSched,          !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2234,7 +2234,7 @@
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Fan Inlet Node;          !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil,             !- Name
     HVACAvailSched,          !- Availability Schedule Name
     NaturalGas,              !- FuelType

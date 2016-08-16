@@ -413,7 +413,7 @@ namespace HeatingCoils {
 
 		NumElecCoil = GetNumObjectsFound( "Coil:Heating:Electric" );
 		NumElecCoilMultiStage = GetNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
-		NumGasCoil = GetNumObjectsFound( "Coil:Heating:Gas" );
+		NumGasCoil = GetNumObjectsFound( "Coil:Heating:Fuel" );
 		NumGasCoilMultiStage = GetNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
 		NumDesuperheaterCoil = GetNumObjectsFound( "Coil:Heating:Desuperheater" );
 		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
@@ -430,7 +430,7 @@ namespace HeatingCoils {
 		GetObjectDefMaxArgs( "Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:Heating:Gas", TotalArgs, NumAlphas, NumNums );
+		GetObjectDefMaxArgs( "Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		GetObjectDefMaxArgs( "Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums );
@@ -581,7 +581,7 @@ namespace HeatingCoils {
 			CoilNum = NumElecCoil + NumElecCoilMultiStage + GasCoilNum;
 			HeatingCoilEquipConditions & coil = HeatingCoil( CoilNum );
 
-			CurrentModuleObject = "Coil:Heating:Gas";
+			CurrentModuleObject = "Coil:Heating:Fuel";
 
 			GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
@@ -1299,7 +1299,7 @@ namespace HeatingCoils {
 			PreDefTableEntry( pdchHeatCoilNomCap, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages ) );
 			PreDefTableEntry( pdchHeatCoilNomEff, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).MSEfficiency( HeatingCoil( CoilNum ).NumOfStages ) );
 		} else if ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) {
-			PreDefTableEntry( pdchHeatCoilType, HeatingCoil( CoilNum ).Name, "Coil:Heating:Gas" );
+			PreDefTableEntry( pdchHeatCoilType, HeatingCoil( CoilNum ).Name, "Coil:Heating:Fuel" );
 			PreDefTableEntry( pdchHeatCoilNomCap, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).NominalCapacity );
 			PreDefTableEntry( pdchHeatCoilNomEff, HeatingCoil( CoilNum ).Name, HeatingCoil( CoilNum ).Efficiency );
 		} else if ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) {
@@ -1821,7 +1821,7 @@ namespace HeatingCoils {
 						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", PLF curve values" );
 						ShowContinueError( "The PLF curve value = " + TrimSigDigits( PLF, 5 ) + " for part-load ratio = " + TrimSigDigits( PartLoadRat, 5 ) );
 						ShowContinueError( "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues..." );
-						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Gas]." );
+						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );
 					} else {
 						ShowRecurringWarningErrorAtEnd( HeatingCoil( CoilNum ).Name + ", Heating coil PLF curve < 0.7 warning continues... ", HeatingCoil( CoilNum ).PLFErrorIndex, PLF, PLF );
 					}
@@ -1835,7 +1835,7 @@ namespace HeatingCoils {
 						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );
 						ShowContinueError( "The runtime fraction exceeded 1.0. [" + TrimSigDigits( HeatingCoil( CoilNum ).RTF, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction is set to 1.0 and the simulation continues..." );
-						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Gas]." );
+						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );
 					} else {
 						ShowRecurringWarningErrorAtEnd( HeatingCoil( CoilNum ).Name + ", Heating coil runtime fraction > 1.0 warning continues... ", HeatingCoil( CoilNum ).RTFErrorIndex, HeatingCoil( CoilNum ).RTF, HeatingCoil( CoilNum ).RTF );
 					}
@@ -2099,7 +2099,7 @@ namespace HeatingCoils {
 						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", PLF curve values" );
 						ShowContinueError( "The PLF curve value = " + TrimSigDigits( PLF, 5 ) + " for part-load ratio = " + TrimSigDigits( PartLoadRat, 5 ) );
 						ShowContinueError( "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues..." );
-						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Gas]." );
+						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );
 					} else {
 						ShowRecurringWarningErrorAtEnd( HeatingCoil( CoilNum ).Name + ", Heating coil PLF curve < 0.7 warning continues... ", HeatingCoil( CoilNum ).PLFErrorIndex, PLF, PLF );
 					}
@@ -2113,7 +2113,7 @@ namespace HeatingCoils {
 						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );
 						ShowContinueError( "The runtime fraction exceeded 1.0. [" + TrimSigDigits( HeatingCoil( CoilNum ).RTF, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction is set to 1.0 and the simulation continues..." );
-						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Gas]." );
+						ShowContinueError( "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel]." );
 					} else {
 						ShowRecurringWarningErrorAtEnd( HeatingCoil( CoilNum ).Name + ", Heating coil runtime fraction > 1.0 warning continues... ", HeatingCoil( CoilNum ).RTFErrorIndex, HeatingCoil( CoilNum ).RTF, HeatingCoil( CoilNum ).RTF );
 					}

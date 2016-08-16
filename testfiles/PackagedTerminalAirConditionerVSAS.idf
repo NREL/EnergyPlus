@@ -112,7 +112,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:VariableSpeed, COIL:ELECTRIC:HEATING, Coil:Heating:Gas,
+! Coils:                          Coil:Cooling:DX:VariableSpeed, COIL:ELECTRIC:HEATING, Coil:Heating:Fuel,
 !                                 COIL:STEAM:AIRHEATING
 ! Pumps:                          None
 ! Boilers:                        None
@@ -146,7 +146,7 @@
     0.0186,                  !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1PTACFan,            !- Supply Air Fan Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Zone1PTACHeater,         !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone1PTACDXCoolCoil,     !- Cooling Coil Name
@@ -1988,9 +1988,9 @@
     Zone2PTACCoolCoilOutletNode,  !- Air Inlet Node Name
     Zone2PTACAirOutletNode;  !- Air Outlet Node Name
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Zone1PTACHeater,         !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
     NaturalGas,              !- FuelType

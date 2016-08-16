@@ -3367,7 +3367,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingElectric_MultiStage;
 			} else if ( SameString( HeatingCoilType, "Coil:Heating:Gas:MultiStage" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_HeatingGas_MultiStage;
-			} else if ( SameString( HeatingCoilType, "Coil:Heating:Gas" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) || SameString( HeatingCoilType, "Coil:Heating:Desuperheater" ) ) {
+			} else if ( SameString( HeatingCoilType, "Coil:Heating:Fuel" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) || SameString( HeatingCoilType, "Coil:Heating:Desuperheater" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 			} else if ( SameString( HeatingCoilType, "Coil:UserDefined" ) ) {
 				UnitarySystem( UnitarySysNum ).HeatingCoilType_Num = Coil_UserDefined;
@@ -4785,7 +4785,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 			} else if ( SameString( SuppHeatCoilType, "Coil:Heating:Steam" ) ) {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = Coil_HeatingSteam;
-			} else if ( SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) || SameString( SuppHeatCoilType, "Coil:Heating:DesuperHeater" ) ) {
+			} else if ( SameString( SuppHeatCoilType, "Coil:Heating:Fuel" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) || SameString( SuppHeatCoilType, "Coil:Heating:DesuperHeater" ) ) {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 			} else if ( SameString( SuppHeatCoilType, "Coil:UserDefined" ) ) {
 				UnitarySystem( UnitarySysNum ).SuppHeatCoilType_Num = Coil_UserDefined;
@@ -6107,7 +6107,7 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex > 0 ) {
 					if ( DesignSpecMSHP( UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex ).SingleModeFlag ) {
 						ShowSevereError( CurrentModuleObject + ": " + UnitarySystem( UnitarySysNum ).Name );
-						ShowContinueError( "In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed and the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Gas." );
+						ShowContinueError( "In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed and the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Fuel." );
 						ShowContinueError( "The input cooliing coil type = " + Alphas( iCoolingCoilTypeAlphaNum ) + " and the input heating coil type = " + Alphas( iHeatingCoilTypeAlphaNum ) );
 					}
 				}

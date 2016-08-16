@@ -2634,7 +2634,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE1-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     ContsFanSch,             !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE1-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2772,7 +2772,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE2-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     ContsFanSch,             !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE2-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2831,7 +2831,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE3-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     ContsFanSch,             !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE3-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2890,7 +2890,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE4-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE4-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2949,7 +2949,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE5-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE5-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -3234,9 +3234,9 @@ Fan:OnOff,
     SPACE5-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
 
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE1-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3245,7 +3245,7 @@ Coil:Heating:Gas,
     SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE1-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE2-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3254,7 +3254,7 @@ Coil:Heating:Gas,
     SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE2-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE3-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3263,7 +3263,7 @@ Coil:Heating:Gas,
     SPACE3-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE3-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE4-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3272,7 +3272,7 @@ Coil:Heating:Gas,
     SPACE4-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE4-1 PTAC Outlet;    !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE5-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type

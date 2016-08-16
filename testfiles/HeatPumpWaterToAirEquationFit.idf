@@ -2137,7 +2137,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2214,7 +2214,7 @@
     Sys 1 Mixed Air Node,    !- Air Inlet Node Name
     Sys 1 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2406,7 +2406,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 2,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2476,7 +2476,7 @@
     Sys 2 Mixed Air Node,    !- Air Inlet Node Name
     Sys 2 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 2,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2668,7 +2668,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 3,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2738,7 +2738,7 @@
     Sys 3 Mixed Air Node,    !- Air Inlet Node Name
     Sys 3 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 3,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2930,7 +2930,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 4,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3000,7 +3000,7 @@
     Sys 4 Mixed Air Node,    !- Air Inlet Node Name
     Sys 4 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 4,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -3192,7 +3192,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 5,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3262,7 +3262,7 @@
     Sys 5 Mixed Air Node,    !- Air Inlet Node Name
     Sys 5 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 5,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     NaturalGas,              !- FuelType

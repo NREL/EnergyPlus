@@ -93,7 +93,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          Yes
 ! Boilers:                        No
 ! Chillers:                       No
@@ -2643,7 +2643,7 @@ ThermostatSetpoint:DualSetpoint,
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE1-1 HP Cooling Mode,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE1-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2858,7 +2858,7 @@ ThermostatSetpoint:DualSetpoint,
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE2-1 HP Cooling Mode,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE2-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2930,7 +2930,7 @@ ThermostatSetpoint:DualSetpoint,
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE3-1 HP Cooling Mode,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE3-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3002,7 +3002,7 @@ ThermostatSetpoint:DualSetpoint,
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE4-1 HP Cooling Mode,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE4-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3074,7 +3074,7 @@ ThermostatSetpoint:DualSetpoint,
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE5-1 HP Cooling Mode,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE5-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3363,9 +3363,9 @@ Fan:OnOff,
     SPACE5-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
 
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE1-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3374,7 +3374,7 @@ Coil:Heating:Gas,
     SPACE1-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE1-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE2-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3383,7 +3383,7 @@ Coil:Heating:Gas,
     SPACE2-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE2-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE3-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3392,7 +3392,7 @@ Coil:Heating:Gas,
     SPACE3-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE3-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE4-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3401,7 +3401,7 @@ Coil:Heating:Gas,
     SPACE4-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE4-1 Heat Pump Outlet;  !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE5-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type

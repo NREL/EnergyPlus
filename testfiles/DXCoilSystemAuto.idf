@@ -86,7 +86,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1357,7 +1357,7 @@
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
     SuppHeating Coil Air Inlet Node,  !- Component 4 Outlet Node Name
     PASSIVE,                 !- Component 4 Branch Control Type
-    Coil:Heating:Gas,        !- Component 5 Object Type
+    Coil:Heating:Fuel,        !- Component 5 Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Component 5 Name
     SuppHeating Coil Air Inlet Node,  !- Component 5 Inlet Node Name
     Air Loop Outlet Node,    !- Component 5 Outlet Node Name
@@ -1606,7 +1606,7 @@
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     NaturalGas,              !- FuelType

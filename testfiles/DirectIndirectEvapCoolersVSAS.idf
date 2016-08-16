@@ -56,7 +56,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -86,7 +86,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -106,7 +106,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -126,7 +126,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -146,7 +146,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -4659,7 +4659,7 @@
     FURNACE_PACU_CAV:1_OA-FURNACE_PACU_CAV:1_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -4929,7 +4929,7 @@
     FURNACE_PACU_CAV:2_OA-FURNACE_PACU_CAV:2_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -5224,7 +5224,7 @@
     FURNACE_PACU_CAV:3_OA-FURNACE_PACU_CAV:3_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -5519,7 +5519,7 @@
     FURNACE_PACU_CAV:4_OA-FURNACE_PACU_CAV:4_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- FuelType

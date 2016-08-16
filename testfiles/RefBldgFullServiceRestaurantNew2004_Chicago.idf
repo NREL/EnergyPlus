@@ -34,7 +34,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Cooling:DX:TwoSpeed; Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Cooling:DX:TwoSpeed; Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1421,7 +1421,7 @@
     Kitchen Exhaust Fan Outlet Node Name,  !- Air Outlet Node Name
     Zone Exhaust Fans;       !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_1:1_HeatC,        !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -1431,7 +1431,7 @@
     PSZ-AC_1:1_HeatC-PSZ-AC_1:1_FanNode,  !- Air Outlet Node Name
     PSZ-AC_1:1_HeatC-PSZ-AC_1:1_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_2:2_HeatC,        !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- FuelType
@@ -2030,7 +2030,7 @@
     PSZ-AC_1:1_OA-PSZ-AC_1:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC_1:1_CoolC-PSZ-AC_1:1_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-AC_1:1_HeatC,        !- Component 3 Name
     PSZ-AC_1:1_CoolC-PSZ-AC_1:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC_1:1_HeatC-PSZ-AC_1:1_FanNode,  !- Component 3 Outlet Node Name
@@ -2055,7 +2055,7 @@
     PSZ-AC_2:2_OA-PSZ-AC_2:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC_2:2_CoolC-PSZ-AC_2:2_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-AC_2:2_HeatC,        !- Component 3 Name
     PSZ-AC_2:2_CoolC-PSZ-AC_2:2_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC_2:2_HeatC-PSZ-AC_2:2_FanNode,  !- Component 3 Outlet Node Name
