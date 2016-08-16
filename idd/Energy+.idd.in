@@ -379,7 +379,6 @@ Version,
       \memo Specifies the EnergyPlus version of the IDF file.
       \unique-object
       \format singleLine
-      \min-fields 1
   A1 ; \field Version Identifier
       \default ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}
 
@@ -548,7 +547,6 @@ SurfaceConvectionAlgorithm:Inside,
        \memo Default indoor surface heat transfer convection algorithm to be used for all zones
        \unique-object
        \format singleLine
-       \min-fields 1
   A1 ; \field Algorithm
        \type choice
        \key Simple
@@ -566,7 +564,6 @@ SurfaceConvectionAlgorithm:Outside,
        \memo Default outside surface heat transfer convection algorithm to be used for all zones
        \unique-object
        \format singleLine
-       \min-fields 1
   A1 ; \field Algorithm
        \type choice
        \key SimpleCombined
@@ -615,7 +612,6 @@ HeatBalanceSettings:ConductionFiniteDifference,
        \memo Determines settings for the Conduction Finite Difference
        \memo algorithm for surface heat transfer modeling.
        \unique-object
-       \min-fields 4
   A1 , \field Difference Scheme
        \type choice
        \key CrankNicholsonSecondOrder
@@ -652,7 +648,6 @@ ZoneAirContaminantBalance,
        \memo Determines which contaminant concentration will be simulates.
        \unique-object
        \format singleLine
-       \min-fields 3
   A1 , \field Carbon Dioxide Concentration
        \note If Yes, CO2 simulation will be performed.
        \type choice
@@ -750,7 +745,6 @@ Timestep,
        \memo transfer and load calculations.
        \unique-object
        \format singleLine
-       \min-fields 1
   N1 ; \field Number of Timesteps per Hour
        \note Number in hour: normal validity 4 to 60: 6 suggested
        \note Must be evenly divisible into 60
