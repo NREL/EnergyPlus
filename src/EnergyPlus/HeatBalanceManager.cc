@@ -7197,11 +7197,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-<<<<<<< HEAD
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Material, MaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-=======
-			VerifyName( cAlphaArgs( 1 ), Material, MaterNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
->>>>>>> NREL/develop
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), Material, MaterNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
