@@ -379,8 +379,8 @@ Version,
       \memo Specifies the EnergyPlus version of the IDF file.
       \unique-object
       \format singleLine
+      \min-fields 1
   A1 ; \field Version Identifier
-      \required-field
       \default ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}
 
 SimulationControl,
@@ -450,7 +450,6 @@ Building,
        \required-object
        \min-fields 8
   A1 , \field Name
-       \required-field
        \retaincase
        \default NONE
   N1 , \field North Axis
@@ -507,6 +506,7 @@ Building,
 ShadowCalculation,
        \unique-object
        \memo This object is used to control details of the solar, shading, and daylighting models
+       \min-fields 5
   A1 , \field Calculation Method
        \note choose calculation method. note that TimestepFrequency is only needed for certain cases
        \note and can increase execution time significantly.
@@ -515,7 +515,6 @@ ShadowCalculation,
        \key TimestepFrequency
        \default AverageOverDaysInFrequency
   N1 , \field Calculation Frequency
-       \required-field
        \type integer
        \minimum 1
        \default 20
@@ -535,6 +534,7 @@ ShadowCalculation,
        \type choice
        \key ConvexWeilerAtherton
        \key SutherlandHodgman
+       \default SutherlandHodgman
   A3 ; \field Sky Diffuse Modeling Algorithm
        \note Advanced Feature.  Internal default is SimpleSkyDiffuseModeling
        \note If you have shading elements that change transmittance over the
@@ -543,13 +543,14 @@ ShadowCalculation,
        \type choice
        \key SimpleSkyDiffuseModeling
        \key DetailedSkyDiffuseModeling
+       \default SimpleSkyDiffuseModeling
 
 SurfaceConvectionAlgorithm:Inside,
        \memo Default indoor surface heat transfer convection algorithm to be used for all zones
        \unique-object
        \format singleLine
+       \min-fields 1
   A1 ; \field Algorithm
-       \required-field
        \type choice
        \key Simple
        \key TARP
@@ -566,8 +567,8 @@ SurfaceConvectionAlgorithm:Outside,
        \memo Default outside surface heat transfer convection algorithm to be used for all zones
        \unique-object
        \format singleLine
+       \min-fields 1
   A1 ; \field Algorithm
-       \required-field
        \type choice
        \key SimpleCombined
        \key TARP
@@ -590,8 +591,8 @@ HeatBalanceAlgorithm,
        \memo Advanced/Research Usage: HAMT (Combined Heat And Moisture Finite Element)
        \unique-object
        \format singleLine
+       \min-fields 4
   A1 , \field Algorithm
-       \required-field
        \type choice
        \key ConductionTransferFunction
        \key MoisturePenetrationDepthConductionTransferFunction
@@ -616,6 +617,7 @@ HeatBalanceSettings:ConductionFiniteDifference,
        \memo Determines settings for the Conduction Finite Difference
        \memo algorithm for surface heat transfer modeling.
        \unique-object
+       \min-fields 4
   A1 , \field Difference Scheme
        \type choice
        \key CrankNicholsonSecondOrder
@@ -640,6 +642,7 @@ ZoneAirHeatBalanceAlgorithm,
        \memo Determines which algorithm will be used to solve the zone air heat balance.
        \unique-object
        \format singleLine
+       \min-fields 1
   A1 ; \field Algorithm
        \type choice
        \key ThirdOrderBackwardDifference
@@ -651,6 +654,7 @@ ZoneAirContaminantBalance,
        \memo Determines which contaminant concentration will be simulates.
        \unique-object
        \format singleLine
+       \min-fields 3
   A1 , \field Carbon Dioxide Concentration
        \note If Yes, CO2 simulation will be performed.
        \type choice
@@ -748,8 +752,8 @@ Timestep,
        \memo transfer and load calculations.
        \unique-object
        \format singleLine
+       \min-fields 1
   N1 ; \field Number of Timesteps per Hour
-       \required-field
        \note Number in hour: normal validity 4 to 60: 6 suggested
        \note Must be evenly divisible into 60
        \note Allowable values include 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, and 60
@@ -766,6 +770,7 @@ ConvergenceLimits,
        \memo Specifies limits on HVAC system simulation timesteps and iterations.
        \memo This item is an advanced feature that should be used only with caution.
        \unique-object
+       \min-fields 3
   N1 , \field Minimum System Timestep
        \units minutes
        \type integer
@@ -1363,7 +1368,6 @@ RunPeriodControl:SpecialDays,
      \maximum 366
      \default 1
  A3; \field Special Day Type
-       \required-field
        \note Special Day Type selects the schedules appropriate for each day so labeled
        \type choice
        \key Holiday
@@ -1478,62 +1482,50 @@ Site:GroundTemperature:BuildingSurface,
        \min-fields 12
        \format singleLine
   N1 , \field January Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N2 , \field February Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N3 , \field March Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N4 , \field April Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N5 , \field May Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N6 , \field June Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N7 , \field July Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N8 , \field August Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N9 , \field September Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N10, \field October Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N11, \field November Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
   N12; \field December Ground Temperature
-       \required-field
        \units C
        \type real
        \default 18
@@ -1546,62 +1538,50 @@ Site:GroundTemperature:FCfactorMethod,
        \min-fields 12
        \format singleLine
   N1 , \field January Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N2 , \field February Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N3 , \field March Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N4 , \field April Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N5 , \field May Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N6 , \field June Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N7 , \field July Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N8 , \field August Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N9 , \field September Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N10, \field October Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N11, \field November Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N12; \field December Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
@@ -1614,62 +1594,50 @@ Site:GroundTemperature:Shallow,
        \min-fields 12
        \format singleLine
   N1 , \field January Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N2 , \field February Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N3 , \field March Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N4 , \field April Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N5 , \field May Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N6 , \field June Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N7 , \field July Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N8 , \field August Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N9 , \field September Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N10, \field October Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N11, \field November Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
   N12; \field December Surface Ground Temperature
-       \required-field
        \units C
        \type real
        \default 13
@@ -1682,62 +1650,50 @@ Site:GroundTemperature:Deep,
        \min-fields 12
        \format singleLine
   N1 , \field January Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N2 , \field February Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N3 , \field March Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N4 , \field April Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N5 , \field May Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N6 , \field June Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N7 , \field July Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N8 , \field August Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N9 , \field September Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N10, \field October Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N11, \field November Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
   N12; \field December Deep Ground Temperature
-       \required-field
        \units C
        \type real
        \default 16
