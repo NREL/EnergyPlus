@@ -194,6 +194,7 @@ namespace SystemAvailabilityManager {
 	bool GetAvailMgrInputFlag( true ); // First time, input is "gotten"
 	bool GetHybridInputFlag( true ); // Flag set to make sure you get input once
 	int NumOptStartSysAvailMgrs( 0 );
+	bool BeginOfDayResetFlag( true );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -248,6 +249,7 @@ namespace SystemAvailabilityManager {
 		OptStartSysAvailMgrData.deallocate();
 		ASHRAEOptSCoeffCooling.deallocate();
 		ASHRAEOptSCoeffHeating.deallocate();
+		BeginOfDayResetFlag = true;
 	}
 
 	void
@@ -1638,7 +1640,12 @@ namespace SystemAvailabilityManager {
 		if ( allocated( HiTurnOnSysAvailMgrData ) ) for ( auto & e : HiTurnOnSysAvailMgrData ) e.AvailStatus = NoAction;
 		if ( allocated( LoTurnOffSysAvailMgrData ) ) for ( auto & e : LoTurnOffSysAvailMgrData ) e.AvailStatus = NoAction;
 		if ( allocated( LoTurnOnSysAvailMgrData ) ) for ( auto & e : LoTurnOnSysAvailMgrData ) e.AvailStatus = NoAction;
-		if ( allocated( OptStartSysAvailMgrData ) ) for ( auto & e : OptStartSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( OptStartSysAvailMgrData ) ) {
+			for ( auto & e : OptStartSysAvailMgrData ) {
+				e.AvailStatus = NoAction;
+				e.isSimulated = false;
+			}
+		}
 		//  HybridVentSysAvailMgrData%AvailStatus= NoAction
 		for ( ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType ) { // loop over the zone equipment types
 			if ( allocated( ZoneComp ) ) {
@@ -2254,8 +2261,6 @@ namespace SystemAvailabilityManager {
 		// Sets the AvailStatus indicator according to the
 		// optimum start algorithm
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using namespace DataAirLoop;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -2269,15 +2274,6 @@ namespace SystemAvailabilityManager {
 		using DataEnvironment::DayOfWeekTomorrow;
 		using DataZoneControls::OccRoomTSetPointHeat;
 		using DataZoneControls::OccRoomTSetPointCool;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2296,35 +2292,79 @@ namespace SystemAvailabilityManager {
 		int I;
 		int J;
 		Real64 TempDiff;
-		static Real64 TempDiffHi( 0.0 );
-		static Real64 TempDiffLo( 0.0 );
-		//  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: ZoneCompOptStartControlType
-		static bool FirstTimeATGFlag( true );
-		static bool OverNightStartFlag( false ); // Flag to indicate the optimum start starts before mid night.
-		static bool CycleOnFlag( false );
-		static bool OSReportVarFlag( true );
+		Real64 TempDiffHi;
+		Real64 TempDiffLo;
+		bool FirstTimeATGFlag( true );
+		bool OverNightStartFlag( false ); // Flag to indicate the optimum start starts before mid night.
+		bool CycleOnFlag( false );
+		bool OSReportVarFlag( true );
 		int NumPreDays;
 		int NumOfZonesInList;
 		static Array1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
 		static Array1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
-		static Real64 AdaTempGradHeat;
-		static Real64 AdaTempGradCool;
-		static Real64 ATGUpdateTime1( 0.0 );
-		static Real64 ATGUpdateTime2( 0.0 );
-		static Real64 ATGUpdateTemp1( 0.0 );
-		static Real64 ATGUpdateTemp2( 0.0 );
-		static bool ATGUpdateFlag1( false );
-		static bool ATGUpdateFlag2( false );
+		Real64 AdaTempGradHeat;
+		Real64 AdaTempGradCool;
+		Real64 ATGUpdateTime1( 0.0 );
+		Real64 ATGUpdateTime2( 0.0 );
+		Real64 ATGUpdateTemp1( 0.0 );
+		Real64 ATGUpdateTemp2( 0.0 );
+		bool ATGUpdateFlag1( false );
+		bool ATGUpdateFlag2( false );
 		int ATGCounter;
 		int ATGWCZoneNumHi;
 		int ATGWCZoneNumLo;
-		static Real64 NumHoursBeforeOccupancy( 0.0 ); // Variable to store the number of hours before occupancy in optimum start period
+		Real64 NumHoursBeforeOccupancy; // Variable to store the number of hours before occupancy in optimum start period
+		bool exitLoop; // exit loop on found data
+
+		auto & OptStartMgr( OptStartSysAvailMgrData( SysAvailNum ) );
+
+		// some avail managers may be used in air loop and plant availability manager lists, if so they only need be simulated once
+		if ( OptStartMgr.isSimulated ) {
+			AvailStatus = OptStartMgr.AvailStatus;
+			return;
+		}
+		OptStartMgr.isSimulated = true;
+
+		// update air loop specific data
+		TempDiffLo = OptStartMgr.TempDiffLo;
+		TempDiffHi = OptStartMgr.TempDiffHi;
+		ATGWCZoneNumLo = OptStartMgr.ATGWCZoneNumLo;
+		ATGWCZoneNumHi = OptStartMgr.ATGWCZoneNumHi;
+		CycleOnFlag = OptStartMgr.CycleOnFlag;
+		ATGUpdateFlag1 = OptStartMgr.ATGUpdateFlag1;
+		ATGUpdateFlag2 = OptStartMgr.ATGUpdateFlag2;
+		NumHoursBeforeOccupancy = OptStartMgr.NumHoursBeforeOccupancy;
+		FirstTimeATGFlag = OptStartMgr.FirstTimeATGFlag;
+		OverNightStartFlag = OptStartMgr.OverNightStartFlag;
+		OSReportVarFlag = OptStartMgr.OSReportVarFlag;
+
+		if ( OptStartMgr.CtrlAlgType == AdaptiveTemperatureGradient ) {
+			NumPreDays = OptStartMgr.NumPreDays;
+			if ( ! allocated( AdaTempGradTrdHeat ) ) {
+				AdaTempGradTrdHeat.allocate( NumPreDays );
+				AdaTempGradTrdCool.allocate( NumPreDays );
+			}
+			if ( ! allocated( OptStartMgr.AdaTempGradTrdHeat ) ) {
+				OptStartMgr.AdaTempGradTrdHeat.allocate( NumPreDays );
+				OptStartMgr.AdaTempGradTrdHeat = 0.0;
+				OptStartMgr.AdaTempGradTrdCool.allocate( NumPreDays );
+				OptStartMgr.AdaTempGradTrdCool = 0.0;
+			}
+			AdaTempGradTrdHeat = OptStartMgr.AdaTempGradTrdHeat;
+			AdaTempGradTrdCool = OptStartMgr.AdaTempGradTrdCool;
+			AdaTempGradHeat = OptStartMgr.AdaTempGradHeat;
+			AdaTempGradCool = OptStartMgr.AdaTempGradCool;
+			ATGUpdateTime1 = OptStartMgr.ATGUpdateTime1;
+			ATGUpdateTime2 = OptStartMgr.ATGUpdateTime2;
+			ATGUpdateTemp1 = OptStartMgr.ATGUpdateTemp1;
+			ATGUpdateTemp2 = OptStartMgr.ATGUpdateTemp2;
+		}
 
 		// add or use a new variable OptStartSysAvailMgrData(SysAvailNum)%FanSchIndex
 		if ( KickOffSimulation ) {
 			AvailStatus = NoAction;
 		} else {
-			ScheduleIndex = GetScheduleIndex( OptStartSysAvailMgrData( SysAvailNum ).FanSched );
+			ScheduleIndex = GetScheduleIndex( OptStartMgr.FanSched );
 			JDay = DayOfYear;
 			TmrJDay = JDay + 1;
 			TmrDayOfWeek = DayOfWeekTomorrow;
@@ -2336,32 +2376,44 @@ namespace SystemAvailabilityManager {
 				OptStartData.OccStartTime.allocate( NumOfZones );
 			}
 			if ( ! allocated( OptStartData.ActualZoneNum ) ) OptStartData.ActualZoneNum.allocate( NumOfZones );
-			OptStartData.OptStartFlag = false;
-			OptStartData.OccStartTime = 99.99; //initialize the zone occupancy start time
+
+			// reset OptStartData once per beginning of day
+			if ( BeginDayFlag ) {
+				NumHoursBeforeOccupancy = 0.0; //Initialize the hours of optimum start period. This variable is for reporting purpose.
+				if ( BeginOfDayResetFlag ) {
+					OptStartData.OccStartTime = 22.99; //initialize the zone occupancy start time
+					OptStartData.OptStartFlag = false;
+					BeginOfDayResetFlag = false;
+				}
+			}
+			if ( !BeginDayFlag ) BeginOfDayResetFlag = true;
+
 			GetScheduleValuesForDay( ScheduleIndex, DayValues );
 			GetScheduleValuesForDay( ScheduleIndex, DayValuesTmr, TmrJDay, TmrDayOfWeek );
 
 			FanStartTime = 0.0;
 			FanStartTimeTmr = 0.0;
+			exitLoop = false;
 			for ( I = 1; I <= 24; ++I ) {
 				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValues( J, I ) > 0.0 ) {
-						FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
-						goto Loop1_exit;
-					}
+					if ( DayValues( J, I ) <= 0.0 ) continue;
+					FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
+					exitLoop = true;
+					break;
 				}
+				if ( exitLoop ) break;
 			}
-			Loop1_exit: ;
 
+			exitLoop = false;
 			for ( I = 1; I <= 24; ++I ) {
 				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValuesTmr( J, I ) > 0.0 ) {
-						FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
-						goto Loop3_exit;
-					}
+					if ( DayValuesTmr( J, I ) <= 0.0 ) continue;
+					FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
+					exitLoop = true;
+					break;
 				}
+				if ( exitLoop ) break;
 			}
-			Loop3_exit: ;
 
 			if ( FanStartTimeTmr == 0.0 ) FanStartTimeTmr = 24.0;
 
@@ -2378,18 +2430,14 @@ namespace SystemAvailabilityManager {
 				--FanStartTimeTmr;
 			}
 
-			if ( BeginDayFlag ) {
-				NumHoursBeforeOccupancy = 0.0; //Initialize the hours of optimum start period. This variable is for reporting purpose.
-			}
-
-			{ auto const SELECT_CASE_var( OptStartSysAvailMgrData( SysAvailNum ).CtrlAlgType );
+			{ auto const SELECT_CASE_var( OptStartMgr.CtrlAlgType );
 			if ( SELECT_CASE_var == ConstantStartTime ) {
-				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == StayOff ) {
+				if ( OptStartMgr.CtrlType == StayOff ) {
 					AvailStatus = NoAction;
 				} else {
-					DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).ConstStartTime;
-					if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-						DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+					DeltaTime = OptStartMgr.ConstStartTime;
+					if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+						DeltaTime = OptStartMgr.MaxOptStartTime;
 					}
 					PreStartTime = FanStartTime - DeltaTime;
 					if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -2442,8 +2490,8 @@ namespace SystemAvailabilityManager {
 				}
 
 			} else if ( SELECT_CASE_var == ConstantTemperatureGradient ) {
-				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == ControlZone ) {
-					ZoneNum = OptStartSysAvailMgrData( SysAvailNum ).ZoneNum;
+				if ( OptStartMgr.CtrlType == ControlZone ) {
+					ZoneNum = OptStartMgr.ZoneNum;
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -2462,9 +2510,9 @@ namespace SystemAvailabilityManager {
 						TempDiff = TempDiffLo;
 						if ( TempDiff < 0.0 ) { //Heating Mode
 							TempDiff = std::abs( TempDiff );
-							DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradHeat;
-							if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+							DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
+							if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+								DeltaTime = OptStartMgr.MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
 							if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2541,9 +2589,9 @@ namespace SystemAvailabilityManager {
 						}
 					} else if ( OccRoomTSetPointCool( ZoneNum ) < 50.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
-						DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2617,8 +2665,9 @@ namespace SystemAvailabilityManager {
 						AvailStatus = NoAction;
 						CycleOnFlag = false;
 					}
-				} else if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == MaximumOfZoneList ) {
-					NumOfZonesInList = OptStartSysAvailMgrData( SysAvailNum ).NumOfZones;
+				} else if ( OptStartMgr.CtrlType == MaximumOfZoneList ) {
+
+					NumOfZonesInList = OptStartMgr.NumOfZones;
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -2627,9 +2676,9 @@ namespace SystemAvailabilityManager {
 								TempDiffHi = 0.0;
 								TempDiffLo = 0.0;
 								for ( ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum ) {
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffHi = max( TempDiffHi, TempDiff );
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffLo = min( TempDiffLo, TempDiff );
 								}
 							} else {
@@ -2641,9 +2690,9 @@ namespace SystemAvailabilityManager {
 					if ( ( TempDiffHi < 0.0 && TempDiffLo < 0.0 ) || ( std::abs( TempDiffLo ) > std::abs( TempDiffHi ) && TempDiffLo < 0 ) ) { //Heating Mode
 						TempDiff = TempDiffLo;
 						TempDiff = std::abs( TempDiff );
-						DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradHeat;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						DeltaTime = TempDiff / OptStartMgr.ConstTGradHeat;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2722,9 +2771,9 @@ namespace SystemAvailabilityManager {
 						TempDiffLo = 0.0;
 					} else if ( TempDiffHi < 30.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
-						DeltaTime = TempDiff / OptStartSysAvailMgrData( SysAvailNum ).ConstTGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -2803,13 +2852,9 @@ namespace SystemAvailabilityManager {
 				}
 
 			} else if ( SELECT_CASE_var == AdaptiveTemperatureGradient ) {
-				NumPreDays = OptStartSysAvailMgrData( SysAvailNum ).NumPreDays;
-				if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == ControlZone ) {
-					if ( ! allocated( AdaTempGradTrdHeat ) ) {
-						AdaTempGradTrdHeat.allocate( NumPreDays );
-						AdaTempGradTrdCool.allocate( NumPreDays );
-					}
-					ZoneNum = OptStartSysAvailMgrData( SysAvailNum ).ZoneNum;
+
+				if ( OptStartMgr.CtrlType == ControlZone ) {
+					ZoneNum = OptStartMgr.ZoneNum;
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -2826,13 +2871,13 @@ namespace SystemAvailabilityManager {
 					//Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
 					//-----------------------------------------------------------------------------
 					if ( WarmupFlag ) {
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
-						AdaTempGradTrdHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
+						AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
@@ -2855,8 +2900,8 @@ namespace SystemAvailabilityManager {
 						if ( TempDiff < 0.0 ) { //Heating Mode
 							TempDiff = std::abs( TempDiff );
 							DeltaTime = TempDiff / AdaTempGradHeat;
-							if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+							if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+								DeltaTime = OptStartMgr.MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
 							if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -2977,8 +3022,8 @@ namespace SystemAvailabilityManager {
 					} else if ( OccRoomTSetPointCool( ZoneNum ) < 50.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
 						DeltaTime = TempDiff / AdaTempGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -3090,14 +3135,11 @@ namespace SystemAvailabilityManager {
 						AvailStatus = NoAction;
 						CycleOnFlag = false;
 					}
-				} else if ( OptStartSysAvailMgrData( SysAvailNum ).CtrlType == MaximumOfZoneList ) {
-					if ( ! allocated( AdaTempGradTrdHeat ) ) {
-						AdaTempGradTrdHeat.allocate( NumPreDays );
-						AdaTempGradTrdCool.allocate( NumPreDays );
-					}
-					NumOfZonesInList = OptStartSysAvailMgrData( SysAvailNum ).NumOfZones;
-					ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
-					ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
+				} else if ( OptStartMgr.CtrlType == MaximumOfZoneList ) {
+
+					NumOfZonesInList = OptStartMgr.NumOfZones;
+					ATGWCZoneNumHi = OptStartMgr.ZonePtrs( 1 );
+					ATGWCZoneNumLo = OptStartMgr.ZonePtrs( 1 );
 					if ( ( ! allocated( TempTstatAir ) ) || ( ! allocated( ZoneThermostatSetPointLo ) ) || ( ! allocated( ZoneThermostatSetPointHi ) ) ) {
 						TempDiff = 0.0;
 					} else {
@@ -3105,21 +3147,19 @@ namespace SystemAvailabilityManager {
 							if ( allocated( OccRoomTSetPointHeat ) && allocated( OccRoomTSetPointCool ) ) {
 								TempDiffHi = 0.0;
 								TempDiffLo = 0.0;
+								ATGWCZoneNumHi = OptStartMgr.ZonePtrs( 1 );
+								ATGWCZoneNumLo = OptStartMgr.ZonePtrs( 1 );
 								for ( ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum ) {
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointCool( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffHi = max( TempDiffHi, TempDiff );
 									//Store the worse case zone number for actual temperature gradient calculation
 									if ( TempDiff == TempDiffHi ) {
-										ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum );
-									} else {
-										ATGWCZoneNumHi = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
+										ATGWCZoneNumHi = OptStartMgr.ZonePtrs( ZoneNum );
 									}
-									TempDiff = TempTstatAir( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum ) );
+									TempDiff = TempTstatAir( OptStartMgr.ZonePtrs( ZoneNum ) ) - OccRoomTSetPointHeat( OptStartMgr.ZonePtrs( ZoneNum ) );
 									TempDiffLo = min( TempDiffLo, TempDiff );
 									if ( TempDiff == TempDiffLo ) {
-										ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( ZoneNum );
-									} else {
-										ATGWCZoneNumLo = OptStartSysAvailMgrData( SysAvailNum ).ZonePtrs( 1 );
+										ATGWCZoneNumLo = OptStartMgr.ZonePtrs( ZoneNum );
 									}
 								}
 							} else {
@@ -3131,13 +3171,13 @@ namespace SystemAvailabilityManager {
 					//Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
 					//-----------------------------------------------------------------------------
 					if ( WarmupFlag ) {
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradCool;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
-						AdaTempGradTrdHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradHeat = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradTrdCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
-						AdaTempGradCool = OptStartSysAvailMgrData( SysAvailNum ).InitTGradHeat;
+						AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
+						AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
@@ -3159,8 +3199,8 @@ namespace SystemAvailabilityManager {
 						TempDiff = TempDiffLo;
 						TempDiff = std::abs( TempDiff );
 						DeltaTime = TempDiff / AdaTempGradHeat;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
@@ -3282,8 +3322,8 @@ namespace SystemAvailabilityManager {
 					} else if ( TempDiffHi < 30.0 ) { // Cooling Mode
 						TempDiff = TempDiffHi;
 						DeltaTime = TempDiff / AdaTempGradCool;
-						if ( DeltaTime > OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime ) {
-							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
+						if ( DeltaTime > OptStartMgr.MaxOptStartTime ) {
+							DeltaTime = OptStartMgr.MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
 						if ( PreStartTime < 0 ) PreStartTime = -0.1;
@@ -3409,8 +3449,28 @@ namespace SystemAvailabilityManager {
 			}}
 		}
 
-		OptStartSysAvailMgrData( SysAvailNum ).AvailStatus = AvailStatus;
-		OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy = NumHoursBeforeOccupancy;
+		OptStartMgr.AvailStatus = AvailStatus;
+		OptStartMgr.NumHoursBeforeOccupancy = NumHoursBeforeOccupancy;
+		OptStartMgr.TempDiffLo = TempDiffLo;
+		OptStartMgr.TempDiffHi = TempDiffHi;
+		OptStartMgr.ATGWCZoneNumLo = ATGWCZoneNumLo;
+		OptStartMgr.ATGWCZoneNumHi = ATGWCZoneNumHi;
+		OptStartMgr.CycleOnFlag = CycleOnFlag;
+		OptStartMgr.ATGUpdateFlag1 = ATGUpdateFlag1;
+		OptStartMgr.ATGUpdateFlag2 = ATGUpdateFlag2;
+		OptStartMgr.FirstTimeATGFlag = FirstTimeATGFlag;
+		OptStartMgr.OverNightStartFlag = OverNightStartFlag;
+		OptStartMgr.OSReportVarFlag = OSReportVarFlag;
+		if ( OptStartMgr.CtrlAlgType == AdaptiveTemperatureGradient ) {
+			OptStartMgr.AdaTempGradTrdHeat = AdaTempGradTrdHeat;
+			OptStartMgr.AdaTempGradTrdCool = AdaTempGradTrdCool;
+			OptStartMgr.AdaTempGradHeat = AdaTempGradHeat;
+			OptStartMgr.AdaTempGradCool = AdaTempGradCool;
+			OptStartMgr.ATGUpdateTime1 = ATGUpdateTime1;
+			OptStartMgr.ATGUpdateTime2 = ATGUpdateTime2;
+			OptStartMgr.ATGUpdateTemp1 = ATGUpdateTemp1;
+			OptStartMgr.ATGUpdateTemp2 = ATGUpdateTemp2;
+		}
 
 	}
 

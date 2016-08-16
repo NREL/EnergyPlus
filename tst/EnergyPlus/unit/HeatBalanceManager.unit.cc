@@ -95,6 +95,78 @@ using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
 
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names )
+	{
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			"  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0127,                  !- Thickness {m}",
+			"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+			"  WindowGap:DeflectionState,",
+			"    DeflectionState_813_Measured_Gap_1,  !- Name",
+			"    0.0120;                  !- Deflected Thickness {m}",
+			"  WindowMaterial:Gap,",
+			"    Gap_6_Layer,             !- Name",
+			"    0.0060,                  !- Thickness {m}",
+			"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+			"    101300.0000,             !- Pressure {Pa}",
+			"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+		    "  WindowMaterial:Gap,",
+			"    Gap_1_Layer,             !- Name",
+			"    0.0100,                  !- Thickness {m}",
+			"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+			"    101325.0000;             !- Pressure {Pa}",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_TRUE( ErrorsFound );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2 )
+	{
+		std::string const idf_objects = delimited_string(
+			{
+				"Version,8.6;",
+				"  WindowGap:DeflectionState,",
+				"    DeflectionState_813_Measured_Gap_1,  !- Name",
+				"    0.0120;                  !- Deflected Thickness {m}",
+				"  WindowMaterial:Gap,",
+				"    Gap_6_Layer,             !- Name",
+				"    0.0060,                  !- Thickness {m}",
+				"    Gap_6_W_0_0060,          !- Gas (or Gas Mixture)",
+				"    101300.0000,             !- Pressure {Pa}",
+				"    DeflectionState_813_Measured_Gap_1;  !- Deflection State",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0127,                  !- Thickness {m}",
+				"    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+				"  WindowMaterial:Gap,",
+				"    Gap_1_Layer,             !- Name",
+				"    0.0100,                  !- Thickness {m}",
+				"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
+				"    101325.0000;             !- Pressure {Pa}",
+			}
+		);
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+
+		GetMaterialData( ErrorsFound );
+
+		EXPECT_TRUE( ErrorsFound );
+
+	}
+
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ProcessZoneData )
 	{
 	// Test input processing of Zone object
