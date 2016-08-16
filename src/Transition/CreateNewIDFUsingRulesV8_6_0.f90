@@ -921,7 +921,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    ObjectName='Daylighting:ReferencePoint'
                    CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                    OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt2'
-                   OutArgs(2) = InArgs(1)                   OutArgs(3:5) = InArgs(6:8)                   CurArgs = 5
+                   OutArgs(2) = InArgs(1)
+                   OutArgs(3:5) = InArgs(6:8)
+                   CurArgs = 5
                    CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
                  ENDIF
 
