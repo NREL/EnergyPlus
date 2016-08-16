@@ -1,4 +1,4 @@
-\section{Group Energy Management System (EMS)}\label{group-energy-management-system-ems}
+\section{Group -- Energy Management System (EMS)}\label{group-energy-management-system-ems}
 
 The Energy Management System (EMS) is one of the high-level control methods available in EnergyPlus. An EMS is able to access a wide variety of sensor data and use this data to direct various types of control actions. The concept is to emulate, inside EnergyPlus, the types of controls possible with the digital energy management systems used in real buildings.
 
@@ -51,7 +51,7 @@ EnergyManagementSystem:Sensor,
 
 \subsection{EnergyManagementSystem:Actuator}\label{energymanagementsystemactuator}
 
-This object maps an Erl variable to a control actuator elsewhere in EnergyPlus. The EMS then initiates control actions by changing the value of this variable inside an Erl program. The Application Guide for EMS contains much more information on EMS actuators. The eplusout.EDD file can contain a listing of the actuators available for a specific model.
+This object maps an Erl variable to a control actuator elsewhere in EnergyPlus. The EMS then initiates control actions by changing the value of this variable inside an Erl program. The Application Guide for EMS contains much more information on EMS actuators. The eplusout.EDD file can contain a listing of the actuators available for a specific model.  As a debugging aid, to help catch spelling mistakes for example, the program checks to see if any actuators were never used during the simulation and issues a warning for any that it finds. 
 
 \subsubsection{Inputs}\label{inputs-1-013}
 

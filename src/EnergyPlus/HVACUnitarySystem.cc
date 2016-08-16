@@ -72,6 +72,7 @@
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -101,6 +102,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SingleDuct.hh>
 #include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
 #include <VariableSpeedCoils.hh>
@@ -497,7 +499,7 @@ namespace HVACUnitarySystem {
 		}
 
 		// Coils should have been sized by now. Set this flag to false in case other equipment is downstream of Unitary System.
-		// can't do this since there are other checks that need this flag (e.g., HVACManager, line 3577)
+		// can't do this since there are other checks that need this flag (e.g., HVACManager, SetHeatToReturnAirFlag())
 		//  AirLoopControlInfo(AirLoopNum)%UnitarySys = .FALSE.
 
 		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = TempMassFlowRateMaxAvail;
@@ -664,7 +666,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow = GetCoilMaxWaterFlowRate( CoolingCoilType, CoolingCoilName, InitUnitarySystemsErrorsFound );
 
 				if ( UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidIndex, RoutineName );
 					UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow *= rho;
 				}
 				// fill outlet node for coil
@@ -689,7 +691,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( HeatingCoilType, UnitarySystem( UnitarySysNum ).HeatingCoilName, InitUnitarySystemsErrorsFound );
 
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow > 0.0 ) {
-						rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidIndex, RoutineName );
 						UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( HeatingCoilType, UnitarySystem( UnitarySysNum ).HeatingCoilName, InitUnitarySystemsErrorsFound ) * rho;
 					}
 				} else {
@@ -723,7 +725,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", UnitarySystem( UnitarySysNum ).SuppHeatCoilName, InitUnitarySystemsErrorsFound );
 
 				if ( UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow > 0.0 ) {
-					rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidIndex, RoutineNames );
+					rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidIndex, RoutineNames );
 					UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", UnitarySystem( UnitarySysNum ).SuppHeatCoilName, InitUnitarySystemsErrorsFound ) * rho;
 				}
 				// fill outlet node for coil
@@ -758,6 +760,11 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow * StdRhoAir;
 			UnitarySystem( UnitarySysNum ).MaxHeatAirMassFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow * StdRhoAir;
 			UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirMassFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow * StdRhoAir;
+			UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = 0.0;
+			UnitarySystem( UnitarySysNum ).CompPartLoadRatio = 0.0;
+			UnitarySystem( UnitarySysNum ).CoolingCoilSensDemand = 0.0;
+			UnitarySystem( UnitarySysNum ).CoolingCoilLatentDemand = 0.0;
+			UnitarySystem( UnitarySysNum ).HeatingCoilSensDemand = 0.0;
 			UnitarySystem( UnitarySysNum ).SenLoadLoss = 0.0;
 			if ( UnitarySystem( UnitarySysNum ).Humidistat ) {
 				UnitarySystem( UnitarySysNum ).LatLoadLoss = 0.0;
@@ -765,7 +772,7 @@ namespace HVACUnitarySystem {
 
 			if ( ( UnitarySystem( UnitarySysNum ).HeatRecActive ) && ( ! MyPlantScanFlag( UnitarySysNum ) ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidName, 60.0, PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidIndex, RoutineNames );
+				rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidIndex, RoutineNames );
 
 				UnitarySystem( UnitarySysNum ).DesignHeatRecMassFlowRate = UnitarySystem( UnitarySysNum ).DesignHRWaterVolumeFlow * rho;
 
@@ -784,7 +791,7 @@ namespace HVACUnitarySystem {
 					SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).CoolingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
 					CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( CoolingCoilType, UnitarySystem( UnitarySysNum ).CoolingCoilName, InitUnitarySystemsErrorsFound );
 					if ( CoilMaxVolFlowRate != AutoSize ) {
-						rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidIndex, RoutineName );
+						rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).CoolCoilLoopNum ).FluidIndex, RoutineName );
 						UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow = CoilMaxVolFlowRate * rho;
 					}
 				}
@@ -799,7 +806,7 @@ namespace HVACUnitarySystem {
 						SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", UnitarySystem( UnitarySysNum ).HeatingCoilName, InitUnitarySystemsErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidIndex, RoutineNames );
+							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidIndex, RoutineNames );
 							UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}
@@ -824,7 +831,7 @@ namespace HVACUnitarySystem {
 						SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).SuppHeatCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", UnitarySystem( UnitarySysNum ).SuppHeatCoilName, InitUnitarySystemsErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidIndex, RoutineNames );
+							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidIndex, RoutineNames );
 							UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}
@@ -1371,7 +1378,7 @@ namespace HVACUnitarySystem {
 						SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", UnitarySystem( UnitarySysNum ).HeatingCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HeatCoilLoopNum ).FluidIndex, RoutineName );
 							UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}
@@ -1396,7 +1403,7 @@ namespace HVACUnitarySystem {
 						SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).SuppHeatCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex );
 						CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", UnitarySystem( UnitarySysNum ).SuppHeatCoilName, ErrorsFound );
 						if ( CoilMaxVolFlowRate != AutoSize ) {
-							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidName, InitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidIndex, RoutineName );
+							rho = GetDensityGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidName, CWInitConvTemp, PlantLoop( UnitarySystem( UnitarySysNum ).SuppCoilLoopNum ).FluidIndex, RoutineName );
 							UnitarySystem( UnitarySysNum ).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
 						}
 					}
@@ -1425,12 +1432,12 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).HeatingFanSpeedRatio = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).CoolingFanSpeedRatio = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).NoHeatCoolSpeedRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
-					if ( UnitarySystem( UnitarySysNum ).FanExists ) {
+					if ( UnitarySystem( UnitarySysNum ).FanExists && ! MultiOrVarSpeedHeatCoil( UnitarySysNum ) && ! MultiOrVarSpeedCoolCoil( UnitarySysNum )) {
 						if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) {
 							if ( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow ) {
 								ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 								ShowContinueError( "...For fan type and name = " + FanType + " \"" + FanName + "\"" );
-								ShowContinueError( "...Fan power ratio function of speed ratio curve has no impact IF fan volumetric flow rate is the same as the unitary system volumetric flow rate." );
+								ShowContinueError( "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the same as the unitary system volumetric flow rate." );
 								ShowContinueError( "...Fan volumetric flow rate            = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 5 ) + " m3/s." );
 								ShowContinueError( "...Unitary system volumetric flow rate = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, 5 ) + " m3/s." );
 							}
@@ -1718,10 +1725,10 @@ namespace HVACUnitarySystem {
 				ZoneLoad = 0.0;
 				CoolingLoad = false;
 				HeatingLoad = false;
-			} else if ( UnitarySystem( UnitarySysNum ).iterationCounter > 4 )  { // attempt to lock output (air flow) if oscillations are detected
-				OperatingMode = UnitarySystem( UnitarySysNum ).iterationMode( 5 );
-				OperatingModeMinusOne = UnitarySystem( UnitarySysNum ).iterationMode( 4 );
-				OperatingModeMinusTwo = UnitarySystem( UnitarySysNum ).iterationMode( 3 );
+			} else if ( UnitarySystem( UnitarySysNum ).iterationCounter > 6 )  { // attempt to lock output (air flow) if oscillations are detected
+				OperatingMode = UnitarySystem( UnitarySysNum ).iterationMode( 7 ); // VS systems can take a few more iterations than single-speed systems
+				OperatingModeMinusOne = UnitarySystem( UnitarySysNum ).iterationMode( 6 ); // previously tested 5th iteration, now tests 7th
+				OperatingModeMinusTwo = UnitarySystem( UnitarySysNum ).iterationMode( 5 );
 				Oscillate = true;
 				if ( OperatingMode == OperatingModeMinusOne && OperatingMode == OperatingModeMinusTwo ) Oscillate = false;
 				if ( Oscillate ) {
@@ -2338,16 +2345,17 @@ namespace HVACUnitarySystem {
 			if ( MSHPIndex > 0 ) {
 				for ( Iter = DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating; Iter >= 1; --Iter ) { // use reverse order since we divide by HeatVolumeFlowRate(max)
 					if ( DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) == AutoSize ) {
-						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
+						if ( UnitarySystem( UnitarySysNum ).ControlType == SetPointBased && ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) ) {
 							DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) = 1.0;
 						} else {
 							DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) = double( Iter ) / double( DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating );
 						}
 					} else {
 						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
-							if ( DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) < 1.0 ) {
+							if ( DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) < 1.0 && UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
 								ShowWarningError( RoutineName + ": " + CompType + " = " + CompName );
 								ShowContinueError( "Design specification object = " + DesignSpecMSHP( MSHPIndex ).Name );
+								ShowContinueError( "When control type = SetPointBased the outlet air temperature must change with coil capacity, if air flow also changes outlet air temperature will be relatively constant." );
 								ShowContinueError( "Speed " + TrimSigDigits( Iter ) + " Supply Air Flow Ratio During Heating Operation will be set = 1.0 and the simulation continues");
 								DesignSpecMSHP( MSHPIndex ).HeatingVolFlowRatio( Iter ) = 1.0;
 							}
@@ -2789,6 +2797,7 @@ namespace HVACUnitarySystem {
 		using UserDefinedComponents::GetUserDefinedCoilAirOutletNode;
 		using PackagedThermalStorageCoil::GetTESCoilCoolingCapacity;
 		using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
+		using SingleDuct::GetATMixer;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5051,9 +5060,15 @@ namespace HVACUnitarySystem {
 					}
 				}
 			}
+			 
+			// Get AirTerminal mixer data
+			GetATMixer( UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ATMixerName, UnitarySystem( UnitarySysNum ).ATMixerIndex, UnitarySystem( UnitarySysNum ).ATMixerType, UnitarySystem( UnitarySysNum ).ATMixerPriNode, UnitarySystem( UnitarySysNum ).ATMixerSecNode, UnitarySystem( UnitarySysNum ).ATMixerOutNode );
+			if ( UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_InletSide || UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_SupplySide ) {
+				UnitarySystem( UnitarySysNum ).ATMixerExists = true;
+			}
 
 			// check if the UnitarySystem is connected as zone equipment
-			if ( !AirLoopFound && !OASysFound) {
+			if ( !UnitarySystem( UnitarySysNum ).ATMixerExists && !AirLoopFound && !OASysFound ) {
 				for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 					for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
@@ -5103,6 +5118,119 @@ namespace HVACUnitarySystem {
 					ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
 					ShowContinueError( "Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections object inputs." );
 					ErrorsFound = true;
+				}
+			}
+
+			// check if the UnitarySystem is connected as zone equipment
+			if ( UnitarySystem( UnitarySysNum ).ATMixerExists && UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_InletSide ) {
+
+				if ( !AirLoopFound && !OASysFound ) {
+					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+						for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
+							if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).ATMixerSecNode ) continue;
+							ZoneEquipmentFound = true;
+							//               Find the controlled zone number for the specified thermostat location
+							UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+							++TotalZonesOnAirLoop;
+							TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
+							UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
+							UnitarySystem( UnitarySysNum ).ZoneInletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+							if ( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex > 0 ) {
+								for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
+									if ( ( ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipType_Num( EquipNum ) != ZoneUnitarySystem_Num ) || ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipName( EquipNum ) != UnitarySystem( UnitarySysNum ).Name ) continue;
+									UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).CoolingPriority( EquipNum );
+									UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).HeatingPriority( EquipNum );
+								}
+							}
+							UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
+							break;
+						}
+						if ( ZoneEquipmentFound ) {
+							for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
+								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+								ZoneInletNodeFound = true;
+								break;
+							}
+						}
+					}
+					if ( !ZoneInletNodeFound ) {
+						for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+							for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
+								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+								ZoneInletNodeFound = true;
+								ZoneEquipmentFound = true;
+								break;
+							}
+						}
+						if ( !ZoneInletNodeFound ) {
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirOutletNodeNameAlphaNum ) + " = " + Alphas( iAirOutletNodeNameAlphaNum ) );
+							ShowContinueError( "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections object inputs." );
+							ErrorsFound = true;
+						}
+					}
+					if ( !ZoneEquipmentFound ) {
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
+						ShowContinueError( "Node name does not match air terminal mixer secondary air node. Check AirTerminal:SingleDuct:Mixer object inputs." );
+						ErrorsFound = true;
+					}
+				}
+			}
+
+			if ( UnitarySystem( UnitarySysNum ).ATMixerExists && UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_SupplySide ) {
+
+				if ( !AirLoopFound && !OASysFound ) {
+					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+						for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
+							if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
+							ZoneEquipmentFound = true;
+							//               Find the controlled zone number for the specified thermostat location
+							UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+							++TotalZonesOnAirLoop;
+							TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
+							UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
+							UnitarySystem( UnitarySysNum ).ZoneInletNode = UnitarySystem( UnitarySysNum ).ATMixerOutNode;							
+							if ( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex > 0 ) {
+								for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
+									if ( ( ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipType_Num( EquipNum ) != ZoneUnitarySystem_Num ) || ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipName( EquipNum ) != UnitarySystem( UnitarySysNum ).Name ) continue;
+									UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).CoolingPriority( EquipNum );
+									UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).HeatingPriority( EquipNum );
+								}
+							}
+							UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
+							break;
+						}
+						if ( ZoneEquipmentFound ) {
+							for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
+								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).ATMixerOutNode ) continue;
+								ZoneInletNodeFound = true;
+								break;
+							}
+						}
+					}
+					if ( !ZoneInletNodeFound ) {
+						for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+							for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
+								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).ATMixerOutNode ) continue;
+								ZoneInletNodeFound = true;
+								ZoneEquipmentFound = true;
+								break;
+							}
+						}
+						if ( !ZoneInletNodeFound ) {
+							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+							ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirOutletNodeNameAlphaNum ) + " = " + Alphas( iAirOutletNodeNameAlphaNum ) );
+							ShowContinueError( "Node name does not match any air terminal mixer secondary air inlet node. Check AirTerminal:SingleDuct:Mixer object inputs." );
+							ErrorsFound = true;
+						}
+					}
+					if ( !ZoneEquipmentFound ) {
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
+						ShowContinueError( "Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections object inputs." );
+						ErrorsFound = true;
+					}
 				}
 			}
 
@@ -7195,7 +7323,11 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).HeatingSpeedNum <= 1 ) {
 					UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).HeatingCycRatio = PartLoadRatio;
-					MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+						MSHPMassFlowRateLow = CompOnMassFlow; // #5737
+					} else {
+						MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					}
 				} else {
 					if ( UnitarySystem( UnitarySysNum ).SingleMode == 0 ) {
 						UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = PartLoadRatio;
@@ -7223,7 +7355,11 @@ namespace HVACUnitarySystem {
 				if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum <= 1 ) {
 					UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).CoolingCycRatio = PartLoadRatio;
-					MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+						MSHPMassFlowRateLow = CompOnMassFlow; // #5737
+					} else {
+						MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // #5518
+					}
 				} else {
 					if ( UnitarySystem( UnitarySysNum ).SingleMode == 0 ) {
 						UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = PartLoadRatio;
@@ -7419,6 +7555,7 @@ namespace HVACUnitarySystem {
 		using Fans::SimulateFanComponents;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
+		using SingleDuct::SimATMixer;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7448,6 +7585,13 @@ namespace HVACUnitarySystem {
 		Real64 CpAirOut; // outlet air Cp [J/kg-C]
 		Real64 HCDeltaT; // heating coil delta temperture [deltaC]
 		Real64 MaxHeatCoilLoad; // maximum allowed coil load so max temp is not exceeded [W]
+		int InletNode; // unitary system inlet node
+		int ZoneNode; // zone air node
+		int ATMixOutNode; // air terminal mixer outlet node
+
+		OutletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+		InletNode = UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum;
+		ZoneNode = UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone;
 
 		CoolingCompOn = 0;
 		if ( CoolPLR > 0 ) {
@@ -7457,6 +7601,8 @@ namespace HVACUnitarySystem {
 			// for multispeed coils, comp is on IF speed > 1
 		} else if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 ) {
 			CoolingCompOn = 1;
+			// let logical override compressor status if present (tests if economizer can meet load without compressor)
+			if ( present( CompOn ) ) CoolingCompOn = CompOn;
 		}
 
 		HeatingCompOn = 0;
@@ -7480,6 +7626,17 @@ namespace HVACUnitarySystem {
 		}
 
 		// Call the series of components that simulate a Unitary System
+		if ( UnitarySystem( UnitarySysNum ).ATMixerExists ) {
+			// There is an air terminal mixer
+			if ( UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
+				// set the primary air inlet mass flow rate
+				Node( UnitarySystem( UnitarySysNum ).ATMixerPriNode ).MassFlowRate = min( Node( UnitarySystem( UnitarySysNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( InletNode ).MassFlowRate );
+				// now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
+				// the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
+				SimATMixer( UnitarySystem( UnitarySysNum ).ATMixerName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).ATMixerIndex );
+			}
+		}
+
 		if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
 			SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 		}
@@ -7585,6 +7742,13 @@ namespace HVACUnitarySystem {
 			}
 		}
 
+		// If there is a supply side air terminal mixer, calculate its output
+		if ( UnitarySystem( UnitarySysNum ).ATMixerExists ) {
+			if ( UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_SupplySide ) {
+				SimATMixer( UnitarySystem( UnitarySysNum ).ATMixerName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).ATMixerIndex );
+			}
+		}
+
 		// Check delta T (outlet to space), IF positive
 		// use space HumRat (next line), ELSE outlet humrat (IF) so psyc routine gives good result
 		MinHumRatio = Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat;
@@ -7594,16 +7758,40 @@ namespace HVACUnitarySystem {
 		ZoneHumRat = Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat;
 		if ( Node( OutletNode ).Temp < ZoneTemp ) MinHumRatio = Node( OutletNode ).HumRat;
 
-		// Calculate sensible load met (at constant humidity ratio)
-		SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem( UnitarySysNum ).SenLoadLoss;
-		UnitarySystem( UnitarySysNum ).SensibleLoadMet = SensOutput;
-
-		if ( UnitarySystem( UnitarySysNum ).Humidistat ) {
-
-			//   Calculate latent load met (at constant temperature)
-			LatOutput = AirMassFlow * ( PsyHFnTdbW( ZoneTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( ZoneTemp, ZoneHumRat ) ) - UnitarySystem( UnitarySysNum ).LatLoadLoss;
+		// calculate sensible load met
+		if ( UnitarySystem( UnitarySysNum ).ATMixerExists ) {
+			if ( UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_SupplySide ) {
+				// Air terminal supply side mixer
+				ATMixOutNode = UnitarySystem( UnitarySysNum ).ATMixerOutNode;
+				SensOutput = Node( ATMixOutNode ).MassFlowRate * ( PsyHFnTdbW( Node( ATMixOutNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+				if ( UnitarySystem( UnitarySysNum ).Humidistat ) {
+					//   Calculate latent load met (at constant temperature)
+					LatOutput = Node( ATMixOutNode ).MassFlowRate * ( PsyHFnTdbW( ZoneTemp, Node( ATMixOutNode ).HumRat ) - PsyHFnTdbW( ZoneTemp, ZoneHumRat ) ) - UnitarySystem( UnitarySysNum ).LatLoadLoss;
+				} else {
+					LatOutput = 0.0;
+				}
+			} else {
+				// Air terminal inlet side mixer
+				SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) );
+				if ( UnitarySystem( UnitarySysNum ).Humidistat ) {
+					//   Calculate latent load met (at constant temperature)
+					LatOutput = AirMassFlow * ( PsyHFnTdbW( ZoneTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( ZoneTemp, ZoneHumRat ) ) - UnitarySystem( UnitarySysNum ).LatLoadLoss;
+				} else {
+					LatOutput = 0.0;
+				}
+			}
 		} else {
-			LatOutput = 0.0;
+			// Calculate sensible load met (at constant humidity ratio)
+			SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem( UnitarySysNum ).SenLoadLoss;
+			UnitarySystem( UnitarySysNum ).SensibleLoadMet = SensOutput;
+
+			if ( UnitarySystem( UnitarySysNum ).Humidistat ) {
+
+				//   Calculate latent load met (at constant temperature)
+				LatOutput = AirMassFlow * ( PsyHFnTdbW( ZoneTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( ZoneTemp, ZoneHumRat ) ) - UnitarySystem( UnitarySysNum ).LatLoadLoss;
+			} else {
+				LatOutput = 0.0;
+			}
 		}
 		UnitarySystem( UnitarySysNum ).LatentLoadMet = LatOutput;
 
@@ -10717,9 +10905,17 @@ namespace HVACUnitarySystem {
 		} // No Heating/Cooling Load
 
 		if ( UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil && ( HeatingLoad && HeatSpeedNum == 1 ) ) {
-			MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				MSHPMassFlowRateLow = CompOnMassFlow; // #5737
+			} else {
+				MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			}
 		} else if ( UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil && ( CoolingLoad && CoolSpeedNum == 1 ) ) {
-			MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				MSHPMassFlowRateLow = CompOnMassFlow; // #5737
+			} else {
+				MSHPMassFlowRateLow = CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
+			}
 		} else {
 			MSHPMassFlowRateLow = CompOffMassFlow; // these need to be set for multi-speed coils
 		}
@@ -11134,6 +11330,7 @@ namespace HVACUnitarySystem {
 		// Using/Aliasing
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
+		using General::SafeDivide;
 		using PlantUtilities::SafeCopyPlantNode;
 
 		// Locals
@@ -11153,7 +11350,6 @@ namespace HVACUnitarySystem {
 		Real64 HeatRecOutletTemp; // Heat reclaim outlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
 		Real64 CpHeatRec; // Heat reclaim water inlet specIFic heat [J/kg-K]
-		Real64 HeatRecInletEnth; // Heat reclaim water inlet enthalpy [J/kg]
 		Real64 ReportingConstant;
 
 		ReportingConstant = TimeStepSys * SecInHour;
@@ -11164,7 +11360,6 @@ namespace HVACUnitarySystem {
 
 		// Inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
-		HeatRecInletEnth = Node( HeatRecInNode ).Enthalpy;
 
 		// Set heat recovery mass flow rates
 		HeatRecMassFlowRate = Node( HeatRecInNode ).MassFlowRate;
@@ -11176,9 +11371,14 @@ namespace HVACUnitarySystem {
 			CpHeatRec = GetSpecificHeatGlycol( PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( UnitarySystem( UnitarySysNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			HeatRecOutletTemp = QHeatRec / ( HeatRecMassFlowRate * CpHeatRec ) + HeatRecInletTemp;
-			if ( HeatRecOutletTemp > UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp ) HeatRecOutletTemp = UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp;
+			// coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by the coil
+			if ( HeatRecOutletTemp > UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp ) {
+				HeatRecOutletTemp = max( HeatRecInletTemp, UnitarySystem( UnitarySysNum ).MaxHROutletWaterTemp );
+				QHeatRec = HeatRecMassFlowRate * CpHeatRec * ( HeatRecOutletTemp - HeatRecInletTemp );
+			}
 		} else {
 			HeatRecOutletTemp = HeatRecInletTemp;
+			QHeatRec = 0.0;
 		}
 
 		SafeCopyPlantNode( HeatRecInNode, HeatRecOutNode );

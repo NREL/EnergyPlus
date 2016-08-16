@@ -363,7 +363,7 @@ namespace EnergyPlus {
 		AirLoopNum = 1;
 		OAControllerNum = 1;
 		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
@@ -382,7 +382,7 @@ namespace EnergyPlus {
 		OAController( OAControllerNum ).InletTemp = 0.0; // This is the same as the outdoor air dry bulb for these tests
 		OAController( OAControllerNum ).OATemp = 0.0;
 
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = expectedMinOAflow;
@@ -401,7 +401,7 @@ namespace EnergyPlus {
 		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = true;
 		OAController( OAControllerNum ).InletTemp = 20.0; // This is the same as the outdoor air dry bulb for these tests
 		OAController( OAControllerNum ).OATemp = 20.0;
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
@@ -420,7 +420,7 @@ namespace EnergyPlus {
 		OAController( OAControllerNum ).InletTemp = 0.0; // This is the same as the outdoor air dry bulb for these tests
 		OAController( OAControllerNum ).OATemp = 0.0;
 
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
 		expectedOAflow = expectedMinOAflow;
@@ -535,6 +535,7 @@ namespace EnergyPlus {
 		People( 1 ).Name = "WestPeople";
 		People( 1 ).ZonePtr = 1;
 		People( 1 ).NumberOfPeople = 3;
+		Zone( 1 ).TotOccupants = 3;
 		Schedule( 4 ).CurrentValue = 1.0;
 		ZoneCO2GainFromPeople.allocate( 1 );
 		ZoneCO2GainFromPeople( 1 ) = 3.82E-8;
@@ -554,7 +555,7 @@ namespace EnergyPlus {
 		OutBaroPress = 101325;
 		ZoneSysEnergyDemand.allocate( 1 );
 
-		CalcOAController( 1, 1 );
+		OAController( 1 ).CalcOAController( 1 );
 
 		EXPECT_NEAR( 0.0194359, OAController( 1 ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( 0.009527, OAController( 1 ).MinOAFracLimit, 0.00001 );
@@ -687,8 +688,8 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 0.00944, VentilationMechanical( 1 ).ZoneOAPeopleRate( 1 ) );
 		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAAreaRate( 1 ) );
-		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAFlow( 1 ) );
-		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAACH( 1 ) );
+		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAFlowRate( 1 ) );
+		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAACHRate( 1 ) );
 
 	}
 
@@ -1078,7 +1079,7 @@ namespace EnergyPlus {
 		OAController( 1 ).CoolCoilFreezeCheck = true;
 		Schedule( 1 ).CurrentValue = 1.0;
 
-		CalcOAController( OAControllerNum, AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
 
 		EXPECT_NEAR( 0.2408617, OAController( 1 ).OAFractionRpt, 0.00001 );
 
@@ -1112,7 +1113,7 @@ namespace EnergyPlus {
 		Contaminant.CO2Simulation = true;
 		Contaminant.GenericContamSimulation = true;
 
-		UpdateOAController( OAControllerNum );
+		OAController( OAControllerNum ).UpdateOAController( );
 		// Expect no value changes of relief node due to no actions.
 		EXPECT_NEAR( 500.0, Node( OAController( OAControllerNum ).RelNode ).CO2, 0.00001 );
 		EXPECT_NEAR( 0.3, Node( OAController( OAControllerNum ).RelNode ).GenContam, 0.00001 );
@@ -1232,6 +1233,98 @@ namespace EnergyPlus {
 			"   **   ~~~   ** ...Control High Indoor Humidity Based on Outdoor Humidity Ratio will default to Yes when High Humidity Control= \"Yes\"",
 		} );
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
+	}
+
+	TEST_F( EnergyPlusFixture, OAControllerMixedAirSPTest )
+	{
+
+		std::string const idf_objects = delimited_string( {
+
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node;  !- Name",
+
+			"  Schedule:Constant,",
+			"    OAFractionSched,         !- Name",
+			"     ,                       !- Schedule Type Limits Name",
+			"     1;                      !- Hourly value",
+
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,         !- Name",
+			"    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
+			"    Outdoor Air Mixer Inlet Node, !- Return Air Node Name",
+			"    Mixed Air Node,          !- Mixed Air Node Name",
+			"    Outside Air Inlet Node,  !- Actuator Node Name",
+			"    0.0,                     !- Minimum Outdoor Air Flow Rate{ m3 / s }",
+			"    1.7,                     !- Maximum Outdoor Air Flow Rate{ m3 / s }",
+			"    NoEconomizer,            !- Economizer Control Type",
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry - Bulb Temperature{ C }",
+			"    ,                        !- Economizer Maximum Limit Enthalpy{ J / kg }",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature{ C }",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    12.5,                    !- Economizer Minimum Limit Dry - Bulb Temperature{ C }",
+			"    NoLockout,               !- Lockout Type",
+			"    FixedMinimum,            !- Minimum Limit Type",
+			"    OAFractionSched,         !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ;                        !- Mechanical Ventilation Controller Name",
+		} );
+
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		AirLoopFlow.allocate( 1 );
+		AirLoopControlInfo.allocate( 1 );
+		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
+
+		GetOAControllerInputs();
+
+		StdRhoAir = 1.2;
+		OAController( 1 ).MixMassFlow = 1.7 * StdRhoAir;
+		OAController( 1 ).MaxOAMassFlowRate = 1.7 * StdRhoAir;
+		AirLoopFlow( 1 ).DesSupply = 1.7 * StdRhoAir;
+		AirLoopFlow( 1 ).ReqSupplyFrac = 1.0;
+		Node( OAController( 1 ).MixNode ).MassFlowRateMaxAvail = AirLoopFlow( 1 ).DesSupply; // set max avail or controller will shut down
+		Node( OAController( 1 ).RetNode ).MassFlowRate = AirLoopFlow( 1 ).DesSupply; // set return flow for mixing calculation (i.e., mix flow = return flow + exhaust flow [0])
+		NumOASystems = 1;
+		OutsideAirSys.allocate( 1 );
+		OutsideAirSys( 1 ).Name = "AIRLOOP OASYSTEM";
+		OutsideAirSys( 1 ).NumControllers = 1;
+		OutsideAirSys( 1 ).ControllerName.allocate( 1 );
+		OutsideAirSys( 1 ).ControllerName( 1 ) = "OA CONTROLLER 1";
+		OutsideAirSys( 1 ).ComponentType.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentType( 1 ) = "OutdoorAir:Mixer";
+		OutsideAirSys( 1 ).ComponentName.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentName( 1 ) = "OAMixer";
+		OAMixer.allocate( 1 );
+		OAMixer( 1 ).Name = "OAMixer";
+		OAMixer( 1 ).InletNode = 2;
+
+		DataHVACGlobals::NumPrimaryAirSys = 1;
+		PrimaryAirSystem.allocate( 1 );
+		PrimaryAirSystem( 1 ).Name = "PrimaryAirLoop";
+		PrimaryAirSystem( 1 ).NumBranches = 1;
+		PrimaryAirSystem( 1 ).Branch.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = OutsideAirSys( 1 ).Name;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+
+		// mixed node temperature set point has not yet been set, expect OA controller mixed temp SP to be equal to low temp limit
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( OAController( 1 ).MixSetTemp, OAController( 1 ).TempLowLim );
+
+		// expect OA controller mixed node temp SP to be equal to 0.5 C.
+		Node( 1 ).TempSetPoint = 0.5;
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( OAController( 1 ).MixSetTemp, 0.5 );
+
+		// expect OA controller mixed node temp SP to be less than 0 and equal to -5.0 C.
+		Node( 1 ).TempSetPoint = -5.0;
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( OAController( 1 ).MixSetTemp, -5.0 );
 
 	}
 

@@ -206,7 +206,7 @@ This is the predicted sensible load in W required to meet the current zone therm
 
 This is the predicted sensible load in W required to meet the current zone thermostat cooling setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. This is calculated and reported from the Predict step in the Zone Predictor-Corrector module. This value is not multiplied by zone or group multipliers.
 
-\paragraph{\texorpdfstring{Zone Thermostat Control Type {[]}}{Zone Thermostat Control Type }}\label{zone-thermostat-control-type}
+\paragraph{Zone Thermostat Control Type {[]}}\label{zone-thermostat-control-type}
 
 This is the current zone thermostat control type (0 through 4). This value is set at each zone timestep. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
 
@@ -222,7 +222,7 @@ This is the current zone thermostat cooling setpoint in degrees C. If there is n
 
 When the Thermostat:StagedDualSetpoint object is applied to the current zone, this output variable reports staged zone cooling setpoint. When the staged number is not equal to zero, both staged heating and cooling setpoints are the same. When no cooling or heating is required, the staged heating setpoint is equal to the scheduled heating setpoint 0.5 * heating throttling range, and the staged cooling setpoint is equal to the scheduled cooling setpoint + 0.5 * cooling throttling range.
 
-\paragraph{\texorpdfstring{Zone Thermostat Stage Number {[]}}{Zone Thermostat Stage Number }}\label{zone-thermostat-stage-number}
+\paragraph{Zone Thermostat Stage Number {[]}}\label{zone-thermostat-stage-number}
 
 This is the current zone thermostat stage number when the ZoneControl:Thermostat:StagedDualSetpoint object is specified in this zone. When no heating or cooling is required, the stage number is set to 0. When heating is required, the stage number is positive. When cooling is required, the stage number is negative. The absolute number is sent to the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object to specify the speed number accordingly.
 
@@ -904,15 +904,15 @@ Three outputs are available from the ZoneControl:Thermostat:ThermalComfort objec
   Zone,Average,Zone Thermostat Cooling Setpoint Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Control Type {[]}}{Zone Thermal Comfort Control Type }}\label{zone-thermal-comfort-control-type}
+\paragraph{Zone Thermal Comfort Control Type {[]}}\label{zone-thermal-comfort-control-type}
 
 This is the current zone thermal comfort control type (0 through 4). This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Control Fanger Low Setpoint PMV {[]}}{Zone Thermal Comfort Control Fanger Low Setpoint PMV }}\label{zone-thermal-comfort-control-fanger-low-setpoint-pmv}
+\paragraph{Zone Thermal Comfort Control Fanger Low Setpoint PMV {[]}}\label{zone-thermal-comfort-control-fanger-low-setpoint-pmv}
 
 This is the current zone thermal comfort low Predicted Mean Vote value. Values range between -3 and +3. If there is no heating thermal comfort active, then the value reported will be -999. This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
 
-\paragraph{\texorpdfstring{Zone Thermal Comfort Control Fanger High Setpoint PMV {[]}}{Zone Thermal Comfort Control Fanger High Setpoint PMV }}\label{zone-thermal-comfort-control-fanger-high-setpoint-pmv}
+\paragraph{Zone Thermal Comfort Control Fanger High Setpoint PMV {[]}}\label{zone-thermal-comfort-control-fanger-high-setpoint-pmv}
 
 This is the current zone thermal comfort high Predicted Mean Vote value. Values range between -3 and +3. If there is no cooling thermal comfort active, then the value reported will be 999. This value is set at each system timestep and averaged over the reporting interval. Using the averaged value for longer reporting frequencies (hourly, for example) may not be meaningful in some applications.
 
@@ -1033,7 +1033,7 @@ For the first purpose above, when multiple zones are served by an AirLoop, those
 
 Unique identifying name for the ZoneControl:ContaminantController.
 
-\paragraph{Field: Controlled Zone Name}\label{field-controlled-zone-name-000}
+\paragraph{Field: Zone Name}\label{field-controlled-zone-name-000}
 
 Name of the zone that is being controlled.
 
@@ -1063,7 +1063,7 @@ An IDF example is provided below:
 
 ZoneControl:ContaminantController,
   CO2 Controller1,                 !- Name
-  EAST ZONE,                             !- Controlled Zone Name
+  EAST ZONE,                             !- Zone Name
   CO2AvailSchedule,               !- Carbon Dioxide Control Availability Schedule Name
   CO2SetpointSchedule,         !- Carbon Dioxide Setpoint Schedule Name
   ,                                               !- Minimum Carbon Dioxide Concentration Schedule Name

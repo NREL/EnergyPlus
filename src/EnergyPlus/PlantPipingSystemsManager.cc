@@ -1431,8 +1431,8 @@ namespace PlantPipingSystemsManager {
 			// additional evapotranspiration parameter, min/max validated by IP
 			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 9 );
 
-			// assign the mesh count
-			int meshCount = 4;
+			// assign the mesh count -- input processor will default it to 4 if blank
+			int meshCount = rNumericArgs( 13 );
 			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = meshCount;
 			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = meshCount;
 			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = meshCount;
@@ -2160,7 +2160,6 @@ namespace PlantPipingSystemsManager {
 			// Once we find ourselves on the plant loop, we can do other things
 			Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( thisCircuit.LoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( thisCircuit.LoopNum ).FluidIndex, RoutineName );
 			thisCircuit.DesignMassFlowRate = thisCircuit.DesignVolumeFlowRate * rho;
-
 			thisCircuit.NeedToFindOnPlantLoop = false;
 
 		}

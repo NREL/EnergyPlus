@@ -2,7 +2,7 @@
 
 Source weather data for building energy simulation programs can be broken into two major classes: \emph{historical data} and \emph{typical weather years}. Historical data is just ``real'' data: usually measured (but sometimes modeled) data from a particular location for a given period of record. Typical years are ersatz years assembled to match the long term data from a particular location using a particular statistical measure. Typical data may also be ``real'' data but may not be a contiguous year - the data may be comprised of months from multiple years.
 
-The primary source for historical weather data is the U.S. National Climatic Data Center (NCDC) in Asheville, NC: http://www.ncdc.noaa.gov/. NCDC can provide hourly historical data for thousands of locations around the world. This data may not always be complete; data items or periods of record may be missing.
+The primary source for historical weather data is the U.S. National Climatic Data Center (NCDC) in Asheville, NC: \url{http://www.ncdc.noaa.gov/}. NCDC can provide hourly historical data for thousands of locations around the world. This data may not always be complete; data items or periods of record may be missing.
 
 \subsection{Data Set vs.~Data Format}\label{data-set-vs.data-format}
 
@@ -12,7 +12,7 @@ Any data \emph{could} be put into a TMY2 format, but it wouldn't necessarily be 
 
 \subsection{SAMSON Data Set/Format}\label{samson-data-setformat}
 
-A highly reliable source of historical data for U.S. locations is the Solar and Meteorological Surface Observational Network (SAMSON) data set assembled by the National Renewable Energy Laboratory (NREL) in Golden, CO: http://www.nrel.gov/. The SAMSON data set contains a 30 year (1961 to 1990) period of record for 239 locations and are available from the NCDC.
+A highly reliable source of historical data for U.S. locations is the Solar and Meteorological Surface Observational Network (SAMSON) data set assembled by the National Renewable Energy Laboratory (NREL) in Golden, CO: \url{http://www.nrel.gov/}. The SAMSON data set contains a 30 year (1961 to 1990) period of record for 239 locations and are available from the NCDC.
 
 SAMSON also describes a file format. Though no data from the SAMSON data set are available for download in EPW format, the weather conversion utility can read and process this file format.
 
@@ -24,7 +24,7 @@ TMY3 files have somewhat replaced TMY2 files but all TMY2 files are available fo
 
 \subsection{Solar and Wind Energy Resource Assessment (SWERA) Format}\label{solar-and-wind-energy-resource-assessment-swera-format}
 
-The Solar and Wind Energy Resource Assessment (SWERA) project, funded by the United Nations Environment Program, is developing high quality information on solar and wind energy resources in 14 developing countries. Currently typical year hourly data are available for 156 locations in Belize, Brazil, China, Cuba, El Salvador, Ethiopia, Ghana, Guatemala, Honduras, Kenya, Maldives, Nicaragua, and Sri Lanka. The data are available from the SWERA project web site. http://swera.unep.net/;
+The Solar and Wind Energy Resource Assessment (SWERA) project, funded by the United Nations Environment Program, is developing high quality information on solar and wind energy resources in 14 developing countries. Currently typical year hourly data are available for 156 locations in Belize, Brazil, China, Cuba, El Salvador, Ethiopia, Ghana, Guatemala, Honduras, Kenya, Maldives, Nicaragua, and Sri Lanka. The data are available from the SWERA project web site. \url{http://swera.unep.net/};
 
 The SWERA format is very similar to the TMY2 format except: WMO stations are used (6 character) in the header and 4 digit years have been adopted in the data lines.
 
@@ -50,7 +50,7 @@ The files are derived from up to 18 years of DATSAV3 hourly weather data origina
 
 The Department of Energy has licensed the IWEC data from ASHRAE. Our license with ASHRAE allows us to: ``Distribute versions of the individual IWEC files in converted format suitable for EnergyPlus (EPW). Make the EnergyPlus versions of the IWEC files available to users at no cost via this EnergyPlus web site.'' All 227 locations in the IWEC data set are available for download in EnergyPlus weather format.
 
-The IWEC source data is © 2001 American Society of Heating, Refrigerating and Air-Conditioning Engineers (ASHRAE), Inc., Atlanta, GA, USA. http://www.ashrae.org/ All rights reserved as noted in the License Agreement and Additional Conditions.
+The IWEC source data is © 2001 American Society of Heating, Refrigerating and Air-Conditioning Engineers (ASHRAE), Inc., Atlanta, GA, USA. \url{http://www.ashrae.org/} All rights reserved as noted in the License Agreement and Additional Conditions.
 
 IWEC also describes a data format, very similar to the TMY2 data format.
 
@@ -78,7 +78,7 @@ Originally developed for use with Calener, a new program for building energy lab
 
 For more information on these weather files, contact: Profesor Luis Pérez-Lombard (\href{file:///E:/Docs4PDFs/lpl@tmt.us.es}{lpl@tmt.us.es}) Escuela Superior de Ingenieros
 
-\subsection{\texorpdfstring{Italian Climatic data collection ``Gianni De Giorgio'' (IGDG)}{Italian Climatic data collection Gianni De Giorgio (IGDG)}}\label{italian-climatic-data-collection-gianni-de-giorgio-igdg}
+\subsection{Italian Climatic data collection ``Gianni De Giorgio'' (IGDG)}\label{italian-climatic-data-collection-gianni-de-giorgio-igdg}
 
 Developed for use in simulating renewable energy technologies, this set of 66 weather files is based on a 1951-1970 period of record. The data were created by Professor Livio Mazzarella, Politecnico di Milano, and is named in honor of Gianni de Giorgio.
 
@@ -92,7 +92,7 @@ The CTYW files are no longer available for download from the web site.
 
 Two weather files for Portugal developed by Ricardo Aguiar of Instituto Nacional de Engenharia, Tecnologia e Inovação (INETI). Synthetic data set based on spatially interpolation of public climatic data published by Instituto de Meteorologia 1951-80 combined with INETI owned data and other freely available data sources. INETI has granted DOE permission to distribute versions of the individual INETI files in converted format suitable for EnergyPlus (EPW) and make those files available to users at no cost via this EnergyPlus web site.
 
-The INETI synthetic data are © 2005 Instituto Nacional de Engenharia, Tecnologia e Inovação, Lisboa, Portugal. http://www.ineti.pt
+The INETI synthetic data are © 2005 Instituto Nacional de Engenharia, Tecnologia e Inovação, Lisboa, Portugal. \url{http://www.ineti.pt}
 
 \subsection{ISHRAE India Weather Data Files (ISHRAE)}\label{ishrae-india-weather-data-files-ishrae}
 
@@ -106,7 +106,7 @@ CityUHK-45007 -- WMO\#450070 Typical year file Hong Kong originally in IWEC form
 
 Developed for use in simulating building heating and air conditioning loads and energy use, and for calculating renewable energy utilization, this set of 270 typical hourly data weather files. These data were developed by Dr.~Jiang Yi, Department of Building Science and Technology at Tsinghua University and China Meteorological Bureau. The source data include annual design data, typical year data, and extreme years for maximum enthalpy, and maximum and minimum temperature and solar radiation.
 
-China Meteorological Bureau, Climate Information Center, Climate Data Office and Tsinghua University, Department of Building Science and Technology. 2005. China Standard Weather Data for Analyzing Building Thermal Conditions, April 2005. Beijing: China Building Industry Publishing House, ISBN 7-112-07273-3 (13228). http://www.china-building.com.cn.
+China Meteorological Bureau, Climate Information Center, Climate Data Office and Tsinghua University, Department of Building Science and Technology. 2005. China Standard Weather Data for Analyzing Building Thermal Conditions, April 2005. Beijing: China Building Industry Publishing House, ISBN 7-112-07273-3 (13228). \url{http://www.china-building.com.cn}.
 
 \subsection{Kuwait Weather Data from Kuwait Institute for Scientific Research (KISR)}\label{kuwait-weather-data-from-kuwait-institute-for-scientific-research-kisr}
 

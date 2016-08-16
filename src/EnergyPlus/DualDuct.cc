@@ -111,29 +111,19 @@ namespace DualDuct {
 	// METHODOLOGY EMPLOYED:
 	// Needs description, as appropriate.
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::NumOfZones;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataEnvironment::StdRhoAir;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using namespace DataSizing;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
-	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const DualDuct_ConstantVolume( 1 );
 	int const DualDuct_VariableVolume( 2 );
@@ -152,8 +142,6 @@ namespace DualDuct {
 
 	static std::string const BlankString;
 
-	// DERIVED TYPE DEFINITIONS
-
 	//MODULE VARIABLE DECLARATIONS:
 	Array1D_bool CheckEquipName;
 
@@ -164,19 +152,6 @@ namespace DualDuct {
 	Real64 MassFlowSetToler;
 	bool GetDualDuctInputFlag( true ); // Flag set to make sure you get input once
 
-	// Subroutine Specifications for the Module
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Algorithms for the module
-
-	// Update routine to check convergence and update nodes
-
-	// Reporting routines for module
-
 	// Object Data
 	Array1D< DamperDesignParams > Damper;
 	Array1D< DamperFlowConditions > DamperInlet;
@@ -185,11 +160,6 @@ namespace DualDuct {
 	Array1D< DamperFlowConditions > DamperOutlet;
 	Array1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
 	Array1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
-
-	// MODULE SUBROUTINES:
-	//*************************************************************************
-
-	// Functions
 
 	void
 	SimulateDualDuct(
@@ -1742,7 +1712,6 @@ namespace DualDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int AirLoopNum; // Index to air loop
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		Real64 OAMassFlow; // outside air mass flow rate (kg/s)
 
@@ -1760,8 +1729,7 @@ namespace DualDuct {
 			// Calculate outdoor air flow rate, zone multipliers are applied in GetInput
 			if ( AirLoopOAFrac > 0.0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, AirLoopControlInfo( AirLoopNum ).AirLoopDCVFlag, UseMinOASchFlag );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat );
-				OAMassFlow = OAVolumeFlowRate * RhoAir;
+				OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
 				// convert OA mass flow rate to supply air flow rate based on air loop OA fraction
 				SAMassFlow = OAMassFlow / AirLoopOAFrac;
@@ -1815,7 +1783,6 @@ namespace DualDuct {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Real64 RhoAir; // density of terminal unit inlet air
 		Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
 		bool UseOccSchFlag; // TRUE = use actual occupancy, FALSE = use total zone people
 		bool PerPersonNotSet;
@@ -1841,9 +1808,7 @@ namespace DualDuct {
 
 		OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet );
 
-		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, RoutineName );
-
-		OAMassFlow = OAVolumeFlowRate * RhoAir;
+		OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
 		if ( present( MaxOAVolFlow ) ) {
 			OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true );

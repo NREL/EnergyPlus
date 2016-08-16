@@ -36,8 +36,8 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/undisturbed-ground-temperature-model-finite.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/undisturbed-ground-temperature-model-kusuda.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/undisturbed-ground-temperature-model-xing.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/exterior-naturally-vented-cavity.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/green-roof-model-ecoroof.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/advanced-surface-concepts/exterior-naturally-vented-cavity.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/advanced-surface-concepts/green-roof-model-ecoroof.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations/climate-calculations.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations/design-week-specification.tex
@@ -95,37 +95,39 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/hvac-controllers.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/baseboard-heaters.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/electric-baseboard-heater-with-radiation.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/cooling-towers-and-evaporative-fluid-coolers.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/demand-controlled-ventilation.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/evaporative-coolers.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/air-system-fans.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/air-system-compound-component-groups.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/variable-refrigerant-flow-heat-pumps.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/heat-exchangers.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/air-system-humidifiers.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/zone-internal-gains.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/indoor-swimming-pool.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/pipes.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/pumps.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/ideal-loads-air-system.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/district-cooling.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/district-heating.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/centralheatpumpsystem.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/chillerheaterperformance-electric-eir.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-001/plant-temperature-source-component.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/radiant-system-models.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/refrigeration-equipment.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/setpoint-managers.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/solar-collectors.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/system-availability-managers.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/cooling-towers-and-evaporative-fluid-coolers.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/demand-controlled-ventilation.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/evaporative-coolers.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/air-system-fans.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/air-system-compound-component-groups.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/variable-refrigerant-flow-heat-pumps.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/heat-exchangers.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/air-system-humidifiers.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/occupant-thermal-comfort.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/trombe-walls.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/water-thermal-tanks-includes-water-heaters.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/water-systems.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/zone-controls.tex
-  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/zone-equipment-and-zone-forced-air-units.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/zone-internal-gains.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/indoor-swimming-pool.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/pipes.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/pumps.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/ideal-loads-air-system.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/district-cooling.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/district-heating.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/centralheatpumpsystem.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/chillerheaterperformance-electric-eir.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-003/plant-temperature-source-component.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-004.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-004/radiant-system-models.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-004/refrigeration-equipment.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-004/setpoint-managers.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-004/solar-collectors.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-004/system-availability-managers.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-005.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-005/occupant-thermal-comfort.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-005/trombe-walls.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-005/water-thermal-tanks-includes-water-heaters.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-005/water-systems.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-005/zone-controls.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/simulation-models-encyclopedic-reference-005/zone-equipment-and-zone-forced-air-units.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation/whole-facility-electric-service.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/on-site-generation/electric-load-center-distribution-manager.tex
