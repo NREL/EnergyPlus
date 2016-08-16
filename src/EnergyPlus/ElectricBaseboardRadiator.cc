@@ -505,6 +505,15 @@ namespace ElectricBaseboardRadiator {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Summed radiant fractions for people + surface groups < 1.0" );
 				ShowContinueError( "The rest of the radiant energy delivered by the baseboard heater will be lost" );
 			}
+			// search zone equipment list structure for zone index
+			for ( int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				for ( int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList( ctrlZone ).NumOfEquipTypes; ++zoneEquipTypeNum ) {
+					if ( DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipType_Num( zoneEquipTypeNum ) == DataZoneEquipment::BBElectric_Num && DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipName( zoneEquipTypeNum ) == ElecBaseboard( BaseboardNum ).EquipName ) {
+						ElecBaseboard( BaseboardNum ).ZonePtr = ctrlZone;
+					}
+				}
+			}
+
 		}
 
 		if ( ErrorsFound ) {
@@ -1093,33 +1102,34 @@ namespace ElectricBaseboardRadiator {
 
 		for ( BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum ) {
 
-			ZoneNum = ElecBaseboard( BaseboardNum ).ZonePtr;
-			QElecBaseboardToPerson( ZoneNum ) += QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribPerson;
+			if ( ElecBaseboard( BaseboardNum ).ZonePtr > 0 ) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
+				ZoneNum = ElecBaseboard( BaseboardNum ).ZonePtr;
+				QElecBaseboardToPerson( ZoneNum ) += QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribPerson;
 
-			for ( RadSurfNum = 1; RadSurfNum <= ElecBaseboard( BaseboardNum ).TotSurfToDistrib; ++RadSurfNum ) {
-				SurfNum = ElecBaseboard( BaseboardNum ).SurfacePtr( RadSurfNum );
-				if ( Surface( SurfNum ).Area > SmallestArea ) {
-					ThisSurfIntensity = ( QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribToSurf( RadSurfNum ) / Surface( SurfNum ).Area );
-					QElecBaseboardSurf( SurfNum ) += ThisSurfIntensity;
-					if ( ThisSurfIntensity > MaxRadHeatFlux ) {
-						ShowSevereError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+				for ( RadSurfNum = 1; RadSurfNum <= ElecBaseboard( BaseboardNum ).TotSurfToDistrib; ++RadSurfNum ) {
+					SurfNum = ElecBaseboard( BaseboardNum ).SurfacePtr( RadSurfNum );
+					if ( Surface( SurfNum ).Area > SmallestArea ) {
+						ThisSurfIntensity = ( QBBElecRadSource( BaseboardNum ) * ElecBaseboard( BaseboardNum ).FracDistribToSurf( RadSurfNum ) / Surface( SurfNum ).Area );
+						QElecBaseboardSurf( SurfNum ) += ThisSurfIntensity;
+						if ( ThisSurfIntensity > MaxRadHeatFlux ) {
+							ShowSevereError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+							ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
+							ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
+							ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
+							ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
+							ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
+							ShowFatalError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+						}
+					} else {
+						ShowSevereError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
 						ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
 						ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
 						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
-						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
-						ShowFatalError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+						ShowFatalError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
 					}
-				} else {
-					ShowSevereError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
-					ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
-					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
-					ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
-					ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
-					ShowFatalError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
 				}
 			}
-
 		}
 
 	}

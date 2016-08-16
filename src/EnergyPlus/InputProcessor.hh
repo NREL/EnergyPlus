@@ -55,7 +55,7 @@ public:
 	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
 	                   json const & obj_loc );
 
-	void add_missing_field_value( std::string & field_name, json & root, json & extensible, json const & obj_loc,
+	void add_missing_field_value( std::string const & field_name, json & root, json & extensible, json const & obj_loc,
 	                              json const & loc, int legacy_idd_index );
 
 	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
@@ -113,8 +113,8 @@ private:
 };
 
 class State {
-	json schema;
-	std::vector < json > stack;
+	json const * schema;
+	std::vector < json const * > stack;
 	std::unordered_map < std::string, bool > obj_required, extensible_required, root_required;
 	// this design decision was made because
 	// the choice was between sorting a vector for binary searching or log time object lookup in a map
@@ -125,9 +125,10 @@ class State {
 	bool is_in_extensibles = false, does_key_exist = true, need_new_object_name = true;
 	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
 	char s[ 129 ];
+	char s2[ 129 ];
 
 public:
-	void initialize( json & parsed_schema );
+	void initialize( json const * parsed_schema );
 
 	void traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index );
 

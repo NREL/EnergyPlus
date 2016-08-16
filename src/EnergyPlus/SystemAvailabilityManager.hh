@@ -231,6 +231,7 @@ namespace SystemAvailabilityManager {
 		// Members
 		std::string Name; // Name of the manager object
 		int MgrType; // Integer equivalent of availability manager type
+		bool isSimulated; // true after availability manager is simulated
 		int SchedPtr; // Applicability schedule pointer
 		std::string FanSched; // Fan schedule name
 		int FanSchedPtr; // Fan schedule pointer
@@ -254,10 +255,29 @@ namespace SystemAvailabilityManager {
 		int NumPreDays; // Number of previous days for adaptive control
 		int AvailStatus; // reports status of availability manager
 		Real64 NumHoursBeforeOccupancy;
+		Real64 TempDiffHi; // temperature difference for cooling mode
+		Real64 TempDiffLo; // temperature difference for heating mode
+		int ATGWCZoneNumLo; // zone index for worst case heating zone
+		int ATGWCZoneNumHi; // zone index for worst case cooling zone
+		bool CycleOnFlag; // Tracks when air loop has cycled on
+		bool ATGUpdateFlag1; // updates 
+		bool ATGUpdateFlag2;
+		bool FirstTimeATGFlag;
+		bool OverNightStartFlag; // Flag to indicate the optimum start starts before mid night.
+		bool OSReportVarFlag;
+		Array1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
+		Array1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
+		Real64 AdaTempGradHeat;
+		Real64 AdaTempGradCool;
+		Real64 ATGUpdateTime1;
+		Real64 ATGUpdateTime2;
+		Real64 ATGUpdateTemp1;
+		Real64 ATGUpdateTemp2;
 
 		// Default Constructor
 		DefineOptStartSysAvailManager() :
 			MgrType( 0 ),
+			isSimulated( false),
 			SchedPtr( 0 ),
 			FanSchedPtr( 0 ),
 			CtrlType( 0 ),
@@ -275,7 +295,23 @@ namespace SystemAvailabilityManager {
 			ConstStartTime( 2.0 ),
 			NumPreDays( 1 ),
 			AvailStatus( 0 ),
-			NumHoursBeforeOccupancy( 0.0 )
+			NumHoursBeforeOccupancy( 0.0 ),
+			TempDiffHi( 0.0 ),
+			TempDiffLo( 0.0 ),
+			ATGWCZoneNumLo( 0 ),
+			ATGWCZoneNumHi( 0 ),
+			CycleOnFlag( false ),
+			ATGUpdateFlag1( false ),
+			ATGUpdateFlag2( false ),
+			FirstTimeATGFlag( true ),
+			OverNightStartFlag( false ),
+			OSReportVarFlag( false ),
+			AdaTempGradHeat( 0.0 ),
+			AdaTempGradCool( 0.0 ),
+			ATGUpdateTime1( 0.0 ),
+			ATGUpdateTime2( 0.0 ),
+			ATGUpdateTemp1( 0.0 ),
+			ATGUpdateTemp2( 0.0 )
 		{}
 
 	};

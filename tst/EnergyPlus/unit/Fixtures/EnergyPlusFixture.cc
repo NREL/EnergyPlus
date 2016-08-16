@@ -231,7 +231,7 @@ namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
-		InputProcessor::state.initialize(InputProcessor::schema);
+		InputProcessor::state.initialize(&InputProcessor::schema);
 
 		show_message();
 

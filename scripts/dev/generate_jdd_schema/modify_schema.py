@@ -11,7 +11,7 @@ anyOf = [
 def change_version(schema):
     schema["jdd_version"] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
     schema["jdd_build"] = "${CMAKE_VERSION_BUILD}"
-    loc = schema['properties']['Version']['properties']['version_identifier']
+    loc = schema['properties']['Version']['patternProperties']['.*']['properties']['version_identifier']
     loc['default'] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"
     loc['type'] = "string"
 
