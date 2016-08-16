@@ -55,7 +55,7 @@ public:
 	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
 	                   json const & obj_loc );
 
-	void add_missing_field_value( std::string & field_name, json & root, json & extensible, json const & obj_loc,
+	void add_missing_field_value( std::string const & field_name, json & root, json & extensible, json const & obj_loc,
 	                              json const & loc, int legacy_idd_index );
 
 	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );

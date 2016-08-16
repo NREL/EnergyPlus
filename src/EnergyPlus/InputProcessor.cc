@@ -180,15 +180,17 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		} else if ( token == Token::COMMA || token == Token::SEMICOLON ) {
 			if ( !was_value_parsed ) {
 				int ext_size = 0;
-				std::string field_name;
+				// std::string const & field_name;
 				if ( legacy_idd_index < loc[ "fields" ].size() ) {
-					field_name = loc[ "fields" ][ legacy_idd_index ];
+					std::string const & field_name = loc[ "fields" ][ legacy_idd_index ];
+					add_missing_field_value( field_name, root, extensible, obj_loc, loc, legacy_idd_index );
 				} else {
 					ext_size = static_cast<int>(loc[ "extensibles" ].size());
-					field_name = loc[ "extensibles" ][ extensible_index % ext_size ];
+					std::string const & field_name = loc[ "extensibles" ][ extensible_index % ext_size ];
 					extensible_index++;
+					add_missing_field_value( field_name, root, extensible, obj_loc, loc, legacy_idd_index );
 				}
-				add_missing_field_value( field_name, root, extensible, obj_loc, loc, legacy_idd_index );
+				// add_missing_field_value( field_name, root, extensible, obj_loc, loc, legacy_idd_index );
 				if ( ext_size && extensible_index % ext_size == 0 ) {
 					array_of_extensions.push_back( extensible );
 					extensible.clear();
@@ -200,14 +202,15 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			next_token( idf, index );
 			if ( token == Token::SEMICOLON ) {
 				int min_fields = 0;
-				if ( obj_loc.find( "min_fields" ) != obj_loc.end() ) {
-					min_fields = obj_loc[ "min_fields" ];
+				auto const found_min_fields = obj_loc.find( "min_fields" );
+				if ( found_min_fields != obj_loc.end() ) {
+					min_fields = found_min_fields.value();
 				}
 				// what about if this is in extensibles? should check for that before running this loop
 				// so if legacy_idd_index > loc[ "fields" ].size() then must be in extensibles, then mod operation
 				// TODO: find out if filling in objects UP TO MIN FIELDS applies to extensible objects
                 for (; legacy_idd_index < min_fields; legacy_idd_index++) {
-					std::string name = loc[ "fields" ][ legacy_idd_index ];
+					std::string const & name = loc[ "fields" ][ legacy_idd_index ];
 					add_missing_field_value(name, root, extensible, obj_loc, loc, legacy_idd_index);
 				}
 				if ( extensible.size() ) {
@@ -224,7 +227,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				return root;
 			}
 			auto const size = loc[ "extensibles" ].size();
-			std::string const field_name = loc[ "extensibles" ][ extensible_index % size ];
+			std::string const & field_name = loc[ "extensibles" ][ extensible_index % size ];
 			auto const val = parse_value( idf, index, success,
 			                        obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field_name ] );
 			extensible[ field_name ] = std::move( val );
@@ -236,7 +239,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			}
 		} else {
 			was_value_parsed = true;
-			std::string field = loc[ "fields" ][ legacy_idd_index ];
+			std::string const & field = loc[ "fields" ][ legacy_idd_index ];
 			auto it = obj_loc.find( "patternProperties" );
 			if ( it == obj_loc.end() ) {
 				if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
@@ -253,8 +256,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				if ( field == "name" ) root[ field ] = parse_string( idf, index, success );
 				else std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
 			} else {
-				auto const val = parse_value( idf, index, success,
-				                             obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ field ] );
+				auto const val = parse_value( idf, index, success, tmp[ field ] );
 				root[ field ] = std::move( val );
 			}
 			if ( !success ) return root;
@@ -267,7 +269,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	return root;
 }
 
-void IdfParser::add_missing_field_value( std::string & field_name, json & root, json & extensible, json const & obj_loc,
+void IdfParser::add_missing_field_value( std::string const & field_name, json & root, json & extensible, json const & obj_loc,
                                          json const & loc, int legacy_idd_index ) {
 	json const * tmp;
 	int ext_size = 0;
@@ -292,7 +294,6 @@ void IdfParser::add_missing_field_value( std::string & field_name, json & root, 
 json IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
 	size_t save_i = index;
 	eat_whitespace( idf, save_i );
-	json val;
 	bool is_double = false, is_sign = false, is_scientific = false;
 	std::string num_str, numeric = "-+.eE0123456789";
 
@@ -301,19 +302,19 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 		if ( idf[ save_i ] == '.' ) {
 			if ( is_double ) {
 				success = false;
-				return val;
+				return nullptr;
 			}
 			is_double = true;
 		} else if ( idf[ save_i ] == '-' || idf[ save_i ] == '+' ) {
 			if ( is_sign && !is_scientific ) {
 				success = false;
-				return val;
+				return nullptr;
 			}
 			is_sign = true;
 		} else if ( idf[ save_i ] == 'e' || idf[ save_i ] == 'E' ) {
 			if ( is_scientific ) {
 				success = false;
-				return val;
+				return nullptr;
 			}
 			is_scientific = true;
 			is_double = true;
@@ -326,25 +327,30 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 
 	if ( num_str[ num_str.size() - 1 ] == 'e' || num_str[ num_str.size() - 1 ] == 'E' ) {
 		success = false;
-		return val;
+		return nullptr;
 	}
 
 	Token token = look_ahead( idf, save_i );
 	if ( token != Token::SEMICOLON && token != Token::COMMA ) {
 		success = false;
-		return val;
+		return nullptr;
 	}
+	json val;
 	if ( is_double ) {
         try {
-			val = stod(num_str, 0);
+			auto const double_val = stod(num_str, nullptr );
+			val = double_val;
 		} catch ( std::exception e ) {
-			val = stoll( num_str, 0 );
+			auto const double_val = stold( num_str, nullptr );
+			val = double_val;
 		}
 	} else {
 		try {
-			val = stoi( num_str, 0 );
+			auto const int_val = stoi( num_str, nullptr );
+			val = int_val;
 		} catch ( std::exception e ) {
-			val = stoll( num_str, 0 );
+			auto const int_val = stoll( num_str, nullptr );
+			val = int_val;
 		}
 	}
 	index = save_i;
@@ -352,7 +358,6 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 }
 
 json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
-	json value;
 	auto const & field_type = field_loc.find("type");
     if ( field_type != field_loc.end() ) {
 		if ( field_type.value() == "number" || field_type.value() == "integer" ) {
@@ -379,7 +384,7 @@ json IdfParser::parse_value( std::string const & idf, size_t & index, bool & suc
 			case Token::NUMBER: {
 				size_t save_line_index = index_into_cur_line;
 				size_t save_line_num = cur_line_num;
-				value = parse_number(idf, index, success);
+				json value = parse_number(idf, index, success);
 				if ( !success ) {
 					cur_line_num = save_line_num;
 					index_into_cur_line = save_line_index;
@@ -396,7 +401,7 @@ json IdfParser::parse_value( std::string const & idf, size_t & index, bool & suc
 				break;
 		}
 		success = false;
-		return value;
+		return nullptr;
 	}
 }
 
@@ -565,7 +570,7 @@ void State::initialize( json const * parsed_schema ) {
 void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index ) {
 	switch ( event ) {
 		case json::parse_event_t::object_start: {
-			if ( is_in_extensibles or stack.back()->find( "patternProperties" ) == stack.back()->end() ) {
+			if ( is_in_extensibles || stack.back()->find( "patternProperties" ) == stack.back()->end() ) {
 				if ( stack.back()->find( "properties" ) != stack.back()->end() )
 					stack.push_back( & stack.back()->at( "properties" ) );
 			} else {
@@ -589,7 +594,7 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 		}
 
 		case json::parse_event_t::key: {
-			std::string key = parsed;
+			std::string const & key = parsed;
 			prev_line_index = line_index;
 			prev_key_len = ( unsigned ) key.size() + 3;
 			if ( need_new_object_name ) {
@@ -715,24 +720,28 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 	if ( loc->find( "enum" ) != loc->end() ) {
 		int i;
 		auto const & enum_array = loc->at( "enum" );
+		auto const enum_array_size = enum_array.size();
 		if ( parsed.is_string() ) {
 			auto const & parsed_string = parsed.get < std::string >();
-			for ( i = 0; i < enum_array.size(); i++ ) {
-				if ( icompare( enum_array[ i ], parsed_string ) ) {
+			for ( i = 0; i < enum_array_size; i++ ) {
+				auto const & enum_string = enum_array[ i ].get< std::string >();
+				if ( icompare( enum_string, parsed_string ) ) {
 					break;
 				}
 			}
-			if ( i == enum_array.size() ) {
+			if ( i == enum_array_size ) {
 				u64toa( line_num, s );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
 				                  + ": \"" + parsed_string + "\" was not found in the enum" );
 			}
 		} else {
-			for ( i = 0; i < enum_array.size(); i++ ) {
-				if ( enum_array[ i ].get < int >() == parsed.get < int >() ) break;
+			int const parsed_int = parsed.get < int >();
+			for ( i = 0; i < enum_array_size; i++ ) {
+				auto const & enum_int = enum_array[ i ].get< int >();
+				if ( enum_int == parsed_int ) break;
 			}
-			if ( i == enum_array.size() ) {
-				i64toa( parsed.get < int >(), s );
+			if ( i == enum_array_size ) {
+				i64toa( parsed_int, s );
 				u64toa( line_num, s2 );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
 				                  + ": \"" + s2 + "\" was not found in the enum" );
@@ -740,25 +749,31 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 		}
 	}
 	else if ( parsed.is_number() ) {
-		double val = parsed.get < double >();
-		if ( loc->find( "anyOf" ) != loc->end() ) {
-			loc = & loc->at( "anyOf" )[ 0 ];
+		double const val = parsed.get < double >();
+		auto const found_anyOf = loc->find( "anyOf" );
+		if ( found_anyOf != loc->end() ) {
+			loc = & found_anyOf->at( 0 );
 		}
-		if ( loc->find( "minimum" ) != loc->end() ) {
-			if ( loc->find( "exclusiveMinimum" ) != loc->end() && val <= loc->at( "minimum" ).get < double >() ) {
+		auto const found_min = loc->find( "minimum" );
+		if ( found_min != loc->end() ) {
+			double const min_val = found_min->get < double >();
+			if ( loc->find( "exclusiveMinimum" ) != loc->end() && val <= min_val ) {
 				add_error( "exmin", val, line_num, prev_line_index + prev_key_len );
-			} else if ( val < loc->at( "minimum" ).get < double >() ) {
+			} else if ( val < min_val ) {
 				add_error( "min", val, line_num, prev_line_index + prev_key_len );
 			}
 		}
-		if ( loc->find( "maximum" ) != loc->end() ) {
-			if ( loc->find( "exclusiveMaximum" ) != loc->end() && val >= loc->at( "maximum" ).get < double >() ) {
+		auto const found_max = loc->find( "maximum" );
+		if ( found_max != loc->end() ) {
+			double const max_val = found_max->get < double >();
+			if ( loc->find( "exclusiveMaximum" ) != loc->end() && val >= max_val ) {
 				add_error( "exmax", val, line_num, prev_line_index + prev_key_len );
-			} else if ( val > loc->at( "maximum" ).get < double >() ) {
+			} else if ( val > max_val ) {
 				add_error( "max", val, line_num, prev_line_index + prev_key_len );
 			}
 		}
-		if ( loc->find( "type" ) != loc->end() && loc->at( "type" ) != "number" ) {
+		auto const found_type = loc->find( "type" );
+		if ( found_type != loc->end() && found_type.value() != "number" ) {
 			dtoa( val, s );
 			u64toa( line_num, s2 );
 			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + s
@@ -767,18 +782,24 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 		}
 	}
 	else if ( parsed.is_string() ) {
-		if ( loc->find( "anyOf" ) != loc->end() ) {
+		auto const found_anyOf = loc->find( "anyOf" );
+		if ( found_anyOf != loc->end() ) {
 			int i;
-			for ( i = 0; i < loc->at( "anyOf" ).size(); i++ ) {
-				auto const & any_of_check = loc->at( "anyOf" )[ i ];
-				if ( any_of_check.find( "type" ) != any_of_check.end() && any_of_check[ "type" ] == "string" ) break;
+			for ( i = 0; i < found_anyOf->size(); i++ ) {
+				auto const & any_of_check = found_anyOf->at( i );
+				auto const found_type = any_of_check.find( "type" );
+				if ( found_type != any_of_check.end() && *found_type == "string" ) break;
 			}
-			if ( i == loc->at( "anyOf" ).size() ) {
+			if ( i == found_anyOf->size() ) {
 				u64toa( line_num, s );
 				warnings.push_back( "type == string was not found in anyOf in object \"" + cur_obj_name
 				                    + "\" at line " + s );
 			}
-		} else if ( loc->find( "type" ) != loc->end() && loc->at( "type" ) != "string" && ! parsed.get< std::string >().empty() ) {
+			return;
+		}
+		auto const found_type = loc->find( "type" );
+		auto const & parsed_string = parsed.get< std::string >();
+		if ( found_type != loc->end() && *found_type != "string" && ! parsed_string.empty() ) {
 			u64toa( line_num, s );
 			errors.push_back( "In object \"" + cur_obj_name + "\", at line " + s + ": type needs to be string" );
 		}

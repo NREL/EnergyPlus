@@ -5070,7 +5070,6 @@ namespace SingleDuct {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5094,7 +5093,7 @@ namespace SingleDuct {
 			GetATMixerFlag = false;
 		}
 
-		ATMixerIndex = FindItemInList( ZoneEquipName, SysATMixer );
+		ATMixerIndex = InputProcessor::FindItemInList( ZoneEquipName, SysATMixer );
 		if ( ATMixerIndex > 0 ) {
 			ATMixerTypeNum = SysATMixer( ATMixerIndex ).MixerType;
 		}
