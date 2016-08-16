@@ -825,6 +825,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               
               CASE('COIL:HEATING:GAS')
                 nodiff = .false.
+                ObjectName = 'Coil:Heating:Fuel'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:2) = InArgs(1:2)
                 OutArgs(3) = 'NaturalGas'
