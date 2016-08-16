@@ -675,6 +675,8 @@ namespace DataSurfaces {
 		int MaterialMovInsulInt; // Pointer to the material used for interior movable insulation
 		int SchedMovInsulExt; // Schedule for exterior movable insulation
 		int SchedMovInsulInt; // Schedule for interior movable insulation
+		bool MovInsulIntPresent; // True when movable insulation is present
+		bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
 		// Vertices
 		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
@@ -811,6 +813,8 @@ namespace DataSurfaces {
 			MaterialMovInsulInt( 0 ),
 			SchedMovInsulExt( 0 ),
 			SchedMovInsulInt( 0 ),
+			MovInsulIntPresent( false ),
+			MovInsulIntPresentPrevTS( false ),
 			Centroid( 0.0, 0.0, 0.0 ),
 			lcsx( 0.0, 0.0, 0.0 ),
 			lcsy( 0.0, 0.0, 0.0 ),
