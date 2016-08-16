@@ -221,21 +221,6 @@ namespace Fans {
 		int BalancedFractSchedNum; // schedule index portion recirculated
 		Real64 UnbalancedOutletMassFlowRate;
 		Real64 BalancedOutletMassFlowRate;
-		int FanInletVsNodeFlowNotMatchingIndex; // index for node flow warning messages
-		int FanOutletVsNodeFlowNotMatchingIndex; // index for node flow warning messages
-		int FanInletVsFanOutletFlowNotMatchingIndex; // index for node flow warning messages
-		bool PrintNodeInletToFanInletMessage; // logical for printing node mass conservation warning
-		bool PrintNodeOutletToFanOutletMessage; // logical for printing node mass conservation warning
-		bool PrintNodeOutletToNodeInletMessage; // logical for printing node mass conservation warning
-		Real64 NodeInVsFanInFlowLast; // difference between fan inlet node and fan inlet mass flow rate last iteration
-		Real64 NodeOutVsFanOutFlowLast; // difference between fan outlet node and fan outlet mass flow rate last iteration
-		Real64 NodeOutVsNodeInFlowLast; // difference between fan outlet node and fan inlet node mass flow rate last iteration
-		std::string NodeInletToFanInletMessage; // stored message for printing when valid
-		std::string NodeOutletToFanOutletMessage; // stored message for printing when valid
-		std::string NodeInletToNodeOutletMessage; // stored message for printing when valid
-		std::string NodeInletToFanInletMessage2; // stored message for printing when valid
-		std::string NodeOutletToFanOutletMessage2; // stored message for printing when valid
-		std::string NodeInletToNodeOutletMessage2; // stored message for printing when valid
 
 		// Default Constructor
 		FanEquipConditions() :
@@ -334,16 +319,7 @@ namespace Fans {
 			MinTempLimitSchedNum( 0 ),
 			BalancedFractSchedNum( 0 ),
 			UnbalancedOutletMassFlowRate( 0.0 ),
-			BalancedOutletMassFlowRate( 0.0 ),
-			FanInletVsNodeFlowNotMatchingIndex( 0 ),
-			FanOutletVsNodeFlowNotMatchingIndex( 0 ),
-			FanInletVsFanOutletFlowNotMatchingIndex( 0 ),
-			PrintNodeInletToFanInletMessage( false ),
-			PrintNodeOutletToFanOutletMessage( false ),
-			PrintNodeOutletToNodeInletMessage( false ),
-			NodeInVsFanInFlowLast( 0.0 ),
-			NodeOutVsFanOutFlowLast( 0.0 ),
-			NodeOutVsNodeInFlowLast( 0.0 )
+			BalancedOutletMassFlowRate( 0.0 )
 		{}
 
 	};

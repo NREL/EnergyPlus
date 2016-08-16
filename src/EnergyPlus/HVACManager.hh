@@ -77,8 +77,6 @@ namespace HVACManager {
 
 	extern int HVACManageIteration; // counts iterations to enforce maximum iteration limit
 	extern int RepIterAir;
-	extern Real64 HVACManagerTimeStepSysLast; // time step of last iteration [hr]
-	extern Real64 HVACManagerCurrentEndTimeLast; // time of last iteration [hr]
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -92,9 +90,6 @@ namespace HVACManager {
 
 	void
 	SimHVAC();
-
-	void
-	CheckMassBalances();
 
 	void
 	SimSelectedEquipment(
