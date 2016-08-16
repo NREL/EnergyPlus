@@ -1431,8 +1431,13 @@ namespace PlantPipingSystemsManager {
 			// additional evapotranspiration parameter, min/max validated by IP
 			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 9 );
 
-			// assign the mesh count -- input processor will default it to 4 if blank
-			int meshCount = rNumericArgs( 13 );
+			// assign the mesh count
+			int meshCount;
+		        if ( lNumericFieldBlanks( 13 ) ) {
+				meshCount = 4;
+			} else {
+				meshCount = rNumericArgs( 13 );
+			}
 			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = meshCount;
 			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = meshCount;
 			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = meshCount;
@@ -3476,7 +3481,12 @@ namespace PlantPipingSystemsManager {
 				if ( i == ThesePartitionRegions.l1() ) { // First partition
 					// Create region to left of partition
 					auto tempRegion( GridRegion( 0.0, thisPartition.Min, DirDirection, tempCellWidths ) );
-					cellCountUpToNow += this->getCellWidthsCount( DirDirection );
+					int potentialCellWidthsCount = this->getCellWidthsCount( DirDirection );
+					if ( ( thisPartition.Min - 0.0 ) < 0.00001 ) {
+						cellCountUpToNow += 1; // just one cell for extremely tight regions
+					} else {
+						cellCountUpToNow += potentialCellWidthsCount;
+					}
 					++regionIndex;
 					this->getCellWidths( tempRegion, tempRegion.thisRegionType );
 					Regions.push_back( tempRegion );
@@ -3484,7 +3494,12 @@ namespace PlantPipingSystemsManager {
 					// Create region to left of partition
 					auto & leftPartition( ThesePartitionRegions( i - 1 ) );
 					auto tempRegion( GridRegion( leftPartition.Max, thisPartition.Min, DirDirection, tempCellWidths ) );
-					cellCountUpToNow += this->getCellWidthsCount( DirDirection );
+					int potentialCellWidthsCount = this->getCellWidthsCount( DirDirection );
+					if ( ( thisPartition.Min - leftPartition.Max ) < 0.00001 ) {
+						cellCountUpToNow += 1; // just one cell for extremely tight regions
+					} else {
+						cellCountUpToNow += potentialCellWidthsCount;
+					}
 					++regionIndex;
 					this->getCellWidths( tempRegion, tempRegion.thisRegionType );
 					Regions.push_back( tempRegion );
@@ -4282,6 +4297,13 @@ namespace PlantPipingSystemsManager {
 			//ShowContinueError( "This is a developer problem, as the code should never reach this point." );
 			//ShowFatalError( "EnergyPlus aborts due to the previous severe error" );
 		}
+
+		// just one cell for extremely tight regions
+		if ( ( g.Max - g.Min ) < 0.00001 ) {
+			ThisMesh.RegionMeshCount = 1;
+			ThisMesh.thisMeshDistribution = MeshDistribution::Uniform;
+		}
+		assert(g.Max>g.Min);
 
 		if ( ThisMesh.RegionMeshCount > 0 ) {
 			g.CellWidths.allocate( {0,ThisMesh.RegionMeshCount - 1} );
