@@ -20968,7 +20968,7 @@ SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
        \note Value in this schedule should be a fraction (generally 0.0 - 1.0) applied to the
        \note Initial Emission Rate. When the value is equal to 1.0, the time will be reset to
        \note zero.
-  N2 ; \field Henry adsorption constant or partition coefficient
+  N2 ; \field Henry Adsorption Constant or Partition Coefficient
        \units dimensionless
        \type real
        \minimum> 0.0
@@ -46063,11 +46063,12 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
         \type real
         \minimum> 0.0
         \units W
-   N3, \field High Pressure Cutoff
+   N3,  \field High Pressure Cutoff
         \required-field
         \type real
         \minimum> 0.0
-   N4, \field Low Pressure Cutoff
+        \units Pa
+   N4,  \field Low Pressure Cutoff
         \required-field
         \type real
         \minimum 0.0
