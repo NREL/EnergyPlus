@@ -506,7 +506,6 @@ Building,
 ShadowCalculation,
        \unique-object
        \memo This object is used to control details of the solar, shading, and daylighting models
-       \min-fields 5
   A1 , \field Calculation Method
        \note choose calculation method. note that TimestepFrequency is only needed for certain cases
        \note and can increase execution time significantly.
@@ -591,7 +590,6 @@ HeatBalanceAlgorithm,
        \memo Advanced/Research Usage: HAMT (Combined Heat And Moisture Finite Element)
        \unique-object
        \format singleLine
-       \min-fields 4
   A1 , \field Algorithm
        \type choice
        \key ConductionTransferFunction
@@ -770,7 +768,6 @@ ConvergenceLimits,
        \memo Specifies limits on HVAC system simulation timesteps and iterations.
        \memo This item is an advanced feature that should be used only with caution.
        \unique-object
-       \min-fields 3
   N1 , \field Minimum System Timestep
        \units minutes
        \type integer
