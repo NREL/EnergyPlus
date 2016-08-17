@@ -2221,7 +2221,7 @@ namespace WaterThermalTanks {
 						else{
 							DXCoilAirOutletNodeNum = GetCoilOutletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
 						};
-						
+
 					} else if ( HPWH.DXCoilNum > 0 ) {
 						DXCoilAirOutletNodeNum = DXCoil( HPWH.DXCoilNum ).AirOutNode;
 					}
@@ -7679,13 +7679,10 @@ namespace WaterThermalTanks {
 		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
 		//Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
 		int loopIter; // iteration loop counter
-<<<<<<< HEAD
 		int VSCoilNum( 0 );
 		IHPOperationMode IHPMode( IHPOperationMode::IdleMode ); // IHP working mode
-		int LowSpeedNum( 2 );//low speed number for iteration
-=======
+		int LowSpeedNum( 2 ); //low speed number for iteration
 		Real64 SourceEffectivenessBackup( 1.0 );
->>>>>>> develop
 
 		// References to objects used in this function
 		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
@@ -8096,44 +8093,25 @@ namespace WaterThermalTanks {
 						strip( IterNum );
 						if ( !WarmupFlag ) {
 							++HeatPump.IterLimitExceededNum2;
-<<<<<<< HEAD
 							if ( HeatPump.IterLimitExceededNum2 == 1 ) {
 								ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
 								ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 								ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 							} else {
 								ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
-=======
-							if (HeatPump.IterLimitExceededNum2 == 1) {
-								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
-								ShowContinueError("Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits(HPPartLoadRatio, 3));
-								ShowContinueErrorTimeStamp("This error occurred in heating mode.");
-							} else {
-								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio);
->>>>>>> develop
 							}
 						}
 					} else if ( SolFla == -2 ) {
 						HPPartLoadRatio = max( 0.0, min( 1.0, ( SetPointTemp - TankTemp ) / ( NewTankTemp - TankTemp ) ) );
 						if ( !WarmupFlag ) {
 							++HeatPump.RegulaFalsiFailedNum2;
-<<<<<<< HEAD
 							if ( HeatPump.RegulaFalsiFailedNum2 == 1 ) {
 								ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
 								ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 								ShowContinueError( "Please send this information to the EnergyPlus support group." );
-								ShowContinueErrorTimeStamp( "This error occured in float mode." );
+								ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 							} else {
 								ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio );
-=======
-							if (HeatPump.RegulaFalsiFailedNum2 == 1) {
-								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
-								ShowContinueError("Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits(HPPartLoadRatio, 3));
-								ShowContinueError("Please send this information to the EnergyPlus support group.");
-								ShowContinueErrorTimeStamp("This error occured in heating mode.");
-							} else {
-								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio);
->>>>>>> develop
 							}
 						}
 					}

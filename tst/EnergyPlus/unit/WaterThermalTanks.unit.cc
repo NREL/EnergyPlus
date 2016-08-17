@@ -69,7 +69,6 @@
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-<<<<<<< HEAD
 #include <Fixtures/EnergyPlusFixture.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -77,17 +76,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/FluidProperties.hh>
-=======
-#include "Fixtures/EnergyPlusFixture.hh"
-#include "OutputReportPredefined.hh"
-#include "DXCoils.hh"
-#include "Fans.hh"
-#include "DataHeatBalFanSys.hh"
-#include "DataLoopNode.hh"
-#include "FluidProperties.hh"
-#include "WaterThermalTanks.hh"
-#include "ScheduleManager.hh"
->>>>>>> develop
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
