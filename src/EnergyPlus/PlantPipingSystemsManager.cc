@@ -5245,8 +5245,6 @@ namespace PlantPipingSystemsManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 RunningSummation = 0.0;
 		Real64 RunningVolume = 0.0;
-		Real64 AvgTemp = 0.0;
-		int NumCells = 0;
 
 		auto const & cells( Cells );
 		for ( int X = 0, X_end = this->x_max_index; X <= X_end; ++X ) {
@@ -5257,8 +5255,6 @@ namespace PlantPipingSystemsManager {
 						Real64 CellVolume = cell.volume();
 						RunningVolume += CellVolume;
 						RunningSummation += CellVolume * cell.Temperature;
-						AvgTemp += cell.Temperature;
-						NumCells += 1;
 					}
 				}
 			}
@@ -5985,11 +5981,11 @@ namespace PlantPipingSystemsManager {
 		//       RE-ENGINEERED  na
 
 		//'initialize cell properties
-		auto & dom( PipingSystemDomains( DomainNum ) );
-		auto & cells( dom.Cells );
-		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
-			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
-				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
+		auto & thisDomain( PipingSystemDomains( DomainNum ) );
+		auto & cells( thisDomain.Cells );
+		for ( int X = 0, X_end = thisDomain.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = thisDomain.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = thisDomain.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 					switch ( cell.cellType ) {
 					case CellType::Pipe:
@@ -6005,28 +6001,32 @@ namespace PlantPipingSystemsManager {
 					case CellType::GeneralField:
 					case CellType::GroundSurface:
 					case CellType::FarfieldBoundary:
-						cell.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
+						cell.Properties = thisDomain.GroundProperties;
 						break;
 					case CellType::BasementWall:
 					case CellType::BasementFloor:
 					case CellType::BasementCorner:
-						if ( PipingSystemDomains( DomainNum ).HasZoneCoupledBasement ) { // Basement interface layer
-							cell.Properties = PipingSystemDomains( DomainNum ).BasementInterfaceProperties;
+						if ( thisDomain.HasZoneCoupledBasement ) { // Basement interface layer
+							cell.Properties = thisDomain.BasementInterfaceProperties;
 						} else { // Basement cells are partially ground, give them some props
-							cell.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
+							cell.Properties = thisDomain.GroundProperties;
 						}
 						break;
 					case CellType::Slab:
-						cell.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
+						cell.Properties = thisDomain.SlabProperties;
 						break;
 					case CellType::HorizInsulation:
-						cell.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
+						cell.Properties = thisDomain.HorizInsProperties;
 						break;
 					case CellType::VertInsulation:
-						cell.Properties = PipingSystemDomains( DomainNum ).VertInsProperties;
+						cell.Properties = thisDomain.VertInsProperties;
 						break;
 					case CellType::ZoneGroundInterface:
-						cell.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
+						if ( thisDomain.SlabInGradeFlag ) {
+							cell.Properties = thisDomain.SlabProperties;
+						} else {
+							cell.Properties = thisDomain.GroundProperties;
+						}
 						break;
 					case CellType::BasementCutaway:
 						break;
@@ -6038,9 +6038,9 @@ namespace PlantPipingSystemsManager {
 		}
 
 		//'calculate one-time resistance terms for cartesian cells
-		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
-			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
-				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
+		for ( int X = 0, X_end = thisDomain.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = thisDomain.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = thisDomain.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 					int NumFieldCells = 0, NumBoundaryCells = 0;
 					EvaluateCellNeighborDirections( DomainNum, cell, NumFieldCells, NumBoundaryCells );
@@ -6075,11 +6075,11 @@ namespace PlantPipingSystemsManager {
 					switch ( PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).FlowDirection ) {
 					case SegmentFlow::IncreasingZ:
 						StartingZ = 0;
-						EndingZ = dom.z_max_index;
+						EndingZ = thisDomain.z_max_index;
 						Increment = 1;
 						break;
 					case SegmentFlow::DecreasingZ:
-						StartingZ = dom.z_max_index;
+						StartingZ = thisDomain.z_max_index;
 						EndingZ = 0;
 						Increment = -1;
 						break;
@@ -6088,7 +6088,7 @@ namespace PlantPipingSystemsManager {
 					int PipeX = PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).PipeCellCoordinates.X;
 					int PipeY = PipingSystemSegments( PipingSystemCircuits( CircuitNum ).PipeSegmentIndeces( SegIndex ) ).PipeCellCoordinates.Y;
 
-					//'loop across all z-direction indeces
+					//'loop across all z-direction indices
 					int const Zindex_stop( floop_end( StartingZ, EndingZ, Increment ) );
 					for ( int Zindex = StartingZ; Zindex != Zindex_stop; Zindex += Increment ) {
 						++SegCtr2;
@@ -6102,9 +6102,9 @@ namespace PlantPipingSystemsManager {
 		PipingSystemDomains( DomainNum ).InitializeSoilMoistureCalcs();
 
 		//'we can also initialize the domain based on the farfield temperature here
-		for ( int X = 0, X_end = dom.x_max_index; X <= X_end; ++X ) {
-			for ( int Y = 0, Y_end = dom.y_max_index; Y <= Y_end; ++Y ) {
-				for ( int Z = 0, Z_end = dom.z_max_index; Z <= Z_end; ++Z ) {
+		for ( int X = 0, X_end = thisDomain.x_max_index; X <= X_end; ++X ) {
+			for ( int Y = 0, Y_end = thisDomain.y_max_index; Y <= Y_end; ++Y ) {
+				for ( int Z = 0, Z_end = thisDomain.z_max_index; Z <= Z_end; ++Z ) {
 					auto & cell( cells( X, Y, Z ) );
 
 					// On OneTimeInit, the cur sim time should be zero, so this will be OK
