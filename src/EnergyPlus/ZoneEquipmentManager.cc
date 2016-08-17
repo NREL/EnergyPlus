@@ -3269,7 +3269,7 @@ namespace ZoneEquipmentManager {
 					SimCoolingPanel( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 					
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
-					LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
+					LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
 					
 				} else if ( SELECT_CASE_var == HiTempRadiant_Num ) { // 'ZoneHVAC:HighTemperatureRadiant'
 					SimHighTempRadiantSystem( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );

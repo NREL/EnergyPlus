@@ -104,24 +104,16 @@ namespace CoolingPanelSimple {
 	// MODULE INFORMATION:
 	//       AUTHOR         Rick Strand
 	//       DATE WRITTEN   Aug 2014
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// The purpose of this module is to simulate simple chilled ceiling panels.  It is similar to
     // hot water radiant/convective baseboard units and the code for this model used that model as
     // a starting point.
 
-	// METHODOLOGY EMPLOYED:
-
 	// REFERENCES:
-    // 1. Existing code for hot water baseboard models (radiant-convective variety)
+    // Existing code for hot water baseboard models (radiant-convective variety)
     
-	// OTHER NOTES:
-	// na
-
 	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
@@ -143,7 +135,6 @@ namespace CoolingPanelSimple {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-
 	std::string const cCMO_CoolingPanel_Simple( "ZoneHVAC:CoolingPanel:RadiantConvective:Water" );
 	// Control types:
 	int const MATControl( 1 ); // Controls system using mean air temperature
@@ -157,8 +148,6 @@ namespace CoolingPanelSimple {
 	int const CondCtrlNone( 0 ); // Condensation control--none, so system never shuts down
 	int const CondCtrlSimpleOff( 1 ); // Condensation control--simple off, system shuts off when condensation predicted
 	int const CondCtrlVariedOff( 2 ); // Condensation control--variable off, system modulates to keep running if possible
-
-	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumCoolingPanels( 0 );
@@ -194,18 +183,13 @@ namespace CoolingPanelSimple {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   Aug 2014
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine simulates the simple cooling (chilled ceiling) panel.  It borrows heavily
         // from the hot water radiant-convective baseboard model code.
 
-		// METHODOLOGY EMPLOYED:
-		// See the hot water radiant-convective baseboard code.
-
 		// REFERENCES:
-		// na
+		// Existing code for hot water baseboard models (radiant-convective variety)
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
@@ -213,17 +197,6 @@ namespace CoolingPanelSimple {
 		using General::TrimSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-		
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoolingPanelNum; // Index of unit in baseboard array
@@ -303,8 +276,6 @@ namespace CoolingPanelSimple {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   Aug 2014
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the simple cooling panel units.
@@ -312,16 +283,12 @@ namespace CoolingPanelSimple {
 		// METHODOLOGY EMPLOYED:
 		// Standard input processor calls--started from Daeho's radiant-convective water baseboard model.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Water;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::NodeConnectionType_Outlet;
 		using DataLoopNode::ObjectIsNotParent;
-		//unused0909    USE DataGlobals,           ONLY: NumOfZones
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
@@ -337,22 +304,15 @@ namespace CoolingPanelSimple {
 		using General::TrimSigDigits;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetCoolingPanelInput:" );
 		Real64 const MaxFraction( 1.0 );
 		Real64 const MinFraction( 0.0 );
 		Real64 const MaxWaterTempAvg( 30.0 ); // Maximum limit of average water temperature in degree C
 		Real64 const MinWaterTempAvg( 0.0 ); // Minimum limit of average water temperature in degree C
-		Real64 const HighWaterMassFlowRate( 10.0 ); // Maximum limit of water mass flow rate in kg/s
-		Real64 const LowWaterMassFlowRate( 0.00001 ); // Minimum limit of water mass flow rate in kg/s
 		Real64 const MaxWaterFlowRate( 10.0 ); // Maximum limit of water volume flow rate in m3/s
 		Real64 const MinWaterFlowRate( 0.00001 ); // Minimum limit of water volume flow rate in m3/s
 		Real64 const WaterMassFlowDefault( 0.063 ); // Default water mass flow rate in kg/s
-		//    INTEGER, PARAMETER   :: MaxDistribSurfaces    = 20         ! Maximum number of surfaces that a baseboard heater can radiate to
 		int const MinDistribSurfaces( 1 ); // Minimum number of surfaces that a baseboard heater can radiate to
 		Real64 const MinThrottlingRange( 0.5 ); // Smallest throttling range allowed in degrees Celsius
 		static std::string const MeanAirTemperature( "MeanAirTemperature" );
@@ -365,14 +325,6 @@ namespace CoolingPanelSimple {
 		static std::string const Off( "Off" );
 		static std::string const SimpleOff( "SimpleOff" );
 		static std::string const VariableOff( "VariableOff" );
-
-		
-		
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
@@ -460,7 +412,7 @@ namespace CoolingPanelSimple {
 			}
 			
 			CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = rNumericArgs( 3 );
-			if ( CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate < LowWaterMassFlowRate - 0.0001 || CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate > HighWaterMassFlowRate + 0.0001 ) {
+			if ( CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate < 0.00001  || CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate > 10.0 ) {
 				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 2 ) + " is an invalid Standard Water mass flow rate." );
 				ShowContinueError( "...reset to a default value=[" + RoundSigDigits( WaterMassFlowDefault, 1 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = WaterMassFlowDefault;
@@ -709,14 +661,8 @@ namespace CoolingPanelSimple {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Russ Taylor
-		//                      Rick Strand
-		//       DATE WRITTEN   Nov 1997
-		//                      Feb 2001
-		//       MODIFIED       Aug 2007 Daeho Kang (Add radiant component)
-		//                      Sept 2010 Brent Griffith (plant interactions)
-		//						Sept 2014 Rick Strand (modified from version in baseboard unit for the cooling panel)
-		//       RE-ENGINEERED  na
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Sept 2014
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine initializes the cooling panel units, and determines the UA values during simulation.
@@ -725,7 +671,7 @@ namespace CoolingPanelSimple {
 		// The initialization subrotines borrowed from other sources and heat exchanger formulation for cooling panel.
 
 		// REFERENCES:
-		// 1. Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
+		// Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
@@ -734,17 +680,8 @@ namespace CoolingPanelSimple {
 		using PlantUtilities::InitComponentNodes;
 		using DataPlant::ScanPlantLoopsForObject;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ChilledCeilingPanelSimple:InitCoolingPanel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
@@ -896,23 +833,16 @@ namespace CoolingPanelSimple {
 	)
 	{
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Russ Taylor
-		//       DATE WRITTEN   Nov 1997
-		//       MODIFIED       May 2000 Fred Buhl
-		//                      Aug 2007 Daeho Kang (Add the calculation of radiant heat source)
-		//                      Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-		//						Sept 2014 Rick Strand (modified from version in baseboard unit for the cooling panel)
-		//       RE-ENGINEERED  na
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Sept 2014
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates both the convective and radiant heat transfer rate
 		// for the simple cooling panel.  The process used here was derived from the hot
 		// water baseboard radiant/convective heater and adapted for cooling.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
+		// Existing code for hot water baseboard models (radiant-convective variety)
 		// Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
 		// Using/Aliasing
@@ -928,20 +858,11 @@ namespace CoolingPanelSimple {
 		using DataEnvironment::OutBaroPress;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MinFrac( 0.0005 ); // Minimum fraction that delivers radiant heats to surfaces
 		int const Maxiter( 20 ); // Maximum number of iterations to achieve tolerance
 		Real64 const IterTol( 0.005 ); // Tolerance of 0.5%
 		static std::string const RoutineName( "CalcCoolingPanel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -1201,35 +1122,14 @@ namespace CoolingPanelSimple {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   July 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-		
-		// PURPOSE OF THIS SUBROUTINE:
 		
 		// METHODOLOGY EMPLOYED:
 		// This subroutine sets the control temperature for the simple cooling panel.
-		
-		// REFERENCES:
-		// na
 		
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using DataHeatBalance::Zone;
 		using DataHeatBalFanSys::MAT;
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-		
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		
-		// DERIVED TYPE DEFINITIONS
-		// na
-		
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		{ auto const SELECT_CASE_var( CoolingPanel( CoolingPanelNum ).ControlType );
 			if ( SELECT_CASE_var == MATControl ) {
@@ -1257,39 +1157,19 @@ namespace CoolingPanelSimple {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Russ Taylor
-		//                      Rick Strand
-		//       DATE WRITTEN   Nov 1997
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Sept 2014
 		//                      February 2001
 		//       MODIFIED       Aug 2007 Daeho Kang (Add the update of radiant source)
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-		// The update subrotines both in high temperature radiant radiator
-		// and convective only baseboard radiator are combined and modified.
 
 		// REFERENCES:
-		// na
+		// Existing code for hot water baseboard models (radiant-convective variety)
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::BeginEnvrnFlag;
 		using PlantUtilities::SafeCopyPlantNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterInletNode;
@@ -1336,9 +1216,7 @@ namespace CoolingPanelSimple {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
-		//       DATE WRITTEN   February 2001
-		//       MODIFIED       Aug 2007 Daeho Kang (Modification only for baseboard)
-		//       RE-ENGINEERED  na
+		//       DATE WRITTEN   Sept 2014
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To transfer the average value of the heat source over the entire
@@ -1354,22 +1232,7 @@ namespace CoolingPanelSimple {
 		// one or more of the radiant systems was running.
 
 		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
+		// Existing code for hot water baseboard models (radiant-convective variety)
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoolingPanelNum; // DO loop counter for surface index
@@ -1400,10 +1263,7 @@ namespace CoolingPanelSimple {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
-		//       DATE WRITTEN   February 2001
-		//       MODIFIED       Aug. 2007 Daeho Kang (Modification only for baseboard)
-		//                      April 2010 Brent Griffith, max limit to protect surface temperature calcs
-		//       RE-ENGINEERED  na
+		//       DATE WRITTEN   Sept 2014
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To distribute the gains from the hot water basebaord heater
@@ -1417,8 +1277,8 @@ namespace CoolingPanelSimple {
 		// but them it is assumed to be convected to the air.
 
 		// REFERENCES:
-		// na
-
+		// Existing code for hot water baseboard models (radiant-convective variety)
+		
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataHeatBalance::Zone;
@@ -1428,17 +1288,8 @@ namespace CoolingPanelSimple {
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallestArea( 0.001 ); // Smallest area in meters squared (to avoid a divide by zero)
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RadSurfNum; // Counter for surfaces receiving radiation from radiant heater
@@ -1493,36 +1344,15 @@ namespace CoolingPanelSimple {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Daeho Kang
-		//       DATE WRITTEN   Aug 2007
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE: This subroutine
-
-		// METHODOLOGY EMPLOYED:
-		// na
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Aug 2014
 
 		// REFERENCES:
-		// na
+		// Existing code for hot water baseboard models (radiant-convective variety)
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataSurfaces::Surface;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		CoolingPanel( CoolingPanelNum ).TotEnergy = CoolingPanel( CoolingPanelNum ).TotPower * TimeStepSys * SecInHour;
 		CoolingPanel( CoolingPanelNum ).Energy = CoolingPanel( CoolingPanelNum ).Power * TimeStepSys * SecInHour;
@@ -1536,22 +1366,17 @@ namespace CoolingPanelSimple {
 	{
 
 		// FUNCTION INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   July 2003
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Aug 2014
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
 		// The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
 		// and should be updated accordingly.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
-		// na
-
+		// Existing code for hot water baseboard models (radiant-convective variety)
+		
 		// Using/Aliasing
 		using namespace DataSurfaces;
 		using namespace DataHeatBalance;
@@ -1559,9 +1384,6 @@ namespace CoolingPanelSimple {
 
 		// Return value
 		Real64 SumHATsurf;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int SurfNum; // Surface number
@@ -1598,30 +1420,6 @@ namespace CoolingPanelSimple {
 		return SumHATsurf;
 
 	}
-
-	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // CoolingPanelSimple
 
