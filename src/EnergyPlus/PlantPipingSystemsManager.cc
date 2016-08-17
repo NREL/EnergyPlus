@@ -3493,6 +3493,11 @@ namespace PlantPipingSystemsManager {
 				} else if ( i == 1 && this->HasZoneCoupledBasement ) {
 					cellCountUpToNow += 1; // don't add a left partition for partition index 1 of coupled basements
 				} else { // All other partitions
+					// Because of the way the index block below is structured, we need to update cellCount
+					//  **after** we pass that block.  We could include logic below to do this, but this block
+					//  already fits within the structure properly, so increment it here to account for the 
+					//  single cell partition layer that was applied at the **end** of the previous partition index
+					++cellCountUpToNow;
 					// Create region to left of partition
 					auto & leftPartition( ThesePartitionRegions( i - 1 ) );
 					auto tempRegion( GridRegion( leftPartition.Max, thisPartition.Min, DirDirection, tempCellWidths ) );
@@ -3506,14 +3511,7 @@ namespace PlantPipingSystemsManager {
 					this->getCellWidths( tempRegion, tempRegion.thisRegionType );
 					Regions.push_back( tempRegion );
 				}
-
-				// Create region for this partition
-				auto tempRegion( GridRegion( thisPartition.Min, thisPartition.Max, thisPartition.thisRegionType, tempCellWidths ) );
-				++cellCountUpToNow;
-				++regionIndex;
-				this->getCellWidths( tempRegion, tempRegion.thisRegionType );
-				Regions.push_back( tempRegion );
-
+				
 				if ( thisPartition.thisRegionType == RegionType::BasementWall ) {
 					if ( present( BasementWallXIndex ) ) BasementWallXIndex = cellCountUpToNow;
 				} else if ( thisPartition.thisRegionType == RegionType::BasementFloor ) {
@@ -3546,6 +3544,13 @@ namespace PlantPipingSystemsManager {
 					if ( present( InsulationYIndex ) ) InsulationYIndex = cellCountUpToNow;
 					this->InsulationYIndex = InsulationYIndex;
 				}
+
+				// Create region for this partition
+				auto tempRegion( GridRegion( thisPartition.Min, thisPartition.Max, thisPartition.thisRegionType, tempCellWidths ) );
+				//++cellCountUpToNow;
+				++regionIndex;
+				this->getCellWidths( tempRegion, tempRegion.thisRegionType );
+				Regions.push_back( tempRegion );
 
 			}
 
