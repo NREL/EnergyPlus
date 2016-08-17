@@ -1,4 +1,3 @@
-\section{Group -- Advanced Surface Concepts}\label{group-advanced-surface-concepts}
 
 This group of objects describe concepts applied to heat transfer surfaces that are of an advanced nature. Careful consideration must be given before using these.
 
@@ -229,7 +228,7 @@ This field refers the movable insulation back to a particular surface (ref: Buil
 
 \subsubsection{Field: Material Name}\label{field-material-name}
 
-This field refers to a material layer (e.g., Material, Material:NoMass, or WindowMaterial:Glazing; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.
+This field refers to a material layer (e.g., Material, Material:NoMass, or WindowMaterial:Glazing; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
 
 \subsubsection{Field: Schedule Name}\label{field-schedule-name}
 

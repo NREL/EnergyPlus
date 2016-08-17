@@ -91,6 +91,8 @@
 #include <SortAndStringUtilities.hh>
 #include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>
+#include <milo/dtoa.hpp>
+#include <milo/itoa.hpp>
 
 namespace EnergyPlus {
 
@@ -4377,72 +4379,49 @@ namespace OutputProcessor {
 		// of the UpdateDataandReport subroutine. The code was moved to facilitate
 		// easier maintenance and writing of data to the SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
+		static char s[ 129 ];
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataPrecisionGlobals;
-		using DataGlobals::eso_stream;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string NumberOut; // Character for producing "number out"
-		std::string MaxOut; // Character for Max out string
-		std::string MinOut; // Character for Min out string
-		Real64 repVal; // The variable's value
+		Real64 repVal( repValue ); // The variable's value
 
-		repVal = repValue;
 		if ( storeType == AveragedVar ) repVal /= numOfItemsStored;
 		if ( repVal == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repVal;
-			strip_trailing_zeros( strip( NumberOut ) );
+			dtoa( repVal, s );
+			NumberOut = std::string( s );
 		}
-
-		if ( MaxValue == 0.0 ) {
-			MaxOut = "0.0";
-		} else {
-			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip_trailing_zeros( strip( MaxOut ) );
-		}
-
-		if ( minValue == 0.0 ) {
-			MinOut = "0.0";
-		} else {
-			gio::write( MinOut, fmtLD ) << minValue;
-			strip_trailing_zeros( strip( MinOut ) );
-		}
-
-		// Append the min and max strings with date information
-		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
-		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
 		if ( sqlite ) {
 			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
 		}
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 
 		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+			std::string MaxOut; // Character for Max out string
+			std::string MinOut; // Character for Min out string
+
+			if ( MaxValue == 0.0 ) {
+				MaxOut = "0.0";
+			} else {
+				dtoa( MaxValue, s );
+				MaxOut = std::string( s );
+			}
+
+			if ( minValue == 0.0 ) {
+				MinOut = "0.0";
+			} else {
+				dtoa( minValue, s );
+				MinOut = std::string( s );
+			}
+
+			// Append the min and max strings with date information
+			ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
+			ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
+
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
 
 		}
 
@@ -4467,52 +4446,26 @@ namespace OutputProcessor {
 		// This subroutine writes the cumulative meter data to the output files and
 		// SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataGlobals::eso_stream;
-		using DataGlobals::mtr_stream;
-		using DataGlobals::StdOutputRecordCount;
-		using DataGlobals::StdMeterRecordCount;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static char s[ 129 ];
 		std::string NumberOut; // Character for producing "number out"
 
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repValue;
-			strip_trailing_zeros( strip( NumberOut ) );
+			dtoa( repValue, s );
+			NumberOut = std::string( s );
 		}
 
 		if ( sqlite ) {
 			sqlite->createSQLiteReportDataRecord( reportID, repValue );
 		}
 
-		if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
-		++StdMeterRecordCount;
+		if ( DataGlobals::mtr_stream ) *DataGlobals::mtr_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+		++DataGlobals::StdMeterRecordCount;
 
 		if ( ! meterOnlyFlag ) {
-			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
-			++StdOutputRecordCount;
+			if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
+			++DataGlobals::StdOutputRecordCount;
 		}
 
 	}
@@ -4548,81 +4501,60 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using namespace DataPrecisionGlobals;
 		using DataGlobals::eso_stream;
 		using DataGlobals::mtr_stream;
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
 
-		// Locals
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static char s[ 129 ];
 		std::string NumberOut; // Character for producing "number out"
-		std::string MaxOut; // Character for Max out string
-		std::string MinOut; // Character for Min out string
 
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repValue;
-			strip_trailing_zeros( strip( NumberOut ) );
-		}
-
-		if ( MaxValue == 0.0 ) {
-			MaxOut = "0.0";
-		} else {
-			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip_trailing_zeros( strip( MaxOut ) );
-		}
-
-		if ( minValue == 0.0 ) {
-			MinOut = "0.0";
-		} else {
-			gio::write( MinOut, fmtLD ) << minValue;
-			strip_trailing_zeros( strip( MinOut ) );
+			dtoa( repValue, s );
+			NumberOut = std::string( s );
 		}
 
 		if ( sqlite ) {
 			sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 		}
 
-		// Append the min and max strings with date information
-		//    CALL ProduceMinMaxStringWStartMinute(MinOut, minValueDate, reportingInterval)
-		//    CALL ProduceMinMaxStringWStartMinute(MaxOut, maxValueDate, reportingInterval)
-		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
-		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
-
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
+			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 			++StdMeterRecordCount;
-
-		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
-			++StdMeterRecordCount;
-
-		}
-
-		if ( ! meterOnlyFlag ) {
-			if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
-				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
-				++StdOutputRecordCount;
-			} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
-				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
+			if ( eso_stream && ! meterOnlyFlag ) {
+				*eso_stream << creportID << ',' << NumberOut << DataStringGlobals::NL;
 				++StdOutputRecordCount;
 			}
+		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
+			std::string MaxOut; // Character for Max out string
+			std::string MinOut; // Character for Min out string
 
+			if ( MaxValue == 0.0 ) {
+				MaxOut = "0.0";
+			} else {
+				dtoa( MaxValue, s );
+				MaxOut = std::string( s );
+			}
+
+			if ( minValue == 0.0 ) {
+				MinOut = "0.0";
+			} else {
+				dtoa( minValue, s );
+				MinOut = std::string( s );
+			}
+
+			// Append the min and max strings with date information
+			ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
+			ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
+
+			if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
+			++StdMeterRecordCount;
+			if ( eso_stream && ! meterOnlyFlag ) {
+				*eso_stream << creportID << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << DataStringGlobals::NL;
+				++StdOutputRecordCount;
+			}
 		}
 
 	}
@@ -4667,124 +4599,107 @@ namespace OutputProcessor {
 	}
 
 	void
-	WriteRealData(
+	WriteNumericData(
 		int const reportID, // The variable's reporting ID
 		std::string const & creportID, // variable ID in characters
 		Real64 const repValue // The variable's value
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Greg Stark
-		//       DATE WRITTEN   July 2008
+		//       AUTHOR         Mark Adams
+		//       DATE WRITTEN   May 2016
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
+		// PURPOSE:
 		// This subroutine writes real data to the output files and
-		// SQL database. It supports the WriteRealVariableOutput subroutine.
+		// SQL database.
+		// This is a refactor of WriteRealData.
+		//
 		// Much of the code here was an included in earlier versions
 		// of the UpdateDataandReport subroutine. The code was moved to facilitate
 		// easier maintenance and writing of data to the SQL database.
 
-		// METHODOLOGY EMPLOYED:
-		// na
+		static char s[ 129 ];
 
-		// REFERENCES:
-		// na
+		if ( DataSystemVariables::UpdateDataDuringWarmupExternalInterface &&
+			! DataSystemVariables::ReportDuringWarmup )
+			return;
 
-		// Using/Aliasing
-		using DataGlobals::eso_stream;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-		using DataSystemVariables::ReportDuringWarmup;
-		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static char s[ 25 ];
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
-
-		if ( repValue == 0.0 ) {
-			std::strcpy( s, "0.0" );
-		} else {
-//			gio::write( NumberOut, fmtLD ) << repValue; //Tuned Replaced by below: This is a hot spot for large output cases: Rounding logic differs so last digits can differ
-//			std::sprintf( s, "%-24.15G", repValue ); // This is simpler and faster but only switches to E format at E-5
-			Real64 const absValue( std::abs( repValue ) );
-			if ( ( 0.1 <= absValue ) && ( absValue <= 1.0e16 ) ) {
-				int const p( static_cast< int >( std::floor( std::log10( absValue ) + 1.0 ) ) );
-				switch ( p ) { // Verbose but fast
-				case 0:
-					std::sprintf( s, "%-19.15f", repValue );
-					break;
-				case 1:
-					std::sprintf( s, "%-19.14f", repValue );
-					break;
-				case 2:
-					std::sprintf( s, "%-19.13f", repValue );
-					break;
-				case 3:
-					std::sprintf( s, "%-19.12f", repValue );
-					break;
-				case 4:
-					std::sprintf( s, "%-19.11f", repValue );
-					break;
-				case 5:
-					std::sprintf( s, "%-19.10f", repValue );
-					break;
-				case 6:
-					std::sprintf( s, "%-19.9f", repValue );
-					break;
-				case 7:
-					std::sprintf( s, "%-19.8f", repValue );
-					break;
-				case 8:
-					std::sprintf( s, "%-19.7f", repValue );
-					break;
-				case 9:
-					std::sprintf( s, "%-19.6f", repValue );
-					break;
-				case 10:
-					std::sprintf( s, "%-19.5f", repValue );
-					break;
-				case 11:
-					std::sprintf( s, "%-19.4f", repValue );
-					break;
-				case 12:
-					std::sprintf( s, "%-19.3f", repValue );
-					break;
-				case 13:
-					std::sprintf( s, "%-19.2f", repValue );
-					break;
-				case 14:
-					std::sprintf( s, "%-19.1f", repValue );
-					break;
-				default:
-					std::sprintf( s, "%-19.0f", repValue );
-					break;
-				}
-			} else {
-				std::sprintf( s, "%-24.15E", repValue );
-			}
-			strip_number( s );
-		}
+		dtoa( repValue, s );
 
 		if ( sqlite ) {
 			sqlite->createSQLiteReportDataRecord( reportID, repValue );
 		}
 
-		if ( eso_stream ) *eso_stream << creportID << ',' << s << NL;
+		if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
+	}
+
+	void
+	WriteNumericData(
+		int const reportID, // The variable's reporting ID
+		std::string const & creportID, // variable ID in characters
+		int32_t const repValue // The variable's value
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Mark Adams
+		//       DATE WRITTEN   May 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE:
+		// This subroutine writes real data to the output files and
+		// SQL database.
+		// This is a refactor of WriteIntegerData.
+		//
+		// Much of the code here was an included in earlier versions
+		// of the UpdateDataandReport subroutine. The code was moved to facilitate
+		// easier maintenance and writing of data to the SQL database.
+
+		static char s[ 129 ];
+
+		i32toa( repValue, s );
+
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		}
+
+		if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
+
+	}
+
+	void
+	WriteNumericData(
+		int const reportID, // The variable's reporting ID
+		std::string const & creportID, // variable ID in characters
+		int64_t const repValue // The variable's value
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Mark Adams
+		//       DATE WRITTEN   May 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE:
+		// This subroutine writes real data to the output files and
+		// SQL database.
+		// This is a refactor of WriteIntegerData.
+		//
+		// Much of the code here was an included in earlier versions
+		// of the UpdateDataandReport subroutine. The code was moved to facilitate
+		// easier maintenance and writing of data to the SQL database.
+
+		static char s[ 129 ];
+
+		i64toa( repValue, s );
+
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		}
+
+		if ( DataGlobals::eso_stream ) *DataGlobals::eso_stream << creportID << ',' << s << DataStringGlobals::NL;
 
 	}
 
@@ -4935,69 +4850,6 @@ namespace OutputProcessor {
 		} else if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //  2, 3, 4
 			if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << ',' << MinOut << ',' << MaxOut << NL;
 		}
-
-	}
-
-	void
-	WriteIntegerData(
-		int const reportID, // the reporting ID of the data
-		std::string const & reportIDString, // the reporting ID of the data (character)
-		Optional_int_const IntegerValue, // the value of the data
-		Optional< Real64 const > RealValue // the value of the data
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Greg Stark
-		//       DATE WRITTEN   July 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine writes integer data to the output files and
-		// SQL database. It supports the WriteIntegerVariableOutput subroutine.
-		// Much of the code here was an included in earlier versions
-		// of the UpdateDataandReport subroutine. The code was moved to facilitate
-		// easier maintenance and writing of data to the SQL database.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataGlobals::eso_stream;
-		using DataStringGlobals::NL;
-		using General::strip_trailing_zeros;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string NumberOut; // Character for producing "number out"
-		Real64 repValue( 0.0 ); // for SQLite
-
-		if ( present( IntegerValue ) ) {
-			gio::write( NumberOut, fmtLD ) << IntegerValue;
-			strip( NumberOut );
-			repValue = IntegerValue;
-		}
-		if ( present( RealValue ) ) {
-			repValue = RealValue;
-			if ( RealValue == 0.0 ) {
-				NumberOut = "0.0";
-			} else {
-				gio::write( NumberOut, fmtLD ) << RealValue;
-				strip_trailing_zeros( strip( NumberOut ) );
-			}
-		}
-
-		if ( sqlite ) {
-			sqlite->createSQLiteReportDataRecord( reportID, repValue );
-		}
-
-		if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
 
 	}
 
@@ -5883,7 +5735,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 
-				WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.Which );
+				WriteNumericData( rVar.ReportID, rVar.ReportIDChr, rVar.Which );
 
 				++StdOutputRecordCount;
 			}
@@ -5947,7 +5799,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 				// only time integer vars actual report as integer only is "detailed"
-				WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, iVar.Which );
+				WriteNumericData( iVar.ReportID, iVar.ReportIDChr, iVar.Which );
 				++StdOutputRecordCount;
 			}
 		}
@@ -6003,7 +5855,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.TSValue );
+					WriteNumericData( rVar.ReportID, rVar.ReportIDChr, rVar.TSValue );
 					++StdOutputRecordCount;
 				}
 				rVar.TSValue = 0.0;
@@ -6042,7 +5894,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.TSValue );
+					WriteNumericData( iVar.ReportID, iVar.ReportIDChr, iVar.TSValue );
 					++StdOutputRecordCount;
 				}
 				iVar.TSValue = 0.0;
@@ -6083,7 +5935,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						rVar.Value /= double( rVar.thisTSCount );
 					}
 					if ( rVar.Report && rVar.ReportFreq == ReportHourly && rVar.Stored ) {
-						WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.Value );
+						WriteNumericData( rVar.ReportID, rVar.ReportIDChr, rVar.Value );
 						++StdOutputRecordCount;
 						rVar.Stored = false;
 					}
@@ -6109,7 +5961,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						iVar.Value /= double( iVar.thisTSCount );
 					}
 					if ( iVar.Report && iVar.ReportFreq == ReportHourly && iVar.Stored ) {
-						WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.Value );
+						WriteNumericData( iVar.ReportID, iVar.ReportIDChr, iVar.Value );
 						++StdOutputRecordCount;
 						iVar.Stored = false;
 					}
