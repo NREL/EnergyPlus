@@ -35,7 +35,10 @@
 !  \note            Note describing the field and its valid values. If multiple lines,
 !                   start each line with \note. Limit line length to 100 characters.
 !
-!  \required-field  To flag fields which may not be left blank
+!  \required-field  To flag fields which must have a value. If the idf input is blank and
+!                   there is a \default, then the default will be used. However, as of v8.6.0
+!                   the use of \required-field and \default on the same field is discouraged
+!                   and instances with both have been changed.
 !                     (this comment has no "value")
 !
 !  \begin-extensible  Marks the first field at which the object accepts an extensible
@@ -62,7 +65,10 @@
 !
 !  \maximum<        Maximum that must be < than the following value
 !
-!  \default         Default for the field (if N/A then omit entire line)
+!  \default         Default for the field (if N/A then omit entire line). If a default is
+!                   added to an existing field, then \required-field should be removed if present.
+!                   Defaults are filled in only if the field is within \min-fields, or the actual
+!                   object is longer than this field.
 !
 !  \deprecated      This field is not really used and will be deleted from the object.
 !                   The required information is gotten internally or
