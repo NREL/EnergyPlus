@@ -21083,6 +21083,7 @@ DaylightingDevice:Tubular,
        \memo a dome, a pipe, and a diffuser. The dome and diffuser are defined separately using the
        \memo FenestrationSurface:Detailed object.
        \extensible:2 Duplicate the last two fields Transition Zone Name and Transition Zone Length
+       \min-fields 7
   A1 , \field Name
        \required-field
        \type alpha
@@ -21114,7 +21115,6 @@ DaylightingDevice:Tubular,
        \minimum> 0
   N3 , \field Effective Thermal Resistance
        \note R value between TubularDaylightDome and TubularDaylightDiffuser
-       \required-field
        \units m2-K/W
        \type real
        \minimum> 0
@@ -21302,7 +21302,6 @@ ZoneInfiltration:DesignFlowRate,
        \note Flow/ExteriorWallArea => Flow per Exterior Surface Area - Value * Exterior Wall Surface Area (zone) = Design Flow Rate
        \note AirChanges/Hour => Air Changes per Hour - Value * Floor Volume (zone) adjusted for m3/s = Design Volume Flow Rate
        \note  "Idesign" in Equation is the result.
-       \required-field
        \type choice
        \key Flow/Zone
        \key Flow/Area
@@ -21330,22 +21329,18 @@ ZoneInfiltration:DesignFlowRate,
        \type real
        \minimum 0
   N5 , \field Constant Term Coefficient
-       \required-field
        \note  "A" in Equation
        \type real
        \default 1
   N6 , \field Temperature Term Coefficient
-       \required-field
        \note  "B" in Equation
        \type real
        \default 0
   N7 , \field Velocity Term Coefficient
-       \required-field
        \note  "C" in Equation
        \type real
        \default 0
   N8 ; \field Velocity Squared Term Coefficient
-       \required-field
        \note  "D" in Equation
        \type real
        \default 0
@@ -21414,7 +21409,6 @@ ZoneInfiltration:FlowCoefficient,
        \note "n" in Equation
        \minimum> 0
        \type real
-       \required-field
        \default 0.67
   N4 , \field Wind Coefficient
        \note "Cw" in Equation
@@ -21453,7 +21447,6 @@ ZoneVentilation:DesignFlowRate,
        \note Flow/Person => Flow Rate per Person - Value * #people = Design Flow Rate
        \note AirChanges/Hour => Air Changes per Hour - Value * Floor Volume (zone) adjusted for m3/s = Design Volume Flow Rate
        \note  "Vdesign" in Equation is the result.
-       \required-field
        \type choice
        \key Flow/Zone
        \key Flow/Area
@@ -21477,7 +21470,6 @@ ZoneVentilation:DesignFlowRate,
        \type real
        \minimum 0
   A5 , \field Ventilation Type
-       \required-field
        \type choice
        \key Natural
        \key Intake
@@ -21485,34 +21477,28 @@ ZoneVentilation:DesignFlowRate,
        \key Balanced
        \default Natural
   N5 , \field Fan Pressure Rise
-       \required-field
        \note pressure rise across the fan
        \type real
        \units Pa
        \minimum 0
        \default 0
   N6 , \field Fan Total Efficiency
-       \required-field
        \type real
        \minimum> 0
        \default 1
   N7 , \field Constant Term Coefficient
-       \required-field
        \note  "A" in Equation
        \type real
        \default 1
   N8 , \field Temperature Term Coefficient
-       \required-field
        \note  "B" in Equation
        \type real
        \default 0
   N9 , \field Velocity Term Coefficient
-       \required-field
        \note  "C" in Equation
        \type real
        \default 0
   N10, \field Velocity Squared Term Coefficient
-       \required-field
        \note  "D" in Equation
        \type real
        \default 0
@@ -21776,7 +21762,6 @@ ZoneMixing,
        \note Flow/Person => Flow Rate per Person - Value * #people = Design Flow Rate
        \note AirChanges/Hour => Air Changes per Hour - Value * Floor Volume (zone) adjusted for m3/s = Design Volume Flow Rate
        \note  "Vdesign" in Equation is the result.
-       \required-field
        \type choice
        \key Flow/Zone
        \key Flow/Area
@@ -21868,7 +21853,6 @@ ZoneCrossMixing,
        \note Flow/Person => Flow Rate per Person - Value * #people = Design Flow Rate
        \note AirChanges/Hour => Air Changes per Hour - Value * Floor Volume (zone) adjusted for m3/s = Design Volume Flow Rate
        \note  "Vdesign" in Equation is the result.
-       \required-field
        \type choice
        \key Flow/Zone
        \key Flow/Person
@@ -22030,56 +22014,47 @@ ZoneEarthtube,
       \type real
       \minimum 0
   A3, \field Earthtube Type
-      \required-field
       \type choice
       \key Natural
       \key Intake
       \key Exhaust
       \default Natural
   N5, \field Fan Pressure Rise
-      \required-field
       \note pressure rise across the fan
       \type real
       \units Pa
       \minimum 0
       \default 0
   N6, \field Fan Total Efficiency
-      \required-field
       \type real
       \minimum> 0
       \default 1
   N7, \field Pipe Radius
-      \required-field
       \units m
       \type real
       \minimum> 0
       \default 1
   N8, \field Pipe Thickness
-      \required-field
       \units m
       \type real
       \minimum> 0
       \default 0.2
   N9, \field Pipe Length
-      \required-field
       \units m
       \type real
       \minimum> 0
       \default 15
  N10, \field Pipe Thermal Conductivity
-      \required-field
       \units W/m-K
       \type real
       \minimum> 0
       \default 200
  N11, \field Pipe Depth Under Ground Surface
-      \required-field
       \units m
       \type real
       \minimum> 0
       \default 3
   A4, \field Soil Condition
-      \required-field
       \type choice
       \key HeavyAndSaturated
       \key HeavyAndDamp
@@ -22090,36 +22065,29 @@ ZoneEarthtube,
       \required-field
       \units C
       \type real
-      \default 0
  N13, \field Amplitude of Soil Surface Temperature
       \required-field
       \units deltaC
       \type real
       \minimum 0
-      \default 0
  N14, \field Phase Constant of Soil Surface Temperature
       \required-field
       \units days
       \type real
       \minimum 0
-      \default 0
  N15, \field Constant Term Flow Coefficient
-      \required-field
       \note  "A" in Equation
       \type real
       \default 1
  N16, \field Temperature Term Flow Coefficient
-      \required-field
       \note  "B" in Equation
       \type real
       \default 0
  N17, \field Velocity Term Flow Coefficient
-      \required-field
       \note  "C" in Equation
       \type real
       \default 0
  N18; \field Velocity Squared Term Flow Coefficient
-      \required-field
       \note  "D" in Equation
       \type real
       \default 0
@@ -22222,7 +22190,6 @@ ZoneThermalChimney,
         \type real
         \minimum 0
    N3, \field Discharge Coefficient
-        \required-field
         \type real
         \minimum 0
         \maximum 1
@@ -22237,7 +22204,6 @@ ZoneThermalChimney,
         \type real
         \minimum 0
    N5, \field Relative Ratios of Air Flow Rates Passing through Zone 1
-        \required-field
         \type real
         \minimum 0
         \maximum 1
@@ -22782,7 +22748,6 @@ AirflowNetwork:MultiZone:Surface,
       \note Used if Wind Pressure Coefficient Type = Input in the AirflowNetwork:SimulationControl object,
       \note otherwise this field may be left blank.
   N1, \field Window/Door Opening Factor, or Crack Factor
-      \required-field
       \type real
       \units dimensionless
       \minimum> 0.0
@@ -30533,7 +30498,6 @@ HVACTemplate:Plant:Chiller:ObjectReference,
       \note The name of this object.
       \required-field
   A2, \field Chiller Object Type
-      \required-field
       \type choice
       \key Chiller:Electric:EIR
       \key Chiller:Electric:ReformulatedEIR
@@ -30634,7 +30598,6 @@ HVACTemplate:Plant:Tower:ObjectReference,
       \note The name of this object.
       \required-field
   A2, \field Cooling Tower Object Type
-      \required-field
       \type choice
       \key CoolingTower:SingleSpeed
       \key CoolingTower:TwoSpeed
@@ -30856,7 +30819,6 @@ HVACTemplate:Plant:Boiler:ObjectReference,
       \note The name of this object.
       \required-field
   A2, \field Boiler Object Type
-      \required-field
       \type choice
       \key Boiler:HotWater
       \default Boiler:HotWater
@@ -31108,7 +31070,6 @@ Sizing:Zone,
       \type object-list
       \object-list ZoneAndZoneListNames
   A2, \field Zone Cooling Design Supply Air Temperature Input Method
-      \required-field
       \type choice
       \key SupplyAirTemperature
       \key TemperatureDifference
@@ -31126,7 +31087,6 @@ Sizing:Zone,
       \note The absolute value of this field will be subtracted from the zone temperature
       \note at peak load to calculate the Zone Cooling Design Supply Air Temperature.
   A3, \field Zone Heating Design Supply Air Temperature Input Method
-      \required-field
       \type choice
       \key SupplyAirTemperature
       \key TemperatureDifference
@@ -31502,7 +31462,6 @@ Sizing:System,
       \units m3/s
       \autosizable
   N2, \field Central Heating Maximum System Air Flow Ratio
-      \required-field
       \type real
       \minimum 0.0
       \maximum 1.0
@@ -31547,12 +31506,10 @@ Sizing:System,
       \key No
       \default No
   N9, \field Central Cooling Design Supply Air Humidity Ratio
-      \required-field
       \type real
       \default 0.008
       \units kgWater/kgDryAir
  N10, \field Central Heating Design Supply Air Humidity Ratio
-      \required-field
       \type real
       \default 0.008
       \units kgWater/kgDryAir
@@ -31915,14 +31872,12 @@ ZoneControl:Thermostat:ThermalComfort,
        \type object-list
        \object-list PeopleNames
   N1 , \field Minimum Dry-Bulb Temperature Setpoint
-       \required-field
        \type real
        \units C
        \minimum 0
        \maximum 50
        \default 0
   N2 , \field Maximum Dry-Bulb Temperature Setpoint
-       \required-field
        \type real
        \units C
        \minimum 0
@@ -33871,7 +33826,6 @@ ZoneHVAC:OutdoorAirUnit,
        \type object-list
        \object-list FansCVandVAV
   A6, \field Supply Fan Placement
-      \required-field
       \type choice
       \key BlowThrough
       \key DrawThrough
@@ -33888,7 +33842,6 @@ ZoneHVAC:OutdoorAirUnit,
        \type object-list
        \object-list ScheduleNames
    A9, \field Unit Control Type
-       \required-field
        \type choice
        \key NeutralControl
        \key TemperatureControl
@@ -34269,7 +34222,6 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \units Kg/s
        \default 0.063
   A5,  \field Heating Design Capacity Method
-       \required-field
        \type choice
        \key HeatingDesignCapacity
        \key CapacityPerFloorArea
@@ -35046,7 +34998,6 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \required-field
        \type node
   A5 , \field Heating Design Capacity Method
-       \required-field
        \type choice
        \key HeatingDesignCapacity
        \key CapacityPerFloorArea
@@ -35819,7 +35770,6 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \type object-list
        \object-list ScheduleNames
   A3 , \field Heating Design Capacity Method
-       \required-field
        \type choice
        \key HeatingDesignCapacity
        \key CapacityPerFloorArea
@@ -35853,7 +35803,6 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
        \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
   N4 , \field Efficiency
-       \required-field
        \maximum 1.0
        \minimum> 0.0
        \default 1.0
@@ -36571,6 +36520,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
 
 ZoneHVAC:Baseboard:Convective:Water,
        \memo Hot water baseboard heater, convection-only. Natural convection hydronic heating unit.
+       \min-fields 10
   A1 , \field Name
         \required-field
   A2 , \field Availability Schedule Name
@@ -36585,7 +36535,6 @@ ZoneHVAC:Baseboard:Convective:Water,
        \required-field
        \type node
   A5 , \field Heating Design Capacity Method
-       \required-field
        \type choice
        \key HeatingDesignCapacity
        \key CapacityPerFloorArea
@@ -36634,6 +36583,7 @@ ZoneHVAC:Baseboard:Convective:Water,
 
 ZoneHVAC:Baseboard:Convective:Electric,
        \memo Electric baseboard heater, convection-only. Natural convection electric heating unit.
+       \min-fields 7
   A1 , \field Name
         \required-field
   A2 , \field Availability Schedule Name
@@ -36642,7 +36592,6 @@ ZoneHVAC:Baseboard:Convective:Electric,
         \type object-list
         \object-list ScheduleNames
   A3 ,  \field Heating Design Capacity Method
-        \required-field
         \type choice
         \key HeatingDesignCapacity
         \key CapacityPerFloorArea
@@ -36676,7 +36625,6 @@ ZoneHVAC:Baseboard:Convective:Electric,
         \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
         \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
   N4 ;  \field Efficiency
-        \required-field
         \maximum 1.0
         \minimum 0.0
         \default 1.0
@@ -36725,7 +36673,6 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \key OutdoorWetBulbTemperature
         \default MeanAirTemperature
    A6 , \field Heating Design Capacity Method
-        \required-field
         \type choice
         \key HeatingDesignCapacity
         \key CapacityPerFloorArea
@@ -36974,6 +36921,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
 
 ZoneHVAC:LowTemperatureRadiant:Electric,
         \memo Electric resistance low temperature radiant system
+        \min-fields 11
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
@@ -36993,7 +36941,6 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \object-list RadiantSurfaceNames
         \object-list RadiantGroupNames
    A5 , \field Heating Design Capacity Method
-        \required-field
         \type choice
         \key HeatingDesignCapacity
         \key CapacityPerFloorArea
@@ -37040,6 +36987,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \minimum 0
         \default 0
    A7 ; \field Heating Setpoint Temperature Schedule Name
+        \required-field
         \type object-list
         \object-list ScheduleNames
 
@@ -37561,6 +37509,7 @@ ZoneHVAC:HighTemperatureRadiant,
         \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
         \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
         \memo groups to the end of the list
+        \min-fields 14
    A1,  \field Name
         \required-field
    A2 , \field Availability Schedule Name
@@ -37574,7 +37523,6 @@ ZoneHVAC:HighTemperatureRadiant,
         \type object-list
         \object-list ZoneNames
    A4 , \field Heating Design Capacity Method
-        \required-field
         \type choice
         \key HeatingDesignCapacity
         \key CapacityPerFloorArea
@@ -37614,24 +37562,20 @@ ZoneHVAC:HighTemperatureRadiant,
         \key Electricity
    N4 , \field Combustion Efficiency
         \note Not used for non-gas radiant heaters
-        \required-field
         \minimum 0
         \maximum 1
         \default 0.9
    N5 , \field Fraction of Input Converted to Radiant Energy
-        \required-field
         \note Radiant+latent+lost fractions must sum to 1 or less, remainder is considered convective heat
         \minimum 0
         \maximum 1
         \default 0.7
    N6 , \field Fraction of Input Converted to Latent Energy
-        \required-field
         \minimum 0
         \maximum 1
         \default 0.0
    N7 , \field Fraction of Input that Is Lost
         \note Fraction of input vented to outdoor environment
-        \required-field
         \minimum 0
         \maximum 1
         \default 0.0
@@ -37646,7 +37590,6 @@ ZoneHVAC:HighTemperatureRadiant,
         \key OperativeTemperatureSetpoint
         \default OperativeTemperature
    N8 , \field Heating Throttling Range
-        \required-field
         \units deltaC
         \minimum 0
         \default 2.0
@@ -38265,6 +38208,7 @@ ZoneHVAC:HighTemperatureRadiant,
 ZoneHVAC:VentilatedSlab,
        \memo Ventilated slab system where outdoor air flows through hollow cores in a building
        \memo surface (wall, ceiling, or floor).
+       \min-fields 32
    A1, \field Name
        \required-field
    A2, \field Availability Schedule Name
@@ -38314,7 +38258,6 @@ ZoneHVAC:VentilatedSlab,
        \type object-list
        \object-list ScheduleNames
    A8, \field System Configuration Type
-       \required-field
        \type choice
        \key SlabOnly
        \key SlabAndZone
@@ -38333,7 +38276,6 @@ ZoneHVAC:VentilatedSlab,
        \note flow will be divided evenly among the cores
        \minimum 0
    A9, \field Temperature Control Type
-       \required-field
        \note (temperature on which unit is controlled)
        \type choice
        \key MeanAirTemperature
@@ -39275,6 +39217,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
 AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \memo Central air system terminal unit, single duct, variable volume, induction unit with
        \memo hot water reheat coil and chilled water recool coil.
+       \min-fields 18
   A1,  \field Name
        \required-field
        \type alpha
@@ -39290,7 +39233,6 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \autosizable
        \minimum 0.0
   N2,  \field Induction Ratio
-       \required-field
        \type real
        \minimum 0.0
        \default 2.5
@@ -39746,7 +39688,6 @@ AirTerminal:DualDuct:VAV,
        \minimum 0.0
        \autosizable
   N2 , \field Zone Minimum Air Flow Fraction
-       \required-field
        \note fraction of maximum air flow
        \maximum 1.0
        \minimum 0.0
@@ -42607,6 +42548,7 @@ Coil:Cooling:DX:VariableSpeed,
         \memo wet coil when compressor cycles off with continuous fan operation. Requires two to
         \memo ten sets of performance data and will interpolate between speeds. Modeled as a
         \memo single coil with variable-speed compressor.
+        \min-fields 30
    A1,  \field Name
         \required-field
         \type alpha
@@ -42620,7 +42562,6 @@ Coil:Cooling:DX:VariableSpeed,
    N1,  \field Number of Speeds
         \units dimensionless
         \type integer
-        \required-field
         \minimum 1
         \maximum 10
         \default 2
@@ -42628,7 +42569,6 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type integer
         \default 2
-        \required-field
         \note must be lower than or equal to the highest speed number
    N3,  \field Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
         \note Total cooling capacity not accounting for the effect of supply air fan heat
@@ -42636,25 +42576,21 @@ Coil:Cooling:DX:VariableSpeed,
         \type real
         \autosizable
         \default autosize
-        \required-field
    N4,  \field Rated Air Flow Rate At Selected Nominal Speed Level
         \units m3/s
         \type real
         \autosizable
         \default autosize
-        \required-field
    N5,  \field Nominal Time for Condensate to Begin Leaving the Coil
         \units s
         \type real
         \minimum 0
-        \required-field
         \default 0
    N6,  \field Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
         \units dimensionless
         \type real
         \minimum 0
         \default 0
-        \required-field
    A4,  \field Energy Part Load Fraction Curve Name
         \required-field
         \type object-list
@@ -42731,7 +42667,7 @@ Coil:Cooling:DX:VariableSpeed,
         \units dimensionless
         \type real
         \minimum 0
-        \Maximum 1.0
+        \maximum 1.0
         \required-field
    N14, \field Speed 1 Reference Unit Gross Rated Cooling COP
         \units dimensionless
@@ -45176,6 +45112,7 @@ Coil:Heating:DX:VariableSpeed,
         \memo (includes electric compressor and outdoor fan), variable-speed, with defrost
         \memo controls. Requires two to ten sets of performance data and will interpolate between
         \memo speeds.
+        \min-fields 25
    A1,  \field Name
         \required-field
         \type alpha
@@ -45189,7 +45126,6 @@ Coil:Heating:DX:VariableSpeed,
    N1,  \field Number of Speeds
         \units dimensionless
         \type integer
-        \required-field
         \minimum 1
         \maximum 10
         \default 2
@@ -45197,20 +45133,17 @@ Coil:Heating:DX:VariableSpeed,
         \units dimensionless
         \type integer
         \default 2
-        \required-field
         \note must be lower than or equal to the highest speed number
    N3,  \field Rated Heating Capacity At Selected Nominal Speed Level
         \units w
         \type real
         \autosizable
         \default autosize
-        \required-field
    N4,  \field Rated Air Flow Rate At Selected Nominal Speed Level
         \units m3/s
         \type real
         \autosizable
         \default autosize
-        \required-field
    A4,  \field Energy Part Load Fraction Curve Name
         \required-field
         \type object-list
