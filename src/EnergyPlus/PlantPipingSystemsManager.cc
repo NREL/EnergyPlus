@@ -3490,6 +3490,8 @@ namespace PlantPipingSystemsManager {
 					++regionIndex;
 					this->getCellWidths( tempRegion, tempRegion.thisRegionType );
 					Regions.push_back( tempRegion );
+				} else if ( i == 1 && this->HasZoneCoupledBasement ) {
+					cellCountUpToNow += 1; // don't add a left partition for partition index 1 of coupled basements
 				} else { // All other partitions
 					// Create region to left of partition
 					auto & leftPartition( ThesePartitionRegions( i - 1 ) );
