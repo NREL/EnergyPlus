@@ -167,6 +167,7 @@ namespace HeatingCoils {
 	bool CoilIsSuppHeater( false ); // Flag set to indicate the heating coil is a supplemental heater
 	bool MyOneTimeFlag( true ); // one time initialization flag
 	Array1D_bool CheckEquipName;
+	bool InputErrorsFound( false );
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -404,7 +405,6 @@ namespace HeatingCoils {
 		int NumNums;
 		int IOStat;
 		int StageNum;
-		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool DXCoilErrFlag; // Used in GetDXCoil mining functions
@@ -465,12 +465,12 @@ namespace HeatingCoils {
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 			HeatingCoil( CoilNum ).Name = Alphas( 1 );
 			HeatingCoil( CoilNum ).Schedule = Alphas( 2 );
@@ -480,7 +480,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( HeatingCoil( CoilNum ).SchedPtr == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
-					ErrorsFound = true;
+					InputErrorsFound = true;
 				}
 			}
 
@@ -490,12 +490,18 @@ namespace HeatingCoils {
 
 			HeatingCoil( CoilNum ).Efficiency = Numbers( 1 );
 			HeatingCoil( CoilNum ).NominalCapacity = Numbers( 2 );
-			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
-			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			// Setup Report variables for the Electric Coils
 			// CurrentModuleObject = "Coil:Heating:Electric"
@@ -524,12 +530,12 @@ namespace HeatingCoils {
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 			HeatingCoil( CoilNum ).Name = Alphas( 1 );
 			HeatingCoil( CoilNum ).Schedule = Alphas( 2 );
@@ -539,7 +545,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( HeatingCoil( CoilNum ).SchedPtr == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
-					ErrorsFound = true;
+					InputErrorsFound = true;
 				}
 			}
 
@@ -559,12 +565,18 @@ namespace HeatingCoils {
 
 			}
 
-			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
-			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			// Setup Report variables for the Electric Coils
 			// CurrentModuleObject = "Coil:Heating:Electric:MultiStage"
@@ -593,12 +605,12 @@ namespace HeatingCoils {
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 			coil.Name = Alphas( 1 );
 			coil.Schedule = Alphas( 2 );
@@ -608,7 +620,7 @@ namespace HeatingCoils {
 				coil.SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( coil.SchedPtr == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
-					ErrorsFound = true;
+					InputErrorsFound = true;
 				}
 			}
 
@@ -619,18 +631,24 @@ namespace HeatingCoils {
 			coil.FuelType_Num = AssignResourceTypeNum( Alphas( 3 ) );
 			if ( !( coil.FuelType_Num == iRT_Natural_Gas || coil.FuelType_Num == iRT_Propane || coil.FuelType_Num == iRT_Diesel || coil.FuelType_Num == iRT_Gasoline || coil.FuelType_Num == iRT_FuelOil_1 || coil.FuelType_Num == iRT_FuelOil_2 || coil.FuelType_Num == iRT_OtherFuel1 || coil.FuelType_Num == iRT_OtherFuel2 ) || coil.FuelType_Num == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 3 ) + " entered =" + Alphas( 3 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 			std::string const FuelType( GetResourceTypeChar( coil.FuelType_Num ) );
 
 			coil.Efficiency = Numbers( 1 );
 			coil.NominalCapacity = Numbers( 2 );
-			coil.AirInletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			coil.AirOutletNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			errFlag = false;
+			coil.AirInletNodeNum = GetOnlySingleNode( Alphas( 4 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
+			errFlag = false;
+			coil.AirOutletNodeNum = GetOnlySingleNode( Alphas( 5 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 4 ), Alphas( 5 ), "Air Nodes" );
 
-			coil.TempSetPointNodeNum = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			errFlag = false;
+			coil.TempSetPointNodeNum = GetOnlySingleNode( Alphas( 6 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			//parasitic electric load associated with the fuel heating coil
 			coil.ParasiticElecLoad = Numbers( 3 );
@@ -673,12 +691,12 @@ namespace HeatingCoils {
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 			HeatingCoil( CoilNum ).Name = Alphas( 1 );
 			HeatingCoil( CoilNum ).Schedule = Alphas( 2 );
@@ -688,7 +706,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( HeatingCoil( CoilNum ).SchedPtr == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
-					ErrorsFound = true;
+					InputErrorsFound = true;
 				}
 			}
 
@@ -712,12 +730,18 @@ namespace HeatingCoils {
 
 			}
 
-			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
-			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 5 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			//parasitic electric load associated with the gas heating coil
 			HeatingCoil( CoilNum ).ParasiticElecLoad = Numbers( 10 );
@@ -758,12 +782,12 @@ namespace HeatingCoils {
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), HeatingCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 			HeatingCoil( CoilNum ).Name = Alphas( 1 );
 			HeatingCoil( CoilNum ).Schedule = Alphas( 2 );
@@ -773,7 +797,7 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).SchedPtr = GetScheduleIndex( Alphas( 2 ) );
 				if ( HeatingCoil( CoilNum ).SchedPtr == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 2 ) + " entered =" + Alphas( 2 ) + " for " + cAlphaFields( 1 ) + '=' + Alphas( 1 ) );
-					ErrorsFound = true;
+					InputErrorsFound = true;
 				}
 			}
 
@@ -783,7 +807,7 @@ namespace HeatingCoils {
 					ShowSevereError( CurrentModuleObject + " = \"" + HeatingCoil( CoilNum ).Name + "\"" );
 					ShowContinueError( "Error found in " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) );
 					ShowContinueError( "Schedule values must be (>=0., <=1.)" );
-					ErrorsFound = true;
+					InputErrorsFound = true;
 				}
 			}
 
@@ -795,8 +819,12 @@ namespace HeatingCoils {
 			//(Numbers(1)) error limits checked and defaults applied on efficiency after
 			//       identifying souce type.
 
-			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( Alphas( 3 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
+			errFlag = false;
+			HeatingCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( Alphas( 4 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
@@ -827,7 +855,7 @@ namespace HeatingCoils {
 				ShowSevereError( CurrentModuleObject + ", \"" + HeatingCoil( CoilNum ).Name + "\" valid desuperheater heat source object type not found: " + Alphas( 5 ) );
 				ShowContinueError( "Valid desuperheater heat source objects are:" );
 				ShowContinueError( "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, Refrigeration:Condenser:EvaporativeCooled, Refrigeration:Condenser:WaterCooled,Coil:Cooling:DX:TwoSpeed, and Coil:Cooling:DX:TwoStageWithHumidityControlMode" );
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 
 			if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == CONDENSER_REFRIGERATION ) {
@@ -837,7 +865,7 @@ namespace HeatingCoils {
 					HeatingCoil( CoilNum ).Efficiency = Numbers( 1 );
 					if ( Numbers( 1 ) < 0.0 || Numbers( 1 ) > 0.9 ) {
 						ShowSevereError( CurrentModuleObject + ", \"" + HeatingCoil( CoilNum ).Name + "\" heat reclaim recovery efficiency must be >= 0 and <=0.9" );
-						ErrorsFound = true;
+						InputErrorsFound = true;
 					}
 				}
 			} else {
@@ -847,21 +875,23 @@ namespace HeatingCoils {
 					HeatingCoil( CoilNum ).Efficiency = Numbers( 1 );
 					if ( Numbers( 1 ) < 0.0 || Numbers( 1 ) > 0.3 ) {
 						ShowSevereError( CurrentModuleObject + ", \"" + HeatingCoil( CoilNum ).Name + "\" heat reclaim recovery efficiency must be >= 0 and <=0.3" );
-						ErrorsFound = true;
+						InputErrorsFound = true;
 					}
 				}
 			}
 
 			HeatingCoil( CoilNum ).ReclaimHeatingCoilName = Alphas( 6 );
 
-			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			errFlag = false;
+			HeatingCoil( CoilNum ).TempSetPointNodeNum = GetOnlySingleNode( Alphas( 7 ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			InputErrorsFound = errFlag || InputErrorsFound;
 
 			//parasitic electric load associated with the desuperheater heating coil
 			HeatingCoil( CoilNum ).ParasiticElecLoad = Numbers( 2 );
 
 			if ( Numbers( 2 ) < 0.0 ) {
 				ShowSevereError( CurrentModuleObject + ", \"" + HeatingCoil( CoilNum ).Name + "\" parasitic electric load must be >= 0" );
-				ErrorsFound = true;
+				InputErrorsFound = true;
 			}
 
 			// Setup Report variables for the Desuperheater Heating Coils
@@ -905,12 +935,12 @@ namespace HeatingCoils {
 					}
 					ShowSevereError( "Coil:Heating:Desuperheater, \"" + HeatingCoil( CoilNum ).Name + "\" and \"" + HeatingCoil( RemainingCoils ).Name + "\" cannot use the same" );
 					ShowContinueError( " heat source object " + SourceTypeString + ", \"" + SourceNameString + "\"" );
-					ErrorsFound = true;
+					InputErrorsFound = true;
 				}
 			}
 		}
 
-		if ( ErrorsFound ) {
+		if ( InputErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
 		}
 
@@ -3335,6 +3365,7 @@ namespace HeatingCoils {
 		GetCoilsInputFlag = true;
 		CoilIsSuppHeater = false;
 		MyOneTimeFlag = true;
+		InputErrorsFound = false;
 
 		MySizeFlag.deallocate();
 		ValidSourceType.deallocate();
