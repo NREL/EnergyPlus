@@ -88027,6 +88027,7 @@ Output:VariableDictionary,
        \memo on the types of objects present in the idf file.  For example, variables related to
        \memo lights will only appear if a Lights object is present. The IDF option generates
        \memo complete Output:Variable objects to simplify adding the desired output to the idf file.
+       \min-fields 1
   \format singleLine
    A1, \field Key Field
    \type choice
