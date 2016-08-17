@@ -65,7 +65,7 @@ L = N * {P_{kW - COP}}
 
 \subsubsection{Coil:Heating:Fuel}\label{coilheatinggas}
 
-Gas-fired heating coil costs can be estimated in one of three ways: per-each, per-kW, per-kW-COP.~ The program determines which method to use based on there being non-zero values in appropriate input fields.
+Fuel-fired heating coil costs can be estimated in one of three ways: per-each, per-kW, per-kW-COP.~ The program determines which method to use based on there being non-zero values in appropriate input fields.
 
 If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}, is the number of heaters.~ This will be 1 if the \textbf{Item Name} is the name of a specific heater described elsewhere.~ If the name is set to the wildcard (*) then this will equal the total number of Coil:Heating:Fuel objects in the model.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
 
