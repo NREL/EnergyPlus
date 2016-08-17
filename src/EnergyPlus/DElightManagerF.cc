@@ -230,20 +230,24 @@ namespace DElightManagerF {
 		// Init the counter for Window Construction types for writing to Library Data section of DElight input file
 		int iNumWndoConsts = 0;
 
-		// Open a file for writing DElight input from EnergyPlus data
+			// Open a file for writing DElight input from EnergyPlus data
 		unit = GetNewUnitNumber();
 
-		// Hardwire file name to eplusout.delightin in the current working directory
+			// Hardwire file name to eplusout.delightin in the current working directory
 		{
 			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDelightInFileName, flags );
 			if ( flags.err() ) {
-				ShowFatalError( "DElightInputGenerator: Could not open file \""+ outputDelightInFileName + "\" for output (write)." );
+				ShowFatalError( "DElightInputGenerator: Could not open file \"" + outputDelightInFileName + "\" for output (write)." );
 			}
 		}
-		delightin_stream = gio::out_stream( unit );
-
+		if ( !delightin_stream ) {
+			delightin_stream = gio::out_stream( unit );
+		}
 		// Start of DElight input file
 		gio::write( unit, Format_901 ) << CurrentDateTime;
+		// do i need to refactor all the gio::writes????
+		*delightin_stream << "Version EPlus : DElight input generated from EnergyPlus processed input " <<CurrentDateTime << NL;
+
 
 		// Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
 		// Remove any blanks from the Building Name for ease of input to DElight

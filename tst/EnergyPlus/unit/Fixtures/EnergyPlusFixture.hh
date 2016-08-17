@@ -353,7 +353,7 @@ namespace EnergyPlus {
 		std::unique_ptr< std::ostringstream > err_stream;
 		std::unique_ptr< std::ostringstream > m_cout_buffer;
 		std::unique_ptr< std::ostringstream > m_cerr_buffer;
-		std::unique_ptr< std::ostringstream > delightin_stream;
+		std::unique_ptr< std::ostringstream > m_delightin_stream;
 		std::unique_ptr< RedirectCout > m_redirect_cout;
 		std::unique_ptr< RedirectCerr > m_redirect_cerr;
 		static std::unique_ptr< InputProcessorCache > m_idd_cache;
