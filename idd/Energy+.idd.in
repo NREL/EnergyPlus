@@ -19949,15 +19949,15 @@ Lights,
        \maximum 1.0
        \default 0
   N5 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
+       \default 0
   N6 , \field Fraction Visible
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
+       \default 0
   N7 , \field Fraction Replaceable
        \note For Daylighting:Controls and Daylighting:DElight:Controls,
        \note must be 0 or 1:  0 = no dimming control, 1 = full dimming control
