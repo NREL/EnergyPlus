@@ -9752,11 +9752,16 @@
 !         Window Gap Layers
 !----------------------------------------------------------------------
 
-  WindowMaterial:Gap,
-    Gap_1_Layer,             !- Name
-    0.0127,                  !- Thickness {m}
-    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)
-    101325.0000;             !- Pressure {Pa}
+! There were two materials called "Gap_1_Layer" and this slipped through
+! the input processing cracks.  Once this was fixed, this testfile failed,
+! so this second instance is just commented out, which is likely what
+! was occuring in the erroneous previous condition.
+!
+!  WindowMaterial:Gap,
+!    Gap_1_Layer,             !- Name
+!    0.0127,                  !- Thickness {m}
+!    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)
+!    101325.0000;             !- Pressure {Pa}
 
 !----------------------------------------------------------------------
 !         Complex Shade
