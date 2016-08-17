@@ -1410,7 +1410,8 @@ WeatherProperty:SkyTemperature,
        \note if name is for a SizingPeriod:WeatherFileDays, SizingPeriod:WeatherFileConditionType or
        \note RunPeriod, put in a full year schedule that covers the appropriate days.
        \type object-list
-       \object-list ScheduleAndDayScheduleNames
+       \object-list DayScheduleNames
+       \object-list ScheduleNames
 
 Site:WeatherStation,
        \unique-object
@@ -2457,7 +2458,6 @@ Schedule:Day:Hourly,
        \required-field
        \type alpha
        \reference DayScheduleNames
-       \reference ScheduleAndDayScheduleNames
   A2 , \field Schedule Type Limits Name
        \type object-list
        \object-list ScheduleTypeLimitsNames
@@ -2543,7 +2543,6 @@ Schedule:Day:Interval,
        \required-field
        \type alpha
        \reference DayScheduleNames
-       \reference ScheduleAndDayScheduleNames
   A2 , \field Schedule Type Limits Name
        \type object-list
        \object-list ScheduleTypeLimitsNames
@@ -3140,7 +3139,6 @@ Schedule:Day:List,
        \required-field
        \type alpha
        \reference DayScheduleNames
-       \reference ScheduleAndDayScheduleNames
   A2 , \field Schedule Type Limits Name
        \type object-list
        \object-list ScheduleTypeLimitsNames
@@ -19604,7 +19602,7 @@ People,
    \memo Sets internal gains and contaminant rates for occupants in the zone.
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
    \memo to all the zones in the ZoneList.
-   \min-fields 5
+   \min-fields 10
   A1 , \field Name
        \required-field
        \type alpha
@@ -19641,10 +19639,10 @@ People,
        \minimum 0
        \units m2/person
   N4 , \field Fraction Radiant
-       \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
+       \default 0.3
   N5,  \field Sensible Heat Fraction
        \note if input, overrides program calculated sensible/latent split
        \autocalculatable
@@ -31555,7 +31553,7 @@ Sizing:System,
       \key FlowPerFloorArea
       \key FractionOfAutosizedHeatingAirflow
       \key FractionOfAutosizedCoolingAirflow
-      \key FlowPerCoolingCapacity
+      \key FlowPerHeatingCapacity
       \default DesignDay
  N15, \field Heating Supply Air Flow Rate
       \note Required field when Heating Supply Air Flow Rate Method is Flow/System
@@ -71779,6 +71777,8 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
+       \key AvailabilityManager:HybridVentilation
   A3 , \field Availability Manager 1 Name
        \required-field
        \type object-list
@@ -71795,6 +71795,8 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
+       \key AvailabilityManager:HybridVentilation
   A5 , \field Availability Manager 2 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71810,6 +71812,8 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
+       \key AvailabilityManager:HybridVentilation
   A7 , \field Availability Manager 3 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71825,6 +71829,8 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
+       \key AvailabilityManager:HybridVentilation
   A9 , \field Availability Manager 4 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71840,6 +71846,8 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
+       \key AvailabilityManager:HybridVentilation
   A11, \field Availability Manager 5 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71855,6 +71863,8 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOff
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
+       \key AvailabilityManager:OptimumStart
+       \key AvailabilityManager:HybridVentilation
   A13; \field Availability Manager 6 Name
        \type object-list
        \object-list SystemAvailabilityManagers
