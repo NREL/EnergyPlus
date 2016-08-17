@@ -71784,7 +71784,6 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
        \key AvailabilityManager:OptimumStart
-       \key AvailabilityManager:HybridVentilation
   A3 , \field Availability Manager 1 Name
        \required-field
        \type object-list
@@ -71802,7 +71801,6 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
        \key AvailabilityManager:OptimumStart
-       \key AvailabilityManager:HybridVentilation
   A5 , \field Availability Manager 2 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71819,7 +71817,6 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
        \key AvailabilityManager:OptimumStart
-       \key AvailabilityManager:HybridVentilation
   A7 , \field Availability Manager 3 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71836,7 +71833,6 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
        \key AvailabilityManager:OptimumStart
-       \key AvailabilityManager:HybridVentilation
   A9 , \field Availability Manager 4 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71853,7 +71849,6 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
        \key AvailabilityManager:OptimumStart
-       \key AvailabilityManager:HybridVentilation
   A11, \field Availability Manager 5 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -71870,7 +71865,6 @@ AvailabilityManagerAssignmentList,
        \key AvailabilityManager:LowTemperatureTurnOn
        \key AvailabilityManager:NightVentilation
        \key AvailabilityManager:OptimumStart
-       \key AvailabilityManager:HybridVentilation
   A13; \field Availability Manager 6 Name
        \type object-list
        \object-list SystemAvailabilityManagers
@@ -97863,6 +97857,7 @@ Output:Diagnostics,
        \key DisplayAdvancedReportVariables
        \key DisplayZoneAirHeatBalanceOffBalance
        \key DoNotMirrorDetachedShading
+       \key DoNotMirrorAttachedShading
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
@@ -97876,6 +97871,7 @@ Output:Diagnostics,
        \key DisplayAdvancedReportVariables
        \key DisplayZoneAirHeatBalanceOffBalance
        \key DoNotMirrorDetachedShading
+       \key DoNotMirrorAttachedShading
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
