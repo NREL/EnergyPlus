@@ -44173,6 +44173,7 @@ Coil:Heating:Fuel,
        \memo another component such as an air terminal unit, zone HVAC equipment, or unitary
        \memo system, then the coil is controlled by the parent component and the setpoint node name
        \memo is not entered.
+       \min-fields 7
   A1 , \field Name
        \required-field
        \type alpha
@@ -44184,7 +44185,6 @@ Coil:Heating:Fuel,
        \type object-list
        \object-list ScheduleNames
   A3 , \field Fuel Type
-       \required-field
        \type choice
        \key Gas
        \key NaturalGas
