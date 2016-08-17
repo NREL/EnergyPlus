@@ -156,6 +156,9 @@ IF(NOT APPLE )
 ENDIF()
 ADD_SUBDIRECTORY(third_party/jsoncpp)
 
+# Kiva
+INCLUDE(third_party/cmake/kiva.cmake)
+
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 

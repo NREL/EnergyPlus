@@ -40,3 +40,6 @@ Builds
 
 # vim temp file:
 *.swp
+
+# external dependencies
+third_party/kiva/
