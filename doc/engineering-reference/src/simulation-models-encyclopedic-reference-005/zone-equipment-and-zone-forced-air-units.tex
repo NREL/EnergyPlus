@@ -28,21 +28,21 @@ There is no calculation associated with ZoneHVAC:AirDistributionUnit.
 
 No specific references.
 
-\subsection{Inlet Side Mixer Air Terminal Unit}\label{inlet-side-mixer-air-terminal-unit}
+\subsection{Air Terminal Single Duct Mixer}\label{air-terminal-single-duct-mixer}
 
 \subsubsection{Overview}\label{overview-1-009}
 
-The input object AirTerminal:SingleDuct:InletSideSideMixer provides a means for using a zonal air conditioning unit as a terminal unit by mixing central system conditioned air with the inlet air stream of the zonal unit. Usually the central system would be a Direct Outside Air System (DOAS) providing centrally conditioned ventilation air to the zones.
+The mixer object AirTerminal:SingleDuct:Mixer provides a means for using a ZoneHVAC equipment as a terminal unit by mixing central system conditioned air with the inlet or supply side air stream of the ZoneHVAC equipment. Usually the central system would be a Direct Outside Air System (DOAS) providing centrally conditioned ventilation air to the controlled zones. The inlet or supply side connection type is specified by user.
 
 \subsubsection{Model}\label{model-1-000}
 
-The inlet side mixer uses the equations for adiabatic mixing of two moist air streams. Namely, dry air mass balance, water mass balance, and enthalpy balance.
+The mixer uses the equations for adiabatic mixing of two moist air streams. Namely, dry air mass balance, water mass balance, and enthalpy balance. For inlet side mixer connection, the primary air and outlet air flow rates are known, and the condition of the primary and secondary air streams are also known. The mass balance yields the secondary air mass flow rate, and the outlet conditions are determined from enthalpy and water mass balance. For the supply side mixer connection, the primary and secondary air stream conditions and flow rates are known so the outlet condition and flow rate is calculated.
 
 \subsubsection{Inputs and Data}\label{inputs-and-data-1-000}
 
-The only input data are the name and type of the zonal air conditioning unit plus the node names of the 2 input air nodes and the outlet air node. No flow rate data is needed.
+The only input data are the name and type of the ZoneHVAC equipment unit plus the node names of the primary and the secondary air nodes and the outlet air node. No flow rate data is needed.
 
-All input data for the inlet side mixer air terminal unit is stored in the data structure \emph{SysATMixer}.
+All input data for the inlet and supply side mixer units is stored in the data structure \emph{SysATMixer}.
 
 \subsubsection{Calculation}\label{calculation-1-000}
 
@@ -60,61 +60,27 @@ The following equations for the mixing of two moist air streams are used:
 {\dot m_{da1}}{W_1} + {\dot m_{da2}}{W_2} = {\dot m_{da3}}{W_3}
 \end{equation}
 
-where \({\dot m_{da}}\) is dry air mass flow rate in kg/s, \emph{h} is specific enthalpy in J/kg, and W is humidity ratio in (kg of water)/(kg of dry air).
+The mixed air temperature is determined using the following psychometric function:
+\begin{equation}
+{T_3} = PsyHFnTdbW({h_3}, {w_3})
+\end{equation}
 
-In this case, the outlet air mass flow rate has been set by the zonal unit. The air mass flow rate of one of the inlets - the primary air from the central system - is also known. So the air mass balance equation is used to obtain the secondary air mass flow rate.
+where \({\dot m_{da}}\) is dry air mass flow rate in kg/s, \emph{h} is specific enthalpy in J/kg, \emph{T} is temperature in C, and W is humidity ratio in (kg of water)/(kg of dry air).
+
+For a mixer unit connected to the inlet side of a ZoneHVAC equipment, the outlet air mass flow rate has been set by the zone HVAC equipment. The air mass flow rate of one of the inlets - the primary air from the central system - is also known. So the air mass balance equation is used to obtain the secondary air mass flow rate. 
 
 The inlet conditions - specific enthalpy and humidity ratio - for both inlet air streams are known. Now that both inlet air streams' mass flow rate is known, the enthalpy and water mass balance equations are used to get the outlet conditions.
 
+For a mixer unit connected to the supply side of a ZoneHVAC equipment, the conditions and flow rates of the primary air and secondary air streams are known, are taken from the inlet nodes' data. The balance equations are then used to calculate the outlet flow rate and conditions.
+
 \subsubsection{Simulation and Control}\label{simulation-and-control-1-002}
 
-The inlet side mixer model is invoked from within the zonal AC model. Basically the inlet side mixer becomes a subcomponent of the zonal unit model. This allows the zonal unit to allow for the mixing of central supply air with its inlet stream in calculating how much cooling or heating it needs to do in order to meet the zone load.
+The mixer model is invoked from within the zone HVAC model. Basically the mixer becomes a subcomponent of the zone HVAC equipment model. This allows the zone unit to allow for the mixing of central supply air with its inlet or supply air stream of the ZoneHVAC equipment in calculating how much cooling or heating it needs to do in order to meet the zone load.
 
 \subsubsection{References}\label{references-1-020}
 
 See Chapter 1, page 1.17 of the 2013 ASHRAE Handbook of Fundamentals
 
-\subsection{Supply Side Mixer Air Terminal Unit}\label{supply-side-mixer-air-terminal-unit}
-
-\subsubsection{Overview}\label{overview-2-007}
-
-The input object AirTerminal:SingleDuct:SupplySideSideMixer provides a means for using a zonal air conditioning unit as a terminal unit by mixing central system conditioned air with the outlet air stream of the zonal unit. Usually the central system would be a Direct Outside Air System (DOAS) providing centrally conditioned ventilation air to the zones.
-
-\subsubsection{Model}\label{model-2-000}
-
-The supply side mixer uses the equations for adiabatic mixing of two moist air streams. Namely, dry air mass balance, water mass balance, and enthalpy balance. In this case the inlet conditions and flow rates are known so the outlet condition and flow rate is calculated.
-
-\subsubsection{Inputs and Data}\label{inputs-and-data-2-000}
-
-The only input data are the name and type of the zonal air conditioning unit plus the node names of the 2 input air nodes and the outlet air node. No flow rate data is needed.
-
-All input data for the supply side mixer air terminal unit is stored in the data structure \emph{SysATMixer}.
-
-\subsubsection{Calculation}\label{calculation-2-000}
-
-Given the needed inputs, the output is calculated in subroutine \emph{CalcATMixer}. The input flow rates, humidity ratios, and enthalpies are taken from the inlet nodes' data. The balance equations are then used to calculate the outlet flow rate and conditions:
-
-\begin{equation}
-{\dot m_{da1}}{h_1} + {\dot m_{da2}}{h_2} = {\dot m_{da3}}{h_3}
-\end{equation}
-
-\begin{equation}
-{\dot m_{da1}} + {\dot m_{da2}} = {\dot m_{da3}}
-\end{equation}
-
-\begin{equation}
-{\dot m_{da1}}{W_1} + {\dot m_{da2}}{W_2} = {\dot m_{da3}}{W_3}
-\end{equation}
-
-where \({\dot m_{da}}\) is dry air mass flow rate in kg/s, \emph{h} is specific enthalpy in J/kg, and W is humidity ratio in (kg of water)/(kg of dry air).
-
-\subsubsection{Simulation and Control}\label{simulation-and-control-2-001}
-
-The supply side mixer model is invoked from within the zonal AC model. Basically the supply side mixer becomes a subcomponent of the zonal unit model. This allows the zonal unit to allow for the mixing of central supply air with its outlet stream in calculating how much cooling or heating it needs to do in order to meet the zone load.
-
-\subsubsection{References}\label{references-2-010}
-
-See Chapter 1, page 1.17 of the 2013 ASHRAE Handbook of Fundamentals
 
 \subsection{Simple Duct Leakage Model}\label{simple-duct-leakage-model}
 

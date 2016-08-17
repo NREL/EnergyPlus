@@ -4,7 +4,7 @@ The LifeCycleCost:UsePriceEscalation object will commonly be part of a dataset o
 
 The LCCusePriceEscalationDataSetXXXX.idf is periodically updated by the EnergyPlus development team using data available from NIST along with a spreadsheet to convert that data into an IDF dataset file. The NIST 135 annual supplement is available from NIST or through US DOE FEMP program.
 
-http://www1.eere.energy.gov/femp/program/lifecycle.html
+\url{http://www1.eere.energy.gov/femp/program/lifecycle.html}
 
 If requested, NIST personnel will provide a file called ENCOSTxx.TXT which contains the data used to create Table Ca-1 to Table Ca-5 in the supplement. To convert the data in the ENCOSTxx.TXT file to an IDF file, open the ENCOSTxx.TXT file in a text editor and copy the entire contents into the first tab called ``Step 1'' of the conversion spreadsheet. The conversion spreadsheet file named ConvertENCOSTtoEnergyPlusLifeCycleCost.xls is available upon request from the EnergyPlus development team. The ``Step 2'' tab separates the data into columns. The ``Step 3'' tab computes ratios that are the same as Table Ca-1 to Table C1-6 in the supplement. Checking these values against what appears in the printed supplement is recommended. The ``Step 4'' and ``Step 5'' tabs rearrange the data and the ``Step 6'' tab shows the data in a format that can be easily copied and pasted into a new idf dataset file. The final step requires using your text editor to replace the fuel names with those used by EnergyPlus. The replacement names are listed on the ``FuelNameConversion'' tab.
 

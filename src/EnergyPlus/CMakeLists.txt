@@ -10,6 +10,8 @@ if(NOT PROFILE_USE)
 endif()
 
 SET( SRC
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
   Timer.h
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
@@ -592,6 +594,7 @@ set_target_properties(
 install( TARGETS energyplusapi
   RUNTIME DESTINATION ./
   LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
 )
 
 if (MINGW)
