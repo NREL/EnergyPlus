@@ -1849,7 +1849,7 @@ namespace InputProcessor {
 										DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
 										ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected for Object=" + ObjectDef( Found ).Name, EchoInputFile );
 										ShowContinueError( SqueezedArg + " is invalid object in object-list-class = " + ObjectRefClass( objectlistPtr ).Name, EchoInputFile );
-										errFlag = true;
+										// errFlag = true;
 									}
 								}
 							}

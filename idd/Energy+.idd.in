@@ -40856,6 +40856,8 @@ Fan:ConstantVolume,
        \reference FansCVandOnOffandVAV
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -40909,6 +40911,8 @@ Fan:VariableVolume,
        \reference FansCVandOnOffandVAV
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41130,6 +41134,8 @@ Fan:ComponentModel,
        \reference Fans
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Air Inlet Node Name
        \required-field
        \type node
@@ -41365,6 +41371,8 @@ Coil:Cooling:Water,
        \reference SimpleCoils
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41443,6 +41451,8 @@ Coil:Cooling:Water:DetailedGeometry,
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -43981,6 +43991,8 @@ Coil:Heating:Water,
        \reference SimpleCoils
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -44049,6 +44061,8 @@ Coil:Heating:Steam,
        \reference HeatingCoilName
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -44104,6 +44118,8 @@ Coil:Heating:Electric,
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -44212,6 +44228,8 @@ Coil:Heating:Gas,
        \reference AFNCoilNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -44382,6 +44400,8 @@ Coil:Heating:Desuperheater,
        \type alpha
        \reference HeatingCoilsDesuperheater
        \reference AFNCoilNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -49682,6 +49702,8 @@ CoilSystem:Cooling:DX,
         \type alpha
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
+        \reference-class-name validOASysEquipmentTypes
+        \reference validOASysEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -49781,6 +49803,8 @@ CoilSystem:Heating:DX,
         \type alpha
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
+        \reference-class-name validOASysEquipmentTypes
+        \reference validOASysEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -49809,6 +49833,8 @@ CoilSystem:Cooling:Water:HeatExchangerAssisted,
        \reference CoolingCoilsWater
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Heat Exchanger Object Type
        \required-field
        \type choice
@@ -49838,8 +49864,6 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
        \reference CoolingCoilsDX
        \reference CoolingCoilsDXSingleSpeed
        \reference CoolingCoilsDXMultiModeOrSingleSpeed
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames 
   A2 , \field Heat Exchanger Object Type
        \required-field
        \type choice
@@ -50664,6 +50688,8 @@ EvaporativeCooler:Direct:CelDekPad,
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -50708,6 +50734,8 @@ EvaporativeCooler:Indirect:CelDekPad,
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -50776,6 +50804,8 @@ EvaporativeCooler:Indirect:WetCoil,
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -50832,6 +50862,8 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51026,6 +51058,8 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \reference EvapCoolerNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51140,6 +51174,8 @@ Humidifier:Steam:Electric,
       \required-field
       \reference-class-name validBranchEquipmentTypes
       \reference validBranchEquipmentNames 
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -51185,6 +51221,8 @@ Humidifier:Steam:Gas,
       \required-field
       \reference-class-name validBranchEquipmentTypes
       \reference validBranchEquipmentNames
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -51285,6 +51323,10 @@ Dehumidifier:Desiccant:NoFans,
        \memo but can also be specified in any AirLoopHVAC.
    A1, \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
    A2, \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51470,6 +51512,8 @@ Dehumidifier:Desiccant:System,
        \type alpha
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51567,6 +51611,8 @@ HeatExchanger:AirToAir:FlatPlate,
       \reference AFNHeatExchangerNames
       \reference-class-name validBranchEquipmentTypes
       \reference validBranchEquipmentNames 
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -51643,6 +51689,8 @@ HeatExchanger:AirToAir:SensibleAndLatent,
       \reference AFNHeatExchangerNames
       \reference-class-name validBranchEquipmentTypes
       \reference validBranchEquipmentNames 
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -51780,6 +51828,10 @@ HeatExchanger:Desiccant:BalancedFlow,
       \reference HXDesiccantBalanced
       \reference HXAirToAirNames
       \reference AFNHeatExchangerNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -52084,6 +52136,8 @@ AirLoopHVAC:UnitarySystem,
        \note Unique name for the Unitary System.
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2,  \field Control Type
        \type choice
        \key Load
@@ -56262,294 +56316,60 @@ AirLoopHVAC:OutdoorAirSystem:EquipmentList,
        \reference AirLoopOAEquipmentLists
   A2 , \field Component 1 Object Type
        \required-field
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A3 , \field Component 1 Name
        \required-field
+       \type object-list
+       \object-list validOASysEquipmentNames
   A4 , \field Component 2 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A5 , \field Component 2 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A6 , \field Component 3 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A7 , \field Component 3 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A8 , \field Component 4 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A9 , \field Component 4 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A10, \field Component 5 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A11, \field Component 5 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A12, \field Component 6 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A13, \field Component 6 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A14, \field Component 7 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A15, \field Component 7 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A16, \field Component 8 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A17, \field Component 8 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A18, \field Component 9 Object Type
-       \type choice
-       \key AirLoopHVAC:UnitarySystem
-       \key Coil:Heating:Electric
-       \key Coil:Heating:Gas
-       \key Coil:Heating:Steam
-       \key Coil:Heating:Water
-       \key Coil:Cooling:Water
-       \key Coil:Cooling:Water:DetailedGeometry
-       \key Coil:UserDefined
-       \key CoilSystem:Cooling:Water:HeatexchangerAssisted
-       \key CoilSystem:Cooling:DX
-       \key CoilSystem:Heating:DX
-       \key Dehumidifier:Desiccant:NoFans
-       \key Dehumidifier:Desiccant:System
-       \key EvaporativeCooler:Direct:CelDekPad
-       \key EvaporativeCooler:Direct:ResearchSpecial
-       \key EvaporativeCooler:Indirect:CelDekPad
-       \key EvaporativeCooler:Indirect:WetCoil
-       \key EvaporativeCooler:Indirect:ResearchSpecial
-       \key Fan:ComponentModel
-       \key Fan:ConstantVolume
-       \key Fan:VariableVolume
-       \key HeatExchanger:AirToAir:FlatPlate
-       \key HeatExchanger:AirToAir:SensibleAndLatent
-       \key HeatExchanger:Desiccant:BalancedFlow
-       \key Humidifier:Steam:Electric
-       \key Humidifier:Steam:Gas
-       \key OutdoorAir:Mixer
-       \key SolarCollector:UnglazedTranspired
-       \key SolarCollector:FlatPlate:PhotovoltaicThermal
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A19; \field Component 9 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
 
 AirLoopHVAC:OutdoorAirSystem,
        \memo Outdoor air subsystem for an AirLoopHVAC. Includes an outdoor air mixing box and
@@ -56584,6 +56404,8 @@ OutdoorAir:Mixer,
       \required-field
       \type alpha
       \reference OutdoorAirMixers
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Mixed Air Node Name
       \note Name of Mixed Air Node
       \required-field
@@ -59917,8 +59739,6 @@ PipingSystem:Underground:Domain,
    A1,  \field Name
         \required-field
         \type alpha
-        \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames
    N1,  \field Xmax
         \required-field
         \type real
@@ -60830,6 +60650,8 @@ TemperingValve,
       \type alpha
       \reference-class-name validPlantEquipmentTypes
       \reference validPlantEquipmentNames
+      \reference-class-name validCondenserEquipmentTypes
+      \reference validCondenserEquipmentNames
       \reference-class-name validBranchEquipmentTypes
       \reference validBranchEquipmentNames 
   A2, \field Inlet Node Name
@@ -60975,6 +60797,8 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
        \memo Models hybrid photovoltaic-thermal (PVT) solar collectors that convert incident solar
        \memo energy into both electricity and useful thermal energy by heating air or water.
   A1 , \field Name
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Surface Name
        \required-field
        \type object-list
@@ -61238,6 +61062,8 @@ SolarCollector:UnglazedTranspired,
        \required-field
        \type alpha
        \reference UTSCNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2,  \field Boundary Conditions Model Name
        \required-field
        \type object-list
@@ -63635,6 +63461,8 @@ DistrictCooling,
        \required-field
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
   A2 , \field Chilled Water Inlet Node Name
@@ -63659,6 +63487,8 @@ DistrictHeating,
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
        \reference validBranchEquipmentNames 
   A2 , \field Hot Water Inlet Node Name
        \required-field
@@ -63686,6 +63516,8 @@ PlantComponent:TemperatureSource,
        \note Component Name
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
   A2 , \field Inlet Node
@@ -66820,6 +66652,8 @@ GroundHeatExchanger:HorizontalTrench,
         \required-field
         \reference-class-name validPlantEquipmentTypes
         \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames
    A2 , \field Inlet Node Name
@@ -67216,6 +67050,8 @@ WaterHeater:Mixed,
        \reference WaterHeaterMixedNames
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   N1 , \field Tank Volume
@@ -67449,6 +67285,8 @@ WaterHeater:Stratified,
        \reference WaterHeaterStratifiedNames
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
   A2 , \field End-Use Subcategory
@@ -68519,8 +68357,10 @@ ThermalStorage:ChilledWater:Mixed,
        \type alpha
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
-      \reference-class-name validBranchEquipmentTypes
-      \reference validBranchEquipmentNames 
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Tank Volume
        \type real
        \units m3
@@ -68619,6 +68459,8 @@ ThermalStorage:ChilledWater:Stratified,
        \type alpha
        \reference-class-name validPlantEquipmentTypes
        \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames 
   N1 , \field Tank Volume
@@ -72157,6 +71999,8 @@ ZoneHVAC:ForcedAir:UserDefined,
         \note This is the name of the coil
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
+        \reference-class-name validOASysEquipmentTypes
+        \reference validOASysEquipmentNames
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
         \object-list ProgramNames
@@ -72214,6 +72058,8 @@ ZoneHVAC:ForcedAir:UserDefined,
         \note This is the name of the plant component
         \reference-class-name validPlantEquipmentTypes
         \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
         \reference-class-name validBranchEquipmentTypes
         \reference validBranchEquipmentNames 
    A2 , \field Main Model Program Calling Manager Name
