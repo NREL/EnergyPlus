@@ -34,7 +34,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Gas; Coil:Heating:Electric (unit heaters)
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Fuel; Coil:Heating:Electric (unit heaters)
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1882,33 +1882,37 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC:1 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.78,                    !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC:2 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:3_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC:3 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC:4_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -2755,7 +2759,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC:1_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -2777,7 +2781,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC:2_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -2799,7 +2803,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC:3_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -2821,7 +2825,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC:4_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name

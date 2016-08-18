@@ -117,7 +117,7 @@
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
 ! Coils:                          CoilSystem:Cooling:DX:HeatExchangerAssisted,
-!                                 Coil:Heating:Gas
+!                                 Coil:Heating:Fuel
 !                                 HX used is HEAT EXCHANGER:DESICCANT:BALANCEDFLOW
 !                                 This HX uses HEAT EXCHANGER:DESICCANT:BALANCEDFLOW:PERFORMANCE DATA TYPE 1 for
 !                                 model inputs and empirical model limits. These limits are checked against actual
@@ -2491,7 +2491,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Furnace Heating Coil 1,  !- Coil Name
-    Coil:Heating:Gas,        !- Coil Object Type
+    Coil:Heating:Fuel,        !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2929,15 +2929,16 @@
     Fan:ConstantVolume,      !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     CoilSystem:Cooling:DX:HeatExchangerAssisted,  !- Cooling Coil Object Type
     Heat Exchanger Assisted Cooling Coil 1,  !- Cooling Coil Name
     MultiMode;               !- Dehumidification Control Type
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE HEATING COIL 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     60000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name

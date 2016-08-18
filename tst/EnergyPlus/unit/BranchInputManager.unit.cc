@@ -188,7 +188,7 @@ namespace EnergyPlus {
 			"  DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 			"  DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name",
 			"  Passive,                 !- Component 2 Branch Control Type",
-			"  Coil:Heating:Gas,        !- Component 2 Object Type",
+			"  Coil:Heating:Fuel,        !- Component 2 Object Type",
 			"  DOAS Heating Coil,       !- Component 2 Name",
 			"  DOAS Cooling Coil Outlet,  !- Component 2 Inlet Node Name",
 			"  DOAS Heating Coil Outlet,!- Component 2 Outlet Node Name",

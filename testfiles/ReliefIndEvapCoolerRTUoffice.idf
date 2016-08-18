@@ -3859,7 +3859,7 @@
     Evap Cooler Outlet Node ZN1,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN1,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN1,  !- Component 4 Outlet Node Name
@@ -3983,9 +3983,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN1;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN1,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN1,  !- Air Inlet Node Name
@@ -4193,7 +4194,7 @@
     Evap Cooler Outlet Node ZN3,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN3,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN3,  !- Component 4 Outlet Node Name
@@ -4317,9 +4318,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN3;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN3,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN3,  !- Air Inlet Node Name
@@ -4527,7 +4529,7 @@
     Evap Cooler Outlet Node ZN5,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN5,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN5,  !- Component 4 Outlet Node Name
@@ -4651,9 +4653,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN5;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN5,   !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN5,  !- Air Inlet Node Name
@@ -4861,7 +4864,7 @@
     Evap Cooler Outlet Node ZN7,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN7,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN7,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN7,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN7,  !- Component 4 Outlet Node Name
@@ -4985,9 +4988,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN7;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN7,   !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN7,  !- Air Inlet Node Name
@@ -5195,7 +5199,7 @@
     Evap Cooler Outlet Node ZN9,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN9,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN9,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN9,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN9,  !- Component 4 Outlet Node Name
@@ -5319,9 +5323,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN9;            !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN9,   !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN9,  !- Air Inlet Node Name
@@ -5529,7 +5534,7 @@
     Evap Cooler Outlet Node ZN11,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN11,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN11,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN11,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN11,  !- Component 4 Outlet Node Name
@@ -5653,9 +5658,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN11;           !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN11,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN11,  !- Air Inlet Node Name
@@ -5863,7 +5869,7 @@
     Evap Cooler Outlet Node ZN13,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN13,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN13,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN13,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN13,  !- Component 4 Outlet Node Name
@@ -5987,9 +5993,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN13;           !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN13,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN13,  !- Air Inlet Node Name
@@ -6197,7 +6204,7 @@
     Evap Cooler Outlet Node ZN15,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN15,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN15,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN15,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN15,  !- Component 4 Outlet Node Name
@@ -6321,9 +6328,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN15;           !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN15,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN15,  !- Air Inlet Node Name
@@ -6531,7 +6539,7 @@
     Evap Cooler Outlet Node ZN17,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN17,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN17,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN17,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN17,  !- Component 4 Outlet Node Name
@@ -6655,9 +6663,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN17;           !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN17,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN17,  !- Air Inlet Node Name
@@ -6865,7 +6874,7 @@
     Evap Cooler Outlet Node ZN19,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN19,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil ZN19,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN19,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN19,  !- Component 4 Outlet Node Name
@@ -6989,9 +6998,10 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN19;           !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil ZN19,  !- Name
     Always_on,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Cooling Coil Air Outlet Node ZN19,  !- Air Inlet Node Name
