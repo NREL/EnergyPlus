@@ -21065,12 +21065,10 @@ Daylighting:Controls,
        \type choice
        \key SplitFlux
        \key DElight
-       \default SplitFlux
   A4,  \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
   A5,  \field Lighting Control Type
-       \required-field
        \type choice
        \key Continuous
        \key Stepped
