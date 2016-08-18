@@ -1946,7 +1946,8 @@ namespace SingleDuct {
 				} else { // Hard-size with sizing data
 					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 && MaxAirVolFlowRateDes > 0.0 ) {
 						MaxAirVolFlowRateUser = Sys( SysNum ).MaxAirVolFlowRate;
-						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes, "User-Specified Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateUser );
+						ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Air Flow Rate [m3/s]", 
+							MaxAirVolFlowRateDes, "User-Specified Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowRateDes - MaxAirVolFlowRateUser ) / MaxAirVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
@@ -2042,8 +2043,8 @@ namespace SingleDuct {
 			} else {
 				// report out hard (user set) value and issue warning if appropriate
 				MinAirFlowFracUser = Sys( SysNum ).ZoneMinAirFrac;
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User Specified Constant Minimum Air Flow Fraction",
-					MinAirFlowFracUser );
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Constant Minimum Air Flow Fraction", MinAirFlowFracDes, 
+					"User-Specified Constant Minimum Air Flow Fraction", MinAirFlowFracUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( MinAirFlowFracDes - MinAirFlowFracUser ) / MinAirFlowFracUser) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
@@ -2055,7 +2056,7 @@ namespace SingleDuct {
 				}
 			}
 			// report out the min air flow rate set by min air flow frac
-			ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Minimum Air Flow Rate (from Min Air Flow Frac) [m3/s]",
+			ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Minimum Air Flow Rate [m3/s]",
 				Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate );
 		}
 		else {
@@ -2096,8 +2097,8 @@ namespace SingleDuct {
 			else {
 				// report out hard (user set) value and issue warning if appropriate
 				FixedMinAirUser = Sys( SysNum ).ZoneFixedMinAir;
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User Specified Fixed Minimum Air Flow Rate [m3/s]",
-					FixedMinAirUser );
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Fixed Minimum Air Flow Rate [m3/s]", FixedMinAirDes, 
+					"User-Specified Fixed Minimum Air Flow Rate [m3/s]", FixedMinAirUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( FixedMinAirDes - FixedMinAirUser ) / FixedMinAirUser ) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeHVACSingleDuct: Potential issue with equipment sizing for " + Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName + "\"." );
@@ -2110,7 +2111,7 @@ namespace SingleDuct {
 			}
 			// report out the min air flow frac set by the min air flow rate
 			if ( Sys( SysNum ).MaxAirVolFlowRate> 0.0 ) {
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Minimum Air Flow Fraction (from Min Air Flow Rate) [m3/s]",
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Minimum Air Flow Fraction [m3/s]",
 					Sys( SysNum ).ZoneFixedMinAir / Sys( SysNum ).MaxAirVolFlowRate );
 			}
 		}
@@ -2164,12 +2165,12 @@ namespace SingleDuct {
 			}
 			if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat == AutoCalculate && Sys( SysNum ).MaxAirVolFractionDuringReheat == AutoCalculate ) {
 				// if both inputs are autosize (the default) report both out and save in the Sys array.
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow Fraction during Reheat []",
+					MaxAirVolFractionDuringReheatDes );
 				if ( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
 					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
 						MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
 				}
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow Fraction during Reheat []",
-					MaxAirVolFractionDuringReheatDes);
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
 				Sys( SysNum ).MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
 			}
@@ -2178,13 +2179,13 @@ namespace SingleDuct {
 				// Check for optional caution message that user input value is not within 10% of the design value.
 				MaxAirVolFlowRateDuringReheatDes = Sys( SysNum ).MaxAirVolFractionDuringReheat * Sys( SysNum ).MaxAirVolFlowRate;
 				MaxAirVolFractionDuringReheatUser = Sys( SysNum ).MaxAirVolFractionDuringReheat;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow Fraction during Reheat []",
+					MaxAirVolFractionDuringReheatDes, "User-Specified Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatUser );
 				if ( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
 					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, 
-						"Maximum Flow per Zone Floor Area during Reheat (from alternate user input) [m3/s-m2]",
+						"Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
 						MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea );
 				}
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Flow Fraction during Reheat []",
-					MaxAirVolFractionDuringReheatUser );
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( MaxAirVolFractionDuringReheatDes - MaxAirVolFractionDuringReheatUser ) / MaxAirVolFractionDuringReheatUser ) > AutoVsHardSizingThreshold ) {
@@ -2197,7 +2198,7 @@ namespace SingleDuct {
 				}
 			}
 			else if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat != AutoCalculate && Sys( SysNum ).MaxAirVolFractionDuringReheat == AutoCalculate ) {
-				// if max reheat flow was input set the design max reheat flow frac to the cooresponding value, report both out, save the design value of the flow
+				// if max reheat flow was input set the design max reheat flow frac to the corresponding value, report both out, save the design value of the flow
 				// frac in Sys. Check for optional caution message that user input value is not within 10% of the design value.
 				if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 					MaxAirVolFractionDuringReheatDes = MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).MaxAirVolFlowRate;
@@ -2206,12 +2207,15 @@ namespace SingleDuct {
 					MaxAirVolFractionDuringReheatDes = 0.0;
 				}
 				MaxAirVolFlowRateDuringReheatUser = Sys( SysNum ).MaxAirVolFlowRateDuringReheat;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Maximum Flow Fraction during Reheat []",
+					MaxAirVolFractionDuringReheatDes );
 				if ( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
-					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName,
+						"Design Size Maximum Flow per Zone Floor Area during Reheat [ m3/s-m2 ]",
+						MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea,
+						"User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
 						MaxAirVolFlowRateDuringReheatUser / Sys( SysNum ).ZoneFloorArea );
 				}
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Maximum Flow Fraction during Reheat (from alternate user input) []",
-					MaxAirVolFractionDuringReheatDes );
 				Sys( SysNum ).MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( MaxAirVolFlowRateDuringReheatDes - MaxAirVolFlowRateDuringReheatUser ) / MaxAirVolFlowRateDuringReheatUser ) > AutoVsHardSizingThreshold ) {
@@ -2228,12 +2232,18 @@ namespace SingleDuct {
 				// subsequently. Check both inputs for optional caution message that user input value is not within 10% of the design value.
 				MaxAirVolFlowRateDuringReheatUser = Sys( SysNum ).MaxAirVolFlowRateDuringReheat;
 				MaxAirVolFractionDuringReheatUser = Sys( SysNum ).MaxAirVolFractionDuringReheat;
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName,
+					"Design Size Maximum Flow Fraction during Reheat []",
+					MaxAirVolFractionDuringReheatDes,
+					"User-Specified Maximum Flow Fraction during Reheat []",
+					MaxAirVolFractionDuringReheatUser );
 				if ( Sys( SysNum ).ZoneFloorArea > 0.0 ) {
-					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName,
+						"Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+						MaxAirVolFlowRateDuringReheatDes / Sys( SysNum ).ZoneFloorArea,
+						"User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
 						MaxAirVolFlowRateDuringReheatUser / Sys( SysNum ).ZoneFloorArea );
 				}
-				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Flow Fraction during Reheat []",
-					MaxAirVolFractionDuringReheatUser );
 				Sys( SysNum ).MaxAirVolFlowRateDuringReheat = max( Sys( SysNum ).MaxAirVolFlowRateDuringReheat,
 					Sys( SysNum ).MaxAirVolFractionDuringReheat * Sys( SysNum ).MaxAirVolFlowRate );
 				if ( DisplayExtraWarnings ) {
