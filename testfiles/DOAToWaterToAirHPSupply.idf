@@ -3048,8 +3048,8 @@ Fan:OnOff,
 Coil:Heating:Fuel,
     SPACE1-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    NaturalGas,              !- Fuel Type
-    0.8,                     !- Burner Efficiency
+    NaturalGas,              !- FuelType
+    0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE1-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE1-1 Heat Pump Outlet;  !- Air Outlet Node Name
@@ -3057,8 +3057,8 @@ Coil:Heating:Fuel,
 Coil:Heating:Fuel,
     SPACE2-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    NaturalGas,              !- Fuel Type
-    0.8,                     !- Burner Efficiency
+    NaturalGas,              !- FuelType
+    0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE2-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE2-1 Heat Pump Outlet;  !- Air Outlet Node Name
@@ -3066,8 +3066,8 @@ Coil:Heating:Fuel,
 Coil:Heating:Fuel,
     SPACE3-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    NaturalGas,              !- Fuel Type
-    0.8,                     !- Burner Efficiency
+    NaturalGas,              !- FuelType
+    0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE3-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE3-1 Heat Pump Outlet;  !- Air Outlet Node Name
@@ -3075,8 +3075,8 @@ Coil:Heating:Fuel,
 Coil:Heating:Fuel,
     SPACE4-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    NaturalGas,              !- Fuel Type
-    0.8,                     !- Burner Efficiency
+    NaturalGas,              !- FuelType
+    0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE4-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE4-1 Heat Pump Outlet;  !- Air Outlet Node Name
@@ -3084,8 +3084,8 @@ Coil:Heating:Fuel,
 Coil:Heating:Fuel,
     SPACE5-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    NaturalGas,              !- Fuel Type
-    0.8,                     !- Burner Efficiency
+    NaturalGas,              !- FuelType
+    0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE5-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE5-1 Heat Pump Outlet;  !- Air Outlet Node Name

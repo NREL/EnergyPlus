@@ -1216,7 +1216,7 @@
   Coil:Heating:Fuel,
     Furnace Coil,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    FuelOil#2,               !- Fuel Type
+    FuelOil#2,              !- FuelType
     0.8,                     !- Burner Efficiency
     20000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name

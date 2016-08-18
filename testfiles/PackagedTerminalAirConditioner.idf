@@ -1675,8 +1675,8 @@
   Coil:Heating:Fuel,
     Zone1PTACHeater,         !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    NaturalGas,              !- Fuel Type
-    1.0,                     !- Burner Efficiency
+    NaturalGas,              !- FuelType
+    1.0,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone1PTACDXCoolCoilOutletNode,  !- Air Inlet Node Name
     Zone1PTACAirOutletNode;  !- Air Outlet Node Name
