@@ -33,7 +33,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1565,25 +1565,28 @@
     BulkStorage Unit Heater Post Fan Node,  !- Air Outlet Node Name
     Unit Heater Fans;        !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     BulkStorage Unit Heater Coil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.78,                    !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     BulkStorage Unit Heater Post Fan Node,  !- Air Inlet Node Name
     BulkStorage Unit Heater Inlet Node Name;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV_1:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV_1:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV_1:1 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV_2:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.78,                    !- Gas Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV_2:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
@@ -1629,7 +1632,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     BulkStorage Unit HeaterFan,  !- Supply Air Fan Name
     AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     BulkStorage Unit Heater Coil,  !- Heating Coil Name
     ,                        !- Supply Air Fan Operating Mode Schedule Name
     No,                      !- Supply Air Fan Operation During No Heating
@@ -2152,7 +2155,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV_1:1_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV_1:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV_1:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -2174,7 +2177,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV_2:2_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV_2:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV_2:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name

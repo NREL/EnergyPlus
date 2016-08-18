@@ -1224,7 +1224,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     AHU 1 Supply Fan,        !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     AHU 1 Heating Coil,      !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     AHU 1 Cooling Coil,      !- Cooling Coil Name
@@ -1305,9 +1305,10 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:GAS:HEATING ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     AHU 1 Heating Coil,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     AHU 1 Supply Fan Outlet, !- Air Inlet Node Name

@@ -84,12 +84,18 @@ namespace DataMoistureBalanceEMPD {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Variables that are used in both the Surface Heat Balance and the Moisture Balance
-	extern Array1D< Real64 > MoistEMPDOld; // Moisture level at interior surfaces at previous time step
-	extern Array1D< Real64 > MoistEMPDInt; // Moisture level at interior surfaces at previous interation
+	extern Array1D< Real64 > RVSurfaceOld; // Moisture level at interior surfaces at previous time step
+	extern Array1D< Real64 > RVSurface; // Moisture level at interior surfaces at current interation
 	// and current time step
-	extern Array1D< Real64 > MoistEMPDNew; // Moisture level at interior surfaces at current interation
-	// and current time step
-	extern Array1D< Real64 > MoistEMPDFlux; // Moisture flux at interior surfaces [W]
+	extern Array1D< Real64 > HeatFluxLatent; // Moisture flux at interior surfaces [W]
+	extern Array1D< Real64 > RVSurfLayerOld;
+	extern Array1D< Real64 > RVdeepOld;
+	extern Array1D< Real64 > RVSurfLayer;
+	extern Array1D< Real64 > RVDeepLayer;
+	extern Array1D< Real64 > RVwall;
+
+	void
+	clear_state();
 
 } // DataMoistureBalanceEMPD
 

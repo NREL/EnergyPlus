@@ -1185,7 +1185,7 @@ namespace SimAirServingZones {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = WaterCoil_Cooling;
 					} else if ( componentType == "COIL:HEATING:ELECTRIC" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_ElectricHeat;
-					} else if ( componentType == "COIL:HEATING:GAS" ) {
+					} else if ( componentType == "COIL:HEATING:FUEL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_GasHeat;
 
 						// Heat reclaim
@@ -2917,7 +2917,7 @@ namespace SimAirServingZones {
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 
 			// stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Gas'
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
 			SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, QActual );
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 			// stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)

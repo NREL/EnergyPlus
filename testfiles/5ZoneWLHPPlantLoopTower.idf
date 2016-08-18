@@ -2113,7 +2113,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2190,9 +2190,10 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU1,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU1,  !- Air Inlet Node Name
@@ -2301,7 +2302,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU2,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2375,9 +2376,10 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU2,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU2,  !- Air Inlet Node Name
@@ -2486,7 +2488,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU3,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2560,9 +2562,10 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU3,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU3,  !- Air Inlet Node Name
@@ -2671,7 +2674,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU4,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2745,9 +2748,10 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU4,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU4,  !- Air Inlet Node Name
@@ -2856,7 +2860,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU5,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2930,9 +2934,10 @@
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
     ;                        !- Source Side Heat Transfer Resistance2 {W/K}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU5,  !- Name
     FanAvailSched,           !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Heating Coil Air Outlet Node AHU5,  !- Air Inlet Node Name
