@@ -99,6 +99,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
+#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataPlantPipingSystems.hh>
@@ -207,6 +208,7 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -297,6 +299,7 @@ namespace EnergyPlus {
 		DataIPShortCuts::clear_state();
 		DataLoopNode::clear_state();
 		DataMoistureBalance::clear_state();
+		DataMoistureBalanceEMPD::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
 		DataPlantPipingSystems::clear_state();
@@ -345,6 +348,7 @@ namespace EnergyPlus {
 		LowTempRadiantSystem::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
+		MoistureBalanceEMPDManager::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
 		OutdoorAirUnit::clear_state();

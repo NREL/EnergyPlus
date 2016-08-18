@@ -130,8 +130,12 @@ protected:
 		Surface.allocate( NumOfSurfaces );
 		HConvIn.allocate( NumOfSurfaces );
 		TempSurfInTmp.allocate( NumOfSurfaces );
-		MoistEMPDNew.allocate( NumOfSurfaces );
-		MoistEMPDOld.allocate( NumOfSurfaces );
+		RVSurface.allocate( NumOfSurfaces );
+		RVSurfaceOld.allocate( NumOfSurfaces );
+		RVDeepLayer.allocate( NumOfSurfaces );
+		RVdeepOld.allocate( NumOfSurfaces );
+		RVSurfLayerOld.allocate( NumOfSurfaces );
+		RVSurfLayer.allocate( NumOfSurfaces );
 		RhoVaporSurfIn.allocate( NumOfSurfaces );
 		RhoVaporAirIn.allocate( NumOfSurfaces );
 		HMassConvInFD.allocate( NumOfSurfaces );
@@ -277,8 +281,8 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 
 	Surface( 1 ).HeatTransferAlgorithm = HeatTransferModel_EMPD;
 	Surface( 2 ).HeatTransferAlgorithm = HeatTransferModel_EMPD;
-	MoistEMPDNew( 1 ) = 0.0011;
-	MoistEMPDNew( 2 ) = 0.0012;
+	RVSurface( 1 ) = 0.0011;
+	RVSurface( 2 ) = 0.0012;
 
 	NodeID( 1 ) = "Supply";
 	NodeID( 2 ) = "Return";

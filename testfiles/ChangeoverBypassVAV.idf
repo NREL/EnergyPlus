@@ -87,7 +87,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    UNITARYSYSTEM:VAV:CHANGEOVERBYPASS
-! Coils:                          COIL:DX:MULTIMODE:COOLINGEMPIRICAL, Coil:Heating:Gas
+! Coils:                          COIL:DX:MULTIMODE:COOLINGEMPIRICAL, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1428,11 +1428,12 @@
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -1462,7 +1463,7 @@
     Fan OpMode Schedule,     !- Supply Air Fan Operating Mode Schedule Name
     Coil:Cooling:DX:TwoStageWithHumidityControlMode,  !- Cooling Coil Object Type
     ACDXCoil 2,              !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     CoolingPriority,         !- Priority Control Mode
     10.0,                    !- Minimum Outlet Air Temperature During Cooling Operation {C}

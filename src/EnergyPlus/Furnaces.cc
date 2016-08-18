@@ -1146,7 +1146,7 @@ namespace Furnaces {
 			HeatingCoilName = Alphas( 11 );
 			Furnace( FurnaceNum ).HeatingCoilType = HeatingCoilType;
 			Furnace( FurnaceNum ).HeatingCoilName = HeatingCoilName;
-			if ( SameString( HeatingCoilType, "Coil:Heating:Gas" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
+			if ( SameString( HeatingCoilType, "Coil:Heating:Fuel" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
 				errFlag = false;
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
@@ -1307,7 +1307,7 @@ namespace Furnaces {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 11 ) + " = " + Alphas( 11 ) );
 				ErrorsFound = true;
-			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGas .OR. &, etc.
+			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
 			// Add component sets array
 			if ( Furnace( FurnaceNum ).FanPlace == BlowThru ) {
@@ -1665,7 +1665,7 @@ namespace Furnaces {
 			HeatingCoilPLFCurveIndex = 0;
 			Furnace( FurnaceNum ).HeatingCoilType = HeatingCoilType;
 			Furnace( FurnaceNum ).HeatingCoilName = HeatingCoilName;
-			if ( SameString( HeatingCoilType, "Coil:Heating:Gas" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
+			if ( SameString( HeatingCoilType, "Coil:Heating:Fuel" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
 				errFlag = false;
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
@@ -1833,7 +1833,7 @@ namespace Furnaces {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 11 ) + " = " + Alphas( 11 ) );
 				ErrorsFound = true;
-			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGas .OR. &, etc.
+			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
 			// Get Cooling Coil Information if available
 			CoolingCoilType = Alphas( 12 );
@@ -2059,7 +2059,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilName = ReheatingCoilName;
 			errFlag = false;
 			if ( ! lAlphaBlanks( 15 ) ) {
-				if ( SameString( ReheatingCoilType, "Coil:Heating:Gas" ) || SameString( ReheatingCoilType, "Coil:Heating:Electric" ) || SameString( ReheatingCoilType, "Coil:Heating:Desuperheater" ) ) {
+				if ( SameString( ReheatingCoilType, "Coil:Heating:Fuel" ) || SameString( ReheatingCoilType, "Coil:Heating:Electric" ) || SameString( ReheatingCoilType, "Coil:Heating:Desuperheater" ) ) {
 
 					Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( ReheatingCoilType, ReheatingCoilName, errFlag );
 					if ( errFlag ) {
@@ -2218,7 +2218,7 @@ namespace Furnaces {
 					ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 					ShowContinueError( "Illegal " + cAlphaFields( 15 ) + " = " + Alphas( 15 ) );
 					ErrorsFound = true;
-				} // IF (Furnace(FurnaceNum)%SuppHeatCoilType_Num == Coil_HeatingGas .OR. &, etc.
+				} // IF (Furnace(FurnaceNum)%SuppHeatCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
 			} // IF(.NOT. lAlphaBlanks(15))THEN
 
@@ -2893,7 +2893,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilType = SuppHeatCoilType;
 			Furnace( FurnaceNum ).SuppHeatCoilName = SuppHeatCoilName;
 			errFlag = false;
-			if ( SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
+			if ( SameString( SuppHeatCoilType, "Coil:Heating:Fuel" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
 
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {
@@ -3049,7 +3049,7 @@ namespace Furnaces {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 12 ) + " = " + Alphas( 12 ) );
 				ErrorsFound = true;
-			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGas .OR. &, etc.
+			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
 			if ( SameString( Alphas( 14 ), "BlowThrough" ) ) Furnace( FurnaceNum ).FanPlace = BlowThru;
 			if ( SameString( Alphas( 14 ), "DrawThrough" ) ) Furnace( FurnaceNum ).FanPlace = DrawThru;
@@ -3646,7 +3646,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilType = SuppHeatCoilType;
 			Furnace( FurnaceNum ).SuppHeatCoilName = SuppHeatCoilName;
 			errFlag = false;
-			if ( SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
+			if ( SameString( SuppHeatCoilType, "Coil:Heating:Fuel" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
 
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {
@@ -3802,7 +3802,7 @@ namespace Furnaces {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 12 ) + " = " + Alphas( 12 ) );
 				ErrorsFound = true;
-			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGas .OR. &, etc.
+			} // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
 			if ( lAlphaBlanks( 14 ) ) {
 				Furnace( FurnaceNum ).CondenserNodeNum = 0;
@@ -7589,7 +7589,7 @@ namespace Furnaces {
 			HeatPartLoadRatio = PartLoadRatio;
 
 			auto const HeatingCoilType_Num( Furnace( FurnaceNum ).HeatingCoilType_Num );
-			if ( HeatingCoilType_Num == Coil_HeatingGas || HeatingCoilType_Num == Coil_HeatingElectric || HeatingCoilType_Num == Coil_HeatingWater || HeatingCoilType_Num == Coil_HeatingSteam ) {
+			if ( HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel || HeatingCoilType_Num == Coil_HeatingElectric || HeatingCoilType_Num == Coil_HeatingWater || HeatingCoilType_Num == Coil_HeatingSteam ) {
 				HeatCoilLoad = Furnace( FurnaceNum ).DesignHeatingCapacity * PartLoadRatio;
 			} else {
 				HeatCoilLoad = 0.0;
@@ -8172,7 +8172,7 @@ namespace Furnaces {
 		}
 
 		{ auto const SELECT_CASE_var( CoilTypeNum );
-		if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
+		if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) || ( SELECT_CASE_var == Coil_HeatingDesuperheater ) ) {
 			SimulateHeatingCoilComponents( HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode );
 		} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 			if ( QCoilLoad > SmallLoad ) {
