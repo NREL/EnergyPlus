@@ -1338,18 +1338,7 @@ namespace PlantPipingSystemsManager {
 
 	bool
 	inline
-	IsInRange(
-		int const i,
-		int const lower,
-		int const upper
-	)
-	{
-		return ( ( i >= lower ) && ( i <= upper ) );
-	}
-
-	bool
-	inline
-	IsInRange(
+	IsInRangeReal(
 		Real64 const r,
 		Real64 const lower,
 		Real64 const upper

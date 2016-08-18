@@ -3335,7 +3335,7 @@ namespace PlantPipingSystemsManager {
 			for ( int SubIndex = 0; SubIndex <= Index - 1; ++SubIndex ) {
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ) - SA
 				if ( this->HasZoneCoupledBasement && Index ==1 ) {
-					if ( IsInRange_BasementModel( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRange( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
+					if ( IsInRange_BasementModel( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRangeReal( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
 
 						ShowSevereError( "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain." );
 						ShowContinueError( "Occurs during mesh development for domain=" + this->Name );
@@ -3348,7 +3348,7 @@ namespace PlantPipingSystemsManager {
 
 				} else {
 
-					if ( IsInRange( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRange( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
+					if ( IsInRangeReal( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRangeReal( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
 
 						ShowSevereError( "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain." );
 						ShowContinueError( "Occurs during mesh development for domain=" + this->Name );
