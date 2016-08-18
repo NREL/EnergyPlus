@@ -3087,8 +3087,8 @@
   Coil:Heating:Fuel,
     HeatingCoil_SouthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_SouthZone_1stFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_SouthZone_1stFloor;  !- Air Outlet Node Name
@@ -3096,8 +3096,8 @@
   Coil:Heating:Fuel,
     ReheatCoil_SouthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_SouthZone_1stFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_SouthZone_1stFloor;  !- Air Outlet Node Name
@@ -3105,8 +3105,8 @@
   Coil:Heating:Fuel,
     HeatingCoil_NorthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_NorthZone_1stFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_NorthZone_1stFloor;  !- Air Outlet Node Name
@@ -3114,8 +3114,8 @@
   Coil:Heating:Fuel,
     ReheatCoil_NorthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_NorthZone_1stFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_NorthZone_1stFloor;  !- Air Outlet Node Name
@@ -3123,8 +3123,8 @@
   Coil:Heating:Fuel,
     HeatingCoil_SouthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_SouthZone_2ndFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_SouthZone_2ndFloor;  !- Air Outlet Node Name
@@ -3132,8 +3132,8 @@
   Coil:Heating:Fuel,
     ReheatCoil_SouthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_SouthZone_2ndFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_SouthZone_2ndFloor;  !- Air Outlet Node Name
@@ -3141,8 +3141,8 @@
   Coil:Heating:Fuel,
     HeatingCoil_NorthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     InletNode_HeatingCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
     InletNode_ReheatCoil_NorthZone_2ndFloor;  !- Air Outlet Node Name
@@ -3150,8 +3150,8 @@
   Coil:Heating:Fuel,
     ReheatCoil_NorthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     InletNode_ReheatCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_NorthZone_2ndFloor;  !- Air Outlet Node Name

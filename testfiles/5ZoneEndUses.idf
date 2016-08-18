@@ -2792,8 +2792,8 @@ Lights,
   Coil:Heating:Fuel,
     SPACE1-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE1-1 In Node;        !- Air Outlet Node Name
@@ -2801,8 +2801,8 @@ Lights,
   Coil:Heating:Fuel,
     SPACE2-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE2-1 In Node;        !- Air Outlet Node Name
@@ -2810,8 +2810,8 @@ Lights,
   Coil:Heating:Fuel,
     SPACE3-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE3-1 In Node;        !- Air Outlet Node Name
@@ -2819,8 +2819,8 @@ Lights,
   Coil:Heating:Fuel,
     SPACE4-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE4-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE4-1 In Node;        !- Air Outlet Node Name
@@ -2828,8 +2828,8 @@ Lights,
   Coil:Heating:Fuel,
     SPACE5-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE5-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE5-1 In Node;        !- Air Outlet Node Name
@@ -2979,8 +2979,8 @@ Lights,
   Coil:Heating:Fuel,
     Main heating Coil 1,     !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 1 Outlet Node,  !- Air Outlet Node Name

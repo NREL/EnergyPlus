@@ -3488,8 +3488,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_10:10_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_10:10_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_10:10 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3497,8 +3497,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_1:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_1:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_1:1 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3506,8 +3506,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_2:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_2:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_2:2 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3515,8 +3515,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_3:3_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_3:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_3:3 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3524,8 +3524,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_4:4_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_4:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_4:4 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3533,8 +3533,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_5:5_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_5:5_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_5:5 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3542,8 +3542,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_6:6_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_6:6_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_6:6 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3551,8 +3551,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_7:7_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_7:7_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_7:7 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3560,8 +3560,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_8:8_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_8:8_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_8:8 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -3569,8 +3569,8 @@
   Coil:Heating:Fuel,
     PSZ-AC_9:9_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_9:9_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_9:9 Supply Equipment Outlet Node;  !- Air Outlet Node Name

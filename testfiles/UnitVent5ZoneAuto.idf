@@ -2799,8 +2799,8 @@
   Coil:Heating:Fuel,
     Zone5UnitVentHeatingCoil,!- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.77,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.77,                    !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone5UnitVentFanOutletNode,  !- Air Inlet Node Name
     Zone5UnitVentAirOutletNode;  !- Air Outlet Node Name
