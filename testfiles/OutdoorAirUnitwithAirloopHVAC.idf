@@ -456,8 +456,8 @@
   Coil:Heating:Fuel,
     Zone2OAUHeatingCoil,     !- Name
     OAUnitOASched,           !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.77,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.77,                    !- Burner Efficiency
     30000,                   !- Nominal Capacity {W}
     Zone2OAUHCoilIn,         !- Air Inlet Node Name
     Zone2OAUHCoilout;        !- Air Outlet Node Name
@@ -742,8 +742,8 @@
   Coil:Heating:Fuel,
     Desiccant Regen Coil,    !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.80,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.80,                    !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Regen Coil Inlet Node,   !- Air Inlet Node Name
     Regen Coil Out Node;     !- Air Outlet Node Name

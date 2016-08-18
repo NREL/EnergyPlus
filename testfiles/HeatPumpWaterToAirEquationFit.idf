@@ -2217,8 +2217,8 @@
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 1 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -2479,8 +2479,8 @@
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 2,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 2 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 2 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -2741,8 +2741,8 @@
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 3,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 3 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 3 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -3003,8 +3003,8 @@
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 4,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 4 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 4 Air Loop Outlet Node;  !- Air Outlet Node Name
@@ -3265,8 +3265,8 @@
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 5,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     32000,                   !- Nominal Capacity {W}
     Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 5 Air Loop Outlet Node;  !- Air Outlet Node Name
