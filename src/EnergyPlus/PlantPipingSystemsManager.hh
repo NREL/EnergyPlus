@@ -1300,7 +1300,7 @@ namespace PlantPipingSystemsManager {
 	);
 
 	void
-	IssueSevereInputFieldError(
+	IssueSevereInputFieldErrorStringEntry(
 		std::string const & RoutineName,
 		std::string const & ObjectName,
 		std::string const & InstanceName,
@@ -1311,7 +1311,7 @@ namespace PlantPipingSystemsManager {
 	);
 
 	void
-	IssueSevereInputFieldError(
+	IssueSevereInputFieldErrorRealEntry(
 		std::string const & RoutineName,
 		std::string const & ObjectName,
 		std::string const & InstanceName,
