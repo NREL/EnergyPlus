@@ -21061,10 +21061,10 @@ Daylighting:Controls,
        \type object-list
        \object-list ZoneNames
   A3,  \field Daylighting Method
-       \required-field
        \type choice
        \key SplitFlux
        \key DElight
+       \default SplitFlux
   A4,  \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
