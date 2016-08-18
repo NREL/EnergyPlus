@@ -234,7 +234,7 @@ namespace EnergyPlus {
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
-		DElightManagerF::delightin_stream = this->m_delightin_stream.get();
+		DataGlobals::delightin_stream = this->m_delightin_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
@@ -264,6 +264,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileMeters, flags );
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
+			gio::close( DataGlobals::OutputDElightIn, flags );
 
 		}
 	}
@@ -315,7 +316,6 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
-		DElightManagerF::clear_state();
 		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();

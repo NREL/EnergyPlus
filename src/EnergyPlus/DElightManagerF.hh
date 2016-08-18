@@ -69,11 +69,6 @@ namespace EnergyPlus {
 
 namespace DElightManagerF {
 
-	extern std::ostream * delightin_stream; // Internal stream used for DElight input
-
-	void
-	clear_state();
-
 	void
 	DElightInputGenerator();
 

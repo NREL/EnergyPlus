@@ -64,6 +64,7 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <DaylightingManager.hh>
 #include <DElightManagerF.hh>
 #include <DataDaylighting.hh>
 #include <DataEnvironment.hh>
@@ -75,6 +76,7 @@
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <ScheduleManager.hh>
+#include <SimulationManager.hh>
 #include <SurfaceGeometry.hh>
 
 // EnergyPlus Headers
@@ -640,7 +642,9 @@ TEST_F(EnergyPlusFixture, DElightManagerF_InputGenerator_Test)
 	InternalHeatGains::GetInternalHeatGainsInput();
 	InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
-	DElightInputGenerator();
+	//SimulationManager::OpenOutputFiles();
+
+	DaylightingManager::GetDaylightingParametersInput(); // which calls DElightInputGenerator();
 	compare_err_stream("");
 
 //	compare_delightin_stream(""); // this should fail since the delightin stream should be the DElight.in file

@@ -67,6 +67,7 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Write.hh>
 
 // EnergyPlus Headers
 #include <DElightManagerF.hh>
@@ -127,15 +128,6 @@ namespace DElightManagerF {
 	// USE STATEMENTS:
 	using namespace DataPrecisionGlobals;
 	using namespace DataDElight;
-
-	std::ostream * delightin_stream( nullptr ); // Internal stream used for delight input
-
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
-	{
-		delightin_stream = nullptr;
-	}
 
 	void
 	DElightInputGenerator()
@@ -230,29 +222,14 @@ namespace DElightManagerF {
 		// Init the counter for Window Construction types for writing to Library Data section of DElight input file
 		int iNumWndoConsts = 0;
 
-			// Open a file for writing DElight input from EnergyPlus data
-		unit = GetNewUnitNumber();
-
-			// Hardwire file name to eplusout.delightin in the current working directory
-		{
-			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDelightInFileName, flags );
-			if ( flags.err() ) {
-				ShowFatalError( "DElightInputGenerator: Could not open file \"" + outputDelightInFileName + "\" for output (write)." );
-			}
-		}
-		if ( !delightin_stream ) {
-			delightin_stream = gio::out_stream( unit );
-		}
 		// Start of DElight input file
-		gio::write( unit, Format_901 ) << CurrentDateTime;
-		// do i need to refactor all the gio::writes????
-		*delightin_stream << "Version EPlus : DElight input generated from EnergyPlus processed input " <<CurrentDateTime << NL;
-
+		//*delightin_stream << "Version EPlus : DElight input generated from EnergyPlus processed input " <<CurrentDateTime << NL;
+		write( *delightin_stream, Format_901 ) << CurrentDateTime;
 
 		// Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
 		// Remove any blanks from the Building Name for ease of input to DElight
 		cNameWOBlanks = ReplaceBlanksWithUnderscores( BuildingName );
-		gio::write( unit, Format_902 ) << cNameWOBlanks << Latitude << Longitude << Elevation * M2FT << BuildingAzimuth << TimeZoneNumber;
+		write( *delightin_stream, Format_902 ) << cNameWOBlanks << Latitude << Longitude << Elevation * M2FT << BuildingAzimuth << TimeZoneNumber;
 
 		// Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
 		CosBldgRelNorth = std::cos( - BuildingAzimuth * DegToRadians );
@@ -291,7 +268,7 @@ namespace DElightManagerF {
 		} //traverse ZoneDaylight array
 
 		// Zone Data Section
-		gio::write( unit, Format_903 ) << iNumDElightZones;
+		write( *delightin_stream, Format_903 ) << iNumDElightZones;
 
 		// Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
@@ -307,7 +284,7 @@ namespace DElightManagerF {
 					// Write this Zone to the DElight input file
 					// Remove any blanks from the Zone Name for ease of input to DElight
 					cNameWOBlanks = ReplaceBlanksWithUnderscores( zn.Name );
-					gio::write( unit, Format_904 ) << cNameWOBlanks << zn.OriginX * M2FT << zn.OriginY * M2FT << zn.OriginZ * M2FT << zn.RelNorth << zn.Multiplier * zn.ListMultiplier << zn.FloorArea * M22FT2 << zn.Volume * M32FT3 << rLightLevel / ( zn.FloorArea * M22FT2 + 0.00001 ) << znDayl.MinPowerFraction << znDayl.MinLightFraction << znDayl.LightControlSteps << znDayl.LightControlProbability << znDayl.DElightGriddingResolution * M22FT2;
+					write( *delightin_stream, Format_904 ) << cNameWOBlanks << zn.OriginX * M2FT << zn.OriginY * M2FT << zn.OriginZ * M2FT << zn.RelNorth << zn.Multiplier * zn.ListMultiplier << zn.FloorArea * M22FT2 << zn.Volume * M32FT3 << rLightLevel / ( zn.FloorArea * M22FT2 + 0.00001 ) << znDayl.MinPowerFraction << znDayl.MinLightFraction << znDayl.LightControlSteps << znDayl.LightControlProbability << znDayl.DElightGriddingResolution * M22FT2;
 
 					// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
 					CosZoneRelNorth = std::cos( -zn.RelNorth * DegToRadians );
@@ -315,7 +292,7 @@ namespace DElightManagerF {
 
 					// Zone Lighting Schedule Data Section
 					// NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed
-					gio::write( unit, Format_905 );
+					write( *delightin_stream, Format_905 );
 
 					// Zone Surface Data Section
 					// Count the number of opaque surfaces bounding the current zone
@@ -330,7 +307,7 @@ namespace DElightManagerF {
 						if ( surf.Class == SurfaceClass_Floor ) ++iNumOpaqueSurfs;
 					} // Zone Opaque Surface loop
 
-					gio::write( unit, Format_906 ) << iNumOpaqueSurfs;
+					write( *delightin_stream, Format_906 ) << iNumOpaqueSurfs;
 
 					// Write each opaque bounding Surface to the DElight input file
 					for ( int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf ) {
@@ -356,12 +333,12 @@ namespace DElightManagerF {
 
 							// Remove any blanks from the Surface Name for ease of input to DElight
 							cNameWOBlanks = ReplaceBlanksWithUnderscores( surf.Name );
-							gio::write( unit, Format_907 ) << cNameWOBlanks << surf.Azimuth << surf.Tilt << Construct( iconstruct ).ReflectVisDiffBack << rExtVisRefl << surf.Sides;
+							write( *delightin_stream, Format_907 ) << cNameWOBlanks << surf.Azimuth << surf.Tilt << Construct( iconstruct ).ReflectVisDiffBack << rExtVisRefl << surf.Sides;
 
 							// Write out the vertex coordinates for each vertex
 							int const iNumVertices = surf.Sides; // Counter for surface vertices
 							for ( int ivert = 1; ivert <= iNumVertices; ++ivert ) {
-								gio::write( unit, Format_908 ) << surf.Vertex( ivert ).x * M2FT << surf.Vertex( ivert ).y * M2FT << surf.Vertex( ivert ).z * M2FT;
+								write( *delightin_stream, Format_908 ) << surf.Vertex( ivert ).x * M2FT << surf.Vertex( ivert ).y * M2FT << surf.Vertex( ivert ).z * M2FT;
 							}
 
 							// Count each Window hosted by the current opaque bounding Surface
@@ -404,7 +381,7 @@ namespace DElightManagerF {
 								} // Window test
 							} // Window loop
 
-							gio::write( unit, Format_909 ) << iNumWindows;
+							write( *delightin_stream, Format_909 ) << iNumWindows;
 
 							// If the current opaque bounding Surface hosts Windows,
 							// then write each hosted Window to the DElight input file
@@ -451,14 +428,14 @@ namespace DElightManagerF {
 												// Write this Window to the DElight input file
 												// Remove any blanks from the Window Surface Name for ease of input to DElight
 												cNameWOBlanks = ReplaceBlanksWithUnderscores( wndo2.Name );
-												gio::write( unit, Format_910 ) << cNameWOBlanks << iconstruct + 10000 << wndo2.Sides;
+												write( *delightin_stream, Format_910 ) << cNameWOBlanks << iconstruct + 10000 << wndo2.Sides;
 												// Use WndoConstIndex + 10000 as the Glass Type Name
 												// to differentiate EPlus glass types within DElight
 
 												// Write out the vertex coordinates for each vertex
 												int const iNumVertices = wndo2.Sides; // Counter for surface vertices
 												for ( int ivert = 1; ivert <= iNumVertices; ++ivert ) {
-													gio::write( unit, Format_908 ) << wndo2.Vertex( ivert ).x * M2FT << wndo2.Vertex( ivert ).y * M2FT << wndo2.Vertex( ivert ).z * M2FT;
+													write( *delightin_stream, Format_908 ) << wndo2.Vertex( ivert ).x * M2FT << wndo2.Vertex( ivert ).y * M2FT << wndo2.Vertex( ivert ).z * M2FT;
 												}
 											} //!lWndoIsDoppelganger
 										} // Surface hosts Window2 test
@@ -479,7 +456,7 @@ namespace DElightManagerF {
 								}
 							} // CFS object loop 1
 
-							gio::write( unit, Format_911 ) << iHostedCFS;
+							write( *delightin_stream, Format_911 ) << iHostedCFS;
 
 							// Now write each of the hosted CFS data
 							// Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
@@ -513,11 +490,11 @@ namespace DElightManagerF {
 										// Remove any blanks from the CFS Name for ease of input to DElight
 										cNameWOBlanks = ReplaceBlanksWithUnderscores( cfs.Name );
 										int const iNumVertices = doppelgangerSurf.Sides; // Counter for surface vertices
-										gio::write( unit, Format_915 ) << cNameWOBlanks << cfs.ComplexFeneType << cfs.feneRota << iNumVertices;
+										write( *delightin_stream, Format_915 ) << cNameWOBlanks << cfs.ComplexFeneType << cfs.feneRota << iNumVertices;
 
 										// Write out the vertex coordinates for each vertex
 										for ( int ivert = 1; ivert <= iNumVertices; ++ivert ) {
-											gio::write( unit, Format_908 ) << doppelgangerSurf.Vertex( ivert ).x * M2FT << doppelgangerSurf.Vertex( ivert ).y * M2FT << doppelgangerSurf.Vertex( ivert ).z * M2FT;
+											write( *delightin_stream, Format_908 ) << doppelgangerSurf.Vertex( ivert ).x * M2FT << doppelgangerSurf.Vertex( ivert ).y * M2FT << doppelgangerSurf.Vertex( ivert ).z * M2FT;
 										}
 									}
 									// Register Error if there is no valid Doppelganger for current Complex Fenestration
@@ -531,7 +508,7 @@ namespace DElightManagerF {
 					} // Zone Surface loop
 
 					// Write ZONE REFERENCE POINTS
-					gio::write( unit, Format_912 ) << znDayl.TotalDaylRefPoints;
+					write( *delightin_stream, Format_912 ) << znDayl.TotalDaylRefPoints;
 
 					// Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
 					for ( auto & refPt : DaylRefPt ) {
@@ -594,11 +571,11 @@ namespace DElightManagerF {
 								// Remove any blanks from the RefPt Name for ease of input to DElight
 								cNameWOBlanks = ReplaceBlanksWithUnderscores( refPt.Name );
 								if ( refPt.indexToFracAndIllum != 0 ){
-									gio::write( unit, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << znDayl.FracZoneDaylit( refPt.indexToFracAndIllum ) << znDayl.IllumSetPoint( refPt.indexToFracAndIllum) * LUX2FC << znDayl.LightControlType;
+									write( *delightin_stream, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << znDayl.FracZoneDaylit( refPt.indexToFracAndIllum ) << znDayl.IllumSetPoint( refPt.indexToFracAndIllum ) * LUX2FC << znDayl.LightControlType;
 									// RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
 									SetupOutputVariable( "Daylighting Reference Point Illuminance [lux]", znDayl.DaylIllumAtRefPt( refPt.indexToFracAndIllum ), "Zone", "Average", refPt.Name );
 								} else {
-									gio::write( unit, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << 0.0 << 0.0 * LUX2FC << znDayl.LightControlType; // should never happen but just in case send zero fraction and illuminance
+									write( *delightin_stream, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << 0.0 << 0.0 * LUX2FC << znDayl.LightControlType; // should never happen but just in case send zero fraction and illuminance
 								}
 							} // Max 100 RefPt test
 						} // RefPt in current DElight Zone test
@@ -608,22 +585,22 @@ namespace DElightManagerF {
 		} // traverse ZoneDayLight object loop
 
 		// Write BUILDING SHADES
-		gio::write( unit, Format_914 );
+		write( *delightin_stream, Format_914 );
 
 		// Write LIBRARY DATA
-		gio::write( unit, Format_920 ) << iNumWndoConsts;
+		write( *delightin_stream, Format_920 ) << iNumWndoConsts;
 
 		// Write GLASS TYPES
 		// VisBeamCoeffs are processed in EPlus by POLYF() function
 		// Use WndoConstIndex + 10000 as the Glass Type Name to differentiate EPlus glass types within DElight
 		for ( int iconst = 1; iconst <= iNumWndoConsts; ++iconst ) {
-			gio::write( unit, Format_921 ) << iWndoConstIndexes( iconst ) + 10000 << Construct( iWndoConstIndexes( iconst ) ).TransDiffVis << Construct( iWndoConstIndexes( iconst ) ).ReflectVisDiffBack << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 1 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 2 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 3 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 4 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 5 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 6 );
+			write( *delightin_stream, Format_921 ) << iWndoConstIndexes( iconst ) + 10000 << Construct( iWndoConstIndexes( iconst ) ).TransDiffVis << Construct( iWndoConstIndexes( iconst ) ).ReflectVisDiffBack << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 1 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 2 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 3 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 4 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 5 ) << Construct( iWndoConstIndexes( iconst ) ).TransVisBeamCoef( 6 );
 
 		} // Glass Type loop
 
 		if ( ErrorsFound ) ShowFatalError( "Problems with Daylighting:DElight input, see previous error messages" );
 //		auto const stream_str = delightin_stream->str();
-//		gio::close( unit );
+//		gio::close( OutputDElightIn );
 		return;
 	}
 
