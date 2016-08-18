@@ -841,7 +841,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:2) = InArgs(1:2)
                 OutArgs(3) = 'NaturalGas'
-                OutArgs(3:11) = InArgs(2:10)
+                OutArgs(4:11) = InArgs(3:10)
                 CurArgs = CurArgs + 1
 
               CASE('MATERIALPROPERTY:MOISTUREPENETRATIONDEPTH:SETTINGS')
