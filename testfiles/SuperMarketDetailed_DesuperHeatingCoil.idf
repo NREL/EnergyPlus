@@ -108,7 +108,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas, COIL:Heating:Desuperheater
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel, COIL:Heating:Desuperheater
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1465,11 +1465,12 @@
     3.0,                     !- Maximum Cycling Rate {cycles/hr}
     45.0;                    !- Latent Capacity Time Constant {s}
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -1504,7 +1505,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name

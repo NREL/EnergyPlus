@@ -86265,7 +86265,7 @@
     SYS-1 Mixed Air Outlet,  !- Component 2 Inlet Node Name
     SYS-1 Cooling Coil Outlet,  !- Component 2 Outlet Node Name
     PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     SYS-1 Heating Coil,      !- Component 3 Name
     SYS-1 Cooling Coil Outlet,  !- Component 3 Inlet Node Name
     SYS-1 Heating Coil Outlet,  !- Component 3 Outlet Node Name
@@ -86369,9 +86369,10 @@
     ,                        !- Latent Capacity Time Constant {s}
     ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SYS-1 Heating Coil,      !- Name
     ALWAYSON,                !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.7407407,               !- Gas Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SYS-1 Cooling Coil Outlet,  !- Air Inlet Node Name

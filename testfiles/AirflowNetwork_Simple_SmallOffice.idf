@@ -117,7 +117,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Heating:Gas
+! Coils:                          Coil:Heating:Fuel
 !                                 Coil:Cooling:DX:SingleSpeed
 ! Pumps:                          None
 ! Boilers:                        None
@@ -1890,7 +1890,7 @@
     Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil 1,     !- Component 4 Name
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
     Air Loop Outlet Node,    !- Component 4 Outlet Node Name
@@ -2420,7 +2420,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Main Heating Coil 1,     !- Coil Name
-    Coil:Heating:Gas,        !- Coil Object Type
+    Coil:Heating:Fuel,        !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2788,7 +2788,7 @@
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.59,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,        !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2800,7 +2800,7 @@
     Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.55,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,        !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2858,26 +2858,29 @@
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 1,     !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     60000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
     Air Loop Outlet Node;    !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil Zone 1,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     1000,                    !- Nominal Capacity {W}
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 1 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil Zone 2,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     1.0,                     !- Gas Burner Efficiency
     1000,                    !- Nominal Capacity {W}
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name

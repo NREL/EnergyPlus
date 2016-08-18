@@ -2173,7 +2173,7 @@
     Zone5VentSlabFanOutletNode,  !- Fan Outlet Node Name
     Zone5VentSlabFan,        !- Fan Name
     HEATING,                 !- Coil Option Type
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Zone5VentSlabHeatingCoil;!- Heating Coil Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
@@ -2411,11 +2411,12 @@
     Zone4VentSlabCCOutletNode,  !- Air Inlet Node Name
     Zone4VentSlabSlabInNode; !- Air Outlet Node Name
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Zone5VentSlabHeatingCoil,!- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.77,                    !- Gas Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Zone5VentSlabFanOutletNode,  !- Air Inlet Node Name

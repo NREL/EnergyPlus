@@ -1243,7 +1243,7 @@
     Heating Coil Air Sys Branch,  !- Name
     1.3,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    Coil:Heating:Gas,        !- Component 1 Object Type
+    Coil:Heating:Fuel,        !- Component 1 Object Type
     Main Heating Coil,       !- Component 1 Name
     Heating Coil Inlet Node, !- Component 1 Inlet Node Name
     Heating Coil Outlet Node,!- Component 1 Outlet Node Name
@@ -1995,9 +1995,10 @@
     0,                       !- Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil,       !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     Heating Coil Inlet Node, !- Air Inlet Node Name

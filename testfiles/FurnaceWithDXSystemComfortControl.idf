@@ -91,7 +91,7 @@
 ! Purchased Chilled Water:        Yes (not used)
 ! Purchased Hot Water:            Yes
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1289,7 +1289,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
@@ -1390,9 +1390,10 @@
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- FuelType
     0.8,                     !- Gas Burner Efficiency
     25000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
