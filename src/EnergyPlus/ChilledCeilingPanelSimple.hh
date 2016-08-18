@@ -228,6 +228,9 @@ namespace CoolingPanelSimple {
 	// Functions
 
 	void
+	clear_state();
+		
+	void
 	SimCoolingPanel(
 		std::string const & EquipName,
 		int const ActualZoneNum,

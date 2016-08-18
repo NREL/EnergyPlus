@@ -72,9 +72,7 @@
 #include <DataHeatBalSurface.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
 #include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEnergyDemands.hh>
@@ -82,16 +80,13 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -115,23 +110,7 @@ namespace CoolingPanelSimple {
     
 	// USE STATEMENTS:
 	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
-	using DataPlant::PlantLoop;
-	using DataPlant::TypeOf_CoolingPanel_Simple;
-	using DataZoneEquipment::ZoneEquipInputsFilled;
-	using DataZoneEquipment::CheckZoneEquipmentList;
-	using DataZoneEquipment::ZoneEquipConfig;
-	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::TimeStepSys;
-	using DataHVACGlobals::SysTimeElapsed;
-	// Use statements for access to subroutines in other modules
-	using Psychrometrics::PsyTdpFnWPb;
-	using Psychrometrics::PsyCpAirFnWTdb;
-	using Psychrometrics::PsyRhoAirFnPbTdbW;
-	using FluidProperties::GetDensityGlycol;
-	using FluidProperties::GetSpecificHeatGlycol;
-	using ReportSizingManager::ReportSizingOutput;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -162,13 +141,32 @@ namespace CoolingPanelSimple {
 	Array1D_bool CheckEquipName;
 	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
+	// Other variables
+	static bool GetInputFlag( true ); // One time get input flag
+	static bool MyOneTimeFlag( true );
+	
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Simple Chilled Ceiling Panel
-
 	// Object Data
 	Array1D< CoolingPanelParams > CoolingPanel;
 
 	// Functions
 
+	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		MyOneTimeFlag = true;
+		CoolingPanelSource.deallocate();
+		CoolingPanelSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastCoolingPanelSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		CheckEquipName.deallocate();
+		SetLoopIndexFlag.deallocate();
+		CoolingPanel.deallocate();
+	}
+	
 	void
 	SimCoolingPanel(
 		std::string const & EquipName,
@@ -195,12 +193,11 @@ namespace CoolingPanelSimple {
 		using DataLoopNode::Node;
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
+		using DataPlant::TypeOf_CoolingPanel_Simple;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoolingPanelNum; // Index of unit in baseboard array
-		static bool GetInputFlag( true ); // One time get input flag
 		Real64 QZnReq; // Zone load not yet satisfied
 		Real64 MaxWaterFlow;
 		Real64 MinWaterFlow;
@@ -284,7 +281,6 @@ namespace CoolingPanelSimple {
 		// Standard input processor calls--started from Daeho's radiant-convective water baseboard model.
 
 		// Using/Aliasing
-		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Water;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::NodeConnectionType_Outlet;
@@ -297,11 +293,10 @@ namespace CoolingPanelSimple {
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using ScheduleManager::GetScheduleIndex;
-		using ScheduleManager::GetCurrentScheduleValue;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
+		using DataPlant::TypeOf_CoolingPanel_Simple;
 		using namespace DataIPShortCuts;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -675,16 +670,20 @@ namespace CoolingPanelSimple {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::NumOfZones;
 		using DataLoopNode::Node;
 		using PlantUtilities::InitComponentNodes;
 		using DataPlant::ScanPlantLoopsForObject;
+		using DataZoneEquipment::ZoneEquipInputsFilled;
+		using DataZoneEquipment::CheckZoneEquipmentList;
+		using FluidProperties::GetDensityGlycol;
+		using FluidProperties::GetSpecificHeatGlycol;
+		using DataZoneEquipment::ZoneEquipConfig;
+		using DataPlant::PlantLoop;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ChilledCeilingPanelSimple:InitCoolingPanel" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false );
 		static Array1D_bool MyEnvrnFlag;
 		int Loop;
@@ -826,7 +825,7 @@ namespace CoolingPanelSimple {
 		CoolingPanel( CoolingPanelNum ).RadEnergy = 0.0;
 
 	}
-
+	
 	void
 	CalcCoolingPanel(
 		int & CoolingPanelNum
@@ -851,12 +850,15 @@ namespace CoolingPanelSimple {
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
 		using DataHeatBalance::MRT;
-		using DataHeatBalance::Zone;
 		using DataHeatBalFanSys::MAT;
 		using PlantUtilities::SetComponentFlowRate;
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using DataEnvironment::OutBaroPress;
 		using General::RoundSigDigits;
+		using DataHVACGlobals::SmallLoad;
+		using Psychrometrics::PsyTdpFnWPb;
+		using DataPlant::PlantLoop;
+		using FluidProperties::GetSpecificHeatGlycol;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MinFrac( 0.0005 ); // Minimum fraction that delivers radiant heats to surfaces
@@ -1168,8 +1170,10 @@ namespace CoolingPanelSimple {
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataGlobals::TimeStepZone;
+		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::BeginEnvrnFlag;
 		using PlantUtilities::SafeCopyPlantNode;
+		using DataHVACGlobals::SysTimeElapsed;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterInletNode;
@@ -1281,12 +1285,10 @@ namespace CoolingPanelSimple {
 		
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using DataHeatBalance::Zone;
 		using DataHeatBalFanSys::QCoolingPanelToPerson;
 		using DataHeatBalFanSys::QCoolingPanelSurf;
 		using DataHeatBalFanSys::MaxRadHeatFlux;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallestArea( 0.001 ); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1350,10 +1352,8 @@ namespace CoolingPanelSimple {
 		// REFERENCES:
 		// Existing code for hot water baseboard models (radiant-convective variety)
 
-		// Using/Aliasing
-		using DataLoopNode::Node;
-		using DataSurfaces::Surface;
-
+		using DataHVACGlobals::TimeStepSys;
+		
 		CoolingPanel( CoolingPanelNum ).TotEnergy = CoolingPanel( CoolingPanelNum ).TotPower * TimeStepSys * SecInHour;
 		CoolingPanel( CoolingPanelNum ).Energy = CoolingPanel( CoolingPanelNum ).Power * TimeStepSys * SecInHour;
 		CoolingPanel( CoolingPanelNum ).ConvEnergy = CoolingPanel( CoolingPanelNum ).ConvPower * TimeStepSys * SecInHour;
@@ -1378,9 +1378,14 @@ namespace CoolingPanelSimple {
 		// Existing code for hot water baseboard models (radiant-convective variety)
 		
 		// Using/Aliasing
-		using namespace DataSurfaces;
-		using namespace DataHeatBalance;
-		using namespace DataHeatBalSurface;
+		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceWindow;
+		using DataSurfaces::IntShadeOn;
+		using DataSurfaces::IntBlindOn;
+		using DataSurfaces::SurfaceClass_Window;
+		using DataHeatBalance::Zone;
+		using DataHeatBalance::HConvIn;
+		using DataHeatBalSurface::TempSurfInTmp;
 
 		// Return value
 		Real64 SumHATsurf;
