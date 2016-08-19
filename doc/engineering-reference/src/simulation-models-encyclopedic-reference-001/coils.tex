@@ -3034,17 +3034,17 @@ For a temperature setpoint coil the delta temperature from the coil inlet temper
 
 ~~~~~ HeatingCoil(CoilNum)\%ElecUseLoad = HeatingCoilLoad/Effic
 
-\subsection{Gas Air Heating Coil}\label{gas-air-heating-coil}
+\subsection{Fuel-fired Air Heating Coil}\label{gas-air-heating-coil}
 
-The gas-powered heating coil (object name: Coil:Heating:Gas) is a simple capacity model with user inputted gas burner efficiency.~ The default for the gas burner efficiency is 80\%.~ This coil only has air nodes to connect it in the system.~ The coil can be used in the air loop simulation or in the zone equipment as a reheat coil.~ Depending on where it is used determines if this coil is temperature or capacity controlled.~ If used in the air loop simulation it will be controlled to a specified temperature scheduled from the SetpointManager.~ If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.~ The gas coil has additional features that can add a part load correction and a parasitic gas or electric load.
+The fuel-powered heating coil (object name: Coil:Heating:Fuel) is a simple capacity model with user inputted burner efficiency.~ The default for the burner efficiency is 80\%.~ This coil only has air nodes to connect it in the system.~ The coil can be used in the air loop simulation or in the zone equipment as a reheat coil.~ Depending on where it is used determines if this coil is temperature or capacity controlled.~ If used in the air loop simulation it will be controlled to a specified temperature scheduled from the SetpointManager.~ If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.~ The fuel coil has additional features that can add a part load correction and a parasitic fuel or electric load.
 
 The parasitic electric load associated with the gas coil operation, such as an inducer fan, etc.~ This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation time step.
 
-The parasitic gas load associated with the gas coil's operation (Watts), such as a standing pilot light.~ The model assumes that this parasitic load is consumed only for the portion of the simulation time step where the gas heating coil is not operating.
+The parasitic fuel load associated with the gas coil's operation (Watts), such as a standing pilot light.~ The model assumes that this parasitic load is consumed only for the portion of the simulation time step where the gas heating coil is not operating.
 
 \subsubsection{Field: Part Load Fraction Correlation (function of part load ratio)}\label{field-part-load-fraction-correlation-function-of-part-load-ratio}
 
-The part load correction defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of gas consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil).~ For any simulation time step, the nominal gas consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined.~ The part-load curve accounts for efficiency losses due to transient coil operation.
+The part load correction defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of fuel consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil).~ For any simulation time step, the nominal fuel consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined.~ The part-load curve accounts for efficiency losses due to transient coil operation.
 
 The part-load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the heating coil runs continuously for the simulation time step).~ For PLR values between 0 and 1 ( 0 \textless{} = PLR \textless{} 1), the following rules apply:
 
@@ -3066,11 +3066,11 @@ For a better understanding of how the coil meets the temperature setpoint in the
 
 These models (object names Coil:Heating:Electric:MultiStage and Coil:Heating:Gas:MultiStage) simulate the performance of multi stage electric and gas heating systems with two to four discrete air flow stages. Each stage has a set of user inputted gas burner efficiency, Nominal capacity, and Parasitic electric load (for gas coil only). The full load supply airflow rate is dependent on the stage number and is set by its parent object (Ref: AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed). The part-load impact on coil energy use is automatically applied to the lowest stage.
 
-When the model determines performance at Stage 1 (the lowest stage) or cycling between OFF and Stage 1, its performance is almost the same as the performance for the Coil:Heating:Electric and~ Coil:Heating:Gas models. However, the outlet conditions are calculated slightly differently. Therefore, the Coil:Heating:Electric and~ Coil:Heating:Gas model may be considered as subsets of the multistage model described here. When the multistage coil model determines performance at higher stages (above 1), the model linearly interpolates the performance at two consecutive stages (n-1 and n) as needed to meet the heating load, with the fraction of time at each speed established by the speed ratio. For the time being, this coil model can only be called by the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed.
+When the model determines performance at Stage 1 (the lowest stage) or cycling between OFF and Stage 1, its performance is almost the same as the performance for the Coil:Heating:Electric and~ Coil:Heating:Fuel models. However, the outlet conditions are calculated slightly differently. Therefore, the Coil:Heating:Electric and~ Coil:Heating:Fuel model may be considered as subsets of the multistage model described here. When the multistage coil model determines performance at higher stages (above 1), the model linearly interpolates the performance at two consecutive stages (n-1 and n) as needed to meet the heating load, with the fraction of time at each speed established by the speed ratio. For the time being, this coil model can only be called by the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed.
 
 \subsubsection{Model Inputs}\label{model-inputs-1}
 
-The model inputs are also very similar to the inputs of the Coil:Heating:Electric and~ Coil:Heating:Gas objects. The main difference is that this multistage model requires a set of fields at each speed, such as nominal capacity, and efficiency.
+The model inputs are also very similar to the inputs of the Coil:Heating:Electric and~ Coil:Heating:Fuel objects. The main difference is that this multistage model requires a set of fields at each speed, such as nominal capacity, and efficiency.
 
 \subsubsection{Stage 1 Operation}\label{stage-1-operation}
 

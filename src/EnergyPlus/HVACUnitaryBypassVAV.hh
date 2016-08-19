@@ -84,7 +84,7 @@ namespace HVACUnitaryBypassVAV {
 	extern int const CoilDX_CoolingTwoStageWHumControl; // Coil:Cooling:DX:TwoStageWithHumidityControlMode
 	// formerly (v3 and beyond) Coil:DX:MultiMode:CoolingEmpirical
 	extern int const CoilDX_HeatingEmpirical; // Coil:DX:HeatingEmpirical
-	extern int const Coil_HeatingGas; // Coil:Gas:Heating
+	extern int const Coil_HeatingGasOrOtherFuel; // Coil:Gas:Heating
 	extern int const Coil_HeatingElectric; // Coil:Electric:Heating
 
 	// Dehumidification control modes (DehumidControlMode) for Multimode units only
