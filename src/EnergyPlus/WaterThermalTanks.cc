@@ -929,11 +929,7 @@ namespace WaterThermalTanks {
 			CalcWaterThermalTankZoneGains_MyEnvrnFlag = false;
 		}
 
-<<<<<<< HEAD
-		if ( !BeginEnvrnFlag ) MyEnvrnFlag = true;
-=======
 		if ( ! BeginEnvrnFlag ) CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
->>>>>>> develop
 
 		for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterThermalTank; ++WaterThermalTankNum ) {
 			if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) continue;
