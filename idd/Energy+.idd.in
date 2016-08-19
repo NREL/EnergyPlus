@@ -6774,6 +6774,7 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
     \memo Additional properties for moisture using EMPD procedure
     \memo HeatBalanceAlgorithm choice=MoisturePenetrationDepthConductionTransferFunction only
     \memo Has no effect with other HeatBalanceAlgorithm solution algorithms
+    \min-fields 10
   A1 , \field Name
        \required-field
        \type object-list
@@ -6805,7 +6806,6 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \units dimensionless
        \type real
   N6 , \field Surface Layer Penetration Depth
-       \required-field
        \units m
        \ip-units in
        \type real
@@ -6813,7 +6813,6 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \autocalculatable
        \default autocalculate
   N7 , \field Deep Layer Penetration Depth
-       \required-field
        \units m
        \ip-units in
        \type real
@@ -66267,7 +66266,6 @@ HeatExchanger:FluidToFluid,
         \key CounterFlow
         \key Ideal
         \default Ideal
-        \required-field
    N3 , \field Heat Exchanger U-Factor Times Area Value
         \type real
         \units W/k
