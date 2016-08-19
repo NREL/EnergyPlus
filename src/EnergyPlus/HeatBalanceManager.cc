@@ -5765,11 +5765,15 @@ Label20: ;
 				Material( loop ).WinShadeRightOpeningMult = 0.0;
 				Material( loop ).WinShadeAirFlowPermeability = 0.0;
 				Material( loop ).BlindDataPtr = 0;
-				Material( loop ).EMPDVALUE = 0.0;
+				Material( loop ).EMPDmu = 0.0;
 				Material( loop ).MoistACoeff = 0.0;
 				Material( loop ).MoistBCoeff = 0.0;
 				Material( loop ).MoistCCoeff = 0.0;
 				Material( loop ).MoistDCoeff = 0.0;
+				Material( loop ).EMPDSurfaceDepth = 0.0;
+				Material( loop ).EMPDDeepDepth = 0.0;
+				Material( loop ).EMPDmuCoating = 0.0;
+				Material( loop ).EMPDCoatingThickness = 0.0;
 			}
 
 			// Glass objects
