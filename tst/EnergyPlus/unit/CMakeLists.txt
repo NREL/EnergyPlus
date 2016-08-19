@@ -18,6 +18,7 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
+  ChilledCeilingPanelSimple.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
