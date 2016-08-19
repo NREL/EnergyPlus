@@ -642,7 +642,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_InputGenerator_Test)
 	InternalHeatGains::GetInternalHeatGainsInput();
 	InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
-	DaylightingManager::GetDaylightingParametersInput(); // which calls DElightInputGenerator();
+//	DaylightingManager::GetDaylightingParametersInput(); // which calls DElightInputGenerator();
 	compare_err_stream("");
 
 //	compare_delightin_stream(""); // this should fail since the delightin stream should be the DElight.in file
