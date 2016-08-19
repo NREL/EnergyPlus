@@ -202,6 +202,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > SumHmAW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
 	extern Array1D< Real64 > SumHmARa; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 	extern Array1D< Real64 > SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
+	extern Array1D< Real64 > SumHmARaZ;
 
 	extern Array1D< Real64 > TempZoneThermostatSetPoint;
 	extern Array1D< Real64 > ZoneThermostatSetPointHi;

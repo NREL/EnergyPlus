@@ -89,7 +89,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:SingleSpeed, COIL:DX:HeatingEmpirical, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, COIL:DX:HeatingEmpirical, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1491,7 +1491,7 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     1.7,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -1619,10 +1619,11 @@
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     45000,                !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name

@@ -453,10 +453,11 @@
     AIR 6MM,                 !- Layer 2
     CLEAR 6MM;               !- Layer 3
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Zone2OAUHeatingCoil,     !- Name
     OAUnitOASched,           !- Availability Schedule Name
-    0.77,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.77,                    !- Burner Efficiency
     30000,                   !- Nominal Capacity {W}
     Zone2OAUHCoilIn,         !- Air Inlet Node Name
     Zone2OAUHCoilout;        !- Air Outlet Node Name
@@ -696,7 +697,7 @@
     1,                       !- Nominal Process Air Flow Rate {m3/s}
     2.5,                     !- Nominal Process Air Velocity {m/s}
     10,                      !- Rotor Power {W}
-    Coil:Heating:Gas,        !- Regeneration Coil Object Type
+    Coil:Heating:Fuel,        !- Regeneration Coil Object Type
     Desiccant Regen Coil,    !- Regeneration Coil Name
     Fan:VariableVolume,      !- Regeneration Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Fan Name
@@ -738,10 +739,11 @@
     Zone5OAUZoneOutletNode,  !- Secondary Air Inlet Node Name
     Heat Recovery Secondary Outlet Node;  !- Secondary Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Desiccant Regen Coil,    !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.80,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.80,                    !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Regen Coil Inlet Node,   !- Air Inlet Node Name
     Regen Coil Out Node;     !- Air Outlet Node Name
@@ -1634,7 +1636,7 @@
     Zone2OAUHX,              !- Component 1 Name
     coil:cooling:water,      !- Component 2 Object Type
     Zone2OAUWCcoil,          !- Component 2 Name
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     Zone2OAUHeatingCoil,     !- Component 3 Name
     Coil:Cooling:Water,      !- Component 4 Object Type
     Zone2OAUWCcoil2;         !- Component 4 Name

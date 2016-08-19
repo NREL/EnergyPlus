@@ -85,7 +85,7 @@
 ! Purchased Hot Water:            Yes
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
 ! Coils:                          Coil:Cooling:DX:SingleSpeed
-!                                 Coil:Heating:Gas
+!                                 Coil:Heating:Fuel
 !
 ! Heat Reclaim Coils:             Coil:WaterHeating:Desuperheater
 !
@@ -1261,7 +1261,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
@@ -1366,10 +1366,11 @@
     WaterHeatingCoilInletNode,  !- Source Side Outlet Node Name
     0.95;                    !- Source Side Effectiveness
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     25000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name

@@ -83,7 +83,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatOnly, AirLoopHVAC:UnitaryHeatOnly
-! Coils:                          Coil:Heating:Gas
+! Coils:                          Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1265,7 +1265,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Furnace Coil;            !- Heating Coil Name
 
   AirLoopHVAC:UnitaryHeatOnly,
@@ -1280,7 +1280,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 2,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Furnace Coil 2;          !- Heating Coil Name
 
   AirTerminal:SingleDuct:Uncontrolled,
@@ -1373,10 +1373,11 @@
     Return Air Mixer Outlet 2,  !- Outlet Node Name
     Zone 3 Outlet Node;      !- Inlet 1 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Coil,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
@@ -1385,10 +1386,11 @@
     PLFCurveforGasFurnace,   !- Part Load Fraction Correlation Curve Name
     10;                      !- Parasitic Gas Load {W}
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Furnace Coil 2,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node 2,  !- Air Inlet Node Name
     Air Loop Outlet Node 2,  !- Air Outlet Node Name
