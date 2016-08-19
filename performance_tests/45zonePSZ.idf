@@ -18394,7 +18394,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:1_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:1_HeatC-PSZ-AC:1 FanNode,  !- Air Outlet Node Name
@@ -18682,7 +18683,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:2_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:2_HeatC-PSZ-AC:2 FanNode,  !- Air Outlet Node Name
@@ -18970,7 +18972,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:3_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:3_HeatC-PSZ-AC:3 FanNode,  !- Air Outlet Node Name
@@ -19258,7 +19261,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:4_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:4_HeatC-PSZ-AC:4 FanNode,  !- Air Outlet Node Name
@@ -19546,7 +19550,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:5_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:5_HeatC-PSZ-AC:5 FanNode,  !- Air Outlet Node Name
@@ -19834,7 +19839,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:6_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:6_CoolC-PSZ-AC:6_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:6_HeatC-PSZ-AC:6 FanNode,  !- Air Outlet Node Name
@@ -20122,7 +20128,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:7_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:7_CoolC-PSZ-AC:7_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:7_HeatC-PSZ-AC:7 FanNode,  !- Air Outlet Node Name
@@ -20410,7 +20417,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:8_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:8_CoolC-PSZ-AC:8_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:8_HeatC-PSZ-AC:8 FanNode,  !- Air Outlet Node Name
@@ -20698,7 +20706,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:9_HeatC,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:9_CoolC-PSZ-AC:9_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:9_HeatC-PSZ-AC:9 FanNode,  !- Air Outlet Node Name
@@ -20986,7 +20995,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:10_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:10_CoolC-PSZ-AC:10_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:10_HeatC-PSZ-AC:10 FanNode,  !- Air Outlet Node Name
@@ -21274,7 +21284,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:11_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:11_CoolC-PSZ-AC:11_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:11_HeatC-PSZ-AC:11 FanNode,  !- Air Outlet Node Name
@@ -21562,7 +21573,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:12_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:12_CoolC-PSZ-AC:12_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:12_HeatC-PSZ-AC:12 FanNode,  !- Air Outlet Node Name
@@ -21850,7 +21862,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:13_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:13_CoolC-PSZ-AC:13_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:13_HeatC-PSZ-AC:13 FanNode,  !- Air Outlet Node Name
@@ -22138,7 +22151,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:14_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:14_CoolC-PSZ-AC:14_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:14_HeatC-PSZ-AC:14 FanNode,  !- Air Outlet Node Name
@@ -22426,7 +22440,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:15_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:15_CoolC-PSZ-AC:15_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:15_HeatC-PSZ-AC:15 FanNode,  !- Air Outlet Node Name
@@ -22714,7 +22729,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:16_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:16_CoolC-PSZ-AC:16_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:16_HeatC-PSZ-AC:16 FanNode,  !- Air Outlet Node Name
@@ -23002,7 +23018,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:17_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:17_CoolC-PSZ-AC:17_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:17_HeatC-PSZ-AC:17 FanNode,  !- Air Outlet Node Name
@@ -23290,7 +23307,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:18_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:18_CoolC-PSZ-AC:18_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:18_HeatC-PSZ-AC:18 FanNode,  !- Air Outlet Node Name
@@ -23578,7 +23596,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:19_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:19_CoolC-PSZ-AC:19_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:19_HeatC-PSZ-AC:19 FanNode,  !- Air Outlet Node Name
@@ -23866,7 +23885,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:20_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:20_CoolC-PSZ-AC:20_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:20_HeatC-PSZ-AC:20 FanNode,  !- Air Outlet Node Name
@@ -24154,7 +24174,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:21_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:21_CoolC-PSZ-AC:21_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:21_HeatC-PSZ-AC:21 FanNode,  !- Air Outlet Node Name
@@ -24442,7 +24463,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:22_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:22_CoolC-PSZ-AC:22_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:22_HeatC-PSZ-AC:22 FanNode,  !- Air Outlet Node Name
@@ -24730,7 +24752,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:23_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:23_CoolC-PSZ-AC:23_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:23_HeatC-PSZ-AC:23 FanNode,  !- Air Outlet Node Name
@@ -25018,7 +25041,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:24_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:24_CoolC-PSZ-AC:24_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:24_HeatC-PSZ-AC:24 FanNode,  !- Air Outlet Node Name
@@ -25306,7 +25330,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:25_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:25_CoolC-PSZ-AC:25_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:25_HeatC-PSZ-AC:25 FanNode,  !- Air Outlet Node Name
@@ -25594,7 +25619,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:26_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:26_CoolC-PSZ-AC:26_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:26_HeatC-PSZ-AC:26 FanNode,  !- Air Outlet Node Name
@@ -25882,7 +25908,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:27_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:27_CoolC-PSZ-AC:27_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:27_HeatC-PSZ-AC:27 FanNode,  !- Air Outlet Node Name
@@ -26170,7 +26197,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:28_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:28_CoolC-PSZ-AC:28_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:28_HeatC-PSZ-AC:28 FanNode,  !- Air Outlet Node Name
@@ -26458,7 +26486,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:29_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:29_CoolC-PSZ-AC:29_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:29_HeatC-PSZ-AC:29 FanNode,  !- Air Outlet Node Name
@@ -26746,7 +26775,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:30_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:30_CoolC-PSZ-AC:30_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:30_HeatC-PSZ-AC:30 FanNode,  !- Air Outlet Node Name
@@ -27034,7 +27064,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:31_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:31_CoolC-PSZ-AC:31_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:31_HeatC-PSZ-AC:31 FanNode,  !- Air Outlet Node Name
@@ -27322,7 +27353,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:32_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:32_CoolC-PSZ-AC:32_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:32_HeatC-PSZ-AC:32 FanNode,  !- Air Outlet Node Name
@@ -27610,7 +27642,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:33_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:33_CoolC-PSZ-AC:33_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:33_HeatC-PSZ-AC:33 FanNode,  !- Air Outlet Node Name
@@ -27898,7 +27931,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:34_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:34_CoolC-PSZ-AC:34_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:34_HeatC-PSZ-AC:34 FanNode,  !- Air Outlet Node Name
@@ -28186,7 +28220,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:35_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:35_CoolC-PSZ-AC:35_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:35_HeatC-PSZ-AC:35 FanNode,  !- Air Outlet Node Name
@@ -28474,7 +28509,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:36_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:36_CoolC-PSZ-AC:36_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:36_HeatC-PSZ-AC:36 FanNode,  !- Air Outlet Node Name
@@ -28762,7 +28798,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:37_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:37_CoolC-PSZ-AC:37_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:37_HeatC-PSZ-AC:37 FanNode,  !- Air Outlet Node Name
@@ -29050,7 +29087,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:38_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:38_CoolC-PSZ-AC:38_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:38_HeatC-PSZ-AC:38 FanNode,  !- Air Outlet Node Name
@@ -29338,7 +29376,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:39_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:39_CoolC-PSZ-AC:39_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:39_HeatC-PSZ-AC:39 FanNode,  !- Air Outlet Node Name
@@ -29626,7 +29665,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:40_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:40_CoolC-PSZ-AC:40_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:40_HeatC-PSZ-AC:40 FanNode,  !- Air Outlet Node Name
@@ -29914,7 +29954,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:41_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:41_CoolC-PSZ-AC:41_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:41_HeatC-PSZ-AC:41 FanNode,  !- Air Outlet Node Name
@@ -30202,7 +30243,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:42_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:42_CoolC-PSZ-AC:42_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:42_HeatC-PSZ-AC:42 FanNode,  !- Air Outlet Node Name
@@ -30490,7 +30532,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:43_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:43_CoolC-PSZ-AC:43_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:43_HeatC-PSZ-AC:43 FanNode,  !- Air Outlet Node Name
@@ -30778,7 +30821,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:44_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:44_CoolC-PSZ-AC:44_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:44_HeatC-PSZ-AC:44 FanNode,  !- Air Outlet Node Name
@@ -31066,7 +31110,8 @@
   Coil:Heating:Fuel,
     PSZ-AC:45_HeatC,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC:45_CoolC-PSZ-AC:45_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC:45_HeatC-PSZ-AC:45 FanNode,  !- Air Outlet Node Name

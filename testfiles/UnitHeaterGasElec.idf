@@ -977,8 +977,8 @@
   Coil:Heating:Fuel,
     Zone1UnitHeatHeatingCoil,!- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.76,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.76,                    !- Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Zone1UnitHeatFanOutletNode,  !- Air Inlet Node Name
     Zone1UnitHeatAirOutletNode;  !- Air Outlet Node Name
