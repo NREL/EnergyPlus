@@ -93,7 +93,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            Yes
 ! HVAC System:                    ZoneHVAC:WindowAirConditioner
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None

@@ -257,6 +257,17 @@ namespace WaterThermalTanks {
 	int NumWaterHeaterSizing( 0 ); // Number of sizing/design objects for water heaters.
 	Array1D_bool AlreadyRated; // control so we don't repeat again
 
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitWaterThermalTanksOnce( true ); // flag for 1 time initialization
+		bool SimWaterThermalTank_OneTimeSetupFlag( true );
+		bool CalcWaterThermalTankZoneGains_MyEnvrnFlag( true );
+	}
+
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
@@ -313,7 +324,6 @@ namespace WaterThermalTanks {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool OneTimeSetupFlag( true );
 		static Array1D_bool MyOneTimeFlagWH; // first pass log
 		static Array1D_bool MyTwoTimeFlagWH; // second pass do input check
 		static Array1D_bool MyOneTimeFlagHP; // first pass log
@@ -329,7 +339,7 @@ namespace WaterThermalTanks {
 			GetWaterThermalTankInputFlag = false;
 		}
 
-		if ( OneTimeSetupFlag ) {
+		if ( SimWaterThermalTank_OneTimeSetupFlag ) {
 			MyOneTimeFlagWH.allocate( NumWaterThermalTank );
 			MyTwoTimeFlagWH.allocate( NumWaterThermalTank );
 			MyOneTimeFlagHP.allocate( NumHeatPumpWaterHeater );
@@ -338,7 +348,7 @@ namespace WaterThermalTanks {
 			MyTwoTimeFlagWH = true;
 			MyOneTimeFlagHP = true;
 			MyTwoTimeFlagHP = true;
-			OneTimeSetupFlag = false;
+			SimWaterThermalTank_OneTimeSetupFlag = false;
 		}
 
 		// Find the correct Equipment
@@ -738,7 +748,6 @@ namespace WaterThermalTanks {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterThermalTankNum;
 		int ZoneNum;
-		static bool MyEnvrnFlag( true );
 		Real64 TankTemp;
 		Real64 QLossToZone;
 		int SchIndex;
@@ -758,17 +767,17 @@ namespace WaterThermalTanks {
 
 		}
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
+		if ( BeginEnvrnFlag && CalcWaterThermalTankZoneGains_MyEnvrnFlag ) {
 			for ( auto & e : WaterThermalTank ) {
 				e.AmbientZoneGain = 0.0;
 				e.FuelEnergy = 0.0;
 				e.OffCycParaFuelEnergy = 0.0;
 				e.OnCycParaFuelEnergy = 0.0;
 			}
-			MyEnvrnFlag = false;
+			CalcWaterThermalTankZoneGains_MyEnvrnFlag = false;
 		}
 
-		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
+		if ( ! BeginEnvrnFlag ) CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
 
 		for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterThermalTank; ++WaterThermalTankNum ) {
 			if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) continue;
@@ -4798,7 +4807,6 @@ namespace WaterThermalTanks {
 		Real64 FanVolFlow(0.0); // Used for error checking fans used with HPWHs
 		//  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
 		//  Integer             :: Loop
-		static bool InitWaterThermalTanksOnce( true ); // flag for 1 time initialization
 		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
 		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 		static Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -7445,6 +7453,7 @@ namespace WaterThermalTanks {
 		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
 		//Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
 		int loopIter; // iteration loop counter
+		Real64 SourceEffectivenessBackup( 1.0 );
 
 		// References to objects used in this function
 		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
@@ -7564,6 +7573,103 @@ namespace WaterThermalTanks {
 		if ( HeatPump.Mode == HeatMode ) {
 			// HPWH was heating last iteration and will continue to heat until the set point is reached
 			HPPartLoadRatio = 1.0;
+			if ( TankTemp > SetPointTemp ) { // tank set point temp may have been reduced since last iteration and float mode may be needed
+				HeatPump.Mode = FloatMode;
+				HPPartLoadRatio = 0.0;
+				// check to see if HP needs to operate
+				// set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
+				{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
+				if ( SELECT_CASE_var1 == MixedWaterHeater ) {
+					Node( HPWaterInletNode ).Temp = TankTemp;
+					Node( HPWaterOutletNode ).Temp = TankTemp;
+				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
+					Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
+					Node( HPWaterOutletNode ).Temp = Tank.SourceInletTemp;
+				}}
+				Node( HPWaterInletNode ).MassFlowRate = 0.0;
+				Node( HPWaterOutletNode ).MassFlowRate = 0.0;
+
+				// Check tank temperature by setting source inlet mass flow rate to zero.
+				HPPartLoadRatio = 0.0;
+
+				// Set the full load outlet temperature on the water heater source inlet node (init has already been called).
+				Tank.SourceInletTemp = Node( HPWaterOutletNode ).Temp;
+
+				// Disable the tank's internal heating element to find PLR of the HPWH using floating temperatures.
+				Tank.MaxCapacity = 0.0;
+				Tank.MinCapacity = 0.0;
+				Tank.SourceMassFlowRate = 0.0; // disables heat pump for mixed tanks
+				SourceEffectivenessBackup = Tank.SourceEffectiveness;
+				Tank.SourceEffectiveness = 0.0; // disables heat pump for stratified tanks
+				CalcWaterThermalTank( WaterThermalTankNum );
+				Tank.SourceEffectiveness = SourceEffectivenessBackup;
+				NewTankTemp = GetHPWHSensedTankTemp( Tank );
+
+				// Reset the tank's internal heating element capacity.
+				Tank.MaxCapacity = HeatPump.BackupElementCapacity;
+				Tank.MinCapacity = HeatPump.BackupElementCapacity;
+
+				// Check to see if the tank drifts below set point if no heating happens.
+				if ( NewTankTemp <= ( SetPointTemp - DeadBandTempDiff ) ) {
+
+					// HPWH is now in heating mode
+					HeatPump.Mode = HeatMode;
+
+					// Reset the water heater's mode (call above may have changed modes)
+					Tank.Mode = HeatPump.SaveWHMode;
+
+					HPPartLoadRatio = 1.0;
+				}
+			} else { // or use side nodes may meet set point without need for heat pump compressor operation
+				// check to see if HP needs to operate
+				{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
+				if ( SELECT_CASE_var1 == MixedWaterHeater ) {
+					Node( HPWaterInletNode ).Temp = TankTemp;
+					Node( HPWaterOutletNode ).Temp = TankTemp;
+				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
+					Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
+					Node( HPWaterOutletNode ).Temp = Tank.SourceInletTemp;
+				}}
+				// Check tank temperature by setting source inlet mass flow rate to zero.
+				Node( HPWaterInletNode ).MassFlowRate = 0.0;
+				Node( HPWaterOutletNode ).MassFlowRate = 0.0;
+
+				HPPartLoadRatio = 0.0;
+
+				// Set the full load outlet temperature on the water heater source inlet node (init has already been called).
+				Tank.SourceInletTemp = Node( HPWaterOutletNode ).Temp;
+
+				// Disable the tank's internal heating element to find PLR of the HPWH using floating temperatures.
+				Tank.MaxCapacity = 0.0;
+				Tank.MinCapacity = 0.0;
+				Tank.SourceMassFlowRate = 0.0; // disables heat pump for mixed tanks
+				SourceEffectivenessBackup = Tank.SourceEffectiveness;
+				Tank.SourceEffectiveness = 0.0; // disables heat pump for stratified tanks
+				CalcWaterThermalTank( WaterThermalTankNum );
+				Tank.SourceEffectiveness = SourceEffectivenessBackup;
+				NewTankTemp = GetHPWHSensedTankTemp( Tank );
+
+				// Reset the tank's internal heating element capacity.
+				Tank.MaxCapacity = HeatPump.BackupElementCapacity;
+				Tank.MinCapacity = HeatPump.BackupElementCapacity;
+
+				// Check to see if the tank meets set point if no heating happens.
+				if ( NewTankTemp > SetPointTemp ) {
+
+					// HPWH is now in floating mode
+					HeatPump.Mode = FloatMode;
+
+				} else {
+
+					// HPWH remains in heating mode
+					HPPartLoadRatio = 1.0;
+
+				}
+
+				// Reset the water heater's mode (call above may have changed modes)
+				Tank.Mode = HeatPump.SaveWHMode;
+
+			}
 		} else {
 			assert( HeatPump.Mode == FloatMode );
 			// HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
@@ -7586,13 +7692,11 @@ namespace WaterThermalTanks {
 			// Set the full load outlet temperature on the water heater source inlet node (init has already been called).
 			Tank.SourceInletTemp = Node( HPWaterOutletNode ).Temp;
 
-			// Check tank temperature by setting source inlet mass flow rate to zero.
-
 			// Disable the tank's internal heating element to find PLR of the HPWH using floating temperatures.
 			Tank.MaxCapacity = 0.0;
 			Tank.MinCapacity = 0.0;
 			Tank.SourceMassFlowRate = 0.0; // disables heat pump for mixed tanks
-			Real64 const SourceEffectivenessBackup = Tank.SourceEffectiveness;
+			SourceEffectivenessBackup = Tank.SourceEffectiveness;
 			Tank.SourceEffectiveness = 0.0; // disables heat pump for stratified tanks
 			CalcWaterThermalTank( WaterThermalTankNum );
 			Tank.SourceEffectiveness = SourceEffectivenessBackup;
@@ -7671,9 +7775,9 @@ namespace WaterThermalTanks {
 							if (HeatPump.IterLimitExceededNum2 == 1) {
 								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
 								ShowContinueError("Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits(HPPartLoadRatio, 3));
-								ShowContinueErrorTimeStamp("This error occurred in float mode.");
+								ShowContinueErrorTimeStamp("This error occurred in heating mode.");
 							} else {
-								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio);
+								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio);
 							}
 						}
 					} else if (SolFla == -2) {
@@ -7684,9 +7788,9 @@ namespace WaterThermalTanks {
 								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
 								ShowContinueError("Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits(HPPartLoadRatio, 3));
 								ShowContinueError("Please send this information to the EnergyPlus support group.");
-								ShowContinueErrorTimeStamp("This error occured in float mode.");
+								ShowContinueErrorTimeStamp("This error occured in heating mode.");
 							} else {
-								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio);
+								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio);
 							}
 						}
 					}
@@ -10596,6 +10700,9 @@ namespace WaterThermalTanks {
 		NumWaterHeaterSizing = 0;
 		AlreadyRated.deallocate();
 
+		SimWaterThermalTank_OneTimeSetupFlag = true;
+		InitWaterThermalTanksOnce = true;
+		CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
 		WaterThermalTank.deallocate();
 		HPWaterHeater.deallocate();
 		WaterHeaterDesuperheater.deallocate();

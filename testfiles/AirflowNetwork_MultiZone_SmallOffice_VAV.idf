@@ -113,7 +113,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          A main heating coil and 3 terminal reheat coils using Coil:Heating:Gas
+! Coils:                          A main heating coil and 3 terminal reheat coils using Coil:Heating:Fuel
 !                                 Coil:Cooling:DX:TwoSpeed
 ! Pumps:                          None
 ! Boilers:                        None
@@ -1775,7 +1775,7 @@
     Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name
     PASSIVE,                 !- Component 3 Branch Control Type
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     Main Heating Coil 1,     !- Component 4 Name
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
     Air Loop Outlet Node,    !- Component 4 Outlet Node Name
@@ -2558,7 +2558,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Main Heating Coil 1,     !- Coil Name
-    Coil:Heating:Gas,        !- Coil Object Type
+    Coil:Heating:Fuel,        !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2990,7 +2990,7 @@
     0.10,                    !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     Minimum OA Sch,          !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,        !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -3012,7 +3012,7 @@
     0.10,                    !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     Minimum OA Sch,          !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,        !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -3034,7 +3034,7 @@
     0.10,                    !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     Minimum OA Sch,          !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,        !- Reheat Coil Object Type
     Reheat Coil Zone 3,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -3231,35 +3231,39 @@
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 1,     !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
     Air Loop Outlet Node;    !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil Zone 1,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone 1 Coil Air Inlet Node,  !- Air Inlet Node Name
     Zone 1 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil Zone 2,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    1.0,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    1.0,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone 2 Coil Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Reheat Coil Zone 3,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    1.0,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    1.0,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     Zone 3 Coil Air Inlet Node,  !- Air Inlet Node Name
     Zone 3 Reheat Air Outlet Node;  !- Air Outlet Node Name
