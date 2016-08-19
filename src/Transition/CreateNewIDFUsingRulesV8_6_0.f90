@@ -110,6 +110,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: continuous
   CHARACTER(len=MaxNameLength) :: OutScheduleName
 
+
+  REAL MaterialDensity
+  REAL EMPDCoeffA
+  REAL EMPDCoeffB
+  REAL EMPDCoeffC
+  REAL EMPDCoeffD
+  REAL EMPDCoeffDEMPD
+  REAL MuEMPD
+  INTEGER MatlSearchNum
+  REAL, EXTERNAL :: CalculateMuEMPD
+  LOGICAL FoundMaterial
+
   LOGICAL :: ErrFlag
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
@@ -822,6 +834,58 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(2) = 'None'
                 OutArgs(3:11) = InArgs(2:10)
                 CurArgs = CurArgs+1
+              
+              CASE('COIL:HEATING:GAS')
+                nodiff = .false.
+                ObjectName = 'Coil:Heating:Fuel'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:2) = InArgs(1:2)
+                OutArgs(3) = 'NaturalGas'
+                OutArgs(4:11) = InArgs(3:10)
+                CurArgs = CurArgs + 1
+
+              CASE('MATERIALPROPERTY:MOISTUREPENETRATIONDEPTH:SETTINGS')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! Write out the new field values
+                OutArgs(1)  = InArgs(1) ! Name
+                OutArgs(2)  = "Could not find Material Match for "//InArgs(1)         ! Initialize to something dumb in case we don't find a matching material
+                OutArgs(3)  = InArgs(3) ! coefficient a
+                OutArgs(4)  = InArgs(4) ! coefficient b
+                OutArgs(5)  = InArgs(5) ! coefficient c
+                OutArgs(6)  = InArgs(6) ! coefficient d
+                OutArgs(7)  = InArgs(2) ! original d_empd value
+                OutArgs(8)  = "0"       ! New field with default of 0
+                OutArgs(9)  = "0"       ! New field with default of 0
+                OutArgs(10) = "0"       ! New field with default of 0
+                ! Tell the "output" processor that we have 10 fields now
+                CurArgs = 10
+				! Get density of the material using InArgs(1) as the name, converted to a REAL
+				FoundMaterial = .FALSE.
+				DO MatlSearchNum = 1, NumIDFRecords
+				  IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Name) /= 'MATERIAL') CYCLE
+				  IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Alphas(1)) == MakeUPPERCase(InArgs(1))) THEN
+				    FoundMaterial = .TRUE.
+					! We have our match for the stratified tank child
+					WRITE(diflfn,fmta) '! Found a material component match; name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+					! Now simply get the material density
+					READ (IDFRecords(MatlSearchNum)%Numbers(3),*) MaterialDensity
+				  END IF
+				END DO
+				IF ( .NOT. FoundMaterial ) THEN
+				  WRITE(diflfn,fmta) '! Didnt find a material component match for name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+				  CALL ShowFatalError( 'Material match issue' )
+				END IF
+				! Get other values into REALs
+				READ (InArgs(3),*) EMPDCoeffA
+				READ (InArgs(4),*) EMPDCoeffB
+				READ (InArgs(5),*) EMPDCoeffC
+				READ (InArgs(6),*) EMPDCoeffD
+				READ (InArgs(2),*) EMPDCoeffDEMPD
+				! Get new mu_empd value from a function that deals with REALs
+				MuEMPD = CalculateMuEMPD(EMPDCoeffA, EMPDCoeffB, EMPDCoeffC, EMPDCoeffD, EMPDCoeffDEMPD, MaterialDensity)
+				! Read the real value back and assign to OutArgs(2)
+				WRITE(OutArgs(2),*) MuEMPD
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN

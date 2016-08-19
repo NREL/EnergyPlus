@@ -4842,7 +4842,7 @@ namespace HeatBalanceManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			DataSurfaces::Surface( SurfNum ).MovInsulIntPresentPrevTS = DataSurfaces::Surface( SurfNum ).MovInsulIntPresent;
 		}
-		
+
 	}
 
 	void
@@ -5796,11 +5796,15 @@ Label20: ;
 				Material( loop ).WinShadeRightOpeningMult = 0.0;
 				Material( loop ).WinShadeAirFlowPermeability = 0.0;
 				Material( loop ).BlindDataPtr = 0;
-				Material( loop ).EMPDVALUE = 0.0;
+				Material( loop ).EMPDmu = 0.0;
 				Material( loop ).MoistACoeff = 0.0;
 				Material( loop ).MoistBCoeff = 0.0;
 				Material( loop ).MoistCCoeff = 0.0;
 				Material( loop ).MoistDCoeff = 0.0;
+				Material( loop ).EMPDSurfaceDepth = 0.0;
+				Material( loop ).EMPDDeepDepth = 0.0;
+				Material( loop ).EMPDmuCoating = 0.0;
+				Material( loop ).EMPDCoatingThickness = 0.0;
 			}
 
 			// Glass objects
@@ -7199,7 +7203,7 @@ Label1000: ;
 			IsBlank = false;
 
 			// Verify unique names
-			VerifyName( cAlphaArgs( 1 ), Material, MaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Material, MaterNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );

@@ -58,6 +58,7 @@ set( test_src
   HeatBalanceIntRadExchange.unit.cc
   HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
+  HeatingCoils.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
@@ -77,6 +78,7 @@ set( test_src
   InternalHeatGains.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
+  MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
@@ -114,6 +116,7 @@ set( test_src
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
+  SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc

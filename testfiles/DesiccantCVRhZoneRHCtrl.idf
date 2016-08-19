@@ -2384,10 +2384,11 @@
     Cooling Coil Air Outlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Desiccant Regen Coil,    !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.80,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.80,                    !- Burner Efficiency
     100000,                  !- Nominal Capacity {W}
     Regen Coil Inlet Node,   !- Air Inlet Node Name
     Regen Coil Out Node;     !- Air Outlet Node Name
@@ -2458,7 +2459,7 @@
     1,                       !- Nominal Process Air Flow Rate {m3/s}
     2.5,                     !- Nominal Process Air Velocity {m/s}
     10,                      !- Rotor Power {W}
-    Coil:Heating:Gas,        !- Regeneration Coil Object Type
+    Coil:Heating:Fuel,        !- Regeneration Coil Object Type
     Desiccant Regen Coil,    !- Regeneration Coil Name
     Fan:VariableVolume,      !- Regeneration Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Fan Name

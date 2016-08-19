@@ -7513,8 +7513,8 @@ namespace AirflowNetworkBalanceManager {
 						ErrorsFound = true;
 					}
 
-				} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
-					ValidateComponent( "Coil:Heating:Gas", DisSysCompCoilData( i ).Name, IsNotOK, RoutineName + CurrentModuleObject );
+				} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
+					ValidateComponent( "Coil:Heating:Fuel", DisSysCompCoilData( i ).Name, IsNotOK, RoutineName + CurrentModuleObject );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 					}

@@ -56,7 +56,7 @@
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1722,7 +1722,7 @@
     Mixed Air 1 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
     PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     DX Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 1 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -1747,7 +1747,7 @@
     Mixed Air 2 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 2 Outlet Node,  !- Component 2 Outlet Node Name
     PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil 2,     !- Component 3 Name
     DX Cooling Coil 2 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 2 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -1772,7 +1772,7 @@
     Mixed Air 3 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 3 Outlet Node,  !- Component 2 Outlet Node Name
     PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil 3,     !- Component 3 Name
     DX Cooling Coil 3 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 3 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -1797,7 +1797,7 @@
     Mixed Air 4 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 4 Outlet Node,  !- Component 2 Outlet Node Name
     PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil 4,     !- Component 3 Name
     DX Cooling Coil 4 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 4 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -2198,37 +2198,41 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 4;              !- Cooling Coil Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 1,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 1 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 1 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 2,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 2 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 2 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 2 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 3,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 3 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 3 Air Outlet Node,  !- Air Outlet Node Name
     Main Heating Coil 3 Air Outlet Node;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Main Heating Coil 4,     !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     15000,                   !- Nominal Capacity {W}
     DX Cooling Coil 4 Outlet Node,  !- Air Inlet Node Name
     Main Heating Coil 4 Air Outlet Node,  !- Air Outlet Node Name

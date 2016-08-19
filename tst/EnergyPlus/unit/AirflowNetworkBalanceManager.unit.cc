@@ -1858,7 +1858,7 @@ namespace EnergyPlus {
 
 			"  AirflowNetwork:Distribution:Component:Coil,",
 			"    Main Heating Coil 1,     !- Coil Name",
-			"    Coil:Heating:Gas,        !- Coil Object Type",
+			"    Coil:Heating:Fuel,        !- Coil Object Type",
 			"    0.1,                     !- Air Path Length {m}",
 			"    1.00;                    !- Air Path Hydraulic Diameter {m}",
 

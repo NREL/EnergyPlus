@@ -505,7 +505,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 7 );
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
+			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
@@ -747,7 +747,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctCBVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 5 );
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
+			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
@@ -910,7 +910,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctConstVolReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 5 );
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
+			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
@@ -1288,7 +1288,7 @@ namespace SingleDuct {
 			Sys( SysNum ).ReheatComp = Alphas( 7 );
 			Sys( SysNum ).ReheatName = Alphas( 8 );
 			IsNotOK = false;
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
+			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 				Sys( SysNum ).ReheatAirOutletNode = GetHeatingCoilOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				Sys( SysNum ).ReheatCoilMaxCapacity = GetHeatingCoilCapacity( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
