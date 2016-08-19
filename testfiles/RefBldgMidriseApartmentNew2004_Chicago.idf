@@ -34,7 +34,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Gas (apartment zones)
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Fuel (apartment zones)
 !                                 Coil:Heating:Electric (corridor zones)
 ! Pumps:                          None
 ! Boilers:                        None
@@ -7004,194 +7004,218 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:01_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:01_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:01 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:02_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:02_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:02 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:03_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:03_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:03 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:04_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:04_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:04 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:05_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:05_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:05 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:06_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:06_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:06 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:07_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:07_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:07 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:08_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:08_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:08 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:09_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:09_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:09 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:10_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:10_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:10 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:11_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:11_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:11 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:12_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:12_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:12 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:13_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:13_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:13 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:14_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:14_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:14 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:15_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:15_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:15 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:16_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:16_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:16 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:17_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:17_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:17 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:18_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:18_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:18 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:19_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:19_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:19 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:20_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:20_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:20 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:21_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:21_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:21 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:22_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:22_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:22 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:23_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:23_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:23 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     SPLITSYSTEMAC:24_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     SPLITSYSTEMAC:24_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:24 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -11093,7 +11117,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:01_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:01_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:01_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11115,7 +11139,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:02_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:02_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:02_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11137,7 +11161,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:03_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:03_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:03_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11159,7 +11183,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:04_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:04_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:04_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11181,7 +11205,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:05_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:05_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:05_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11203,7 +11227,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:06_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:06_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:06_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11225,7 +11249,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:07_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:07_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:07_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11247,7 +11271,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:08_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:08_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:08_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11269,7 +11293,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:09_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:09_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:09_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11291,7 +11315,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:10_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:10_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:10_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11313,7 +11337,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:11_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:11_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:11_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11335,7 +11359,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:12_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:12_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:12_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11357,7 +11381,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:13_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:13_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:13_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11379,7 +11403,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:14_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:14_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:14_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11401,7 +11425,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:15_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:15_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:15_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11423,7 +11447,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:16_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:16_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:16_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11445,7 +11469,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:17_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:17_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:17_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11467,7 +11491,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:18_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:18_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:18_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11489,7 +11513,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:19_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:19_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:19_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11511,7 +11535,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:20_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:20_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:20_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11533,7 +11557,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:21_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:21_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:21_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11555,7 +11579,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:22_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:22_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:22_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11577,7 +11601,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:23_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:23_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:23_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -11599,7 +11623,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     SPLITSYSTEMAC:24_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPLITSYSTEMAC:24_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:24_Unitary_Package_CoolCoil,  !- Cooling Coil Name

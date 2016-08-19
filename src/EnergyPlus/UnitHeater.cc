@@ -483,7 +483,7 @@ namespace UnitHeater {
 				UnitHeat( UnitHeatNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 			} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = ElectricCoil;
-			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+			} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 				UnitHeat( UnitHeatNum ).HCoilType = GasCoil;
 			} else {
 				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
