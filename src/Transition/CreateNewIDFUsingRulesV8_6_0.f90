@@ -904,6 +904,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(5) = 'Continuous'
                  ENDIF
                  OutArgs(6:9) = InArgs(16:19)
+                 IF (OutArgs(8) == '0') THEN
+                   OutArgs(8) = ''
+                 ENDIF
                  OutArgs(10) = TRIM(InArgs(1)) // '_DaylRefPt1'
                  OutArgs(11:12) = InArgs(14:15)
                  OutArgs(13) = ''
@@ -958,6 +961,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(5) = 'Continuous'
                  ENDIF
                  OutArgs(6:9) = InArgs(4:7)
+                 IF (OutArgs(8) == '0') THEN
+                   OutArgs(8) = ''
+                 ENDIF
                  OutArgs(10) = ''
                  OutArgs(11) = '0'
                  OutArgs(12) = ''

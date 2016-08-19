@@ -642,8 +642,6 @@ TEST_F(EnergyPlusFixture, DElightManagerF_InputGenerator_Test)
 	InternalHeatGains::GetInternalHeatGainsInput();
 	InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
-	//SimulationManager::OpenOutputFiles();
-
 	DaylightingManager::GetDaylightingParametersInput(); // which calls DElightInputGenerator();
 	compare_err_stream("");
 

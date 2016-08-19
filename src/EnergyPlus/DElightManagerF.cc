@@ -157,7 +157,6 @@ namespace DElightManagerF {
 
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int unit; // Unit number on which to write file
 		int iNumDElightZones; // Counter for Thermal Zones with hosted Daylighting:DElight objects
 		int iNumOpaqueSurfs; // Counter for opaque surfaces in each zone
 		int iSurfaceFirst; // starting loop variable for surfaces
