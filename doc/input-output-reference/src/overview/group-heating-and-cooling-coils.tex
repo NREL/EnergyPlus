@@ -5135,6 +5135,240 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
 
 No variables are reported for this compound object. However, outputs are provided by the cooling coil and heat exchanger that are specified.
 
+\subsection{CoilSystem:IntegratedHeatPump:AirSource}\label{ASIHPIO}
+
+CoilSystem:IntegratedHeatPump:AirSource is a collection of all the working modes in an air-source integrated heat pump, including space cooling (SC), space heating (SH), dedicated water heating (DWH), combined space cooling and water heating with full condensing(SCWH), combined space cooling and water heating with desuperheating (SCDWH), combined space heating and water heating with desuperheating (SHDWH). These working modes should also be referred to in other related air loop or water loop parent objects, for example, AirLoopHVAC:UnitarySystem and WaterHeater:HeatPump:PumpedCondenser, to represent the air side and water side node connections, and facilitate iterating the speed to match the space conditioning or water heating load. In addition, CoilSystem:IntegratedHeatPump:AirSource contains a series of criteria for selecting a working mode at the beginning of each timestep. 
+
+\subsubsection{Inputs}\label{inputs-ASIHP}
+
+\paragraph{Field: Name}\label{field-name-ASIHP}
+
+This alpha field defines a unique user-assigned name for an instance of an air-source integrated heat pump. 
+
+\paragraph{Field: Supply Water Monitoring Node Name}\label{Field-Supply-Water-Monitoring-Node-Name-ASIHP}
+
+This alpha field defines a water side node to monitor the supply water amount after the water heating operation of the integrated heat pump is turned on. 
+
+\paragraph{Field: Space Cooling Mode Coil Name}\label{Field-Space-Cooling-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the space cooling (SC) mode in an ASIHP, which must be given. The SC mode refers to the name of a Coil:Cooling:DX:VariableSpeed object, which contains all the performance curves and rated values to describe the space cooling operation. 
+
+\paragraph{Field: Space Heating Mode Coil Name}\label{Field-Space-Heating-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the space heating (SH) mode in the ASIHP, which must be given. The SH mode refers to the name of a Coil:Heating:DX:VariableSpeed object, which contains all the performance curves and rated values to describe the space heating operation. 
+
+\paragraph{Field: Water Heating Mode Coil Name}\label{Field-Water-Heating-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the dedicated water heating (DWH) mode in the ASIHP, which must be given. The DWH mode refers to the name of a Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with outdoor air source. 
+
+\paragraph{Field: SCWH Mode Coil Name}\label{Field-SCWH-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the combined space cooling and water heating with full condensing (SCWH) in an ASIHP, which must be given. The SCWH mode refers to the name of a Coil:WaterHeating:--AirToWaterHeatPump:VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with an indoor air source. The SCWH mode is connected to the same WaterHeater:HeatPump:--PumpedCondenser as the DWH mode, and the same air side node connections as the SC mode. 
+
+\paragraph{Field: SCDWH Mode Cooling Coil Name}\label{Field-SCDWH-Mode-Cooling-Coil-Name-ASIHP}
+
+This alpha field defines the cooling operation in the combined space cooling and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. These should be a different object from the SC mode. It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX:VariableSpeed object. That means the power consumption at each speed level of the SCDWH mode is accounted for by the cooling coil part.
+
+\paragraph{Field: SCDWH Mode Water Heating Coil Name}\label{Field-SCDWH-Mode-Water-Heating-Coil-Name-ASIHP}
+
+This alpha field defines the water heating operation in the combined space cooling and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted for by the cooling coil part.
+
+\paragraph{Field: SHDWH Mode Heating Coil Name}\label{Field-SHDWH-Mode-Heating-Coil-Name-ASIHP}
+
+This alpha field defines the heating operation in the combined space heating and water heating with desuperheating (SHDWH) mode in an ASIHP, which must be given. This should be a different object from the SH mode. It should be noted that the rated power and power correction curves are contained in the Coil:Heating:DX:VariableSpeed object. That means the power consumption at each speed level of the SHDWH mode is accounted for by the cooling coil part.
+
+\paragraph{Field: SHDWH Mode Water Heating Coil Name}\label{Field-SHDWH-Mode-Water-Heating-Coil-Name-ASIHP}
+
+This alpha field defines the water heating operation in the combined space heating and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted for by the heating coil part.
+
+\paragraph{Field: SCWH Mode Minimum Indoor Temperature to Allow  Overcooling}\label{Field-SCWH-Minimum-In-Overcooling-ASIHP}
+
+This numeric field defines an indoor air temperature [C] above which indoor overcooling is allowed in the cooling operation, i.e., allowing running the SCWH mode to cool down the indoor air below the thermostat setting temperature, and iterate the compressor speed to match the water heating load. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when allowing indoor overcooling by running the SCWH mode. 
+
+
+\paragraph{Field: SCWH Mode Minimum Outdoor Temperature to Allow Overcooling}\label{Field-SCWH-Minimum-Outdoor-ASIHP}
+
+This numeric field defines an ambient air temperature above which indoor overcooling is allowed in the cooling operation, i.e., allowing running the SCWH mode to cool down the indoor air below the thermostat setting temperature, and iterate the compressor speed to match the water heating load. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when allowing overcooling the indoor by running the SCWH mode. 
+
+\paragraph{Field: Minimum Indoor Temperature to Ignore Space Heating Call}\label{Field-Minimum-Indoor-IgnoreSH-ASIHP}
+
+This numeric field defines an indoor air temperature [C] above which the water heating request has the higher priority and the space heating call can be ignored. The ASIHP will run the DWH mode to match the water heating load regardless of space heating call. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when a space heating call can be ignored. 
+
+
+\paragraph{Field: Minimum Outdoor Temperature to Ignore Space Heating Call}\label{Field-Minimum-Outdoor-IgnoreSH-ASIHP}
+
+This numeric field defines an ambient air temperature [C] above which the water heating request has the higher priority and the space heating call can be ignored. The ASIHP will run the DWH mode to match the water heating load regardless of space heating call. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when a space heating call can be ignored. 
+
+
+\paragraph{Field: SCWH Mode Load Matching Type}\label{Field-SCWH-Matching-Type-ASIHP}
+
+This choice field specifies the control in the SCWH mode. The choices are CoolingLoad or WaterHeatingLoad. During the SCWH operation when both the space cooling and water heating calls exist, if the field is CoolingLoad, it means that the compressor speed is iterated to match the space cooling load, and the water heating energy is a byproduct.  If this field is WaterHeatingLoad, it means that the speed is altered to match the water heating load, and the space cooling energy is a byproduct. 
+
+
+
+\paragraph{Field: SCWH Mode Minimum Speed}\label{Field-SCWH-Minimum-Speed-ASIHP}
+
+This numeric field defines a minimum speed level for running the SCWH; i.e., the compressor speed will be altered between the minimum speed specified and top speed, responding to the simultaneous space cooling and water heating calls. If there is only a water heating call, this input will not be used. 
+
+\paragraph{Field: SCDWH Mode Maximum Heated Water Vol Before Switching to SCWH}\label{Field-SCDWH-Max-Water-ASIHP}
+
+This numeric field defines an accumulative, heated water volume [m3] before switching from SCDWH to SCWH mode. When there are simultaneous space cooling and water heating calls, the ASIHP will run SCDWH first to satisfy a small water heating load. If the water volume heated by the heat pump goes beyond the limit, it means that the SCDWH, which uses a desuperheater, cannot provide enough capacity for the water heating request, and thus the SCWH mode will be turned on. 
+
+
+
+\paragraph{Field: SCDWH Mode Minimum Speed}\label{Field-SCDWH-MinSped-ASIHP}
+
+This numeric field defines a minimum speed level for running the SCDWH; i.e., the compressor speed will be altered between the minimum speed specified and top speed to match the space cooling load, and the water heating energy is a byproduct. 
+
+\paragraph{Field: SHDWH Mode Time Limit Before Turning on Electric Water Heating Element}\label{Field-SHDWH-HeatElemement-ASIHP}
+
+This numeric field defines the running time [s] of the SHDWH mode before electric heating elements in the connected water tank are turned on if the water heating request cannot be satisfied on time. When there are simultaneous space heating and water heating calls, the ASIHP will run SHDWH mode first to satisfy a small water heating load. If the running time goes beyond the time limit, it means that the SHDWH mode, which uses a desuperheater, cannot provide enough capacity for the water heating request, and thus the electric elements in the water tank will be turned on to supplement the heating capacity.
+
+\paragraph{Field: SHDWH Mode Minimum Speed}\label{Field-SHDWH-Mode-Minimum-Speed-ASIHP}
+
+This numeric field defines a minimum speed level for running the SHDWH mode; i.e., the compressor speed will be altered between the minimum speed and top speed to match the space heating load. Consequently, the water heating capacity is the byproduct.
+
+
+
+\paragraph{An IDF example:}\label{FieldIDFExample-ASIHP}
+
+
+An IDF example showing how this object is:
+
+
+\begin{lstlisting}
+CoilSystem:IntegratedHeatPump:AirSource,
+  ASIHP1,        !- Name of an air-source integrated heat pump
+  TankoutNod,    !- Name of a water node for  monitoring the supply water flow amount
+  SCCoil1,       !- Coil object Name of space cooling mode 
+  SHCoil1,       !- Coil object Name of space heating mode 
+  DWHCoil1,      !- Coil object Name of dedicated water heating mode 
+  SCWHCoil1,     !- Coil object Name for SCWH mode
+  SCDWHCoil1     !- Coil object Name for cooling part of SCDWH mode
+  SCDWHCoil2     !- Coil object Name for WH part of SCDWH mode
+  SHDWHCoil1     !- Coil object Name for space heating part of SHDWH mode
+  SHDWHCoil2     !- Coil object Name for WH part of SHDWH mode
+  23.0,          !-{C},indoor temperature above which indoor overcooling is allowed
+  28.0,          !-{C},outdoor temperature above which indoor overcooling is allowed
+  20.0,          !-{C},indoor temperature above which water heating has the higher priority
+  16.0,          !-{C},outdoor temperature above which water heating has the higher priority
+  0,             !-0: match cooling load, 1: match water heating load in SCWH mode
+  2,             !- minimum speed level for SCWH mode
+  3.0,           !- {m3}, limit of heated water volume before switching from SCDWH to SCWH mode
+  2,             !- minimum speed level for SCDWH mode
+  600,           !- {s}, time limit before turning on electric element in SHDWH mode
+  5;             !- minimum speed level for SHDWH mode
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-011}
+
+The output variables that are available for this air source integrated heat pump are shown below:
+
+\begin{itemize}
+\item
+  HVAC, Average, Operation Mode {[}{]}
+\item
+  HVAC, Average, Air Loop Flow Rate {[}kg/s{]}
+\item
+  HVAC, Average, Condenser Water Flow Rate {[}kg/s{]}
+\item
+  HVAC, Average, Cooling Coil Total Cooling Rate {[}W{]}
+\item
+  HVAC, Average, Heating Coil Total Air Heating Rate {[}W{]}
+\item
+  HVAC, Average, Total Water Heating Rate {[}W{]}
+\item
+  HVAC, Average, Total Electric Power {[}W{]}
+\item
+  HVAC, Average, Total Latent Cooling Rate {[}W{]}
+\item
+  HVAC, Average, Total Source Energy Rate {[}W{]}
+ \item
+  HVAC, Average, Total Coefficient of Performance (COP) {[}{]}
+ \item
+  HVAC, Sum, Total Electric Energy {[}J{]}
+ \item
+  HVAC, Sum, Total Cooling Energy {[}J{]}
+  \item
+  HVAC, Sum, Total Air Heating Energy {[}J{]}
+\item
+  HVAC, Sum, Total Water Heating Energy {[}J{]}
+ \item
+  HVAC, Sum, Total Latent Cooling Energy {[}J{]}
+ \item
+  HVAC, Sum, Total Source Energy {[}J{]}
+
+\end{itemize}
+
+\paragraph{Operation Mode {[}{]}}\label{Opt-Mod-ASIHP}
+
+This output variable is an integer representing the operation mode in the timestep.
+
+\paragraph{Air Loop Flow Rate {[}kg/s{]}}\label{Out-Air-Loop-Flow-Rate-ASIHP}
+The output variable is the air mass flow rate in the indoor air loop, over the timestep being reported. 
+
+\paragraph{Condenser Water Flow Rate {[}kg/s{]}}\label{Out-Cond-water-Flow-ASIHP}
+
+The output variable is the hot water mass flow rate through the condenser of the heat pump water heater, over the timestep being reported.
+
+\paragraph{Cooling Coil Total Cooling Rate {[}W{]}}\label{Out-Cooling-Coil-Total-Cooling-Rate-ASIHP}
+
+The output variable is the average total cooling load provided by the integrated heat pump, which includes the sensible and latent load in watts over the timestep being reported.
+
+
+\paragraph{Heating Coil Total Air Heating Rate {[}W{]}}\label{Out-Heating-Total-Air-Heating-Rate-ASIHP}
+
+The output variable is the average total heating load provided by the integrated heat pump in watts over the timestep being reported.
+
+
+\paragraph{Total Water Heating Rate {[}W{]}}\label{Out-Total-Water-Heating-Rate-ASIHP}
+
+The output variable is the average total water heating load provided by the integrated heat pump in watts over the timestep being reported.
+
+\paragraph{Total Electric Power {[}W{]}}\label{Out-Total-Electric-Power-ASIHP}
+
+The output variable is the average total electric power consumed by the integrated heat pump in watts over the timestep being reported.
+
+
+\paragraph{Total Latent Cooling Rate {[}W{]}}\label{Out-Total-Latent-Cooling-Rate-ASIHP}
+
+The output variable is the average latent cooling load provided by the integrated heat pump in watts over the timestep being reported.
+
+\paragraph{Total Source Energy Rate {[}W{]}}\label{Out-Total-Source-Energy-Rate-ASIHP}
+
+The output variable is the average total source energy rate absorbed or discharged to the outdoor air by the integrated heat pump in watts over the timestep being reported.
+
+
+\paragraph{Total COP {[}{]}}\label{Out-Tot-COP-ASIHP}
+
+The output variable is the average total COP (using the total delivered load divided by the electric power) by the integrated heat pump in watts over the timestep being reported. The total delivered load includes all the incurred space cooling, water heating, and space heating loads.
+
+
+\paragraph{Total Electric Energy {[}J{]}}\label{Out-Total-Electric-Energy-ASIHP}
+
+The output variable is the electric consumption of the integrated heat pump in joules over the timestep being reported. 
+
+
+\paragraph{Total Cooling Energy {[}J{]}}\label{Out-Total-Cooling-Energy-ASIHP}
+The output variable is the total space cooling output of the integrated heat pump in joules over the timestep being reported. 
+
+
+\paragraph{Total Air Heating Energy {[}J{]}}\label{Out-Total-Air-Heating-Energy-ASIHP}
+
+The output variable is the total space heating output of the integrated heat pump in joules over the timestep being reported. 
+
+\paragraph{Total Water Heating Energy{[}J{]}}\label{Out-Total-WH-Energy-ASIHP}
+The output variable is the total water heating output of the integrated heat pump in joules over the timestep being reported. 
+
+
+\paragraph{Total Latent Cooling Energy {[}J{]}}\label{Out-Total-LatCooling-Energy-ASIHP}
+The output variable is the total latent cooling output of the integrated heat pump in joules over the timestep being reported.
+
+\paragraph{Total Source Energy {[}J{]}}\label{Out-Total-Source-Energy-ASIHP}
+The output variable is the total source energy output of the integrated heat pump in joules, absorbed or discharged to the outdoor air, over the timestep being reported.
+
+
+
 \subsection{CoilSystem:Cooling:Water:HeatExchangerAssisted}\label{coilsystemcoolingwaterheatexchangerassisted}
 
 The heat exchanger-assisted water cooling coil is a virtual component consisting of a chilled-water cooling coil and an air-to-air heat exchanger as shown in Figure~\ref{fig:schematic-of-the-coilsystem-cooling-water} below. The air-to-air heat exchanger precools the air entering the cooling coil, and reuses this energy to reheat the supply air leaving the cooling coil. This heat exchange process improves the latent removal performance of the cooling coil by allowing it to dedicate more of its cooling capacity toward dehumidification (lower sensible heat ratio).
