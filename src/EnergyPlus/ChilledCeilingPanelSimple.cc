@@ -416,8 +416,8 @@ namespace CoolingPanelSimple {
 			if ( SameString( cAlphaArgs( 5 ), "CoolingDesignCapacity" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
 				if ( ! lNumericFieldBlanks( 4 ) ) {
-					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 4 );
-					if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity < 0.0 && CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity != DataSizing::AutoSize ) {
+					CoolingPanel( CoolingPanelNum ).RatedCapacity = rNumericArgs( 4 );
+					if ( CoolingPanel( CoolingPanelNum ).RatedCapacity < 0.0 && CoolingPanel( CoolingPanelNum ).RatedCapacity != DataSizing::AutoSize ) {
 						ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
 						ShowContinueError( "Illegal " + cNumericFieldNames( 4 ) + " = " + TrimSigDigits( rNumericArgs( 4 ), 7 ) );
 						ErrorsFound = true;
