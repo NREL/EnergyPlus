@@ -2380,7 +2380,7 @@
     Zone5UnitVentFan,        !- Supply Air Fan Name
     Heating,                 !- Coil Option
     ,                        !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     Zone5UnitVentHeatingCoil,!- Heating Coil Name
     0.001;                   !- Heating Convergence Tolerance
 
@@ -2578,10 +2578,11 @@
     Zone4UnitVentCCOutletNode,  !- Air Inlet Node Name
     Zone4UnitVentAirOutletNode;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     Zone5UnitVentHeatingCoil,!- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.77,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.77,                    !- Burner Efficiency
     10000,                   !- Nominal Capacity {W}
     Zone5UnitVentFanOutletNode,  !- Air Inlet Node Name
     Zone5UnitVentAirOutletNode;  !- Air Outlet Node Name

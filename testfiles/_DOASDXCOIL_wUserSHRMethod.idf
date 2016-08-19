@@ -2265,7 +2265,7 @@
     DOAS DX Cooling System,  !- Component 3 Name
     DOAS Supply Fan Outlet,  !- Component 3 Inlet Node Name
     DOAS Cooling Coil Outlet,!- Component 3 Outlet Node Name
-    Coil:Heating:Gas,        !- Component 4 Object Type
+    Coil:Heating:Fuel,        !- Component 4 Object Type
     DOAS Heating Coil,       !- Component 4 Name
     DOAS Cooling Coil Outlet,!- Component 4 Inlet Node Name
     DOAS Heating Coil Outlet;!- Component 4 Outlet Node Name
@@ -2582,10 +2582,11 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     DOAS Heating Coil,       !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     DOAS Cooling Coil Outlet,!- Air Inlet Node Name
     DOAS Heating Coil Outlet,!- Air Outlet Node Name

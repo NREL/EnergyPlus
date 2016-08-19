@@ -22,8 +22,8 @@
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7ï¿½C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2ï¿½C MWB=25.3ï¿½C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7.
 !
@@ -169,7 +169,7 @@ Timestep,
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7ï¿½C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -201,7 +201,7 @@ Timestep,
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2ï¿½C MWB=25.3ï¿½C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -2634,7 +2634,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE1-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     ContsFanSch,             !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE1-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2772,7 +2772,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE2-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     ContsFanSch,             !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE2-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2831,7 +2831,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE3-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     ContsFanSch,             !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE3-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2890,7 +2890,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE4-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE4-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -2949,7 +2949,7 @@ ThermostatSetpoint:DualSetpoint,
     SPACE5-1 Supply Fan,     !- Supply Air Fan Name
     BlowThrough,             !- Fan Placement
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     SPACE5-1 Heating Coil,   !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -3234,44 +3234,49 @@ Fan:OnOff,
     SPACE5-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
 
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE1-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE1-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE2-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE2-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE3-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE3-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE3-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE4-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE4-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE4-1 PTAC Outlet;    !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE5-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE5-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE5-1 PTAC Outlet;    !- Air Outlet Node Name

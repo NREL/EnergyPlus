@@ -29,7 +29,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -5585,7 +5585,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_1:1_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_1:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_1:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -5607,10 +5607,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_1:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_1:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_1:1_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -5868,7 +5869,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_2:2_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_2:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_2:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -5890,10 +5891,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_2:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_2:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_2:2_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -6151,7 +6153,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_3:3_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_3:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_3:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -6173,10 +6175,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_3:3_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_3:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_3:3_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -6434,7 +6437,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_4:4_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_4:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_4:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -6456,10 +6459,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_4:4_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_4:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_4:4_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -6717,7 +6721,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_5:5_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_5:5_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_5:5_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -6739,10 +6743,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_5:5_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_5:5_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_5:5_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -7000,7 +7005,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_6:6_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_6:6_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_6:6_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -7022,10 +7027,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_6:6_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_6:6_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_6:6_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -7283,7 +7289,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_7:7_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_7:7_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_7:7_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -7305,10 +7311,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_7:7_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_7:7_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_7:7_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -7566,7 +7573,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_8:8_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_8:8_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_8:8_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -7588,10 +7595,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_8:8_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_8:8_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_8:8_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -7849,7 +7857,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_9:9_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_9:9_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_9:9_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -7871,10 +7879,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_9:9_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_9:9_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_9:9_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
@@ -8132,7 +8141,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     PSZ-AC_10:10_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     PSZ-AC_10:10_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     PSZ-AC_10:10_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -8154,10 +8163,11 @@
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Unitary Fans;            !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-AC_10:10_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-AC_10:10_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_10:10_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name

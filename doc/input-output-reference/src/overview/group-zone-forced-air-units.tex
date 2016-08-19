@@ -1014,7 +1014,7 @@ This field is the type of coil that is used for heating in the unit ventilator s
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -1275,7 +1275,7 @@ This field is the type of coil that is used for heating in the unit heater syste
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -2170,7 +2170,7 @@ This alpha field defines the type of heating coil to be used by this PTAC. The i
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -2223,7 +2223,7 @@ As shown in the example below, correct specification of the packaged terminal ai
 \item
   DX cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
 \item
-  Heating coil (Coil:Heating:Gas, Coil:Heating:Electric, Coil:Heating:Water, or Coil:Heating:Steam)
+  Heating coil (Coil:Heating:Fuel, Coil:Heating:Electric, Coil:Heating:Water, or Coil:Heating:Steam)
 \item
   OutdoorAir:Mixer
 \end{enumerate}
@@ -2554,7 +2554,7 @@ This alpha field defines the type of supplemental heating coil to be used by thi
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -2602,7 +2602,7 @@ As shown in the example below, correct specification of the packaged terminal he
 \item
   DX heating coil (Coil:Heating:DX:SingleSpeed)
 \item
-  Supplemental heating coil (Coil:Heating:Gas or Coil:Heating:Electric)
+  Supplemental heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
 \item
   OutdoorAir:Mixer
 \end{enumerate}
@@ -3027,7 +3027,7 @@ This is the object type of the supplemental heating coil. The hot water and stea
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -3129,7 +3129,7 @@ ZoneHVAC:WaterToAirHeatPump,
   60.0,                     !- Heat Pump Time Constant
   0.01,                     !- Fraction of On-Cycle Power Use
   60,                       !- Heat Pump Fan Delay Time
-  Coil:Heating:Gas,         !- Supplemental Heating Coil Object Type
+  Coil:Heating:Fuel,         !- Supplemental Heating Coil Object Type
   Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name
   60.0,                  !- Maximum Supply Air Temperature from Supplemental Heater {C}
   20.0,                  !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3184,7 +3184,7 @@ ZoneHVAC:WaterToAirHeatPump,
       Sys 1 Mixed Air Node,    !- Air Inlet Node Name
       Sys 1 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-    Coil:Heating:Gas,
+    Coil:Heating:Fuel,
       Heat Pump DX Supp Heating Coil 1,  !- Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
       0.8,                     !- Gas Burner Efficiency

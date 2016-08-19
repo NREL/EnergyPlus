@@ -1,6 +1,6 @@
 ! Fault_FoulingAirFilter_RefBldgMediumOfficeNew2004_Chicago.idf
 !
-! Highlights:  Illustrates modeling of fouling air filter fault  
+! Highlights:  Illustrates modeling of fouling air filter fault
 !
 ! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
 !
@@ -37,7 +37,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:TwoSpeed; Coil:Heating:Gas; Coil:Heating:Electric
+! Coils:                          Coil:Cooling:DX:TwoSpeed; Coil:Heating:Fuel; Coil:Heating:Electric
 ! Pumps:                          Yes
 ! Boilers:                        None
 ! Chillers:                       None
@@ -4418,28 +4418,31 @@
     VAV_3 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     Fan Energy;              !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     VAV_1_HeatC,             !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Air Inlet Node Name
     VAV_1_HeatC-VAV_1_FanNode,  !- Air Outlet Node Name
     VAV_1_HeatC-VAV_1_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     VAV_2_HeatC,             !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Air Inlet Node Name
     VAV_2_HeatC-VAV_2_FanNode,  !- Air Outlet Node Name
     VAV_2_HeatC-VAV_2_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     VAV_3_HeatC,             !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Air Inlet Node Name
     VAV_3_HeatC-VAV_3_FanNode,  !- Air Outlet Node Name
@@ -6454,7 +6457,7 @@
     VAV_1_CoolC,             !- Component 2 Name
     VAV_1_OA-VAV_1_CoolCNode,!- Component 2 Inlet Node Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     VAV_1_HeatC,             !- Component 3 Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_1_HeatC-VAV_1_FanNode,  !- Component 3 Outlet Node Name
@@ -6474,7 +6477,7 @@
     VAV_2_CoolC,             !- Component 2 Name
     VAV_2_OA-VAV_2_CoolCNode,!- Component 2 Inlet Node Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     VAV_2_HeatC,             !- Component 3 Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_2_HeatC-VAV_2_FanNode,  !- Component 3 Outlet Node Name
@@ -6494,7 +6497,7 @@
     VAV_3_CoolC,             !- Component 2 Name
     VAV_3_OA-VAV_3_CoolCNode,!- Component 2 Inlet Node Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     VAV_3_HeatC,             !- Component 3 Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_3_HeatC-VAV_3_FanNode,  !- Component 3 Outlet Node Name
@@ -7885,15 +7888,15 @@
     For: AllDays,            !- Field 2
     Until: 24:00,1.1;        !- Field 3
 
-! ***VAV_1_Fan_Curve***	
-  Curve:Cubic,		
-    VAV_1_Fan_Curve,         ! name		
-    1263.1,                  ! Coefficient1 Constant		
-    33.773,                  ! Coefficient2 x		
-   -5.6906,                  ! Coefficient3 x**2		
-   -0.2023,                  ! Coefficient4 x**3		
-    4.0,                     ! Minimum Value of x		
-    15.0;                    ! Maximum Value of x		
+! ***VAV_1_Fan_Curve***
+  Curve:Cubic,
+    VAV_1_Fan_Curve,         ! name
+    1263.1,                  ! Coefficient1 Constant
+    33.773,                  ! Coefficient2 x
+   -5.6906,                  ! Coefficient3 x**2
+   -0.2023,                  ! Coefficient4 x**3
+    4.0,                     ! Minimum Value of x
+    15.0;                    ! Maximum Value of x
 
 !-   ===========  ALL OBJECTS IN CLASS: FaultModel:Fouling:AirFilter ===========
 FaultModel:Fouling:AirFilter,

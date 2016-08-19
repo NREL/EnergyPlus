@@ -918,6 +918,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(2) = 'None'
                 OutArgs(3:11) = InArgs(2:10)
                 CurArgs = CurArgs+1
+              
+              CASE('COIL:HEATING:GAS')
+                nodiff = .false.
+                ObjectName = 'Coil:Heating:Fuel'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:2) = InArgs(1:2)
+                OutArgs(3) = 'NaturalGas'
+                OutArgs(4:11) = InArgs(3:10)
+                CurArgs = CurArgs + 1
 
               CASE('MATERIALPROPERTY:MOISTUREPENETRATIONDEPTH:SETTINGS')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
