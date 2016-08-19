@@ -6478,11 +6478,12 @@ WindowMaterial:Glazing:EquivalentLayer,
        \type alpha
        \reference WindowEquivalentLayerMaterialNames
   A2 , \field Optical Data Type
-       \required-field
        \type choice
+       \key Spectral
        \default SpectralAverage
-       \note Spectral is no longer supported and SpectralAverage is now the default.
+       \note Spectral is not currently supported and SpectralAverage is the default.
   A3 , \field Window Glass Spectral Data Set Name
+       \note Spectral data is not currently supported.
        \note Used only when Optical Data Type = Spectral
        \type object-list
        \object-list SpectralDataSets
@@ -48339,7 +48340,6 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
   N1,  \field Number of Speeds
        \units dimensionless
        \type integer
-       \required-field
        \minimum 1
        \maximum 10
        \default 1
@@ -48347,7 +48347,6 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \units dimensionless
        \type integer
        \default 1
-       \required-field
        \note must be lower than or equal to the highest speed number
   N3 , \field Rated Water Heating Capacity
        \required-field
@@ -48491,7 +48490,6 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump heat.
   N13, \field Rated Water Heating COP at Speed 1
-       \required-field
        \type real
        \units W/W
        \minimum> 0
@@ -48500,7 +48498,6 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
        \note Can optionally include condenser pump power and evaporator fan power (see fields below).
   N14, \field Rated Sensible Heat Ratio at Speed 1
-       \required-field
        \type real
        \minimum 0.5
        \maximum 1
@@ -50425,17 +50422,15 @@ EvaporativeCooler:Direct:CelDekPad,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Direct Pad Area
-       \required-field
        \units m2
        \minimum 0.0
        \autosizable
-       \default Autosize
+       \default autosize
   N2 , \field Direct Pad Depth
-       \required-field
        \units m
        \minimum 0.0
        \autosizable
-       \default Autosize
+       \default autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \required-field
        \units W
@@ -50467,19 +50462,17 @@ EvaporativeCooler:Indirect:CelDekPad,
        \type object-list
        \object-list ScheduleNames
   N1 , \field Direct Pad Area
-       \required-field
        \type real
        \units m2
        \minimum 0.0
        \autosizable
-       \default Autosize
+       \default autosize
   N2 , \field Direct Pad Depth
-       \required-field
        \type real
        \units m
        \minimum 0.0
        \autosizable
-       \default Autosize
+       \default autosize
   N3 , \field Recirculating Water Pump Power Consumption
        \required-field
        \type real
@@ -51328,12 +51321,11 @@ HeatExchanger:AirToAir:FlatPlate,
       \note Ratio of h*A for supply side to h*A for exhaust side
       \minimum 0.0
   N2, \field Nominal Supply Air Flow Rate
-      \required-field
       \type real
       \minimum> 0.0
       \units m3/s
       \autosizable
-      \default Autosize
+      \default autosize
   N3, \field Nominal Supply Air Inlet Temperature
       \required-field
       \type real
@@ -54101,7 +54093,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
        \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \extensible:3 - repeat last three fields, remembering to remove ; from "inner" fields.
-       \min-fields 11
+       \min-fields 47
   A1 , \field Heat Pump Name
        \required-field
        \type alpha
@@ -54354,7 +54346,6 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \minimum 0.0
        \maximum 50000000.0
   N31, \field Number of Compressor Loading Index Entries
-       \required-field
        \type integer
        \default 2
        \minimum 2
@@ -54482,7 +54473,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \memo Temperature Control. It describes the VRF HR system excluding the performance of indoor units.
        \memo Indoor units are modeled separately in the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
        \extensible:3 repeat last three fields (changing numbering, please), remembering to remove ";" from "inner" fields.
-       \min-fields 11
+       \min-fields 64
   A1 , \field Name
        \required-field
        \type alpha
@@ -54855,7 +54846,6 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \note Describe the evaporative capacity difference because of system configuration 
        \note difference between test bed and real system.
   N48, \field Number of Compressor Loading Index Entries
-       \required-field
        \type integer
        \default 2
        \minimum 2
@@ -65463,7 +65453,6 @@ GroundHeatExchanger:Vertical,
         \minimum> 0.0
         \units years
   N14,  \field G-Function Reference Ratio
-        \required-field
         \type real
         \minimum> 0.0
         \units dimensionless
@@ -66269,6 +66258,7 @@ HeatExchanger:FluidToFluid,
         \ip-units gal/min
         \autosizable
    A7 , \field Heat Exchange Model Type
+        \type choice
         \key CrossFlowBothUnMixed
         \key CrossFlowBothMixed
         \key CrossFlowSupplyMixedDemandUnMixed
@@ -72793,13 +72783,11 @@ SetpointManager:ReturnTemperature:ChilledWater,
        \type real
        \units C
        \default 5
-       \required-field
   N2,  \field Maximum Supply Temperature Setpoint
        \note This is the maximum reset temperature for the chilled water supply.
        \type real
        \units C
        \default 10
-       \required-field
   A4,  \field Return Temperature Setpoint Input Type
        \note This defines whether the chilled water return temperature target is constant,
        \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
@@ -72849,14 +72837,12 @@ SetpointManager:ReturnTemperature:HotWater,
        \type real
        \units C
        \default 77
-       \required-field
   N2,  \field Maximum Supply Temperature Setpoint
        \note This is the maximum hot water supply temperature setpoint.  This is also used as the default
        \note setpoint during no-load or negative-load conditions and during initialization.
        \type real
        \units C
        \default 82
-       \required-field
   A4,  \field Return Temperature Setpoint Input Type
        \note This defines whether the hot water return temperature target is constant,
        \note scheduled, or specified on the supply inlet node by a separate setpoint manager.
@@ -75868,7 +75854,6 @@ DemandManager:Thermostats,
        \note Not yet implemented
        \type real
   A4 , \field Selection Control
-       \required-field
        \type choice
        \key All
        \key RotateMany
