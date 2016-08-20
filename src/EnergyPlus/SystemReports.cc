@@ -4181,7 +4181,7 @@ namespace SystemReports {
 					// HPWaterHeater can be used as zone equipment
 					SELECT_CASE_var == HPWaterHeater_Num || SELECT_CASE_var == BBWater_Num || SELECT_CASE_var == ZoneDXDehumidifier_Num ||
 					SELECT_CASE_var == BBSteam_Num || SELECT_CASE_var == BBElectric_Num || SELECT_CASE_var == RefrigerationAirChillerSet_Num ||
-					SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num ) {
+					SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num || SELECT_CASE_var == CoolingPanel_Num ) {
 					// do nothing, OA not included
 
 				} else {
