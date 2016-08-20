@@ -2729,19 +2729,34 @@
     ATTIC ZONE,              !- Node 2 Name
     ZoneSupplyELR3;          !- Component Name
 
+  AirflowNetwork:ZoneControl:PressureController,
+    PressureController,      !- Name
+    NORTH ZONE,              !- Control Zone Name
+    AirflowNetwork:Distribution:Component:ReliefAirFlow, !- Control Object Type
+    Relief Fan,              !- Control Object Name
+    ,                        !- Pressure Control Availability Schedule Name
+    Pressure Setpoint Schedule; !- Pressure Setpoint Schedule Name
   Schedule:Compact,
     Pressure Setpoint Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,3.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: AllDays,            !- Field 6
-    Until: 24:00,6.5,        !- Field 7
-    Through: 12/31,          !- Field 9
-    For: AllDays,            !- Field 10
-    Until: 24:00,3.0;        !- Field 11
+    Through: 9/30,           !- Field 4
+    For: AllDays,            !- Field 5
+    Until: 24:00,6.5,        !- Field 6
+    Through: 12/31,          !- Field 7
+    For: AllDays,            !- Field 8
+    Until: 24:00,3.0;        !- Field 9
 
+  AirflowNetwork:Distribution:Component:OutdoorAirFlow,
+    OA Fan,                  !- Name
+    0.001,                   !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
+    0.667;                   !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off {dimensionless}
+  AirflowNetwork:Distribution:Component:ReliefAirFlow,
+    Relief Fan,              !- Name
+    0.001,                   !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
+    0.667;                   !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off {dimensionless}
   AvailabilityManagerAssignmentList,
     Reheat System 1 Avail List,  !- Name
     AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
