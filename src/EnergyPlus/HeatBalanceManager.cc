@@ -4638,6 +4638,7 @@ namespace HeatBalanceManager {
 		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QElecBaseboardToPerson.dimension( NumOfZones, 0.0 );
+		QCoolingPanelToPerson.dimension( NumOfZones, 0.0 );
 		XMAT.dimension( NumOfZones, 23.0 );
 		XM2T.dimension( NumOfZones, 23.0 );
 		XM3T.dimension( NumOfZones, 23.0 );

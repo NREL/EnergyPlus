@@ -2127,7 +2127,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Zone 3 Reheat Air Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     0.15;                    !- Maximum Flow Fraction During Reheat
 

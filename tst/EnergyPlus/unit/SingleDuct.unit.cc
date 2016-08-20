@@ -82,11 +82,12 @@
 #include <SimulationManager.hh>
 #include <SingleDuct.hh>
 #include <ZoneAirLoopEquipmentManager.hh>
+#include <DataSizing.hh>
 
 using namespace EnergyPlus;
 using namespace SimulationManager;
+using namespace DataSizing;
 using DataHeatBalance::Zone;
-
 
 TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	std::string const idf_objects = delimited_string( {
@@ -277,7 +278,11 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		"    Zone 1 Reheat Coil,      !- Reheat Coil Name",
 		"    ,                        !- Maximum Hot Water or Steam Flow Rate{m3/s}",
 		"    ,                        !- Minimum Hot Water or Steam Flow Rate{m3/s}",
-		"    Zone 1 Supply Inlet;     !- Air Outlet Node Name",
+		"    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+		"    0.001,                   !- Convergence Tolerance",
+		"    ,                        !- Damper Heating Action",
+		"    ,                        !- Maximum Flow per Zone Floor Area During Reheat",
+		"    ;                        !- Maximum Flow Fraction During Reheat",
 		"Coil:Heating:Electric,",
 		"    Zone 1 Reheat Coil,      !- Name",
 		"    ,                        !- Availability Schedule Name",
@@ -668,7 +673,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 		"    SPACE In Node,           !- Air Outlet Node Name",
 		"    0.001,                   !- Convergence Tolerance",
-		"    Reverse,                 !- Damper Heating Action",
+		"    ReverseWithLimits,       !- Damper Heating Action",
 		"    AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}",
 		"    AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat",
 
@@ -688,7 +693,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 		"    SPACE2 In Node,          !- Air Outlet Node Name",
 		"    0.001,                   !- Convergence Tolerance",
-		"    Reverse,                 !- Damper Heating Action",
+		"    ReverseWithLimits,       !- Damper Heating Action",
 		"    AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}",
 		"    AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat",
 
@@ -1264,11 +1269,15 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 	//compare_err_stream( "" ); // just for debugging
 
 	//zone floor area of zone 1 = 0, zone 2 > 0. Expect TU MaxAirVolFlowRateDuringReheat = 0 only for zone 1.
-	Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea, SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
+	// this test isn't relevant anymore since defaulting is done differently
+	Real64 MaxAirVolFlowRateDuringReheatDes = min( FinalZoneSizing( 1 ).DesHeatVolFlowMax, SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
+	//Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea, SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
 	// apply limit based on min stop
 	MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( SingleDuct::Sys( 1 ).MaxAirVolFlowRate * SingleDuct::Sys( 1 ).ZoneMinAirFrac ) );
 
-	Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea / SingleDuct::Sys( 1 ).MaxAirVolFlowRate ) );
+	// This isn't relevant any more since the default is calculated differently
+	Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( FinalZoneSizing( 1 ).DesHeatVolFlowMax / SingleDuct::Sys( 1 ).MaxAirVolFlowRate ) );
+	// Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea / SingleDuct::Sys( 1 ).MaxAirVolFlowRate ) );
 	// apply limit based on min stop
 	MaxAirVolFractionDuringReheatDes = max( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 1 ).ZoneMinAirFrac );
 	// apply model math
@@ -1278,9 +1287,9 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 	EXPECT_NEAR( SingleDuct::Sys( 1 ).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001 );
 	EXPECT_NEAR( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 1 ).MaxAirVolFractionDuringReheat, 0.0000000000001 );
 
-	MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 2 ).ZoneFloorArea, SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
+	MaxAirVolFlowRateDuringReheatDes = min( FinalZoneSizing( 2 ).DesHeatVolFlowMax, SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
 	MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( SingleDuct::Sys( 2 ).MaxAirVolFlowRate * SingleDuct::Sys( 2 ).ZoneMinAirFrac ) );
-	MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 2 ).ZoneFloorArea / SingleDuct::Sys( 2 ).MaxAirVolFlowRate ) );
+	MaxAirVolFractionDuringReheatDes = min( 1.0, ( FinalZoneSizing( 2 ).DesHeatVolFlowMax / SingleDuct::Sys( 2 ).MaxAirVolFlowRate ) );
 	MaxAirVolFractionDuringReheatDes = max( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 2 ).ZoneMinAirFrac );
 	MaxAirVolFlowRateDuringReheatDes = min( max( MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * SingleDuct::Sys( 2 ).MaxAirVolFlowRate ), SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
 

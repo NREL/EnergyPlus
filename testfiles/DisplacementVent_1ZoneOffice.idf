@@ -2064,7 +2064,7 @@
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZONE1 Inlet Node,        !- Air Outlet Node Name
     0.00025,                 !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
