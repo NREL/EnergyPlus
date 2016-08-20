@@ -121,6 +121,7 @@ set( test_src
   ThermalComfort.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
+  VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   VentilatedSlab.unit.cc

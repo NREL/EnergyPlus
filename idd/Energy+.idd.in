@@ -31255,10 +31255,16 @@ DesignSpecification:ZoneAirDistribution,
         \object-list ScheduleNames
         \note optionally used to replace Zone Air Distribution Effectiveness in Cooling and
         \note Heating Mode
-   N3;  \field Zone Secondary Recirculation Fraction
+   N3,  \field Zone Secondary Recirculation Fraction
         \type real
         \default 0.0
         \minimum 0.0
+        \units dimensionless
+   N4;  \field Minimum Zone Ventilation Efficiency
+        \type real
+        \default 0.0
+        \minimum 0.0
+        \maximum 1.0
         \units dimensionless
 
 Sizing:Parameters,
@@ -31381,7 +31387,7 @@ Sizing:Zone,
       \note fraction of the Cooling design Air Flow Rate
       \type real
       \minimum 0
-      \default 0
+      \default 0.2
       \note This input is currently used in sizing the Fan minimum Flow Rate.
       \note It does not currently affect other component autosizing.
   A6, \field Heating Design Air Flow Method
@@ -39777,10 +39783,14 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \key Constant
        \key FixedFlowRate
        \key Scheduled
+       \default Constant
        \note Constant = Constant Minimum Air Flow Fraction (a fraction of Maximum Air Flow Rate)
        \note FixedFlowRate = Fixed Minimum Air Flow Rate (a fixed minimum air volume flow rate)
        \note Scheduled = Scheduled Minimum Air Flow Fraction (a fraction of Maximum Air Flow
   N2 , \field Constant Minimum Air Flow Fraction
+       \type real
+       \autosizable
+       \default autosize
        \note This field is used if the field Zone Minimum Air Flow Input Method is Constant
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -39788,6 +39798,8 @@ AirTerminal:SingleDuct:VAV:NoReheat,
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
+       \autosizable
+       \default autosize
        \note This field is used if the field Zone Minimum Air Flow Input Method is FixedFlowRate.
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -39812,6 +39824,7 @@ AirTerminal:SingleDuct:VAV:NoReheat,
 AirTerminal:SingleDuct:VAV:Reheat,
        \memo Central air system terminal unit, single duct, variable volume, with reheat coil (hot
        \memo water, electric, gas, or steam).
+       \min-fields 18
   A1 , \field Name
        \required-field
   A2 , \field Availability Schedule Name
@@ -39839,10 +39852,14 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \key Constant
        \key FixedFlowRate
        \key Scheduled
+       \default Constant
        \note Constant = Constant Minimum Air Flow Fraction (a fraction of Maximum Air Flow Rate)
        \note FixedFlowRate = Fixed Minimum Air Flow Rate (a fixed minimum air volume flow rate)
        \note Scheduled = Scheduled Minimum Air Flow Fraction (a fraction of Maximum Air Flow
   N2 , \field Constant Minimum Air Flow Fraction
+       \type real
+       \autosizable
+       \default autosize
        \note This field is used if the field Zone Minimum Air Flow Input Method is Constant
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -39850,6 +39867,8 @@ AirTerminal:SingleDuct:VAV:Reheat,
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
+       \autosizable
+       \default autosize       
        \note This field is used if the field Zone Minimum Air Flow Input Method is FixedFlowRate.
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -39897,26 +39916,31 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \type choice
        \key Normal
        \key Reverse
-       \default Normal
+       \key ReverseWithLimits
+       \default ReverseWithLimits
+       \note Normal means the damper is fixed at the minimum position in heating mode
+       \note Reverse means the damper can open fully during reheat
+       \note ReverseWithLimits means the damper will open partially during reheat 
+       \note as specified in the following 2 fields 
   N7 , \field Maximum Flow per Zone Floor Area During Reheat
        \type real
        \units m3/s-m2
-       \autocalculatable
-       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = Reverse
+       \autosizable
+       \default autosize
+       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits
        \note When autocalculating, the maximum flow per zone is set to 0.002032 m3/s-m2 (0.4 cfm/sqft)
        \note This optional field limits the maximum flow allowed in reheat mode.
-       \note If this field and the following field are left blank, the maximum flow will not be limited.
        \note At no time will the maximum flow rate calculated here exceed the value of
        \note Maximum Air Flow Rate.
   N8 , \field Maximum Flow Fraction During Reheat
        \type real
-       \autocalculatable
-       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = Reverse
+       \autosizable
+       \default autosize
+       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits
        \note When autocalculating, the maximum flow fraction is set to the ratio of
        \note 0.002032 m3/s-m2 (0.4 cfm/sqft) multiplied by the zone floor area and the
        \note Maximum Air Flow Rate.
        \note This optional field limits the maximum flow allowed in reheat mode.
-       \note If this field and the previous field are left blank, the maximum flow will not be limited.
        \note At no time will the maximum flow rate calculated here exceed the value of
        \note Maximum Air Flow Rate.
   N9 , \field Maximum Reheat Air Temperature
