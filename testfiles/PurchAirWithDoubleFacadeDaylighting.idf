@@ -1374,11 +1374,11 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,West Zone,Daylighting Reference Point 1 Illuminance,hourly;
+  Output:Variable,West Zone_DaylCtrl,Daylighting Reference Point 1 Illuminance,hourly;
 
-  Output:Variable,West Zone,Daylighting Reference Point 1 Glare Index,hourly;
+  Output:Variable,West Zone_DaylCtrl,Daylighting Reference Point 1 Glare Index,hourly;
 
-  Output:Variable,West Zone,Daylighting Lighting Power Multiplier,hourly;
+  Output:Variable,West Zone_DaylCtrl,Daylighting Lighting Power Multiplier,hourly;
 
   Output:Variable,*,Zone Lights Total Heating Energy,hourly;
 
