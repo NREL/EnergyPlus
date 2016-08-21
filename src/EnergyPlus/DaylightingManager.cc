@@ -4775,12 +4775,6 @@ namespace DaylightingManager {
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", will use 1" );
 				zone_daylight.LightControlSteps = 1;
 			}
-			// For DElight, if control type is not stepped, then control steps must be zero?
-			if ( ( zone_daylight.DaylightMethod == DElightDaylighting ) && ( zone_daylight.LightControlType != Stepped ) ) {
-				zone_daylight.LightControlSteps = 0;
-			}
-
-
 			if ( zone_daylight.DaylightMethod == SplitFluxDaylighting ){
 				SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", zone_daylight.Name );
 			}
