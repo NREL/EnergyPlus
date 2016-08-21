@@ -143,7 +143,19 @@ The name of the central fan on/off schedule for the air system that this availab
 
 \textbf{\emph{Field: Control Type}}
 
-The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly}. \emph{StayOff} means the availability manager will have no effect air handler on/off will be determined by the fan schedule. \emph{CycleOnAny} means that if any zone served by a system whose AvailabilityManagerAssignmentList references this system availability manager has an air temperature outside the cooling or heating set points the central fan will turn on even though the fan schedule indicates the fan is off. \emph{CycleOnControlZone} means the same thing except the availability manager looks at the temperature in only one zone. \emph{CycleOnAnyZoneFansOnly} is the same as \emph{CycleOnAny} except that only the zone fans are cycled on and the central air handler fan is left off. The default is \emph{StayOff}.
+The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly}, \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyCoolingZone}, \emph{CycleOnAnyHeatingZone}, or \emph{CycleOnAnyHeatingZoneFansOnly}. The default is \emph{StayOff}.
+
+\begin{itemize}
+\tightlist
+\item  \emph{StayOff} means the availability manager will have no effect air handler on/off will be determined by the fan schedule. 
+\item  \emph{CycleOnAny} means that if any zone served by a system whose AvailabilityManagerAssignmentList references this system availability manager has an air temperature outside the cooling or heating set points the central fan will turn on even though the fan schedule indicates the fan is off. 
+\item  \emph{CycleOnControlZone} means the same thing except the availability manager looks at the temperature in any one or more zones specified in the Control Zone or Zone List Name field. 
+\item  \emph{CycleOnAnyZoneFansOnly} is the same as \emph{CycleOnAny} except that only the zone fans are cycled on and the central air handler fan is left off. 
+\item  \emph{CycleOnAnyCoolingOrHeatingZone} means that the central fan will turn on if any zone listed in the Cooling Control Zone or Zone List Name is outside the cooling setpoint or any zone listed in the Heating Control Zone or Zone List Name is outside the heating setpoint. If the central fan is activated, then the zone fans are enabled.  If the central fan is not activated, but any zone in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint, then the zone fans only will be enabled.
+\item  \emph{CycleOnAnyCoolingZone} means that the central fan will turn on if any zone listed in the Cooling Control Zone or Zone List Name is outside the cooling setpoint. If the central fan is activated, then the zone fans are enabled.  
+\item  \emph{CycleOnAnyHeatingZone} means that the central fan will turn on if any zone listed in the Heating Control Zone or Zone List Name is outside the heating setpoint. If the central fan is activated, then the zone fans are enabled.   If the central fan is not activated, but any zone in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint, then the zone fans only will be enabled. 
+\item  \emph{CycleOnAnyHeatingZoneFansOnly} means that the zone fans will be enabled if any zone listed in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint. The central fan is never activated with this control type.
+\end{itemize}
 
 \textbf{\emph{Field: Thermostat Tolerance}}
 
@@ -153,21 +165,37 @@ The Thermostat Tolerance defines the amount by which the zone temperature must f
 
 The time in seconds for which the system will run after it has cycled on. The default is 3600 seconds (1 hour).
 
-\textbf{\emph{Field: Control Zone Name}}
+\textbf{\emph{Field: Control Zone or Zone List Name}}
 
-For the option \emph{CycleOnControlZone} this is the name of the control zone.
+For the option \emph{CycleOnControlZone} this is the name of the control zone or zone list. These zones will activate the central fan for heating or cooling.
+
+\textbf{\emph{Field: Cooling Control Zone or Zone List Name}}
+
+For the options \emph{CycleOnAnyCoolingOrHeatingZone} and  \emph{CycleOnAnyCoolingZone}  this is the name of the cooling control zone or zone list. These zones will activate the central fan for cooling.
+
+\textbf{\emph{Field: Heating Control Zone or Zone List Name}}
+
+For the options \emph{CycleOnAnyCoolingOrHeatingZone} and  \emph{CycleOnAnyHeatingZone}  this is the name of the heating control zone or zone list. These zones will activate the central fan for heating.
+
+\textbf{\emph{Field: Heating Zone Fans Only Zone or Zone List Name}}
+
+For the options \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyHeatingZone}, and \emph{CycleOnAnyHeatingZoneFansOnly},  this is the name of the heating zone fans control zone or zone list. These zones will activate the zone fans for heating.
 
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
 
 AvailabilityManager:NightCycle,
-  VAV Sys 1 Avail,         ! Name
-  SysAvailApplicSch,     !Applicability Schedule Name
-  FanAvailSched,             ! Fan Schedule Name
-  CycleOnAny,                   ! Control Type
-  4.0,                                 ! Temperature Tolerance {delta C}
-  7200.;                             ! Cycle Run Time {s}
+  VAV Sys 1 Avail,       !- Name
+  SysAvailApplicSch,     !- Applicability Schedule Name
+  FanAvailSched,         !- Fan Schedule Name
+  CycleOnAny,            !- Control Type
+  4.0,                   !- Temperature Tolerance {delta C}
+  7200.;                 !- Cycle Run Time {s}
+  ,                      !- Control Zone or Zone List Name
+  ,                      !- Cooling Zone or Zone List Name
+  ,                      !- Heating Control Zone or Zone List Name
+  ;                      !- Heating Zone Fans Only Zone or Zone List Name
 \end{lstlisting}
 
 \subsubsection{Inputs}\label{inputs-3-037}
