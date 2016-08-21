@@ -129,6 +129,8 @@ This manager is used for cycling on an air system when one or more zones become 
 
 This object gives the user considerable flexibility in determining how the night time on/off decision will be made. The manager can look at the temperature in 1 zone or it can sample all the zones connected to the air handler. The user can specify a temperature tolerance and a run time for the system once it switches on. There is also an applicability schedule the user can schedule whether or not this availability manager itself is being applied.
 
+\subsubsection{Inputs}\label{inputs-3-037}
+
 \textbf{\emph{Field: Name}}
 
 A unique, user-assigned name for an instance of a night cycle availability manager. Other objects that use this availability manager will reference it by this name.
@@ -197,8 +199,6 @@ AvailabilityManager:NightCycle,
   ,                      !- Heating Control Zone or Zone List Name
   ;                      !- Heating Zone Fans Only Zone or Zone List Name
 \end{lstlisting}
-
-\subsubsection{Inputs}\label{inputs-3-037}
 
 \subsubsection{Outputs}\label{outputs-2-022}
 
