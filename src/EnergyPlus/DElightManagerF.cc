@@ -607,13 +607,12 @@ namespace DElightManagerF {
 
 		} // Glass Type loop
 
-		// on some platforms, the flush isn't triggered, so force it
-		gio::flush( unit );
-
 		if ( ErrorsFound ) ShowFatalError( "Problems with Daylighting:DElight input, see previous error messages" );
-//		auto const stream_str = delightin_stream->str();
-//		gio::close( OutputDElightIn );
+
+		gio::close( unit );
+
 		return;
+
 	}
 
 	void
