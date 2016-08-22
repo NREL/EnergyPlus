@@ -87,7 +87,7 @@
 !
 ! HVAC:                           Packaged terminal air conditioner in each zone and a dedicated outdoor air system with
 !                                 heat recovery and standard VAV fan. There are no central HVAC heating or cooling coils.
-!                                 There is no conventional central plant. 
+!                                 There is no conventional central plant.
 !
 ! Zonal Equipment:                Yes
 ! Central Air Handling Equipment: Yes
@@ -276,7 +276,7 @@ RunPeriod,
     Last Sunday in October;  !- End Date
 
 
-  
+
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========
 
 ScheduleTypeLimits,
@@ -3145,7 +3145,7 @@ Coil:Heating:Fuel,
     SPACE1-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
-    0.8,                     !- Gas Burner Efficiency
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE1-1 Supply Inlet;   !- Air Outlet Node Name
@@ -3154,7 +3154,7 @@ Coil:Heating:Fuel,
     SPACE2-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
-    0.8,                     !- Gas Burner Efficiency
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE2-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE2-1 Supply Inlet;   !- Air Outlet Node Name
@@ -3163,7 +3163,7 @@ Coil:Heating:Fuel,
     SPACE3-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
-    0.8,                     !- Gas Burner Efficiency
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE3-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE3-1 Supply Inlet;   !- Air Outlet Node Name
@@ -3172,7 +3172,7 @@ Coil:Heating:Fuel,
     SPACE4-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
-    0.8,                     !- Gas Burner Efficiency
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE4-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE4-1 PTAC Outlet;    !- Air Outlet Node Name
@@ -3181,7 +3181,7 @@ Coil:Heating:Fuel,
     SPACE5-1 Heating Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
-    0.8,                     !- Gas Burner Efficiency
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE5-1 Cooling Coil Outlet,  !- Air Inlet Node Name
     SPACE5-1 PTAC Outlet;    !- Air Outlet Node Name
@@ -3357,18 +3357,15 @@ AirLoopHVAC:ReturnPath,
 
 Branch,
     DOAS Main Branch,        !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
-    DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    DOAS Supply Fan Outlet;  !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -3452,12 +3449,12 @@ Output:Variable,
     *,                       !- Key Value
     Site Outdoor Air Drybulb Temperature,  !- Variable Name
     hourly;                  !- Reporting Frequency
-  
+
 Output:Variable,
     *,                       !- Key Value
     Site Outdoor Air Wetbulb Temperature,  !- Variable Name
     hourly;                  !- Reporting Frequency
-  
+
 Output:Variable,
     *,                       !- Key Value
     Zone Air Temperature,    !- Variable Name

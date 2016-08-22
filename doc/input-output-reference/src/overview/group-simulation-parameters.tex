@@ -36,12 +36,12 @@ The choice made for this field has important implications for modeling accuracy 
 \end{itemize}
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
 \midrule
 \endhead
@@ -133,13 +133,13 @@ The site's terrain affects how the wind hits the building -- as does the buildin
 % table 1
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Values for ``Terrain'' \label{table:values-for-terrain}} \tabularnewline
-\toprule 
+\toprule
 Terrain Type Value & Terrain Description \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Values for ``Terrain''} \tabularnewline
-\toprule 
+\toprule
 Terrain Type Value & Terrain Description \tabularnewline
 \midrule
 \endhead
@@ -587,7 +587,9 @@ Allowable choices are:
 
 \textbf{DisplayZoneAirHeatBalanceOffBalance} -- this is a developer diagnostic which you can turn on, if you desire.
 
-\textbf{DoNotMirrorDetachedShading} -- use this to turn off the automatic mirroring of detached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. Note that Shading:Zone:Detailed surfaces are also mirrored and there is no way to turn that ``off''.
+\textbf{DoNotMirrorDetachedShading} -- use this to turn off the automatic mirroring of detached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. 
+
+\textbf{DoNotMirrorAttachedShading} -- use this to turn off the automatic mirroring of attached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. Attached shading surfaces include Shading:Overhang, Shading:Overhang:Projection, Shading:Fin, Shading:Fin:Projection, and Shading:Zone:Detailed.
 
 \textbf{DisplayWeatherMissingDataWarnings} -- use this to turn on the missing data warnings from the read of the weather file.
 

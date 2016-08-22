@@ -16382,8 +16382,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:10_HeatC,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:10_HeatC-PSZ-HEATCOOL:10_FanNode,  !- Air Outlet Node Name
@@ -16392,8 +16392,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:11_HeatC,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:11_HeatC-PSZ-HEATCOOL:11_FanNode,  !- Air Outlet Node Name
@@ -16402,8 +16402,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:12_HeatC,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:12_HeatC-PSZ-HEATCOOL:12_FanNode,  !- Air Outlet Node Name
@@ -16412,8 +16412,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:1_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:1_HeatC-PSZ-HEATCOOL:1_FanNode,  !- Air Outlet Node Name
@@ -16422,8 +16422,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:2_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:2_HeatC-PSZ-HEATCOOL:2_FanNode,  !- Air Outlet Node Name
@@ -16432,8 +16432,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:3_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:3_HeatC-PSZ-HEATCOOL:3_FanNode,  !- Air Outlet Node Name
@@ -16442,8 +16442,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:4_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:4_HeatC-PSZ-HEATCOOL:4_FanNode,  !- Air Outlet Node Name
@@ -16452,8 +16452,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:5_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:5_HeatC-PSZ-HEATCOOL:5_FanNode,  !- Air Outlet Node Name
@@ -16462,8 +16462,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:6_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:6_HeatC-PSZ-HEATCOOL:6_FanNode,  !- Air Outlet Node Name
@@ -16472,8 +16472,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:7_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.78,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.78,                    !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:7_HeatC-PSZ-HEATCOOL:7_FanNode,  !- Air Outlet Node Name
@@ -16482,8 +16482,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:8_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:8_HeatC-PSZ-HEATCOOL:8_FanNode,  !- Air Outlet Node Name
@@ -16492,8 +16492,8 @@
   Coil:Heating:Fuel,
     PSZ-HEATCOOL:9_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:9_HeatC-PSZ-HEATCOOL:9_FanNode,  !- Air Outlet Node Name
@@ -24331,303 +24331,243 @@
 
   Branch,
     PSZ-HEATCOOL:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:1_OA,       !- Component 1 Name
     PSZ-HEATCOOL:1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:1_OA-PSZ-HEATCOOL:1_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:1_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:1_OA-PSZ-HEATCOOL:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:1_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:1_HeatC-PSZ-HEATCOOL:1_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:1_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:1_HeatC-PSZ-HEATCOOL:1_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:1 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:1 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:10 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:10_OA,      !- Component 1 Name
     PSZ-HEATCOOL:10 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:10_OA-PSZ-HEATCOOL:10_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:10_CoolC,   !- Component 2 Name
     PSZ-HEATCOOL:10_OA-PSZ-HEATCOOL:10_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:10_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:10_HeatC-PSZ-HEATCOOL:10_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:10_Fan,     !- Component 4 Name
     PSZ-HEATCOOL:10_HeatC-PSZ-HEATCOOL:10_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:10 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:10 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:11 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:11_OA,      !- Component 1 Name
     PSZ-HEATCOOL:11 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:11_OA-PSZ-HEATCOOL:11_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:11_CoolC,   !- Component 2 Name
     PSZ-HEATCOOL:11_OA-PSZ-HEATCOOL:11_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:11_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:11_HeatC-PSZ-HEATCOOL:11_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:11_Fan,     !- Component 4 Name
     PSZ-HEATCOOL:11_HeatC-PSZ-HEATCOOL:11_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:11 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:11 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:12 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:12_OA,      !- Component 1 Name
     PSZ-HEATCOOL:12 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:12_OA-PSZ-HEATCOOL:12_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:12_CoolC,   !- Component 2 Name
     PSZ-HEATCOOL:12_OA-PSZ-HEATCOOL:12_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:12_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:12_HeatC-PSZ-HEATCOOL:12_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:12_Fan,     !- Component 4 Name
     PSZ-HEATCOOL:12_HeatC-PSZ-HEATCOOL:12_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:12 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:12 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:2_OA,       !- Component 1 Name
     PSZ-HEATCOOL:2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:2_OA-PSZ-HEATCOOL:2_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:2_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:2_OA-PSZ-HEATCOOL:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:2_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:2_HeatC-PSZ-HEATCOOL:2_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:2_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:2_HeatC-PSZ-HEATCOOL:2_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:2 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:2 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:3 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:3_OA,       !- Component 1 Name
     PSZ-HEATCOOL:3 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:3_OA-PSZ-HEATCOOL:3_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:3_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:3_OA-PSZ-HEATCOOL:3_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:3_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:3_HeatC-PSZ-HEATCOOL:3_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:3_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:3_HeatC-PSZ-HEATCOOL:3_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:3 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:3 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:4 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:4_OA,       !- Component 1 Name
     PSZ-HEATCOOL:4 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:4_OA-PSZ-HEATCOOL:4_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:4_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:4_OA-PSZ-HEATCOOL:4_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:4_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:4_HeatC-PSZ-HEATCOOL:4_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:4_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:4_HeatC-PSZ-HEATCOOL:4_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:4 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:4 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:5 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:5_OA,       !- Component 1 Name
     PSZ-HEATCOOL:5 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:5_OA-PSZ-HEATCOOL:5_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:5_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:5_OA-PSZ-HEATCOOL:5_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:5_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:5_HeatC-PSZ-HEATCOOL:5_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:5_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:5_HeatC-PSZ-HEATCOOL:5_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:5 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:5 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:6 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:6_OA,       !- Component 1 Name
     PSZ-HEATCOOL:6 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:6_OA-PSZ-HEATCOOL:6_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:6_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:6_OA-PSZ-HEATCOOL:6_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:6_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:6_HeatC-PSZ-HEATCOOL:6_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:6_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:6_HeatC-PSZ-HEATCOOL:6_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:6 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:6 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:7 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:7_OA,       !- Component 1 Name
     PSZ-HEATCOOL:7 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:7_OA-PSZ-HEATCOOL:7_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:7_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:7_OA-PSZ-HEATCOOL:7_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:7_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:7_HeatC-PSZ-HEATCOOL:7_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:7_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:7_HeatC-PSZ-HEATCOOL:7_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:7 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:7 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:8 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:8_OA,       !- Component 1 Name
     PSZ-HEATCOOL:8 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:8_OA-PSZ-HEATCOOL:8_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:8_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:8_OA-PSZ-HEATCOOL:8_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:8_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:8_HeatC-PSZ-HEATCOOL:8_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:8_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:8_HeatC-PSZ-HEATCOOL:8_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:8 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:8 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   Branch,
     PSZ-HEATCOOL:9 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-HEATCOOL:9_OA,       !- Component 1 Name
     PSZ-HEATCOOL:9 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-HEATCOOL:9_OA-PSZ-HEATCOOL:9_CoolCNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     PSZ-HEATCOOL:9_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:9_OA-PSZ-HEATCOOL:9_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:9_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:9_HeatC-PSZ-HEATCOOL:9_FanNode,  !- Component 3 Outlet Node Name
-    Passive,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     PSZ-HEATCOOL:9_Fan,      !- Component 4 Name
     PSZ-HEATCOOL:9_HeatC-PSZ-HEATCOOL:9_FanNode,  !- Component 4 Inlet Node Name
-    PSZ-HEATCOOL:9 Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    Active;                  !- Component 4 Branch Control Type
+    PSZ-HEATCOOL:9 Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-HEATCOOL:10_OA_Controllers,  !- Name
@@ -26536,433 +26476,347 @@
 
   Branch,
     SWHSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Bypass Pipe,  !- Component 1 Name
     SWHSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Inlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Inlet Pipe-SWHSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom101 Water Equipment,  !- Component 1 Name
     GuestRoom101 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom101 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom101 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom209_212 Water Equipment,  !- Component 1 Name
     GuestRoom209_212 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom209_212 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom209_212 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom213 Water Equipment,  !- Component 1 Name
     GuestRoom213 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom213 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom213 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom214 Water Equipment,  !- Component 1 Name
     GuestRoom214 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom214 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom214 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom215_218 Water Equipment,  !- Component 1 Name
     GuestRoom215_218 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom215_218 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom215_218 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom219 Water Equipment,  !- Component 1 Name
     GuestRoom219 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom219 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom219 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom220_223 Water Equipment,  !- Component 1 Name
     GuestRoom220_223 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom220_223 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom220_223 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 16,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom224 Water Equipment,  !- Component 1 Name
     GuestRoom224 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom224 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom224 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 17,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom301 Water Equipment,  !- Component 1 Name
     GuestRoom301 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom301 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom301 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 18,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom302_305 Water Equipment,  !- Component 1 Name
     GuestRoom302_305 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom302_305 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom302_305 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 19,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom306_308 Water Equipment,  !- Component 1 Name
     GuestRoom306_308 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom306_308 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom306_308 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom102 Water Equipment,  !- Component 1 Name
     GuestRoom102 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom102 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom102 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 20,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom309_312 Water Equipment,  !- Component 1 Name
     GuestRoom309_312 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom309_312 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom309_312 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 21,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom313 Water Equipment,  !- Component 1 Name
     GuestRoom313 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom313 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom313 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 22,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom314 Water Equipment,  !- Component 1 Name
     GuestRoom314 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom314 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom314 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 23,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom315_318 Water Equipment,  !- Component 1 Name
     GuestRoom315_318 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom315_318 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom315_318 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 24,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom319 Water Equipment,  !- Component 1 Name
     GuestRoom319 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom319 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom319 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 25,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom320_323 Water Equipment,  !- Component 1 Name
     GuestRoom320_323 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom320_323 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom320_323 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 26,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom324 Water Equipment,  !- Component 1 Name
     GuestRoom324 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom324 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom324 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 27,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom401 Water Equipment,  !- Component 1 Name
     GuestRoom401 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom401 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom401 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 28,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom402_405 Water Equipment,  !- Component 1 Name
     GuestRoom402_405 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom402_405 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom402_405 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 29,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom406_408 Water Equipment,  !- Component 1 Name
     GuestRoom406_408 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom406_408 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom406_408 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom103 Water Equipment,  !- Component 1 Name
     GuestRoom103 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom103 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom103 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 30,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom409_412 Water Equipment,  !- Component 1 Name
     GuestRoom409_412 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom409_412 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom409_412 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 31,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom413 Water Equipment,  !- Component 1 Name
     GuestRoom413 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom413 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom413 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 32,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom414 Water Equipment,  !- Component 1 Name
     GuestRoom414 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom414 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom414 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 33,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom415_418 Water Equipment,  !- Component 1 Name
     GuestRoom415_418 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom415_418 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom415_418 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 34,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom419 Water Equipment,  !- Component 1 Name
     GuestRoom419 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom419 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom419 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 35,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom420_423 Water Equipment,  !- Component 1 Name
     GuestRoom420_423 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom420_423 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom420_423 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 36,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom424 Water Equipment,  !- Component 1 Name
     GuestRoom424 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom424 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom424 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom104 Water Equipment,  !- Component 1 Name
     GuestRoom104 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom104 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom104 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom105 Water Equipment,  !- Component 1 Name
     GuestRoom105 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom105 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom105 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     LaundryRoomFlr1 Water Equipment,  !- Component 1 Name
     LaundryRoomFlr1 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    LaundryRoomFlr1 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    LaundryRoomFlr1 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom201 Water Equipment,  !- Component 1 Name
     GuestRoom201 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom201 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom201 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom202_205 Water Equipment,  !- Component 1 Name
     GuestRoom202_205 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom202_205 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom202_205 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     GuestRoom206_208 Water Equipment,  !- Component 1 Name
     GuestRoom206_208 Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
-    GuestRoom206_208 Water Equipment Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    GuestRoom206_208 Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Demand Outlet Pipe,  !- Component 1 Name
     SWHSys1 Demand Mixer-SWHSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SWHSys1 Water Heater,    !- Component 1 Name
     SWHSys1 Pump-SWHSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SWHSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SWHSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    SWHSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SWHSys1 Pump,            !- Component 1 Name
     SWHSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SWHSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SWHSys1 Supply Outlet Pipe,  !- Component 1 Name
     SWHSys1 Supply Mixer-SWHSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SWHSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    SWHSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   ConnectorList,
     SWHSys1 Demand Connectors,  !- Name

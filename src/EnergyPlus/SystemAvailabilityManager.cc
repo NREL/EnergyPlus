@@ -196,6 +196,18 @@ namespace SystemAvailabilityManager {
 	int NumOptStartSysAvailMgrs( 0 );
 	bool BeginOfDayResetFlag( true );
 
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitSysAvailManagers_MyOneTimeFlag( true );
+		bool CalcNCycSysAvailMgr_OneTimeFlag( true );
+		Array1D< Real64 > OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
+		Array1D< Real64 > OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
+	}
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
@@ -233,6 +245,8 @@ namespace SystemAvailabilityManager {
 		GetAvailListsInput = true ;
 		GetAvailMgrInputFlag = true ;
 		GetHybridInputFlag = true ;
+		InitSysAvailManagers_MyOneTimeFlag = true ;
+		CalcNCycSysAvailMgr_OneTimeFlag = true ;
 		NumOptStartSysAvailMgrs = 0 ;
 		SchedSysAvailMgrData.deallocate();
 		SchedOnSysAvailMgrData.deallocate();
@@ -250,6 +264,8 @@ namespace SystemAvailabilityManager {
 		ASHRAEOptSCoeffCooling.deallocate();
 		ASHRAEOptSCoeffHeating.deallocate();
 		BeginOfDayResetFlag = true;
+		OptStart_AdaTempGradTrdHeat.deallocate();
+		OptStart_AdaTempGradTrdCool.deallocate();
 	}
 
 	void
@@ -1565,7 +1581,6 @@ namespace SystemAvailabilityManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // One time flag
 		int SysAvailNum; // DO loop indes for Sys Avail Manager objects
 		int ControlledZoneNum; // Index into the ZoneEquipConfig array
 		int ZoneEquipType;
@@ -1574,7 +1589,7 @@ namespace SystemAvailabilityManager {
 		int ZoneNum;
 		// One time initializations
 
-		if ( MyOneTimeFlag ) {
+		if ( InitSysAvailManagers_MyOneTimeFlag ) {
 
 			for ( SysAvailNum = 1; SysAvailNum <= NumNCycSysAvailMgrs; ++SysAvailNum ) {
 				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == CycleOnControlZone ) {
@@ -1630,7 +1645,7 @@ namespace SystemAvailabilityManager {
 				}
 			}
 
-			MyOneTimeFlag = false;
+			InitSysAvailManagers_MyOneTimeFlag = false;
 
 		} // end 1 time initializations
 
@@ -2029,15 +2044,14 @@ namespace SystemAvailabilityManager {
 		int ZoneNum;
 		Real64 TempTol;
 		static Array1D_bool ZoneCompNCControlType;
-		static bool OneTimeFlag( true );
 
 		TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
 		if ( present( ZoneEquipType ) ) {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
-			if ( OneTimeFlag ) {
+			if (CalcNCycSysAvailMgr_OneTimeFlag) {
 				ZoneCompNCControlType.dimension( NumNCycSysAvailMgrs, true );
-				OneTimeFlag = false;
+				CalcNCycSysAvailMgr_OneTimeFlag = false;
 			}
 		} else {
 			StartTime = PriAirSysAvailMgr( PriAirSysNum ).StartTime;
@@ -2305,8 +2319,6 @@ namespace SystemAvailabilityManager {
 		bool OSReportVarFlag( true );
 		int NumPreDays;
 		int NumOfZonesInList;
-		static Array1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
-		static Array1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
 		Real64 AdaTempGradHeat;
 		Real64 AdaTempGradCool;
 		Real64 ATGUpdateTime1( 0.0 );
@@ -2345,9 +2357,9 @@ namespace SystemAvailabilityManager {
 
 		if ( OptStartMgr.CtrlAlgType == AdaptiveTemperatureGradient ) {
 			NumPreDays = OptStartMgr.NumPreDays;
-			if ( ! allocated( AdaTempGradTrdHeat ) ) {
-				AdaTempGradTrdHeat.allocate( NumPreDays );
-				AdaTempGradTrdCool.allocate( NumPreDays );
+			if ( ! allocated(OptStart_AdaTempGradTrdHeat ) ) {
+				OptStart_AdaTempGradTrdHeat.allocate( NumPreDays );
+				OptStart_AdaTempGradTrdCool.allocate( NumPreDays );
 			}
 			if ( ! allocated( OptStartMgr.AdaTempGradTrdHeat ) ) {
 				OptStartMgr.AdaTempGradTrdHeat.allocate( NumPreDays );
@@ -2355,8 +2367,8 @@ namespace SystemAvailabilityManager {
 				OptStartMgr.AdaTempGradTrdCool.allocate( NumPreDays );
 				OptStartMgr.AdaTempGradTrdCool = 0.0;
 			}
-			AdaTempGradTrdHeat = OptStartMgr.AdaTempGradTrdHeat;
-			AdaTempGradTrdCool = OptStartMgr.AdaTempGradTrdCool;
+			OptStart_AdaTempGradTrdHeat = OptStartMgr.AdaTempGradTrdHeat;
+			OptStart_AdaTempGradTrdCool = OptStartMgr.AdaTempGradTrdCool;
 			AdaTempGradHeat = OptStartMgr.AdaTempGradHeat;
 			AdaTempGradCool = OptStartMgr.AdaTempGradCool;
 			ATGUpdateTime1 = OptStartMgr.ATGUpdateTime1;
@@ -2879,19 +2891,19 @@ namespace SystemAvailabilityManager {
 						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
 						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
-						AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+						OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
 						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
-						AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+						OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
 						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
-							AdaTempGradHeat += AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - AdaTempGradTrdHeat( 1 ) / NumPreDays;
-							AdaTempGradCool += AdaTempGradTrdCool( NumPreDays ) / NumPreDays - AdaTempGradTrdCool( 1 ) / NumPreDays;
+							AdaTempGradHeat += OptStart_AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdHeat( 1 ) / NumPreDays;
+							AdaTempGradCool += OptStart_AdaTempGradTrdCool( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdCool( 1 ) / NumPreDays;
 							if ( FanStartTime > 0 ) {
 								for ( ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter ) {
-									AdaTempGradTrdHeat( ATGCounter ) = AdaTempGradTrdHeat( ATGCounter + 1 );
-									AdaTempGradTrdCool( ATGCounter ) = AdaTempGradTrdCool( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdHeat( ATGCounter ) = OptStart_AdaTempGradTrdHeat( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdCool( ATGCounter ) = OptStart_AdaTempGradTrdCool( ATGCounter + 1 );
 								}
 							}
 						}
@@ -2942,9 +2954,9 @@ namespace SystemAvailabilityManager {
 											ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 											ATGUpdateFlag2 = false;
 											if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 											} else {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 											}
 										}
 									}
@@ -2993,9 +3005,9 @@ namespace SystemAvailabilityManager {
 											ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 											ATGUpdateFlag2 = false;
 											if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 											} else {
-												AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+												OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 											}
 										}
 									}
@@ -3066,9 +3078,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3105,9 +3117,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ZoneNum );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3179,19 +3191,19 @@ namespace SystemAvailabilityManager {
 						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
 						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else if ( DayOfSim == BeginDay && BeginDayFlag ) {
-						AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
+						OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
 						AdaTempGradHeat = OptStartMgr.InitTGradHeat;
-						AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
+						OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
 						AdaTempGradCool = OptStartMgr.InitTGradCool;
 					} else {
 						if ( BeginDayFlag && FirstTimeATGFlag ) {
 							FirstTimeATGFlag = false;
-							AdaTempGradHeat += AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - AdaTempGradTrdHeat( 1 ) / NumPreDays;
-							AdaTempGradCool += AdaTempGradTrdCool( NumPreDays ) / NumPreDays - AdaTempGradTrdCool( 1 ) / NumPreDays;
+							AdaTempGradHeat += OptStart_AdaTempGradTrdHeat( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdHeat( 1 ) / NumPreDays;
+							AdaTempGradCool += OptStart_AdaTempGradTrdCool( NumPreDays ) / NumPreDays - OptStart_AdaTempGradTrdCool( 1 ) / NumPreDays;
 							if ( FanStartTime > 0 ) {
 								for ( ATGCounter = 1; ATGCounter <= NumPreDays - 1; ++ATGCounter ) {
-									AdaTempGradTrdHeat( ATGCounter ) = AdaTempGradTrdHeat( ATGCounter + 1 );
-									AdaTempGradTrdCool( ATGCounter ) = AdaTempGradTrdCool( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdHeat( ATGCounter ) = OptStart_AdaTempGradTrdHeat( ATGCounter + 1 );
+									OptStart_AdaTempGradTrdCool( ATGCounter ) = OptStart_AdaTempGradTrdCool( ATGCounter + 1 );
 								}
 							}
 						}
@@ -3241,9 +3253,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumLo );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 										} else {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3286,9 +3298,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumLo );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 										} else {
-											AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdHeat( NumPreDays ) = ( ATGUpdateTemp2 - ATGUpdateTemp1 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3358,9 +3370,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumHi );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 
 									}
@@ -3409,9 +3421,9 @@ namespace SystemAvailabilityManager {
 										ATGUpdateTemp2 = TempTstatAir( ATGWCZoneNumHi );
 										ATGUpdateFlag2 = false;
 										if ( std::abs( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 ) > 1.e-10 ) {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) / ( ATGUpdateTime2 - ATGUpdateTime1 + 24.0 );
 										} else {
-											AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
+											OptStart_AdaTempGradTrdCool( NumPreDays ) = ( ATGUpdateTemp1 - ATGUpdateTemp2 ) * NumOfTimeStepInHour;
 										}
 									}
 								}
@@ -3467,8 +3479,8 @@ namespace SystemAvailabilityManager {
 		OptStartMgr.OverNightStartFlag = OverNightStartFlag;
 		OptStartMgr.OSReportVarFlag = OSReportVarFlag;
 		if ( OptStartMgr.CtrlAlgType == AdaptiveTemperatureGradient ) {
-			OptStartMgr.AdaTempGradTrdHeat = AdaTempGradTrdHeat;
-			OptStartMgr.AdaTempGradTrdCool = AdaTempGradTrdCool;
+			OptStartMgr.AdaTempGradTrdHeat = OptStart_AdaTempGradTrdHeat;
+			OptStartMgr.AdaTempGradTrdCool = OptStart_AdaTempGradTrdCool;
 			OptStartMgr.AdaTempGradHeat = AdaTempGradHeat;
 			OptStartMgr.AdaTempGradCool = AdaTempGradCool;
 			OptStartMgr.ATGUpdateTime1 = ATGUpdateTime1;
