@@ -1374,13 +1374,11 @@ NOTE: branch object required only when tank use inlet nodes are used.
 
   Branch,
       Central HPWH Branch,     !- Name
-      0,                       !- Maximum Flow Rate {m3/s}
       ,                        !- Pressure Drop Curve Name
       WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
       PlantHeatPumpWaterHeater,!- Component 1 Name
       HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
-      HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
-      PASSIVE;                 !- Component 1 Branch Control Type
+      HPWH Use Outlet Node;    !- Component 1 Outlet Node Name
 
 
 
@@ -1736,13 +1734,11 @@ NOTE: branch object required only when tank use inlet nodes are used.
 
 Branch,
       Central HPWH Branch,     !- Name
-      0,                       !- Maximum Flow Rate {m3/s}
       ,                        !- Pressure Drop Curve Name
       WaterHeater:HeatPump:WrappedCondenser,    !- Component 1 Object Type
       PlantHeatPumpWaterHeater,!- Component 1 Name
       HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
-      HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
-      PASSIVE;                 !- Component 1 Branch Control Type
+      HPWH Use Outlet Node;    !- Component 1 Outlet Node Name
 
   WaterHeater:Stratified,
   HPWHPlantTank,           !- Name

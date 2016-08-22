@@ -77,6 +77,8 @@ namespace SingleDuct {
 	//MODULE PARAMETER DEFINITIONS
 	extern int const Normal;
 	extern int const ReverseAction;
+	extern int const ReverseActionWithLimits;
+	extern int const HeatingActionNotUsed;
 	// SysTypes represented here
 	extern int const SingleDuctVAVReheat;
 	extern int const SingleDuctConstVolReheat;
@@ -97,6 +99,7 @@ namespace SingleDuct {
 	extern int const ConstantMinFrac;
 	extern int const ScheduledMinFrac;
 	extern int const FixedMin;
+	extern int const MinFracNotUsed;
 	extern int NumATMixers;
 
 	// DERIVED TYPE DEFINITIONS
@@ -180,7 +183,7 @@ namespace SingleDuct {
 		Real64 ControllerOffset;
 		Real64 MaxReheatTemp; // C
 		bool MaxReheatTempSetByUser;
-		int DamperHeatingAction; // ! 1=NORMAL;  2=REVERSE ACTION
+		int DamperHeatingAction; // ! 1=NORMAL;  2=REVERSE ACTION;  3=REVERSE ACTION WITH LIMITS
 		Real64 DamperPosition;
 		int ADUNum; // index of corresponding air distribution unit
 		int FluidIndex; // Refrigerant index
