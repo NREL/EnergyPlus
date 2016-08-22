@@ -148,8 +148,14 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat \tabularnewline
  & Maximum Hot Water or Steam Flow Rate \tabularnewline
 AirTerminal:SingleDuct:VAV:NoReheat \tabularnewline
  & Maximum Air Flow Rate \tabularnewline
+ & Constant Minimum Air Flow Fraction \tabularnewline
+ & Fixed Minimum Air Flow Rate \tabularnewline
 AirTerminal:SingleDuct:VAV:Reheat \tabularnewline
  & Maximum Air Flow Rate \tabularnewline
+ & Constant Minimum Air Flow Fraction \tabularnewline
+ & Fixed Minimum Air Flow Rate \tabularnewline
+ & Maximum Flow per Zone Floor Area During Reheat \tabularnewline
+ & Maximum Flow Fraction During Reheat \tabularnewline
  & Maximum Hot Water or Steam Flow Rate \tabularnewline
 AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan \tabularnewline
  & Maximum Cooling Air Flow Rate \tabularnewline
@@ -941,6 +947,11 @@ This optional field input points to a schedule with values of zone air distribut
 
 The non-negative numeric input for this field is the fraction of a zone's recirculation air that does not directly mix with the outdoor air. The zone secondary recirculation fraction Er is determined by the designer based on system configuration. For plenum return systems with secondary recirculation (e.g., fan-powered VAV with plenum return) Er is usually less than 1.0, although values may range from 0.1 to 1.2 depending upon the location of the ventilation zone relative to other zones and the air handler. For ducted return systems with secondary recirculation (e.g., fan-powered VAV with ducted return), Er is typically 0.0, while for those with system-level recirculation (e.g, dual-fan dual-duct systems with ducted return) Er is typically 1.0. For other system types, Er is typically 0.75. Minimum is 0.0, and default is 0.0 for single-path systems (also to maintain backward compatibility). For parallel fan-powered VAV systems, the secondary ventilation path only functions (Er \textgreater{} 0.0) when the fans in the VAV boxes operate, which is during heating. The local ventilation path and the benefits of secondary recirculation disappear during cooling, when the local parallel fans are off (Er = 0.0).
 
+\paragraph{Field: Minimum Zone Ventilation 
+Efficiency}\label{field-minimum-zone-ventilation-efficiency}
+
+This optional input sets a minimum on the ventilation efficiency for the zone. It is only used with the Ventilation Rate Procedure (VRP), single-path method. VRP should be chosen in Sizing System, System Outdoor Air Method = VentilationRateProcedure. Single-path method is indicated by leaving the previous input (Zone Secondary Recirculation Fraction) blank or setting it to 0.0. If the calculated value of ventilation efficiency for a zone is less than this value, it is raised to this minimum by raising the zone minimum air flow rate. This new value for zone minimum air flow rate then overrides other defaults and inputs in Sizing:Zone.
+
 An example of this in an IDF context is shown:
 
 \begin{lstlisting}
@@ -1104,7 +1115,7 @@ The minimum zone cooling volumetric flow rate in m\(^{3}\)/s. This field is used
 
 \paragraph{Field: Cooling Minimum Air Flow Fraction}\label{field-cooling-minimum-air-flow-fraction}
 
-The minimum zone design cooling volumetric flow rate expressed as a fraction of the zone design cooling volumetric flow rate. . In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, and \emph{Cooling Minimum Air Flow Fraction}~ is used to set a minimum supply air flow rate for the zone for VAV systems. The default is zero. This input is currently used in sizing the fan minimum flow rate. It does not currently affect other component autosizing.
+The minimum zone design cooling volumetric flow rate expressed as a fraction of the zone design cooling volumetric flow rate. . In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, and \emph{Cooling Minimum Air Flow Fraction}~ is used to set a minimum supply air flow rate for the zone for VAV systems. The default is 0.2. This input is currently used in sizing the VAV air terminal unit. It does not currently affect other component autosizing.
 
 \paragraph{Field: Heating Design Air Flow Method}\label{field-heating-design-air-flow-method}
 

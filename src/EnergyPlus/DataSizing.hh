@@ -334,6 +334,7 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user input for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -351,6 +352,7 @@ namespace DataSizing {
 		int ZoneAirDistributionIndex; // index to the zone air distribution object
 		int ZoneDesignSpecOAIndex; // index to the zone design spec OA object
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
 		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
 		// 3=supply cold ventilation air
@@ -377,6 +379,7 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
+			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			DesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -389,6 +392,7 @@ namespace DataSizing {
 			ZoneAirDistributionIndex( 0 ),
 			ZoneDesignSpecOAIndex( 0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			AccountForDOAS( false ),
 			DOASControlStrategy( 0 ),
 			DOASLowSetpoint( 0.0 ),
@@ -430,6 +434,7 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user flag for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -543,6 +548,7 @@ namespace DataSizing {
 		Real64 ZoneADEffCooling; // the zone air distribution effectiveness in cooling mode
 		Real64 ZoneADEffHeating; // the zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		Real64 ZonePrimaryAirFraction; // the zone primary air fraction for cooling based calculations
 		Real64 ZonePrimaryAirFractionHtg; // the zone primary air fraction for heating based calculations
 		Real64 ZoneOAFracCooling; // OA fraction in cooling mode
@@ -594,6 +600,7 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
+			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			InpDesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -674,6 +681,7 @@ namespace DataSizing {
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			ZonePrimaryAirFraction( 0.0 ),
 			ZonePrimaryAirFractionHtg( 0.0 ),
 			ZoneOAFracCooling( 0.0 ),
@@ -1236,13 +1244,15 @@ namespace DataSizing {
 		Real64 ZoneADEffHeating; // - Zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // - Zone air secondary recirculation ratio
 		int ZoneADEffSchPtr; // - Zone air distribution effectiveness schedule index
+		Real64 ZoneVentilationEff; // Zone ventilation effectiveness
 
 		// Default Constructor
 		ZoneAirDistributionData() :
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
-			ZoneADEffSchPtr( 0 )
+			ZoneADEffSchPtr( 0 ),
+			ZoneVentilationEff( 0.0 )
 		{}
 
 	};

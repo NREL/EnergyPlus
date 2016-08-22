@@ -4235,100 +4235,116 @@
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN1_S_Space_1_DaylCtrl,  !- Name
     ZN1_S_Space_1,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    12.500,                  !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN1_S_Space_1_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN1_S_Space_1_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN1_S_Space_1_DaylRefPt1,!- Name
+    ZN1_S_Space_1,           !- Zone Name
+    12.500,                  !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !X1, Y1, Z1
 !X2, Y2, Z2
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN2_E_Space_1_DaylCtrl,  !- Name
     ZN2_E_Space_1,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    7.930,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN2_E_Space_1_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN2_E_Space_1_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN2_E_Space_1_DaylRefPt1,!- Name
+    ZN2_E_Space_1,           !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    7.930,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !X1, Y1, Z1
 !X2, Y2, Z2
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN3_N_Space_1_DaylCtrl,  !- Name
     ZN3_N_Space_1,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN3_N_Space_1_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN3_N_Space_1_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN3_N_Space_1_DaylRefPt1,!- Name
+    ZN3_N_Space_1,           !- Zone Name
+    7.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !X1, Y1, Z1
 !X2, Y2, Z2
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN4_W_Space_1_DaylCtrl,  !- Name
     ZN4_W_Space_1,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    12.500,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN4_W_Space_1_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN4_W_Space_1_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN4_W_Space_1_DaylRefPt1,!- Name
+    ZN4_W_Space_1,           !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    12.500,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !! DAYLIGHTING:DETAILED,
 !!     ZN5_Core_Space_1 ,       !- Zone Name
@@ -4359,100 +4375,116 @@
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN6_S_Space_2_DaylCtrl,  !- Name
     ZN6_S_Space_2,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    12.500,                  !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN6_S_Space_2_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN6_S_Space_2_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN6_S_Space_2_DaylRefPt1,!- Name
+    ZN6_S_Space_2,           !- Zone Name
+    12.500,                  !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !X1, Y1, Z1
 !X2, Y2, Z2
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN7_E_Space_2_DaylCtrl,  !- Name
     ZN7_E_Space_2,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    7.930,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN7_E_Space_2_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN7_E_Space_2_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN7_E_Space_2_DaylRefPt1,!- Name
+    ZN7_E_Space_2,           !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    7.930,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !X1, Y1, Z1
 !X2, Y2, Z2
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN8_N_Space_2_DaylCtrl,  !- Name
     ZN8_N_Space_2,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN8_N_Space_2_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN8_N_Space_2_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN8_N_Space_2_DaylRefPt1,!- Name
+    ZN8_N_Space_2,           !- Zone Name
+    7.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !X1, Y1, Z1
 !X2, Y2, Z2
 !Zone Control Fractions
 
   Daylighting:Controls,
+    ZN9_W_Space_2_DaylCtrl,  !- Name
     ZN9_W_Space_2,           !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    12.500,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0,                       !- X-Coordinate of Second Reference Point {m}
-    0,                       !- Y-Coordinate of Second Reference Point {m}
-    0,                       !- Z-Coordinate of Second Reference Point {m}
-    1.00,                    !- Fraction of Zone Controlled by First Reference Point
-    0.0,                     !- Fraction of Zone Controlled by Second Reference Point
-    400.000,                 !- Illuminance Setpoint at First Reference Point {lux}
-    400.000,                 !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN9_W_Space_2_DaylRefPt1,!- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20.000,                  !- Maximum Allowable Discomfort Glare Index
-    0.3,                     !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2,                     !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0;                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN9_W_Space_2_DaylRefPt1,!- Daylighting Reference Point 1 Name
+    1.00,                    !- Fraction of Zone Controlled by Reference Point 1
+    400.000;                 !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN9_W_Space_2_DaylRefPt1,!- Name
+    ZN9_W_Space_2,           !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    12.500,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
 !! DAYLIGHTING:DETAILED,
 !!     ZN10_Core_Space_2 ,      !- Zone Name
@@ -4969,17 +5001,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -6199,7 +6231,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN1_S_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6219,7 +6251,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN2_E_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6239,7 +6271,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN3_N_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6259,7 +6291,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN4_W_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6279,7 +6311,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN5_Core_Space_1 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6299,7 +6331,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN6_S_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6319,7 +6351,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN7_E_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6339,7 +6371,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN8_N_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6359,7 +6391,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN9_W_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6379,7 +6411,7 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN10_Core_Space_2 Supply Inlet,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse,                 !- Damper Heating Action
+    ReverseWithLimits,       !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
     AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
 
@@ -6625,41 +6657,41 @@
     Chiller Plant Cnd Circ Pump,  !- Name
     Chiller Plant Cnd Supply Inlet Node,  !- Inlet Node Name
     Chiller Plant Cnd Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Pump:VariableSpeed,
     Boiler Plant HW Circ Pump,  !- Name
     Boiler Plant HW Supply Inlet Node,  !- Inlet Node Name
     Boiler Plant HW Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Pump:ConstantSpeed,
     Chiller Plant ChW Circ Pump,  !- Name
     Chiller Plant ChW Supply Inlet Node,  !- Inlet Node Name
     Chiller Plant ChW Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type

@@ -73,6 +73,7 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
@@ -113,6 +114,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -227,11 +229,13 @@ namespace EnergyPlus {
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+		this->m_delightin_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
+		DataGlobals::delightin_stream = this->m_delightin_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
@@ -261,6 +265,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileMeters, flags );
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
+			gio::close( DataGlobals::OutputDElightIn, flags );
 
 		}
 	}
@@ -274,6 +279,7 @@ namespace EnergyPlus {
 		Boilers::clear_state();
 		BoilerSteam::clear_state();
 		BranchInputManager::clear_state();
+		CoolingPanelSimple::clear_state();
 		ChillerExhaustAbsorption::clear_state();
 		ChillerGasAbsorption::clear_state();
 		ChillerIndirectAbsorption::clear_state();
@@ -488,6 +494,15 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::compare_delightin_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->m_delightin_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if (reset_stream) this->m_delightin_stream->str(std::string());
+		return are_equal;
+	}
+
+
 	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
 	{
 		auto const has_output = this->eso_stream->str().size() > 0;
@@ -527,6 +542,14 @@ namespace EnergyPlus {
 	{
 		auto const has_output = this->m_cerr_buffer->str().size() > 0;
 		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
+		return has_output;
+	}
+
+
+	bool EnergyPlusFixture::has_delightin_output( bool reset_stream )
+	{
+		auto const has_output = this->m_delightin_stream->str().size() > 0;
+		if ( reset_stream ) this->m_delightin_stream->str( std::string() );
 		return has_output;
 	}
 

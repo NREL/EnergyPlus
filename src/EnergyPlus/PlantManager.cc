@@ -1258,6 +1258,10 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Steam;
 							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "ZoneHVAC:CoolingPanel:RadiantConvective:Water" ) ) {
+							this_comp.TypeOf_Num = TypeOf_CoolingPanel_Simple;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else if ( SameString( this_comp_type, "ZoneHVAC:LowTemperatureRadiant:VariableFlow" ) ) {
 							this_comp.TypeOf_Num = TypeOf_LowTempRadiant_VarFlow;
 							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
@@ -4269,6 +4273,10 @@ namespace PlantManager {
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) { //      = 62
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_CoolingPanel_Simple ) {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;

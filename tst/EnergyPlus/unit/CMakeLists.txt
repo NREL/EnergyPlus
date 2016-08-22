@@ -18,6 +18,7 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
+  ChilledCeilingPanelSimple.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
@@ -31,6 +32,8 @@ set( test_src
   Datasets.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
+  DaylightingManager.unit.cc
+  DElightManager.unit.cc
   DemandResponse.unit.cc
   DesiccantDehumidifiers.unit.cc
   DisplacementVentMgr.unit.cc
@@ -121,6 +124,7 @@ set( test_src
   ThermalComfort.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
+  VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   VentilatedSlab.unit.cc
