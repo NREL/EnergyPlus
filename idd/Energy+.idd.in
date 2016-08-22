@@ -21049,143 +21049,65 @@ ZoneContaminantSourceAndSink:Generic:DepositionRateSink,
 \group Daylighting
 
 Daylighting:Controls,
-       \min-fields 19
-       \memo Dimming of overhead electric lighting is determined from
-       \memo interior daylight illuminance calculated at one or two reference points.
-       \memo reference points are given in coordinates specified in the GlobalGeometryRules object
-       \memo Daylighting Reference Point CoordinateSystem field
+       \extensible:3 - repeat last three fields remembering to remove ; from "inner" fields.
+       \min-fields 16
+       \memo Dimming of overhead electric lighting is determined from each reference point.
        \memo Glare from daylighting is also calculated.
-  A1 , \field Zone Name
+  A1,  \field Name
+       \required-field
+       \type alpha
+  A2,  \field Zone Name
        \required-field
        \type object-list
        \object-list ZoneNames
-  N1 , \field Total Daylighting Reference Points
+  A3,  \field Daylighting Method
+       \type choice
+       \key SplitFlux
+       \key DElight
+       \default SplitFlux
+  A4,  \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+  A5,  \field Lighting Control Type
+       \type choice
+       \key Continuous
+       \key Stepped
+       \key ContinuousOff
+       \default Continuous
+  N1,  \field Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+       \type real
+       \minimum 0.0
+       \maximum 0.6
+       \default 0.3
+  N2,  \field Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+       \type real
+       \minimum 0.0
+       \maximum 0.6
+       \default 0.2
+  N3,  \field Number of Stepped Control Steps
+       \note for Stepped Lighting Control Type, this field cannot be zero.
        \type integer
-       \minimum 1
-       \maximum 2
+       \minimum 1 
        \default 1
-  N2 , \field X-Coordinate of First Reference Point
-       \units m
-       \required-field
-       \type real
-  N3 , \field Y-Coordinate of First Reference Point
-       \units m
-       \required-field
-       \type real
-  N4 , \field Z-Coordinate of First Reference Point
-       \units m
-       \default 0.8
-       \type real
-  N5 , \field X-Coordinate of Second Reference Point
-       \units m
-       \type real
-       \note Required if Total Daylighting Reference Points = 2
-  N6 , \field Y-Coordinate of Second Reference Point
-       \units m
-       \type real
-       \note Required if Total Daylighting Reference Points = 2
-  N7 , \field Z-Coordinate of Second Reference Point
-       \units m
-       \type real
-       \default 0.8
-  N8 , \field Fraction of Zone Controlled by First Reference Point
+  N4,  \field Probability Lighting will be Reset When Needed in Manual Stepped Control
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 1.0
-  N9 , \field Fraction of Zone Controlled by Second Reference Point
-       \type real
-       \minimum 0.0
-       \maximum 1.0
-       \default 0.0
-  N10, \field Illuminance Setpoint at First Reference Point
-       \units lux
-       \type real
-       \minimum 0.0
-       \default 500
-  N11, \field Illuminance Setpoint at Second Reference Point
-       \units lux
-       \type real
-       \minimum 0.0
-       \default 500
-  N12, \field Lighting Control Type
-       \type integer
-       \minimum 1
-       \maximum 3
-       \note 1=continuous,2=stepped,3=continuous/off
-       \default 1
-  N13, \field Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+  A6,  \field Glare Calculation Daylighting Reference Point Name
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N5,  \field Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
        \required-field
        \units deg
        \minimum 0
        \maximum 360
-  N14, \field Maximum Allowable Discomfort Glare Index
+  N6,  \field Maximum Allowable Discomfort Glare Index
        \type real
        \minimum 1
        \note The default is for general office work
        \default 22
-  N15, \field Minimum Input Power Fraction for Continuous Dimming Control
-       \type real
-       \minimum 0.0
-       \maximum 0.6
-       \default 0.3
-  N16, \field Minimum Light Output Fraction for Continuous Dimming Control
-       \type real
-       \minimum 0.0
-       \maximum 0.6
-       \default 0.2
-  N17, \field Number of Stepped Control Steps
-       \note for Lighting Control Type=2, this field cannot be zero.
-       \type integer
-       \default 1
-  N18, \field Probability Lighting will be Reset When Needed in Manual Stepped Control
-       \type real
-       \minimum 0.0
-       \maximum 1.0
-       \default 1.0
-  A2 ; \field Availability Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-
-Daylighting:DELight:Controls,
-       \min-fields 8
-       \memo Dimming of overhead electric lighting is determined from
-       \memo DElight calculated interior daylight illuminance at one or more reference points.
-  A1 , \field Name
-       \required-field
-       \type alpha
-       \reference DElightZoneNames
-  A2 , \field Zone Name
-       \note Name of Thermal Zone hosting the given DElight Zone
-       \required-field
-       \type object-list
-       \object-list ZoneNames
-  N1 , \field Lighting Control Type
-       \type integer
-       \minimum 1
-       \maximum 3
-       \note 1=continuous,2=stepped,3=continuous/off
-       \default 1
-  N2 , \field Minimum Input Power Fraction for Continuous Dimming Control
-       \type real
-       \minimum 0.0
-       \maximum 0.6
-       \default 0.3
-  N3 , \field Minimum Light Output Fraction for Continuous Dimming Control
-       \type real
-       \minimum 0.0
-       \maximum 0.6
-       \default 0.2
-  N4 , \field Number of Stepped Control Steps
-       \type integer
-       \note for Lighting Control Type=2, this field cannot be zero.
-       \default 1
-  N5 , \field Probability Lighting will be Reset When Needed in Manual Stepped Control
-       \type real
-       \minimum 0.0
-       \maximum 1.0
-       \default 0.0
-  N6;  \field Gridding Resolution
+  N7,  \field DElight Gridding Resolution
        \units m2
        \type real
        \note Maximum surface area for nodes in gridding all surfaces in the DElight zone.
@@ -21194,43 +21116,164 @@ Daylighting:DELight:Controls,
        \note Higher resolution subdivisions require greater calculation times,
        \note but generally produce more accurate results.
        \minimum> 0.0
-
-Daylighting:DELight:ReferencePoint,
-       \min-fields 7
-       \memo DElight reference point for illuminance calculation and electric lighting dimming.
-       \memo reference points are given in coordinates specified in the GlobalGeometryRules object
-       \memo Daylighting Reference Point CoordinateSystem field
-       \memo There is a maximum number of 100 reference points per DElight daylighting zone.
-  A1 , \field Name
-       \type alpha
-  A2 , \field DElight Name
-       \required-field
+  A7,  \field Daylighting Reference Point 1 Name 
        \type object-list
-       \object-list DElightZoneNames
-  N1 , \field X-coordinate of Reference Point
+       \object-list DaylightReferencePointNames
+       \begin-extensible
        \required-field
-       \units m
-       \type real
-  N2,  \field Y-coordinate of Reference Point
-       \required-field
-       \units m
-       \type real
-  N3,  \field Z-coordinate of Reference Point
-       \required-field
-       \units m
-       \type real
-  N4 , \field Fraction of Zone Controlled by Reference Point
-       \required-field
+  N8,  \field Fraction of Zone Controlled by Reference Point 1
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 1.0
-  N5;  \field Illuminance Setpoint at Reference Point
-       \required-field
+  N9,  \field Illuminance Setpoint at Reference Point 1
        \units lux
        \type real
        \minimum 0.0
        \default 500
+  A8,  \field Daylighting Reference Point 2 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N10, \field Fraction of Zone Controlled by Reference Point 2
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N11, \field Illuminance Setpoint at Reference Point 2
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A9,  \field Daylighting Reference Point 3 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N12, \field Fraction of Zone Controlled by Reference Point 3
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N13, \field Illuminance Setpoint at Reference Point 3
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A10, \field Daylighting Reference Point 4 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N14, \field Fraction of Zone Controlled by Reference Point 4
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N15, \field Illuminance Setpoint at Reference Point 4
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A11, \field Daylighting Reference Point 5 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N16, \field Fraction of Zone Controlled by Reference Point 5
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N17, \field Illuminance Setpoint at Reference Point 5
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A12, \field Daylighting Reference Point 6 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N18, \field Fraction of Zone Controlled by Reference Point 6
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N19, \field Illuminance Setpoint at Reference Point 6
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A13, \field Daylighting Reference Point 7 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N20, \field Fraction of Zone Controlled by Reference Point 7
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N21, \field Illuminance Setpoint at Reference Point 7
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A14, \field Daylighting Reference Point 8 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N22, \field Fraction of Zone Controlled by Reference Point 8
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N23, \field Illuminance Setpoint at Reference Point 8
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A15, \field Daylighting Reference Point 9 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N24, \field Fraction of Zone Controlled by Reference Point 9
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N25, \field Illuminance Setpoint at Reference Point 9
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+  A16, \field Daylighting Reference Point 10 Name 
+       \type object-list
+       \object-list DaylightReferencePointNames
+  N26, \field Fraction of Zone Controlled by Reference Point 10
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  N27; \field Illuminance Setpoint at Reference Point 10
+       \units lux
+       \type real
+       \minimum 0.0
+       \default 500
+
+Daylighting:ReferencePoint,
+       \min-fields 5
+       \memo Used by Daylighting:Controls to identify the reference point coordinates for each sensor.
+       \memo Reference points are given in coordinates specified in the GlobalGeometryRules object
+       \memo Daylighting Reference Point CoordinateSystem field
+  A1,  \field Name
+       \required-field
+       \type alpha
+       \reference DaylightReferencePointNames
+  A2,  \field Zone Name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  N1,  \field X-Coordinate of Reference Point
+       \units m
+       \required-field
+       \type real
+  N2,  \field Y-Coordinate of Reference Point
+       \units m
+       \required-field
+       \type real
+  N3;  \field Z-Coordinate of Reference Point
+       \units m
+       \default 0.8
+       \type real
 
 Daylighting:DELight:ComplexFenestration,
        \min-fields 5

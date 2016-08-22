@@ -208,6 +208,8 @@ namespace DataGlobals {
 	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
+	int OutputDElightIn( 0 ); // Unit number for the DElight In file
+	std::ostream * delightin_stream( nullptr ); // Internal stream used for DElight In file
 	bool ZoneSizingCalc( false ); // TRUE if zone sizing calculation
 	bool SysSizingCalc( false ); // TRUE if system sizing calculation
 	bool DoZoneSizing( false ); // User input in SimulationControl object
@@ -345,6 +347,7 @@ namespace DataGlobals {
 		eso_stream = nullptr;
 		mtr_stream = nullptr;
 		err_stream = nullptr;
+		delightin_stream = nullptr;
 	}
 
 } // DataGlobals
