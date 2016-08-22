@@ -6796,7 +6796,7 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \units dimensionless
        \minimum 0.0
        \type real
-       \note Ratio of water vapor permeability of stagnant air to water vapor 
+       \note Ratio of water vapor permeability of stagnant air to water vapor
        \note permeability of material
   N2 , \field Moisture Equation Coefficient a
        \required-field
@@ -6840,7 +6840,7 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \units dimensionless
        \minimum 0
        \note The coating's resistance to water vapor diffusion relative to the
-       \note resistance to water vapor diffusion in stagnant air 
+       \note resistance to water vapor diffusion in stagnant air
        \note (see Water Vapor Diffusion Resistance Factor above).
 
 MaterialProperty:PhaseChange,
@@ -20247,7 +20247,7 @@ HotWaterEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20944,7 +20944,7 @@ Daylighting:Controls,
   N3,  \field Number of Stepped Control Steps
        \note for Stepped Lighting Control Type, this field cannot be zero.
        \type integer
-       \minimum 1 
+       \minimum 1
        \default 1
   N4,  \field Probability Lighting will be Reset When Needed in Manual Stepped Control
        \type real
@@ -20973,7 +20973,7 @@ Daylighting:Controls,
        \note Higher resolution subdivisions require greater calculation times,
        \note but generally produce more accurate results.
        \minimum> 0.0
-  A7,  \field Daylighting Reference Point 1 Name 
+  A7,  \field Daylighting Reference Point 1 Name
        \type object-list
        \object-list DaylightReferencePointNames
        \begin-extensible
@@ -20988,7 +20988,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A8,  \field Daylighting Reference Point 2 Name 
+  A8,  \field Daylighting Reference Point 2 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N10, \field Fraction of Zone Controlled by Reference Point 2
@@ -21001,7 +21001,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A9,  \field Daylighting Reference Point 3 Name 
+  A9,  \field Daylighting Reference Point 3 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N12, \field Fraction of Zone Controlled by Reference Point 3
@@ -21014,7 +21014,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A10, \field Daylighting Reference Point 4 Name 
+  A10, \field Daylighting Reference Point 4 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N14, \field Fraction of Zone Controlled by Reference Point 4
@@ -21027,7 +21027,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A11, \field Daylighting Reference Point 5 Name 
+  A11, \field Daylighting Reference Point 5 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N16, \field Fraction of Zone Controlled by Reference Point 5
@@ -21040,7 +21040,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A12, \field Daylighting Reference Point 6 Name 
+  A12, \field Daylighting Reference Point 6 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N18, \field Fraction of Zone Controlled by Reference Point 6
@@ -21053,7 +21053,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A13, \field Daylighting Reference Point 7 Name 
+  A13, \field Daylighting Reference Point 7 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N20, \field Fraction of Zone Controlled by Reference Point 7
@@ -21066,7 +21066,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A14, \field Daylighting Reference Point 8 Name 
+  A14, \field Daylighting Reference Point 8 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N22, \field Fraction of Zone Controlled by Reference Point 8
@@ -21079,7 +21079,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A15, \field Daylighting Reference Point 9 Name 
+  A15, \field Daylighting Reference Point 9 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N24, \field Fraction of Zone Controlled by Reference Point 9
@@ -21092,7 +21092,7 @@ Daylighting:Controls,
        \type real
        \minimum 0.0
        \default 500
-  A16, \field Daylighting Reference Point 10 Name 
+  A16, \field Daylighting Reference Point 10 Name
        \type object-list
        \object-list DaylightReferencePointNames
   N26, \field Fraction of Zone Controlled by Reference Point 10
@@ -32998,7 +32998,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note Must be less than or equal to fan size.
         \note Only used when heat pump fan operating mode is continuous. This air flow rate
         \note is used when no heating or cooling is required and the DX coil compressor is off.
-        \note If this field is left blank or zero, the supply air flow rate from the previous 
+        \note If this field is left blank or zero, the supply air flow rate from the previous
         \note on cycle (either cooling or heating) is used.
    N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
@@ -33217,7 +33217,7 @@ ZoneHVAC:WaterToAirHeatPump,
         \autosizable
         \note Only used when heat pump Fan operating mode is continuous. This air flow rate
         \note is used when no heating or cooling is required and the DX coil compressor is off.
-        \note If this field is left blank or zero, the outdoor air flow rate from the previous 
+        \note If this field is left blank or zero, the outdoor air flow rate from the previous
         \note on cycle (either cooling or heating) is used.
         \note This field is set to zero flow when the PTHP is connected to central
         \note dedicated outdoor air through air terminal single duct mixer object.
@@ -34155,21 +34155,21 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to 
+        \note This field is set to zero flow when the VRF terminal unit is connected to
         \note central dedicated outdoor air through air terminal single duct mixer object.
   N6 ,  \field Heating Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to 
+        \note This field is set to zero flow when the VRF terminal unit is connected to
         \note central dedicated outdoor air through air terminal single duct mixer object.
   N7 ,  \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note This field is set to zero flow when the VRF terminal unit is connected to 
+        \note This field is set to zero flow when the VRF terminal unit is connected to
         \note central dedicated outdoor air through air terminal single duct mixer object.
   A5 ,  \field Supply Air Fan Operating Mode Schedule Name
         \required-field
@@ -34204,7 +34204,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \key OutdoorAir:Mixer
         \note Currently only one type OutdoorAir:Mixer object is available.
         \note If this field is blank, and outside air mixer is not used.
-        \note This field should be left blank if the VRF terminal unit is connected to 
+        \note This field should be left blank if the VRF terminal unit is connected to
         \note central dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
   A10,  \field Outside Air Mixer Object Name
         \type object-list
@@ -34212,7 +34212,7 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note If this field is blank, the OutdoorAir:Mixer is not used.
         \note This optional field specifies the name of the OutdoorAir:Mixer object.
         \note When used, this name needs to match name of the OutdoorAir:Mixer object.
-        \note This field should be left blank if the VRF terminal unit is connected to 
+        \note This field should be left blank if the VRF terminal unit is connected to
         \note central dedicated outdoor air through an AirTerminal:SingleDuct:Mixer object.
   A11,  \field Cooling Coil Object Type
         \type choice
@@ -36616,11 +36616,11 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \maximum 1
 
 ZoneHVAC:CoolingPanel:RadiantConvective:Water,
-  A1 , \field Name
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
        \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
        \memo groups to the end of the list
        \min-fields 18
+  A1 , \field Name
        \required-field
   A2 , \field Availability Schedule Name
        \required-field
@@ -36677,7 +36677,7 @@ ZoneHVAC:CoolingPanel:RadiantConvective:Water,
        \minimum 0.0
        \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling
        \note design capacity method field is FractionOfAutosizedCoolingCapacity.
-  N7 , \field Maximum Chilled Water Flow Rate 
+  N7 , \field Maximum Chilled Water Flow Rate
        \required-field
        \autosizable
        \type real
@@ -39711,7 +39711,7 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \type real
        \units m3/s
        \autosizable
-       \default autosize       
+       \default autosize
        \note This field is used if the field Zone Minimum Air Flow Input Method is FixedFlowRate.
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -39763,8 +39763,8 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \default ReverseWithLimits
        \note Normal means the damper is fixed at the minimum position in heating mode
        \note Reverse means the damper can open fully during reheat
-       \note ReverseWithLimits means the damper will open partially during reheat 
-       \note as specified in the following 2 fields 
+       \note ReverseWithLimits means the damper will open partially during reheat
+       \note as specified in the following 2 fields
   N7 , \field Maximum Flow per Zone Floor Area During Reheat
        \type real
        \units m3/s-m2
@@ -40513,17 +40513,17 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key AirLoopHVAC:UnitarySystem
-       \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.   
+       \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.
    A3, \field ZoneHVAC Unit Object Name
        \required-field
        \type object-list
        \object-list DOAToZonalUnit
-       \note The name of ZoneHVAC equipment to which this terminal mixer will be connected.   
+       \note The name of ZoneHVAC equipment to which this terminal mixer will be connected.
    A4, \field Mixer Outlet Node Name
        \required-field
        \type node
-       \note This is the outlet air node name of the mixer. This will be the inlet air node name 
-       \note of the ZoneHVAC equipment if the connection type in the input field Mixer Connection 
+       \note This is the outlet air node name of the mixer. This will be the inlet air node name
+       \note of the ZoneHVAC equipment if the connection type in the input field Mixer Connection
        \note Type below is InletSide, else this will be an inlet air node name of the conditioned zone
        \note if the connection type in the input field Mixer Connection Type below is SupplySide.
    A5, \field Mixer Primary Air Inlet Node Name
@@ -40531,26 +40531,26 @@ AirTerminal:SingleDuct:Mixer,
        \type node
        \note The primary air (treated outdoor air) inlet node name of the mixer. This will be an
        \note outlet air node name of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum providing
-       \note the connection to the DOA system. 
+       \note the connection to the DOA system.
    A6, \field Mixer Secondary Air Inlet Node Name
        \required-field
        \type node
-       \note The secondary air (recirculating air) inlet node name of the mixer. This will be 
-       \note the outlet air node name of the ZoneHVAC equipment if the connection type in the 
+       \note The secondary air (recirculating air) inlet node name of the mixer. This will be
+       \note the outlet air node name of the ZoneHVAC equipment if the connection type in the
        \note input field mixer Connection Type below is SupplySide, or else this will be an exhaust
-       \note air node name of the conditioned zone if the connection type in the input field 
+       \note air node name of the conditioned zone if the connection type in the input field
        \note Mixer Connection Type below is InletSide.
    A7; \field Mixer Connection Type
        \required-field
        \type choice
        \key InletSide
-       \key SupplySide  
+       \key SupplySide
        \note This input field allows user to specify the mixer connection type. Valid choices
        \note are InletSide or SupplySide. This is a required input field. If the mixer connection
-       \note type selected is InletSide, then the mixer is connected on the inlet side of the 
-       \note ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then 
-       \note the mixer is connected at the outlet side of the ZoneHVAC equipment.   
-   
+       \note type selected is InletSide, then the mixer is connected on the inlet side of the
+       \note ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then
+       \note the mixer is connected at the outlet side of the ZoneHVAC equipment.
+
 AirTerminal:DualDuct:ConstantVolume,
        \memo Central air system terminal unit, dual duct, constant volume.
        \min-fields 6
@@ -90858,7 +90858,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A16, \field Report 16 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -92269,7 +92268,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A31, \field Report 31 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -93680,7 +93678,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A46, \field Report 46 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -95091,7 +95088,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A61, \field Report 61 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
@@ -96502,7 +96498,6 @@ Output:Table:SummaryReports,
        \key AirLoopSystemComponentEnergyUseMonthly
        \key MechanicalVentilationLoadsMonthly
    A76, \field Report 76 Name
-       \begin-extensible
        \type choice
        \key AllSummary
        \key AllSummaryAndSizingPeriod
