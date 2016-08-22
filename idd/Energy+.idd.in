@@ -72478,6 +72478,10 @@ AvailabilityManager:NightCycle,
        \key CycleOnAny
        \key CycleOnControlZone
        \key CycleOnAnyZoneFansOnly
+       \key CycleOnAnyCoolingOrHeatingZone
+       \key CycleOnAnyCoolingZone
+       \key CycleOnAnyHeatingZone
+       \key CycleOnAnyHeatingZoneFansOnly 
        \default StayOff
        \note When AvailabilityManager:NightCycle is used in the zone component availability
        \note manager assignment list, the key choices for Control Type would only be
@@ -72488,12 +72492,21 @@ AvailabilityManager:NightCycle,
   N2 , \field Cycling Run Time
        \default 3600.
        \units s
-  A5 ; \field Control Zone Name
+  A5 , \field Control Zone or Zone List Name
        \type object-list
-       \object-list ZoneNames
+       \object-list ZoneAndZoneListNames
        \note When AvailabilityManager:NightCycle is used in the zone component availability
        \note manager assignment list, the Control Zone Name should be the name of the zone in which the
        \note zone component is.
+  A6 , \field Cooling Control Zone or Zone List Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
+  A7 , \field Heating Control Zone or Zone List Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
+  A8 ; \field Heating Zone Fans Only Zone or Zone List Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
 
 AvailabilityManager:DifferentialThermostat,
        \memo Overrides fan/pump schedules depending on temperature difference between two nodes.
