@@ -207,6 +207,7 @@ namespace SystemAvailabilityManager {
 		Real64 TempTolRange; // range in degrees C of thermostat tolerance
 		int CyclingTimeSteps; // period (in Loads time steps) system will cycle on.
 		int AvailStatus; // reports status of availability manager
+		int PriorAvailStatus; // prior status of availability manager
 		std::string CtrlZoneListName; // controlled zone or zonelist name
 		int NumOfCtrlZones; // number of controlled zones
 		Array1D_int CtrlZonePtrs; // pointers to controlled zone(s)
@@ -229,6 +230,7 @@ namespace SystemAvailabilityManager {
 			TempTolRange( 1.0 ),
 			CyclingTimeSteps( 1 ),
 			AvailStatus( 0 ),
+			PriorAvailStatus( 0 ),
 			NumOfCtrlZones( 0 ),
 			NumOfCoolingZones( 0 ),
 			NumOfHeatingZones( 0 ),

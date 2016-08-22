@@ -2242,7 +2242,7 @@ namespace SystemAvailabilityManager {
 			}
 		} else {
 			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime ) { // if cycled on
-				AvailStatus = CycleOn;
+				AvailStatus = NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus;
 				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == ZoneFansOnly ) AvailStatus = CycleOnZoneFansOnly;
 			} else if ( SimTimeSteps == StopTime ) { // if end of cycle run time, shut down if fan off
 				AvailStatus = NoAction;
@@ -2309,19 +2309,35 @@ namespace SystemAvailabilityManager {
 					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones, TempTol ) ) AvailStatus = CycleOn;
 					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones, TempTol ) ) AvailStatus = CycleOn;
 				} else if ( SELECT_CASE_var == CycleOnAnyCoolingOrHeatingZone) {
-					AvailStatus = NoAction;
-					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones, TempTol ) ) AvailStatus = CycleOn;
-					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones, TempTol ) ) AvailStatus = CycleOn;
-					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) AvailStatus = CycleOnZoneFansOnly;
+					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) {
+						AvailStatus = CycleOnZoneFansOnly;
+					} else {
+						AvailStatus = NoAction;
+					}
 				} else if ( SELECT_CASE_var == CycleOnAnyCoolingZone) {
-					AvailStatus = NoAction;
-					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones, TempTol ) ) AvailStatus = CycleOn;
+					if ( CoolingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else {
+						AvailStatus = NoAction;
+					}
 				} else if ( SELECT_CASE_var == CycleOnAnyHeatingZone ) {
-					AvailStatus = NoAction;
-					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones, TempTol ) ) AvailStatus = CycleOn;
+					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones, TempTol ) ) {
+						AvailStatus = CycleOn;
+					} else if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) {
+						AvailStatus = CycleOnZoneFansOnly;
+					} else {
+						AvailStatus = NoAction;
+					}
 				} else if ( SELECT_CASE_var == CycleOnControlZone ) {
-					AvailStatus = NoAction;
-					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) AvailStatus = CycleOnZoneFansOnly;
+					if ( HeatingZoneOutOfTolerance( NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs, NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones, TempTol ) ) {
+						AvailStatus = CycleOnZoneFansOnly;
+					} else {
+						AvailStatus = NoAction;
+					}
 				} else {
 					AvailStatus = NoAction;
 
@@ -2335,6 +2351,7 @@ namespace SystemAvailabilityManager {
 			}
 		}
 		NCycSysAvailMgrData( SysAvailNum ).AvailStatus = AvailStatus;
+		NCycSysAvailMgrData( SysAvailNum ).PriorAvailStatus = AvailStatus;
 
 	}
 
@@ -2350,8 +2367,12 @@ namespace SystemAvailabilityManager {
 			int ZoneNum = ZonePtrList( Index );
 			{ auto const tstatType ( DataHeatBalFanSys::TempControlType( ZoneNum ) );
 
-			if ( ( tstatType == SingleCoolingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ||  ( tstatType == DualSetPointWithDeadBand) ){
+			if ( ( tstatType == SingleCoolingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) + TempTolerance ) {
+					return true; // return on the first zone found 
+				}
+			} else if ( tstatType == DualSetPointWithDeadBand ){
+				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::ZoneThermostatSetPointHi( ZoneNum ) + TempTolerance ) {
 					return true; // return on the first zone found 
 				}
 			}}
@@ -2371,8 +2392,12 @@ namespace SystemAvailabilityManager {
 			int ZoneNum = ZonePtrList( Index );
 			{ auto const tstatType ( DataHeatBalFanSys::TempControlType( ZoneNum ) );
 
-			if ( ( tstatType == SingleHeatingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ||  ( tstatType == DualSetPointWithDeadBand) ){
+			if ( ( tstatType == SingleHeatingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) - TempTolerance ) {
+					return true; // return on the first zone found 
+				}
+			} else if ( tstatType == DualSetPointWithDeadBand ){
+				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::ZoneThermostatSetPointLo( ZoneNum ) - TempTolerance ) {
 					return true; // return on the first zone found 
 				}
 			}}
