@@ -46560,7 +46560,8 @@ Coil:Heating:DX:VariableSpeed,
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
-
+						
+		
 Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
         \memo Direct expansion (DX) cooling coil for water-to-air heat pump (includes electric
         \memo compressor), single-speed, parameter estimation model. Optional inputs for moisture
@@ -50493,6 +50494,108 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
        \type object-list
        \object-list CoolingCoilsDXSingleSpeed
 
+CoilSystem:IntegratedHeatPump:AirSource,
+      \memo This object is used for air-source integrated heat pump, a collection of its working modes.
+  A1, \field Name
+       \required-field
+       \type alpha
+       \reference IntegratedHeatPumps
+       \note Unique name for this instance of an air-source integrated heat pump.
+  A2, \field Supply Hot Water Flow Sensor Node Name 
+       \required-field
+       \type node
+  A3, \field Space Cooling Coil  Name
+       \required-field
+       \type object-list
+       \object-list CoolingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
+  A4, \field Space Heating Coil Name
+       \type object-list
+       \object-list HeatingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.
+  A5, \field Dedicated Water Heating Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
+  A6, \field SCWH Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
+  A7, \field SCDWH Cooling Coil Name
+       \type object-list
+       \object-list CoolingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
+  A8, \field SCDWH Water Heating Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   
+  A9, \field SHDWH Heating Coil Name
+       \type object-list
+       \object-list HeatingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.   
+  A10, \field SHDWH Water Heating Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.	   	   
+  N1 , \field Indoor Temperature Limit for SCWH Mode
+       \type real
+       \units C
+       \minimum> 15.0
+       \default 20.0
+       \note Indoor Temperature above which Indoor Overcooling is Allowed during Cooling Operation
+  N2 , \field Ambient Temperature Limit for SCWH Mode
+       \type real
+       \units C
+       \minimum> 20.0
+       \default 27.0
+       \note Ambient Temperature above which Indoor Overcooling is Allowed during Cooling Operation
+  N3 , \field Indoor Temperature above Which WH has Higher Priority
+       \type real
+       \units C
+       \minimum> 15.0
+       \default 20.0
+       \note Indoor Temperature above which Water Heating has the higher priority and Space Heating Call Can be ignored. 
+  N4 , \field Ambient Temperature above Which WH has Higher Priority
+       \type real
+       \units C
+       \minimum> 15.0
+       \default 20.0
+       \note Ambient Temperature above which Water Heating has the higher priority and Space Heating Call Can be ignored. 
+  N5,  \field Flag to Indicate Load Control in SCWH Mode
+       \units dimensionless
+       \type integer
+       \default 0
+       \note 0: match space cooling load in SCWH mode, 1: match water heating load in SCWH mode
+  N6,  \field Minimum Speed Level for SCWH Mode
+       \units dimensionless
+       \type integer
+       \default 1
+       \minimum> 0
+       \maximum< 10
+  N7 , \field Maximum Water Flow Volume before Switching from SCDWH to SCWH Mode
+       \type real
+       \units m3
+       \default 0.0
+  N8,  \field Minimum Speed Level for SCDWH Mode
+       \units dimensionless
+       \type integer
+       \default 1
+       \minimum> 0
+       \maximum< 10
+  N9,  \field Maximum Running Time before Allowing Electric Resistance Heat Use during SHDWH Mode
+       \type real
+       \units s
+       \minimum> 0.0
+       \default 360.0
+  N10; \field Minimum Speed Level for SHDWH Mode
+       \units dimensionless
+       \type integer
+       \default 1
+       \minimum> 0
+       \maximum< 10
+
+	   
+	   
 Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), single-speed with packaged integrated thermal storage for cooling.
@@ -53707,13 +53810,16 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \type choice
         \key Coil:Heating:DX:SingleSpeed
         \key Coil:Heating:DX:VariableSpeed
+        \key CoilSystem:IntegratedHeatPump:AirSource
         \note  Only works with Coil:Heating:DX:SingleSpeed or
-        \note Coil:Heating:DX:VariableSpeed
+        \note Coil:Heating:DX:VariableSpeed or
+        \note CoilSystem:IntegratedHeatPump:AirSource
    A9,  \field Heating Coil Name
         \required-field
         \type object-list
         \object-list HeatingCoilsDXSingleSpeed
         \object-list HeatingCoilsDXVariableSpeed
+        \object-list IntegratedHeatPumps
         \note  Needs to match in the DX heating coil object
    A10, \field Cooling Coil Object Type
         \required-field
@@ -53721,15 +53827,18 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \key Coil:Cooling:DX:SingleSpeed
         \key Coil:Cooling:DX:VariableSpeed
         \key CoilSystem:Cooling:DX:HeatExchangerAssisted
+        \key CoilSystem:IntegratedHeatPump:AirSource
         \note Only works with Coil:Cooling:DX:SingleSpeed or
         \note CoilSystem:Cooling:DX:HeatExchangerAssisted or
-        \note Coil:Cooling:DX:VariableSpeed
+        \note Coil:Cooling:DX:VariableSpeed or
+        \note CoilSystem:IntegratedHeatPump:AirSource
    A11, \field Cooling Coil Name
         \required-field
         \note Needs to match in the DX cooling coil object
         \type object-list
         \object-list CoolingCoilsDXSingleSpeed
         \object-list CoolingCoilsDXVariableSpeed
+        \object-list IntegratedHeatPumps
    A12, \field Supplemental Heating Coil Object Type
         \required-field
         \type choice
@@ -67996,15 +68105,17 @@ WaterHeater:HeatPump:PumpedCondenser,
        \type choice
        \key Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
+       \key CoilSystem:IntegratedHeatPump:AirSource
        \default Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \note Specify the type of DX coil used by this heat pump water heater. The only
-       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, and CoilSystem:IntegratedHeatPump:AirSource
   A19, \field DX Coil Name
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoilsPumped
        \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
-       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object.
+       \object-list IntegratedHeatPumps
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object, or CoilSystem:IntegratedHeatPump:AirSource
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C

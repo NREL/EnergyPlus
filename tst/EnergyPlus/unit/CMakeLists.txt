@@ -78,6 +78,7 @@ set( test_src
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
+  IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
