@@ -1013,7 +1013,7 @@ namespace DataHeatBalance {
 	}
 
 	void
-	CheckZoneOutBulbTempAt() 
+	CheckZoneOutBulbTempAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;

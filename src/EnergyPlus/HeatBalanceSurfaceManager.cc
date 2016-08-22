@@ -106,6 +106,7 @@
 #include <HeatBalanceAirManager.hh>
 #include <HeatBalanceHAMTManager.hh>
 #include <HeatBalanceIntRadExchange.hh>
+#include <HeatBalanceKivaManager.hh>
 #include <HeatBalanceMovableInsulation.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HeatBalFiniteDiffManager.hh>
@@ -123,6 +124,7 @@
 #include <SolarShading.hh>
 #include <SteamBaseboardRadiator.hh>
 #include <SwimmingPool.hh>
+#include <SurfaceGeometry.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
@@ -196,7 +198,7 @@ namespace HeatBalanceSurfaceManager {
 		bool calcHeatBalanceInsideSurfFirstTime( true ); // Used for trapping errors or other problems
 	}
 	// DERIVED TYPE DEFINITIONS:
-	// na
+  // na
 
 	// MODULE VARIABLE DECLARATIONS:
 	// na
@@ -4888,6 +4890,8 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
 			}
 
+		} else if ( SELECT_CASE_var == KivaFoundation ) {
+			// Do nothing
 		} else { // for interior or other zone surfaces
 
 			if ( Surface( SurfNum ).ExtBoundCond == SurfNum ) { // Regular partition/internal mass
@@ -5239,17 +5243,20 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	}
 
 	//Tuned Precompute whether CTF temperature limits will be needed //? Can we do this just once in the FirstTime block to save a little more time (with static array)
-	Array1D_bool any_surface_ConFD_or_HAMT( NumOfZones, false );
+	Array1D_bool zone_has_mixed_HT_models( NumOfZones, false );
 	for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 		auto const & zone( Zone( iZone ) );
 		for ( int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf ) { //Tuned Replaced any_eq and array slicing and member array usage
 			auto const alg( Surface( iSurf ).HeatTransferAlgorithm );
-			if ( ( alg == HeatTransferModel_CondFD ) || ( alg == HeatTransferModel_HAMT ) ) {
-				any_surface_ConFD_or_HAMT( iZone ) = true;
+			if ( ( alg == HeatTransferModel_CondFD ) || ( alg == HeatTransferModel_HAMT ) || ( alg == HeatTransferModel_Kiva ) ) {
+				zone_has_mixed_HT_models( iZone ) = true;
 				break;
 			}
 		}
 	}
+
+	// TODO Somewhere around here, calculate Kiva instances...
+	SurfaceGeometry::kivaManager.calcKivaInstances();
 
 	bool const useCondFDHTalg( any_eq( HeatTransferAlgosUsed, UseCondFD ) );
 	Converged = false;
@@ -5330,7 +5337,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						}
 					}
 					// if any mixed heat transfer models in zone, apply limits to CTF result
-					if ( any_surface_ConFD_or_HAMT( ZoneNum ) ) TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check //Tuned Precomputed condition to eliminate loop
+					if ( zone_has_mixed_HT_models( ZoneNum ) ) TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check //Tuned Precomputed condition to eliminate loop
 
 					if ( construct.SourceSinkPresent ) { // Set the appropriate parameters for the radiant system
 
@@ -5384,7 +5391,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								}
 							}
 							// if any mixed heat transfer models in zone, apply limits to CTF result
-							if ( any_surface_ConFD_or_HAMT( ZoneNum ) ) TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check //Tuned Precomputed condition to eliminate loop
+							if ( zone_has_mixed_HT_models( ZoneNum ) ) TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check //Tuned Precomputed condition to eliminate loop
 
 							if ( construct.SourceSinkPresent ) { // Set the appropriate parameters for the radiant system
 
@@ -5429,7 +5436,12 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 							TH11 = TempSurfOutTmp;
 
+						} else if ( surface.HeatTransferAlgorithm == HeatTransferModel_Kiva ) {
+							// Read Kiva results for each surface
+							TempSurfInTmp( SurfNum ) = 18.0;
+							TH11 = 0.0;
 						}
+
 
 						TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum );
 
@@ -5451,7 +5463,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 						TempSurfInTmp( SurfNum ) = ( construct.CTFInside( 0 ) * TempSurfIn( SurfNum ) + HMovInsul * TempSurfIn( SurfNum ) - QRadSWInAbs( SurfNum ) - CTFConstInPart( SurfNum ) - construct.CTFCross( 0 ) * TH11 ) / ( HMovInsul );
 						// if any mixed heat transfer models in zone, apply limits to CTF result
-						if ( any_surface_ConFD_or_HAMT( ZoneNum ) ) TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check //Tuned Precomputed condition to eliminate loop
+						if ( zone_has_mixed_HT_models( ZoneNum ) ) TempSurfInTmp( SurfNum ) = max( MinSurfaceTempLimit, min( MaxSurfaceTempLimit, TempSurfInTmp( SurfNum ) ) ); // Limit Check //Tuned Precomputed condition to eliminate loop
 					}
 
 				} else { // Window

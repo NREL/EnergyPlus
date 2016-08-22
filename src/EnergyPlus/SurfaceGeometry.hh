@@ -67,6 +67,7 @@
 #include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
+#include <HeatBalanceKivaManager.hh>
 
 namespace EnergyPlus {
 
@@ -113,6 +114,7 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	extern Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	extern HeatBalanceKivaManager::KivaManager kivaManager;
 
 	// Functions
 
@@ -320,6 +322,9 @@ namespace SurfaceGeometry {
 	GetOSCMData( bool & ErrorsFound );
 
 	void
+	GetFoundationData( bool & ErrorsFound );
+
+	void
 	GetMovableInsulationData( bool & ErrorsFound ); // If errors found in input
 
 	void
@@ -386,7 +391,7 @@ namespace SurfaceGeometry {
 	isRectangle(
 		int const ThisSurf // Current surface number
 	);
-		
+
 } // SurfaceGeometry
 
 } // EnergyPlus

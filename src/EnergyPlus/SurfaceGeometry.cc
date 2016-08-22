@@ -181,6 +181,7 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	HeatBalanceKivaManager::KivaManager kivaManager;
 
 	// Functions
 
@@ -2735,6 +2736,7 @@ namespace SurfaceGeometry {
 
 		GetOSCData( ErrorsFound );
 		GetOSCMData( ErrorsFound );
+		GetFoundationData( ErrorsFound );
 
 		NeedToAddSurfaces = 0;
 
@@ -2920,6 +2922,23 @@ namespace SurfaceGeometry {
 						ShowContinueError( "..Referenced as Zone for this surface." );
 						ErrorsFound = true;
 					}
+
+				} else if ( SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
+					// TODO Kiva: Find foundation object, if not found use default
+					if ( lAlphaFieldBlanks(ArgPointer + 1) ) {
+
+						// Apply default foundation
+						SurfaceTmp( SurfNum ).OSCPtr = 0; // Reuse OSC pointer...shouldn't be used for non OSC cases anyway.
+
+					} else {
+						for (auto& fnd : kivaManager.foundationInputs) {
+							// Check if foundation exists
+							if ( fnd.name == SurfaceTmp( SurfNum ).ExtBoundCondName) {
+								// assign index
+							}
+						}
+					}
+					SurfaceTmp( SurfNum ).ExtBoundCond = KivaFoundation;
 
 				} else if ( SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
 					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
@@ -6162,6 +6181,22 @@ namespace SurfaceGeometry {
 			}
 		}
 
+		// Change algorithm for Kiva foundaiton surfaces
+		for (auto& surf : Surface) {
+			if (surf.ExtBoundCond == KivaFoundation) {
+				surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
+				if ( ! any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) { // add new algo
+					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
+					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = HeatTransferModel_Kiva;
+				}
+			}
+		}
+
+		// Setup Kiva intances
+		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
+			kivaManager.setupKivaInstances(Surface);
+		}
+
 		// test for missing materials for algorithms selected
 		NumEMPDMat = GetNumObjectsFound( "MaterialProperty:MoisturePenetrationDepth:Settings" );
 		NumPCMat = GetNumObjectsFound( "MaterialProperty:PhaseChange" ); // needs detailed algo
@@ -6222,6 +6257,8 @@ namespace SurfaceGeometry {
 				AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
 			} else if ( SELECT_CASE_var == HeatTransferModel_HAMT ) {
 				AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
+			} else if ( SELECT_CASE_var == HeatTransferModel_Kiva ) {
+				AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
 			}}
 
 			gio::write( OutputFileInits, Format_725 ) << AlgoName << RoundSigDigits( MaxSurfaceTempLimit, 0 ) << RoundSigDigits( LowHConvLimit, 2 ) << RoundSigDigits( HighHConvLimit, 1 );
@@ -7519,6 +7556,19 @@ namespace SurfaceGeometry {
 			}
 
 		} // End of loop over window airflow controls
+
+	}
+
+	void
+	GetFoundationData( bool & ErrorsFound )
+	{
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+
+		// TODO Kiva: Read foundation data from input
+		cCurrentModuleObject = "Foundation:Kiva";
+		int TotKivaFnds = GetNumObjectsFound( cCurrentModuleObject );
+
 
 	}
 
