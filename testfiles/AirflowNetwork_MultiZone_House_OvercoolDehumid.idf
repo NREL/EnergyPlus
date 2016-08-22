@@ -1561,13 +1561,11 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    1.10,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatCool,  !- Component 1 Object Type
     Res Central AC,          !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
   AirLoopHVAC,
     Residential System,      !- Name
@@ -2228,8 +2226,8 @@
   Coil:Heating:Fuel,
     Heating Coil 1,          !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     25000,                   !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Fan Inlet Node;          !- Air Outlet Node Name
@@ -2237,8 +2235,8 @@
   Coil:Heating:Fuel,
     Reheat Coil,             !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     25000,                   !- Nominal Capacity {W}
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name

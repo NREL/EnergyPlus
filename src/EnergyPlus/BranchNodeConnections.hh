@@ -103,6 +103,18 @@ namespace BranchNodeConnections {
 		Optional_string_const InputFieldName = _ // Input Field Name
 	);
 
+	void
+	OverrideNodeConnectionType(
+		int const NodeNumber, // Number for this Node
+		std::string const & NodeName, // Name of this Node
+		std::string const & ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+		std::string const & ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+		std::string const & ConnectionType, // Connection Type for this Node (must be valid)
+		int const FluidStream, // Count on Fluid Streams
+		bool const IsParent, // True when node is a parent node
+		bool & errFlag // Will be True if errors already detected or if errors found here
+	);
+
 	bool
 	IsValidConnectionType( std::string const & ConnectionType );
 

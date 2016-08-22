@@ -1339,13 +1339,11 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    0.7551,                  !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 1 Object Type
     TwoSpeed Heat Pump 1,    !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
   AirLoopHVAC,
     Typical Residential System,  !- Name
@@ -1463,8 +1461,8 @@
   Coil:Heating:Fuel,
     Supp Heating Coil 1,     !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     35000,                   !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name

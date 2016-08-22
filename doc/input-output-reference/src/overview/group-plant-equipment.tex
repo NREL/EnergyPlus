@@ -3149,10 +3149,6 @@ The chilled water supply temperature in degrees C below which the chiller will s
 
 The fuel higher heating value in kJ/kg. \emph{This field is not currently used}.
 
-\paragraph{Field: Chiller Flow Mode}\label{field-chiller-flow-mode-7}
-
-This field is deprecated and is not used.
-
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2-000}
 
 This alpha field determines the type of fuel that the chiller uses. The default is \textbf{NaturalGas}. Valid values are \textbf{NaturalGas}, \textbf{PropaneGas}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOil\#1}, \textbf{FuelOil\#2, OtherFuel1, OtherFuel2}.
@@ -3191,14 +3187,13 @@ ChillerHeater:Absorption:DirectFired,
       GasAbsFlatBiQuad,        !- Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
       GasAbsLinearQuad,        !- Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
       GasAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-      GasAbsFlatQuad,      !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+      GasAbsFlatQuad,          !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
       GasAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name
       GasAbsLinearQuad,        !- Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
       EnteringCondenser,       !- Temperature Curve Input Variable
       WaterCooled,             !- Condenser Type
       2,                       !- Chilled Water Temperature Lower Limit {C}
       0,                       !- Fuel Higher Heating Value {kJ/kg}
-      VariableFlow,            !- Chiller Flow Mode
       NaturalGas,              !- Fuel Type
       1.0;                     !- Sizing Factor
 \end{lstlisting}
@@ -4898,28 +4893,26 @@ For the heating mode:
 
 \begin{lstlisting}
 
-BRANCH, Heating GshpHeating Branch,
-    ,
+BRANCH,
+	Heating GshpHeating Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Heating,
     GshpHeating,
     GshpHeating LoadSide Inlet Node,
-    GshpHeating LoadSide Outlet Node,
-    ACTIVE;
+    GshpHeating LoadSide Outlet Node;
 \end{lstlisting}
 
 \textbf{!in condenser loop}
 
 \begin{lstlisting}
 
-BRANCH, GshpHeating SourceSide Branch,
-    ,
+BRANCH,
+	GshpHeating SourceSide Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Heating,
     GshpHeating,
     GshpHeating SourceSide Inlet Node,
-    GshpHeating SourceSide Outlet Node,
-    ACTIVE;
+    GshpHeating SourceSide Outlet Node;
 \end{lstlisting}
 
 Example of Heat Pump Links
@@ -4947,8 +4940,7 @@ BRANCH,GshpCLG1 Chiller Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
     GshpCLG LoadSide Inlet Node1,
-    GshpCLG LoadSide Outlet Node1,
-    Active;
+    GshpCLG LoadSide Outlet Node1;
 \end{lstlisting}
 
 \textbf{!in condenser loop}
@@ -4960,8 +4952,7 @@ BRANCH, GshpCLG1 Condenser Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
     GshpCLG SourceSide Inlet Node1,
-    GshpCLG SourceSide Outlet Node1,
-    ACTIVE;
+    GshpCLG SourceSide Outlet Node1;
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-13-003}
@@ -5911,9 +5902,9 @@ Cooling with chiller and storage (chiller carries portion of load, valid if chil
 
 Example files have been developed for three common storage configurations:
 
-1.~Series -- Chiller Upstream:~ In this configuration, a chiller is placed first on the same branch as the storage unit and both use the \textbf{SeriesActive} branch control type.
+1.~Series -- Chiller Upstream:~ In this configuration, a chiller is placed first on the same branch as the storage unit.
 
-2.~Series -- Chiller Downstream:~ In this configuration, a chiller is placed second on the same branch as the storage unit and both use the \textbf{SeriesActive} branch control type.
+2.~Series -- Chiller Downstream:~ In this configuration, a chiller is placed second on the same branch as the storage unit.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

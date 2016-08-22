@@ -61,19 +61,22 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Optional.hh>
+
 // EnergyPlus Headers
-#include <WaterThermalTanks.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
-#include "OutputReportPredefined.hh"
-#include "DXCoils.hh"
-#include "Fans.hh"
-#include "DataHeatBalFanSys.hh"
-#include "DataLoopNode.hh"
-#include "FluidProperties.hh"
-#include "WaterThermalTanks.hh"
-#include "ScheduleManager.hh"
+#include <Fixtures/EnergyPlusFixture.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
