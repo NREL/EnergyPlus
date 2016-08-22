@@ -4730,6 +4730,8 @@ Label902: ;
 				++HdLine;
 				if ( HdLine == 9 ) StillLooking = false;
 			}
+			// TODO Kiva: SetAnnualDryBulb();
+			SetWeatherStatistics();
 		} else { // Header already processed, just read
 			SkipEPlusWFHeader();
 		}
@@ -8727,6 +8729,66 @@ Label9999: ;
 			ShowFatalError( "Invalid EPW Header designation found=" + HeaderString );
 
 		}}
+
+	}
+
+	void SetWeatherStatistics()
+	{
+		// This function reads the entire weather file for useful statistical
+		// information, e.g.: Annual and monthly averages, etc.
+		int ReadStatus = 0;
+		bool ErrorFound = false;
+		int WYear;
+		int WMonth;
+		int WDay;
+		int WHour;
+		int WMinute;
+		Real64 DryBulb;
+		Real64 DewPoint;
+		Real64 RelHum;
+		Real64 AtmPress;
+		Real64 ETHoriz;
+		Real64 ETDirect;
+		Real64 IRHoriz;
+		Real64 GLBHoriz;
+		Real64 DirectRad;
+		Real64 DiffuseRad;
+		Real64 GLBHorizIllum;
+		Real64 DirectNrmIllum;
+		Real64 DiffuseHorizIllum;
+		Real64 ZenLum;
+		Real64 WindDir;
+		Real64 WindSpeed;
+		Real64 TotalSkyCover;
+		Real64 OpaqueSkyCover;
+		Real64 Visibility;
+		Real64 CeilHeight;
+		Real64 PrecipWater;
+		Real64 AerosolOptDepth;
+		Real64 SnowDepth;
+		Real64 DaysSinceLastSnow;
+		Real64 Albedo;
+		Real64 LiquidPrecip;
+		int PresWeathObs;
+		Array1D_int PresWeathConds( 9 );
+
+		Real64 totalDB = 0.0;
+		int count = 0;
+		std::string WeatherDataLine;
+
+		while (! ReadStatus) {
+			{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+			if ( ReadStatus < 0 ) {
+				break;
+			}
+			InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
+			++count;
+			totalDB += DryBulb;
+
+		}
+
+		// Annual averages
+		AnnualAverageDrybulbTemp = totalDB/count;
 
 	}
 

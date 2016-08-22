@@ -1064,6 +1064,9 @@ namespace WeatherManager {
 	);
 
 	void
+	SetWeatherStatistics();
+
+	void
 	SkipEPlusWFHeader();
 
 	void
