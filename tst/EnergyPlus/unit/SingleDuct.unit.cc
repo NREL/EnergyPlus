@@ -145,7 +145,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 0;
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
+	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 );
 	ScheduleManager::UpdateScheduleValues();
 
 	bool ErrorsFound = false;
@@ -316,7 +316,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 0;
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
+	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 );
 	ScheduleManager::UpdateScheduleValues();
 
 	bool ErrorsFound = false;
@@ -703,28 +703,23 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 
 		"  Branch,",
 		"    VAV Sys 1 Main Branch,   !- Name",
-		"    autosize,                !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"    OA Sys 1,                !- Component 1 Name",
 		"    VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name",
 		"    Mixed Air Node 1,        !- Component 1 Outlet Node Name",
-		"    PASSIVE,                 !- Component 1 Branch Control Type",
 		"    CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 		"    DX Cooling Coil System 1,!- Component 2 Name",
 		"    Mixed Air Node 1,        !- Component 2 Inlet Node Name",
 		"    Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name",
-		"    PASSIVE,                 !- Component 2 Branch Control Type",
 		"    Coil:Heating:Fuel,        !- Component 3 Object Type",
 		"    Main Heating Coil 1,     !- Component 3 Name",
 		"    Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name",
 		"    Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name",
-		"    PASSIVE,                 !- Component 3 Branch Control Type",
 		"    Fan:VariableVolume,      !- Component 4 Object Type",
 		"    Supply Fan 1,            !- Component 4 Name",
 		"    Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name",
-		"    VAV Sys 1 Outlet Node,   !- Component 4 Outlet Node Name",
-		"    ACTIVE;                  !- Component 4 Branch Control Type",
+		"    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
 
 		"  AirLoopHVAC,",
 		"    VAV Sys 1,               !- Name",

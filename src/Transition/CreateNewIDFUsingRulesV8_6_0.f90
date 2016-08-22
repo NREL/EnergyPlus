@@ -138,6 +138,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
   LOGICAL :: ErrFlag
 
+  INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -405,6 +407,88 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1) = sVersionNum
                 nodiff=.false.
 
+    !!!    Changes for this version
+            CASE('EXTERIOR:FUELEQUIPMENT')
+                ObjectName='Exterior:FuelEquipment'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                if (samestring('Gas',InArgs(2))) then
+                  OutArgs(2)='NaturalGas'
+                endif
+                if (samestring('LPG',InArgs(2))) then
+                  OutArgs(2)='PropaneGas'
+                endif
+
+            CASE('HVACTEMPLATE:SYSTEM:UNITARYSYSTEM')
+                ObjectName='HVACTemplate:System:UnitarySystem'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:56)=InArgs(1:56) ! No change
+                OutArgs(57:CurArgs-1)=InArgs(58:CurArgs) ! Remove Dehumidification Control Zone Name
+                CurArgs = CurArgs-1
+
+            CASE('HVACTEMPLATE:SYSTEM:UNITARY')
+                ObjectName='HVACTemplate:System:Unitary'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:39)=InArgs(1:39) ! No change
+                OutArgs(40:CurArgs-1)=InArgs(41:CurArgs) ! Remove Dehumidification Control Zone Name
+                CurArgs = CurArgs-1
+
+            CASE('CHILLERHEATER:ABSORPTION:DIRECTFIRED')
+                ObjectName='ChillerHeater:Absorption:DirectFired'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:32)=InArgs(1:32) ! No change
+                ! Remove Chiller Flow Mode
+                OutArgs(33)=InArgs(34)
+                OutArgs(34)=InArgs(35)
+                CurArgs = CurArgs-1
+
+            CASE('SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MINIMUM')
+                ObjectName='SetpointManager:SingleZone:Humidity:Minimum'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1)=InArgs(1) ! No change
+                ! Remove Control Variable and Schedule Name
+                OutArgs(2)=InArgs(4)
+                OutArgs(3)=InArgs(5)
+                CurArgs = CurArgs-2
+
+            CASE('SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MAXIMUM')
+                ObjectName='SetpointManager:SingleZone:Humidity:Maximum'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1)=InArgs(1) ! No change
+                ! Remove Control Variable and Schedule Name
+                OutArgs(2)=InArgs(4)
+                OutArgs(3)=InArgs(5)
+                CurArgs = CurArgs-2
+
+              CASE('BRANCH')
+                ObjectName='Branch'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1) ! No change
+                ! eliminate Max Flow Rate Field
+                OutArgs(2)=InArgs(3)
+                CurArgs=CurArgs-1
+                nodiff=.false.
+                ! eliminate Control Type fields
+                ! Control Type fields are on: 8, 13, 18, 23, ...
+                I = 0
+                DO WHILE (.TRUE.)
+                    I = I + 1
+                    CurField = 5*(I-1) + 3
+                    NewField = 4*(I-1) + 2
+                    IF ( CurField > CurArgs ) EXIT
+                    OutArgs(NewField+1)=InArgs(CurField+1)  ! Type
+                    OutArgs(NewField+2)=InArgs(CurField+2)  ! Name
+                    OutArgs(NewField+3)=InArgs(CurField+3)  ! Inlet Node Name
+                    OutArgs(NewField+4)=InArgs(CurField+4)  ! Outlet Node Name
+                    ! Remove Control Type
+                    CurArgs = CurArgs-1
+                END DO
 
               ! It is debatable whether I should actually improve this to make it more like the report variables
               ! I think it is much less likely that these will change between versions

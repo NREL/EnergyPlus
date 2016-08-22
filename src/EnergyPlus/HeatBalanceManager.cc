@@ -890,11 +890,8 @@ namespace HeatBalanceManager {
 				DefaultInsideConvectionAlgo = ASHRAESimple;
 				AlphaName( 1 ) = "Simple";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultInsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetInsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -931,32 +928,20 @@ namespace HeatBalanceManager {
 			GetObjectItem( "SurfaceConvectionAlgorithm:Outside", 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 
-			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
+			if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAESimple;
-				if ( AlphaName( 1 ) == "SIMPLE" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to SimpleCombined, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "SimpleCombined";
 
-			} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
+			} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 				DefaultOutsideConvectionAlgo = ASHRAETARP;
-				if ( AlphaName( 1 ) == "DETAILED" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
-				if ( AlphaName( 1 ) == "BLAST" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to TARP, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "TARP";
 
 			} else if ( SELECT_CASE_var == "MOWITT" ) {
 				DefaultOutsideConvectionAlgo = MoWiTTHcOutside;
 				AlphaName( 1 ) = "MoWitt";
 
-			} else if ( ( SELECT_CASE_var == "DOE-2" ) || ( SELECT_CASE_var == "DOE2" ) ) {
+			} else if ( ( SELECT_CASE_var == "DOE-2" ) ) {
 				DefaultOutsideConvectionAlgo = DOE2HcOutside;
-				if ( AlphaName( 1 ) == "DOE2" ) {
-					ShowSevereError( "GetOutsideConvectionAlgorithm: Deprecated value for " + CurrentModuleObject + ", defaulting to DOE-2, entered value=" + AlphaName( 1 ) );
-				}
 				AlphaName( 1 ) = "DOE-2";
 
 			} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
@@ -4390,11 +4375,7 @@ namespace HeatBalanceManager {
 				if ( SELECT_CASE_var == "SIMPLE" ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
-					if ( cAlphaArgs( 2 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
@@ -4422,22 +4403,10 @@ namespace HeatBalanceManager {
 		if ( NumAlphas > 2 && !lAlphaFieldBlanks( 3 ) ) {
 				{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 
-				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
-					if ( cAlphaArgs( 3 ) == "SIMPLE" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to SimpleCombined." );
-					}
+				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAESimple;
 
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
-					if ( cAlphaArgs( 3 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
-					if ( cAlphaArgs( 3 ) == "BLAST" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
+				} else if ( ( SELECT_CASE_var == "TARP" ) ) {
 					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAETARP;
 
 				} else if ( SELECT_CASE_var == "MOWITT" ) {

@@ -341,7 +341,7 @@
 !      $
 !      1/hr
 !      A
-!      A/V                 
+!      A/V
 !      Ah
 !      Availability
 !      Control
@@ -20003,7 +20003,7 @@ Lights,
   A5 , \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20089,7 +20089,7 @@ ElectricEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20169,7 +20169,7 @@ GasEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -20304,7 +20304,7 @@ SteamEquipment,
   A5 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -24320,7 +24320,7 @@ Exterior:Lights,
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -24361,7 +24361,7 @@ Exterior:FuelEquipment,
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -24390,7 +24390,7 @@ Exterior:WaterEquipment,
   A4 ; \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:  
+       \note EAp2-4/5. Performance Rating Method Compliance:
        \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
        \type alpha
        \retaincase
@@ -27383,7 +27383,7 @@ HVACTemplate:System:VRF,
       \default 45
 
 HVACTemplate:System:Unitary,
-      \min-fields 52
+      \min-fields 51
       \memo Unitary furnace with air conditioner
   A1, \field Name
       \required-field
@@ -27592,10 +27592,6 @@ HVACTemplate:System:Unitary,
       \key CoolReheatHeatingCoil
       \key CoolReheatDesuperheater
       \default None
- A19, \field Dehumidification Control Zone Name
-      \note This field is not currently used - the thermostat control zone is also the dehumidification control zone
-      \type object-list
-      \object-list ZoneNames
  N22, \field Dehumidification Setpoint
       \note Zone relative humidity setpoint in percent (0 to 100)
       \type real
@@ -27603,12 +27599,12 @@ HVACTemplate:System:Unitary,
       \maximum 100.0
       \default 60.0
       \units percent
- A20, \field Humidifier Type
+ A19, \field Humidifier Type
       \type choice
       \key None
       \key ElectricSteam
       \default None
- A21, \field Humidifier Availability Schedule Name
+ A20, \field Humidifier Availability Schedule Name
       \note If blank, always available
       \type object-list
       \object-list ScheduleNames
@@ -27630,7 +27626,7 @@ HVACTemplate:System:Unitary,
       \autosizable
       \default autosize
       \ip-units W
- A22, \field Humidifier Control Zone Name
+ A21, \field Humidifier Control Zone Name
       \note Zone name where humidistat is located
       \type object-list
       \object-list ZoneNames
@@ -27641,7 +27637,7 @@ HVACTemplate:System:Unitary,
       \maximum 100.0
       \default 30.0
       \units percent
- A23, \field Return Fan
+ A22, \field Return Fan
       \note Specifies if the system has a return fan.
       \type choice
       \key Yes
@@ -28018,7 +28014,7 @@ HVACTemplate:System:UnitaryHeatPump:AirToAir,
       \default 1.0
 
 HVACTemplate:System:UnitarySystem,
-      \min-fields 72
+      \min-fields 71
       \memo Unitary HVAC system with optional cooling and heating. Supports DX and chilled water,
       \memo cooling, gas, electric, and hot water heating, air-to-air and water-to-air heat pumps.
   A1, \field Name
@@ -28370,10 +28366,6 @@ HVACTemplate:System:UnitarySystem,
       \key CoolReheat
       \key Multimode
       \default None
- A24, \field Dehumidification Control Zone Name
-      \note Zone name where humidistat is located
-      \type object-list
-      \object-list ZoneNames
  N34, \field Dehumidification Relative Humidity Setpoint
       \note Zone relative humidity setpoint in percent (0 to 100)
       \note Ignored if Dehumidification Relative Humidity Setpoint Schedule specified below
@@ -28382,17 +28374,17 @@ HVACTemplate:System:UnitarySystem,
       \maximum 100.0
       \default 60.0
       \units percent
- A25, \field Dehumidification Relative Humidity Setpoint Schedule Name
+ A24, \field Dehumidification Relative Humidity Setpoint Schedule Name
       \note Leave blank to use constant setpoint specified in Dehumidification Relative Humidity
       \note Setpoint above. Schedule values must be in percent relative humidity (0 to 100).
       \type object-list
       \object-list ScheduleNames
- A26, \field Humidifier Type
+ A25, \field Humidifier Type
       \type choice
       \key None
       \key ElectricSteam
       \default None
- A27, \field Humidifier Availability Schedule Name
+ A26, \field Humidifier Availability Schedule Name
       \note If blank, always available
       \type object-list
       \object-list ScheduleNames
@@ -28414,7 +28406,7 @@ HVACTemplate:System:UnitarySystem,
       \autosizable
       \default autosize
       \ip-units W
- A28, \field Humidifier Control Zone Name
+ A27, \field Humidifier Control Zone Name
       \note Zone name where humidistat is located
       \type object-list
       \object-list ZoneNames
@@ -28426,19 +28418,19 @@ HVACTemplate:System:UnitarySystem,
       \maximum 100.0
       \default 30.0
       \units percent
- A29, \field Humidifier Relative Humidity Setpoint Schedule Name
+ A28, \field Humidifier Relative Humidity Setpoint Schedule Name
       \note Leave blank to use constant setpoint specified in Humidifier Relative Humidity
       \note  Setpoint above.Schedule values must be in percent relative humidity (0 to 100).
       \type object-list
       \object-list ScheduleNames
- A30, \field Sizing Option
+ A29, \field Sizing Option
       \note Select whether autosized system supply flow rate is the sum of Coincident or NonCoincident
       \note zone air flow rates.
       \type choice
       \key Coincident
       \key NonCoincident
       \default NonCoincident
- A31, \field Return Fan
+ A30, \field Return Fan
       \note Specifies if the system has a return fan.
       \type choice
       \key Yes
@@ -39821,11 +39813,11 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \note fraction of cooling air flow rate
   A3,  \field Air Inlet Node Name
        \type node
-       \note The name of the HVAC system node that is the air inlet node for the 
-       \note terminal unit. This is also the air inlet node for the unit’s fan.  
+       \note The name of the HVAC system node that is the air inlet node for the
+       \note terminal unit. This is also the air inlet node for the unit’s fan.
   A4,  \field Air Outlet Node Name
        \type node
-       \note The name of the HVAC system node that is the air outlet node for the 
+       \note The name of the HVAC system node that is the air outlet node for the
        \note terminal unit. This is also the air outlet node for the unit’s heating
        \note coil’s air outlet node. This node is also a zone inlet node.
   A5,  \field Fan Object Type
@@ -52127,12 +52119,12 @@ Dehumidifier:Desiccant:System,
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
        \note works with gas, electric, hot water and steam heating coils.
-       \note For autosizing the regeneration air heating coil the 
+       \note For autosizing the regeneration air heating coil the
        \note Design Coil Inlet Air Condition used is the outdoor air condition
-       \note if the desiccant system is on the primary air loop, or else if the  
+       \note if the desiccant system is on the primary air loop, or else if the
        \note desiccant system is on outdoor air system then it is the return air
        \note condition. The Design Coil Outlet Air Temperature is the Regeneration
-       \note Inlet Air Setpoint Temperature specified in the input field below.   
+       \note Inlet Air Setpoint Temperature specified in the input field below.
   A10, \field Regeneration Air Heater Name
        \type object-list
        \object-list HeatingCoilName
@@ -53157,7 +53149,7 @@ UnitarySystemPerformance:Multispeed,
        \key Yes
        \key No
        \default No
-       \note Controls coil operation during each HVAC timestep. 
+       \note Controls coil operation during each HVAC timestep.
        \note This choice does not apply to speed 1 operation.
        \note Yes = operate at the highest speed possible without exceeding the current load.
        \note No = allow operation at the average of two adjacent speeds to match the current load.
@@ -58330,19 +58322,13 @@ AirLoopHVAC:ReturnPath,
 \group Node-Branch Management
 
 Branch,
-        \extensible:5 Just duplicate last 5 fields and comments (changing numbering, please)
+        \extensible:4 Just duplicate last 4 fields and comments (changing numbering, please)
         \memo List components on the branch in simulation and connection order
         \memo Note: this should NOT include splitters or mixers which define
         \memo endpoints of branches
    A1,  \field Name
         \required-field
         \reference Branches
-   N1, \field Maximum Flow Rate
-        \deprecated
-        \default 0
-        \units m3/s
-        \minimum 0
-        \autosizable
    A2, \field Pressure Drop Curve Name
         \type object-list
         \object-list PressureDropCurves
@@ -58366,88 +58352,66 @@ Branch,
    A6, \field Component 1 Outlet Node Name
         \required-field
         \type node
-   A7, \field Component 1 Branch Control Type
-       \note field is no longer used
-   A8, \field Component 2 Object Type
-   A9, \field Component 2 Name
-   A10,\field Component 2 Inlet Node Name
+   A7, \field Component 2 Object Type
+   A8, \field Component 2 Name
+   A9,\field Component 2 Inlet Node Name
         \type node
-   A11, \field Component 2 Outlet Node Name
+   A10, \field Component 2 Outlet Node Name
         \type node
-   A12, \field Component 2 Branch Control Type
-       \note field is no longer used
-   A13, \field Component 3 Object Type
-   A14, \field Component 3 Name
-   A15, \field Component 3 Inlet Node Name
+   A11, \field Component 3 Object Type
+   A12, \field Component 3 Name
+   A13, \field Component 3 Inlet Node Name
         \type node
-   A16, \field Component 3 Outlet Node Name
+   A14, \field Component 3 Outlet Node Name
         \type node
-   A17, \field Component 3 Branch Control Type
-       \note field is no longer used
-   A18, \field Component 4 Object Type
-   A19, \field Component 4 Name
-   A20, \field Component 4 Inlet Node Name
+   A15, \field Component 4 Object Type
+   A16, \field Component 4 Name
+   A17, \field Component 4 Inlet Node Name
         \type node
-   A21, \field Component 4 Outlet Node Name
+   A18, \field Component 4 Outlet Node Name
         \type node
-   A22, \field Component 4 Branch Control Type
-       \note field is no longer used
-   A23, \field Component 5 Object Type
-   A24, \field Component 5 Name
-   A25, \field Component 5 Inlet Node Name
+   A19, \field Component 5 Object Type
+   A20, \field Component 5 Name
+   A21, \field Component 5 Inlet Node Name
         \type node
-   A26, \field Component 5 Outlet Node Name
+   A22, \field Component 5 Outlet Node Name
         \type node
-   A27, \field Component 5 Branch Control Type
-       \note field is no longer used
-   A28, \field Component 6 Object Type
-   A29, \field Component 6 Name
-   A30, \field Component 6 Inlet Node Name
+   A23, \field Component 6 Object Type
+   A24, \field Component 6 Name
+   A25, \field Component 6 Inlet Node Name
         \type node
-   A31, \field Component 6 Outlet Node Name
+   A26, \field Component 6 Outlet Node Name
         \type node
-   A32, \field Component 6 Branch Control Type
-       \note field is no longer used
-   A33, \field Component 7 Object Type
-   A34, \field Component 7 Name
-   A35, \field Component 7 Inlet Node Name
+   A27, \field Component 7 Object Type
+   A28, \field Component 7 Name
+   A29, \field Component 7 Inlet Node Name
         \type node
-   A36, \field Component 7 Outlet Node Name
+   A30, \field Component 7 Outlet Node Name
         \type node
-   A37, \field Component 7 Branch Control Type
-       \note field is no longer used
-   A38, \field Component 8 Object Type
-   A39, \field Component 8 Name
-   A40, \field Component 8 Inlet Node Name
+   A31, \field Component 8 Object Type
+   A32, \field Component 8 Name
+   A33, \field Component 8 Inlet Node Name
         \type node
-   A41, \field Component 8 Outlet Node Name
+   A34, \field Component 8 Outlet Node Name
         \type node
-   A42, \field Component 8 Branch Control Type
-       \note field is no longer used
-   A43, \field Component 9 Object Type
-   A44, \field Component 9 Name
-   A45, \field Component 9 Inlet Node Name
+   A35, \field Component 9 Object Type
+   A36, \field Component 9 Name
+   A37, \field Component 9 Inlet Node Name
         \type node
-   A46, \field Component 9 Outlet Node Name
+   A38, \field Component 9 Outlet Node Name
         \type node
-   A47, \field Component 9 Branch Control Type
-       \note field is no longer used
-   A48, \field Component 10 Object Type
-   A49, \field Component 10 Name
-   A50, \field Component 10 Inlet Node Name
+   A39, \field Component 10 Object Type
+   A40, \field Component 10 Name
+   A41, \field Component 10 Inlet Node Name
         \type node
-   A51, \field Component 10 Outlet Node Name
+   A42, \field Component 10 Outlet Node Name
         \type node
-   A52, \field Component 10 Branch Control Type
-       \note field is no longer used
-   A53, \field Component 11 Object Type
-   A54, \field Component 11 Name
-   A55, \field Component 11 Inlet Node Name
+   A43, \field Component 11 Object Type
+   A44, \field Component 11 Name
+   A45, \field Component 11 Inlet Node Name
         \type node
-   A56, \field Component 11 Outlet Node Name
+   A46; \field Component 11 Outlet Node Name
         \type node
-   A57; \field Component 11 Branch Control Type
-       \note field is no longer used
 
 BranchList,
  \extensible:1 Just duplicate last field and comments (changing numbering, please)
@@ -63090,7 +63054,7 @@ Chiller:CombustionTurbine,
        \note throughout the entire simulation.
 
 ChillerHeater:Absorption:DirectFired,
-  \min-fields 35
+  \min-fields 34
   \memo Direct fired gas absorption chiller-heater using performance curves similar to DOE-2
   A1,  \field Name
        \required-field
@@ -63135,7 +63099,7 @@ ChillerHeater:Absorption:DirectFired,
           \required-field
           \type node
   A5   ,  \field Condenser Outlet Node Name
-          \note Not required if air-cooled 
+          \note Not required if air-cooled
           \type node
   A6   ,  \field Hot Water Inlet Node Name
           \required-field
@@ -63278,9 +63242,7 @@ ChillerHeater:Absorption:DirectFired,
             \note Not currently used.
             \units kJ/kg
             \default 0.0
-  A17  ,  \field Chiller Flow Mode
-       \deprecated
-  A18  ,  \field Fuel Type
+  A17  ,  \field Fuel Type
             \type choice
             \key NaturalGas
             \key PropaneGas
@@ -63344,7 +63306,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \required-field
        \type node
   A5 , \field Condenser Outlet Node Name
-       \note Not required if air-cooled 
+       \note Not required if air-cooled
        \type node
   A6 , \field Hot Water Inlet Node Name
        \required-field
@@ -72991,15 +72953,11 @@ SetpointManager:SingleZone:Humidity:Minimum,
      \memo object ZoneControl:Humidistat to detect humidity levels.
   A1 , \field Name
        \required-field
-  A2 , \field Control Variable
-       \deprecated
-  A3 , \field Schedule Name
-       \deprecated
-  A4 , \field Setpoint Node or NodeList Name
+  A2 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which humidity ratio setpoint will be set
-  A5 ; \field Control Zone Air Node Name
+  A3 ; \field Control Zone Air Node Name
        \required-field
        \type node
        \note Name of the zone air node for the humidity control zone
@@ -73009,18 +72967,13 @@ SetpointManager:SingleZone:Humidity:Maximum,
      \memo control of a single zone maximum humidity level.
      \memo This setpoint manager can be used in conjunction with
      \memo object ZoneControl:Humidistat to detect humidity levels.
-       \min-fields 5
   A1 , \field Name
        \required-field
-  A2 , \field Control Variable
-       \deprecated
-  A3 , \field Schedule Name
-       \deprecated
-  A4 , \field Setpoint Node or NodeList Name
+  A2 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which humidity ratio setpoint will be set
-  A5 ; \field Control Zone Air Node Name
+  A3 ; \field Control Zone Air Node Name
        \required-field
        \type node
        \note Name of the zone air node for the humidity control zone
@@ -79183,7 +79136,7 @@ ElectricLoadCenter:Generators,
   N60; \field Generator 30 Rated Thermal to Electrical Power Ratio
        \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
        \type real
-       
+
 ElectricLoadCenter:Inverter:Simple,
         \memo Electric power inverter to convert from direct current (DC) to alternating current
         \memo (AC) in an electric load center that contains photovoltaic modules. This input
@@ -79474,7 +79427,7 @@ ElectricLoadCenter:Transformer,
        \default PowerInFromGrid
        \note A transformer can be used to transfer electric energy from utility grid to
        \note building (PowerInFromGrid)or from building on-site generation to
-       \note the grid (PowerOutToGrid) or within a load center to match generation 
+       \note the grid (PowerOutToGrid) or within a load center to match generation
        \note to the facility service main panel (LoadCenterPowerConditioning)
   A4,  \field Zone Name
        \type object-list
@@ -79620,7 +79573,7 @@ ElectricLoadCenter:Transformer,
 
 
 ElectricLoadCenter:Distribution,
-       \memo Describes a subpanel 
+       \memo Describes a subpanel
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
   A1 , \field Name
@@ -79678,11 +79631,11 @@ ElectricLoadCenter:Distribution,
        \note Select method to govern how storage charge and discharge is controlled
        \type choice
        \key TrackFacilityElectricDemandStoreExcessOnSite
-       \note TrackFacilityElectricDemandStoreExcessOnSite indicates that storage control will follow the facility power demand 
+       \note TrackFacilityElectricDemandStoreExcessOnSite indicates that storage control will follow the facility power demand
        \note while accounting for any on-site generation.  Only excess on site generation  gets stored (legacy behavior).
        \default TrackFacilityElectricDemandStoreExcessOnSite
        \key TrackMeterDemandStoreExcessOnSite
-       \note TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similiar 
+       \note TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similiar
        \note to TrackFacilityElectricDemandStoreExcessOnSite except that instead of the main facility electric meter, the control is based off of a user-selected meter.
        \key TrackChargeDischargeSchedules
        \note TrackChargeDischargeSchedules indicates that control will follow the charging and discharging power and schedules defined in the fields called Maximum Storage Charge Grid Supply Power,
@@ -79691,7 +79644,7 @@ ElectricLoadCenter:Distribution,
        \note FacilityDemandLeveling indicates that storage control will attempt to control the facility's power demand drawn from the utility service to a prescribed level.
        \note The target utility demand is entered in the fields called Storage Control Utility Demand Limit and Storage Control Utility Demand Limit Fraction Schedule Name
        \note This scheme first accounts for any on-site generation and during times of high use will discharge storage to reduce facility grid demand to meet the target level
-       \note and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level. 
+       \note and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level.
   A11, \field Storage Control Track Meter Name
        \note required when Storage Operation Scheme is set to TrackMeterDemandStoreExcessOnSite.
        \type external-list
@@ -79713,7 +79666,7 @@ ElectricLoadCenter:Distribution,
   N4 , \field Design Storage Control Charge Power
        \note Maximum rate that electric power can be charged into storage.
        \note Storage charging adjusted downward for conversion losses.
-       \note Rate is modified by fractional values in the schedule named in the next field. 
+       \note Rate is modified by fractional values in the schedule named in the next field.
        \note Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
        \type real
        \units W
@@ -79725,7 +79678,7 @@ ElectricLoadCenter:Distribution,
        \object-list ScheduleNames
   N5 , \field Design Storage Control Discharge Power
        \note Maximum rate that electric power can be discharged from storage.
-       \note Rate is modified by fractional values in the schedule named in the next field. 
+       \note Rate is modified by fractional values in the schedule named in the next field.
        \note Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
        \type real
        \units W
@@ -79736,7 +79689,7 @@ ElectricLoadCenter:Distribution,
        \type object-list
        \object-list ScheduleNames
   N6,  \field Storage Control Utility Demand Target
-       \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses. 
+       \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses.
        \note Required field for FacilityDemandLeveling storage operation scheme
        \type real
        \units W
@@ -79785,7 +79738,7 @@ ElectricLoadCenter:Distribution,
         \object-list UniVariateCurves
         \object-list UniVariateTables
    N3 , \field Ancillary Power Consumed In Standby
-        \note Optional standby power consumed when converter is available but no power is being conditioned. 
+        \note Optional standby power consumed when converter is available but no power is being conditioned.
         \type real
         \units W
    A5 , \field Zone Name
@@ -79797,7 +79750,7 @@ ElectricLoadCenter:Distribution,
         \note fraction of zone heat gains treated as thermal radiation
         \minimum 0.0
         \maximum 1.0
-        
+
 \group Water Systems
 
 WaterUse:Equipment,

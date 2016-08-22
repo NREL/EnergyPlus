@@ -1619,18 +1619,15 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    5.5,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:Unitary:Furnace:HeatCool,  !- Component 2 Object Type
     Supermarket Rooftop DX w/ Gas Heat,  !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 

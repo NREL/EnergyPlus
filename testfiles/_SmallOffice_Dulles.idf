@@ -2505,63 +2505,51 @@
 
   Branch,
     MainBranch_AirLoop_SouthZone_1stFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_SouthZone_1stFloor,  !- Component 1 Name
     InletNode_AirLoop_SouthZone_1stFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_SouthZone_1stFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_SouthZone_1stFloor,  !- Component 2 Name
     OutsideAirNode_SouthZone_1stFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_SouthZone_1stFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_SouthZone_1stFloor;  !- Component 2 Outlet Node Name
 
   Branch,
     MainBranch_AirLoop_NorthZone_1stFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_NorthZone_1stFloor,  !- Component 1 Name
     InletNode_AirLoop_NorthZone_1stFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_NorthZone_1stFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_NorthZone_1stFloor,  !- Component 2 Name
     OutsideAirNode_NorthZone_1stFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_NorthZone_1stFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_NorthZone_1stFloor;  !- Component 2 Outlet Node Name
 
   Branch,
     MainBranch_AirLoop_SouthZone_2ndFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_SouthZone_2ndFloor,  !- Component 1 Name
     InletNode_AirLoop_SouthZone_2ndFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_SouthZone_2ndFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_SouthZone_2ndFloor,  !- Component 2 Name
     OutsideAirNode_SouthZone_2ndFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_SouthZone_2ndFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_SouthZone_2ndFloor;  !- Component 2 Outlet Node Name
 
   Branch,
     MainBranch_AirLoop_NorthZone_2ndFloor,  !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OASystem_NorthZone_2ndFloor,  !- Component 1 Name
     InletNode_AirLoop_NorthZone_2ndFloor,  !- Component 1 Inlet Node Name
     OutsideAirNode_NorthZone_2ndFloor,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     UnitarySystem_NorthZone_2ndFloor,  !- Component 2 Name
     OutsideAirNode_NorthZone_2ndFloor,  !- Component 2 Inlet Node Name
-    OutletNode_AirLoop_NorthZone_2ndFloor,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    OutletNode_AirLoop_NorthZone_2ndFloor;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC,
     AirLoop_SouthZone_1stFloor,  !- Name

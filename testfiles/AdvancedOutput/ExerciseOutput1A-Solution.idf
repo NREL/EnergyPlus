@@ -1154,13 +1154,11 @@
 
   Branch,
     AHU 1 Main Branch,       !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:Unitary:Furnace:HeatCool,  !- Component 1 Object Type
     AHU 1 Furnace with DX Cooling,  !- Component 1 Name
     AHU 1 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 1 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    AHU 1 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
 
