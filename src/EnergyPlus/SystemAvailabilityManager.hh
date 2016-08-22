@@ -206,10 +206,20 @@ namespace SystemAvailabilityManager {
 		//   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
 		Real64 TempTolRange; // range in degrees C of thermostat tolerance
 		int CyclingTimeSteps; // period (in Loads time steps) system will cycle on.
-		std::string CtrlZoneName; // Name of the control zone
-		int ZoneNum; // zone number of control zone
-		int ControlledZoneNum; // controlled zone number of control zone
 		int AvailStatus; // reports status of availability manager
+		int PriorAvailStatus; // prior status of availability manager
+		std::string CtrlZoneListName; // controlled zone or zonelist name
+		int NumOfCtrlZones; // number of controlled zones
+		Array1D_int CtrlZonePtrs; // pointers to controlled zone(s)
+		std::string CoolingZoneListName; // coolin zone or zonelist name
+		int NumOfCoolingZones; // number of cooling zones
+		Array1D_int CoolingZonePtrs; // pointers to cooling zone(s)
+		std::string HeatingZoneListName; // heatig zone or zonelist name
+		int NumOfHeatingZones; // number of heatig zones
+		Array1D_int HeatingZonePtrs; // pointers to heating zone(s)
+		std::string HeatZnFanZoneListName; // heating zone fans only zone or zonelist name
+		int NumOfHeatZnFanZones; // number of heating zone fans only zones
+		Array1D_int HeatZnFanZonePtrs; // pointers to heating zone fans only zone(s)
 
 		// Default Constructor
 		DefineNightCycSysAvailManager() :
@@ -219,9 +229,12 @@ namespace SystemAvailabilityManager {
 			CtrlType( 0 ),
 			TempTolRange( 1.0 ),
 			CyclingTimeSteps( 1 ),
-			ZoneNum( 0 ),
-			ControlledZoneNum( 0 ),
-			AvailStatus( 0 )
+			AvailStatus( 0 ),
+			PriorAvailStatus( 0 ),
+			NumOfCtrlZones( 0 ),
+			NumOfCoolingZones( 0 ),
+			NumOfHeatingZones( 0 ),
+			NumOfHeatZnFanZones( 0 )
 		{}
 
 	};
@@ -601,6 +614,20 @@ namespace SystemAvailabilityManager {
 		int & AvailStatus, // System status indicator
 		Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
 		Optional_int_const CompNum = _ // Index of ZoneHVAC equipment component
+	);
+
+	bool
+	CoolingZoneOutOfTolerance(
+		Array1D_int const ZonePtrList, // list of controlled zone pointers
+		int const NumZones, // number of zones in list
+		Real64 const TempTolerance // temperature tolerance
+	);
+
+	bool
+	HeatingZoneOutOfTolerance(
+		Array1D_int const ZonePtrList, // list of controlled zone pointers
+		int const NumZones, // number of zones in list
+		Real64 const TempTolerance // temperature tolerance
 	);
 
 	void
