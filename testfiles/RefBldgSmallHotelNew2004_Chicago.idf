@@ -38,7 +38,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Electric; Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Electric; Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -16379,109 +16379,121 @@
     RearStorageFlr4 Unit Heater Post Fan Node,  !- Air Outlet Node Name
     Unit Heater Fans;        !- End-Use Subcategory
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:10_HeatC,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:10_HeatC-PSZ-HEATCOOL:10_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:10_HeatC-PSZ-HEATCOOL:10_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:11_HeatC,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:11_HeatC-PSZ-HEATCOOL:11_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:11_HeatC-PSZ-HEATCOOL:11_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:12_HeatC,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:12_HeatC-PSZ-HEATCOOL:12_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:12_HeatC-PSZ-HEATCOOL:12_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:1_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:1_HeatC-PSZ-HEATCOOL:1_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:1_HeatC-PSZ-HEATCOOL:1_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:2_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:2_HeatC-PSZ-HEATCOOL:2_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:2_HeatC-PSZ-HEATCOOL:2_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:3_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:3_HeatC-PSZ-HEATCOOL:3_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:3_HeatC-PSZ-HEATCOOL:3_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:4_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:4_HeatC-PSZ-HEATCOOL:4_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:4_HeatC-PSZ-HEATCOOL:4_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:5_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:5_HeatC-PSZ-HEATCOOL:5_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:5_HeatC-PSZ-HEATCOOL:5_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:6_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:6_HeatC-PSZ-HEATCOOL:6_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:6_HeatC-PSZ-HEATCOOL:6_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:7_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.78,                    !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.78,                    !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:7_HeatC-PSZ-HEATCOOL:7_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:7_HeatC-PSZ-HEATCOOL:7_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:8_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:8_HeatC-PSZ-HEATCOOL:8_FanNode,  !- Air Outlet Node Name
     PSZ-HEATCOOL:8_HeatC-PSZ-HEATCOOL:8_FanNode;  !- Temperature Setpoint Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     PSZ-HEATCOOL:9_HeatC,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Air Inlet Node Name
     PSZ-HEATCOOL:9_HeatC-PSZ-HEATCOOL:9_FanNode,  !- Air Outlet Node Name
@@ -24331,7 +24343,7 @@
     PSZ-HEATCOOL:1_OA-PSZ-HEATCOOL:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:1_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:1_HeatC-PSZ-HEATCOOL:1_FanNode,  !- Component 3 Outlet Node Name
@@ -24356,7 +24368,7 @@
     PSZ-HEATCOOL:10_OA-PSZ-HEATCOOL:10_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:10_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:10_HeatC-PSZ-HEATCOOL:10_FanNode,  !- Component 3 Outlet Node Name
@@ -24381,7 +24393,7 @@
     PSZ-HEATCOOL:11_OA-PSZ-HEATCOOL:11_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:11_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:11_HeatC-PSZ-HEATCOOL:11_FanNode,  !- Component 3 Outlet Node Name
@@ -24406,7 +24418,7 @@
     PSZ-HEATCOOL:12_OA-PSZ-HEATCOOL:12_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:12_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:12_HeatC-PSZ-HEATCOOL:12_FanNode,  !- Component 3 Outlet Node Name
@@ -24431,7 +24443,7 @@
     PSZ-HEATCOOL:2_OA-PSZ-HEATCOOL:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:2_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:2_HeatC-PSZ-HEATCOOL:2_FanNode,  !- Component 3 Outlet Node Name
@@ -24456,7 +24468,7 @@
     PSZ-HEATCOOL:3_OA-PSZ-HEATCOOL:3_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:3_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:3_HeatC-PSZ-HEATCOOL:3_FanNode,  !- Component 3 Outlet Node Name
@@ -24481,7 +24493,7 @@
     PSZ-HEATCOOL:4_OA-PSZ-HEATCOOL:4_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:4_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:4_HeatC-PSZ-HEATCOOL:4_FanNode,  !- Component 3 Outlet Node Name
@@ -24506,7 +24518,7 @@
     PSZ-HEATCOOL:5_OA-PSZ-HEATCOOL:5_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:5_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:5_HeatC-PSZ-HEATCOOL:5_FanNode,  !- Component 3 Outlet Node Name
@@ -24531,7 +24543,7 @@
     PSZ-HEATCOOL:6_OA-PSZ-HEATCOOL:6_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:6_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:6_HeatC-PSZ-HEATCOOL:6_FanNode,  !- Component 3 Outlet Node Name
@@ -24556,7 +24568,7 @@
     PSZ-HEATCOOL:7_OA-PSZ-HEATCOOL:7_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:7_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:7_HeatC-PSZ-HEATCOOL:7_FanNode,  !- Component 3 Outlet Node Name
@@ -24581,7 +24593,7 @@
     PSZ-HEATCOOL:8_OA-PSZ-HEATCOOL:8_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:8_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:8_HeatC-PSZ-HEATCOOL:8_FanNode,  !- Component 3 Outlet Node Name
@@ -24606,7 +24618,7 @@
     PSZ-HEATCOOL:9_OA-PSZ-HEATCOOL:9_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Heating:Gas,        !- Component 3 Object Type
+    Coil:Heating:Fuel,        !- Component 3 Object Type
     PSZ-HEATCOOL:9_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:9_HeatC-PSZ-HEATCOOL:9_FanNode,  !- Component 3 Outlet Node Name

@@ -390,7 +390,11 @@ namespace PoweredInductionUnits {
 			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+<<<<<<< HEAD
 			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+=======
+			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:FUEL" ) ) {
+>>>>>>> NREL/develop
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
 			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;
@@ -506,7 +510,11 @@ namespace PoweredInductionUnits {
 			if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:WATER" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SimpleHeating;
 				PIU( PIUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+<<<<<<< HEAD
 			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:GAS" ) ) {
+=======
+			} else if ( SameString( cAlphaArgs( 9 ), "COIL:HEATING:FUEL" ) ) {
+>>>>>>> NREL/develop
 				PIU( PIUNum ).HCoilType_Num = HCoilType_Gas;
 			} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "COIL:HEATING:STEAM" ) ) {
 				PIU( PIUNum ).HCoilType_Num = HCoilType_SteamAirHeating;

@@ -3502,7 +3502,7 @@ namespace SystemReports {
 			{ "COIL:HEATING:DX:VARIABLESPEED", COIL_HEATING_DX_VARIABLESPEED },
 			{ "COIL:HEATING:ELECTRIC", COIL_HEATING_ELECTRIC },
 			{ "COIL:HEATING:ELECTRIC:MULTISTAGE", COIL_HEATING_ELECTRIC_MULTISTAGE },
-			{ "COIL:HEATING:GAS", COIL_HEATING_GAS },
+			{ "COIL:HEATING:FUEL", COIL_HEATING_GAS },
 			{ "COIL:HEATING:GAS:MULTISTAGE", COIL_HEATING_GAS_MULTISTAGE },
 			{ "COIL:HEATING:STEAM", COIL_HEATING_STEAM },
 			{ "COIL:HEATING:WATER", COIL_HEATING_WATER },
@@ -4180,7 +4180,7 @@ namespace SystemReports {
 					// HPWaterHeater can be used as zone equipment
 					SELECT_CASE_var == HPWaterHeater_Num || SELECT_CASE_var == BBWater_Num || SELECT_CASE_var == ZoneDXDehumidifier_Num ||
 					SELECT_CASE_var == BBSteam_Num || SELECT_CASE_var == BBElectric_Num || SELECT_CASE_var == RefrigerationAirChillerSet_Num ||
-					SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num ) {
+					SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num || SELECT_CASE_var == CoolingPanel_Num ) {
 					// do nothing, OA not included
 
 				} else {

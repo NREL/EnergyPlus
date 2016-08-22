@@ -1154,7 +1154,7 @@ namespace RoomAirModelAirflowNetwork {
 		using Psychrometrics::PsyWFnTdbRhPb;
 		using Psychrometrics::PsyRhFnTdbRhov;
 		using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
-		using DataMoistureBalanceEMPD::MoistEMPDNew;
+		using DataMoistureBalanceEMPD::RVSurface;
 		using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
 		using MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD;
 		using DataEnvironment::OutBaroPress;
@@ -1209,7 +1209,7 @@ namespace RoomAirModelAirflowNetwork {
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 
 				UpdateMoistureBalanceEMPD( SurfNum );
-				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
+				RhoVaporSurfIn( SurfNum ) = RVSurface( SurfNum );
 
 				SumHmAW = SumHmAW + HMassConvInFD( SurfNum )*Surface( SurfNum ).Area* ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
 				SumHmARa = SumHmARa + HMassConvInFD( SurfNum )*Surface( SurfNum ).Area* PsyRhoAirFnPbTdbW( OutBaroPress, TempSurfInTmp( SurfNum ),

@@ -400,6 +400,9 @@ EnergyPlusPgm( std::string const & filepath )
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
+	get_environment_variable( cDisplayInputInAuditEnvVar, cEnvValue );
+	if ( ! cEnvValue.empty() ) DisplayInputInAudit = env_var_on( cEnvValue ); // Yes or True
+
 	if ( ! filepath.empty() ) {
 		// if filepath is not empty, then we are using E+ as a library API call
 		// change the directory to the specified folder, and pass in dummy args to command line parser

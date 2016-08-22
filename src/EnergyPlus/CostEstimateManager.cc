@@ -436,21 +436,21 @@ namespace CostEstimateManager {
 					}
 				}
 
-			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+			} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 
 				WildcardObjNames = false;
 				thisCoil = 0;
 				// test if too many pricing methods are set in user input
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerEach > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				if ( ( CostLineItem( Item ).PerEach > 0.0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, too many pricing methods specified" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, too many pricing methods specified" );
 					ErrorsFound = true;
 				}
 				//  check for wildcard * in object name..
@@ -458,13 +458,13 @@ namespace CostEstimateManager {
 					WildcardObjNames = true;
 
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
-					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, need to specify a Reference Object Name" );
+					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, need to specify a Reference Object Name" );
 					ErrorsFound = true;
 
 				} else { // assume name is probably useful
 					thisCoil = InputProcessor::FindItem( CostLineItem( Item ).ParentObjName, HeatingCoil );
 					if ( thisCoil == 0 ) {
-						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, invalid coil specified" );
+						ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Fuel, invalid coil specified" );
 						ShowContinueError( "Coil Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
 					}
 				}
@@ -746,7 +746,7 @@ namespace CostEstimateManager {
 					}
 				}
 
-			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+			} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 				WildcardObjNames = false;
 				thisCoil = 0;
 				//  check for wildcard * in object name..

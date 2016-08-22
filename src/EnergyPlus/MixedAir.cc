@@ -708,7 +708,7 @@ namespace MixedAir {
 				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex );
 			}
 			OAHeatingCoil = true;
-		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Gas'
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
 			if ( Sim ) {
 				//     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
 				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex );
@@ -1201,7 +1201,7 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = WaterCoil_DetailedCool;
 				} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Coil_ElectricHeat;
-				} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+				} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Coil_GasHeat;
 				} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = WaterCoil_CoolingHXAsst;

@@ -164,7 +164,7 @@ namespace HVACMultiSpeedHeatPump {
 	using DataHVACGlobals::BlowThru;
 	using DataHVACGlobals::Coil_HeatingWater;
 	using DataHVACGlobals::Coil_HeatingSteam;
-	using DataHVACGlobals::Coil_HeatingGas;
+	using DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
 	using DataHVACGlobals::Coil_HeatingElectric;
 	using DataHVACGlobals::Coil_HeatingGas_MultiStage;
 	using DataHVACGlobals::Coil_HeatingElectric_MultiStage;
@@ -1060,13 +1060,17 @@ namespace HVACMultiSpeedHeatPump {
 
 			// Get supplemental heating coil data
 			MSHeatPump( MSHPNum ).SuppHeatCoilName = Alphas( 15 );
+<<<<<<< HEAD
 			if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Heating:Gas" ) ) {
+=======
+			if ( SameString( Alphas( 14 ), "Coil:Heating:Fuel" ) ) {
+>>>>>>> NREL/develop
 				MSHeatPump( MSHPNum ).SuppHeatCoilType = SuppHeatingCoilGas;
 				errFlag = false;
-				MSHeatPump( MSHPNum ).SuppHeatCoilNum = GetHeatingCoilIndex( "Coil:Heating:Gas", Alphas( 15 ), errFlag );
+				MSHeatPump( MSHPNum ).SuppHeatCoilNum = GetHeatingCoilIndex( "Coil:Heating:Fuel", Alphas( 15 ), errFlag );
 				if ( MSHeatPump( MSHPNum ).SuppHeatCoilNum <= 0 || errFlag ) {
 					ShowContinueError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
-					ShowContinueError( cAlphaFields( 15 ) + " of type Coil:Heating:Gas \"" + Alphas( 15 ) + "\" not found." );
+					ShowContinueError( cAlphaFields( 15 ) + " of type Coil:Heating:Fuel \"" + Alphas( 15 ) + "\" not found." );
 					ErrorsFound = true;
 				}
 
@@ -1095,7 +1099,7 @@ namespace HVACMultiSpeedHeatPump {
 					ErrorsFound = true;
 					LocalError = false;
 				}
-				SetUpCompSets( CurrentModuleObject, MSHeatPump( MSHPNum ).Name, "Coil:Heating:Gas", MSHeatPump( MSHPNum ).SuppHeatCoilName, "UNDEFINED", "UNDEFINED" );
+				SetUpCompSets( CurrentModuleObject, MSHeatPump( MSHPNum ).Name, "Coil:Heating:Fuel", MSHeatPump( MSHPNum ).SuppHeatCoilName, "UNDEFINED", "UNDEFINED" );
 			}
 			if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Heating:Electric" ) ) {
 				MSHeatPump( MSHPNum ).SuppHeatCoilType = SuppHeatingCoilElec;
@@ -1237,7 +1241,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( MSHeatPump( MSHPNum ).SuppHeatCoilType == 0 ) {
 				ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", " + cAlphaFields( 14 ) + " is not allowed = " + Alphas( 14 ) );
-				ShowContinueError( "Valid choices are Coil:Heating:Gas,Coil:Heating:Electric,Coil:Heating:Steam,or Coil:Heating:Water" );
+				ShowContinueError( "Valid choices are Coil:Heating:Fuel,Coil:Heating:Electric,Coil:Heating:Steam,or Coil:Heating:Water" );
 				ErrorsFound = true;
 			}
 
@@ -2373,7 +2377,7 @@ namespace HVACMultiSpeedHeatPump {
 		if ( MSHeatPump( MSHeatPumpNum ).SuppMaxAirTemp == AutoSize ) {
 			if ( CurSysNum > 0 ) {
 				if ( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilType == 1 ) { // Gas
-					CheckZoneSizing( "Coil:Heating:Gas", MSHeatPump( MSHeatPumpNum ).Name );
+					CheckZoneSizing( "Coil:Heating:Fuel", MSHeatPump( MSHeatPumpNum ).Name );
 				} else {
 					CheckZoneSizing( "Coil:Heating:Electric", MSHeatPump( MSHeatPumpNum ).Name );
 				}
@@ -2385,7 +2389,7 @@ namespace HVACMultiSpeedHeatPump {
 		if ( MSHeatPump( MSHeatPumpNum ).DesignSuppHeatingCapacity == AutoSize ) {
 			if ( CurSysNum > 0 ) {
 				if ( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilType == 1 ) { // Gas
-					CheckSysSizing( "Coil:Heating:Gas", MSHeatPump( MSHeatPumpNum ).Name );
+					CheckSysSizing( "Coil:Heating:Fuel", MSHeatPump( MSHeatPumpNum ).Name );
 				} else {
 					CheckSysSizing( "Coil:Heating:Electric", MSHeatPump( MSHeatPumpNum ).Name );
 				}

@@ -10629,7 +10629,14 @@ namespace OutputReportTabular {
 				}
 				//write the table
 				WriteSubtitle( CompSizeTableEntry( foundEntry ).typeField );
-				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, "User-Specified values were used. Design Size values were used if no User-Specified values were provided." );
+				if ( CompSizeTableEntry( foundEntry ).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
+					CompSizeTableEntry( foundEntry ).typeField == "AirTerminal:SingleDuct:VAV:NoReheat" ) {
+					WriteTable( tableBody, rowHead, columnHead, columnWidth, false,
+						"User-Specified values were used. Design Size values were used if no User-Specified values were provided. Design Size values may be derived from alternate User-Specified values." );
+				} else {
+					WriteTable( tableBody, rowHead, columnHead, columnWidth, false,
+						"User-Specified values were used. Design Size values were used if no User-Specified values were provided." );
+				}
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
 				}

@@ -1111,6 +1111,15 @@ namespace SizingManager {
 					ZoneAirDistribution( ZADIndex ).ZoneSecondaryRecirculation = 0.0;
 				}
 
+				// Zone Ventilation Efficiency
+				if ( NumNumbers > 3 ) {
+					ZoneAirDistribution( ZADIndex ).ZoneVentilationEff = Numbers( 4 );
+				}
+				else {
+					// default value
+					ZoneAirDistribution( ZADIndex ).ZoneVentilationEff = 0.0;
+				}
+
 				if ( NumAlphas > 1 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ZoneAirDistribution( ZADIndex ).ZoneADEffSchName = Alphas( 2 );
@@ -1314,6 +1323,9 @@ namespace SizingManager {
 		int NumZoneLists;
 		int OAIndex; // Index of design specification object
 		int ObjIndex; // Index of zone air distribution effectiveness object name
+		bool DesHeatMaxAirFlowPerAreaUsrInp;
+		bool DesHeatMaxAirFlowUsrInp;
+		bool DesHeatMaxAirFlowFracUsrInp;
 
 		struct GlobalMiscObject
 		{
@@ -1663,14 +1675,18 @@ namespace SizingManager {
 					//      \note This input is currently used in sizing the Fan minimum Flow Rate.
 					//      \note It does not currently affect other component autosizing.
 					if ( lNumericFieldBlanks( 12 ) ) {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFrac = 0.0;
-					} else if ( rNumericArgs( 12 ) < 0.0 ) {
+						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = false;
+					} else {
+						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = true;
+					}
+					if ( rNumericArgs( 12 ) < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 						ShowContinueError( "... incorrect " + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "],  value should not be negative." );
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFrac = rNumericArgs( 12 );
 					}
+
 					//  N13,\field Heating Design Air Flow Rate
 					//      \type real
 					//      \units m3/s
@@ -1695,6 +1711,7 @@ namespace SizingManager {
 					//      \default .002032
 					//      \note default is .40 cfm/ft2
 					//      \note This input is not currently used for autosizing any of the components.
+					DesHeatMaxAirFlowPerAreaUsrInp = false;
 					if ( lNumericFieldBlanks( 14 ) ) {
 						if ( rNumericArgs( 14 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = 0.002032;
@@ -1707,6 +1724,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = rNumericArgs( 14 );
+						DesHeatMaxAirFlowPerAreaUsrInp = true;
 					}
 					//  N15,\field Heating Maximum Air Flow
 					//      \type real
@@ -1715,6 +1733,7 @@ namespace SizingManager {
 					//      \default .1415762
 					//      \note default is 300 cfm
 					//      \note This input is not currently used for autosizing any of the components.
+					DesHeatMaxAirFlowUsrInp = false;
 					if ( lNumericFieldBlanks( 15 ) ) {
 						if ( rNumericArgs( 15 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = 0.1415762;
@@ -1727,6 +1746,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = rNumericArgs( 15 );
+						DesHeatMaxAirFlowUsrInp = true;
 					}
 					//  N16;\field Heating Maximum Air Flow Fraction
 					//      \note fraction of the Heating Design Air Flow Rate
@@ -1734,6 +1754,7 @@ namespace SizingManager {
 					//      \type real
 					//      \minimum 0
 					//      \default 0.3
+					DesHeatMaxAirFlowFracUsrInp = false;
 					if ( lNumericFieldBlanks( 16 ) ) {
 						if ( rNumericArgs( 16 ) <= 0.0 ) { // in case someone changes the default in the IDD
 							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = 0.3;
@@ -1746,9 +1767,22 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = rNumericArgs( 16 );
+						DesHeatMaxAirFlowFracUsrInp = true;
+					}
+					// make sure the user specified inputs of the previous 3 inputs override the defaults
+					if ( DesHeatMaxAirFlowPerAreaUsrInp || DesHeatMaxAirFlowUsrInp || DesHeatMaxAirFlowFracUsrInp ) {
+						if ( !DesHeatMaxAirFlowPerAreaUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowPerArea = 0.0;
+						}
+						if ( !DesHeatMaxAirFlowUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlow = 0.0;
+						}
+						if ( !DesHeatMaxAirFlowFracUsrInp ) {
+							ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = 0.0;
+						}
 					}
 
-					//  A7, \field Zone Air Distribution Object Name
+					//  A7, \field Zone Air Distribution Object Name and add its inputs
 					if ( ! lAlphaFieldBlanks( 7 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName = cAlphaArgs( 7 );
 						ObjIndex = InputProcessor::FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName, ZoneAirDistribution );
@@ -1757,6 +1791,7 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).ZoneADEffHeating = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
 							ZoneSizingInput( ZoneSizIndex ).ZoneSecondaryRecirculation = ZoneAirDistribution( ObjIndex ).ZoneSecondaryRecirculation;
 							ZoneSizingInput( ZoneSizIndex ).ZoneAirDistributionIndex = ObjIndex;
+							ZoneSizingInput( ZoneSizIndex ).ZoneVentilationEff = ZoneAirDistribution( ObjIndex ).ZoneVentilationEff;
 						} else {
 							// generate a warning message
 							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );

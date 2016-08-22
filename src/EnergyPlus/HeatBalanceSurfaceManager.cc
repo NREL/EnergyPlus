@@ -73,6 +73,7 @@
 #include <HeatBalanceSurfaceManager.hh>
 #include <CommandLineInterface.hh>
 #include <ConvectionCoefficients.hh>
+#include <ChilledCeilingPanelSimple.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>
@@ -175,7 +176,6 @@ namespace HeatBalanceSurfaceManager {
 	using DataMoistureBalance::HSkyFD;
 	using DataMoistureBalance::HGrndFD;
 	using DataMoistureBalance::HAirFD;
-	//unused0909USE DataMoistureBalanceEMPD, ONLY: MoistEMPDNew, MoistEMPDFlux
 
 	// Use statements for access to subroutines in other modules
 		using namespace ScheduleManager;
@@ -514,16 +514,14 @@ namespace HeatBalanceSurfaceManager {
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window && Surface( SurfNum ).ExtSolar ) {
-				SurfaceWindow( SurfNum ).IllumFromWinAtRefPt1Rep = 0.0;
-				SurfaceWindow( SurfNum ).IllumFromWinAtRefPt2Rep = 0.0;
-				SurfaceWindow( SurfNum ).LumWinFromRefPt1Rep = 0.0;
-				SurfaceWindow( SurfNum ).LumWinFromRefPt2Rep = 0.0;
+				SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep = 0.0;
+				SurfaceWindow( SurfNum ).LumWinFromRefPtRep = 0.0;
 			}
 		}
 
 		for ( NZ = 1; NZ <= NumOfZones; ++NZ ) {
 			// RJH DElight Modification Begin - Change Daylighting test to continue for Detailed AND DElight
-			if ( ZoneDaylight( NZ ).DaylightType == NoDaylighting ) continue;
+			if ( ZoneDaylight( NZ ).DaylightMethod == NoDaylighting ) continue;
 			// RJH DElight Modification End - Change Daylighting test to continue for Detailed AND DElight
 			ZoneDaylight( NZ ).DaylIllumAtRefPt = 0.0;
 			ZoneDaylight( NZ ).GlareIndexAtRefPt = 0.0;
@@ -547,7 +545,7 @@ namespace HeatBalanceSurfaceManager {
 
 			// RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
 			// Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-			if ( SunIsUp && ZoneDaylight( NZ ).TotalDElightRefPts != 0 ) {
+			if ( SunIsUp && ZoneDaylight( NZ ).TotalDaylRefPoints != 0 && (ZoneDaylight( NZ ).DaylightMethod == DataDaylighting::DElightDaylighting) ) {
 				// Call DElight interior illuminance and electric lighting control subroutine
 				dPowerReducFac = 1.0;
 				dHISKFFC = HISKF * LUX2FC;
@@ -634,7 +632,7 @@ namespace HeatBalanceSurfaceManager {
 						// Increment refpt counter
 						++iDElightRefPt;
 						// Assure refpt index does not exceed number of refpts in this zone
-						if ( iDElightRefPt <= ZoneDaylight( NZ ).TotalDElightRefPts ) {
+						if ( iDElightRefPt <= ZoneDaylight( NZ ).TotalDaylRefPoints ) {
 							ZoneDaylight( NZ ).DaylIllumAtRefPt( iDElightRefPt ) = dRefPtIllum;
 						}
 					}
@@ -785,6 +783,7 @@ namespace HeatBalanceSurfaceManager {
 		QHWBaseboardSurf = 0.0;
 		QSteamBaseboardSurf = 0.0;
 		QElecBaseboardSurf = 0.0;
+		QCoolingPanelSurf = 0.0;
 		QPoolSurfNumerator = 0.0;
 		PoolHeatTransCoefs = 0.0;
 
@@ -1381,6 +1380,7 @@ namespace HeatBalanceSurfaceManager {
 		QHWBaseboardSurf.dimension( TotSurfaces, 0.0 );
 		QSteamBaseboardSurf.dimension( TotSurfaces, 0.0 );
 		QElecBaseboardSurf.dimension( TotSurfaces, 0.0 );
+		QCoolingPanelSurf.dimension( TotSurfaces, 0.0 );
 
 		// allocate terms used for pool surface heat balance
 		QPoolSurfNumerator.dimension( TotSurfaces, 0.0 );
@@ -2816,7 +2816,7 @@ namespace HeatBalanceSurfaceManager {
 					} // End of shading flag check
 
 					// Note that FrameQRadInAbs is initially calculated in InitSolarHeatGains
-					if ( SurfaceWindow( SurfNum ).FrameArea > 0.0 ) SurfaceWindow( SurfNum ).FrameQRadInAbs += ( QS( ZoneNum ) * SurfaceWindow( SurfNum ).FrameSolAbsorp + ( QL( ZoneNum ) * TMULT( ZoneNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * SurfaceWindow( SurfNum ).FrameEmis ) * ( 1.0 + 0.5 * SurfaceWindow( SurfNum ).ProjCorrFrIn ); // Window has a frame
+					if ( SurfaceWindow( SurfNum ).FrameArea > 0.0 ) SurfaceWindow( SurfNum ).FrameQRadInAbs += ( QS( ZoneNum ) * SurfaceWindow( SurfNum ).FrameSolAbsorp + ( QL( ZoneNum ) * TMULT( ZoneNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * SurfaceWindow( SurfNum ).FrameEmis ) * ( 1.0 + 0.5 * SurfaceWindow( SurfNum ).ProjCorrFrIn ); // Window has a frame
 					if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 ) { // Window has dividers
 						DividerThermAbs = SurfaceWindow( SurfNum ).DividerEmis;
 						DividerSolAbs = SurfaceWindow( SurfNum ).DividerSolAbsorp;
@@ -2839,7 +2839,7 @@ namespace HeatBalanceSurfaceManager {
 							DividerThermAbs *= InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Blind( BlNum ).IRBackTrans );
 						}
 						// Note that DividerQRadInAbs is initially calculated in InitSolarHeatGains
-						SurfaceWindow( SurfNum ).DividerQRadInAbs += ( QS( ZoneNum ) * DividerSolAbs + ( QL( ZoneNum ) * TMULT( ZoneNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * DividerThermAbs ) * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivIn );
+						SurfaceWindow( SurfNum ).DividerQRadInAbs += ( QS( ZoneNum ) * DividerSolAbs + ( QL( ZoneNum ) * TMULT( ZoneNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * DividerThermAbs ) * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivIn );
 					}
 
 				} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowEQLModel ) {
@@ -3836,6 +3836,7 @@ namespace HeatBalanceSurfaceManager {
 		using HWBaseboardRadiator::UpdateBBRadSourceValAvg;
 		using SteamBaseboardRadiator::UpdateBBSteamRadSourceValAvg;
 		using ElectricBaseboardRadiator::UpdateBBElecRadSourceValAvg;
+		using CoolingPanelSimple::UpdateCoolingPanelSourceValAvg;
 		using SwimmingPool::UpdatePoolSourceValAvg;
 
 		// Locals
@@ -3857,6 +3858,7 @@ namespace HeatBalanceSurfaceManager {
 		bool HWBaseboardSysOn; // .TRUE. if a water baseboard heater is running
 		bool SteamBaseboardSysOn; // .TRUE. if a steam baseboard heater is running
 		bool ElecBaseboardSysOn; // .TRUE. if a steam baseboard heater is running
+		bool CoolingPanelSysOn; // true if a simple cooling panel is running
 		bool SwimmingPoolOn; // true if a pool is present (running)
 
 		// FLOW:
@@ -3865,9 +3867,10 @@ namespace HeatBalanceSurfaceManager {
 		UpdateBBRadSourceValAvg( HWBaseboardSysOn );
 		UpdateBBSteamRadSourceValAvg( SteamBaseboardSysOn );
 		UpdateBBElecRadSourceValAvg( ElecBaseboardSysOn );
+		UpdateCoolingPanelSourceValAvg( CoolingPanelSysOn );
 		UpdatePoolSourceValAvg( SwimmingPoolOn );
 
-		if ( LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || SwimmingPoolOn ) {
+		if ( LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn || SwimmingPoolOn ) {
 			// Solve the zone heat balance 'Detailed' solution
 			// Call the outside and inside surface heat balances
 			CalcHeatBalanceOutsideSurf();
@@ -4331,10 +4334,12 @@ namespace HeatBalanceSurfaceManager {
 			QdotRadIntGainsInRep( SurfNum ) = ( QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum ) ) * surfaceArea;
 			QRadIntGainsInReport( SurfNum ) = QdotRadIntGainsInRep( SurfNum ) * TimeStepZoneSec;
 
+			QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum );
+			QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) * Surface( SurfNum ).Area;
 //Tuned Replaced by one line form below for speed
 //			QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum );
 //			QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) * surfaceArea;
-			QdotRadHVACInRep( SurfNum ) = ( QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * surfaceArea;
+			QdotRadHVACInRep( SurfNum ) = ( QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) * surfaceArea;
 			QRadHVACInReport( SurfNum ) = QdotRadHVACInRep( SurfNum ) * TimeStepZoneSec;
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_Floor || Surface( SurfNum ).Class == SurfaceClass_Wall || Surface( SurfNum ).Class == SurfaceClass_IntMass || Surface( SurfNum ).Class == SurfaceClass_Roof || Surface( SurfNum ).Class == SurfaceClass_Door ) {
@@ -4998,8 +5003,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalance::HSkyFD;
 	using DataMoistureBalance::HGrndFD;
 	using DataMoistureBalance::HAirFD;
-	using DataMoistureBalanceEMPD::MoistEMPDNew;
-	using DataMoistureBalanceEMPD::MoistEMPDFlux;
+	using DataMoistureBalanceEMPD::RVSurface;
+	using DataMoistureBalanceEMPD::HeatFluxLatent;
+	using DataMoistureBalanceEMPD::RVSurfaceOld;
+	using DataMoistureBalanceEMPD::RVSurfLayer;
 
 	using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 	using WindowManager::CalcWindowHeatBalance;
@@ -5276,7 +5283,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 			Real64 & TH11( TH( 1, 1, SurfNum ) );
 			Real64 & TH12( TH( 2, 1, SurfNum ) );
-			Real64 & TH22( TH( 2, 2, SurfNum ) );
 
 			ConstrNum = surface.Construction;
 			auto const & construct( Construct( ConstrNum ) );
@@ -5311,10 +5317,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				if ( surface.HeatTransferAlgorithm == HeatTransferModel_CTF || surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) { // Regular CTF Surface and/or EMPD surface
 
 					if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-						CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), TH22, MAT_zone, TempSurfInSat );
+						CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), MAT_zone, TempSurfInSat );
 					}
 					//Pre-calculate a few terms
-					Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) );
+					Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) );
 					Real64 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + HConvIn_surf + IterDampConst ) );
 					// Calculate the current inside surface temperature
 					if ( ( ! surface.IsPool ) || ( ( surface.IsPool ) && ( abs( QPoolSurfNumerator( SurfNum ) ) < SmallNumber ) && ( abs( PoolHeatTransCoefs( SurfNum ) ) < SmallNumber ) ) ) {
@@ -5323,7 +5329,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						TempSurfInTmp( SurfNum ) = ( CTFConstInPart( SurfNum ) + QPoolSurfNumerator( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) ) / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + PoolHeatTransCoefs( SurfNum ) + IterDampConst ); // Constant part of conduction eq (history terms) | Pool modified terms (see non-pool equation for details) | Iterative damping term (for stability) | Conduction term (both partition sides same temp) | Pool and damping term
 					}
 					if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-						TempSurfInTmp( SurfNum ) -= MoistEMPDFlux( SurfNum ) * TempDiv; // Conduction term (both partition sides same temp) | Conduction term (both partition sides same temp) | Convection and damping term
+						TempSurfInTmp( SurfNum ) -= HeatFluxLatent( SurfNum ) * TempDiv; // Conduction term (both partition sides same temp) | Conduction term (both partition sides same temp) | Convection and damping term
 						if ( TempSurfInSat > TempSurfInTmp( SurfNum ) ) {
 							TempSurfInTmp( SurfNum ) = TempSurfInSat; // Surface temp cannot be below dew point
 						}
@@ -5365,10 +5371,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						if ( surface.HeatTransferAlgorithm == HeatTransferModel_CTF || surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) { // Regular CTF Surface and/or EMPD surface
 
 							if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-								CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), TH22, MAT_zone, TempSurfInSat );
+								CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), MAT_zone, TempSurfInSat );
 							}
 							//Pre-calculate a few terms
-							Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) );
+							Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) );
 							Real64 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) + HConvIn_surf + IterDampConst ) );
 							// Calculate the current inside surface temperature
 							if ( ( ! surface.IsPool ) || ( ( surface.IsPool ) && ( abs( QPoolSurfNumerator( SurfNum ) ) < SmallNumber ) && ( abs( PoolHeatTransCoefs( SurfNum ) ) < SmallNumber ) ) ) {
@@ -5377,7 +5383,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								TempSurfInTmp( SurfNum ) = ( CTFConstInPart( SurfNum ) + QPoolSurfNumerator( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) + construct.CTFCross( 0 ) * TH11 ) / ( construct.CTFInside( 0 ) + PoolHeatTransCoefs( SurfNum ) + IterDampConst ); // Constant part of conduction eq (history terms) | Pool modified terms (see non-pool equation for details) | Iterative damping term (for stability) | Current conduction from | the outside surface | Coefficient for conduction (current time) | Pool and damping term
 							}
 							if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
-								TempSurfInTmp( SurfNum ) -= MoistEMPDFlux( SurfNum ) * TempDiv; // Coefficient for conduction (current time) | Convection and damping term
+								TempSurfInTmp( SurfNum ) -= HeatFluxLatent( SurfNum ) * TempDiv; // Coefficient for conduction (current time) | Convection and damping term
 								if ( TempSurfInSat > TempSurfInTmp( SurfNum ) ) {
 									TempSurfInTmp( SurfNum ) = TempSurfInSat; // Surface temp cannot be below dew point
 								}
@@ -5446,7 +5452,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 						F1 = HMovInsul / ( HMovInsul + HConvIn_surf + IterDampConst );
 
-						TempSurfIn( SurfNum ) = ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + construct.CTFCross( 0 ) * TH11 + F1 * ( QRadThermInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) ) ) / ( construct.CTFInside( 0 ) + HMovInsul - F1 * HMovInsul ); // Convection from surface to zone air
+						TempSurfIn( SurfNum ) = ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + construct.CTFCross( 0 ) * TH11 + F1 * ( QRadThermInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) ) ) / ( construct.CTFInside( 0 ) + HMovInsul - F1 * HMovInsul ); // Convection from surface to zone air
 
 						TempSurfInTmp( SurfNum ) = ( construct.CTFInside( 0 ) * TempSurfIn( SurfNum ) + HMovInsul * TempSurfIn( SurfNum ) - QRadSWInAbs( SurfNum ) - CTFConstInPart( SurfNum ) - construct.CTFCross( 0 ) * TH11 ) / ( HMovInsul );
 						// if any mixed heat transfer models in zone, apply limits to CTF result
@@ -5471,13 +5477,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						Real64 const Sigma_Temp_4( Sigma * pow_4( TempSurfIn( SurfNum ) ) );
 
 						// Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( surface.Construction ).InsideAbsorpThermal * surface.Area * ( Sigma_Temp_4 - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( surface.Zone ) * surface.Area * Construct( surface.Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
+						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( surface.Construction ).InsideAbsorpThermal * surface.Area * ( Sigma_Temp_4 - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( surface.Zone ) * surface.Area * Construct( surface.Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR
 						// Zone diffuse interior shortwave reflected back into the TDD
 						WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
 
 						// fill out report vars for components of Window Heat Gain
 						WinGainConvGlazToZoneRep( SurfNum ) = HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) );
-						WinGainIRGlazToZoneRep( SurfNum ) = Construct( surface.Construction ).InsideAbsorpThermal * surface.Area * ( Sigma_Temp_4 - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) );
+						WinGainIRGlazToZoneRep( SurfNum ) = Construct( surface.Construction ).InsideAbsorpThermal * surface.Area * ( Sigma_Temp_4 - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) );
 						WinLossSWZoneToOutWinRep( SurfNum ) = QS( surface.Zone ) * surface.Area * Construct( surface.Construction ).TransDiff;
 						if ( WinHeatGain( SurfNum ) >= 0.0 ) {
 							WinHeatGainRep( SurfNum ) = WinHeatGain( SurfNum );
@@ -5723,7 +5729,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 				SumHmARa( ZoneNum ) += FD_Area_fac * RhoAirZone;
 
-				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoAirZone * Wsurf;
+				SumHmARaW(ZoneNum) += FD_Area_fac * RhoVaporSurfIn(SurfNum);  //old eq'n: FD_Area_fac * RhoAirZone * Wsurf;
+
 			} else if ( surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 				// need to calculate the amount of moisture that is entering or
 				// leaving the zone  Qm [kg/sec] = hmi * Area * (Del Rhov)
@@ -5734,13 +5741,11 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 				// by time to get the actual amount affecting the zone volume of air.
 
 				UpdateMoistureBalanceEMPD( SurfNum );
-				RhoVaporSurfIn( SurfNum ) = MoistEMPDNew( SurfNum );
-				//SUMC(ZoneNum) = SUMC(ZoneNum)-MoistEMPDFlux(SurfNum)*Surface(SurfNum)%Area
-
+				RhoVaporSurfIn( SurfNum ) = RVSurface( SurfNum );
 				Real64 const FD_Area_fac( HMassConvInFD( SurfNum ) * surface.Area );
 				SumHmAW( ZoneNum ) += FD_Area_fac * ( RhoVaporSurfIn( SurfNum ) - RhoVaporAirIn( SurfNum ) );
-				Real64 const surfInTemp( TempSurfInTmp( SurfNum ) );
-				SumHmARa( ZoneNum ) += FD_Area_fac * PsyRhoAirFnPbTdbW( OutBaroPress, surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C( surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
+				Real64 const MAT_zone( MAT( ZoneNum ) );
+				SumHmARa(ZoneNum) += FD_Area_fac * PsyRhoAirFnPbTdbW(OutBaroPress, MAT_zone, PsyWFnTdbRhPb(MAT_zone, PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)), OutBaroPress));  //surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C( surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
 				SumHmARaW( ZoneNum ) += FD_Area_fac * RhoVaporSurfIn( SurfNum );
 			}
 		}
@@ -5989,7 +5994,6 @@ CalcOutsideSurfTemp(
 	using DataMoistureBalance::HSkyFD;
 	using DataMoistureBalance::HGrndFD;
 	using DataMoistureBalance::HAirFD;
-	//unused0909  USE DataMoistureBalanceEMPD,   ONLY: MoistEMPDNew, MoistEMPDFlux
 	using namespace DataDaylightingDevices;
 	using DaylightingDevices::FindTDDPipe;
 	using namespace Psychrometrics;

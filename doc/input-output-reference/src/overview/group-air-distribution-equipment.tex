@@ -110,7 +110,7 @@ The valid reheat component objects currently available are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -186,15 +186,19 @@ The design maximum volume flow rate (m\(^{3}\)/sec) specified for VAV ADU.
 
 \paragraph{Field: Zone Minimum Air Flow Method}\label{field-zone-minimum-air-flow-method}
 
-This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.~ There are three choices for selecting how the minimum flow rate is specified:~ Constant, FixedFlowRate, and Scheduled.~ If Constant is entered, then the program will use the value for the constant minimum air flow fraction entered in the following field.~ If FixedFlowRate is entered, then the program will use the value entered in the field below called Fixed Minimum Air Flow Rate.If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name.
+This field is used to select how the program will determine the minimum flow rate to the zone while the system is operating.~ There are three choices for selecting how the minimum flow rate is specified:~ Constant, FixedFlowRate, and Scheduled.~ If Constant is entered, then the program will use the value for the constant minimum air flow fraction entered in the following field.~ If FixedFlowRate is entered, then the program will use the value entered in the field below called Fixed Minimum Air Flow Rate.If Scheduled is entered, then the program will obtain the value for minimum flow fraction from the schedule named in the field below called Minimum Air Flow Fraction Schedule Name.~ The default is Constant.
 
 \paragraph{Field: Constant Minimum Air Flow Fraction}\label{field-constant-minimum-air-flow-fraction}
 
-The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the previous field is set to Constant.~ If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
+The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal.~ This field is used if the previous field is set to Constant.~ If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
+
+This field is autosizable and defaulted to autosize. The values for autosizing are picked up from the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of .000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) is used.
 
 \paragraph{Field: Fixed Minimum Air Flow Rate}\label{field-fixed-minimum-air-flow-rate}
 
 The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the Zone Minimum Air Flow Method field is set to FixedFlowRate. If the Zone Minimum Air Flow Method field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. Only one of these two minimum air flow fields (i.e., this field and the previous field) should be used at any time. If this field and the previous field have values, the greater of the two is used for sizing.
+
+This field is autosizable and defaulted to autosize. The values for autosizing are picked up from the Sizing:Zone input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of .000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) is used.
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name}
 
@@ -210,7 +214,7 @@ The valid reheat component objects currently available are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -239,9 +243,9 @@ The coil is controlled by knowing the zone demand determined by the zone thermos
 
 \paragraph{Field: Damper Heating Action}\label{field-damper-heating-action}
 
-During heating operation, there are two control options for the damper controlling the air flow in the VAV terminal unit as the zone moves above or below the zone setpoint. With both control options, the damper is at the minimum air flow rate whenever the zone temperature is between the cooling and heating setpoints (deadband condition).
+During heating operation, there are three control options for the damper controlling the air flow in the VAV terminal unit as the zone moves above or below the zone setpoint. With all three control options, the damper is at the minimum air flow rate whenever the zone temperature is between the cooling and heating setpoints (deadband condition).
 
-With \textbf{Normal} (the default) action, the damper will remain at the minimum air flow rate during heating operation. As the heating load increases, the water flow rate in the reheat coil will be increased to maintain temperature in the zone until the maximum water flow rate is reached or the user-specified maximum reheat air temperature is reached.. ~This is sometimes called the single maximum control logic as illustrated below.
+With \textbf{Normal} action, the damper will remain at the minimum air flow rate during heating operation. As the heating load increases, the water flow rate in the reheat coil will be increased to maintain temperature in the zone until the maximum water flow rate is reached or the user-specified maximum reheat air temperature is reached. This is sometimes called the single maximum control logic as illustrated below.
 
 \begin{figure}[hbtp] % fig 102
 \centering
@@ -249,7 +253,7 @@ With \textbf{Normal} (the default) action, the damper will remain at the minimum
 \caption{The Single Maximum Control Logic \protect \label{fig:the-single-maximum-control-logic}}
 \end{figure}
 
-With \textbf{Reverse} action, as the heating load increases, the unit starts at minimum air flow and minimum hot water flow. The hot water flow is increased until it reaches maximum flow or the user-specified maximum reheat air temperature is reached, then the air damper starts to open to meet the load. This option is used if the minimum air flow rate is not adequate to serve the peak heating load. This is sometimes called the dual maximum control logic as illustrated in following figure. For heating coil types other than the hot-water coil, e.g.~electric, steam, and gas, the reverse action works the same as the normal action -- always keeping the air flow at the minimum during heating.
+With \textbf{Reverse} and \textbf{ReverseWithLimits} (the default) action, as the heating load increases, the unit starts at minimum air flow and minimum hot water flow. The hot water flow is increased until it reaches maximum flow or the user-specified maximum reheat air temperature is reached, then the air damper starts to open to meet the load. For \textbf{Reverse} the damper can open all the way. For \textbf{ReverseWithLimits}s the damper can only partially open to a maximum flow rate given by the following two fields. These options are used if the minimum air flow rate is not adequate to serve the peak heating load. This is sometimes called the dual maximum control logic as illustrated in following figure. For heating coil types other than the hot-water coil, e.g.~electric, steam, and gas, the reverse action works the same as the normal action -- always keeping the air flow at the minimum during heating.
 
 The dual-max control currently applies to the AirTerminal:SingleDuct:VAV:Reheat objects with reverse acting dampers and hot-water coils.
 
@@ -261,21 +265,21 @@ The dual-max control currently applies to the AirTerminal:SingleDuct:VAV:Reheat 
 
 \paragraph{Control Fields for Maximum Flow During Reheat:}\label{control-fields-for-maximum-flow-during-reheat}
 
-The following two fields are used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = Reverse. Maximum Flow per Zone Floor Area During Reheat and Maximum Flow Fraction During Reheat are two optional methods to calculate the maximum allowable air flow rate during reheat operation. If both are entered, the greater resulting flow rate is used. If Design Specification Outdoor Air Object Name is also specified, it may increase this limit to meet the outdoor air flow rate requirement. At no time will the maximum flow rate calculated here exceed the value for Maximum Air Flow Rate.
+The following two fields are used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits. Maximum Flow per Zone Floor Area During Reheat and Maximum Flow Fraction During Reheat are two optional methods to calculate the maximum allowable air flow rate during reheat operation. If both are entered, the greater resulting flow rate is used. If Design Specification Outdoor Air Object Name is also specified, it may increase this limit to meet the outdoor air flow rate requirement. At no time will the maximum flow rate calculated here exceed the value for Maximum Air Flow Rate.
 
-This limit is active only when the zone thermostat requests heating and the VAV box damper is reverse acting.
+This limit is active only when the zone thermostat requests heating and the VAV box damper is reverse acting (i.e., ReverseWithLimits).
 
 \paragraph{Field: Maximum Flow per Zone Floor Area During Reheat}\label{field-maximum-flow-per-zone-floor-area-during-reheat}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is multiplied by the zone area, to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autocalculatable. If autocalculate is selected, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)). If this field and the following field are entered, the greater of the two inputs is used. If this field and the following field are left blank, the maximum flow will not be limited.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is multiplied by the zone area, to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizable and its default is autosize. If autosize is selected or the field is blank, the value is filled from the similar inputs in Sizing:Zone. If there is no sizing calculation the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)). If this field and the following field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
 
 \paragraph{Field: Maximum Flow Fraction During Reheat}\label{field-maximum-flow-fraction-during-reheat}
 
-This fraction is multiplied by the Maximum Air Flow Rate to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autocalculatable. If autocalculate is selected, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)) multiplied by the zone floor area divided by the Maximum Air Flow Rate. If this field and the previous field are entered, the greater of the two inputs is used. If this field and the previous field are left blank, the maximum flow will not be limited.
+This fraction is multiplied by the Maximum Air Flow Rate to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizeable and is defaulted to autosize. If autosizeable is selected or the field is blank, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)) multiplied by the zone floor area divided by the Maximum Air Flow Rate. If this field and the previous field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
 
 \paragraph{Field: Maximum Reheat Air Temperature}\label{field-maximum-reheat-air-temperature-1}
 
-This field specifies a maximum supply air temperature (°C) leaving the reheat coil in a VAV terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic high.
+This field specifies a maximum supply air temperature (Â°C) leaving the reheat coil in a VAV terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic high.
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name}
 
@@ -285,7 +289,7 @@ An IDF example:
 
 \begin{lstlisting}
 
-AirTerminal:SingleDuct:VAV:Reheat,
+    AirTerminal:SingleDuct:VAV:Reheat,
       SPACE2-1 VAV Reheat,  !- Name of System
       ReheatCoilAvailSched,  !- Availability schedule for VAV System
       SPACE2-1 Zone Coil Air In Node,  !- Damper Air Outlet Node
@@ -301,10 +305,10 @@ AirTerminal:SingleDuct:VAV:Reheat,
       0.0,  !- Min Reheat Water Flow {m3/s}
       SPACE2-1 In Node,  !- Unit Air Outlet Node
       0.001,  !- Convergence Tolerance
-  Reverse,  !- Damper Heating Action
-  ,         !- Maximum Flow per Zone Floor Area During Reheat
-  ,         !- Maximum Flow Fraction During Reheat
-  35.0,     !- Maximum Reheat Air Temperature {C}
+      ReverseWithLimits,  !- Damper Heating Action
+      ,         !- Maximum Flow per Zone Floor Area During Reheat
+      ,         !- Maximum Flow Fraction During Reheat
+      35.0,     !- Maximum Reheat Air Temperature {C}
       ;         !- Design Specification Outdoor Air Object Name
 
     DesignSpecification:OutdoorAir,
@@ -316,7 +320,6 @@ AirTerminal:SingleDuct:VAV:Reheat,
       ,                         !- Outdoor Air Flow Air Changes per Hour
       Min OARequirements Sched; !- Outdoor Air Flow Rate Fraction Schedule Name
 
-
     Schedule:Compact,
       Min OARequirements Sched,  !- Name
       Any Number,                !- Schedule Type Limits Name
@@ -325,7 +328,8 @@ AirTerminal:SingleDuct:VAV:Reheat,
       Until: 24:00,1.0,          !- Field 7
       For: AllOtherDays,         !- Field 9
       Until: 24:00,0.25;         !- Field 10
-  COIL:Heating:Gas,
+
+    COIL:Heating:Fuel,
       SPACE1-1 Zone Coil,  !- Coil Name
       ReheatCoilAvailSched,  !- Availability Schedule Name
       0.8,  !- Gas Burner Efficiency of the Coil
@@ -413,7 +417,7 @@ The type of heating coil in the terminal unit. The valid choices are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -547,7 +551,7 @@ The valid reheat component objects currently available are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -842,7 +846,7 @@ The type of coil in the PIU. The valid choices are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}
@@ -997,7 +1001,7 @@ The type of coil in the PIU. The valid choices are:
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Steam
 \end{itemize}

@@ -257,6 +257,17 @@ namespace WaterThermalTanks {
 	int NumWaterHeaterSizing( 0 ); // Number of sizing/design objects for water heaters.
 	Array1D_bool AlreadyRated; // control so we don't repeat again
 
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitWaterThermalTanksOnce( true ); // flag for 1 time initialization
+		bool SimWaterThermalTank_OneTimeSetupFlag( true );
+		bool CalcWaterThermalTankZoneGains_MyEnvrnFlag( true );
+	}
+
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
@@ -313,7 +324,6 @@ namespace WaterThermalTanks {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool OneTimeSetupFlag( true );
 		static Array1D_bool MyOneTimeFlagWH; // first pass log
 		static Array1D_bool MyTwoTimeFlagWH; // second pass do input check
 		static Array1D_bool MyOneTimeFlagHP; // first pass log
@@ -329,7 +339,7 @@ namespace WaterThermalTanks {
 			GetWaterThermalTankInputFlag = false;
 		}
 
-		if ( OneTimeSetupFlag ) {
+		if ( SimWaterThermalTank_OneTimeSetupFlag ) {
 			MyOneTimeFlagWH.allocate( NumWaterThermalTank );
 			MyTwoTimeFlagWH.allocate( NumWaterThermalTank );
 			MyOneTimeFlagHP.allocate( NumHeatPumpWaterHeater );
@@ -338,7 +348,7 @@ namespace WaterThermalTanks {
 			MyTwoTimeFlagWH = true;
 			MyOneTimeFlagHP = true;
 			MyTwoTimeFlagHP = true;
-			OneTimeSetupFlag = false;
+			SimWaterThermalTank_OneTimeSetupFlag = false;
 		}
 
 		// Find the correct Equipment
@@ -738,7 +748,6 @@ namespace WaterThermalTanks {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterThermalTankNum;
 		int ZoneNum;
-		static bool MyEnvrnFlag( true );
 		Real64 TankTemp;
 		Real64 QLossToZone;
 		int SchIndex;
@@ -758,17 +767,17 @@ namespace WaterThermalTanks {
 
 		}
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
+		if ( BeginEnvrnFlag && CalcWaterThermalTankZoneGains_MyEnvrnFlag ) {
 			for ( auto & e : WaterThermalTank ) {
 				e.AmbientZoneGain = 0.0;
 				e.FuelEnergy = 0.0;
 				e.OffCycParaFuelEnergy = 0.0;
 				e.OnCycParaFuelEnergy = 0.0;
 			}
-			MyEnvrnFlag = false;
+			CalcWaterThermalTankZoneGains_MyEnvrnFlag = false;
 		}
 
-		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
+		if ( ! BeginEnvrnFlag ) CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
 
 		for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterThermalTank; ++WaterThermalTankNum ) {
 			if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone == 0 ) continue;
@@ -4798,7 +4807,6 @@ namespace WaterThermalTanks {
 		Real64 FanVolFlow(0.0); // Used for error checking fans used with HPWHs
 		//  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
 		//  Integer             :: Loop
-		static bool InitWaterThermalTanksOnce( true ); // flag for 1 time initialization
 		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
 		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
 		static Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -10692,6 +10700,9 @@ namespace WaterThermalTanks {
 		NumWaterHeaterSizing = 0;
 		AlreadyRated.deallocate();
 
+		SimWaterThermalTank_OneTimeSetupFlag = true;
+		InitWaterThermalTanksOnce = true;
+		CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
 		WaterThermalTank.deallocate();
 		HPWaterHeater.deallocate();
 		WaterHeaterDesuperheater.deallocate();
