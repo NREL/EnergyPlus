@@ -32,6 +32,8 @@ set( test_src
   Datasets.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
+  DaylightingManager.unit.cc
+  DElightManager.unit.cc
   DemandResponse.unit.cc
   DesiccantDehumidifiers.unit.cc
   DisplacementVentMgr.unit.cc

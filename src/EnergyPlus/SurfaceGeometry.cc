@@ -79,6 +79,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
 #include <DataWindowEquivalentLayer.hh>
+#include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
@@ -1928,11 +1929,8 @@ namespace SurfaceGeometry {
 		}
 
 		int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection;
-		int NumDElightControls = GetNumObjectsFound( "Daylighting:DElight:Controls" );
-		int NumDElightRefPt = GetNumObjectsFound( "Daylighting:DElight:ReferencePoint" );
 		int NumDElightCmplxFen = GetNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
-		int TotDElightObj = NumDElightControls + NumDElightRefPt + NumDElightCmplxFen;
-		if ( TotShadSurf > 0 && TotDElightObj > 0 ){
+		if ( TotShadSurf > 0 && ( NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight() ) ){
 			ShowWarningError( RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored." );
 		}
 	}
