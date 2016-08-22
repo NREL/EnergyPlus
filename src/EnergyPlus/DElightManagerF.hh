@@ -79,6 +79,11 @@ namespace DElightManagerF {
 	);
 
 	void
+	GetInputDElightComplexFenestration(
+		bool & ErrorsFound
+	);
+
+	void
 	CheckForGeometricTransform(
 		bool & doTransform,
 		Real64 & OldAspectRatio,

@@ -515,16 +515,14 @@ namespace HeatBalanceSurfaceManager {
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window && Surface( SurfNum ).ExtSolar ) {
-				SurfaceWindow( SurfNum ).IllumFromWinAtRefPt1Rep = 0.0;
-				SurfaceWindow( SurfNum ).IllumFromWinAtRefPt2Rep = 0.0;
-				SurfaceWindow( SurfNum ).LumWinFromRefPt1Rep = 0.0;
-				SurfaceWindow( SurfNum ).LumWinFromRefPt2Rep = 0.0;
+				SurfaceWindow( SurfNum ).IllumFromWinAtRefPtRep = 0.0;
+				SurfaceWindow( SurfNum ).LumWinFromRefPtRep = 0.0;
 			}
 		}
 
 		for ( NZ = 1; NZ <= NumOfZones; ++NZ ) {
 			// RJH DElight Modification Begin - Change Daylighting test to continue for Detailed AND DElight
-			if ( ZoneDaylight( NZ ).DaylightType == NoDaylighting ) continue;
+			if ( ZoneDaylight( NZ ).DaylightMethod == NoDaylighting ) continue;
 			// RJH DElight Modification End - Change Daylighting test to continue for Detailed AND DElight
 			ZoneDaylight( NZ ).DaylIllumAtRefPt = 0.0;
 			ZoneDaylight( NZ ).GlareIndexAtRefPt = 0.0;
@@ -548,7 +546,7 @@ namespace HeatBalanceSurfaceManager {
 
 			// RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
 			// Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-			if ( SunIsUp && ZoneDaylight( NZ ).TotalDElightRefPts != 0 ) {
+			if ( SunIsUp && ZoneDaylight( NZ ).TotalDaylRefPoints != 0 && (ZoneDaylight( NZ ).DaylightMethod == DataDaylighting::DElightDaylighting) ) {
 				// Call DElight interior illuminance and electric lighting control subroutine
 				dPowerReducFac = 1.0;
 				dHISKFFC = HISKF * LUX2FC;
@@ -635,7 +633,7 @@ namespace HeatBalanceSurfaceManager {
 						// Increment refpt counter
 						++iDElightRefPt;
 						// Assure refpt index does not exceed number of refpts in this zone
-						if ( iDElightRefPt <= ZoneDaylight( NZ ).TotalDElightRefPts ) {
+						if ( iDElightRefPt <= ZoneDaylight( NZ ).TotalDaylRefPoints ) {
 							ZoneDaylight( NZ ).DaylIllumAtRefPt( iDElightRefPt ) = dRefPtIllum;
 						}
 					}

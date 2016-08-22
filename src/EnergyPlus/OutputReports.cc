@@ -849,7 +849,7 @@ DXFOut(
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
 			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
@@ -1274,7 +1274,7 @@ DXFOutLines( std::string const & ColorScheme )
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
 			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
@@ -1673,7 +1673,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
+		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
 			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
