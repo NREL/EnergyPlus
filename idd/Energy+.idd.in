@@ -20274,7 +20274,7 @@ SteamEquipment,
        \ip-units Btu/h-ft2
   N3 , \field Power per Person
        \type real
-       \minimum
+       \minimum 0
        \units W/Person
        \ip-units Btu/h-person
   N4 , \field Fraction Latent
@@ -72472,7 +72472,7 @@ AvailabilityManager:NightCycle,
        \key CycleOnAnyCoolingOrHeatingZone
        \key CycleOnAnyCoolingZone
        \key CycleOnAnyHeatingZone
-       \key CycleOnAnyHeatingZoneFansOnly 
+       \key CycleOnAnyHeatingZoneFansOnly
        \default StayOff
        \note When AvailabilityManager:NightCycle is used in the zone component availability
        \note manager assignment list, the key choices for Control Type would only be
