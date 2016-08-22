@@ -716,7 +716,7 @@ namespace OutdoorAirUnit {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetElecCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetElecCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 
-						} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+						} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_GasHeat;
 							// Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
 							GetHeatingCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, ErrorsFound );
@@ -1830,7 +1830,7 @@ namespace OutdoorAirUnit {
 				CalcOAUnitCoilComps( UnitNum, FirstHVACIteration, SimCompNum, QUnitOut );
 			}
 
-		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Gas'
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
 			if ( Sim ) {
 				//     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
 				CalcOAUnitCoilComps( UnitNum, FirstHVACIteration, SimCompNum, QUnitOut );

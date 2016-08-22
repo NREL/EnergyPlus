@@ -389,10 +389,27 @@ namespace DaylightingManager {
 	GetDaylightingParametersInput();
 
 	void
-	GetDaylightingParametersDetaild(
-		int const TotDaylightingDetailed, // Total "simple" daylighting inputs
+	GetInputIlluminanceMap(
 		bool & ErrorsFound
 	);
+
+	void
+	GetDaylightingControls(
+		int const TotDaylightingControls, // Total daylighting controls inputs
+		bool & ErrorsFound
+	);
+
+	void
+	GeometryTransformForDaylighting(
+	);
+
+	void
+	GetInputDayliteRefPt(
+		bool & ErrorsFound
+	);
+
+	bool
+	doesDayLightingUseDElight();
 
 	void
 	CheckTDDsAndLightShelvesInDaylitZones();
