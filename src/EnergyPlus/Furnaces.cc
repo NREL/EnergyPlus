@@ -1146,11 +1146,7 @@ namespace Furnaces {
 			HeatingCoilName = Alphas( 11 );
 			Furnace( FurnaceNum ).HeatingCoilType = HeatingCoilType;
 			Furnace( FurnaceNum ).HeatingCoilName = HeatingCoilName;
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
-=======
 			if ( SameString( HeatingCoilType, "Coil:Heating:Fuel" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
->>>>>>> NREL/develop
 				errFlag = false;
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
@@ -1669,11 +1665,7 @@ namespace Furnaces {
 			HeatingCoilPLFCurveIndex = 0;
 			Furnace( FurnaceNum ).HeatingCoilType = HeatingCoilType;
 			Furnace( FurnaceNum ).HeatingCoilName = HeatingCoilName;
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
-=======
 			if ( SameString( HeatingCoilType, "Coil:Heating:Fuel" ) || SameString( HeatingCoilType, "Coil:Heating:Electric" ) ) {
->>>>>>> NREL/develop
 				errFlag = false;
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetHeatingCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 				if ( errFlag ) {
@@ -2067,11 +2059,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilName = ReheatingCoilName;
 			errFlag = false;
 			if ( ! lAlphaBlanks( 15 ) ) {
-<<<<<<< HEAD
-				if ( InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Electric" ) || InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Desuperheater" ) ) {
-=======
 				if ( SameString( ReheatingCoilType, "Coil:Heating:Fuel" ) || SameString( ReheatingCoilType, "Coil:Heating:Electric" ) || SameString( ReheatingCoilType, "Coil:Heating:Desuperheater" ) ) {
->>>>>>> NREL/develop
 
 					Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( ReheatingCoilType, ReheatingCoilName, errFlag );
 					if ( errFlag ) {
@@ -2905,11 +2893,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilType = SuppHeatCoilType;
 			Furnace( FurnaceNum ).SuppHeatCoilName = SuppHeatCoilName;
 			errFlag = false;
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
-=======
 			if ( SameString( SuppHeatCoilType, "Coil:Heating:Fuel" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
->>>>>>> NREL/develop
 
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {
@@ -3662,11 +3646,7 @@ namespace Furnaces {
 			Furnace( FurnaceNum ).SuppHeatCoilType = SuppHeatCoilType;
 			Furnace( FurnaceNum ).SuppHeatCoilName = SuppHeatCoilName;
 			errFlag = false;
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Gas" ) || InputProcessor::SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
-=======
 			if ( SameString( SuppHeatCoilType, "Coil:Heating:Fuel" ) || SameString( SuppHeatCoilType, "Coil:Heating:Electric" ) ) {
->>>>>>> NREL/develop
 
 				Furnace( FurnaceNum ).SuppHeatCoilType_Num = GetHeatingCoilTypeNum( SuppHeatCoilType, SuppHeatCoilName, errFlag );
 				if ( errFlag ) {

@@ -1931,16 +1931,8 @@ namespace SurfaceGeometry {
 		}
 
 		int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection;
-<<<<<<< HEAD
-		int NumDElightControls = InputProcessor::GetNumObjectsFound( "Daylighting:DElight:Controls" );
-		int NumDElightRefPt = InputProcessor::GetNumObjectsFound( "Daylighting:DElight:ReferencePoint" );
 		int NumDElightCmplxFen = InputProcessor::GetNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
-		int TotDElightObj = NumDElightControls + NumDElightRefPt + NumDElightCmplxFen;
-		if ( TotShadSurf > 0 && TotDElightObj > 0 ){
-=======
-		int NumDElightCmplxFen = GetNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
 		if ( TotShadSurf > 0 && ( NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight() ) ){
->>>>>>> NREL/develop
 			ShowWarningError( RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored." );
 		}
 	}

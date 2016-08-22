@@ -147,14 +147,6 @@ namespace DElightManagerF {
 		using namespace DataEnvironment; // Gives access to Site data
 		using namespace DataSurfaces; // Gives access to Surface data
 		using namespace DataStringGlobals; // Gives access to Program Path and Current Time/Date
-<<<<<<< HEAD
-		using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
-
-
-
-=======
-		using InputProcessor::FindItemInList;
->>>>>>> NREL/develop
 		using namespace DataDaylighting;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
@@ -251,53 +243,9 @@ namespace DElightManagerF {
 		CosBldgRelNorth = std::cos( - BuildingAzimuth * DegToRadians );
 		SinBldgRelNorth = std::sin( - BuildingAzimuth * DegToRadians );
 
-<<<<<<< HEAD
-		// Get the set of Daylighting:DElight objects
-		int const iNumDElightObjs = InputProcessor::GetNumObjectsFound( cModuleObjectDElight ); // Counter for Daylighting:DElight objects
-
-		// Loop through the Daylighting:DElight objects checking for a host Zone
-		for ( int iDElight = 1; iDElight <= iNumDElightObjs; ++iDElight ) {
-
-			// Get the data items for the current DElight object
-			InputProcessor::GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
-
-			int const izone = InputProcessor::FindItemInList( AlphaArrayDElight( 2 ), Zone );
-			if ( izone == 0 ) {
-				ShowSevereError( "DElightInputGenerator: Illegal Zone Name=" + AlphaArrayDElight( 2 ) );
-				ShowContinueError( "..in Daylighting:DElight, User Supplied DElight Zone Name=" + AlphaArrayDElight( 1 ) );
-				ErrorsFound = true;
-			} else { // valid zone
-
-				// Count the number of DElight Reference Point objects input for this Thermal Zone.
-				iNumRefPts = 0;
-
-				// Get the set of all Daylighting:DElight:Reference Point objects in the IDF
-				int const iTotNumDElightRefPtObjs = InputProcessor::GetNumObjectsFound( cModuleObjectRefPt );
-
-				// Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
-				rTotalZoneFraction = 0.0; // init Zone Fraction accumulator
-				for ( int irefpt = 1; irefpt <= iTotNumDElightRefPtObjs; ++irefpt ) {
-
-					// Get the data items for the current DElight Reference Point object
-					InputProcessor::GetObjectItem( cModuleObjectRefPt, irefpt, AlphaArrayRefPt, NumAlphasRefPt, RealNumArrayRefPt, NumNumsRefPt, IOSTAT );
-
-					// Is this RefPt hosted by current DElight Zone?
-					if ( AlphaArrayRefPt( 2 ) == AlphaArrayDElight( 1 ) ) {
-
-						// Count this correctly hosted RefPt
-						++iNumRefPts;
-
-						// Sum Fractions of Zone controlled by RefPt
-						rTotalZoneFraction += RealNumArrayRefPt( 4 );
-
-					}
-
-				}
-=======
 		// Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
 		for ( auto & znDayl : ZoneDaylight ) {
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
->>>>>>> NREL/develop
 
 				// Register Error if 0 DElight RefPts have been input for valid DElight object
 				if ( znDayl.TotalDaylRefPoints == 0 ) {
@@ -325,101 +273,12 @@ namespace DElightManagerF {
 				// Increment counter of Thermal Zones with valid hosted DElight object
 				++iNumDElightZones;
 			}
-<<<<<<< HEAD
-		}
-
-		// Get the number of input Complex Fenestration objects for reference throughout this subroutine
-		int const iNumDElightCFS = InputProcessor::GetNumObjectsFound( cModuleObjectCFS );
-=======
 		} //traverse ZoneDaylight array
->>>>>>> NREL/develop
 
 		// Zone Data Section
 		gio::write( unit, Format_903 ) << iNumDElightZones;
 
 		// Loop through the Daylighting:DElight objects searching for a match to the current Zone
-<<<<<<< HEAD
-		for ( int iDElight = 1; iDElight <= iNumDElightObjs; ++iDElight ) {
-
-			// Get the data items for the current DElight object
-			InputProcessor::GetObjectItem( cModuleObjectDElight, iDElight, AlphaArrayDElight, NumAlphasDElight, RealNumArrayDElight, NumNumsDElight, IOSTAT );
-
-			int const izone = InputProcessor::FindItemInList( AlphaArrayDElight( 2 ), Zone );
-			if ( izone != 0 ) {
-
-				rLightLevel = GetDesignLightingLevelForZone( izone );
-				CheckLightsReplaceableMinMaxForZone( izone );
-
-				// Write this Zone to the DElight input file
-				// Remove any blanks from the Zone Name for ease of input to DElight
-				cNameWOBlanks = ReplaceBlanksWithUnderscores( Zone( izone ).Name );
-				gio::write( unit, Format_904 ) << cNameWOBlanks << Zone( izone ).OriginX * M2FT << Zone( izone ).OriginY * M2FT << Zone( izone ).OriginZ * M2FT << Zone( izone ).RelNorth << Zone( izone ).Multiplier * Zone( izone ).ListMultiplier << Zone( izone ).FloorArea * M22FT2 << Zone( izone ).Volume * M32FT3 << rLightLevel / ( Zone( izone ).FloorArea * M22FT2 + 0.00001 ) << RealNumArrayDElight( 2 ) << RealNumArrayDElight( 3 ) << int( RealNumArrayDElight( 4 ) ) << RealNumArrayDElight( 5 ) << RealNumArrayDElight( 6 ) * M22FT2;
-
-				// Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-				CosZoneRelNorth = std::cos( -Zone( izone ).RelNorth * DegToRadians );
-				SinZoneRelNorth = std::sin( -Zone( izone ).RelNorth * DegToRadians );
-
-				// Zone Lighting Schedule Data Section
-				// NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed
-				gio::write( unit, Format_905 );
-
-				// Zone Surface Data Section
-				// Count the number of opaque surfaces bounding the current zone
-				iNumOpaqueSurfs = 0;
-				iSurfaceFirst = Zone( izone ).SurfaceFirst;
-				int const iSurfaceLast = Zone( izone ).SurfaceLast; // ending loop variable for surfaces
-
-				for ( int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf ) {
-					if ( Surface( isurf ).Class == SurfaceClass_Wall ) ++iNumOpaqueSurfs;
-					if ( Surface( isurf ).Class == SurfaceClass_Roof ) ++iNumOpaqueSurfs;
-					if ( Surface( isurf ).Class == SurfaceClass_Floor ) ++iNumOpaqueSurfs;
-				} // Zone Opaque Surface loop
-
-				gio::write( unit, Format_906 ) << iNumOpaqueSurfs;
-
-				// Write each opaque bounding Surface to the DElight input file
-				for ( int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf ) {
-
-					// Only process "opaque bounding" surface types
-					if ( ( Surface( isurf ).Class == SurfaceClass_Wall ) || ( Surface( isurf ).Class == SurfaceClass_Roof ) || ( Surface( isurf ).Class == SurfaceClass_Floor ) ) {
-
-						// Get the Construction index for this Surface
-						iconstruct = Surface( isurf ).Construction;
-
-						// Is this Surface exposed to the exterior?
-						if ( Surface( isurf ).ExtSolar ) {
-							// Get the index for the outside (i.e., 1st) Material Layer for this Construction
-							iMatlLayer = Construct( iconstruct ).LayerPoint( 1 );
-							// Get the outside visible reflectance of this material layer
-							// (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-							rExtVisRefl = 1.0 - Material( iMatlLayer ).AbsorpVisible;
-						} else {
-							rExtVisRefl = 0.0;
-						}
-
-						// Remove any blanks from the Surface Name for ease of input to DElight
-						cNameWOBlanks = ReplaceBlanksWithUnderscores( Surface( isurf ).Name );
-						gio::write( unit, Format_907 ) << cNameWOBlanks << Surface( isurf ).Azimuth << Surface( isurf ).Tilt << Construct( iconstruct ).ReflectVisDiffBack << rExtVisRefl << Surface( isurf ).Sides;
-
-						// Write out the vertex coordinates for each vertex
-						int const iNumVertices = Surface( isurf ).Sides; // Counter for surface vertices
-						for ( int ivert = 1; ivert <= iNumVertices; ++ivert ) {
-							gio::write( unit, Format_908 ) << Surface( isurf ).Vertex( ivert ).x * M2FT << Surface( isurf ).Vertex( ivert ).y * M2FT << Surface( isurf ).Vertex( ivert ).z * M2FT;
-						}
-
-						// Count each Window hosted by the current opaque bounding Surface
-						iNumWindows = 0;
-						for ( int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo ) {
-							if ( Surface( iwndo ).Class == SurfaceClass_Window ) {
-								if ( Surface( iwndo ).BaseSurfName == Surface( isurf ).Name ) {
-
-									// Error if window has multiplier > 1 since this causes incorrect illuminance calc
-									if ( Surface( iwndo ).Multiplier > 1.0 ) {
-										ShowSevereError( "Multiplier > 1.0 for window " + Surface( iwndo ).Name + " not allowed since it is in a zone with DElight daylighting." );
-										ErrorsFound = true;
-									}
-=======
->>>>>>> NREL/develop
 
 		for ( auto & znDayl : ZoneDaylight ) {
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
@@ -484,16 +343,11 @@ namespace DElightManagerF {
 							cNameWOBlanks = ReplaceBlanksWithUnderscores( surf.Name );
 							gio::write( unit, Format_907 ) << cNameWOBlanks << surf.Azimuth << surf.Tilt << Construct( iconstruct ).ReflectVisDiffBack << rExtVisRefl << surf.Sides;
 
-<<<<<<< HEAD
-										// Get the data items for the current CFS object
-										InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
-=======
 							// Write out the vertex coordinates for each vertex
 							int const iNumVertices = surf.Sides; // Counter for surface vertices
 							for ( int ivert = 1; ivert <= iNumVertices; ++ivert ) {
 								gio::write( unit, Format_908 ) << surf.Vertex( ivert ).x * M2FT << surf.Vertex( ivert ).y * M2FT << surf.Vertex( ivert ).z * M2FT;
 							}
->>>>>>> NREL/develop
 
 							// Count each Window hosted by the current opaque bounding Surface
 							iNumWindows = 0;
@@ -517,14 +371,7 @@ namespace DElightManagerF {
 
 										// Loop through all Doppelganger Surface Names to ignore these Windows
 										lWndoIsDoppelganger = false;
-<<<<<<< HEAD
-										for ( int iCFS = 1; iCFS <= iNumDElightCFS; ++iCFS ) {
-
-											// Get the data items for the current CFS object
-											InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
-=======
 										for ( auto & cfs : DElightComplexFene ){
->>>>>>> NREL/develop
 
 											// Is the current Window Surface a Doppelganger?
 											if ( wndo.Name == cfs.wndwName ) {
@@ -623,13 +470,8 @@ namespace DElightManagerF {
 							// Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
 							for ( auto & cfs : DElightComplexFene ){
 
-<<<<<<< HEAD
-							// Get the data items for the current CFS object
-							InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
-=======
 								// Does the current Opaque Bounding Surface host the current CFS object?
 								if ( surf.Name == cfs.surfName ) {
->>>>>>> NREL/develop
 
 									// Get the Doppelganger surface for this CFS
 									iDoppelganger = 0;
@@ -647,13 +489,8 @@ namespace DElightManagerF {
 										}
 									}
 
-<<<<<<< HEAD
-							// Get the data items for the current CFS object
-							InputProcessor::GetObjectItem( cModuleObjectCFS, iCFS, AlphaArrayCFS, NumAlphasCFS, RealNumArrayCFS, NumNumsCFS, IOSTAT );
-=======
 									// Make sure that a valid Doppelganger surface exists
 									if ( iDoppelganger > 0 ) {
->>>>>>> NREL/develop
 
 										// Write the data for this hosted CFS
 										auto & doppelgangerSurf( Surface( iDoppelganger ) );
@@ -731,71 +568,10 @@ namespace DElightManagerF {
 									ShowSevereError( "...Y Reference Point= " + RoundSigDigits( RefPt_WCS_Coord( 2 ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zn.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zn.MaximumY, 2 ) );
 									ErrorsFound = true;
 								}
-<<<<<<< HEAD
-
-							} // The current Opaque Bounding Surface hosts the current CFS object?
-
-						} // CFS object loop 2
-
-					} // Opaque Bounding Surface test
-
-				} // Zone Surface loop
-
-				// Write ZONE REFERENCE POINTS
-				gio::write( unit, Format_912 ) << ZoneDaylight( izone ).TotalDElightRefPts;
-
-				// Keep an incremental count number of valid DElight Reference Points have been input for this DElight Zone
-				iNumRefPts = 0;
-
-				// Get the set of all Daylighting:DElight:Reference Point objects
-				int const iTotNumDElightRefPtObjs = InputProcessor::GetNumObjectsFound( cModuleObjectRefPt );
-
-				// Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
-				for ( int irefpt = 1; irefpt <= iTotNumDElightRefPtObjs; ++irefpt ) {
-
-					// Get the data items for the current DElight Reference Point object
-					InputProcessor::GetObjectItem( cModuleObjectRefPt, irefpt, AlphaArrayRefPt, NumAlphasRefPt, RealNumArrayRefPt, NumNumsRefPt, IOSTAT );
-
-					// Is this RefPt hosted by current DElight Zone?
-					if ( AlphaArrayRefPt( 2 ) == AlphaArrayDElight( 1 ) ) {
-
-						// Count this correctly hosted RefPt
-						++iNumRefPts;
-
-						// Limit to maximum of 100 RefPts
-						if ( iNumRefPts <= 100 ) {
-
-							if ( DaylRefWorldCoordSystem ) {
-								RefPt_WCS_Coord( 1 ) = RealNumArrayRefPt( 1 );
-								RefPt_WCS_Coord( 2 ) = RealNumArrayRefPt( 2 );
-								RefPt_WCS_Coord( 3 ) = RealNumArrayRefPt( 3 );
-							} else {
-								//Transform reference point coordinates into building coordinate system
-								Xb = RealNumArrayRefPt( 1 ) * CosZoneRelNorth - RealNumArrayRefPt( 2 ) * SinZoneRelNorth + Zone( izone ).OriginX;
-								Yb = RealNumArrayRefPt( 1 ) * SinZoneRelNorth + RealNumArrayRefPt( 2 ) * CosZoneRelNorth + Zone( izone ).OriginY;
-								//Transform into World Coordinate System
-								RefPt_WCS_Coord( 1 ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-								RefPt_WCS_Coord( 2 ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-								RefPt_WCS_Coord( 3 ) = RealNumArrayRefPt( 3 ) + Zone( izone ).OriginZ;
-								if ( ldoTransform ) { // Geometry transform
-									Xo = RefPt_WCS_Coord( 1 ); // world coordinates.... shifted by relative north angle...
-									Yo = RefPt_WCS_Coord( 2 );
-									// next derotate the building
-									XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-									YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
-									// translate
-									Xtrans = XnoRot * std::sqrt( rnewAspectRatio / roldAspectRatio );
-									Ytrans = YnoRot * std::sqrt( roldAspectRatio / rnewAspectRatio );
-									// rerotate
-									RefPt_WCS_Coord( 1 ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-
-									RefPt_WCS_Coord( 2 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
-=======
 								if ( RefPt_WCS_Coord( 3 ) < Zone( izone ).MinimumZ || RefPt_WCS_Coord( 3 ) > zn.MaximumZ ) {
 									ShowWarningError( "DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone=" + zn.Name );
 									ShowSevereError( "...Z Reference Point= " + RoundSigDigits( RefPt_WCS_Coord( 3 ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zn.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zn.MaximumZ, 2 ) );
 									ErrorsFound = true;
->>>>>>> NREL/develop
 								}
 
 								// Write this RefPt to the DElight input file

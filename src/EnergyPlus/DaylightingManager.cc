@@ -4078,18 +4078,12 @@ namespace DaylightingManager {
 
 		ErrorsFound = false;
 		cCurrentModuleObject = "Daylighting:Controls";
-<<<<<<< HEAD
-		TotDaylightingDetailed = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-		if ( TotDaylightingDetailed > 0 ) {
-			GetDaylightingParametersDetaild( TotDaylightingDetailed, ErrorsFound );
-=======
 		TotDaylightingControls = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotDaylightingControls > 0 ) {
 			GetInputDayliteRefPt( ErrorsFound );
 			GetDaylightingControls(TotDaylightingControls, ErrorsFound);
 			GeometryTransformForDaylighting(  );
 			GetInputIlluminanceMap( ErrorsFound );
->>>>>>> NREL/develop
 			GetLightWellData( ErrorsFound );
 			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );
 			DayltgSetupAdjZoneListsAndPointers();
@@ -4206,12 +4200,7 @@ namespace DaylightingManager {
 		}
 
 		// RJH DElight Modification Begin - Calls to DElight preprocessing subroutines
-<<<<<<< HEAD
-		TotDaylightingDElight = InputProcessor::GetNumObjectsFound( "Daylighting:DELight:Controls" );
-		if ( TotDaylightingDElight > 0 ) {
-=======
 		if ( doesDayLightingUseDElight() ) {
->>>>>>> NREL/develop
 			dLatitude = Latitude;
 			DisplayString( "Calculating DElight Daylighting Factors" );
 			DElightInputGenerator();
@@ -4298,18 +4287,8 @@ namespace DaylightingManager {
 		// Perform the GetInput function for the Output:IlluminanceMap
 		// Glazer - June 2016 (moved from GetDaylightingControls)
 		using namespace DataIPShortCuts;
-<<<<<<< HEAD
-
-
-
-
-=======
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
->>>>>>> NREL/develop
 		using DataStringGlobals::CharSpace;
 		using DataStringGlobals::CharComma;
 		using DataStringGlobals::CharTab;
@@ -4359,29 +4338,17 @@ namespace DaylightingManager {
 		CheckForGeometricTransform(doTransform, OldAspectRatio, NewAspectRatio);
 
 		cCurrentModuleObject = "Output:IlluminanceMap";
-<<<<<<< HEAD
 		TotIllumMaps = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-=======
-		TotIllumMaps = GetNumObjectsFound(cCurrentModuleObject);
->>>>>>> NREL/develop
 
 		IllumMap.allocate(TotIllumMaps);
 		IllumMapCalc.allocate(TotIllumMaps);
 		ZoneMapCount.dimension(NumOfZones, 0);
 
-<<<<<<< HEAD
 		if ( TotIllumMaps > 0 ) {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IllumMap( MapNum ).Name = cAlphaArgs( 1 );
 				IllumMap( MapNum ).Zone = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
-=======
-		if (TotIllumMaps > 0) {
-			for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-				GetObjectItem(cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-				IllumMap(MapNum).Name = cAlphaArgs(1);
-				IllumMap(MapNum).Zone = FindItemInList(cAlphaArgs(2), Zone);
->>>>>>> NREL/develop
 
 				if (IllumMap(MapNum).Zone == 0) {
 					ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
@@ -4430,25 +4397,14 @@ namespace DaylightingManager {
 				}
 			} // MapNum
 			cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-<<<<<<< HEAD
 			MapStyleIn = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
-=======
-			MapStyleIn = GetNumObjectsFound(cCurrentModuleObject);
->>>>>>> NREL/develop
 
 			if (MapStyleIn == 0) {
 				cAlphaArgs(1) = "COMMA";
 				MapColSep = CharComma; //comma
-<<<<<<< HEAD
 			} else if ( MapStyleIn == 1 ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( cAlphaArgs( 1 ) == "COMMA" ) {
-=======
-			}
-			else if (MapStyleIn == 1) {
-				GetObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-				if (cAlphaArgs(1) == "COMMA") {
->>>>>>> NREL/develop
 					MapColSep = CharComma; //comma
 				}
 				else if (cAlphaArgs(1) == "TAB") {
@@ -4674,14 +4630,8 @@ namespace DaylightingManager {
 		for ( iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl ) {
 			cAlphaArgs = "";
 			rNumericArgs = 0.0;
-<<<<<<< HEAD
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			// First is Zone Name
-			ZoneFound = InputProcessor::FindItemInList( cAlphaArgs( 1 ), Zone );
-=======
 			GetObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ZoneFound = FindItemInList( cAlphaArgs( 2 ), Zone );
->>>>>>> NREL/develop
 			if ( ZoneFound == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;

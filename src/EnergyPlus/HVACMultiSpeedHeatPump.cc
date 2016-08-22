@@ -1060,11 +1060,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			// Get supplemental heating coil data
 			MSHeatPump( MSHPNum ).SuppHeatCoilName = Alphas( 15 );
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Heating:Gas" ) ) {
-=======
-			if ( SameString( Alphas( 14 ), "Coil:Heating:Fuel" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( Alphas( 14 ), "Coil:Heating:Fuel" ) ) {
 				MSHeatPump( MSHPNum ).SuppHeatCoilType = SuppHeatingCoilGas;
 				errFlag = false;
 				MSHeatPump( MSHPNum ).SuppHeatCoilNum = GetHeatingCoilIndex( "Coil:Heating:Fuel", Alphas( 15 ), errFlag );

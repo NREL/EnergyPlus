@@ -410,21 +410,12 @@ namespace HeatingCoils {
 		bool errFlag;
 		// Flow
 
-<<<<<<< HEAD
 		NumElecCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Electric" );
 		NumElecCoilMultiStage = InputProcessor::GetNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
-		NumGasCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Gas" );
+		NumFuelCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Fuel" );
 		NumGasCoilMultiStage = InputProcessor::GetNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
 		NumDesuperheaterCoil = InputProcessor::GetNumObjectsFound( "Coil:Heating:Desuperheater" );
-		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumGasCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
-=======
-		NumElecCoil = GetNumObjectsFound( "Coil:Heating:Electric" );
-		NumElecCoilMultiStage = GetNumObjectsFound( "Coil:Heating:Electric:MultiStage" );
-		NumFuelCoil = GetNumObjectsFound( "Coil:Heating:Fuel" );
-		NumGasCoilMultiStage = GetNumObjectsFound( "Coil:Heating:Gas:MultiStage" );
-		NumDesuperheaterCoil = GetNumObjectsFound( "Coil:Heating:Desuperheater" );
 		NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
->>>>>>> NREL/develop
 		if ( NumHeatingCoils > 0 ) {
 			HeatingCoil.allocate( NumHeatingCoils );
 			HeatingCoilNumericFields.allocate( NumHeatingCoils );
@@ -438,11 +429,7 @@ namespace HeatingCoils {
 		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-<<<<<<< HEAD
-		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Gas", TotalArgs, NumAlphas, NumNums );
-=======
 		GetObjectDefMaxArgs( "Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums );
->>>>>>> NREL/develop
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		InputProcessor::GetObjectDefMaxArgs( "Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums );
@@ -607,11 +594,7 @@ namespace HeatingCoils {
 
 			CurrentModuleObject = "Coil:Heating:Fuel";
 
-<<<<<<< HEAD
-			InputProcessor::GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-=======
 			GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
->>>>>>> NREL/develop
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -697,11 +680,7 @@ namespace HeatingCoils {
 			CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
 			HeatingCoil( CoilNum ).FuelType_Num = iRT_Natural_Gas;
 
-<<<<<<< HEAD
-			InputProcessor::GetObjectItem( CurrentModuleObject, GasCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-=======
 			GetObjectItem( CurrentModuleObject, FuelCoilNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
->>>>>>> NREL/develop
 
 			HeatingCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
@@ -2668,15 +2647,9 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = HeatingCoil( WhichCoil ).NominalCapacity;
 			}
@@ -2759,15 +2732,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		AvailSchIndex = 0;
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = HeatingCoil( WhichCoil ).SchedPtr;
 			}
@@ -2838,15 +2805,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirInletNodeNum;
 			}
@@ -2918,15 +2879,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).AirOutletNodeNum;
 			}
@@ -3092,15 +3047,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				NodeNumber = HeatingCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -3172,15 +3121,9 @@ namespace HeatingCoils {
 
 		WhichCoil = 0;
 		TypeNum = 0;
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				TypeNum = HeatingCoil( WhichCoil ).HCoilType_Num;
 			}
@@ -3250,15 +3193,9 @@ namespace HeatingCoils {
 		}
 
 		WhichCoil = 0;
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 		} else {
 			WhichCoil = 0;
 		}
@@ -3325,15 +3262,9 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-<<<<<<< HEAD
-		FoundType = InputProcessor::FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, HeatingCoil );
-=======
 		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
 		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel || FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater ) {
 			WhichCoil = FindItem( CoilName, HeatingCoil );
->>>>>>> NREL/develop
 			if ( WhichCoil != 0 ) {
 				IndexNum = HeatingCoil( WhichCoil ).PLFCurveIndex;
 			} else {

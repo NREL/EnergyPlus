@@ -504,11 +504,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 7 );
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
-=======
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
@@ -635,12 +631,7 @@ namespace SingleDuct {
 			if ( Sys( SysNum ).ControllerOffset <= 0.0 ) {
 				Sys( SysNum ).ControllerOffset = 0.001;
 			}
-<<<<<<< HEAD
 			if ( InputProcessor::SameString( Alphas( 10 ), "Reverse" ) ) {
-=======
-
-			if ( SameString( Alphas( 10 ), "Reverse" ) ) {
->>>>>>> NREL/develop
 				Sys( SysNum ).DamperHeatingAction = ReverseAction;
 			} else if ( SameString( Alphas( 10 ), "Normal" ) ) {
 				Sys( SysNum ).DamperHeatingAction = Normal;
@@ -754,11 +745,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctCBVAVReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 5 );
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
-=======
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
@@ -921,11 +908,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctConstVolReheat;
 			Sys( SysNum ).ReheatComp = Alphas( 5 );
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
-=======
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Electric;
@@ -1303,11 +1286,7 @@ namespace SingleDuct {
 			Sys( SysNum ).ReheatComp = Alphas( 7 );
 			Sys( SysNum ).ReheatName = Alphas( 8 );
 			IsNotOK = false;
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
-=======
-			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Fuel" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 				Sys( SysNum ).ReheatAirOutletNode = GetHeatingCoilOutletNode( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );
 				Sys( SysNum ).ReheatCoilMaxCapacity = GetHeatingCoilCapacity( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK );

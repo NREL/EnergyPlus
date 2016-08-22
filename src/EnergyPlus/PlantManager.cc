@@ -1257,15 +1257,11 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Steam;
 							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
-<<<<<<< HEAD
-						} else if ( InputProcessor::SameString( this_comp_type, "ZoneHVAC:LowTemperatureRadiant:VariableFlow" ) ) {
-=======
 						} else if ( SameString( this_comp_type, "ZoneHVAC:CoolingPanel:RadiantConvective:Water" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoolingPanel_Simple;
 							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else if ( SameString( this_comp_type, "ZoneHVAC:LowTemperatureRadiant:VariableFlow" ) ) {
->>>>>>> NREL/develop
 							this_comp.TypeOf_Num = TypeOf_LowTempRadiant_VarFlow;
 							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;

@@ -20307,80 +20307,6 @@ SteamEquipment,
        \maximum 1.0
        \default 0
   N6 , \field Fraction Lost
-<<<<<<< HEAD
-       \required-field
-       \type real
-       \minimum 0.0
-       \maximum 1.0
-       \default 0
-  A5 ; \field End-Use Subcategory
-       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
-       \note The following special tags will also place the end-use in specific rows in the LEED Summary table
-       \note EAp2-4/5. Performance Rating Method Compliance:
-       \note Fans-Parking Garage, Interior Lighting-Process, Cooking, Industrial Process, Elevators and Escalators.
-       \type alpha
-       \retaincase
-       \default General
-
-SteamEquipment,
-   \memo Sets internal gains for steam equipment in the zone.
-  A1 , \field Name
-       \required-field
-       \type alpha
-  A2 , \field Zone or ZoneList Name
-       \required-field
-       \type object-list
-       \object-list ZoneAndZoneListNames
-  A3 , \field Schedule Name
-       \required-field
-       \type object-list
-       \object-list ScheduleNames
-       \note units in Schedule should be fraction applied to design level of steam equipment, generally (0.0 - 1.0)
-  A4 , \field Design Level Calculation Method
-       \note The entered calculation method is used to create the maximum amount of steam equipment
-       \note for this set of attributes
-       \note Choices: EquipmentLevel => Design Level -- simply enter power input of equipment
-       \note Watts/Area or Power/Area => Power per Zone Floor Area -- enter the number to apply.  Value * Floor Area = Equipment Level
-       \note Watts/Person or Power/Person => Power per Person -- enter the number to apply.  Value * Occupants = Equipment Level
-       \required-field
-       \type choice
-       \key EquipmentLevel
-       \key Watts/Area
-       \key Watts/Person
-       \key Power/Area
-       \key Power/Person
-       \default EquipmentLevel
-  N1 , \field Design Level
-       \units W
-       \type real
-       \minimum 0
-       \ip-units Btu/h
-  N2 , \field Power per Zone Floor Area
-       \type real
-       \minimum 0
-       \units W/m2
-       \ip-units Btu/h-ft2
-  N3 , \field Power per Person
-       \type real
-       \minimum 0
-       \units W/Person
-       \ip-units Btu/h-person
-  N4 , \field Fraction Latent
-       \required-field
-       \type real
-       \minimum 0.0
-       \maximum 1.0
-       \default 0
-  N5 , \field Fraction Radiant
-       \required-field
-       \type real
-       \minimum 0.0
-       \maximum 1.0
-       \default 0
-  N6 , \field Fraction Lost
-       \required-field
-=======
->>>>>>> NREL/develop
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -24052,12 +23978,9 @@ AirflowNetwork:Distribution:Component:Coil,
       \required-field
       \type choice
       \key Coil:Cooling:DX:SingleSpeed
-<<<<<<< HEAD
+! TODO: double check key below
       \key Coil:Cooling:DX:TwoSpeed
-      \key Coil:Heating:Gas
-=======
       \key Coil:Heating:Fuel
->>>>>>> NREL/develop
       \key Coil:Heating:Electric
       \key Coil:Heating:DX:SingleSpeed
       \key Coil:Cooling:Water
@@ -55089,13 +55012,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \memo Temperature Control
        \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
        \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-<<<<<<< HEAD
-       \extensible:3
-       \min-fields 11
-=======
        \extensible:3 - repeat last three fields, remembering to remove ; from "inner" fields.
-       \min-fields 47
->>>>>>> NREL/develop
+       \min-fields 41
   A1 , \field Heat Pump Name
        \required-field
        \type alpha
@@ -55474,13 +55392,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \memo This is a key object in the new physics based VRF Heat Recovery (HR) model applicable for Fluid
        \memo Temperature Control. It describes the VRF HR system excluding the performance of indoor units.
        \memo Indoor units are modeled separately in the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-<<<<<<< HEAD
-       \extensible:3
-       \min-fields 11
-=======
        \extensible:3 repeat last three fields (changing numbering, please), remembering to remove ";" from "inner" fields.
-       \min-fields 64
->>>>>>> NREL/develop
+       \min-fields 58
   A1 , \field Name
        \required-field
        \type alpha
@@ -73197,7 +73110,6 @@ SetpointManager:OutdoorAirPretreat,
        \memo produce the reference setpoint condition at the
        \memo mixed air node when mixed with the return air stream
   A1 , \field Name
-       \required-field
   A2 , \field Control Variable
        \type choice
        \key Temperature
