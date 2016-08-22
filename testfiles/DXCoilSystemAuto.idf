@@ -1335,33 +1335,27 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan 1,            !- Component 2 Name
     Mixed Air Node,          !- Component 2 Inlet Node Name
     DX Cooling Coil Air Inlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                  !- Component 2 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 3 Object Type
     DX Cooling Coil,         !- Component 3 Name
     DX Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     CoilSystem:Heating:DX,   !- Component 4 Object Type
     HeatPump DX Coil 1,      !- Component 4 Name
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
     SuppHeating Coil Air Inlet Node,  !- Component 4 Outlet Node Name
-    PASSIVE,                 !- Component 4 Branch Control Type
     Coil:Heating:Fuel,        !- Component 5 Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Component 5 Name
     SuppHeating Coil Air Inlet Node,  !- Component 5 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 5 Outlet Node Name
-    PASSIVE;                 !- Component 5 Branch Control Type
+    Air Loop Outlet Node;    !- Component 5 Outlet Node Name
 
   SetpointManager:SingleZone:Reheat,
     Sys 1 setpoint manager,  !- Name
@@ -1609,8 +1603,8 @@
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    NaturalGas,              !- FuelType
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name

@@ -11,7 +11,7 @@
 !
 !                          Illustrates the use of a dedicated outdoor air system (DOAS) with Variable Refrigerant flow (VRF)
 !                          The DOAS air is ducted to the inlet side of the VRF terminal unit and mixed with zone recirculating
-!                          air through the use of inlet side mixer terminal units for zones: SPACE1-1, SPACE2-1 and SPACE3-1. 
+!                          air through the use of inlet side mixer terminal units for zones: SPACE1-1, SPACE2-1 and SPACE3-1.
 !                          The DOAS air is ducted to the outlet side of the VRF terminal unit and mixed with the VRF outlet air
 !                          through the use of supply side mixer terminal units for zones: SPACE4-1 and SPACE5-1.
 !
@@ -86,7 +86,7 @@
 !
 ! HVAC:                           The VRF system uses DX cooling and DX heating coils in each of 5 terminal units.
 !                                 Once all terminal units are simulated, the condenser attached to those terminal
-!                                 units is then simulated. Terminal unit in each zone is connected a dedicated outdoor 
+!                                 units is then simulated. Terminal unit in each zone is connected a dedicated outdoor
 !                                 air system with heat recovery. The DOAS provides a fixed amount of outdoor air.
 !
 ! Zone Equipment:                 ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
@@ -3332,18 +3332,15 @@ AirLoopHVAC:ReturnPath,
 
 Branch,
     DOAS Main Branch,        !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
-    DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    DOAS Supply Fan Outlet;  !- Component 2 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
@@ -3401,7 +3398,7 @@ Schedule:Compact,
   Output:Variable,TU1 VRF DX COOLING COIL,Cooling Coil Runtime Fraction,timestep;
 
   Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Total Heating Rate,timestep;
-  
+
   Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Runtime Fraction,timestep;
 
   Output:Variable,*,VRF Heat Pump Heating Electric Power,timestep;
@@ -3455,7 +3452,7 @@ Schedule:Compact,
   Output:Variable,TU1,Zone VRF Air Terminal Sensible Heating Rate,timestep;
 
   Output:Variable,TU1,Zone VRF Air Terminal Latent Heating Rate,timestep;
-  
+
   Output:Variable,TU1 VRF SUPPLY FAN,Fan Electric Power,timestep;
 
   Output:Meter,Cooling:Electricity,monthly;
@@ -3504,7 +3501,7 @@ Schedule:Compact,
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-  Output:Variable, 
+  Output:Variable,
     DOAS Mixed Air Outlet,   !- Key Value
     System Node Mass Flow Rate,  !- Variable Name
     timestep;                !- Reporting Frequency
