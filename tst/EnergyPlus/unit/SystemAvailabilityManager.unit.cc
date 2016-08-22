@@ -294,3 +294,58 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	EXPECT_EQ( DataHVACGlobals::CycleOn, SystemAvailabilityManager::OptStartSysAvailMgrData( 2 ).AvailStatus ); // avail manager should be set at 6 AM
 
 }
+
+TEST_F( EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance )
+{
+	int NumZones( 4 );
+	DataHeatBalFanSys::TempControlType.allocate( NumZones );
+	DataHeatBalFanSys::TempTstatAir.allocate( NumZones );
+	DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate( NumZones );
+	DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate( NumZones );
+	DataHeatBalFanSys::ZoneThermostatSetPointLo.allocate( NumZones );
+
+	DataHeatBalFanSys::TempControlType( 1 ) = DataHVACGlobals::SingleCoolingSetPoint;
+	DataHeatBalFanSys::TempTstatAir( 1 ) = 30.0;
+	DataHeatBalFanSys::TempZoneThermostatSetPoint( 1 ) = 25.0;
+
+	DataHeatBalFanSys::TempControlType( 2 ) = DataHVACGlobals::SingleHeatCoolSetPoint;
+	DataHeatBalFanSys::TempTstatAir( 2 ) = 25.0;
+	DataHeatBalFanSys::TempZoneThermostatSetPoint( 2 ) = 25.0;
+
+	DataHeatBalFanSys::TempControlType( 3 ) = DataHVACGlobals::SingleHeatingSetPoint;
+	DataHeatBalFanSys::TempTstatAir( 3 ) = 10.0;
+	DataHeatBalFanSys::TempZoneThermostatSetPoint( 3 ) = 20.0;
+
+	DataHeatBalFanSys::TempControlType( 4 ) = DataHVACGlobals::DualSetPointWithDeadBand;
+	DataHeatBalFanSys::TempTstatAir( 4 ) = 30.0;
+	DataHeatBalFanSys::ZoneThermostatSetPointHi( 4 ) = 25.0;
+	DataHeatBalFanSys::ZoneThermostatSetPointLo( 4 ) = 20.0;
+
+	Real64 TempTol = 0.5;
+	Array1D_int ZoneNumList;
+	ZoneNumList.allocate( NumZones );
+	ZoneNumList( 1 ) = 3;
+	ZoneNumList( 2 ) = 2;
+	ZoneNumList( 3 ) = 1;
+	ZoneNumList( 4 ) = 4;
+
+	// Test 1 - One zone is over cooling setpoint, one zone is under heating setpoint
+	EXPECT_TRUE( SystemAvailabilityManager::CoolingZoneOutOfTolerance( ZoneNumList, NumZones, TempTol ) );
+	EXPECT_TRUE( SystemAvailabilityManager::HeatingZoneOutOfTolerance( ZoneNumList, NumZones, TempTol ) );
+
+	// Test 2 - All zones are within tolerance
+	DataHeatBalFanSys::TempTstatAir( 1 ) = 25.1;
+	DataHeatBalFanSys::TempTstatAir( 2 ) = 24.9;
+	DataHeatBalFanSys::TempTstatAir( 3 ) = 19.8;
+	DataHeatBalFanSys::TempTstatAir( 4 ) = 23.0;
+	EXPECT_FALSE( SystemAvailabilityManager::CoolingZoneOutOfTolerance( ZoneNumList, NumZones, TempTol ) );
+	EXPECT_FALSE( SystemAvailabilityManager::HeatingZoneOutOfTolerance( ZoneNumList, NumZones, TempTol ) );
+
+	DataHeatBalFanSys::TempControlType.deallocate();
+	DataHeatBalFanSys::TempTstatAir.deallocate();
+	DataHeatBalFanSys::TempZoneThermostatSetPoint.deallocate();
+	DataHeatBalFanSys::ZoneThermostatSetPointHi.deallocate();
+	DataHeatBalFanSys::ZoneThermostatSetPointLo.deallocate();
+	ZoneNumList.deallocate();
+
+}

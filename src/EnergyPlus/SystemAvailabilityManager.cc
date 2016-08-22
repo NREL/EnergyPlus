@@ -2397,7 +2397,7 @@ namespace SystemAvailabilityManager {
 					return true; // return on the first zone found 
 				}
 			} else if ( tstatType == DualSetPointWithDeadBand ){
-				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::ZoneThermostatSetPointLo( ZoneNum ) - TempTolerance ) {
+				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::ZoneThermostatSetPointLo( ZoneNum ) - TempTolerance ) {
 					return true; // return on the first zone found 
 				}
 			}}
