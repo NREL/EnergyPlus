@@ -106,6 +106,7 @@ set( test_src
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
+  SimulationManager.unit.cc
   SingleDuct.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
