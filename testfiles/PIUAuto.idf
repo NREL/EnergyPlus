@@ -6,7 +6,7 @@
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.
 !
-! Highlights:              test of PIU terminal units: series and parallel
+! Highlights:              Test of PIU terminal units: series and parallel with night cycle availability manager
 !
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, annual run
@@ -125,8 +125,34 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    12,                      !- End Month
-    31,                      !- End Day of Month
+    1,                      !- End Month
+    7,                      !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    ,                        !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    4,                      !- End Month
+    7,                      !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    ,                        !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    7,                      !- End Month
+    7,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -500,10 +526,7 @@
   Schedule:Compact,
     FANANDCOILAVAILSCHED,    !- Name
     FRACTION,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.00,       !- Field 3
-    Through: 10/31,          !- Field 5
+    Through: 12/31,           !- Field 1
     For: Weekdays,           !- Field 6
     Until: 7:00,0.00,        !- Field 7
     Until: 17:00,1.00,       !- Field 9
@@ -517,10 +540,7 @@
     For: CustomDay1,         !- Field 22
     Until: 24:00,0.00,       !- Field 23
     For: CustomDay2,         !- Field 25
-    Until: 24:00,0.00,       !- Field 26
-    Through: 12/31,          !- Field 28
-    For: Alldays,            !- Field 29
-    Until: 24:00,1.00;       !- Field 30
+    Until: 24:00,0.00;       !- Field 26
 
   Schedule:Compact,
     COOLINGPUMPAVAILSCHED,   !- Name
@@ -534,27 +554,6 @@
     Through: 12/31,          !- Field 9
     For: Alldays,            !- Field 10
     Until: 24:00,0.00;       !- Field 11
-
-  Schedule:Compact,
-    COOLINGCOILAVAILSCHED,   !- Name
-    FRACTION,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,0.00,       !- Field 3
-    Through: 10/31,          !- Field 5
-    For: Weekdays,           !- Field 6
-    Until: 7:00,0.00,        !- Field 7
-    Until: 17:00,1.00,       !- Field 9
-    Until: 24:00,0.00,       !- Field 11
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
-    Until: 24:00,0.00,       !- Field 14
-    For: SummerDesignDay,    !- Field 16
-    Until: 24:00,1.00,       !- Field 17
-    For: WinterDesignDay,    !- Field 19
-    Until: 24:00,1.00,       !- Field 20
-    Through: 12/31,          !- Field 22
-    For: Alldays,            !- Field 23
-    Until: 24:00,0.00;       !- Field 24
 
   Schedule:Compact,
     HEATING SETPOINTS,       !- Name
@@ -760,6 +759,47 @@
     0.3000000,               !- Fraction Radiant
     0;                       !- Fraction Lost
 
+  ZoneInfiltration:DesignFlowRate,
+    East Zone Infiltration,  !- Name
+    East Zone,          !- Zone or ZoneList Name
+    ON,    !- Schedule Name
+    Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
+    ,                        !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area {m3/s-m2}
+    0.0001,                !- Flow per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    1.0000,                  !- Constant Term Coefficient
+    0.0000,                  !- Temperature Term Coefficient
+    0.0000,                  !- Velocity Term Coefficient
+    0.0000;                  !- Velocity Squared Term Coefficient
+
+  ZoneInfiltration:DesignFlowRate,
+    West Zone Infiltration,  !- Name
+    West Zone,          !- Zone or ZoneList Name
+    ON,    !- Schedule Name
+    Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
+    ,                        !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area {m3/s-m2}
+    0.000302,                !- Flow per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    1.0000,                  !- Constant Term Coefficient
+    0.0000,                  !- Temperature Term Coefficient
+    0.0000,                  !- Velocity Term Coefficient
+    0.0000;                  !- Velocity Squared Term Coefficient
+
+  ZoneInfiltration:DesignFlowRate,
+    North Zone Infiltration,  !- Name
+    North Zone,          !- Zone or ZoneList Name
+    ON,    !- Schedule Name
+    Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
+    ,                        !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area {m3/s-m2}
+    0.000302,                !- Flow per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    1.0000,                  !- Constant Term Coefficient
+    0.0000,                  !- Temperature Term Coefficient
+    0.0000,                  !- Velocity Term Coefficient
+    0.0000;                  !- Velocity Squared Term Coefficient
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
@@ -1294,12 +1334,31 @@
 
   AvailabilityManagerAssignmentList,
     Reheat System 1 Avail List,  !- Name
-    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    AvailabilityManager:NightCycle,  !- Availability Manager 1 Object Type
     Reheat System 1 Avail;   !- Availability Manager 1 Name
 
-  AvailabilityManager:Scheduled,
+  AvailabilityManager:NightCycle,
     Reheat System 1 Avail,   !- Name
-    FanAndCoilAvailSched;    !- Schedule Name
+    ON,                      !- Schedule Name
+    FanAndCoilAvailSched,    !- Fan Schedule Name
+    CycleOnAnyCoolingOrHeatingZone,  !- Control Type
+    1.0,                     !- Thermostat Tolerance {deltaC}
+    1800,                    !- Cycling Run Time {s}
+    ,                        !- Control Zone or Zone List Name
+    Reheat System 1 Cooling Zones,  !- Cooling Zone or Zone List Name
+    East Zone,  !- Heating Control Zone or Zone List Name
+    Reheat System 1 PIU Zones;  !- Heating Zone Fans Only Zone or Zone List Name
+
+  ZoneList,
+    Reheat System 1 Cooling Zones, !- Name
+    West Zone,               !- Zone 1 Name
+    East Zone,               !- Zone 2 Name
+    North Zone;              !- Zone 3 Name
+
+  ZoneList,
+    Reheat System 1 PIU Zones,  !- Name
+    West Zone,               !- Zone 1 Name
+    North Zone;              !- Zone 2 Name
 
   PlantLoop,
     Chilled Water Loop,      !- Name
@@ -2192,7 +2251,7 @@
 
   Coil:Cooling:Water,
     Simple Cooling Coil,     !- Name
-    CoolingCoilAvailSched,   !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     autosize,                !- Design Water Flow Rate {m3/s}
     autosize,                !- Design Air Flow Rate {m3/s}
     autosize,                !- Design Inlet Water Temperature {C}
@@ -2209,7 +2268,7 @@
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
     Zone 1 SPIU ATU,         !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     autosize,                !- Maximum Primary Air Flow Rate {m3/s}
     autosize,                !- Minimum Primary Air Flow Fraction
@@ -2227,7 +2286,7 @@
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Zone 2 VAV System,       !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     Zone 2 Reheat Air Inlet Node,  !- Damper Air Outlet Node Name
     Zone 2 Damper Inlet Node,!- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
@@ -2247,7 +2306,7 @@
 
   AirTerminal:SingleDuct:ParallelPIU:Reheat,
     Zone 3 PPIU ATU,         !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     autosize,                !- Maximum Primary Air Flow Rate {m3/s}
     autosize,                !- Maximum Secondary Air Flow Rate {m3/s}
     autosize,                !- Minimum Primary Air Flow Fraction
@@ -2283,7 +2342,7 @@
 
   Coil:Heating:Water,
     Reheat Coil Zone 1,      !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     Zone 1 Reheat Water Inlet Node,  !- Water Inlet Node Name
@@ -2300,7 +2359,7 @@
 
   Coil:Heating:Water,
     Reheat Coil Zone 2,      !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     Zone 2 Reheat Water Inlet Node,  !- Water Inlet Node Name
@@ -2317,7 +2376,7 @@
 
   Fan:ConstantVolume,
     Zone 3 PIU Fan,          !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     50.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
@@ -2334,7 +2393,7 @@
 
   Coil:Heating:Water,
     Reheat Coil Zone 3,      !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ON,                      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     Zone 3 Reheat Water Inlet Node,  !- Water Inlet Node Name
@@ -2374,56 +2433,58 @@
     00001,                   !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}
 
-  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,detailed;
 
-  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+  Output:Variable,*,Zone Air System Sensible Heating Rate,detailed;
 
-  Output:Variable,*,Zone Air Temperature,hourly;
+  Output:Variable,*,Zone Air Temperature,detailed;
 
-  Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
+  Output:Variable,*,Cooling Coil Sensible Cooling Rate,detailed;
 
-  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
+  Output:Variable,*,Cooling Coil Total Cooling Rate,detailed;
 
-  Output:Variable,*,Heating Coil Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,detailed;
 
-  Output:Variable,*,Zone Air Humidity Ratio,hourlyp;
+  Output:Variable,*,Zone Air Humidity Ratio,detailed;
 
-  Output:Variable,Cooling Coil Air Inlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Cooling Coil Air Inlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Cooling Coil Air Inlet Node,System Node Temperature,hourly;
+  Output:Variable,Cooling Coil Air Inlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Air Loop Outlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Air Loop Outlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone Equipment Inlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone Equipment Inlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone Equipment Inlet Node,System Node Temperature,hourly;
+  Output:Variable,Zone Equipment Inlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Zone 1 PIU Pri Air Inlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone 1 PIU Pri Air Inlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone 1 PIU Pri Air Inlet Node,System Node Temperature,hourly;
+  Output:Variable,Zone 1 PIU Pri Air Inlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Zone 1 PIU Sec Air Inlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone 1 PIU Sec Air Inlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone 1 PIU Sec Air Inlet Node,System Node Temperature,hourly;
+  Output:Variable,Zone 1 PIU Sec Air Inlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Zone 1 PIU Air Outlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone 1 PIU Air Outlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone 1 PIU Air Outlet Node,System Node Temperature,hourly;
+  Output:Variable,Zone 1 PIU Air Outlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Zone 2 Reheat Air Outlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone 2 Reheat Air Outlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone 3 PIU Pri Air Inlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone 3 PIU Pri Air Inlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone 3 PIU Pri Air Inlet Node,System Node Temperature,hourly;
+  Output:Variable,Zone 3 PIU Pri Air Inlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Zone 3 PIU Sec Air Inlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone 3 PIU Sec Air Inlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone 3 PIU Sec Air Inlet Node,System Node Temperature,hourly;
+  Output:Variable,Zone 3 PIU Sec Air Inlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Zone 3 PIU Air Outlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,Zone 3 PIU Air Outlet Node,System Node Mass Flow Rate,detailed;
 
-  Output:Variable,Zone 3 PIU Air Outlet Node,System Node Temperature,hourly;
+  Output:Variable,Zone 3 PIU Air Outlet Node,System Node Temperature,detailed;
 
+  Output:Variable,*,Availability Manager Night Cycle Control Status,detailed;
+  
   Output:VariableDictionary,Regular;
 
   Output:Surfaces:Drawing,dxf;
