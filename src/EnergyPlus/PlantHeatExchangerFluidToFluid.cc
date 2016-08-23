@@ -1452,9 +1452,6 @@ namespace PlantHeatExchangerFluidToFluid {
 						SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 					}
 				}
-				
-
-
 			}}
 
 		} else { // scheduled off

@@ -2337,4 +2337,132 @@ namespace EnergyPlus {
 		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 0.0, 0.001 );
 	}
 
+	TEST_F( EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride ) {
+		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride. 
+		// unit test checks that the change for #5626 does run the HX as intended when the chiller is not shut down
+
+		PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
+
+		// get availability schedule to work
+		DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+		ScheduleManager::ProcessScheduleInput(); // read schedules
+		ScheduleManager::ScheduleInputProcessed = true;
+		DataEnvironment::Month = 1;
+		DataEnvironment::DayOfMonth = 21;
+		DataGlobals::HourOfDay = 1;
+		DataGlobals::TimeStep = 1;
+		DataEnvironment::DSTIndicator = 0;
+		DataEnvironment::DayOfWeek = 2;
+		DataEnvironment::HolidayIndex = 0;
+		DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
+		ScheduleManager::UpdateScheduleValues();
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).AvailSchedNum = -1;
+
+		// setup four plant nodes for HX
+		DataLoopNode::Node.allocate( 4 );
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletNodeNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.OutletNodeNum = 3;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SetPointNodeNum = 3;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.MassFlowRateMax = 2.0;
+
+		DataLoopNode::Node( 1 ).Temp = 18.0;
+		DataLoopNode::Node( 1 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 1 ).MassFlowRateMax = 2.0;
+		DataLoopNode::Node( 3 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 3 ).MassFlowRateMax = 2.0;
+
+
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletTemp = 18.0;
+
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletNodeNum = 2;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.OutletNodeNum = 4;
+		DataLoopNode::Node( 2 ).Temp = 19.0;
+		DataLoopNode::Node( 2 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 2 ).MassFlowRateMax = 2.0;
+		DataLoopNode::Node( 4 ).MassFlowRateMaxAvail = 2.0;
+		DataLoopNode::Node( 4 ).MassFlowRateMax = 2.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletTemp = 19.0;
+
+
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).ControlMode = PlantHeatExchangerFluidToFluid::CoolingSetPointOnOffWithComponentOverride;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).MinOperationTemp = 10.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).MaxOperationTemp = 30.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).Name = "Test HX";
+
+		//setup two plant loops, need for SetComponenetFlowRate
+		DataPlant::TotNumLoops = 2;
+		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
+
+		for ( int l = 1; l <= DataPlant::TotNumLoops; ++l ) {
+			auto & loop( DataPlant::PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( DataPlant::PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( DataPlant::PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+
+		DataPlant::PlantLoop( 1 ).Name = "HX supply side loop ";
+		DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+		DataPlant::PlantLoop( 1 ).FluidName = "WATER";
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).Name;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletNodeNum;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.LoopNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.LoopSideNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.BranchNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.CompNum = 1;
+
+		DataPlant::PlantLoop( 2 ).Name = "HX demand side loop ";
+		DataPlant::PlantLoop( 2 ).FluidIndex = 1;
+		DataPlant::PlantLoop( 2 ).FluidName = "WATER";
+		DataPlant::PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).Name;
+		DataPlant::PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+		DataPlant::PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletNodeNum;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.LoopNum = 2;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.LoopSideNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.BranchNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.CompNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.MassFlowRateMax = 2.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).ControlSignalTemp = PlantHeatExchangerFluidToFluid::DryBulbTemperature;
+
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).OtherCompSupplySideLoop.LoopNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).OtherCompSupplySideLoop.LoopSideNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).OtherCompSupplySideLoop.BranchNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).OtherCompSupplySideLoop.CompNum = 1;
+
+		bool testFirstHVACIteration = false;
+		// set flag false for case where loop operation scheme has not shut down for free cooling
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).FreeCoolCntrlShutDown = false;
+		PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger( 1, 1, -1000.0, testFirstHVACIteration );
+
+		DataEnvironment::OutDryBulbTemp = 9.0;
+		DataLoopNode::Node( 3 ).TempSetPoint = 11.0;
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).TempControlTol = 0.0;
+		// should have flow
+		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.MassFlowRateMax, 0.001 );
+
+		// set flag true for case where loop operation scheme has shut down for free cooling
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).FreeCoolCntrlShutDown = true;
+		PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger( 1, 1, -1000.0, testFirstHVACIteration );
+		// should have flow
+		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.MassFlowRateMax, 0.001 );
+
+		// Now increase the minimum delta T to something no-zero but not more than 2.0, 11 - 9 = 2.
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).TempControlTol = 1.0;
+		PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger( 1, 1, -1000.0, testFirstHVACIteration );
+		// should have flow
+		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.MassFlowRateMax, 0.001 );
+
+		// now increase the minimum delta T to higher than delta T,
+		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).TempControlTol = 3.0;
+		PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger( 1, 1, -1000.0, testFirstHVACIteration );
+		// should have no flow, because mimimum tolerance not exceeded
+		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 0.0, 0.001 );
+
+	}
+
 }
