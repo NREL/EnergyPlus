@@ -2462,6 +2462,7 @@ namespace CondenserLoopTowers {
 			// We assume the nominal fan power is 0.0105 times the design load
 			if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				SimpleTower( TowerNum ).HighSpeedFanPower = 0.0105 * SimpleTower( TowerNum ).TowerNominalCapacity;
+				tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
 			} else {
 				if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -2778,6 +2779,7 @@ namespace CondenserLoopTowers {
 		}
 
 		if ( SimpleTower( TowerNum ).FreeConvAirFlowRateWasAutoSized ) {
+			SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor * tmpHighSpeedAirFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {
 				SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor * SimpleTower( TowerNum ).HighSpeedAirFlowRate;
 				if ( PlantFinalSizesOkayToReport ) {
