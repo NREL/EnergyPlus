@@ -580,8 +580,12 @@ namespace DataHVACGlobals {
 		SimNonZoneEquipmentFlag = true;
 		ZoneMassBalanceHVACReSim = true;
 		ZoneComp.deallocate();
-		OptStartData = OptStartDataType();
 		CompSetPtEquip.deallocate();
+		OptStartData = OptStartDataType();
+		// unit test ZoneTempPredictorCorrector_ReportingTest fails without this next line. Next 2 lines are just to be thorough.
+		OptStartData.OptStartFlag.deallocate();
+		OptStartData.ActualZoneNum.deallocate();
+		OptStartData.OccStartTime.deallocate();
 	}
 
 } // DataHVACGlobals
