@@ -104,11 +104,15 @@ namespace DataDaylighting {
 	int const CalledForRefPoint( 101 );
 	int const CalledForMapPoint( 102 );
 
-	// Parameters for "DaylightType"
+	// Parameters for "DaylightMethod"
 	int const NoDaylighting( 0 );
-	int const DetailedDaylighting( 1 );
+	int const SplitFluxDaylighting( 1 );
 	int const DElightDaylighting( 2 );
-	Array1D_string const DaylightTypes( 2, { "Daylighting:Controls", "Daylighting:DELight:Controls" } );
+
+	// Parameters for "Lighting Control Type"
+	int const Continuous( 1 );
+	int const Stepped( 2 );
+	int const ContinuousOff( 3 );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -118,6 +122,7 @@ namespace DataDaylighting {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotIllumMaps( 0 );
+	int TotRefPoints( 0 );
 	bool mapResultsToReport( false ); // used when only partial hour has "sun up"
 	bool mapResultsReported( false ); // when no map results are ever reported this will still be false
 	char MapColSep; // Character for separating map columns (tab, space, comma)
@@ -125,10 +130,15 @@ namespace DataDaylighting {
 	bool DFSReportSizingDays( false );
 	bool DFSReportAllShadowCalculationDays( false );
 
+	int TotDElightCFS( 0 );
+
 	// Object Data
 	Array1D< ZoneDaylightCalc > ZoneDaylight;
 	Array1D< IllumMapData > IllumMap;
 	Array1D< MapCalcData > IllumMapCalc;
+	Array1D< RefPointData > DaylRefPt;
+	Array1D< DElightComplexFeneData> DElightComplexFene;
+
 
 } // DataDaylighting
 

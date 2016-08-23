@@ -46,7 +46,7 @@ Zone floor area is used in many places within EnergyPlus. EnergyPlus automatical
 
 \paragraph{Field: Zone Inside Convection Algorithm}\label{field-zone-inside-convection-algorithm}
 
-The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{Detailed} (variable natural convection based on temperature difference - ASHRAE), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
+The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{TARP} (combines natural and wind-driven convection correlations from laboratory measurements on flat plates), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
 
 If omitted or blank, the algorithm specified in the SurfaceConvectionAlgorithm:Inside object is the default.
 
@@ -2258,7 +2258,7 @@ Determine when a shading device is on in a particular timestep & Print the varia
 Control the \textbf{slat angle} of a blind & Window\-Property:\-Shading\-Control & Purch\-Air\-Window\-Blind.idf \tabularnewline
 Add a \textbf{frame} & Window\-Property:\-FrameAndDivider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add a \textbf{divider} & Window\-Property:\-Frame\-And\-Divider & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
-Allow window to \textbf{daylight} a zone & Day\-lighting:Controls, Day\-lighting:\-DELight:\-Controls & Purch\-Air\-With\-Day\-lighting.idf, DElight-\-Detailed-\-Comparison.idf \tabularnewline
+Allow window to \textbf{daylight} a zone & Day\-lighting:Controls & Purch\-Air\-With\-Day\-lighting.idf, DElight-\-Detailed-\-Comparison.idf \tabularnewline
 Find \textbf{solar reflected} onto window from neighboring buildings & Building/\-Solar\-Distribution field – uses ``WithReflections'' & Reflective\-Adjacent\-Building.idf \tabularnewline
 Model \textbf{switchable glazing} (e.g., electrochromic glass) & Window\-Property:\-Shading\-Control & Purch\-Air\-With\-Day\-lighting.idf \tabularnewline
 Add an \textbf{interior window} & Define two Fenestration\-Surface:\-Detailed's, one for each associated interior wall & Purch\-Air\-With\-Double\-Facade\-Day\-lighting.idf \tabularnewline
@@ -3390,7 +3390,7 @@ Several reports can be selected for Surfaces. (See Group -- Report for details o
 
 \subsubsection{DXF}\label{dxf}
 
-This report produces a special file (\textbf{eplusout.dxf}) in the industry standard DXF (Drawing Interchange Format) for drawings. It is produced and accepted by many popular, commercial CAD programs. Detailed reference can be found on the AutoCAD™ website at: http://www.autodesk.com/techpubs/autocad/acadr14/dxf/index.htm
+This report produces a special file (\textbf{eplusout.dxf}) in the industry standard DXF (Drawing Interchange Format) for drawings. It is produced and accepted by many popular, commercial CAD programs. Detailed reference can be found on the AutoCAD™ website at: \url{http://www.autodesk.com/techpubs/autocad/acadr14/dxf/index.htm}.
 
 EnergyPlus produces this file from the Report command:
 
@@ -4742,7 +4742,7 @@ The WINDOW program calculates the U-value, Solar Heat Gain Coefficient, solar tr
 
 WINDOW can write a data file containing a description of the window that was analyzed. An example of this file (which is no longer the preferred method) is shown in the Tips document under WINDOW generated files. is shown below. This file, which can be named by the user, can be read by EnergyPlus. For more complete description and examples, see the object description -- Construction:WindowDataFile.
 
-In this way, the same window that was created in WINDOW can be imported into EnergyPlus for annual energy analysis without having to re-input the window data. To obtain WINDOW, THERM, or OPTICS go to http://windows.lbl.gov and choose the software link. A major advantage of using WINDOW to create window input for EnergyPlus is that you will have direct access to WINDOW's expanding database of over 1000 different glass types; and you will be able to browse through this database according to different criteria (color, transmittance, solar heat gain coefficient, etc.) to help you select the best glass type for your application.
+In this way, the same window that was created in WINDOW can be imported into EnergyPlus for annual energy analysis without having to re-input the window data. To obtain WINDOW, THERM, or OPTICS go to \url{http://windows.lbl.gov} and choose the software link. A major advantage of using WINDOW to create window input for EnergyPlus is that you will have direct access to WINDOW's expanding database of over 1000 different glass types; and you will be able to browse through this database according to different criteria (color, transmittance, solar heat gain coefficient, etc.) to help you select the best glass type for your application.
 
 Although WINDOW writes only one window entry on the WINDOW data file, EnergyPlus users can combine two or more of these files to end up with a single data file with multiple window entries of different types. In this way a library of windows from WINDOW can be built up if so desired. If you combine files like this you should be sure not to leave out or change any of lines from the original files.
 

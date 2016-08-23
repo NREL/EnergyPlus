@@ -80,7 +80,7 @@ Type of heating coil object for regeneration air. The hot water and steam heatin
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -239,7 +239,7 @@ Dehumidifier:Desiccant:NoFans,
   1,                                             !- Nominal Process Air Flow Rate {m3/s}
   2.5,                                         !- Nominal Process Air Velocity {m/s}
   10,                                           !- Rotor Power {W}
-  Coil:Heating:Gas,               !- Regeneration Coil Object Type
+  Coil:Heating:Fuel,               !- Regeneration Coil Object Type
   Desiccant Regen Coil,       !- Regeneration Coil Name
   Fan:VariableVolume,           !- Regeneration Fan Object Type
   Desiccant Regen Fan,         !- Regeneration Fan Name
@@ -374,7 +374,7 @@ Currently the only heat exchanger choice for this object is HeatExchanger:Desicc
 \item
   Fan:OnOff or Fan:ConstantVolume (regeneration air fan)
 \item
-  Coil:Heating:Electric or Coil:Heating:Gas (optional regeneration air heater)
+  Coil:Heating:Electric or Coil:Heating:Fuel (optional regeneration air heater)
 \item
   Coil:Cooling:DX:SingleSpeed or Coil:Cooling:DX:TwoStageWithHumidityControlMode (optional companion cooling coil)
 \end{itemize}
@@ -425,7 +425,7 @@ This alpha field contains the type of heating coil used to heat the regeneration
 \item
   Coil:Heating:Electric
 \item
-  Coil:Heating:Gas
+  Coil:Heating:Fuel
 \item
   Coil:Heating:Water
 \item
@@ -481,7 +481,7 @@ Dehumidifier:Desiccant:System,
   Fan:ConstantVolume,           !- Regeneration Air Fan Object Type
   Desiccant Regen Fan,         !- Regeneration Air Fan Name
   DrawThrough,                         !- Regeneration Air Fan Placement
-  Coil:Heating:Gas,               !- Regeneration Air Heater Object Type
+  Coil:Heating:Fuel,               !- Regeneration Air Heater Object Type
   Desiccant Regen Coil,       !- Regeneration Air Heater Name
   46.111111,                             !- Regeneration Inlet Air Setpoint Temperature {C}
   Coil:Cooling:DX:SingleSpeed,   !- Companion Cooling Coil Object Type

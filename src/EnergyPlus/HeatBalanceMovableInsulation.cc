@@ -182,14 +182,17 @@ namespace HeatBalanceMovableInsulation {
 		{ auto const MaterialIndex( Surface( SurfNum ).MaterialMovInsulInt );
 		if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
 
+			Surface( SurfNum ).MovInsulIntPresent = false;
 			HMovInsul = 0.0;
 			AbsInt = 0.0;
 
 		} else { // Movable insulation present-->calculate output parameters
 
-			if ( ( Material( MaterialIndex ).Resistance ) <= 0.0 ) {
-				if ( Material( MaterialIndex ).Conductivity > 0.0 && Material( MaterialIndex ).Thickness > 0.0 ) {
-					Material( MaterialIndex ).Resistance = Material( MaterialIndex ).Thickness / Material( MaterialIndex ).Conductivity;
+			Surface( SurfNum ).MovInsulIntPresent = true;
+			int const & thisMovableInt = Surface( SurfNum ).MaterialMovInsulInt;
+			if ( ( Material( thisMovableInt ).Resistance ) <= 0.0 ) {
+				if ( Material( thisMovableInt ).Conductivity > 0.0 && Material( thisMovableInt ).Thickness > 0.0 ) {
+					Material( thisMovableInt ).Resistance = Material( thisMovableInt ).Thickness / Material( thisMovableInt ).Conductivity;
 				} else {
 					ShowFatalError( "EvalInsideMovableInsulation: No resistance found for material " + Material( MaterialIndex ).Name );
 				}

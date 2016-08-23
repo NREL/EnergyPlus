@@ -73,6 +73,7 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
@@ -88,6 +89,7 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -98,6 +100,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
+#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataPlantPipingSystems.hh>
@@ -111,6 +114,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -142,8 +146,8 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-
 #include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -206,6 +210,7 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -224,11 +229,13 @@ namespace EnergyPlus {
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+		this->m_delightin_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
+		DataGlobals::delightin_stream = this->m_delightin_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
@@ -258,6 +265,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileMeters, flags );
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
+			gio::close( DataGlobals::OutputDElightIn, flags );
 
 		}
 	}
@@ -271,6 +279,7 @@ namespace EnergyPlus {
 		Boilers::clear_state();
 		BoilerSteam::clear_state();
 		BranchInputManager::clear_state();
+		CoolingPanelSimple::clear_state();
 		ChillerExhaustAbsorption::clear_state();
 		ChillerGasAbsorption::clear_state();
 		ChillerIndirectAbsorption::clear_state();
@@ -286,6 +295,7 @@ namespace EnergyPlus {
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
+		DataErrorTracking::clear_state();
 		DataGenerators::clear_state();
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
@@ -295,6 +305,7 @@ namespace EnergyPlus {
 		DataIPShortCuts::clear_state();
 		DataLoopNode::clear_state();
 		DataMoistureBalance::clear_state();
+		DataMoistureBalanceEMPD::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
 		DataPlantPipingSystems::clear_state();
@@ -339,10 +350,12 @@ namespace EnergyPlus {
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
+		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
+		MoistureBalanceEMPDManager::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
 		OutdoorAirUnit::clear_state();
@@ -481,6 +494,15 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::compare_delightin_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->m_delightin_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if (reset_stream) this->m_delightin_stream->str(std::string());
+		return are_equal;
+	}
+
+
 	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
 	{
 		auto const has_output = this->eso_stream->str().size() > 0;
@@ -520,6 +542,14 @@ namespace EnergyPlus {
 	{
 		auto const has_output = this->m_cerr_buffer->str().size() > 0;
 		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
+		return has_output;
+	}
+
+
+	bool EnergyPlusFixture::has_delightin_output( bool reset_stream )
+	{
+		auto const has_output = this->m_delightin_stream->str().size() > 0;
+		if ( reset_stream ) this->m_delightin_stream->str( std::string() );
 		return has_output;
 	}
 

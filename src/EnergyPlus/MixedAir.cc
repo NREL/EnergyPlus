@@ -683,7 +683,7 @@ namespace MixedAir {
 				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex );
 			}
 			OAHeatingCoil = true;
-		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Gas'
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
 			if ( Sim ) {
 				//     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
 				SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex );
@@ -1179,7 +1179,7 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = WaterCoil_DetailedCool;
 				} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Coil_ElectricHeat;
-				} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+				} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Coil_GasHeat;
 				} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = WaterCoil_CoolingHXAsst;
@@ -1508,20 +1508,12 @@ namespace MixedAir {
 
 				// System outdoor air method
 				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 4 ) ) );
-				if ( SELECT_CASE_var == "ZONESUM" ) { // Simplifily sum the zone OA flow rates
+				if ( SELECT_CASE_var == "ZONESUM" ) { // Simplify sum the zone OA flow rates
 					thisVentilationMechanical.SystemOAMethod = SOAM_ZoneSum;
-				} else if ( ( SELECT_CASE_var == "VRP" ) || ( SELECT_CASE_var == "VENTILATIONRATEPROCEDURE" ) ) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
-					if ( SameString( AlphArray( 4 ), "VRP" ) ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using VentilationRateProcedure." );
-					}
+				} else if ( ( SELECT_CASE_var == "VENTILATIONRATEPROCEDURE" ) ) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
 					thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
-				} else if ( ( SELECT_CASE_var == "IAQP" ) || ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
+				} else if ( ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
 					thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
-					if ( SameString( AlphArray( 4 ), "IAQP" ) ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using IndoorAirQualityProcedure." );
-					}
 					if ( ! Contaminant.CO2Simulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );

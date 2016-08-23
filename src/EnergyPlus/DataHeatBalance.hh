@@ -706,15 +706,15 @@ namespace DataHeatBalance {
 		Real64 WinShadeAirFlowPermeability; // The effective area of openings in the shade itself, expressed as a
 		//  fraction of the shade area
 		bool EMPDMaterialProps; // True if EMPD properties have been assigned
-		Real64 EMPDVALUE;
-		Real64 MoistACoeff;
-		Real64 MoistBCoeff;
-		Real64 MoistCCoeff;
-		Real64 MoistDCoeff;
-		Real64 EMPDaCoeff;
-		Real64 EMPDbCoeff;
-		Real64 EMPDcCoeff;
-		Real64 EMPDdCoeff;
+		Real64 EMPDmu; // Water Vapor Diffusion Resistance Factor (dimensionless)
+		Real64 MoistACoeff; // Moisture Equation Coefficient a
+		Real64 MoistBCoeff; // Moisture Equation Coefficient b
+		Real64 MoistCCoeff; // Moisture Equation Coefficient c
+		Real64 MoistDCoeff; // Moisture Equation Coefficient d
+		Real64 EMPDSurfaceDepth; // Surface-layer penetrtion depth (m)
+		Real64 EMPDDeepDepth; // Deep-layer penetration depth (m)
+		Real64 EMPDCoatingThickness; // Coating Layer Thickness (m)
+		Real64 EMPDmuCoating; // Coating Layer water vapor diffusion resistance factor (dimensionless)
 		// EcoRoof-Related properties, essentially for the plant layer,
 		//    the soil layer uses the same resource as a regular material
 		int EcoRoofCalculationMethod; // 1-Simple, 2-SchaapGenuchten
@@ -869,15 +869,15 @@ namespace DataHeatBalance {
 			WinShadeRightOpeningMult( 0.0 ),
 			WinShadeAirFlowPermeability( 0.0 ),
 			EMPDMaterialProps( false ),
-			EMPDVALUE( 0.0 ),
+			EMPDmu( 0.0 ),
 			MoistACoeff( 0.0 ),
 			MoistBCoeff( 0.0 ),
 			MoistCCoeff( 0.0 ),
 			MoistDCoeff( 0.0 ),
-			EMPDaCoeff( 0.0 ),
-			EMPDbCoeff( 0.0 ),
-			EMPDcCoeff( 0.0 ),
-			EMPDdCoeff( 0.0 ),
+			EMPDSurfaceDepth( 0.0 ),
+			EMPDDeepDepth( 0.0 ),
+			EMPDCoatingThickness( 0.0 ),
+			EMPDmuCoating( 0.0 ),
 			EcoRoofCalculationMethod( 0 ),
 			HeightOfPlants( 0.0 ),
 			LAI( 0.0 ),
@@ -1700,6 +1700,7 @@ namespace DataHeatBalance {
 		Real64 LostEnergy; // Lost energy (converted to work) [J]
 		Real64 TotGainEnergy; // Total heat gain [J]
 		std::string EndUseSubcategory; // user defined name for the end use category
+		int OtherEquipFuelType; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
 
 		// Default Constructor
 		ZoneEquipData() :
@@ -1730,7 +1731,9 @@ namespace DataHeatBalance {
 			ConGainEnergy( 0.0 ),
 			LatGainEnergy( 0.0 ),
 			LostEnergy( 0.0 ),
-			TotGainEnergy( 0.0 )
+			TotGainEnergy( 0.0 ),
+			EndUseSubcategory( "" ),
+			OtherEquipFuelType( 0 )
 		{}
 
 	};
@@ -3132,6 +3135,8 @@ namespace DataHeatBalance {
 		Real64 SteamLostRate;
 		Real64 SteamTotGainRate;
 		// Other Equipment
+		Real64 OtherPower;
+		Real64 OtherConsump;
 		Real64 OtherRadGain;
 		Real64 OtherConGain;
 		Real64 OtherLatGain;
@@ -3263,6 +3268,8 @@ namespace DataHeatBalance {
 			SteamLatGainRate( 0.0 ),
 			SteamLostRate( 0.0 ),
 			SteamTotGainRate( 0.0 ),
+			OtherPower( 0.0 ),
+			OtherConsump( 0.0 ),
 			OtherRadGain( 0.0 ),
 			OtherConGain( 0.0 ),
 			OtherLatGain( 0.0 ),
