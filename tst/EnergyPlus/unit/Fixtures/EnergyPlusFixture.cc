@@ -145,8 +145,8 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-
 #include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -364,6 +364,7 @@ namespace EnergyPlus {
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
+		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
 		MixedAir::clear_state();

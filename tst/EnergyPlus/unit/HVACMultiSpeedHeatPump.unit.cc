@@ -570,9 +570,9 @@ namespace EnergyPlus {
 			"    ,                        !- Heating Speed 4 Supply Air Flow Rate {m3/s}",
 			"    3.209,                   !- Cooling Speed 1 Supply Air Flow Rate {m3/s}",
 			"    3.209;                   !- Cooling Speed 2 Supply Air Flow Rate {m3/s}",
-			
+
 			"  Timestep,6;",
-			
+
 			"  Zone,",
 			"    402,                     !- Name",
 			"    48.33,                   !- Direction of Relative North {deg}",
@@ -882,33 +882,27 @@ namespace EnergyPlus {
 
 			"  Branch,",
 			"    Z401 main branch,        !- Name",
-			"    3.209,                   !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Z401 OA Sys,             !- Component 1 Name",
 			"    AC-24 airloop inlet node,!- Component 1 Inlet Node Name",
 			"    AC-24 SF inlet air node, !- Component 1 Outlet Node Name",
-			"    Passive,                 !- Component 1 Branch Control Type",
 			"    AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 2 Object Type",
 			"    AC-24 heat pump,         !- Component 2 Name",
 			"    AC-24 SF inlet air node, !- Component 2 Inlet Node Name",
-			"    AC-24 airloop outlet node,  !- Component 2 Outlet Node Name",
-			"    Active;                  !- Component 2 Branch Control Type",
+			"    AC-24 airloop outlet node;  !- Component 2 Outlet Node Name",
 
 			"  Branch,",
 			"    Z402 main branch,        !- Name",
-			"    3.209,                   !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"    Z402 OA Sys,             !- Component 1 Name",
 			"    AC-25 airloop inlet node,!- Component 1 Inlet Node Name",
 			"    AC-25 SF inlet air node, !- Component 1 Outlet Node Name",
-			"    Passive,                 !- Component 1 Branch Control Type",
 			"    AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,  !- Component 2 Object Type",
 			"    AC-25 heat pump,         !- Component 2 Name",
 			"    AC-25 SF inlet air node, !- Component 2 Inlet Node Name",
-			"    AC-25 airloop outlet node,  !- Component 2 Outlet Node Name",
-			"    Active;                  !- Component 2 Branch Control Type",
+			"    AC-25 airloop outlet node;  !- Component 2 Outlet Node Name",
 
 			"!-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========",
 
@@ -1238,8 +1232,13 @@ namespace EnergyPlus {
 
 			});
 
+<<<<<<< HEAD
 			ASSERT_TRUE( process_idf( idf_objects ) );
 			
+=======
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+>>>>>>> NREL/develop
 			NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 			MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 			ProcessScheduleInput();
@@ -1248,7 +1247,7 @@ namespace EnergyPlus {
 			EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
 			// Get Zone Equipment Configuration ata
-			DataZoneEquipment::GetZoneEquipmentData();			
+			DataZoneEquipment::GetZoneEquipmentData();
 			MixedAir::GetOutsideAirSysInputs();
 			MixedAir::GetOAControllerInputs();
 			SplitterComponent::GetSplitterInput();
@@ -1294,9 +1293,9 @@ namespace EnergyPlus {
 			MSHeatPump( 2 ).TotHeatEnergyRate = 1000.0;
 			MSHeatPump( 2 ).TotCoolEnergyRate = 1000.0;
 
-			// InitMSHeatPump resets the current MSHeatPumpNum only 
+			// InitMSHeatPump resets the current MSHeatPumpNum only
 			HVACMultiSpeedHeatPump::InitMSHeatPump(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnReq, OnOffAirFlowRatio );
-	
+
 			EXPECT_DOUBLE_EQ( 1000.0, MSHeatPump( 1 ).TotHeatEnergyRate );
 			EXPECT_DOUBLE_EQ( 1000.0, MSHeatPump( 1 ).TotCoolEnergyRate );
 			EXPECT_DOUBLE_EQ( 0.0, MSHeatPump( 2 ).TotHeatEnergyRate );

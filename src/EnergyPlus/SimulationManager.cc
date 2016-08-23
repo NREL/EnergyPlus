@@ -149,17 +149,6 @@ extern "C" {
 #include <Timer.h>
 
 namespace EnergyPlus {
-
-// HBIRE_USE_OMP defined, then openMP instructions are used.  Compiler may have to have switch for openmp
-// HBIRE_NO_OMP defined, then old code is used without any openmp instructions
-// HBIRE - loop in HeatBalanceIntRadExchange.cc
-
-#ifdef HBIRE_USE_OMP
-#undef HBIRE_NO_OMP
-#else
-#define HBIRE_NO_OMP
-#endif
-
 namespace SimulationManager {
 
 	// MODULE INFORMATION:
@@ -361,7 +350,6 @@ namespace SimulationManager {
 		AskForConnectionsReport = false; // set to false until sizing is finished
 
 		OpenOutputFiles();
-		CheckThreading();
 		GetProjectData();
 		CheckForMisMatchedEnvironmentSpecifications();
 		CheckForRequestedReporting();
@@ -2587,6 +2575,7 @@ namespace SimulationManager {
 
 	}
 
+<<<<<<< HEAD
 	void
 	CheckThreading()
 	{
@@ -2757,6 +2746,8 @@ namespace SimulationManager {
 
 	}
 
+=======
+>>>>>>> NREL/develop
 } // SimulationManager
 
 // EXTERNAL SUBROUTINES:

@@ -3267,28 +3267,23 @@
 
   Branch,
     Air Loop Main Branch ZN1,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN1,              !- Component 1 Name
     Air Loop Inlet Node ZN1, !- Component 1 Inlet Node Name
     Mixed Air Node ZN1,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN1,  !- Component 2 Name
     Mixed Air Node ZN1,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil ZN1,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN1,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN1,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN1,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN1,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN1;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN1,  !- Name
@@ -3561,28 +3556,23 @@
 
   Branch,
     Air Loop Main Branch ZN2,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN2,              !- Component 1 Name
     Air Loop Inlet Node ZN2, !- Component 1 Inlet Node Name
     Mixed Air Node ZN2,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN2,  !- Component 2 Name
     Mixed Air Node ZN2,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN2,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil ZN2,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN2,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN2,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN2,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN2,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN2,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN2;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN2,  !- Name
@@ -3855,28 +3845,23 @@
 
   Branch,
     Air Loop Main Branch ZN3,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN3,              !- Component 1 Name
     Air Loop Inlet Node ZN3, !- Component 1 Inlet Node Name
     Mixed Air Node ZN3,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN3,  !- Component 2 Name
     Mixed Air Node ZN3,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil ZN3,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN3,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN3,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN3,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN3,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN3;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN3,  !- Name
@@ -4149,28 +4134,23 @@
 
   Branch,
     Air Loop Main Branch ZN4,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN4,              !- Component 1 Name
     Air Loop Inlet Node ZN4, !- Component 1 Inlet Node Name
     Mixed Air Node ZN4,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN4,  !- Component 2 Name
     Mixed Air Node ZN4,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN4,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil ZN4,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN4,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN4,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN4,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN4,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN4,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN4;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN4,  !- Name
@@ -4443,28 +4423,23 @@
 
   Branch,
     Air Loop Main Branch ZN5,!- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN5,              !- Component 1 Name
     Air Loop Inlet Node ZN5, !- Component 1 Inlet Node Name
     Mixed Air Node ZN5,      !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System ZN5,  !- Component 2 Name
     Mixed Air Node ZN5,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil ZN5,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN5,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Supply Fan ZN5,          !- Component 4 Name
     Heating Coil Air Outlet Node ZN5,  !- Component 4 Inlet Node Name
-    Air Loop Outlet Node ZN5,!- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    Air Loop Outlet Node ZN5;!- Component 4 Outlet Node Name
 
   AirLoopHVAC,
     Direct DX air Loop ZN5,  !- Name
@@ -4669,23 +4644,19 @@
 
   Branch,
     Air Loop Main Branch ZN11,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN11,             !- Component 1 Name
     Air Loop Inlet Node ZN11,!- Component 1 Inlet Node Name
     Mixed Air Node ZN11,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Coil:Heating:Fuel,        !- Component 2 Object Type
     Main Heating Coil ZN11,  !- Component 2 Name
     Mixed Air Node ZN11,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN11,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Fan:ConstantVolume,      !- Component 3 Object Type
     Supply Fan ZN11,         !- Component 3 Name
     Heating Coil Air Outlet Node ZN11,  !- Component 3 Inlet Node Name
-    Air Loop Outlet Node ZN11,  !- Component 3 Outlet Node Name
-    ACTIVE;                  !- Component 3 Branch Control Type
+    Air Loop Outlet Node ZN11;  !- Component 3 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN11,  !- Name
@@ -4873,23 +4844,19 @@
 
   Branch,
     Air Loop Main Branch ZN12,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN12,             !- Component 1 Name
     Air Loop Inlet Node ZN12,!- Component 1 Inlet Node Name
     Mixed Air Node ZN12,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Coil:Heating:Fuel,        !- Component 2 Object Type
     Main Heating Coil ZN12,  !- Component 2 Name
     Mixed Air Node ZN12,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN12,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Fan:ConstantVolume,      !- Component 3 Object Type
     Supply Fan ZN12,         !- Component 3 Name
     Heating Coil Air Outlet Node ZN12,  !- Component 3 Inlet Node Name
-    Air Loop Outlet Node ZN12,  !- Component 3 Outlet Node Name
-    ACTIVE;                  !- Component 3 Branch Control Type
+    Air Loop Outlet Node ZN12;  !- Component 3 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN12,  !- Name
@@ -5078,18 +5045,15 @@
 
   Branch,
     Air Loop Main Branch ZN13,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN13,             !- Component 1 Name
     Air Loop Inlet Node ZN13,!- Component 1 Inlet Node Name
     Mixed Air Node ZN13,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Fan:ConstantVolume,      !- Component 2 Object Type
     Supply Fan ZN13,         !- Component 2 Name
     Mixed Air Node ZN13,     !- Component 2 Inlet Node Name
-    Air Loop Outlet Node ZN13,  !- Component 2 Outlet Node Name
-    ACTIVE;                  !- Component 2 Branch Control Type
+    Air Loop Outlet Node ZN13;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN13,  !- Name
@@ -5266,23 +5230,19 @@
 
   Branch,
     Air Loop Main Branch ZN14,  !- Name
-    3.0,                     !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys ZN14,             !- Component 1 Name
     Air Loop Inlet Node ZN14,!- Component 1 Inlet Node Name
     Mixed Air Node ZN14,     !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     Coil:Heating:Fuel,        !- Component 2 Object Type
     Main Heating Coil ZN14,  !- Component 2 Name
     Mixed Air Node ZN14,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN14,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Fan:ConstantVolume,      !- Component 3 Object Type
     Supply Fan ZN14,         !- Component 3 Name
     Heating Coil Air Outlet Node ZN14,  !- Component 3 Inlet Node Name
-    Air Loop Outlet Node ZN14,  !- Component 3 Outlet Node Name
-    ACTIVE;                  !- Component 3 Branch Control Type
+    Air Loop Outlet Node ZN14;  !- Component 3 Outlet Node Name
 
   AirLoopHVAC,
     Direct Heating Air Loop ZN14,  !- Name

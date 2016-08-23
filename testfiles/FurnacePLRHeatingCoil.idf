@@ -1144,23 +1144,19 @@
 
   Branch,
     Air Loop Main Branch,    !- Name
-    0.83,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:Unitary:Furnace:HeatOnly,  !- Component 1 Object Type
     Gas Furnace 1,           !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
-    Air Loop Outlet Node,    !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
   Branch,
     Air Loop Main Branch 2,  !- Name
-    0.47,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatOnly,  !- Component 1 Object Type
     Gas Furnace 2,           !- Component 1 Name
     Air Loop Inlet Node 2,   !- Component 1 Inlet Node Name
-    Air Loop Outlet Node 2,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Air Loop Outlet Node 2;  !- Component 1 Outlet Node Name
 
 ! Primary air loop serving EAST (zone 2) and WEST ZONE (zone 1)
 

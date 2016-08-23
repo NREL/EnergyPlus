@@ -526,6 +526,7 @@ namespace ExteriorEnergyUse {
 		if ( InputProcessor::SameString( FuelTypeAlpha, "Electricity" ) || InputProcessor::SameString( FuelTypeAlpha, "Electric" ) ) {
 			FuelTypeNumber = ElecUse;
 			FuelTypeString = "Electric";
+<<<<<<< HEAD
 		}
 		if ( InputProcessor::SameString( FuelTypeAlpha, "Gas" ) || InputProcessor::SameString( FuelTypeAlpha, "NaturalGas" ) ) {
 			if ( InputProcessor::SameString( FuelTypeAlpha, "Gas" ) ) {
@@ -584,8 +585,50 @@ namespace ExteriorEnergyUse {
 			FuelTypeString = "DistrictCooling";
 		}
 		if ( InputProcessor::SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
+=======
+		} else if ( SameString( FuelTypeAlpha, "NaturalGas" ) ) {
+			FuelTypeNumber = GasUse;
+			FuelTypeString = "Gas";
+		} else if ( SameString( FuelTypeAlpha, "Coal" ) ) {
+			FuelTypeNumber = CoalUse;
+			FuelTypeString = "Coal";
+		} else if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
+			FuelTypeNumber = FuelOil1Use;
+			FuelTypeString = "FuelOil#1";
+		} else if ( SameString( FuelTypeAlpha, "PropaneGas" ) ) {
+			FuelTypeNumber = LPGUse;
+			FuelTypeString = "Propane";
+		} else if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
+			FuelTypeNumber = GasolineUse;
+			FuelTypeString = "Gasoline";
+		} else if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
+			FuelTypeNumber = DieselUse;
+			FuelTypeString = "Diesel";
+		} else if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
+			FuelTypeNumber = FuelOil2Use;
+			FuelTypeString = "FuelOil#2";
+		} else if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
+			FuelTypeNumber = OtherFuel1Use;
+			FuelTypeString = "OtherFuel1";
+		} else if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
+			FuelTypeNumber = OtherFuel1Use;
+			FuelTypeString = "OtherFuel2";
+		} else if ( SameString( FuelTypeAlpha, "Water" ) ) {
+			FuelTypeNumber = WaterUse;
+			FuelTypeString = "Water";
+		} else if ( SameString( FuelTypeAlpha, "Steam" ) ) {
+			FuelTypeNumber = SteamUse;
+			FuelTypeString = "Steam";
+		} else if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
+			FuelTypeNumber = DistrictCoolUse;
+			FuelTypeString = "DistrictCooling";
+		} else if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
+>>>>>>> NREL/develop
 			FuelTypeNumber = DistrictHeatUse;
 			FuelTypeString = "DistrictHeating";
+		} else {
+			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
+			ShowFatalError( "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha );
 		}
 
 	}

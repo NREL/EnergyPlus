@@ -1528,6 +1528,7 @@ namespace MixedAir {
 				}
 
 				// System outdoor air method
+<<<<<<< HEAD
 				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( AlphArray( 4 ) ) );
 				if ( SELECT_CASE_var == "ZONESUM" ) { // Simplifily sum the zone OA flow rates
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ZoneSum;
@@ -1536,13 +1537,22 @@ namespace MixedAir {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using VentilationRateProcedure." );
 					}
+=======
+				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 4 ) ) );
+				if ( SELECT_CASE_var == "ZONESUM" ) { // Simplify sum the zone OA flow rates
+					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_ZoneSum;
+				} else if ( ( SELECT_CASE_var == "VENTILATIONRATEPROCEDURE" ) ) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
+>>>>>>> NREL/develop
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_VRP;
-				} else if ( ( SELECT_CASE_var == "IAQP" ) || ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
+				} else if ( ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_IAQP;
+<<<<<<< HEAD
 					if ( InputProcessor::SameString( AlphArray( 4 ), "IAQP" ) ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "Deprecated value in " + cAlphaFields( 4 ) + "=\"" + AlphArray( 4 ) + "\", using IndoorAirQualityProcedure." );
 					}
+=======
+>>>>>>> NREL/develop
 					if ( ! Contaminant.CO2Simulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );

@@ -3009,63 +3009,51 @@
 
   Branch,
     PSZ-AC:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:1_OA,             !- Component 1 Name
     PSZ-AC:1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:1_OA-PSZ-AC:1_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     PSZ-AC:1_Unitary_Package,!- Component 2 Name
     PSZ-AC:1_OA-PSZ-AC:1_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    PSZ-AC:1 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    PSZ-AC:1 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     PSZ-AC:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:2_OA,             !- Component 1 Name
     PSZ-AC:2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:2_OA-PSZ-AC:2_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     PSZ-AC:2_Unitary_Package,!- Component 2 Name
     PSZ-AC:2_OA-PSZ-AC:2_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    PSZ-AC:2 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    PSZ-AC:2 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     PSZ-AC:3 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:3_OA,             !- Component 1 Name
     PSZ-AC:3 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:3_OA-PSZ-AC:3_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     PSZ-AC:3_Unitary_Package,!- Component 2 Name
     PSZ-AC:3_OA-PSZ-AC:3_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    PSZ-AC:3 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    PSZ-AC:3 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   Branch,
     PSZ-AC:4 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PSZ-AC:4_OA,             !- Component 1 Name
     PSZ-AC:4 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     PSZ-AC:4_OA-PSZ-AC:4_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     PSZ-AC:4_Unitary_Package,!- Component 2 Name
     PSZ-AC:4_OA-PSZ-AC:4_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    PSZ-AC:4 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    PSZ-AC:4 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     PSZ-AC:1_OA_Controllers, !- Name

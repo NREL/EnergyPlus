@@ -875,38 +875,31 @@
 
   Branch,
     West Zone Air Loop Main Branch, !- Name
-    autosize,                 !- Maximum Flow Rate {m3/s}
     ,                         !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     West Zone OA System,      !- Component 1 Name
     West Zone Return Air Node,    !- Component 1 Inlet Node Name
     West Zone Mixed Air Node, !- Component 1 Outlet Node Name
-    ACTIVE,                   !- Component 1 Branch Control Type
     Fan:VariableVolume,       !- Component 2 Object Type
     West Zone Supply Fan,     !- Component 2 Name
     West Zone Mixed Air Node, !- Component 2 Inlet Node Name
     West Zone Supply Fan Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                   !- Component 2 Branch Control Type
     EvaporativeCooler:Direct:ResearchSpecial,  !- Component 3 Object Type
     West Data Center DEC ,  !- Component 3 Name
     West Zone Supply Fan Outlet Node,  !- Component 3 Inlet Node Name
     West Zone DEC Outlet Node,         !- Component 3 Outlet Node Name
-    ACTIVE,                   !- Component 3 Branch Control Type
     EvaporativeCooler:Indirect:ResearchSpecial, !- Component 4 Object Type
     West Data Center IEC,        !- Component 4 Name
     West Zone DEC Outlet Node,   !- Component 4 Inlet Node Name
     West Zone IEC Outlet Node,   !- Component 4 Outlet Node Name
-    ACTIVE,                      !- Component 4 Branch Control Type
     CoilSystem:Cooling:DX,    !- Component 5 Object Type
     West Zone DX Cooling Coil,!- Component 5 Name
     West Zone IEC Outlet Node, !- Component 5 Inlet Node Name
     West Zone CCoil Air Outlet Node,    !- Component 5 Outlet Node Name
-    PASSIVE,                  !- Component 5 Branch Control Type
     Coil:Cooling:Water,       !- Component 6 Object Type
     West Zone CW Cooling Coil,         !- Component 6 Name
     West Zone CCoil Air Outlet Node,   !- Component 6 Inlet Node Name
-    West Air Loop Outlet Node,    !- Component 6 Outlet Node Name
-    PASSIVE;                  !- Component 6 Branch Control Type
+    West Air Loop Outlet Node;    !- Component 6 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
 
@@ -1443,38 +1436,31 @@
 
   Branch,
     East Zone Air Loop Main Branch, !- Name
-    autosize,                 !- Maximum Flow Rate {m3/s}
     ,                         !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     East Zone OA System,      !- Component 1 Name
     East Zone Return Air Node,    !- Component 1 Inlet Node Name
     East Zone Mixed Air Node, !- Component 1 Outlet Node Name
-    ACTIVE,                   !- Component 1 Branch Control Type
     Fan:VariableVolume,       !- Component 2 Object Type
     East Zone Supply Fan,     !- Component 2 Name
     East Zone Mixed Air Node, !- Component 2 Inlet Node Name
     East Zone Supply Fan Outlet Node,  !- Component 2 Outlet Node Name
-    ACTIVE,                   !- Component 2 Branch Control Type
     EvaporativeCooler:Direct:ResearchSpecial,  !- Component 3 Object Type
     East Data Center DEC ,  !- Component 3 Name
     East Zone Supply Fan Outlet Node,  !- Component 3 Inlet Node Name
     East Zone DEC Outlet Node,         !- Component 3 Outlet Node Name
-    ACTIVE,                   !- Component 3 Branch Control Type
     EvaporativeCooler:Indirect:ResearchSpecial, !- Component 4 Object Type
     East Data Center IEC,        !- Component 4 Name
     East Zone DEC Outlet Node,   !- Component 4 Inlet Node Name
     East Zone IEC Outlet Node,   !- Component 4 Outlet Node Name
-    ACTIVE,                      !- Component 4 Branch Control Type
     CoilSystem:Cooling:DX,       !- Component 5 Object Type
     East Zone DX Cooling Coil,   !- Component 5 Name
     East Zone IEC Outlet Node,   !- Component 5 Inlet Node Name
     East Zone CCoil Air Outlet Node,   !- Component 5 Outlet Node Name
-    PASSIVE,                  !- Component 5 Branch Control Type
     Coil:Cooling:Water,       !- Component 6 Object Type
     East Zone CW Cooling Coil,         !- Component 6 Name
     East Zone CCoil Air Outlet Node,   !- Component 6 Inlet Node Name
-    East Air Loop Outlet Node, !- Component 6 Outlet Node Name
-    PASSIVE;                   !- Component 6 Branch Control Type
+    East Air Loop Outlet Node; !- Component 6 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
 
@@ -1828,43 +1814,35 @@
 
   Branch,
     CW Supply Pump Branch,   !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     CW Circ Pump,            !- Component 1 Name
     CW Supply Inlet Node,    !- Component 1 Inlet Node Name
-    CW Pump Outlet Node,     !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    CW Pump Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     CW Supply Chiller Branch,!- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     Chiller,                 !- Component 1 Name
     Chiller Inlet Node,      !- Component 1 Inlet Node Name
-    Chiller Outlet Node,     !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    Chiller Outlet Node;     !- Component 1 Outlet Node Name
 
   Branch,
     CW Supply Bypass Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Supply Side Bypass Pipe,  !- Component 1 Name
     CW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Supply Outlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Supply Side Outlet Pipe,  !- Component 1 Name
     CW Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Supply Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Supply Outlet Node;   !- Component 1 Outlet Node Name
 
 ! ---Listing and Modeling all connectors on the supply side of the CW loop--
   ConnectorList,
@@ -1898,53 +1876,43 @@
 
   Branch,
     CW Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Demand Side Inlet Pipe,  !- Component 1 Name
     CW Demand Inlet Node,    !- Component 1 Inlet Node Name
-    CW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     West CW Cooling Coil Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     West Zone CW Cooling Coil,         !- Component 1 Name
     West CWCoil Water Inlet Node, !- Component 1 Inlet Node Name
-    West CWCoil Water Outlet Node, !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    West CWCoil Water Outlet Node; !- Component 1 Outlet Node Name
 
   Branch,
     East CW Cooling Coil Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     East Zone CW Cooling Coil,         !- Component 1 Name
     East CWCoil Water Inlet Node, !- Component 1 Inlet Node Name
-    East CWCoil Water Outlet Node, !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    East CWCoil Water Outlet Node; !- Component 1 Outlet Node Name
 
   Branch,
     CW Demand Bypass Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Demand Side Bypass Pipe,  !- Component 1 Name
     CW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CW Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    CW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CW Demand Outlet Branch, !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CW Demand Side Outlet Pipe,  !- Component 1 Name
     CW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CW Demand Outlet Node,   !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    CW Demand Outlet Node;   !- Component 1 Outlet Node Name
 
 ! --Listing and Modeling all the connectors on the demand side of the CW loop--
   ConnectorList,
@@ -2215,43 +2183,35 @@
 
   Branch,
     Condenser Supply Pump Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Tower Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:VariableSpeed,  !- Component 1 Object Type
     Cooling Tower,           !- Component 1 Name
     Condenser Tower Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Tower Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Tower Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Bypass Pipe,  !- Component 1 Name
     Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet Pipe,  !- Component 1 Name
     Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
 
 ! ----Listing and Modeling the supply side connectors of the condenser loop----
 
@@ -2285,43 +2245,35 @@
 
   Branch,
     Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
     Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Demand Chiller Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric,        !- Component 1 Object Type
     Chiller,                 !- Component 1 Name
     Chiller Condenser Inlet Node,  !- Component 1 Inlet Node Name
-    Chiller Condenser Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Chiller Condenser Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Bypass Pipe,  !- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name
     Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
 
 ! ---Listing and Modeling the demand side connectors of the condenser loop---
 

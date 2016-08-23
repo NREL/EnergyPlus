@@ -2083,58 +2083,47 @@
 
   Branch,
     VAV Sys 1 Main Branch,   !- Name
-    2.5893,                  !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     OA Sys 1,                !- Component 1 Name
     VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name
     Mixed Air Node 1,        !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     DX Cooling Coil System 1,!- Component 2 Name
     Mixed Air Node 1,        !- Component 2 Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Fuel,        !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:VariableVolume,      !- Component 4 Object Type
     Supply Fan 1,            !- Component 4 Name
     Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name
-    VAV Sys 1 Outlet Node,   !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name
 
   Branch,
     Desiccant Air Loop Main Branch,  !- Name
-    1.05,                    !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     Desiccant DXSystem OA System,  !- Component 1 Name
     Desiccant DXSystem Air Loop Inlet Node,  !- Component 1 Inlet Node Name
     Desiccant DXSystem Mixed Air Node,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     Desiccant DXSystem Cooling Coil Sys,  !- Component 2 Name
     Desiccant DXSystem Mixed Air Node,  !- Component 2 Inlet Node Name
     HX Process Inlet Node,   !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Dehumidifier:Desiccant:System,  !- Component 3 Object Type
     Desiccant 1,             !- Component 3 Name
     HX Process Inlet Node,   !- Component 3 Inlet Node Name
     HX Process Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     Desiccant DXSystem Supply Fan,  !- Component 4 Name
     HX Process Outlet Node,  !- Component 4 Inlet Node Name
     Desiccant Supply Fan Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE,                  !- Component 4 Branch Control Type
     Coil:Heating:Fuel,        !- Component 5 Object Type
     Desiccant Process Heating Coil,  !- Component 5 Name
     Desiccant Supply Fan Outlet Node,  !- Component 5 Inlet Node Name
-    Desiccant DXSystem Air Loop Outlet Node,  !- Component 5 Outlet Node Name
-    PASSIVE;                 !- Component 5 Branch Control Type
+    Desiccant DXSystem Air Loop Outlet Node;  !- Component 5 Outlet Node Name
 
   AirLoopHVAC,
     VAV Sys 1,               !- Name
@@ -2284,8 +2273,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     Zone Max Humidity Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     HX Process Outlet Node,  !- Setpoint Node or NodeList Name
     SPACE5-1 Node;           !- Control Zone Air Node Name
 
@@ -2993,8 +2980,6 @@
 
   SetpointManager:SingleZone:Humidity:Maximum,
     SPACE1-1 Humidistat Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
     Mixed Air Node 1,        !- Setpoint Node or NodeList Name
     SPACE1-1 Node;           !- Control Zone Air Node Name
 

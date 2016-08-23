@@ -425,8 +425,13 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\"" );
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
+<<<<<<< HEAD
 			// Assign Other Paramters
 			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+=======
+			// Assign Other Parameters
+			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+>>>>>>> NREL/develop
 				GasAbsorber( AbsorberNum ).isWaterCooled = false;
 			} else if ( InputProcessor::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
@@ -465,7 +470,7 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).SizFac = rNumericArgs( 17 );
 
 			//Fuel Type Case Statement
-			{ auto const SELECT_CASE_var( cAlphaArgs( 18 ) );
+			{ auto const SELECT_CASE_var( cAlphaArgs( 17 ) );
 			if ( ( SELECT_CASE_var == "GAS" ) || ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) ) {
 				GasAbsorber( AbsorberNum ).FuelType = "Gas";
 
@@ -492,7 +497,7 @@ namespace ChillerGasAbsorption {
 
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
-				ShowContinueError( "Invalid " + cAlphaFieldNames( 18 ) + '=' + cAlphaArgs( 18 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 17 ) + '=' + cAlphaArgs( 17 ) );
 				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2" );
 				Get_ErrorsFound = true;
 			}}

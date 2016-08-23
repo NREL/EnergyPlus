@@ -794,15 +794,6 @@ ConvergenceLimits,
        \default 8
        \minimum 2
 
-ProgramControl,
-       \memo used to support various efforts in time reduction for simulation including threading
-       \memo This object is currently disabled
-  N1 ; \field Number of Threads Allowed
-       \type integer
-       \minimum 0
-       \note This is currently used only in the Interior Radiant Exchange module -- view factors on # surfaces
-       \note if value is 0, then maximum number allowed will be used.
-
 \group Compliance Objects
 
 Compliance:Building,
@@ -27396,7 +27387,7 @@ HVACTemplate:System:VRF,
       \default 45
 
 HVACTemplate:System:Unitary,
-      \min-fields 52
+      \min-fields 51
       \memo Unitary furnace with air conditioner
   A1, \field Name
       \required-field
@@ -27605,10 +27596,6 @@ HVACTemplate:System:Unitary,
       \key CoolReheatHeatingCoil
       \key CoolReheatDesuperheater
       \default None
- A19, \field Dehumidification Control Zone Name
-      \note This field is not currently used - the thermostat control zone is also the dehumidification control zone
-      \type object-list
-      \object-list ZoneNames
  N22, \field Dehumidification Setpoint
       \note Zone relative humidity setpoint in percent (0 to 100)
       \type real
@@ -27616,12 +27603,12 @@ HVACTemplate:System:Unitary,
       \maximum 100.0
       \default 60.0
       \units percent
- A20, \field Humidifier Type
+ A19, \field Humidifier Type
       \type choice
       \key None
       \key ElectricSteam
       \default None
- A21, \field Humidifier Availability Schedule Name
+ A20, \field Humidifier Availability Schedule Name
       \note If blank, always available
       \type object-list
       \object-list ScheduleNames
@@ -27643,7 +27630,7 @@ HVACTemplate:System:Unitary,
       \autosizable
       \default autosize
       \ip-units W
- A22, \field Humidifier Control Zone Name
+ A21, \field Humidifier Control Zone Name
       \note Zone name where humidistat is located
       \type object-list
       \object-list ZoneNames
@@ -27654,7 +27641,7 @@ HVACTemplate:System:Unitary,
       \maximum 100.0
       \default 30.0
       \units percent
- A23, \field Return Fan
+ A22, \field Return Fan
       \note Specifies if the system has a return fan.
       \type choice
       \key Yes
@@ -28031,7 +28018,7 @@ HVACTemplate:System:UnitaryHeatPump:AirToAir,
       \default 1.0
 
 HVACTemplate:System:UnitarySystem,
-      \min-fields 72
+      \min-fields 71
       \memo Unitary HVAC system with optional cooling and heating. Supports DX and chilled water,
       \memo cooling, gas, electric, and hot water heating, air-to-air and water-to-air heat pumps.
   A1, \field Name
@@ -28383,10 +28370,6 @@ HVACTemplate:System:UnitarySystem,
       \key CoolReheat
       \key Multimode
       \default None
- A24, \field Dehumidification Control Zone Name
-      \note Zone name where humidistat is located
-      \type object-list
-      \object-list ZoneNames
  N34, \field Dehumidification Relative Humidity Setpoint
       \note Zone relative humidity setpoint in percent (0 to 100)
       \note Ignored if Dehumidification Relative Humidity Setpoint Schedule specified below
@@ -28395,17 +28378,17 @@ HVACTemplate:System:UnitarySystem,
       \maximum 100.0
       \default 60.0
       \units percent
- A25, \field Dehumidification Relative Humidity Setpoint Schedule Name
+ A24, \field Dehumidification Relative Humidity Setpoint Schedule Name
       \note Leave blank to use constant setpoint specified in Dehumidification Relative Humidity
       \note Setpoint above. Schedule values must be in percent relative humidity (0 to 100).
       \type object-list
       \object-list ScheduleNames
- A26, \field Humidifier Type
+ A25, \field Humidifier Type
       \type choice
       \key None
       \key ElectricSteam
       \default None
- A27, \field Humidifier Availability Schedule Name
+ A26, \field Humidifier Availability Schedule Name
       \note If blank, always available
       \type object-list
       \object-list ScheduleNames
@@ -28427,7 +28410,7 @@ HVACTemplate:System:UnitarySystem,
       \autosizable
       \default autosize
       \ip-units W
- A28, \field Humidifier Control Zone Name
+ A27, \field Humidifier Control Zone Name
       \note Zone name where humidistat is located
       \type object-list
       \object-list ZoneNames
@@ -28439,19 +28422,19 @@ HVACTemplate:System:UnitarySystem,
       \maximum 100.0
       \default 30.0
       \units percent
- A29, \field Humidifier Relative Humidity Setpoint Schedule Name
+ A28, \field Humidifier Relative Humidity Setpoint Schedule Name
       \note Leave blank to use constant setpoint specified in Humidifier Relative Humidity
       \note  Setpoint above.Schedule values must be in percent relative humidity (0 to 100).
       \type object-list
       \object-list ScheduleNames
- A30, \field Sizing Option
+ A29, \field Sizing Option
       \note Select whether autosized system supply flow rate is the sum of Coincident or NonCoincident
       \note zone air flow rates.
       \type choice
       \key Coincident
       \key NonCoincident
       \default NonCoincident
- A31, \field Return Fan
+ A30, \field Return Fan
       \note Specifies if the system has a return fan.
       \type choice
       \key Yes
@@ -46603,6 +46586,7 @@ Coil:Heating:DX:VariableSpeed,
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
 
+
 Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
         \memo Direct expansion (DX) cooling coil for water-to-air heat pump (includes electric
         \memo compressor), single-speed, parameter estimation model. Optional inputs for moisture
@@ -50535,6 +50519,108 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
        \type object-list
        \object-list CoolingCoilsDXSingleSpeed
 
+CoilSystem:IntegratedHeatPump:AirSource,
+      \memo This object is used for air-source integrated heat pump, a collection of its working modes.
+  A1, \field Name
+       \required-field
+       \type alpha
+       \reference IntegratedHeatPumps
+       \note Unique name for this instance of an air-source integrated heat pump.
+  A2, \field Supply Hot Water Flow Sensor Node Name
+       \required-field
+       \type node
+  A3, \field Space Cooling Coil  Name
+       \required-field
+       \type object-list
+       \object-list CoolingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
+  A4, \field Space Heating Coil Name
+       \type object-list
+       \object-list HeatingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.
+  A5, \field Dedicated Water Heating Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
+  A6, \field SCWH Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
+  A7, \field SCDWH Cooling Coil Name
+       \type object-list
+       \object-list CoolingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Cooling:DX:VariableSpeed object.
+  A8, \field SCDWH Water Heating Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
+  A9, \field SHDWH Heating Coil Name
+       \type object-list
+       \object-list HeatingCoilsDXVariableSpeed
+       \note Must match the name used in the corresponding Coil:Heating:DX:VariableSpeed object.
+  A10, \field SHDWH Water Heating Coil Name
+       \type object-list
+       \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed object.
+  N1 , \field Indoor Temperature Limit for SCWH Mode
+       \type real
+       \units C
+       \minimum> 15.0
+       \default 20.0
+       \note Indoor Temperature above which Indoor Overcooling is Allowed during Cooling Operation
+  N2 , \field Ambient Temperature Limit for SCWH Mode
+       \type real
+       \units C
+       \minimum> 20.0
+       \default 27.0
+       \note Ambient Temperature above which Indoor Overcooling is Allowed during Cooling Operation
+  N3 , \field Indoor Temperature above Which WH has Higher Priority
+       \type real
+       \units C
+       \minimum> 15.0
+       \default 20.0
+       \note Indoor Temperature above which Water Heating has the higher priority and Space Heating Call Can be ignored.
+  N4 , \field Ambient Temperature above Which WH has Higher Priority
+       \type real
+       \units C
+       \minimum> 15.0
+       \default 20.0
+       \note Ambient Temperature above which Water Heating has the higher priority and Space Heating Call Can be ignored.
+  N5,  \field Flag to Indicate Load Control in SCWH Mode
+       \units dimensionless
+       \type integer
+       \default 0
+       \note 0: match space cooling load in SCWH mode, 1: match water heating load in SCWH mode
+  N6,  \field Minimum Speed Level for SCWH Mode
+       \units dimensionless
+       \type integer
+       \default 1
+       \minimum> 0
+       \maximum< 10
+  N7 , \field Maximum Water Flow Volume before Switching from SCDWH to SCWH Mode
+       \type real
+       \units m3
+       \default 0.0
+  N8,  \field Minimum Speed Level for SCDWH Mode
+       \units dimensionless
+       \type integer
+       \default 1
+       \minimum> 0
+       \maximum< 10
+  N9,  \field Maximum Running Time before Allowing Electric Resistance Heat Use during SHDWH Mode
+       \type real
+       \units s
+       \minimum> 0.0
+       \default 360.0
+  N10; \field Minimum Speed Level for SHDWH Mode
+       \units dimensionless
+       \type integer
+       \default 1
+       \minimum> 0
+       \maximum< 10
+
+
+
 Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), single-speed with packaged integrated thermal storage for cooling.
@@ -53749,13 +53835,16 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \type choice
         \key Coil:Heating:DX:SingleSpeed
         \key Coil:Heating:DX:VariableSpeed
+        \key CoilSystem:IntegratedHeatPump:AirSource
         \note  Only works with Coil:Heating:DX:SingleSpeed or
-        \note Coil:Heating:DX:VariableSpeed
+        \note Coil:Heating:DX:VariableSpeed or
+        \note CoilSystem:IntegratedHeatPump:AirSource
    A9,  \field Heating Coil Name
         \required-field
         \type object-list
         \object-list HeatingCoilsDXSingleSpeed
         \object-list HeatingCoilsDXVariableSpeed
+        \object-list IntegratedHeatPumps
         \note  Needs to match in the DX heating coil object
    A10, \field Cooling Coil Object Type
         \required-field
@@ -53763,15 +53852,18 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \key Coil:Cooling:DX:SingleSpeed
         \key Coil:Cooling:DX:VariableSpeed
         \key CoilSystem:Cooling:DX:HeatExchangerAssisted
+        \key CoilSystem:IntegratedHeatPump:AirSource
         \note Only works with Coil:Cooling:DX:SingleSpeed or
         \note CoilSystem:Cooling:DX:HeatExchangerAssisted or
-        \note Coil:Cooling:DX:VariableSpeed
+        \note Coil:Cooling:DX:VariableSpeed or
+        \note CoilSystem:IntegratedHeatPump:AirSource
    A11, \field Cooling Coil Name
         \required-field
         \note Needs to match in the DX cooling coil object
         \type object-list
         \object-list CoolingCoilsDXSingleSpeed
         \object-list CoolingCoilsDXVariableSpeed
+        \object-list IntegratedHeatPumps
    A12, \field Supplemental Heating Coil Object Type
         \required-field
         \type choice
@@ -58364,19 +58456,13 @@ AirLoopHVAC:ReturnPath,
 \group Node-Branch Management
 
 Branch,
-        \extensible:5 Just duplicate last 5 fields and comments (changing numbering, please)
+        \extensible:4 Just duplicate last 4 fields and comments (changing numbering, please)
         \memo List components on the branch in simulation and connection order
         \memo Note: this should NOT include splitters or mixers which define
         \memo endpoints of branches
    A1,  \field Name
         \required-field
         \reference Branches
-   N1, \field Maximum Flow Rate
-        \deprecated
-        \default 0
-        \units m3/s
-        \minimum 0
-        \autosizable
    A2, \field Pressure Drop Curve Name
         \type object-list
         \object-list PressureDropCurves
@@ -58400,88 +58486,66 @@ Branch,
    A6, \field Component 1 Outlet Node Name
         \required-field
         \type node
-   A7, \field Component 1 Branch Control Type
-       \note field is no longer used
-   A8, \field Component 2 Object Type
-   A9, \field Component 2 Name
-   A10,\field Component 2 Inlet Node Name
+   A7, \field Component 2 Object Type
+   A8, \field Component 2 Name
+   A9,\field Component 2 Inlet Node Name
         \type node
-   A11, \field Component 2 Outlet Node Name
+   A10, \field Component 2 Outlet Node Name
         \type node
-   A12, \field Component 2 Branch Control Type
-       \note field is no longer used
-   A13, \field Component 3 Object Type
-   A14, \field Component 3 Name
-   A15, \field Component 3 Inlet Node Name
+   A11, \field Component 3 Object Type
+   A12, \field Component 3 Name
+   A13, \field Component 3 Inlet Node Name
         \type node
-   A16, \field Component 3 Outlet Node Name
+   A14, \field Component 3 Outlet Node Name
         \type node
-   A17, \field Component 3 Branch Control Type
-       \note field is no longer used
-   A18, \field Component 4 Object Type
-   A19, \field Component 4 Name
-   A20, \field Component 4 Inlet Node Name
+   A15, \field Component 4 Object Type
+   A16, \field Component 4 Name
+   A17, \field Component 4 Inlet Node Name
         \type node
-   A21, \field Component 4 Outlet Node Name
+   A18, \field Component 4 Outlet Node Name
         \type node
-   A22, \field Component 4 Branch Control Type
-       \note field is no longer used
-   A23, \field Component 5 Object Type
-   A24, \field Component 5 Name
-   A25, \field Component 5 Inlet Node Name
+   A19, \field Component 5 Object Type
+   A20, \field Component 5 Name
+   A21, \field Component 5 Inlet Node Name
         \type node
-   A26, \field Component 5 Outlet Node Name
+   A22, \field Component 5 Outlet Node Name
         \type node
-   A27, \field Component 5 Branch Control Type
-       \note field is no longer used
-   A28, \field Component 6 Object Type
-   A29, \field Component 6 Name
-   A30, \field Component 6 Inlet Node Name
+   A23, \field Component 6 Object Type
+   A24, \field Component 6 Name
+   A25, \field Component 6 Inlet Node Name
         \type node
-   A31, \field Component 6 Outlet Node Name
+   A26, \field Component 6 Outlet Node Name
         \type node
-   A32, \field Component 6 Branch Control Type
-       \note field is no longer used
-   A33, \field Component 7 Object Type
-   A34, \field Component 7 Name
-   A35, \field Component 7 Inlet Node Name
+   A27, \field Component 7 Object Type
+   A28, \field Component 7 Name
+   A29, \field Component 7 Inlet Node Name
         \type node
-   A36, \field Component 7 Outlet Node Name
+   A30, \field Component 7 Outlet Node Name
         \type node
-   A37, \field Component 7 Branch Control Type
-       \note field is no longer used
-   A38, \field Component 8 Object Type
-   A39, \field Component 8 Name
-   A40, \field Component 8 Inlet Node Name
+   A31, \field Component 8 Object Type
+   A32, \field Component 8 Name
+   A33, \field Component 8 Inlet Node Name
         \type node
-   A41, \field Component 8 Outlet Node Name
+   A34, \field Component 8 Outlet Node Name
         \type node
-   A42, \field Component 8 Branch Control Type
-       \note field is no longer used
-   A43, \field Component 9 Object Type
-   A44, \field Component 9 Name
-   A45, \field Component 9 Inlet Node Name
+   A35, \field Component 9 Object Type
+   A36, \field Component 9 Name
+   A37, \field Component 9 Inlet Node Name
         \type node
-   A46, \field Component 9 Outlet Node Name
+   A38, \field Component 9 Outlet Node Name
         \type node
-   A47, \field Component 9 Branch Control Type
-       \note field is no longer used
-   A48, \field Component 10 Object Type
-   A49, \field Component 10 Name
-   A50, \field Component 10 Inlet Node Name
+   A39, \field Component 10 Object Type
+   A40, \field Component 10 Name
+   A41, \field Component 10 Inlet Node Name
         \type node
-   A51, \field Component 10 Outlet Node Name
+   A42, \field Component 10 Outlet Node Name
         \type node
-   A52, \field Component 10 Branch Control Type
-       \note field is no longer used
-   A53, \field Component 11 Object Type
-   A54, \field Component 11 Name
-   A55, \field Component 11 Inlet Node Name
+   A43, \field Component 11 Object Type
+   A44, \field Component 11 Name
+   A45, \field Component 11 Inlet Node Name
         \type node
-   A56, \field Component 11 Outlet Node Name
+   A46; \field Component 11 Outlet Node Name
         \type node
-   A57; \field Component 11 Branch Control Type
-       \note field is no longer used
 
 BranchList,
  \extensible:1 Just duplicate last field and comments (changing numbering, please)
@@ -63124,7 +63188,7 @@ Chiller:CombustionTurbine,
        \note throughout the entire simulation.
 
 ChillerHeater:Absorption:DirectFired,
-  \min-fields 35
+  \min-fields 34
   \memo Direct fired gas absorption chiller-heater using performance curves similar to DOE-2
   A1,  \field Name
        \required-field
@@ -63312,9 +63376,7 @@ ChillerHeater:Absorption:DirectFired,
             \note Not currently used.
             \units kJ/kg
             \default 0.0
-  A17  ,  \field Chiller Flow Mode
-       \deprecated
-  A18  ,  \field Fuel Type
+  A17  ,  \field Fuel Type
             \type choice
             \key NaturalGas
             \key PropaneGas
@@ -68068,15 +68130,17 @@ WaterHeater:HeatPump:PumpedCondenser,
        \type choice
        \key Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \key Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
+       \key CoilSystem:IntegratedHeatPump:AirSource
        \default Coil:WaterHeating:AirToWaterHeatPump:Pumped
        \note Specify the type of DX coil used by this heat pump water heater. The only
-       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed.
+       \note valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped and Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, and CoilSystem:IntegratedHeatPump:AirSource
   A19, \field DX Coil Name
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoilsPumped
        \object-list HeatPumpWaterHeaterDXCoilsVariableSpeed
-       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object.
+       \object-list IntegratedHeatPumps
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:* object, or CoilSystem:IntegratedHeatPump:AirSource
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
@@ -72447,6 +72511,10 @@ AvailabilityManager:NightCycle,
        \key CycleOnAny
        \key CycleOnControlZone
        \key CycleOnAnyZoneFansOnly
+       \key CycleOnAnyCoolingOrHeatingZone
+       \key CycleOnAnyCoolingZone
+       \key CycleOnAnyHeatingZone
+       \key CycleOnAnyHeatingZoneFansOnly
        \default StayOff
        \note When AvailabilityManager:NightCycle is used in the zone component availability
        \note manager assignment list, the key choices for Control Type would only be
@@ -72457,12 +72525,21 @@ AvailabilityManager:NightCycle,
   N2 , \field Cycling Run Time
        \default 3600.
        \units s
-  A5 ; \field Control Zone Name
+  A5 , \field Control Zone or Zone List Name
        \type object-list
-       \object-list ZoneNames
+       \object-list ZoneAndZoneListNames
        \note When AvailabilityManager:NightCycle is used in the zone component availability
        \note manager assignment list, the Control Zone Name should be the name of the zone in which the
        \note zone component is.
+  A6 , \field Cooling Control Zone or Zone List Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
+  A7 , \field Heating Control Zone or Zone List Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
+  A8 ; \field Heating Zone Fans Only Zone or Zone List Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
 
 AvailabilityManager:DifferentialThermostat,
        \memo Overrides fan/pump schedules depending on temperature difference between two nodes.
@@ -73033,15 +73110,11 @@ SetpointManager:SingleZone:Humidity:Minimum,
      \memo object ZoneControl:Humidistat to detect humidity levels.
   A1 , \field Name
        \required-field
-  A2 , \field Control Variable
-       \deprecated
-  A3 , \field Schedule Name
-       \deprecated
-  A4 , \field Setpoint Node or NodeList Name
+  A2 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which humidity ratio setpoint will be set
-  A5 ; \field Control Zone Air Node Name
+  A3 ; \field Control Zone Air Node Name
        \required-field
        \type node
        \note Name of the zone air node for the humidity control zone
@@ -73051,18 +73124,13 @@ SetpointManager:SingleZone:Humidity:Maximum,
      \memo control of a single zone maximum humidity level.
      \memo This setpoint manager can be used in conjunction with
      \memo object ZoneControl:Humidistat to detect humidity levels.
-       \min-fields 5
   A1 , \field Name
        \required-field
-  A2 , \field Control Variable
-       \deprecated
-  A3 , \field Schedule Name
-       \deprecated
-  A4 , \field Setpoint Node or NodeList Name
+  A2 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which humidity ratio setpoint will be set
-  A5 ; \field Control Zone Air Node Name
+  A3 ; \field Control Zone Air Node Name
        \required-field
        \type node
        \note Name of the zone air node for the humidity control zone

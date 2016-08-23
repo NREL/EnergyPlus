@@ -21462,13 +21462,11 @@
 
   Branch,
     rm1_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_1_C Reheat Coil,     !- Component 1 Name
     rm1_1_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_1_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_1_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_1_C
 !-- VAVZone-Autosize[] --Begin--: rm1_3_C
@@ -21566,13 +21564,11 @@
 
   Branch,
     rm1_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_3_C Reheat Coil,     !- Component 1 Name
     rm1_3_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_3_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_3_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_3_C
 !-- VAVZone-Autosize[] --Begin--: rm1_4_C
@@ -21670,13 +21666,11 @@
 
   Branch,
     rm1_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_4_C Reheat Coil,     !- Component 1 Name
     rm1_4_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_4_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_4_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_4_C
 !-- VAVZone-Autosize[] --Begin--: rm1_5_C
@@ -21774,13 +21768,11 @@
 
   Branch,
     rm1_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_5_C Reheat Coil,     !- Component 1 Name
     rm1_5_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_5_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_5_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_5_C
 !-- VAVZone-Autosize[] --Begin--: rm1_6_C
@@ -21878,13 +21870,11 @@
 
   Branch,
     rm1_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_6_C Reheat Coil,     !- Component 1 Name
     rm1_6_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_6_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_6_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_6_C
 !-- VAVZone-Autosize[] --Begin--: rm1_7_C
@@ -21982,13 +21972,11 @@
 
   Branch,
     rm1_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_7_C Reheat Coil,     !- Component 1 Name
     rm1_7_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_7_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_7_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_7_C
 !-- VAVZone-Autosize[] --Begin--: rm1_8_C
@@ -22086,13 +22074,11 @@
 
   Branch,
     rm1_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_8_C Reheat Coil,     !- Component 1 Name
     rm1_8_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_8_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_8_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_8_C
 !-- VAVZone-Autosize[] --Begin--: rm1_9_C
@@ -22190,13 +22176,11 @@
 
   Branch,
     rm1_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_9_C Reheat Coil,     !- Component 1 Name
     rm1_9_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_9_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_9_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_9_C
 !-- VAVZone-Autosize[] --Begin--: rm1_10_C
@@ -22294,13 +22278,11 @@
 
   Branch,
     rm1_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_10_C Reheat Coil,    !- Component 1 Name
     rm1_10_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_10_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_10_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_10_C
 !-- VAVZone-Autosize[] --Begin--: rm1_2_C
@@ -22398,13 +22380,11 @@
 
   Branch,
     rm1_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm1_2_C Reheat Coil,     !- Component 1 Name
     rm1_2_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm1_2_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm1_2_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm1_2_C
 !-- VAVZone-Autosize[] --Begin--: rm2_1_C
@@ -22502,13 +22482,11 @@
 
   Branch,
     rm2_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_1_C Reheat Coil,     !- Component 1 Name
     rm2_1_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_1_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_1_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_1_C
 !-- VAVZone-Autosize[] --Begin--: rm2_2_C
@@ -22606,13 +22584,11 @@
 
   Branch,
     rm2_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_2_C Reheat Coil,     !- Component 1 Name
     rm2_2_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_2_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_2_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_2_C
 !-- VAVZone-Autosize[] --Begin--: rm2_3_C
@@ -22710,13 +22686,11 @@
 
   Branch,
     rm2_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_3_C Reheat Coil,     !- Component 1 Name
     rm2_3_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_3_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_3_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_3_C
 !-- VAVZone-Autosize[] --Begin--: rm2_4_C
@@ -22814,13 +22788,11 @@
 
   Branch,
     rm2_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_4_C Reheat Coil,     !- Component 1 Name
     rm2_4_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_4_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_4_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_4_C
 !-- VAVZone-Autosize[] --Begin--: rm2_5_C
@@ -22918,13 +22890,11 @@
 
   Branch,
     rm2_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_5_C Reheat Coil,     !- Component 1 Name
     rm2_5_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_5_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_5_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_5_C
 !-- VAVZone-Autosize[] --Begin--: rm2_6_C
@@ -23022,13 +22992,11 @@
 
   Branch,
     rm2_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_6_C Reheat Coil,     !- Component 1 Name
     rm2_6_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_6_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_6_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_6_C
 !-- VAVZone-Autosize[] --Begin--: rm2_7_C
@@ -23126,13 +23094,11 @@
 
   Branch,
     rm2_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_7_C Reheat Coil,     !- Component 1 Name
     rm2_7_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_7_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_7_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_7_C
 !-- VAVZone-Autosize[] --Begin--: rm2_8_C
@@ -23230,13 +23196,11 @@
 
   Branch,
     rm2_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_8_C Reheat Coil,     !- Component 1 Name
     rm2_8_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_8_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_8_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_8_C
 !-- VAVZone-Autosize[] --Begin--: rm2_9_C
@@ -23334,13 +23298,11 @@
 
   Branch,
     rm2_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_9_C Reheat Coil,     !- Component 1 Name
     rm2_9_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_9_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_9_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_9_C
 !-- VAVZone-Autosize[] --Begin--: rm2_10_C
@@ -23438,13 +23400,11 @@
 
   Branch,
     rm2_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm2_10_C Reheat Coil,    !- Component 1 Name
     rm2_10_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm2_10_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm2_10_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm2_10_C
 !-- VAVZone-Autosize[] --Begin--: rm3_1_C
@@ -23542,13 +23502,11 @@
 
   Branch,
     rm3_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_1_C Reheat Coil,     !- Component 1 Name
     rm3_1_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_1_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_1_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_1_C
 !-- VAVZone-Autosize[] --Begin--: rm3_2_C
@@ -23646,13 +23604,11 @@
 
   Branch,
     rm3_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_2_C Reheat Coil,     !- Component 1 Name
     rm3_2_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_2_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_2_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_2_C
 !-- VAVZone-Autosize[] --Begin--: rm3_3_C
@@ -23750,13 +23706,11 @@
 
   Branch,
     rm3_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_3_C Reheat Coil,     !- Component 1 Name
     rm3_3_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_3_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_3_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_3_C
 !-- VAVZone-Autosize[] --Begin--: rm3_4_C
@@ -23854,13 +23808,11 @@
 
   Branch,
     rm3_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_4_C Reheat Coil,     !- Component 1 Name
     rm3_4_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_4_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_4_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_4_C
 !-- VAVZone-Autosize[] --Begin--: rm3_5_C
@@ -23958,13 +23910,11 @@
 
   Branch,
     rm3_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_5_C Reheat Coil,     !- Component 1 Name
     rm3_5_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_5_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_5_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_5_C
 !-- VAVZone-Autosize[] --Begin--: rm3_6_C
@@ -24062,13 +24012,11 @@
 
   Branch,
     rm3_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_6_C Reheat Coil,     !- Component 1 Name
     rm3_6_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_6_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_6_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_6_C
 !-- VAVZone-Autosize[] --Begin--: rm3_7_C
@@ -24166,13 +24114,11 @@
 
   Branch,
     rm3_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_7_C Reheat Coil,     !- Component 1 Name
     rm3_7_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_7_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_7_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_7_C
 !-- VAVZone-Autosize[] --Begin--: rm3_8_C
@@ -24270,13 +24216,11 @@
 
   Branch,
     rm3_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_8_C Reheat Coil,     !- Component 1 Name
     rm3_8_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_8_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_8_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_8_C
 !-- VAVZone-Autosize[] --Begin--: rm3_9_C
@@ -24374,13 +24318,11 @@
 
   Branch,
     rm3_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_9_C Reheat Coil,     !- Component 1 Name
     rm3_9_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_9_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_9_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_9_C
 !-- VAVZone-Autosize[] --Begin--: rm3_10_C
@@ -24478,13 +24420,11 @@
 
   Branch,
     rm3_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm3_10_C Reheat Coil,    !- Component 1 Name
     rm3_10_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm3_10_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm3_10_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm3_10_C
 !-- VAVZone-Autosize[] --Begin--: rm4_1_C
@@ -24582,13 +24522,11 @@
 
   Branch,
     rm4_1_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_1_C Reheat Coil,     !- Component 1 Name
     rm4_1_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_1_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_1_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_1_C
 !-- VAVZone-Autosize[] --Begin--: rm4_2_C
@@ -24686,13 +24624,11 @@
 
   Branch,
     rm4_2_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_2_C Reheat Coil,     !- Component 1 Name
     rm4_2_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_2_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_2_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_2_C
 !-- VAVZone-Autosize[] --Begin--: rm4_3_C
@@ -24790,13 +24726,11 @@
 
   Branch,
     rm4_3_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_3_C Reheat Coil,     !- Component 1 Name
     rm4_3_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_3_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_3_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_3_C
 !-- VAVZone-Autosize[] --Begin--: rm4_4_C
@@ -24894,13 +24828,11 @@
 
   Branch,
     rm4_4_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_4_C Reheat Coil,     !- Component 1 Name
     rm4_4_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_4_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_4_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_4_C
 !-- VAVZone-Autosize[] --Begin--: rm4_5_C
@@ -24998,13 +24930,11 @@
 
   Branch,
     rm4_5_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_5_C Reheat Coil,     !- Component 1 Name
     rm4_5_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_5_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_5_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_5_C
 !-- VAVZone-Autosize[] --Begin--: rm4_6_C
@@ -25102,13 +25032,11 @@
 
   Branch,
     rm4_6_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_6_C Reheat Coil,     !- Component 1 Name
     rm4_6_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_6_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_6_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_6_C
 !-- VAVZone-Autosize[] --Begin--: rm4_7_C
@@ -25206,13 +25134,11 @@
 
   Branch,
     rm4_7_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_7_C Reheat Coil,     !- Component 1 Name
     rm4_7_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_7_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_7_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_7_C
 !-- VAVZone-Autosize[] --Begin--: rm4_8_C
@@ -25310,13 +25236,11 @@
 
   Branch,
     rm4_8_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_8_C Reheat Coil,     !- Component 1 Name
     rm4_8_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_8_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_8_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_8_C
 !-- VAVZone-Autosize[] --Begin--: rm4_9_C
@@ -25414,13 +25338,11 @@
 
   Branch,
     rm4_9_C HW-Branch,       !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_9_C Reheat Coil,     !- Component 1 Name
     rm4_9_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_9_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_9_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_9_C
 !-- VAVZone-Autosize[] --Begin--: rm4_10_C
@@ -25518,13 +25440,11 @@
 
   Branch,
     rm4_10_C HW-Branch,      !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     rm4_10_C Reheat Coil,    !- Component 1 Name
     rm4_10_C Reheat Coil HW Inlet,  !- Component 1 Inlet Node Name
-    rm4_10_C Reheat Coil HW Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    rm4_10_C Reheat Coil HW Outlet;  !- Component 1 Outlet Node Name
 
 !-- VAVZone-Autosize[] --End--: rm4_10_C
 !-- VAVSAirLoop-Autosize[] --Begin--: PVAV_Sys
@@ -25602,23 +25522,19 @@
 
   Branch,
     PVAV_Sys Main Branch,    !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     PVAV_Sys OA System,      !- Component 1 Name
     PVAV_Sys Air Loop Inlet, !- Component 1 Inlet Node Name
     PVAV_Sys Mixed Air Outlet,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Coil:Cooling:Water,      !- Component 2 Object Type
     PVAV_Sys Cooling Coil,   !- Component 2 Name
     PVAV_Sys Mixed Air Outlet,  !- Component 2 Inlet Node Name
     PVAV_Sys Cooling Coil Outlet,  !- Component 2 Outlet Node Name
-    Passive,                 !- Component 2 Branch Control Type
     Fan:VariableVolume,      !- Component 3 Object Type
     PVAV_Sys Supply Fan,     !- Component 3 Name
     PVAV_Sys Cooling Coil Outlet,  !- Component 3 Inlet Node Name
-    PVAV_Sys Fan Outlet,     !- Component 3 Outlet Node Name
-    Active;                  !- Component 3 Branch Control Type
+    PVAV_Sys Fan Outlet;     !- Component 3 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
     PVAV_Sys Supply Path,    !- Name
@@ -25790,13 +25706,11 @@
 
   Branch,
     PVAV_Sys ChW-Branch,     !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
     PVAV_Sys Cooling Coil,   !- Component 1 Name
     PVAV_Sys Cooling Coil Water Inlet Node,  !- Component 1 Inlet Node Name
-    PVAV_Sys Cooling Coil Water Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    PVAV_Sys Cooling Coil Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Fan:VariableVolume,
     PVAV_Sys Supply Fan,     !- Name
@@ -26011,13 +25925,11 @@
 
   Branch,
     HWdemand1 HW Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HWdemand1 HW Inlet Pipe, !- Component 1 Name
     HWdemand1 HW Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HWdemand1 HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HWdemand1 HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HWdemand1 HW Inlet Pipe, !- Name
@@ -26026,13 +25938,11 @@
 
   Branch,
     HWdemand1 HW Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HWdemand1 HW Outlet Pipe,!- Component 1 Name
     HWdemand1 HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HWdemand1 HW Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HWdemand1 HW Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HWdemand1 HW Outlet Pipe,!- Name
@@ -26041,13 +25951,11 @@
 
   Branch,
     HWdemand1 HW Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HWdemand1 HW Bypass Pipe,!- Component 1 Name
     HWdemand1 HW Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HWdemand1 HW Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HWdemand1 HW Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HWdemand1 HW Bypass Pipe,!- Name
@@ -26129,33 +26037,27 @@
 
   Branch,
     BoilerPlant Boiler Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     BoilerPlant Boiler,      !- Component 1 Name
     BoilerPlant Boiler Inlet Node,  !- Component 1 Inlet Node Name
-    BoilerPlant Boiler Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    BoilerPlant Boiler Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     BoilerPlant HW Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     BoilerPlant HW Supply Side Bypass,  !- Component 1 Name
     BoilerPlant HW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    BoilerPlant HW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    BoilerPlant HW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     BoilerPlant HW Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     BoilerPlant HW Supply Outlet,  !- Component 1 Name
     BoilerPlant HW Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    BoilerPlant HW Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    BoilerPlant HW Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     BoilerPlant HW Supply Side Bypass,  !- Name
@@ -26180,13 +26082,11 @@
 
   Branch,
     BoilerPlant HW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     BoilerPlant HW Circ Pump,!- Component 1 Name
     BoilerPlant HW Supply Inlet Node,  !- Component 1 Inlet Node Name
-    BoilerPlant HW Pump Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    BoilerPlant HW Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   PlantEquipmentOperationSchemes,
     BoilerPlant Operation,   !- Name
@@ -26262,13 +26162,11 @@
 
   Branch,
     CHWdemand1 ChW Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHWdemand1 ChW Inlet Pipe,  !- Component 1 Name
     CHWdemand1 ChW Demand Inlet Node,  !- Component 1 Inlet Node Name
-    CHWdemand1 ChW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CHWdemand1 ChW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHWdemand1 ChW Inlet Pipe,  !- Name
@@ -26277,13 +26175,11 @@
 
   Branch,
     CHWdemand1 ChW Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHWdemand1 ChW Outlet Pipe,  !- Component 1 Name
     CHWdemand1 ChW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    CHWdemand1 ChW Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    CHWdemand1 ChW Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHWdemand1 ChW Outlet Pipe,  !- Name
@@ -26292,13 +26188,11 @@
 
   Branch,
     CHWdemand1 ChW Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     CHWdemand1 ChW Bypass Pipe,  !- Component 1 Name
     CHWdemand1 ChW Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CHWdemand1 ChW Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    CHWdemand1 ChW Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     CHWdemand1 ChW Bypass Pipe,  !- Name
@@ -26464,33 +26358,27 @@
 
   Branch,
     ChillerPlant Chiller Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     ChillerPlant Chiller,    !- Component 1 Name
     ChillerPlant Chiller Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Chiller Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ChillerPlant Chiller Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ChillerPlant ChW Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ChillerPlant ChW Supply Side Bypass,  !- Component 1 Name
     ChillerPlant ChW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant ChW Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    ChillerPlant ChW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ChillerPlant ChW Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ChillerPlant ChW Supply Outlet,  !- Component 1 Name
     ChillerPlant ChW Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant ChW Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    ChillerPlant ChW Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ChillerPlant ChW Supply Side Bypass,  !- Name
@@ -26515,13 +26403,11 @@
 
   Branch,
     ChillerPlant ChW Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
     ChillerPlant ChW Circ Pump,  !- Component 1 Name
     ChillerPlant ChW Supply Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant ChW Pump Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ChillerPlant ChW Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   PlantEquipmentOperationSchemes,
     ChillerPlant Operation,  !- Name
@@ -26609,13 +26495,11 @@
 
   Branch,
     ChillerPlant Condenser Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ChillerPlant Cnd Demand Inlet Pipe,  !- Component 1 Name
     ChillerPlant Cnd Demand Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Cnd Demand In Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    ChillerPlant Cnd Demand In Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ChillerPlant Cnd Demand Inlet Pipe,  !- Name
@@ -26624,23 +26508,19 @@
 
   Branch,
     ChillerPlant Chiller Condenser Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Chiller:Electric:EIR,    !- Component 1 Object Type
     ChillerPlant Chiller,    !- Component 1 Name
     ChillerPlant Chiller Cond Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Chiller Cond Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ChillerPlant Chiller Cond Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ChillerPlant Condenser Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ChillerPlant Condenser Demand Side Bypass,  !- Component 1 Name
     ChillerPlant Condenser Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Condenser Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    ChillerPlant Condenser Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ChillerPlant Condenser Demand Side Bypass,  !- Name
@@ -26649,13 +26529,11 @@
 
   Branch,
     ChillerPlant Condenser Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ChillerPlant Condenser Demand Outlet,  !- Component 1 Name
     ChillerPlant Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Cnd Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    ChillerPlant Cnd Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ChillerPlant Condenser Demand Outlet,  !- Name
@@ -26735,23 +26613,19 @@
 
   Branch,
     ChillerPlant Tower Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     CoolingTower:SingleSpeed,!- Component 1 Object Type
     ChillerPlant Tower,      !- Component 1 Name
     ChillerPlant Tower Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Tower Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ChillerPlant Tower Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     ChillerPlant Condenser Supply Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ChillerPlant Condenser Supply Side Bypass,  !- Component 1 Name
     ChillerPlant Condenser Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Condenser Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    ChillerPlant Condenser Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ChillerPlant Condenser Supply Side Bypass,  !- Name
@@ -26760,13 +26634,11 @@
 
   Branch,
     ChillerPlant Condenser Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     ChillerPlant Condenser Supply Outlet,  !- Component 1 Name
     ChillerPlant Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Cnd Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    ChillerPlant Cnd Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     ChillerPlant Condenser Supply Outlet,  !- Name
@@ -26791,13 +26663,11 @@
 
   Branch,
     ChillerPlant Condenser Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     ChillerPlant Cnd Circ Pump,  !- Component 1 Name
     ChillerPlant Cnd Supply Inlet Node,  !- Component 1 Inlet Node Name
-    ChillerPlant Cnd Pump Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ChillerPlant Cnd Pump Outlet Node;  !- Component 1 Outlet Node Name
 
   CondenserEquipmentOperationSchemes,
     ChillerPlant Condenser Loop Operation,  !- Name

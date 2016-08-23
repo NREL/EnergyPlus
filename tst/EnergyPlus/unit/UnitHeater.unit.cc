@@ -866,33 +866,27 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Heating Supply Inlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    HW Circ Pump,            !- Component 1 Name",
 		"    HW Supply Inlet Node,    !- Component 1 Inlet Node Name",
-		"    HW Pump Outlet Node,     !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    HW Pump Outlet Node;     !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Purchased Hot Water Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    DistrictHeating,         !- Component 1 Object Type",
 		"    Purchased Heating,       !- Component 1 Name",
 		"    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Purchased Heat Outlet Node,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    Heating Supply Bypass Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Side Bypass,  !- Component 1 Name",
 		"    Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
-		"    Heating Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Heating Supply Side Bypass,  !- Name",
@@ -901,13 +895,11 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Heating Supply Outlet Branch,  !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    Heating Supply Outlet,   !- Component 1 Name",
 		"    Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HW Supply Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Supply Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    Heating Supply Outlet,   !- Name",
@@ -958,13 +950,11 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    ZonesHWInletBranch,      !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWInletPipe,        !- Component 1 Name",
 		"    HW Demand Inlet Node,    !- Component 1 Inlet Node Name",
-		"    HW Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    ZonesHWInletPipe,        !- Name",
@@ -973,13 +963,11 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    ZonesHWOutletBranch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWOutletPipe,       !- Component 1 Name",
 		"    HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-		"    HW Demand Outlet Node,   !- Component 1 Outlet Node Name",
-		"    PASSIVE;                 !- Component 1 Branch Control Type",
+		"    HW Demand Outlet Node;   !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    ZonesHWOutletPipe,       !- Name",
@@ -988,23 +976,19 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  Branch,",
 		"    Zone2HWBranch,           !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Coil:Heating:Water,      !- Component 1 Object Type",
 		"    Zone2UnitHeatHeatingCoil,!- Component 1 Name",
 		"    Zone2UnitHeatHWInletNode,!- Component 1 Inlet Node Name",
-		"    Zone2UnitHeatHWOutletNode,  !- Component 1 Outlet Node Name",
-		"    ACTIVE;                  !- Component 1 Branch Control Type",
+		"    Zone2UnitHeatHWOutletNode;  !- Component 1 Outlet Node Name",
 
 		"  Branch,",
 		"    ZonesHWBypassBranch,     !- Name",
-		"    0,                       !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    ZonesHWBypassPipe,       !- Component 1 Name",
 		"    ZonesHWBypassInletNode,  !- Component 1 Inlet Node Name",
-		"    ZonesHWBypassOutletNode, !- Component 1 Outlet Node Name",
-		"    BYPASS;                  !- Component 1 Branch Control Type",
+		"    ZonesHWBypassOutletNode; !- Component 1 Outlet Node Name",
 
 		"  Pipe:Adiabatic,",
 		"    ZonesHWBypassPipe,       !- Name",
@@ -1162,7 +1146,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		InitUnitHeater( UnitHeatNum, ZoneNum, FirstHVACIteration );
 		InitWaterCoil( CoilNum, FirstHVACIteration ); // init hot water heating coil
-		
+
 		PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
@@ -1195,7 +1179,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	Real64 LatOutputProvided( 0.0 ); // latent heating rate delivered
 	Real64 ConvTol( 1.0 ); // convergence tolerance
 	Real64 HWMassFlowRate( 0.0 ); // hot water coil water mass flow rate, m3/s
-	Real64 UHAirMassFlowRate( 0.0 ); // unit heate air mass flow rate 
+	Real64 UHAirMassFlowRate( 0.0 ); // unit heate air mass flow rate
 	Real64 UHHeatingRate( 0.0 ); // unit heate heating rate
 	Real64 UHEnteringAirEnthalpy( 0.0 ); // unit heater entering air enthalpy
 	Real64 UHLeavingAirEnthalpy( 0.0 ); // unit heater leaving air enthalpy
@@ -1366,7 +1350,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	Node( Fan( 1 ).InletNodeNum ).Temp = 16.6;
 	Node( Fan( 1 ).InletNodeNum ).HumRat = PsyWFnTdbRhPb( 16.6, 0.5, 101325.0, "UnitTest" );
 	Node( Fan( 1 ).InletNodeNum ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( Fan( 1 ).InletNodeNum ).Temp, Node( Fan( 1 ).InletNodeNum ).HumRat );
-	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
+	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 );
 
 	WCWaterInletNode = WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum;
 	WCWaterOutletNode = WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum;
@@ -1379,16 +1363,16 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	UHAirOutletNode = UnitHeat( UnitHeatNum ).AirOutNode;
 
 	SimUnitHeater( UnitHeat( UnitHeatNum ).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum );
-	// SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets 
+	// SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets
 	// on the second call (iteration). I suspect it may be an initialization issue related to ControlCompOutput routine
 	SimUnitHeater( UnitHeat( UnitHeatNum ).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum );
 	// verify the total heat rate deleivered by the unit heater
 	UHAirMassFlowRate = Node( UHAirInletNode ).MassFlowRate;
 	UHEnteringAirEnthalpy = PsyHFnTdbW( Node( UHAirInletNode ).Temp, Node( UHAirInletNode ).HumRat );
-	UHLeavingAirEnthalpy = PsyHFnTdbW( Node( UHAirOutletNode ).Temp, Node( UHAirOutletNode ).HumRat );	
+	UHLeavingAirEnthalpy = PsyHFnTdbW( Node( UHAirOutletNode ).Temp, Node( UHAirOutletNode ).HumRat );
 	UHHeatingRate = UHAirMassFlowRate * ( UHLeavingAirEnthalpy - UHEnteringAirEnthalpy );
 	EXPECT_NEAR( UHHeatingRate, UnitHeat( UnitHeatNum ).HeatPower, ConvTol );
-	// verify the heat rate delivered by the hot water heating coil 
+	// verify the heat rate delivered by the hot water heating coil
 	HWMassFlowRate = WaterCoils::WaterCoil( CoilNum ).InletWaterMassFlowRate;
 	CpHW = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "UnitTest" );
 	HWCoilHeatingRate = HWMassFlowRate * CpHW * ( Node( WCWaterInletNode ).Temp - Node( WCWaterOutletNode ).Temp );

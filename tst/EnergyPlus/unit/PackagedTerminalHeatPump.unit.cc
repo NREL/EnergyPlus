@@ -64,6 +64,7 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>

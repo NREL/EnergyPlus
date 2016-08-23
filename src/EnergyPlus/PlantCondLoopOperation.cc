@@ -509,11 +509,7 @@ namespace PlantCondLoopOperation {
 
 						{ auto const plantLoopOperation( PlantLoop( LoopNum ).OpScheme( Num ).TypeOf );
 
-						if ( plantLoopOperation == "LOAD RANGE BASED OPERATION" ) { // Deprecated
-							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = LoadRBOpSchemeType; // Deprecated
-							ShowSevereError( CurrentModuleObject + " = \"" + cAlphaArgs( 1 ) + "\" deprecated field value =\"" + PlantLoop( LoopNum ).OpScheme( Num ).TypeOf + "\"." );
-							ShowContinueError( "... should be replaced with PlantEquipmentOperation:CoolingLoad or PlantEquipmentOperation:HeatingLoad" );
-						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
+						if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CoolingRBOpSchemeType;
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = HeatingRBOpSchemeType;
