@@ -1050,14 +1050,8 @@ namespace EnergyPlus {
 		"    UNTIL: 24:00,1.0;        !- Field 3",
 		}) ;
 
-<<<<<<< HEAD
 		ASSERT_TRUE( process_idf( idf_objects ) );
-	
-=======
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
->>>>>>> NREL/develop
-			bool ErrorsFound =  false;
+		bool ErrorsFound =  false;
 
 		DataGlobals::BeginSimFlag = true;
 		SimulationManager::GetProjectData();
@@ -2135,7 +2129,7 @@ namespace EnergyPlus {
 
 <<<<<<< HEAD
 		ASSERT_TRUE( process_idf( idf_objects ) );
-	
+
 =======
 		ASSERT_FALSE( process_idf( idf_objects ) );
 

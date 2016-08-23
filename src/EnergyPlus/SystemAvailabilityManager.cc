@@ -742,27 +742,18 @@ namespace SystemAvailabilityManager {
 					ShowSevereError( RoutineName + "incorrect value: " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 					ErrorsFound = true;
 				}}
-<<<<<<< HEAD
-				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == CycleOnControlZone ) {
-					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneName = cAlphaArgs( 5 );
-					NCycSysAvailMgrData( SysAvailNum ).ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Zone );
-					if ( NCycSysAvailMgrData( SysAvailNum ).ZoneNum == 0 ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
-						ShowSevereError( "not found: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
-						ErrorsFound = true;
-=======
 
 				// Control zone or zonelist
 				if ( !lAlphaFieldBlanks( 5 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneListName = cAlphaArgs( 5 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
+					int ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 5 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = InputProcessor::FindItemInList( cAlphaArgs( 5 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = NumZones;
@@ -780,14 +771,14 @@ namespace SystemAvailabilityManager {
 				// Cooling zone or zonelist
 				if ( !lAlphaFieldBlanks( 6 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).CoolingZoneListName = cAlphaArgs( 6 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 6 ), Zone );
+					int ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 6 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 6 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = InputProcessor::FindItemInList( cAlphaArgs( 6 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = NumZones;
@@ -805,14 +796,14 @@ namespace SystemAvailabilityManager {
 				// Heating zone or zonelist
 				if ( !lAlphaFieldBlanks( 7 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).HeatingZoneListName = cAlphaArgs( 7 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
+					int ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 7 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 7 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = InputProcessor::FindItemInList( cAlphaArgs( 7 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = NumZones;
@@ -830,14 +821,14 @@ namespace SystemAvailabilityManager {
 				// HeatZnFan zone or zonelist
 				if ( !lAlphaFieldBlanks( 8 ) ){
 					NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZoneListName = cAlphaArgs( 8 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 8 ), Zone );
+					int ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 8 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 8 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = InputProcessor::FindItemInList( cAlphaArgs( 8 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = NumZones;
@@ -849,7 +840,6 @@ namespace SystemAvailabilityManager {
 							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 							ErrorsFound = true;
 						}
->>>>>>> NREL/develop
 					}
 				}
 
@@ -2374,11 +2364,11 @@ namespace SystemAvailabilityManager {
 
 			if ( ( tstatType == SingleCoolingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) + TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			} else if ( tstatType == DualSetPointWithDeadBand ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::ZoneThermostatSetPointHi( ZoneNum ) + TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			}}
 		}
@@ -2399,11 +2389,11 @@ namespace SystemAvailabilityManager {
 
 			if ( ( tstatType == SingleHeatingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) - TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			} else if ( tstatType == DualSetPointWithDeadBand ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::ZoneThermostatSetPointLo( ZoneNum ) - TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			}}
 		}

@@ -1023,11 +1023,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-<<<<<<< HEAD
 								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Furnace( FurnaceNum ).Name ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-=======
-								if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Furnace( FurnaceNum ).Name ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
->>>>>>> NREL/develop
 								AirLoopFound = true;
 								break;
 							}
@@ -1545,11 +1541,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-<<<<<<< HEAD
 								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-=======
-								if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
->>>>>>> NREL/develop
 								AirLoopFound = true;
 								break;
 							}
@@ -1868,12 +1860,8 @@ namespace Furnaces {
 			errFlag = false;
 			PrintMessage = false;
 
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
-=======
-			if ( SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
-				 SameString( CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
+				 InputProcessor::SameString( CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) {
 				Furnace( FurnaceNum ).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 				if ( SameString( CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) Furnace( FurnaceNum ).bIsIHP = true;
 			} else {
@@ -2689,11 +2677,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-<<<<<<< HEAD
 								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-=======
-								if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
->>>>>>> NREL/develop
 								AirLoopFound = true;
 								break;
 							}
@@ -2810,14 +2794,10 @@ namespace Furnaces {
 
 			errFlag = false;
 
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
-=======
-			if ( SameString( HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
-				 SameString( HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
+				 InputProcessor::SameString( HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
-				if ( SameString( HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) Furnace( FurnaceNum ).bIsIHP = true;
+				if ( InputProcessor::SameString( HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) Furnace( FurnaceNum ).bIsIHP = true;
 			} else {
 				Furnace( FurnaceNum ).HeatingCoilType_Num = GetCoilTypeNum( HeatingCoilType, HeatingCoilName, errFlag );
 			}
@@ -2888,14 +2868,10 @@ namespace Furnaces {
 			CoolingCoilType = Alphas( 10 );
 			CoolingCoilName = Alphas( 11 );
 
-<<<<<<< HEAD
-			if ( InputProcessor::SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
-=======
-			if ( SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
-				 SameString( CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
+				 InputProcessor::SameString( CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) {
 				Furnace( FurnaceNum ).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
-				if ( SameString( CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) Furnace( FurnaceNum ).bIsIHP = true;
+				if ( InputProcessor::SameString( CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) Furnace( FurnaceNum ).bIsIHP = true;
 			}
 
 			ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
@@ -3606,11 +3582,7 @@ namespace Furnaces {
 					if ( AirLoopNumber > 0 ) {
 						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-<<<<<<< HEAD
 								if ( ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! InputProcessor::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-=======
-								if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
->>>>>>> NREL/develop
 								AirLoopFound = true;
 								break;
 							}

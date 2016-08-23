@@ -425,13 +425,8 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\"" );
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
-<<<<<<< HEAD
-			// Assign Other Paramters
-			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
-=======
 			// Assign Other Parameters
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
->>>>>>> NREL/develop
+			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = false;
 			} else if ( InputProcessor::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;

@@ -1298,11 +1298,7 @@ namespace WaterThermalTanks {
 
 					WaterHeaterDesuperheater( DesuperheaterNum ).TankType = cAlphaArgs( 7 );
 
-<<<<<<< HEAD
 					if ( ! InputProcessor::SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, cMixedWHModuleObj ) && ! InputProcessor::SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, cStratifiedWHModuleObj ) ) {
-=======
-					if ( !SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, cMixedWHModuleObj ) && !SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, cStratifiedWHModuleObj ) ) {
->>>>>>> NREL/develop
 
 						ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( DesuperheaterNum ).Name + ':' );
 						ShowContinueError( "Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + '.' );
@@ -1341,11 +1337,7 @@ namespace WaterThermalTanks {
 					if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:CompressorRack" ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource = COMPRESSORRACK_REFRIGERATEDCASE;
 						for ( RackNum = 1; RackNum <= NumRefrigeratedRacks; ++RackNum ) {
-<<<<<<< HEAD
 							if ( ! InputProcessor::SameString( HeatReclaimRefrigeratedRack( RackNum ).Name, cAlphaArgs( 10 ) ) ) continue;
-=======
-							if ( !SameString( HeatReclaimRefrigeratedRack( RackNum ).Name, cAlphaArgs( 10 ) ) ) continue;
->>>>>>> NREL/develop
 							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = RackNum;
 							if ( allocated( HeatReclaimRefrigeratedRack ) ) ValidSourceType( DesuperheaterNum ) = true;
 							break;
@@ -1357,11 +1349,7 @@ namespace WaterThermalTanks {
 					} else if ( ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:AirCooled" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( InputProcessor::SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource = CONDENSER_REFRIGERATION;
 						for ( CondNum = 1; CondNum <= NumRefrigCondensers; ++CondNum ) {
-<<<<<<< HEAD
 							if ( ! InputProcessor::SameString( HeatReclaimRefrigCondenser( CondNum ).Name, cAlphaArgs( 10 ) ) ) continue;
-=======
-							if ( !SameString( HeatReclaimRefrigCondenser( CondNum ).Name, cAlphaArgs( 10 ) ) ) continue;
->>>>>>> NREL/develop
 							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = CondNum;
 							if ( allocated( HeatReclaimRefrigCondenser ) ) ValidSourceType( DesuperheaterNum ) = true;
 							break;
@@ -1373,11 +1361,7 @@ namespace WaterThermalTanks {
 					} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource = COIL_DX_COOLING;
 						for ( DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum ) {
-<<<<<<< HEAD
 							if ( ! InputProcessor::SameString( HeatReclaimDXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
-=======
-							if ( !SameString( HeatReclaimDXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
->>>>>>> NREL/develop
 							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 							if ( allocated( HeatReclaimDXCoil ) ) ValidSourceType( DesuperheaterNum ) = true;
 							break;
@@ -1389,11 +1373,7 @@ namespace WaterThermalTanks {
 					} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:TwoSpeed" ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource = COIL_DX_MULTISPEED;
 						for ( DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum ) {
-<<<<<<< HEAD
 							if ( ! InputProcessor::SameString( HeatReclaimDXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
-=======
-							if ( !SameString( HeatReclaimDXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
->>>>>>> NREL/develop
 							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 							if ( allocated( HeatReclaimDXCoil ) ) ValidSourceType( DesuperheaterNum ) = true;
 							break;
@@ -1405,11 +1385,7 @@ namespace WaterThermalTanks {
 					} else if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:TwoStageWithHumidityControlMode" ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource = COIL_DX_MULTIMODE;
 						for ( DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum ) {
-<<<<<<< HEAD
 							if ( ! InputProcessor::SameString( HeatReclaimDXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
-=======
-							if ( !SameString( HeatReclaimDXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
->>>>>>> NREL/develop
 							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 							if ( allocated( HeatReclaimDXCoil ) ) ValidSourceType( DesuperheaterNum ) = true;
 							break;
@@ -1692,13 +1668,8 @@ namespace WaterThermalTanks {
 						HPWH.InletAirConfiguration = AmbientTempZone;
 
 						// Inlet Air Zone
-<<<<<<< HEAD
-						if ( ! hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
-							HPWH.AmbientTempZone = InputProcessor::FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
-=======
 						if ( !hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
-							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
->>>>>>> NREL/develop
+							HPWH.AmbientTempZone = InputProcessor::FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
 							if ( HPWH.AmbientTempZone == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
 								ShowContinueError( hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 13 + nAlphaOffset ] + "\"." );
@@ -1717,13 +1688,8 @@ namespace WaterThermalTanks {
 						HPWH.InletAirConfiguration = AmbientTempZoneAndOA;
 
 						// Inlet Air Zone
-<<<<<<< HEAD
-						if ( ! hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
-							HPWH.AmbientTempZone = InputProcessor::FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
-=======
 						if ( !hpwhAlphaBlank[ 13 + nAlphaOffset ] ) {
-							HPWH.AmbientTempZone = FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
->>>>>>> NREL/develop
+							HPWH.AmbientTempZone = InputProcessor::FindItemInList( hpwhAlpha[ 13 + nAlphaOffset ], Zone );
 							if ( HPWH.AmbientTempZone == 0 ) {
 								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
 								ShowContinueError( hpwhAlphaFieldNames[ 13 + nAlphaOffset ] + "=\"" + hpwhAlpha[ 13 + nAlphaOffset ] + "\"." );
@@ -1799,19 +1765,11 @@ namespace WaterThermalTanks {
 						}
 					} else {
 						// this is a single speed coil
-<<<<<<< HEAD
-						DXCoils::DXCoilData & Coil = DXCoil(HPWH.DXCoilNum);
-						if ( ! InputProcessor::SameString( HPWH.DXCoilType, Coil.DXCoilType ) ) {
-							ShowSevereError(cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-							ShowContinueError("specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\".");
-							ShowContinueError("However, " + HPWH.DXCoilName + " is a coil of type " + Coil.DXCoilType + ".");
-=======
 						DXCoils::DXCoilData & Coil = DXCoil( HPWH.DXCoilNum );
-						if ( !SameString( HPWH.DXCoilType, Coil.DXCoilType ) ) {
+						if ( ! InputProcessor::SameString( HPWH.DXCoilType, Coil.DXCoilType ) ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
 							ShowContinueError( "specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\"." );
 							ShowContinueError( "However, " + HPWH.DXCoilName + " is a coil of type " + Coil.DXCoilType + "." );
->>>>>>> NREL/develop
 							ErrorsFound = true;
 						}
 						HPWH.DXCoilTypeNum = Coil.DXCoilType_Num;
@@ -2383,13 +2341,8 @@ namespace WaterThermalTanks {
 					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, FanInletNode, FanOutletNode );
 
 					// Control Logic Flag
-<<<<<<< HEAD
-					std::string CtrlLogicFlag =  hpwhAlphaBlank[ 29 + nAlphaOffset ] ? "SIMULTANEOUS" : hpwhAlpha[ 29 + nAlphaOffset ];
-					if ( InputProcessor::SameString( CtrlLogicFlag, "SIMULTANEOUS" ) ) {
-=======
 					std::string CtrlLogicFlag = hpwhAlphaBlank[ 29 + nAlphaOffset ] ? "SIMULTANEOUS" : hpwhAlpha[ 29 + nAlphaOffset ];
-					if ( SameString( CtrlLogicFlag, "SIMULTANEOUS" ) ) {
->>>>>>> NREL/develop
+					if ( InputProcessor::SameString( CtrlLogicFlag, "SIMULTANEOUS" ) ) {
 						HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = true;
 					} else if ( InputProcessor::SameString( CtrlLogicFlag, "MUTUALLYEXCLUSIVE" ) ) {
 						HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = false;
@@ -3937,11 +3890,7 @@ namespace WaterThermalTanks {
 				for ( DesuperheaterNum = 1; DesuperheaterNum <= NumWaterHeaterDesuperheater; ++DesuperheaterNum ) {
 
 					for ( CheckWaterHeaterNum = 1; CheckWaterHeaterNum <= NumWaterThermalTank; ++CheckWaterHeaterNum ) {
-<<<<<<< HEAD
 						if ( ! InputProcessor::SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankName, WaterThermalTank( CheckWaterHeaterNum ).Name ) || ! InputProcessor::SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, WaterThermalTank( CheckWaterHeaterNum ).Type ) ) continue;
-=======
-						if ( !SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankName, WaterThermalTank( CheckWaterHeaterNum ).Name ) || !SameString( WaterHeaterDesuperheater( DesuperheaterNum ).TankType, WaterThermalTank( CheckWaterHeaterNum ).Type ) ) continue;
->>>>>>> NREL/develop
 						WaterThermalTank( CheckWaterHeaterNum ).DesuperheaterNum = DesuperheaterNum;
 						WaterHeaterDesuperheater( DesuperheaterNum ).WaterHeaterTankNum = CheckWaterHeaterNum;
 						WaterHeaterDesuperheater( DesuperheaterNum ).TankTypeNum = WaterThermalTank( CheckWaterHeaterNum ).TypeNum;
@@ -3998,11 +3947,7 @@ namespace WaterThermalTanks {
 						// Create reference to the tank
 						WaterThermalTankData & Tank = WaterThermalTank( CheckWaterHeaterNum );
 
-<<<<<<< HEAD
-						if ( ! ( InputProcessor::SameString( HPWH.TankName, Tank.Name ) && InputProcessor::SameString( HPWH.TankType, Tank.Type ) ) ) continue;
-=======
-						if ( !( SameString( HPWH.TankName, Tank.Name ) && SameString( HPWH.TankType, Tank.Type ) ) ) continue;
->>>>>>> NREL/develop
+						if ( !( InputProcessor::SameString( HPWH.TankName, Tank.Name ) && InputProcessor::SameString( HPWH.TankType, Tank.Type ) ) ) continue;
 
 						// save backup element and on/off-cycle parasitic properties for use during standard rating procedure
 						HPWH.BackupElementCapacity = Tank.MaxCapacity;
@@ -5632,12 +5577,7 @@ namespace WaterThermalTanks {
 			HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, HPInletHumRat, OutBaroPress );
 
 			// initialize flow rates at speed levels for varaible-speed HPWH
-<<<<<<< HEAD
-			if (InputProcessor::SameString(HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") &&
-				(0 == HPWaterHeater(HPNum).NumofSpeed))
-=======
-			if ( ( HPWaterHeater( HPNum ).bIsIHP ) && ( 0 == HPWaterHeater( HPNum ).NumofSpeed ) )//use SCWH coil represents
->>>>>>> NREL/develop
+			if ( ( HPWaterHeater( HPNum ).bIsIHP ) && ( HPWaterHeater( HPNum ).NumofSpeed == 0 ) )//use SCWH coil represents
 			{
 				SizeIHP( HPWaterHeater( HPNum ).DXCoilNum );//
 				//SimIHP(BlankString, HPWaterHeater(HPNum).DXCoilNum,
@@ -5647,7 +5587,7 @@ namespace WaterThermalTanks {
 
 			}
 			else if ( SameString( HPWaterHeater( HPNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed" ) &&
-					  ( 0 == HPWaterHeater( HPNum ).NumofSpeed ) ) {
+					  ( HPWaterHeater( HPNum ).NumofSpeed == 0 ) ) {
 				EMP1 = 4.0;
 				EMP2 = 0.0;
 				EMP3 = 0.0;
@@ -10861,11 +10801,7 @@ namespace WaterThermalTanks {
 
 					HPWHCrankcaseDBTemp = WaterThermalTank( WaterThermalTankNum ).AmbientTemp;
 
-<<<<<<< HEAD
-					if (InputProcessor::SameString(HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed")) {
-=======
-					if ( SameString( HPWaterHeater( HPNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed" ) || ( HPWaterHeater( HPNum ).bIsIHP ) ) {
->>>>>>> NREL/develop
+					if ( InputProcessor::SameString( HPWaterHeater( HPNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed" ) || ( HPWaterHeater( HPNum ).bIsIHP ) ) {
 						bIsVSCoil = true;
 						VSCoilName = HPWaterHeater( HPNum ).DXCoilName;
 						VSCoilNum = HPWaterHeater( HPNum ).DXCoilNum;

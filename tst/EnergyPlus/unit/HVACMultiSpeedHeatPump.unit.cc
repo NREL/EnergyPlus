@@ -1232,13 +1232,8 @@ namespace EnergyPlus {
 
 			});
 
-<<<<<<< HEAD
 			ASSERT_TRUE( process_idf( idf_objects ) );
-			
-=======
 			ASSERT_FALSE( process_idf( idf_objects ) );
-
->>>>>>> NREL/develop
 			NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 			MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 			ProcessScheduleInput();
