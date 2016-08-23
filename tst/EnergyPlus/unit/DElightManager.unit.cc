@@ -312,7 +312,7 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool foundErrors = false;
 
@@ -593,7 +593,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_InputGenerator_Test)
 
 	});
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	bool foundErrors = false;
 
