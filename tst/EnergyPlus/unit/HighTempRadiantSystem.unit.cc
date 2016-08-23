@@ -108,7 +108,7 @@ namespace EnergyPlus {
 			"	 0.80;                    !- Fraction of Radiant Energy to Surface 1",
 		} );
 		
-		clear_state();
+		HighTempRadiantSystem::clear_state();
 		
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
