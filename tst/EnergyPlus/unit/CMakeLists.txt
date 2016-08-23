@@ -78,6 +78,7 @@ set( test_src
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
+  IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
@@ -105,6 +106,7 @@ set( test_src
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
+  SimulationManager.unit.cc
   SingleDuct.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
