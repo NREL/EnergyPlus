@@ -58519,7 +58519,7 @@ Branch,
    A1,  \field Name
         \required-field
         \reference Branches
-   A2, \field Pressure Drop Curve Name
+   A2,  \field Pressure Drop Curve Name
         \type object-list
         \object-list PressureDropCurves
         \object-list ExponentCurves
@@ -58531,28 +58531,28 @@ Branch,
         \note Air loops do not account for pressure drop using this field
         \note Valid curve types are: Curve:Functional:PressureDrop or
         \note one of Curve:{Linear,Quadratic,Cubic,Exponent}')
-   A3, \field Component 1 Object Type
+   A3,  \field Component 1 Object Type
         \begin-extensible
         \required-field
         \type object-list 
         \object-list validBranchEquipmentTypes
-   A4, \field Component 1 Name
+   A4,  \field Component 1 Name
         \required-field
         \type object-list 
         \object-list validBranchEquipmentNames
-   A5, \field Component 1 Inlet Node Name
+   A5,  \field Component 1 Inlet Node Name
         \required-field
         \type node
-   A6, \field Component 1 Outlet Node Name
+   A6,  \field Component 1 Outlet Node Name
         \required-field
         \type node
-   A7, \field Component 2 Object Type
-       \type object-list 
-       \object-list validBranchEquipmentTypes
-   A8, \field Component 2 Name
+   A7,  \field Component 2 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
+   A8,  \field Component 2 Name
         \type object-list 
         \object-list validBranchEquipmentNames
-   A9,\field Component 2 Inlet Node Name
+   A9,  \field Component 2 Inlet Node Name
         \type node
    A10, \field Component 2 Outlet Node Name
         \type node
@@ -58563,7 +58563,8 @@ Branch,
         \type object-list 
         \object-list validBranchEquipmentNames
    A13, \field Component 3 Inlet Node Name
-  A14, \field Component 3 Outlet Node Name
+        \type node
+   A14, \field Component 3 Outlet Node Name
         \type node
    A15, \field Component 4 Object Type
         \type object-list 
