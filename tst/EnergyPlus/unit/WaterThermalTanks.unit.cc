@@ -1382,7 +1382,7 @@ TEST_F( EnergyPlusFixture, HPWHTestSPControl )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::OutputFileInits = GetNewUnitNumber();
 	DataHVACGlobals::TimeStepSys = 1;

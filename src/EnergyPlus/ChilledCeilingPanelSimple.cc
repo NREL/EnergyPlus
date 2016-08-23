@@ -191,7 +191,6 @@ namespace CoolingPanelSimple {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataPlant::TypeOf_CoolingPanel_Simple;
@@ -209,7 +208,7 @@ namespace CoolingPanelSimple {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			CoolingPanelNum = FindItemInList( EquipName, CoolingPanel, &CoolingPanelParams::EquipID, NumCoolingPanels );
+			CoolingPanelNum = InputProcessor::FindItemInList( EquipName, CoolingPanel, &CoolingPanelParams::EquipID, NumCoolingPanels );
 			if ( CoolingPanelNum == 0 ) {
 				ShowFatalError( "SimCoolingPanelSimple: Unit not found=" + EquipName );
 			}
@@ -285,11 +284,6 @@ namespace CoolingPanelSimple {
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::NodeConnectionType_Outlet;
 		using DataLoopNode::ObjectIsNotParent;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using DataSurfaces::Surface;
@@ -333,7 +327,7 @@ namespace CoolingPanelSimple {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
-		NumCoolingPanels = GetNumObjectsFound( cCMO_CoolingPanel_Simple );
+		NumCoolingPanels = InputProcessor::GetNumObjectsFound( cCMO_CoolingPanel_Simple );
 
 		// Count total number of baseboard units
 
@@ -344,10 +338,10 @@ namespace CoolingPanelSimple {
 		// Get the data from the user input related to cooling panels
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 
-			GetObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CoolingPanel, &CoolingPanelParams::EquipID, CoolingPanelNum, IsNotOK, IsBlank, cCMO_CoolingPanel_Simple + " Name" );
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), CoolingPanel, &CoolingPanelParams::EquipID, CoolingPanelNum, IsNotOK, IsBlank, cCMO_CoolingPanel_Simple + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -413,7 +407,7 @@ namespace CoolingPanelSimple {
 				CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = WaterMassFlowDefault;
 			}
 
-			if ( SameString( cAlphaArgs( 5 ), "CoolingDesignCapacity" ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "CoolingDesignCapacity" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
 				if ( ! lNumericFieldBlanks( 4 ) ) {
 					CoolingPanel( CoolingPanelNum ).RatedCapacity = rNumericArgs( 4 );
@@ -430,7 +424,7 @@ namespace CoolingPanelSimple {
 						ErrorsFound = true;
 					}
 				}
-			} else if ( SameString( cAlphaArgs( 5 ), "CapacityPerFloorArea" ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "CapacityPerFloorArea" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CapacityPerFloorArea;
 				if ( ! lNumericFieldBlanks( 5 ) ) {
 					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 5 );
@@ -451,7 +445,7 @@ namespace CoolingPanelSimple {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( 5 ) );
 					ErrorsFound = true;
 				}
-			} else if (SameString( cAlphaArgs( 5 ), "FractionOfAutosizedCoolingCapacity" ) ) {
+			} else if (InputProcessor::SameString( cAlphaArgs( 5 ), "FractionOfAutosizedCoolingCapacity" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
 				if ( ! lNumericFieldBlanks( 6 ) ) {
 					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 6 );
@@ -484,19 +478,19 @@ namespace CoolingPanelSimple {
 			}
 
 			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 6 ), MeanAirTemperature ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 6 ), MeanAirTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 6 ), MeanRadiantTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), MeanRadiantTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 6 ), OperativeTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), OperativeTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = OperativeControl;
-			} else if ( SameString( cAlphaArgs( 6 ), OutsideAirDryBulbTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), OutsideAirDryBulbTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ODBControl;
-			} else if ( SameString( cAlphaArgs( 6 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), OutsideAirWetBulbTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = OWBControl;
-			} else if ( SameString( cAlphaArgs( 6 ), ZoneTotalLoad ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), ZoneTotalLoad ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ZoneTotalLoadControl;
-			} else if ( SameString( cAlphaArgs( 6 ), ZoneConvectiveLoad ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), ZoneConvectiveLoad ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ZoneConvectiveLoadControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFieldNames( 6 ) + " =" + cAlphaArgs( 6 ) );
@@ -520,11 +514,11 @@ namespace CoolingPanelSimple {
 				ErrorsFound = true;
 			}
 			
-			if ( SameString( cAlphaArgs( 8 ), Off ) ) {
+			if ( InputProcessor::SameString( cAlphaArgs( 8 ), Off ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlNone;
-			} else if ( SameString( cAlphaArgs( 8 ), SimpleOff ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), SimpleOff ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlSimpleOff;
-			} else if ( SameString( cAlphaArgs( 8 ), VariableOff ) ) {
+			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), VariableOff ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlVariedOff;
 			} else {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlSimpleOff;
@@ -584,7 +578,7 @@ namespace CoolingPanelSimple {
 			AllFracsSummed = CoolingPanel( CoolingPanelNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= CoolingPanel( CoolingPanelNum ).TotSurfToDistrib; ++SurfNum ) {
 				CoolingPanel( CoolingPanelNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 8 );
-				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 8 ), Surface );
+				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + 8 ), Surface );
 				CoolingPanel( CoolingPanelNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 11 );
 				if ( CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 8 ) + "=\"" + cAlphaArgs( SurfNum + 8 ) + "\" invalid - not found." );

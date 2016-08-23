@@ -633,9 +633,9 @@ namespace SingleDuct {
 			}
 			if ( InputProcessor::SameString( Alphas( 10 ), "Reverse" ) ) {
 				Sys( SysNum ).DamperHeatingAction = ReverseAction;
-			} else if ( SameString( Alphas( 10 ), "Normal" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 10 ), "Normal" ) ) {
 				Sys( SysNum ).DamperHeatingAction = Normal;
-			} else if ( SameString( Alphas( 10 ), "ReverseWithLimits" ) ) {
+			} else if ( InputProcessor::SameString( Alphas( 10 ), "ReverseWithLimits" ) ) {
 				Sys( SysNum ).DamperHeatingAction = ReverseActionWithLimits;
 			}
 			else {

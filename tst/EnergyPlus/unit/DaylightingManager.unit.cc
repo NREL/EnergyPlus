@@ -83,7 +83,6 @@ using namespace EnergyPlus::DataDaylighting;
 
 TEST_F( EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test )
 {
-	using InputProcessor::GetNumObjectsFound;
 	using HeatBalanceManager::GetZoneData;
 
 	std::string const idf_objects = delimited_string( {
@@ -125,13 +124,13 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool foundErrors = false;
 	GetZoneData( foundErrors );
 	ASSERT_FALSE( foundErrors );
 
-	int numObjs = GetNumObjectsFound( "Daylighting:Controls" );
+	int numObjs = InputProcessor::GetNumObjectsFound( "Daylighting:Controls" );
 	GetInputDayliteRefPt( foundErrors );
 	compare_err_stream( "" );
 	EXPECT_FALSE( foundErrors );
@@ -168,7 +167,6 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test )
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_Test)
 {
-	using InputProcessor::GetNumObjectsFound;
 	using HeatBalanceManager::GetZoneData;
 
 	std::string const idf_objects = delimited_string({
@@ -230,13 +228,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
 
 	});
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	bool foundErrors = false;
 	GetZoneData(foundErrors);
 	ASSERT_FALSE(foundErrors);
 
-	int numObjs = GetNumObjectsFound("Daylighting:Controls");
+	int numObjs = InputProcessor::GetNumObjectsFound("Daylighting:Controls");
 	GetInputDayliteRefPt(foundErrors);
 	compare_err_stream("");
 	EXPECT_FALSE(foundErrors);
@@ -319,7 +317,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
 
 	});
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	bool foundErrors = false;
 	GetZoneData(foundErrors);
@@ -383,7 +381,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
 
 	});
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	bool foundErrors = false;
 	GetZoneData(foundErrors);
@@ -645,7 +643,7 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool foundErrors = false;
 

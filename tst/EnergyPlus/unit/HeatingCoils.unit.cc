@@ -80,7 +80,7 @@ namespace EnergyPlus {
 			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
 
@@ -100,7 +100,7 @@ namespace EnergyPlus {
 			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		ASSERT_THROW( HeatingCoils::GetHeatingCoilInput(), std::runtime_error );
 
 		std::string const error_string = delimited_string( {

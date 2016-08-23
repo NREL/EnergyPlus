@@ -282,7 +282,7 @@ namespace DElightManagerF {
 
 		for ( auto & znDayl : ZoneDaylight ) {
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
-				int const izone = FindItemInList( znDayl.ZoneName, Zone );
+				int const izone = InputProcessor::FindItemInList( znDayl.ZoneName, Zone );
 				if ( izone != 0 ) {
 
 					rLightLevel = GetDesignLightingLevelForZone( izone );
@@ -644,9 +644,6 @@ namespace DElightManagerF {
 
 		using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
 		using namespace DataDaylighting;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
 
 		int NumAlpha;
@@ -656,19 +653,19 @@ namespace DElightManagerF {
 
 		static std::string const cCurrentModuleObject( "Daylighting:DELight:ComplexFenestration" );
 
-		TotDElightCFS = GetNumObjectsFound( cCurrentModuleObject );
+		TotDElightCFS = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 		DElightComplexFene.allocate( TotDElightCFS );
 		for ( auto & cfs : DElightComplexFene ){
-			GetObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::GetObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			cfs.Name = cAlphaArgs( 1 );
 			cfs.ComplexFeneType = cAlphaArgs( 2 );
 			cfs.surfName = cAlphaArgs( 3 );
-			if ( FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( InputProcessor::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cfs.surfName + "\"." );
 				ErrorsFound = true;
 			}
 			cfs.wndwName = cAlphaArgs( 4 );
-			if ( FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( InputProcessor::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 4 ) + "=\"" + cfs.wndwName + "\"." );
 				ErrorsFound = true;
 			}
