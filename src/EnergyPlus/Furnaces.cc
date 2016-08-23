@@ -2160,7 +2160,7 @@ namespace Furnaces {
 						} // IF (IsNotOK) THEN
 					}
 
-				} else if ( InputProcessor::InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Water" ) ) {
+				} else if ( InputProcessor::SameString( ReheatingCoilType, "Coil:Heating:Water" ) ) {
 					Furnace( FurnaceNum ).SuppHeatCoilType_Num = Coil_HeatingWater;
 					ValidateComponent( ReheatingCoilType, ReheatingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
@@ -2794,12 +2794,8 @@ namespace Furnaces {
 
 			errFlag = false;
 
-<<<<<<< HEAD
 			if ( InputProcessor::SameString( HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
 				 InputProcessor::SameString( HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) {
-=======
-			if ( InputProcessor::InputProcessor::SameString( HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
->>>>>>> origin/input_processor_refactor
 				Furnace( FurnaceNum ).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
 				if ( InputProcessor::SameString( HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE" ) ) Furnace( FurnaceNum ).bIsIHP = true;
 			} else {
