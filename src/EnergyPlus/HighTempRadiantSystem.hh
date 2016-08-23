@@ -203,8 +203,8 @@ namespace HighTempRadiantSystem {
 	);
 
 	void
-	GetHighTempRadiantSystem();
-
+	GetHighTempRadiantSystem( bool & ErrorsFound ); // Error flag if problems encountered on reading user input
+	
 	void
 	InitHighTempRadiantSystem(
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
