@@ -63,7 +63,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ! na
 
           ! DERIVED TYPE DEFINITIONS
-          
+
   ! VARIABLES SUPPORTING DAYLIGHTING:DELIGHT:REFERENCEPOINT
   TYPE DElightRefPtType
     CHARACTER(len=MaxNameLength) :: RefPtName=blank
@@ -275,7 +275,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           !
           IF (.NOT. ALLOCATED(DElightRefPt)) THEN
             ! count number of Daylighting:DELight:ReferencePoint objects
-            NumDElightRefPt = 0 
+            NumDElightRefPt = 0
             DO Num=1,NumIDFRecords
               IF (MakeUPPERCase(IDFRecords(Num)%Name) == 'DAYLIGHTING:DELIGHT:REFERENCEPOINT') THEN
                 NumDElightRefPt = NumDElightRefPt + 1
@@ -283,7 +283,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDDO
             ALLOCATE(DElightRefPt(NumDElightRefPt))
             ! read the Daylighting:DELight:ReferencePoint into the array
-            iRefPt = 0 
+            iRefPt = 0
             DO Num=1,NumIDFRecords
               IF (MakeUPPERCase(IDFRecords(Num)%Name) == 'DAYLIGHTING:DELIGHT:REFERENCEPOINT') THEN
                 iRefPt = iRefPt + 1
@@ -294,7 +294,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 DElightRefPt(iRefPt)%Z = IDFRecords(Num)%Numbers(3)
                 DElightRefPt(iRefPt)%FracZone = IDFRecords(Num)%Numbers(4)
                 DElightRefPt(iRefPt)%IllumSetPt = IDFRecords(Num)%Numbers(5)
-              ENDIF  
+              ENDIF
             ENDDO
             ! now read through the Daylighting:DELight:Controls and associate the zone with each reference point
             DO Num=1,NumIDFRecords
@@ -500,13 +500,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.true.
                 SELECT CASE ( MakeUPPERCase ( InArgs(4) ) )
                 CASE ('OUTDOOR AIR DRYBLUB TEMPERATURE')
-				  nodiff = .true.
-				  OutArgs = InArgs
-				  OutArgs(4) = 'Outdoor Air Drybulb Temperature'
+                  nodiff = .true.
+                  OutArgs = InArgs
+                  OutArgs(4) = 'Outdoor Air Drybulb Temperature'
                 CASE ('OUTDOOR AIR WETBLUB TEMPERATURE')
                   nodiff = .true.
                   OutArgs = InArgs
-				  OutArgs(4) = 'Outdoor Air Wetbulb Temperature'
+                  OutArgs(4) = 'Outdoor Air Wetbulb Temperature'
                 END SELECT
 
     !!!   Changes for report variables, meters, tables -- update names
@@ -971,7 +971,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(2) = 'None'
                 OutArgs(3:11) = InArgs(2:10)
                 CurArgs = CurArgs+1
-              
+
+              CASE('COIL:HEATING:GAS')
+                nodiff = .false.
+                ObjectName = 'Coil:Heating:Fuel'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:2) = InArgs(1:2)
+                OutArgs(3) = 'NaturalGas'
+                OutArgs(4:11) = InArgs(3:10)
+                CurArgs = CurArgs + 1
+
                CASE('DAYLIGHTING:CONTROLS')
                  nodiff=.false.
                  CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -1071,7 +1080,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  DO iRefPt = 1,NumDElightRefPt
                    IF (MakeUPPERCase(InArgs(2)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
                      OutArgs(2) = DElightRefPt(iRefPt)%ZoneName
-                   ENDIF             
+                   ENDIF
                  ENDDO
                  OutArgs(3:5) = InArgs(3:5)
                  CurArgs = 5
@@ -1092,32 +1101,32 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(10) = "0"       ! New field with default of 0
                 ! Tell the "output" processor that we have 10 fields now
                 CurArgs = 10
-				! Get density of the material using InArgs(1) as the name, converted to a REAL
-				FoundMaterial = .FALSE.
-				DO MatlSearchNum = 1, NumIDFRecords
-				  IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Name) /= 'MATERIAL') CYCLE
-				  IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Alphas(1)) == MakeUPPERCase(InArgs(1))) THEN
-				    FoundMaterial = .TRUE.
-					! We have our match for the stratified tank child
-					WRITE(diflfn,fmta) '! Found a material component match; name ='//IDFRecords(MatlSearchNum)%Alphas(1)
-					! Now simply get the material density
-					READ (IDFRecords(MatlSearchNum)%Numbers(3),*) MaterialDensity
-				  END IF
-				END DO
-				IF ( .NOT. FoundMaterial ) THEN
-				  WRITE(diflfn,fmta) '! Didnt find a material component match for name ='//IDFRecords(MatlSearchNum)%Alphas(1)
-				  CALL ShowFatalError( 'Material match issue' )
-				END IF
-				! Get other values into REALs
-				READ (InArgs(3),*) EMPDCoeffA
-				READ (InArgs(4),*) EMPDCoeffB
-				READ (InArgs(5),*) EMPDCoeffC
-				READ (InArgs(6),*) EMPDCoeffD
-				READ (InArgs(2),*) EMPDCoeffDEMPD
-				! Get new mu_empd value from a function that deals with REALs
-				MuEMPD = CalculateMuEMPD(EMPDCoeffA, EMPDCoeffB, EMPDCoeffC, EMPDCoeffD, EMPDCoeffDEMPD, MaterialDensity)
-				! Read the real value back and assign to OutArgs(2)
-				WRITE(OutArgs(2),*) MuEMPD
+                ! Get density of the material using InArgs(1) as the name, converted to a REAL
+                FoundMaterial = .FALSE.
+                DO MatlSearchNum = 1, NumIDFRecords
+                IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Name) /= 'MATERIAL') CYCLE
+                IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Alphas(1)) == MakeUPPERCase(InArgs(1))) THEN
+                    FoundMaterial = .TRUE.
+                    ! We have our match for the stratified tank child
+                    WRITE(diflfn,fmta) '! Found a material component match; name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+                    ! Now simply get the material density
+                    READ (IDFRecords(MatlSearchNum)%Numbers(3),*) MaterialDensity
+                  END IF
+                END DO
+                IF ( .NOT. FoundMaterial ) THEN
+                  WRITE(diflfn,fmta) '! Didnt find a material component match for name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+                  CALL ShowFatalError( 'Material match issue' )
+                END IF
+                ! Get other values into REALs
+                READ (InArgs(3),*) EMPDCoeffA
+                READ (InArgs(4),*) EMPDCoeffB
+                READ (InArgs(5),*) EMPDCoeffC
+                READ (InArgs(6),*) EMPDCoeffD
+                READ (InArgs(2),*) EMPDCoeffDEMPD
+                ! Get new mu_empd value from a function that deals with REALs
+                MuEMPD = CalculateMuEMPD(EMPDCoeffA, EMPDCoeffB, EMPDCoeffC, EMPDCoeffD, EMPDCoeffDEMPD, MaterialDensity)
+                ! Read the real value back and assign to OutArgs(2)
+                WRITE(OutArgs(2),*) MuEMPD
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
