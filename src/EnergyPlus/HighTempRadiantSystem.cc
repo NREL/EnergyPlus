@@ -174,7 +174,23 @@ namespace HighTempRadiantSystem {
 	Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
+	void
+ 	clear_state()
+ 	{
+		NumOfHighTempRadSys = 0;
+		QHTRadSource.deallocate();
+		QHTRadSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQHTRadSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		HighTempRadSys.deallocate();
+		HighTempRadSysNumericFields.deallocate();
+	}
 
+	
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system

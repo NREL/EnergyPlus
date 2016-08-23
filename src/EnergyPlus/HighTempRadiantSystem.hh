@@ -193,7 +193,9 @@ namespace HighTempRadiantSystem {
 	extern Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
-
+	void
+	clear_state();
+	
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
