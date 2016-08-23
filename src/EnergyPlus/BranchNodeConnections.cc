@@ -249,9 +249,6 @@ namespace BranchNodeConnections {
 		// is a based on RegisterNodeConnection.
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::FindItemInList;
 
 		static std::string const RoutineName( "ModifyNodeConnectionType: " );
 
@@ -264,8 +261,8 @@ namespace BranchNodeConnections {
 		int Found = 0;
 		for ( int Count = 1; Count <= NumOfNodeConnections; ++Count ) {
 			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
-			if ( ! SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
-			if ( ! SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
 			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
 			if ( ( NodeConnections( Count ).ObjectIsParent != IsParent )) continue;
 			Found = Count;

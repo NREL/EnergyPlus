@@ -2402,29 +2402,39 @@ namespace EnergyPlus {
 		EXPECT_EQ( 1, IOStatus );
 	}
 
-	TEST_F( InputProcessorFixture, getObjectItem_coil_heating_gas)
+	TEST_F( InputProcessorFixture, getObjectItem_coil_heating_fuel)
 	{
 		std::string const idf_objects = delimited_string({
-																 "Coil:Heating:Gas,",
-																 "  Furnace Heating Coil 1, !- Name",
-																 "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-																 "  0.8,                    !- Gas Burner Efficiency",
-																 "  32000,                  !- Nominal Capacity{ W }",
-																 "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
-																 "  Reheat Coil Air Inlet Node;  !- Air Outlet Node Name",
-																 "  ",
-																 "Coil:Heating:Gas,",
-																 "  Humidistat Reheat Coil 1, !- Name",
-																 "  FanAndCoilAvailSched, !- Availability Schedule Name",
-																 "  0.8, !- Gas Burner Efficiency",
-																 "  32000, !- Nominal Capacity{ W }",
-																 "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
-																 "  Zone 2 Inlet Node;    !- Air Outlet Node Name",
+				"Coil:Heating:Fuel,",
+                "  name number one, ! A1 , \field Name",
+                "  schedule_name1, ! A2 , \field Availability Schedule Name",
+                "  Gas, ! A3 , \field Fuel Type",
+                "  0.45, ! N1 , \field Burner Efficiency",
+                "  0.1, ! N2 , \field Nominal Capacity",
+                "  this_is_an_air_inlet_name, ! A4 , \field Air Inlet Node Name",
+                "  this_is_outlet, ! A5 , \field Air Outlet Node Name",
+                "  other_name, ! A6 , \field Temperature Setpoint Node Name",
+                "  0.3, ! field Parasitic Electric Load",
+                "  curve_blah_name, ! Part Load Fraction Correlation Curve Name",
+                "  0.344; ! field Parasitic Fuel Load",
+                " ",
+                "Coil:Heating:Fuel,",
+                "  the second name, ! A1 , \field Name",
+                "  schedule_name2, ! A2 , \field Availability Schedule Name",
+                "  Gas, ! A3 , \field Fuel Type",
+                "  0.55, ! N1 , \field Burner Efficiency",
+                "  0.2, ! N2 , \field Nominal Capacity",
+                "  this_is_an_air_inlet_name2, ! A4 , \field Air Inlet Node Name",
+                "  this_is_outlet2, ! A5 , \field Air Outlet Node Name",
+                "  other_name2, ! A6 , \field Temperature Setpoint Node Name",
+                "  0.4, ! field Parasitic Electric Load",
+                "  curve_blah_name2, ! Part Load Fraction Correlation Curve Name",
+                "  0.444; ! field Parasitic Fuel Load",
 														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
-		std::string const CurrentModuleObject = "Coil:Heating:Gas";
+		std::string const CurrentModuleObject = "Coil:Heating:Fuel";
 
 		int num_coil_heating_gas = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		ASSERT_EQ( 2,  num_coil_heating_gas );
@@ -2445,14 +2455,13 @@ namespace EnergyPlus {
 
 		InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-		EXPECT_EQ( 4, NumAlphas );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FURNACE HEATING COIL 1", "FANANDCOILAVAILSCHED", "HEATING COIL AIR INLET NODE",
-																	   "REHEAT COIL AIR INLET NODE", "", "" } ), Alphas ) );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true } ), lAlphaBlanks ) );
+		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NAME NUMBER ONE", "SCHEDULE_NAME1", "GAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false } ), lAlphaBlanks ) );
 
-		EXPECT_EQ( 2, NumNumbers );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, true, true } ), lNumericBlanks ) );
-		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.8, 32000, 0, 0 } ), Numbers ) );
+		EXPECT_EQ( 4, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.45, 0.1, 0.30, 0.344 } ), Numbers ) );
 
 		int TotalArgs2 = 0;
 		int NumAlphas2 = 0;
@@ -2469,14 +2478,13 @@ namespace EnergyPlus {
 
 		InputProcessor::GetObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
-		EXPECT_EQ( 4, NumAlphas2 );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HUMIDISTAT REHEAT COIL 1", "FANANDCOILAVAILSCHED", "REHEAT COIL AIR INLET NODE",
-																	   "ZONE 2 INLET NODE", "", "" } ), Alphas2 ) );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true } ), lAlphaBlanks2 ) );
+        EXPECT_EQ( 7, NumAlphas );
+        EXPECT_TRUE( compare_containers( std::vector< std::string >( { "THE SECOND NAME", "SCHEDULE_NAME2", "GAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2" } ), Alphas2 ) );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false } ), lAlphaBlanks2 ) );
 
-		EXPECT_EQ( 2, NumNumbers2 );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, true, true } ), lNumericBlanks2 ) );
-		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.8, 32000, 0, 0 } ), Numbers2 ) );
+        EXPECT_EQ( 4, NumNumbers );
+        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lNumericBlanks2 ) );
+        EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.55, 0.2, 0.40, 0.444 } ), Numbers2 ) );
 
 		EXPECT_EQ( 1, IOStatus );
 	}

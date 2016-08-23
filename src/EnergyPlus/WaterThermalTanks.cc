@@ -5586,7 +5586,7 @@ namespace WaterThermalTanks {
 				HPWaterHeater( HPNum ).NumofSpeed = VarSpeedCoil( VSCoilID ).NumOfSpeeds;
 
 			}
-			else if ( SameString( HPWaterHeater( HPNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed" ) &&
+			else if ( InputProcessor::SameString( HPWaterHeater( HPNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed" ) &&
 					  ( HPWaterHeater( HPNum ).NumofSpeed == 0 ) ) {
 				EMP1 = 4.0;
 				EMP2 = 0.0;

@@ -5558,7 +5558,7 @@ namespace VariableSpeedCoils {
 			 InputProcessor::SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
 			 InputProcessor::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
 			 InputProcessor::SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) ) {
-			WhichCoil = FindItemInList( CoilName, VarSpeedCoil );
+			WhichCoil = InputProcessor::FindItemInList( CoilName, VarSpeedCoil );
 			if ( WhichCoil != 0 ) {
 				if ( InputProcessor::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || InputProcessor::SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ) {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapHeat;

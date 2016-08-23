@@ -1497,7 +1497,6 @@ namespace BranchInputManager {
 	)
 	{
 		// Using
-		using InputProcessor::SameString;
 		using CurveManager::GetPressureCurveTypeAndIndex;
 		using General::RoundSigDigits;
 
@@ -1529,7 +1528,7 @@ namespace BranchInputManager {
 		Branch( BCount ).Component.allocate( Branch( BCount ).NumOfComponents );
 		Comp = 1;
 		for ( int Loop = 3; Loop <= NumAlphas; Loop += 4 ) {
-			if ( SameString( Alphas( Loop ), cSPLITTER ) || SameString( Alphas( Loop ), cMIXER ) ) {
+			if ( InputProcessor::SameString( Alphas( Loop ), cSPLITTER ) || InputProcessor::SameString( Alphas( Loop ), cMIXER ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid data." );
 				ShowContinueError( "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject );
 				ErrFound = true;
