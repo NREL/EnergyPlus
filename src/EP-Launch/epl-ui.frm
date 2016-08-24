@@ -1416,7 +1416,6 @@ Public createCSVprocFile As Boolean
 Public CreateRunEPBatch As Boolean
 Public enableParametricPreprocessor As Boolean
 Public numberOfSimProcessesAllowed As Integer
-Public disableMultiThreading As Boolean
 Public viewAllOutputTabSelected As Boolean
 Dim firstActivateCall As Boolean
 Dim appPath As String
@@ -2876,7 +2875,6 @@ Dim outFN As Integer
 Dim minWindow As Boolean
 Dim showMessages As Boolean
 Dim lineOfBatch As String
-Dim countOfNotRunOrActive As Integer
 Dim i As Integer
 'If startSimulationActive Then Exit Sub 'exit if already running once
 'startSimulationActive = True
@@ -2887,17 +2885,6 @@ wthrName = simQueue(simQueueIndex).nameWthr
 outName = simQueue(simQueueIndex).nameOut
 showMessages = simQueue(simQueueIndex).messagesShow
 simQueue(simQueueIndex).timeStart = Time()
-' see if other simulations are running or about to run
-countOfNotRunOrActive = 0
-For i = 1 To numSimQueue
-  If simQueue(i).status = qStatNotRun Or simQueue(i).status = qStatActive Then
-    countOfNotRunOrActive = countOfNotRunOrActive + 1
-  End If
-Next i
-' limit count of other simulations to the number of processes allowed
-If countOfNotRunOrActive > numberOfSimProcessesAllowed Then
-  countOfNotRunOrActive = numberOfSimProcessesAllowed
-End If
 ' check if all files available first
 On Error Resume Next
 flNum = FreeFile
@@ -3034,12 +3021,6 @@ If CreateRunEPBatch Then
     Print #outFN, "SET procCSV=N"
   End If
   Print #outFN, "SET epPath="; appPath
-  Print #outFN, "SET cntActv="; Trim(Str(countOfNotRunOrActive))
-  If disableMultiThreading Then 'note that this is an inverse since the VB parameter is "disable" and the batch parameter is "enable"
-    Print #outFN, "SET multithrd=N"
-  Else
-    Print #outFN, "SET multithrd=Y"
-  End If
   ' now copy the batch file contents to the temporary batch file
   flNum = FreeFile
   Open appPath & batchFileName For Input As flNum
@@ -3098,14 +3079,6 @@ Else
     cmdLn = cmdLn & "Y "
   Else
     cmdLn = cmdLn & "N "
-  End If
-  ' %cntActv% or %10
-  cmdLn = cmdLn & Str(countOfNotRunOrActive) & " "
-  'multithrd or %11
-  If disableMultiThreading Then 'note that this is an inverse since the VB parameter is "disable" and the batch parameter is "enable"
-    cmdLn = cmdLn & "N "
-  Else
-    cmdLn = cmdLn & "Y "
   End If
   'if using parameter passing, append the command line parameters to the batch file name
   runBatchFile = runBatchFile & cmdLn
@@ -4154,11 +4127,6 @@ Else
     SaveSetting "EP-Launch", "Location", "UseParametricPreprocessor", "False"
 End If
 SaveSetting "EP-Launch", "Location", "MaxNumProcesses", Str(numberOfSimProcessesAllowed)
-If disableMultiThreading Then
-    SaveSetting "EP-Launch", "Location", "DisableMultiThreading", "True"
-Else
-    SaveSetting "EP-Launch", "Location", "DisableMultiThreading", "False"
-End If
 If viewAllOutputTabSelected Then
     SaveSetting "EP-Launch", "Location", "ViewAllOutputTabSelected", "True"
 Else
@@ -4305,7 +4273,6 @@ If firstUse = "True" Then
   CreateRunEPBatch = False
   enableParametricPreprocessor = True
   numberOfSimProcessesAllowed = 2
-  disableMultiThreading = False
   viewAllOutputTabSelected = False
   'update checking
   updateLastAnchor = ""
@@ -4436,11 +4403,6 @@ Else
   numberOfSimProcessesAllowed = Val(GetSetting("EP-Launch", "Location", "MaxNumProcesses"))
   If numberOfSimProcessesAllowed <= 1 Or numberOfSimProcessesAllowed > 1024 Then
     numberOfSimProcessesAllowed = 2
-  End If
-  If Left(GetSetting("EP-Launch", "Location", "DisableMultiThreading"), 1) = "T" Then
-    disableMultiThreading = True
-  Else
-    disableMultiThreading = False
   End If
   If Left(GetSetting("EP-Launch", "Location", "ViewAllOutputTabSelected"), 1) = "T" Then
     viewAllOutputTabSelected = True
