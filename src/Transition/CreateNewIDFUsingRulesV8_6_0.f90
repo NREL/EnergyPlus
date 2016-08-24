@@ -139,6 +139,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: ErrFlag
 
   INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
+  INTEGER :: AlphaNumI
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -395,6 +396,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
             IF (.not. MakingPretty) THEN
 
+              ! For this version, we are doing a global replacement of Coil:Heating:Gas with Coil:Heating:Fuel to catch
+              !  all the references in branches, parent objects, etc.  So this is done before the master CASE block to catch
+              !  any object type and loop over all the alphas.
+              DO AlphaNumI = 1, CurArgs
+                IF (SameString('COIL:HEATING:GAS', InArgs(AlphaNumI))) THEN
+                  InArgs(AlphaNumI) = 'Coil:Heating:Fuel'
+                  nodiff=.false.
+                END IF
+              END DO
+
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
@@ -490,6 +501,195 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     ! Remove Control Type
                     CurArgs = CurArgs-1
                 END DO
+
+              CASE('AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER')
+                nodiff=.false.
+                ! object rename
+                ObjectName = "AirTerminal:SingleDuct:Mixer"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6)=InArgs(1:6)   ! No change to fields F1 - F6
+                CurArgs = CurArgs + 1      ! Add new input field F7: -> "Mixer Connection Type"
+                OutArgs(7)='InletSide'     ! Set field value to "InletSide"
+
+              CASE('AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER')
+                nodiff=.false.
+                ! object rename
+                ObjectName = "AirTerminal:SingleDuct:Mixer"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:6)=InArgs(1:6)   ! No change to fields F1 - F6
+                CurArgs = CurArgs + 1      ! Add new input field F7: -> "Mixer Connection Type"
+                OutArgs(7)='SupplySide'    ! Set field value to "SupplySide"
+
+              CASE('ZONEHVAC:AIRDISTRIBUTIONUNIT')
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                if (samestring('AirTerminal:SingleDuct:InletSideMixer',InArgs(3)) .OR.   &
+                    samestring('AirTerminal:SingleDuct:SupplySideMixer',InArgs(3))) then
+                    OutArgs(3)='AirTerminal:SingleDuct:Mixer'
+                endif
+
+              CASE('OTHEREQUIPMENT')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1)
+                OutArgs(2) = 'None'
+                OutArgs(3:11) = InArgs(2:10)
+                CurArgs = CurArgs+1
+
+              CASE('COIL:HEATING:GAS')
+                nodiff = .false.
+                ObjectName = 'Coil:Heating:Fuel'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:2) = InArgs(1:2)
+                OutArgs(3) = 'NaturalGas'
+                OutArgs(4:11) = InArgs(3:10)
+                CurArgs = CurArgs + 1
+
+               CASE('DAYLIGHTING:CONTROLS')
+                 nodiff=.false.
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
+                 OutArgs(2) = InArgs(1)
+                 OutArgs(3) = 'SplitFlux'
+                 OutArgs(4) = InArgs(20)
+                 IF (inArgs(13) == '1') THEN
+                   OutArgs(5) = 'Continuous'
+                 ELSEIF (inArgs(13) == '2') THEN
+                   OutArgs(5) = 'Stepped'
+                 ELSEIF (inArgs(13) == '3') THEN
+                   OutArgs(5) = 'ContinuousOff'
+                 ELSE
+                   OutArgs(5) = 'Continuous'
+                 ENDIF
+                 OutArgs(6:9) = InArgs(16:19)
+                 IF (OutArgs(8) == '0') THEN
+                   OutArgs(8) = ''
+                 ENDIF
+                 OutArgs(10) = TRIM(InArgs(1)) // '_DaylRefPt1'
+                 OutArgs(11:12) = InArgs(14:15)
+                 OutArgs(13) = ''
+                 OutArgs(14) = TRIM(InArgs(1)) // '_DaylRefPt1'
+                 OutArgs(15) = InArgs(9)
+                 OutArgs(16) = InArgs(11)
+                 IF (InArgs(2) == '2') THEN
+                   OutArgs(17) = TRIM(InArgs(1)) // '_DaylRefPt2'
+                   OutArgs(18) = InArgs(10)
+                   OutArgs(19) = InArgs(12)
+                   CurArgs = 19
+                 ELSE
+                   CurArgs = 16
+                 ENDIF
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 ! create new object Daylighting:ReferencePoint
+                 ObjectName='Daylighting:ReferencePoint'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt1'
+                 OutArgs(2) = InArgs(1)
+                 OutArgs(3:5) = InArgs(3:5)
+                 CurArgs = 5
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! create new object Daylighting:ReferencePoint
+                 IF (InArgs(2) == '2') THEN
+                   ObjectName='Daylighting:ReferencePoint'
+                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                   OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt2'
+                   OutArgs(2) = InArgs(1)
+                   OutArgs(3:5) = InArgs(6:8)
+                   CurArgs = 5
+                   CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 ENDIF
+
+                 Written = .true.
+
+              CASE('DAYLIGHTING:DELIGHT:CONTROLS')
+                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                 ObjectName='Daylighting:Controls'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:2) = InArgs(1:2)
+                 OutArgs(3) = 'DElight'
+                 OutArgs(4) = ''
+                 IF (inArgs(5) == '1') THEN
+                   OutArgs(5) = 'Continuous'
+                 ELSEIF (inArgs(5) == '2') THEN
+                   OutArgs(5) = 'Stepped'
+                 ELSEIF (inArgs(5) == '3') THEN
+                   OutArgs(5) = 'ContinuousOff'
+                 ELSE
+                   OutArgs(5) = 'Continuous'
+                 ENDIF
+                 OutArgs(6:9) = InArgs(4:7)
+                 IF (OutArgs(8) == '0') THEN
+                   OutArgs(8) = ''
+                 ENDIF
+                 OutArgs(10) = ''
+                 OutArgs(11) = '0'
+                 OutArgs(12) = ''
+                 OutArgs(13) = InArgs(8)
+                 CurArgs = 13
+                 DO iRefPt = 1,NumDElightRefPt
+                   IF (MakeUPPERCase(InArgs(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
+                     OutArgs(CurArgs + 1) = DElightRefPt(iRefPt)%RefPtName
+                     OutArgs(CurArgs + 2) = DElightRefPt(iRefPt)%FracZone
+                     OutArgs(CurArgs + 3) = DElightRefPt(iRefPt)%IllumSetPt
+                     CurArgs = CurArgs + 3
+                   ENDIF
+                 ENDDO
+
+              CASE('DAYLIGHTING:DELIGHT:REFERENCEPOINT')
+                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                 ObjectName='Daylighting:ReferencePoint'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = InArgs(1)
+                 DO iRefPt = 1,NumDElightRefPt
+                   IF (MakeUPPERCase(InArgs(2)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
+                     OutArgs(2) = DElightRefPt(iRefPt)%ZoneName
+                   ENDIF
+                 ENDDO
+                 OutArgs(3:5) = InArgs(3:5)
+                 CurArgs = 5
+
+              CASE('MATERIALPROPERTY:MOISTUREPENETRATIONDEPTH:SETTINGS')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! Write out the new field values
+                OutArgs(1)  = InArgs(1) ! Name
+                OutArgs(2)  = "Could not find Material Match for "//InArgs(1)         ! Initialize to something dumb in case we don't find a matching material
+                OutArgs(3)  = InArgs(3) ! coefficient a
+                OutArgs(4)  = InArgs(4) ! coefficient b
+                OutArgs(5)  = InArgs(5) ! coefficient c
+                OutArgs(6)  = InArgs(6) ! coefficient d
+                OutArgs(7)  = InArgs(2) ! original d_empd value
+                OutArgs(8)  = "0"       ! New field with default of 0
+                OutArgs(9)  = "0"       ! New field with default of 0
+                OutArgs(10) = "0"       ! New field with default of 0
+                ! Tell the "output" processor that we have 10 fields now
+                CurArgs = 10
+                ! Get density of the material using InArgs(1) as the name, converted to a REAL
+                FoundMaterial = .FALSE.
+                DO MatlSearchNum = 1, NumIDFRecords
+                IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Name) /= 'MATERIAL') CYCLE
+                IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Alphas(1)) == MakeUPPERCase(InArgs(1))) THEN
+                    FoundMaterial = .TRUE.
+                    ! We have our match for the stratified tank child
+                    WRITE(diflfn,fmta) '! Found a material component match; name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+                    ! Now simply get the material density
+                    READ (IDFRecords(MatlSearchNum)%Numbers(3),*) MaterialDensity
+                  END IF
+                END DO
+                IF ( .NOT. FoundMaterial ) THEN
+                  WRITE(diflfn,fmta) '! Didnt find a material component match for name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+                  CALL ShowFatalError( 'Material match issue' )
+                END IF
+                ! Get other values into REALs
+                READ (InArgs(3),*) EMPDCoeffA
+                READ (InArgs(4),*) EMPDCoeffB
+                READ (InArgs(5),*) EMPDCoeffC
+                READ (InArgs(6),*) EMPDCoeffD
+                READ (InArgs(2),*) EMPDCoeffDEMPD
+                ! Get new mu_empd value from a function that deals with REALs
+                MuEMPD = CalculateMuEMPD(EMPDCoeffA, EMPDCoeffB, EMPDCoeffC, EMPDCoeffD, EMPDCoeffDEMPD, MaterialDensity)
+                ! Read the real value back and assign to OutArgs(2)
+                WRITE(OutArgs(2),*) MuEMPD
 
               ! It is debatable whether I should actually improve this to make it more like the report variables
               ! I think it is much less likely that these will change between versions
@@ -937,196 +1137,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     EXIT
                   ENDIF
                 ENDDO
-
-              !! Changes for this version can go here
-              CASE('AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER')
-                nodiff=.false.
-                ! object rename
-                ObjectName = "AirTerminal:SingleDuct:Mixer"
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:6)=InArgs(1:6)   ! No change to fields F1 - F6
-                CurArgs = CurArgs + 1      ! Add new input field F7: -> "Mixer Connection Type"
-                OutArgs(7)='InletSide'     ! Set field value to "InletSide"
-
-              CASE('AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER')
-                nodiff=.false.
-                ! object rename
-                ObjectName = "AirTerminal:SingleDuct:Mixer"
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:6)=InArgs(1:6)   ! No change to fields F1 - F6
-                CurArgs = CurArgs + 1      ! Add new input field F7: -> "Mixer Connection Type"
-                OutArgs(7)='SupplySide'    ! Set field value to "SupplySide"
-
-              CASE('ZONEHVAC:AIRDISTRIBUTIONUNIT')
-                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                if (samestring('AirTerminal:SingleDuct:InletSideMixer',InArgs(3)) .OR.   &
-                    samestring('AirTerminal:SingleDuct:SupplySideMixer',InArgs(3))) then
-                    OutArgs(3)='AirTerminal:SingleDuct:Mixer'
-                endif
-
-              CASE('OTHEREQUIPMENT')
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1) = InArgs(1)
-                OutArgs(2) = 'None'
-                OutArgs(3:11) = InArgs(2:10)
-                CurArgs = CurArgs+1
-
-              CASE('COIL:HEATING:GAS')
-                nodiff = .false.
-                ObjectName = 'Coil:Heating:Fuel'
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:2) = InArgs(1:2)
-                OutArgs(3) = 'NaturalGas'
-                OutArgs(4:11) = InArgs(3:10)
-                CurArgs = CurArgs + 1
-
-               CASE('DAYLIGHTING:CONTROLS')
-                 nodiff=.false.
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
-                 OutArgs(2) = InArgs(1)
-                 OutArgs(3) = 'SplitFlux'
-                 OutArgs(4) = InArgs(20)
-                 IF (inArgs(13) == '1') THEN
-                   OutArgs(5) = 'Continuous'
-                 ELSEIF (inArgs(13) == '2') THEN
-                   OutArgs(5) = 'Stepped'
-                 ELSEIF (inArgs(13) == '3') THEN
-                   OutArgs(5) = 'ContinuousOff'
-                 ELSE
-                   OutArgs(5) = 'Continuous'
-                 ENDIF
-                 OutArgs(6:9) = InArgs(16:19)
-                 IF (OutArgs(8) == '0') THEN
-                   OutArgs(8) = ''
-                 ENDIF
-                 OutArgs(10) = TRIM(InArgs(1)) // '_DaylRefPt1'
-                 OutArgs(11:12) = InArgs(14:15)
-                 OutArgs(13) = ''
-                 OutArgs(14) = TRIM(InArgs(1)) // '_DaylRefPt1'
-                 OutArgs(15) = InArgs(9)
-                 OutArgs(16) = InArgs(11)
-                 IF (InArgs(2) == '2') THEN
-                   OutArgs(17) = TRIM(InArgs(1)) // '_DaylRefPt2'
-                   OutArgs(18) = InArgs(10)
-                   OutArgs(19) = InArgs(12)
-                   CurArgs = 19
-                 ELSE
-                   CurArgs = 16
-                 ENDIF
-                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-                 ! create new object Daylighting:ReferencePoint
-                 ObjectName='Daylighting:ReferencePoint'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt1'
-                 OutArgs(2) = InArgs(1)
-                 OutArgs(3:5) = InArgs(3:5)
-                 CurArgs = 5
-                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-
-                 ! create new object Daylighting:ReferencePoint
-                 IF (InArgs(2) == '2') THEN
-                   ObjectName='Daylighting:ReferencePoint'
-                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                   OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt2'
-                   OutArgs(2) = InArgs(1)
-                   OutArgs(3:5) = InArgs(6:8)
-                   CurArgs = 5
-                   CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-                 ENDIF
-
-                 Written = .true.
-
-              CASE('DAYLIGHTING:DELIGHT:CONTROLS')
-                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
-                 ObjectName='Daylighting:Controls'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1:2) = InArgs(1:2)
-                 OutArgs(3) = 'DElight'
-                 OutArgs(4) = ''
-                 IF (inArgs(5) == '1') THEN
-                   OutArgs(5) = 'Continuous'
-                 ELSEIF (inArgs(5) == '2') THEN
-                   OutArgs(5) = 'Stepped'
-                 ELSEIF (inArgs(5) == '3') THEN
-                   OutArgs(5) = 'ContinuousOff'
-                 ELSE
-                   OutArgs(5) = 'Continuous'
-                 ENDIF
-                 OutArgs(6:9) = InArgs(4:7)
-                 IF (OutArgs(8) == '0') THEN
-                   OutArgs(8) = ''
-                 ENDIF
-                 OutArgs(10) = ''
-                 OutArgs(11) = '0'
-                 OutArgs(12) = ''
-                 OutArgs(13) = InArgs(8)
-                 CurArgs = 13
-                 DO iRefPt = 1,NumDElightRefPt
-                   IF (MakeUPPERCase(InArgs(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
-                     OutArgs(CurArgs + 1) = DElightRefPt(iRefPt)%RefPtName
-                     OutArgs(CurArgs + 2) = DElightRefPt(iRefPt)%FracZone
-                     OutArgs(CurArgs + 3) = DElightRefPt(iRefPt)%IllumSetPt
-                     CurArgs = CurArgs + 3
-                   ENDIF
-                 ENDDO
-
-              CASE('DAYLIGHTING:DELIGHT:REFERENCEPOINT')
-                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
-                 ObjectName='Daylighting:ReferencePoint'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1) = InArgs(1)
-                 DO iRefPt = 1,NumDElightRefPt
-                   IF (MakeUPPERCase(InArgs(2)) == MakeUPPERCase(DElightRefPt(iRefPt)%ControlName)) THEN
-                     OutArgs(2) = DElightRefPt(iRefPt)%ZoneName
-                   ENDIF
-                 ENDDO
-                 OutArgs(3:5) = InArgs(3:5)
-                 CurArgs = 5
-
-              CASE('MATERIALPROPERTY:MOISTUREPENETRATIONDEPTH:SETTINGS')
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                nodiff=.false.
-                ! Write out the new field values
-                OutArgs(1)  = InArgs(1) ! Name
-                OutArgs(2)  = "Could not find Material Match for "//InArgs(1)         ! Initialize to something dumb in case we don't find a matching material
-                OutArgs(3)  = InArgs(3) ! coefficient a
-                OutArgs(4)  = InArgs(4) ! coefficient b
-                OutArgs(5)  = InArgs(5) ! coefficient c
-                OutArgs(6)  = InArgs(6) ! coefficient d
-                OutArgs(7)  = InArgs(2) ! original d_empd value
-                OutArgs(8)  = "0"       ! New field with default of 0
-                OutArgs(9)  = "0"       ! New field with default of 0
-                OutArgs(10) = "0"       ! New field with default of 0
-                ! Tell the "output" processor that we have 10 fields now
-                CurArgs = 10
-                ! Get density of the material using InArgs(1) as the name, converted to a REAL
-                FoundMaterial = .FALSE.
-                DO MatlSearchNum = 1, NumIDFRecords
-                IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Name) /= 'MATERIAL') CYCLE
-                IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Alphas(1)) == MakeUPPERCase(InArgs(1))) THEN
-                    FoundMaterial = .TRUE.
-                    ! We have our match for the stratified tank child
-                    WRITE(diflfn,fmta) '! Found a material component match; name ='//IDFRecords(MatlSearchNum)%Alphas(1)
-                    ! Now simply get the material density
-                    READ (IDFRecords(MatlSearchNum)%Numbers(3),*) MaterialDensity
-                  END IF
-                END DO
-                IF ( .NOT. FoundMaterial ) THEN
-                  WRITE(diflfn,fmta) '! Didnt find a material component match for name ='//IDFRecords(MatlSearchNum)%Alphas(1)
-                  CALL ShowFatalError( 'Material match issue' )
-                END IF
-                ! Get other values into REALs
-                READ (InArgs(3),*) EMPDCoeffA
-                READ (InArgs(4),*) EMPDCoeffB
-                READ (InArgs(5),*) EMPDCoeffC
-                READ (InArgs(6),*) EMPDCoeffD
-                READ (InArgs(2),*) EMPDCoeffDEMPD
-                ! Get new mu_empd value from a function that deals with REALs
-                MuEMPD = CalculateMuEMPD(EMPDCoeffA, EMPDCoeffB, EMPDCoeffC, EMPDCoeffD, EMPDCoeffDEMPD, MaterialDensity)
-                ! Read the real value back and assign to OutArgs(2)
-                WRITE(OutArgs(2),*) MuEMPD
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
