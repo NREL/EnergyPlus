@@ -1741,17 +1741,17 @@ namespace ReportSizingManager {
 							DesVolFlow = UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
-								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
-									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesMainVolFlow;
-								} else {
+//								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
+//									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//								} else {
 									DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-								}
+//								}
 							} else if ( CurDuctType == Cooling ) {
-								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
-									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesCoolVolFlow;
-								} else {
+//								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
+//									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+//								} else {
 									DesVolFlow = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
-								}
+//								}
 							} else if ( CurDuctType == Heating ) {
 								DesVolFlow = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
 							} else if ( CurDuctType == Other ) {
