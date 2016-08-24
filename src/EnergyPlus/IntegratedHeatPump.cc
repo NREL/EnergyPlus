@@ -1087,50 +1087,21 @@ namespace EnergyPlus {
 //				                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
 //				                     "System", "Average",
 //				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Air Loop Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate,
-				                     "System", "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Condenser Water Flow Rate [kg/s]",
-				                     IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]",
-				                     IntegratedHeatPumps( DXCoilNum ).TotalCoolingRate, "System", "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Heating Coil Total Air Heating Rate [W]",
-				                     IntegratedHeatPumps( DXCoilNum ).TotalSpaceHeatingRate, "System", "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Water Heating Rate [W]",
-				                     IntegratedHeatPumps( DXCoilNum ).TotalWaterHeatingRate, "System", "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Electric Power [W]", IntegratedHeatPumps( DXCoilNum ).TotalPower, "System",
-				                     "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Latent Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalLatentLoad,
-				                     "System", "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Source Energy Rate [W]", IntegratedHeatPumps( DXCoilNum ).Qsource, "System",
-				                     "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total COP []", IntegratedHeatPumps( DXCoilNum ).TotalCOP, "System", "Average",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Electric Energy [J]", IntegratedHeatPumps( DXCoilNum ).Energy, "System",
-				                     "Summed",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Cooling Energy [J]",
-				                     IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalCooling, "System", "Summed",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Air Heating Energy [J]",
-				                     IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalHeating, "System", "Summed",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Water Heating Energy [J]",
-				                     IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalWaterHeating, "System", "Summed",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Latent Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLatent,
-				                     "System", "Summed",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Source Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergySource, "System",
-				                     "Summed",
-				                     IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Air Loop Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Condenser Water Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalCoolingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Heating Coil Total Air Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalSpaceHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Water Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalWaterHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Electric Power [W]", IntegratedHeatPumps( DXCoilNum ).TotalPower, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Latent Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalLatentLoad, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Source Energy Rate [W]", IntegratedHeatPumps( DXCoilNum ).Qsource, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total COP []", IntegratedHeatPumps( DXCoilNum ).TotalCOP, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Electric Energy [J]", IntegratedHeatPumps( DXCoilNum ).Energy, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalCooling, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Air Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Water Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalWaterHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Latent Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLatent, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Total Source Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergySource, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 			}
 
 		}
