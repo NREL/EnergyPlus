@@ -1372,7 +1372,6 @@ Const maxWeatherListSize = 20  'number of items allowed in weather file pull dow
 Const maxGroupListSize = 20  'number of items allowed in group file pull down list
 Const batchFileName = "EPL-run.bat"
 Const noWeatherFile = "No Weather File"
-Const searchLinesVersion = 500 'number of lines that the version detection algorithm will check
 Dim q As String
 Public inputFileName As String
 Dim outputFileName As String
@@ -2616,12 +2615,21 @@ If testViewConvertOld Then
         cancelDueToVersionCheck = True
       End If
     ElseIf IDFversion = "VERSION NOT FOUND" Then
-      msg = "The VERSION object was not found in the first " & Str(searchLinesVersion) & " lines of file:" & vbCrLf & vbCrLf
+      msg = "The VERSION object was not found in the file:" & vbCrLf & vbCrLf
       msg = msg & "  " & inName & vbCrLf & vbCrLf
-      msg = msg & "You may wish to use a text editor to reposition the VERSION object or else turn off version checking under View..Option..Miscellaneous." & vbCrLf & vbCrLf
+      msg = msg & "You may wish to else turn off version checking under View..Option..Miscellaneous." & vbCrLf & vbCrLf
       msg = msg & "The simulation will proceed when you press OK."
       MsgBox msg, vbInformation, "VERSION object missing"
       cancelDueToVersionCheck = False
+    ElseIf isNewerVersion(IDFversion, currentVersion) Then
+      msg = "The file:" & vbCrLf & vbCrLf
+      msg = msg & "  " & inName & vbCrLf & vbCrLf
+      msg = msg & "is an not the same version (" & IDFversion & ") as the EnergyPlus version (" & currentVersion & ")."
+      msg = msg & "You may need download EnergyPlus from http://www.energyplus.net/." & vbCrLf & vbCrLf
+      msg = msg & "Proceed with simulation using the different version?"
+      If MsgBox(msg, vbOKCancel, "Check File Version") = vbCancel Then
+        cancelDueToVersionCheck = True
+      End If
     ElseIf IDFversion <> currentVersion Then
       msg = "The file:" & vbCrLf & vbCrLf
       msg = msg & "  " & inName & vbCrLf & vbCrLf
@@ -5696,6 +5704,7 @@ Dim i As Integer
 Dim startTime As Single
 Dim versionObjectFound As Boolean
 Dim foundEOF As Boolean
+Dim lineCount As Long
 startTime = Timer
 flv = FreeFile
 checkIDFVersion = ""
@@ -5704,7 +5713,8 @@ Open inFile For Input As flv
 If Err.Number <> 0 Then Exit Function
 versionObjectFound = False
 Call getNextLine(flv, lineIn, foundEOF, True) 'get first line and clear buffer
-For i = 1 To searchLinesVersion
+lineCount = 1
+Do
   'Line Input #flv, lineIn
   lineIn = LTrim(lineIn)
   If Left(lineIn, 1) <> "!" Then
@@ -5727,19 +5737,66 @@ For i = 1 To searchLinesVersion
         versionFound = ""
       End If
       checkIDFVersion = versionFound
+      Exit Do
     End If
   End If
   'If EOF(flv) Then Exit For
-  If foundEOF Then Exit For
+  If foundEOF Then Exit Do
   Call getNextLine(flv, lineIn, foundEOF)
-Next i
+  lineCount = lineCount + 1
+Loop
 Close flv
 If Not versionObjectFound Then
   checkIDFVersion = "VERSION NOT FOUND"
 End If
-'MsgBox "Version of IDF: ", checkIDFVersion
+'MsgBox "Version of IDF: " & checkIDFVersion & " -- " & lineCount & " -- " & Timer - startTime, vbOKOnly, "CheckIDFVersion"
 Debug.Print "Time to check for version: "; Timer - startTime
 End Function
+
+'=======================================================
+' Return true if version A is newer than version B and
+' false if not or if it cannot be determined
+'=======================================================
+Function isNewerVersion(versionA, versionB) As Boolean
+Dim aVerNum As Long
+Dim bVerNum As Long
+aVerNum = convertVersionToNumber(versionA)
+bVerNum = convertVersionToNumber(versionB)
+If aVerNum > 0 And bVerNum > 0 Then
+    If aVerNum > bVerNum Then
+        isNewerVersion = True
+    Else
+        isNewerVersion = False
+    End If
+Else
+    isNewerVersion = False
+End If
+End Function
+
+'=======================================================
+' Convert a version string in the format of 8.5.1 into
+' an integer of 80501
+'=======================================================
+Function convertVersionToNumber(versionString) As Long
+Dim parts() As String
+Dim verNum As Long
+Dim i As Integer
+parts = Split(versionString, ".")
+verNum = 0
+If UBound(parts) = 2 Then
+    For i = 0 To UBound(parts)
+        If IsNumeric(parts(i)) Then
+            verNum = verNum * 100 + Val(parts(i))
+        Else
+            verNum = 0 ' if any parts are not numeric then exit function with a zero.
+            Exit For
+        End If
+    Next i
+End If
+convertVersionToNumber = verNum
+'MsgBox "convertVersionToNumber: " & versionString & " into " & verNum, vbOKOnly
+End Function
+
 
 '=======================================================
 ' Remove the part of the string
