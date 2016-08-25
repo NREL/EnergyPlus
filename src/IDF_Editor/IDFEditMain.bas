@@ -34,7 +34,7 @@ Attribute VB_Name = "IDFMain"
 ' command line argument /idd:iddfilename
 '
 
-Public Const ver = "1.47" 'current version of IDFEditor - less than 1 is a beta
+Public Const ver = "1.48" 'current version of IDFEditor - less than 1 is a beta
 Option Explicit
 Option Base 1
 
@@ -626,7 +626,7 @@ End Sub
 '-----------------------------------------------------------------------------
 Sub setUnits()
 Dim i As Long
-maxUsedConvUnits = 144
+maxUsedConvUnits = 153
 unitsDimensionless = 56
 ReDim convUnits(maxUsedConvUnits)
 ' the following is pasted in from the unitsIPandSI.xls file
@@ -774,6 +774,15 @@ convUnits(141).siName = "ms"
 convUnits(142).siName = "Ah"
 convUnits(143).siName = "deltaC/hr"
 convUnits(144).siName = "micron"
+convUnits(145).siName = "W/(m3/s)"
+convUnits(146).siName = "W/((m3/s)-Pa)"
+convUnits(147).siName = "m3/s-m"
+convUnits(148).siName = "m3/s-W"
+convUnits(149).siName = "m3/person"
+convUnits(150).siName = "m3/hr-person"
+convUnits(151).siName = "m3/m2"
+convUnits(152).siName = "m3/hr-m2"
+convUnits(153).siName = "m3/hr"
 
 convUnits(1).ipName = "ft"
 convUnits(2).ipName = "in"
@@ -919,6 +928,15 @@ convUnits(141).ipName = "ms"
 convUnits(142).ipName = "Ah"
 convUnits(143).ipName = "deltaF/hr"
 convUnits(144).ipName = "micron"
+convUnits(145).ipName = "W/(gal/min)"
+convUnits(146).ipName = "W/((gal/min)-ftH20)"
+convUnits(147).ipName = "gal/min-ft"
+convUnits(148).ipName = "(gal/min)/(Btu/h)"
+convUnits(149).ipName = "gal/person"
+convUnits(150).ipName = "gal/hr-person"
+convUnits(151).ipName = "gal/ft2"
+convUnits(152).ipName = "gal/hr-ft2"
+convUnits(153).ipName = "gal/hr"
 
 convUnits(1).mult = 3.28083989501312
 convUnits(2).mult = 39.3700787401575
@@ -1064,6 +1082,15 @@ convUnits(141).mult = 1
 convUnits(142).mult = 1
 convUnits(143).mult = 1.8
 convUnits(144).mult = 1
+convUnits(145).mult = 0.0000630902
+convUnits(146).mult = 0.188582274697355
+convUnits(147).mult = 4831.17821785317
+convUnits(148).mult = 4645.27137336702
+convUnits(149).mult = 264.172037284185
+convUnits(150).mult = 264.172037284185
+convUnits(151).mult = 24.5423853466941
+convUnits(152).mult = 24.5423853466941
+convUnits(153).mult = 264.172037284185
 
 convUnits(7).offset = 32
 convUnits(19).offset = 7.686
@@ -1078,6 +1105,14 @@ convUnits(107).alt = True
 convUnits(108).alt = True
 convUnits(126).alt = True
 convUnits(132).alt = True
+convUnits(145).alt = True
+convUnits(147).alt = True
+convUnits(148).alt = True
+convUnits(149).alt = True
+convUnits(150).alt = True
+convUnits(151).alt = True
+convUnits(152).alt = True
+convUnits(153).alt = True
 
 convUnits(1).multiUnitName = "Distance"
 convUnits(3).multiUnitName = "Capacity"
