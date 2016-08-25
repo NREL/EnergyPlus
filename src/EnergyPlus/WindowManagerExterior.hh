@@ -62,10 +62,19 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
-#include "TarIGUSolidLayer.hpp"
-#include "TarIGUGapLayer.hpp"
-#include "TarEnvironment.hpp"
-#include "TarIGU.hpp"
+namespace Tarcog {
+
+  class CBaseIGUTarcogLayer;
+  class CTarEnvironment;
+  class CTarIGU;
+
+}
+
+namespace Gases {
+
+  class CGas;
+
+}
 
 namespace EnergyPlus {
 
@@ -82,17 +91,22 @@ namespace EnergyPlus {
     class CWCELayerFactory {
     public:
 
-      CWCELayerFactory() {};
+      CWCELayerFactory();
 
-      std::shared_ptr< Tarcog::CTarIGUSolidLayer > getSolidLayer(
+      std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getIGULayer(
+        const EnergyPlus::DataHeatBalance::MaterialProperties &material, 
+        const EnergyPlus::DataSurfaces::SurfaceData &surface = EnergyPlus::DataSurfaces::SurfaceData(),
+        const int t_SurfNum = 0 );
+
+      std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getSolidLayer(
         const EnergyPlus::DataSurfaces::SurfaceData &surface,
         const EnergyPlus::DataHeatBalance::MaterialProperties &material,
         const int t_Index, const int t_SurfNum );
 
-      std::shared_ptr< Tarcog::CTarIGUGapLayer > getGapLayer(
+      std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getGapLayer(
         const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
-      std::shared_ptr< Tarcog::CTarIGUGapLayer > getComplexGapLayer(
+      std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getComplexGapLayer(
         const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
       std::shared_ptr< Tarcog::CTarEnvironment > getIndoor(
@@ -105,7 +119,8 @@ namespace EnergyPlus {
       std::shared_ptr< Tarcog::CTarIGU > getIGU(
         const EnergyPlus::DataSurfaces::SurfaceData &surface );
 
-    private:      
+    private:
+      size_t m_SolidLayerIndex;
       std::shared_ptr< Gases::CGas > getGas( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
     };        

@@ -9016,7 +9016,7 @@ Label99999: ;
 					}
 				}
 				if ( SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
-					iVisibleSpectrum = Loop;
+          iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {
 						ShowSevereError( "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + cAlphaArgs( 1 ) );
