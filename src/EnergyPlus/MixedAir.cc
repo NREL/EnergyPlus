@@ -1757,7 +1757,7 @@ namespace MixedAir {
 						thisVentilationMechanical.ZoneOAACHRate = 0.0;
 						thisVentilationMechanical.ZoneOAFlowMethod( ventMechZoneNum ) = OAFlowPPer;
 						thisVentilationMechanical.ZoneOASchPtr( ventMechZoneNum ) = ScheduleAlwaysOn;
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VentilationMechanical( ventMechZoneNum ).Name);
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name );
 						ShowContinueError( "Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"" + thisVentilationMechanical.VentMechZoneName( ventMechZoneNum ) + "\"." );
 						ShowContinueError( "Using default OA of 0.00944 m3/s-person and 0.0 m3/s-m2." );
 					}
@@ -1772,7 +1772,7 @@ namespace MixedAir {
 						thisVentilationMechanical.ZoneADEffCooling( ventMechZoneNum ) = 1.0;
 						thisVentilationMechanical.ZoneADEffHeating( ventMechZoneNum ) = 1.0;
 						thisVentilationMechanical.ZoneSecondaryRecirculation( ventMechZoneNum ) = 0.0;
-						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name );
 						ShowContinueError( "Cannot locate a matching DesignSpecification:ZoneAirDistribution object for Zone=\"" + thisVentilationMechanical.VentMechZoneName( ventMechZoneNum ) + "\"." );
 						ShowContinueError( "Using default zone air distribution effectiveness of 1.0 for heating and cooling." );
 					}
@@ -3324,7 +3324,7 @@ namespace MixedAir {
 		Real64 OutAirMinFrac; // Local variable used to calculate min OA fraction
 
 		Real64 MechVentOutsideAirMinFrac; // fraction of OA specified by mechanical ventilation object
-		Real64 MechVentOutsideAirFlow; // outside air mass flow rate specified by mechanical ventilation object
+		Real64 MechVentOutsideAirFlow; // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 		Real64 MinOASchedVal; // value of the minimum outside air schedule
 		Real64 OASignal; // Outside air flow rate fraction (0.0 to 1.0)
 		bool AirLoopCyclingFan; // Type of air loop fan (TRUE if Fan:OnOff)
@@ -3333,7 +3333,7 @@ namespace MixedAir {
 		Real64 MixedAirTempAtMinOAFlow; // - mixed air temperature at min flow rate, used for custom economizer control calculation
 		Real64 RecircMassFlowRateAtMinOAFlow; // recirc air mass flow rate at min OA, used for custom economizer control calculation
 		Real64 ReliefMassFlowAtMinOA; // relief air mass flow rate at min OA, used for custom economizer control calculation
-		Real64 SysSA( 0.0 ); // System supply air flow rate
+		Real64 SysSA( 0.0 ); // System supply air mass flow rate [kg/s]
 		MinOASchedVal = 1.0;
 
 		if ( AirLoopNum > 0 ) {
@@ -3566,8 +3566,8 @@ namespace MixedAir {
 
 	void
 	VentilationMechanicalProps::CalcMechVentController(
-		Real64 & SysSA,
-		Real64 & MechVentOutsideAirFlow
+		Real64 & SysSA, // System supply air mass flow rate [kg/s]
+		Real64 & MechVentOutsideAirFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 	)
 	{
 		using DataContaminantBalance::ZoneSysContDemand;
@@ -3585,22 +3585,23 @@ namespace MixedAir {
 		static std::string const CurrentModuleObject(CurrentModuleObjects(CMO_MechVentilation));
 
 		// new local variables for DCV
-		Real64 ZoneOAPeople; // Zone OA flow rate based on number of occupants
-		Real64 ZoneOAArea; // Zone OA flow rate based on space floor area
-		Real64 ZoneOAFlow; // Zone OA flow rate based on simple flow
-		Real64 ZoneOAACH; // Zone OA flow rate based on air changes per hour
-		Real64 ZoneOABZ; // Zone breathing-zone OA flow rate
+		Real64 ZoneOAPeople; // Zone OA flow rate based on number of occupants [m3/s]
+		Real64 ZoneOAArea; // Zone OA flow rate based on space floor area [m3/s]
+		Real64 ZoneOAFlow; // Zone OA flow rate based on simple flow [m3/s]
+		Real64 ZoneOAACH; // Zone OA flow rate based on air changes per hour [m3/s]
+		Real64 ZoneOABZ; // Zone breathing-zone OA flow rate [m3/s]
 		Real64 ZoneOAMin; // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
 		// used for "ProportionalControl" System outdoor air method
 		Real64 ZoneOAMax; // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOAArea)
 		// used for "ProportionalControl" System outdoor air method
-		Real64 ZoneOA; // Zone OA flow rate
+		Real64 ZoneOA; // Zone OA flow rate [m3/s]
 		Real64 ZoneOAFrac; // Zone OA fraction (as a fraction of actual supply air flow rate)
 		Real64 ZoneEz; // Zone air distribution effectiveness
 		Real64 ZoneSA; // Zone supply air flow rate
 		Real64 ZonePA; // Zone primary air flow rate
 		Real64 SysOAuc; // System uncorrected OA flow rate
-		Real64 SysOA; // System supply OA flow rate
+		Real64 SysOA; // System supply OA volume flow rate [m3/s]
+		Real64 SysOAMassFlow; // System supply OA mass flow rate [kg/s]
 		Real64 SysEv; // System ventilation efficiency
 		Real64 NodeTemp; // node temperature
 		Real64 NodeHumRat; // node humidity ratio
@@ -3636,34 +3637,34 @@ namespace MixedAir {
 		if ( GetCurrentScheduleValue( this->SchPtr ) > 0 ) {
 			if ( this->SystemOAMethod == SOAM_IAQP ) {
 				// IAQP for CO2 control
-				SysOA = 0.0;
+				SysOAMassFlow = 0.0;
 				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
+					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = SysOA;
+				MechVentOutsideAirFlow = SysOAMassFlow;
 			} else if ( this->SystemOAMethod == SOAM_IAQPGC ) {
 				// IAQP for generic contaminant control
-				SysOA = 0.0;
+				SysOAMassFlow = 0.0;
 				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
+					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = SysOA;
+				MechVentOutsideAirFlow = SysOAMassFlow;
 			} else if ( this->SystemOAMethod == SOAM_IAQPCOM ) {
 				// IAQP for both CO2 and generic contaminant control
-				SysOA = 0.0;
+				SysOAMassFlow = 0.0;
 				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
+					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = SysOA;
-				SysOA = 0.0;
+				MechVentOutsideAirFlow = SysOAMassFlow;
+				SysOAMassFlow = 0.0;
 				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
-					SysOA += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
+					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = max( SysOA, MechVentOutsideAirFlow );
+				MechVentOutsideAirFlow = max(SysOAMassFlow, MechVentOutsideAirFlow );
 			} else {
 				// for system OA methods: Zone_Sum, VRP, CO2 methods
 				// new code for DCV method complying with the VRP defined in ASHRAE Standard 62.1-2010
@@ -3688,7 +3689,7 @@ namespace MixedAir {
 					// Calc the zone OA flow rate based on the floor area component
 					ZoneOAArea = curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate( ZoneIndex ) * curZoneOASchValue;
 					ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate( ZoneIndex ) * curZoneOASchValue;
-					ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * Zone( ZoneIndex ).Volume ) * curZoneOASchValue / 3600.0;
+					ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * ( this->ZoneOAACHRate( ZoneIndex ) * curZone.Volume ) * curZoneOASchValue / 3600.0;
 
 					// Calc the breathing-zone OA flow rate
 					OAIndex = this->ZoneDesignSpecOAObjIndex( ZoneIndex );

@@ -433,8 +433,8 @@ namespace MixedAir {
 
 		void
 		CalcMechVentController(
-			Real64 & SysSA,
-			Real64 & MechVentOutsideAirFlow
+			Real64 & SysSA, // System supply air mass flow rate [kg/s]
+			Real64 & MechVentOutsideAirFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 		);
 
 	};
