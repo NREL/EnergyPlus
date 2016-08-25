@@ -56315,6 +56315,7 @@ Controller:MechanicalVentilation,
         \key ProportionalControlBasedOnDesignOccupancy
         \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
+        \key IndoorAirQualityProcedureCombined
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction
         \type real
