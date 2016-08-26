@@ -299,7 +299,6 @@ namespace PackagedThermalStorageCoil {
 		using WaterManager::SetupTankDemandComponent;
 		using WaterManager::SetupTankSupplyComponent;
 		using GlobalNames::VerifyUniqueCoilName;
-		using DataSizing::AutoSize;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;

@@ -182,10 +182,6 @@ namespace DataTimings {
 		// na
 
 		// USE STATEMENTS:
-#if defined (_OPENMP) && defined(TIMER_OMP_GET_WTIME)
-		// Using/Aliasing
-		using namespace omp_lib; // only here for OMP timer
-#endif
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -273,11 +269,6 @@ namespace DataTimings {
 		// na
 
 		// USE STATEMENTS:
-
-#if defined (_OPENMP) && defined(TIMER_OMP_GET_WTIME)
-		// Using/Aliasing
-		using namespace omp_lib; // only here for OMP timer
-#endif
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

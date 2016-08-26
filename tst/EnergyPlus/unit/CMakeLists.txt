@@ -18,6 +18,7 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
+  ChilledCeilingPanelSimple.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
@@ -31,6 +32,8 @@ set( test_src
   Datasets.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
+  DaylightingManager.unit.cc
+  DElightManager.unit.cc
   DemandResponse.unit.cc
   DesiccantDehumidifiers.unit.cc
   DisplacementVentMgr.unit.cc
@@ -58,6 +61,7 @@ set( test_src
   HeatBalanceIntRadExchange.unit.cc
   HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
+  HeatingCoils.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
@@ -74,9 +78,11 @@ set( test_src
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
+  IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
+  MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
@@ -100,6 +106,7 @@ set( test_src
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
+  SimulationManager.unit.cc
   SingleDuct.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
@@ -114,9 +121,11 @@ set( test_src
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
+  SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
+  VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   VentilatedSlab.unit.cc

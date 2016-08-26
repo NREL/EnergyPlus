@@ -138,6 +138,7 @@ namespace HeatBalanceHAMTManager {
 	using DataHeatBalFanSys::QHWBaseboardSurf;
 	using DataHeatBalFanSys::QSteamBaseboardSurf;
 	using DataHeatBalFanSys::QElecBaseboardSurf;
+	using DataHeatBalFanSys::QCoolingPanelSurf;
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::SunIsUp;
 	using DataEnvironment::OutBaroPress;
@@ -1176,7 +1177,7 @@ namespace HeatBalanceHAMTManager {
 
 		cells( IntConcell( sid ) ).htc = HConvInFD( sid );
 
-		cells( Intcell( sid ) ).Qadds = Surface( sid ).Area * ( QRadSWInAbs( sid ) + NetLWRadToSurf( sid ) + QHTRadSysSurf( sid ) + QHWBaseboardSurf( sid ) + QSteamBaseboardSurf( sid ) + QElecBaseboardSurf( sid ) + QRadThermInAbs( sid ) );
+		cells( Intcell( sid ) ).Qadds = Surface( sid ).Area * ( QRadSWInAbs( sid ) + NetLWRadToSurf( sid ) + QHTRadSysSurf( sid ) + QCoolingPanelSurf( sid ) + QHWBaseboardSurf( sid ) + QSteamBaseboardSurf( sid ) + QElecBaseboardSurf( sid ) + QRadThermInAbs( sid ) );
 		// Check, Is this per unit area or for the whole wall.
 		//    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
