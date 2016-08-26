@@ -6656,9 +6656,7 @@ namespace WaterThermalTanks {
 
 			} // NodeNum
 
-			Euse += UseMassFlowRate * ( UseInletTemp - tank_useOutletStratNode_temp );
-//? This is using the value of UseMassFlowRate from the last node
-//  If that is intended a comment would be a good idea
+			Euse += Tank.UseMassFlowRate * ( UseInletTemp - tank_useOutletStratNode_temp );
 
 			// Calculation for standard ratings
 			if ( ! Tank.FirstRecoveryDone ) {
