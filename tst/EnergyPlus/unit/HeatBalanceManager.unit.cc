@@ -120,13 +120,13 @@ namespace EnergyPlus {
 			"    101325.0000;             !- Pressure {Pa}",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 
 		GetMaterialData( ErrorsFound );
 
-		EXPECT_TRUE( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
 
 	}
 
@@ -157,13 +157,13 @@ namespace EnergyPlus {
 			}
 		);
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 
 		GetMaterialData( ErrorsFound );
 
-		EXPECT_TRUE( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
 
 	}
 

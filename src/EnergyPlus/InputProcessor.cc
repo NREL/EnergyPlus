@@ -146,7 +146,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 					obj.erase( "name" );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
 						if ( obj_name != "RunPeriod" )
-							EnergyPlus::ShowFatalError("Duplicate names!! name: " + name);
+							EnergyPlus::ShowWarningMessage("Duplicate names!! name: " + name);
 						// name = name + " " + s;
 					}
 				}
