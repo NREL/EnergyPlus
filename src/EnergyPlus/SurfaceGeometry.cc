@@ -10078,6 +10078,9 @@ namespace SurfaceGeometry {
 					// get area fraction of triangles.
 					Tri1Area = AreaPolygon( 3, Triangle1 ) / TotalArea;
 					Tri2Area = AreaPolygon( 3, Triangle2 ) / TotalArea;
+					if ( ( Tri1Area + Tri2Area ) > 1.05 ) {
+						ShowWarningError( "CalcSurfaceCentroid: sum of two sub-triangle areas greater than quadrateral area, for surface=" + surface.Name );
+					}
 				}
 
 				// get centroid of Triangle 1
