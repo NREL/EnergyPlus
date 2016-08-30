@@ -360,6 +360,8 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
   HVAC,Average,Air System Mixed Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Air System Outdoor Air Maximum Flow Fraction {[]}
+\item
+  HVAC,Average,Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
 \paragraph{Air System Outdoor Air Economizer Status {[]}}\label{air-system-outdoor-air-economizer-status}
@@ -401,6 +403,10 @@ Reports the average mixed air mass flow rate of the HVAC air loop associated wit
 \paragraph{Air System Outdoor Air Maximum Flow Fraction {[]}}\label{air-system-outdoor-air-maximum-flow-fraction}
 
 Reports the average maximum limit of the outdoor air fraction for the outdoor air controller over the reporting interval. The maximum flow fraction is used to prevent DX cooling coils from freezing, specified by ASHRAE Stadard 90.1. This output variable is available when a corresponding SetpointManager:MixedAir object specifies optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node.
+
+\paragraph{Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate {[}kg/s{]}}\label{air-system-mechvent-air-mass-flow-rate-kgs}
+
+Reports the average outdoor air mass flow rate requested by the Mechanical Ventilation Controller (Controller:MechanicalVentilation, if specified) over the reporting interval.
 
 \subsection{Controller:MechanicalVentilation}\label{controllermechanicalventilation}
 
