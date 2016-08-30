@@ -3023,6 +3023,7 @@ namespace MixedAir {
 
 					VentMechObjectNum = loopOAController.VentMechObjectNum;
 					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
+						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate  [kg/s]", loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
 						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
 							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
 						}
@@ -3324,7 +3325,7 @@ namespace MixedAir {
 		Real64 OutAirMinFrac; // Local variable used to calculate min OA fraction
 
 		Real64 MechVentOutsideAirMinFrac; // fraction of OA specified by mechanical ventilation object
-		Real64 MechVentOutsideAirFlow; // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
+		Real64 MechVentOAMassFlow; // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 		Real64 MinOASchedVal; // value of the minimum outside air schedule
 		Real64 OASignal; // Outside air flow rate fraction (0.0 to 1.0)
 		bool AirLoopCyclingFan; // Type of air loop fan (TRUE if Fan:OnOff)
@@ -3400,7 +3401,7 @@ namespace MixedAir {
 		}
 
 		// Get mechanical ventilation
-		MechVentOutsideAirFlow = 0.0;
+		MechVentOAMassFlow = 0.0;
 		MechVentOutsideAirMinFrac = 0.0;
 		if ( AirLoopNum > 0 && this->VentMechObjectNum != 0 ) {
 			auto & curAirLoopControlInfo( AirLoopControlInfo( AirLoopNum ) );
@@ -3414,13 +3415,14 @@ namespace MixedAir {
 			} else {
 				SysSA = curAirLoopFlow.SupFlow;
 			}
-			VentilationMechanical( this->VentMechObjectNum ).CalcMechVentController( SysSA, MechVentOutsideAirFlow );
-			MechVentOutsideAirMinFrac = MechVentOutsideAirFlow / curAirLoopFlow.DesSupply;
+			VentilationMechanical( this->VentMechObjectNum ).CalcMechVentController( SysSA, MechVentOAMassFlow );
+			MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
 			if ( curAirLoopFlow.FanPLR > 0.0) {
 				MechVentOutsideAirMinFrac *= curAirLoopFlow.FanPLR;
-				MechVentOutsideAirFlow *= curAirLoopFlow.FanPLR;
+				MechVentOAMassFlow *= curAirLoopFlow.FanPLR;
 			}
 		}
+		this->MechVentOAMassFlowRequest = MechVentOAMassFlow;
 		//****** use greater of Mechanical Ventilation Outside Air fraction and OutAirMinFrac
 		OutAirMinFrac = max( OutAirMinFrac, MechVentOutsideAirMinFrac );
 
@@ -3451,8 +3453,8 @@ namespace MixedAir {
 
 		// Do not allow OA to be below Ventilation:Mechanical flow rate or above mixed mass flow rate
 		if ( AirLoopNum > 0 && VentMechObjectNum != 0 ) {
-			if ( MechVentOutsideAirFlow > this->OAMassFlow ) {
-				this->OAMassFlow = min( MechVentOutsideAirFlow, this->MixMassFlow );
+			if ( MechVentOAMassFlow > this->OAMassFlow ) {
+				this->OAMassFlow = min( MechVentOAMassFlow, this->MixMassFlow );
 			}
 		}
 
@@ -3567,7 +3569,7 @@ namespace MixedAir {
 	void
 	VentilationMechanicalProps::CalcMechVentController(
 		Real64 & SysSA, // System supply air mass flow rate [kg/s]
-		Real64 & MechVentOutsideAirFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
+		Real64 & MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 	)
 	{
 		using DataContaminantBalance::ZoneSysContDemand;
@@ -3631,7 +3633,7 @@ namespace MixedAir {
 		ZoneOAMin = 0.0;
 		ZoneOAMax = 0.0;
 		ZoneContamControllerSched = 0.0;
-		MechVentOutsideAirFlow = 0.0;
+		MechVentOAMassFlow = 0.0;
 
 		// Apply mechanical ventilation only when it is available/allowed
 		if ( GetCurrentScheduleValue( this->SchPtr ) > 0 ) {
@@ -3642,7 +3644,7 @@ namespace MixedAir {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
 					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = SysOAMassFlow;
+				MechVentOAMassFlow = SysOAMassFlow;
 			} else if ( this->SystemOAMethod == SOAM_IAQPGC ) {
 				// IAQP for generic contaminant control
 				SysOAMassFlow = 0.0;
@@ -3650,7 +3652,7 @@ namespace MixedAir {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
 					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = SysOAMassFlow;
+				MechVentOAMassFlow = SysOAMassFlow;
 			} else if ( this->SystemOAMethod == SOAM_IAQPCOM ) {
 				// IAQP for both CO2 and generic contaminant control
 				SysOAMassFlow = 0.0;
@@ -3658,13 +3660,13 @@ namespace MixedAir {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
 					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToCO2SP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = SysOAMassFlow;
+				MechVentOAMassFlow = SysOAMassFlow;
 				SysOAMassFlow = 0.0;
 				for ( int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex ) {
 					int ZoneNum = this->VentMechZone( ZoneIndex );
 					SysOAMassFlow += ZoneSysContDemand( ZoneNum ).OutputRequiredToGCSP * GetCurrentScheduleValue( this->ZoneOASchPtr( ZoneIndex ) );
 				}
-				MechVentOutsideAirFlow = max(SysOAMassFlow, MechVentOutsideAirFlow );
+				MechVentOAMassFlow = max(SysOAMassFlow, MechVentOAMassFlow );
 			} else {
 				// for system OA methods: Zone_Sum, VRP, CO2 methods
 				// new code for DCV method complying with the VRP defined in ASHRAE Standard 62.1-2010
@@ -4026,11 +4028,11 @@ namespace MixedAir {
 				}
 
 				// Finally calc the system supply OA mass flow rate
-				MechVentOutsideAirFlow = SysOA * StdRhoAir;
+				MechVentOAMassFlow = SysOA * StdRhoAir;
 			}
 
 		} else {
-			MechVentOutsideAirFlow = 0.0;
+			MechVentOAMassFlow = 0.0;
 		}
 
 	}

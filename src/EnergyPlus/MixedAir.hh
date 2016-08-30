@@ -254,8 +254,7 @@ namespace MixedAir {
 		int HumidistatZoneNum; // zone number where humidistat is located
 		int NodeNumofHumidistatZone; // node number of zone where humidistat is located
 		Real64 HighRHOAFlowRatio; // Modify ratio with respect to maximum outdoor air flow rate (high RH)
-		bool ModifyDuringHighOAMoisture; // flag to Modify outdoor air flow, TRUE when modify any time
-		// FALSE when modify only when indoor air humrat is less than outdoor HR
+		bool ModifyDuringHighOAMoisture; // flag to Modify outdoor air flow, TRUE when modify any time, FALSE when modify only when indoor air humrat is less than outdoor HR
 		int EconomizerOASchedPtr; // schedule to modify outdoor air flow
 		std::string MinOAflowSch; // Name of the Minimum fraction of Design/Mixed Mass of air
 		std::string MaxOAflowSch; // Name of the Maximum fraction of Design/Mixed Mass of air
@@ -274,6 +273,7 @@ namespace MixedAir {
 		Real64 OAFractionRpt; // Actual outdoor air fraction for reporting (based on mixed air flow rate),
 		// 0 to 1 (normally)
 		Real64 MinOAFracLimit; // Minimum OA fraction limit
+		Real64 MechVentOAMassFlowRequest; // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 		bool EMSOverrideOARate; // if true, EMS is calling to override OA rate
 		Real64 EMSOARateValue; // Value EMS is directing to use. [kg/s]
 		int HeatRecoveryBypassControlType; // User input selects type of heat recovery optimization
@@ -339,6 +339,7 @@ namespace MixedAir {
 			HighHumCtrlStatus( 0 ),
 			OAFractionRpt( 0.0 ),
 			MinOAFracLimit( 0.0 ),
+			MechVentOAMassFlowRequest( 0.0 ),
 			EMSOverrideOARate( false ),
 			EMSOARateValue( 0.0 ),
 			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits ),
@@ -434,7 +435,7 @@ namespace MixedAir {
 		void
 		CalcMechVentController(
 			Real64 & SysSA, // System supply air mass flow rate [kg/s]
-			Real64 & MechVentOutsideAirFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
+			Real64 & MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
 		);
 
 	};

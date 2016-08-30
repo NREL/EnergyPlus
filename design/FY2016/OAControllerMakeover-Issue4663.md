@@ -160,6 +160,8 @@ x 5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Sch
 
 x 7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
 
+x 8. *August 30, 2016* Added new output variable "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate".
+
 ## Modified Objects ##
 
 
