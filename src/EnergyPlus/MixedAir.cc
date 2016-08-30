@@ -4513,8 +4513,7 @@ namespace MixedAir {
 			if ( CurSysNum > 0 ) {
 
 				CheckSysSizing( CurrentModuleObject, this->Name );
-				// If there is a controller:mechanicalventilation, then autosize this to zero to avoid interfering with mech vent flows
-				if ( ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow >= SmallAirVolFlow ) && ( this->VentMechObjectNum == 0 ) ) {
+				if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow >= SmallAirVolFlow ) {
 					this->MinOA = min( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, this->MaxOA );
 				} else {
 					this->MinOA = 0.0;

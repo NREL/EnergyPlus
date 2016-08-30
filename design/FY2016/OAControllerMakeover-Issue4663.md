@@ -6,6 +6,7 @@ Outdoor Air Controller Cleanup - Issue #4663
  - April 22, 2016
  - Revised April 28, 2016
  - Revised July 28-30, 2016 (see dated notes below)
+ - Revised August 30, 2016 (back away from autosizing change for Controller:OutdoorAir Minimum Outdoor Air Flow Rate)
 
 ## Conference Calls and Other Discussion ##
 
@@ -122,8 +123,9 @@ x 1. No changes to `Controller:MechanicalVentilation` and `Controller:OutdoorAir
 
 x 2. In `Controller:MechanicalVentilation` make the zone names and design object names optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there. *This would be consistent with current docs and warning messages.*
 
-x 3.  *July 28, 2016* Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero **if a Controller:MechanicalVentilation object is specified.**
+3.  *July 28, 2016* Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero **if a Controller:MechanicalVentilation object is specified.**
 ~~if one of the advanced methods (VRP, DCV, IAQ) of control is selected.  *Or maybe autosize to the non-per-person flow?*~~
+*August 30, 2016* This change was removed, postponed for further review.
 
 
 x 4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
@@ -154,6 +156,7 @@ x 5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Sch
     
 
 6. Change "Time of Day Economizer Control Schedule" to apply to any type of economizer control, and add a new Economizer Control Type = TimeOfDay.
+*Not done, postponed for further review.*
 
 x 7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
 
