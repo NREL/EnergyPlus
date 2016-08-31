@@ -1079,6 +1079,9 @@ namespace SurfaceGeometry {
 				--NVert;
 			}
 			if ( SurfaceTmp( CurNewSurf ).Sides > 2 ) {
+				// Call to transform vertices
+				TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
+				// compute the area
 				CreateNewellAreaVector( SurfaceTmp( CurNewSurf ).Vertex, SurfaceTmp( CurNewSurf ).Sides, SurfaceTmp( CurNewSurf ).NewellAreaVector );
 				SurfaceTmp( CurNewSurf ).GrossArea = VecLength( SurfaceTmp( CurNewSurf ).NewellAreaVector );
 				SurfaceTmp( CurNewSurf ).Area = SurfaceTmp( CurNewSurf ).GrossArea;
@@ -3446,6 +3449,9 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).Vertex( Vrt ).z = ZLLC + YY( n ) * SinSurfTilt;
 		}
 
+		// Call to transform vertices
+		TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
+        // compute area
 		CreateNewellAreaVector( SurfaceTmp( SurfNum ).Vertex, SurfaceTmp( SurfNum ).Sides, SurfaceTmp( SurfNum ).NewellAreaVector );
 		SurfaceTmp( SurfNum ).GrossArea = VecLength( SurfaceTmp( SurfNum ).NewellAreaVector );
 		SurfaceTmp( SurfNum ).Area = SurfaceTmp( SurfNum ).GrossArea;
@@ -3495,11 +3501,6 @@ namespace SurfaceGeometry {
 			Perimeter += distance( SurfaceTmp( SurfNum ).Vertex( Vrt ), SurfaceTmp( SurfNum ).Vertex( Vrt - 1 ) );
 		}
 		SurfaceTmp( SurfNum ).Perimeter = Perimeter;
-
-		// Call to transform vertices
-
-		TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
-
 	}
 
 	void
@@ -4688,6 +4689,9 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).Vertex( Vrt ).z = ZLLC + YY( n ) * SinSurfTilt;
 		}
 
+		// Call to transform vertices
+		TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
+        // compute area
 		CreateNewellAreaVector( SurfaceTmp( SurfNum ).Vertex, SurfaceTmp( SurfNum ).Sides, SurfaceTmp( SurfNum ).NewellAreaVector );
 		SurfaceTmp( SurfNum ).GrossArea = VecLength( SurfaceTmp( SurfNum ).NewellAreaVector );
 		SurfaceTmp( SurfNum ).Area = SurfaceTmp( SurfNum ).GrossArea;
@@ -4737,11 +4741,6 @@ namespace SurfaceGeometry {
 			Perimeter += distance( SurfaceTmp( SurfNum ).Vertex( Vrt ), SurfaceTmp( SurfNum ).Vertex( Vrt - 1 ) );
 		}
 		SurfaceTmp( SurfNum ).Perimeter = Perimeter;
-
-		// Call to transform vertices
-
-		TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
-
 	}
 
 	void
@@ -6486,6 +6485,9 @@ namespace SurfaceGeometry {
 
 			SurfaceTmp( SurfNum ).Perimeter = Perimeter;
 
+			// Call to transform vertices
+			TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
+
 			CreateNewellSurfaceNormalVector( SurfaceTmp( SurfNum ).Vertex, SurfaceTmp( SurfNum ).Sides, SurfaceTmp( SurfNum ).NewellSurfaceNormalVector );
 			CreateNewellAreaVector( SurfaceTmp( SurfNum ).Vertex, SurfaceTmp( SurfNum ).Sides, SurfaceTmp( SurfNum ).NewellAreaVector );
 			// For surfaces with subsurfaces, the following two areas are turned into net areas later by
@@ -6539,10 +6541,6 @@ namespace SurfaceGeometry {
 			// surfaces
 			SurfaceTmp( SurfNum ).ViewFactorSkyIR = SurfaceTmp( SurfNum ).ViewFactorSky;
 			SurfaceTmp( SurfNum ).ViewFactorGroundIR = 0.5 * ( 1.0 - SurfaceTmp( SurfNum ).CosTilt );
-
-			// Call to transform vertices
-
-			TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
 
 		} else {
 			ShowFatalError( RoutineName + "Called with less than 2 sides, Surface=" + SurfaceTmp( SurfNum ).Name );
