@@ -10050,7 +10050,7 @@ namespace SurfaceGeometry {
 				Triangle2( 3 ) = vertex( 4 );
 
 				// get total Area of quad.
-				Real64 const TotalArea( surface.GrossArea );
+				Real64 TotalArea( surface.GrossArea );
 				if ( TotalArea <= 0.0 ) {
 					//catch a problem....
 					ShowWarningError( "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name );
@@ -10074,11 +10074,11 @@ namespace SurfaceGeometry {
 					Triangle2( 3 ) = vertex( 4 );
 
 					// get area fraction of triangles.
-					Tri1Area = AreaPolygon( 3, Triangle1 ) / TotalArea;
-					Tri2Area = AreaPolygon( 3, Triangle2 ) / TotalArea;
-					if ( ( Tri1Area + Tri2Area ) > 1.05 ) {
-						ShowWarningError( "CalcSurfaceCentroid: sum of two sub-triangle areas greater than quadrateral area, for surface=" + surface.Name );
-					}
+					Real64 AreaTriangle1 = AreaPolygon( 3, Triangle1 );
+					Real64 AreaTriangle2 = AreaPolygon( 3, Triangle2 );
+					TotalArea = AreaTriangle1 + AreaTriangle2;
+					Tri1Area = AreaTriangle1 / TotalArea;
+					Tri2Area = AreaTriangle2 / TotalArea;
 				}
 
 				// get centroid of Triangle 1
