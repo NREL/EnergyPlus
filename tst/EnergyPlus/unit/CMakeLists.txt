@@ -64,6 +64,7 @@ set( test_src
   HeatingCoils.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
+  HighTempRadiantSystem.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
