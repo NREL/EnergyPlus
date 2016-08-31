@@ -2113,6 +2113,7 @@ namespace ThermalComfort {
 		using DataHeatBalFanSys::QHWBaseboardToPerson;
 		using DataHeatBalFanSys::QSteamBaseboardToPerson;
 		using DataHeatBalFanSys::QElecBaseboardToPerson;
+		using DataHeatBalFanSys::QCoolingPanelToPerson;
 		using DataHeatBalSurface::TH;
 
 		// Return value
@@ -2151,9 +2152,9 @@ namespace ThermalComfort {
 		}}
 
 		// If high temperature radiant heater present and on, then must account for this in MRT calculation
-		if ( QHTRadSysToPerson( ZoneNum ) > 0.0 || QHWBaseboardToPerson( ZoneNum ) > 0.0 || QSteamBaseboardToPerson( ZoneNum ) > 0.0 || QElecBaseboardToPerson( ZoneNum ) > 0.0 ) {
+		if ( QHTRadSysToPerson( ZoneNum ) > 0.0 || QCoolingPanelToPerson( ZoneNum ) > 0.0 || QHWBaseboardToPerson( ZoneNum ) > 0.0 || QSteamBaseboardToPerson( ZoneNum ) > 0.0 || QElecBaseboardToPerson( ZoneNum ) > 0.0 ) {
 			RadTemp += KelvinConv; // Convert to Kelvin
-			RadTemp = root_4( pow_4( RadTemp ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) );
+			RadTemp = root_4( pow_4( RadTemp ) + ( ( QHTRadSysToPerson( ZoneNum ) + QCoolingPanelToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) );
 			RadTemp -= KelvinConv; // Convert back to Celsius
 		}
 
