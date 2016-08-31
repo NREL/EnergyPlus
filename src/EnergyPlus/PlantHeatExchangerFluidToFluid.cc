@@ -1419,39 +1419,29 @@ namespace PlantHeatExchangerFluidToFluid {
 				DeltaTCooling = SetPointTemp - ControlSignalValue;
 				//obtain shut down state
 				ChillerShutDown = PlantLoop( FluidHX( CompNum ).OtherCompSupplySideLoop.LoopNum ).LoopSide( FluidHX( CompNum ).OtherCompSupplySideLoop.LoopSideNum ).Branch( FluidHX( CompNum ).OtherCompSupplySideLoop.BranchNum ).Comp( FluidHX( CompNum ).OtherCompSupplySideLoop.CompNum ).FreeCoolCntrlShutDown;
-				if ( ! ChillerShutDown ) {
-						mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
-						SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-						if ( mdotSupSide > MassFlowTolerance ) {
-							mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
-						} else {
-							mdotDmdSide = 0.0;
-						}
-						SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
-				} else {
-					if ( ( DeltaTCooling > FluidHX( CompNum ).TempControlTol ) ) {
-						// can and want to cool
-						mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
-						SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-						if ( mdotSupSide > MassFlowTolerance ) {
-							mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
-						} else {
-							mdotDmdSide = 0.0;
-						}
-						SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
-
+				if ( ChillerShutDown && ( DeltaTCooling > FluidHX( CompNum ).TempControlTol ) ) {
+					// can and want to cool
+					mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
+					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
+					if ( mdotSupSide > MassFlowTolerance ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
 					} else {
-						mdotSupSide = 0.0;
-						SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
-						//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
-						if ( FirstHVACIteration ) {
-							mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
-						} else {
-							mdotDmdSide = 0.0;
-						}
-						SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
+						mdotDmdSide = 0.0;
 					}
+					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
+
+				} else {
+					mdotSupSide = 0.0;
+					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
+					//issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh demand side inlet temperature value
+					if ( FirstHVACIteration ) {
+						mdotDmdSide = FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax;
+					} else {
+						mdotDmdSide = 0.0;
+					}
+					SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 				}
+
 			}}
 
 		} else { // scheduled off
