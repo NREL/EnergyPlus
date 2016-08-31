@@ -70,10 +70,6 @@
 :
 :        %procCSV% or %9 contains Y if csvProc program should be called
 :
-:        %cntActv% or %10 contains the count of other simulations active or about to be active
-:
-:        %multithrd% or %11 contains N if multithreading should be disabled
-:        
 :  This batch file is designed to be used only in the EnergyPlus directory that
 :  contains the EnergyPlus.exe, Energy+.idd and Energy+.ini files.
 :
@@ -159,10 +155,6 @@ SET pausing=%6
 SET maxcol=%7
 SET convESO=%8
 SET procCSV=%9
-SHIFT
-SET cntActv=%9 
-SHIFT
-SET multithrd=%9
 
 :skipSetParams
 IF "%convESO%" == "" SET convESO=N 
@@ -322,10 +314,6 @@ IF EXIST SLABSurfaceTemps.TXT COPY "%epout%.expidf"+SLABSurfaceTemps.TXT "%epout
 IF EXIST SLABSurfaceTemps.TXT DEL SLABSurfaceTemps.TXT
 
 :  4. Execute EnergyPlus
-SET EP_OMP_NUM_THREADS=
-IF "%cntActv%" ==  "" SET cntActv=1
-IF NOT %cntActv% == 1 SET EP_OMP_NUM_THREADS=1
-IF %multithrd%==N SET EP_OMP_NUM_THREADS=1
 "%program_path%EnergyPlus"
 if %pausing%==Y pause
 
