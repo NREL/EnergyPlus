@@ -367,7 +367,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,10.00;      !- Field 3
+    Until: 24:00, 2.00;      !- Field 3
 
   Schedule:Compact,
     HW LOOP TEMP SCHEDULE,   !- Name
@@ -1400,7 +1400,7 @@
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
@@ -1431,7 +1431,7 @@
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
@@ -1462,7 +1462,7 @@
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
