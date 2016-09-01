@@ -2455,7 +2455,8 @@ namespace SimulationManager {
 
 		// PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
-		CheckCachedIPErrors();
+//		CheckCachedIPErrors(); // eplusout.iperr is unused in the json input processor, it has been replaced by
+							   // state.errors and state.warnings in the InputProcessor namespace
 
 		if ( PreP_Fatal ) {
 			ShowFatalError( "Preprocessor condition(s) cause termination." );
@@ -2511,69 +2512,69 @@ namespace SimulationManager {
 
 	}
 
-	void
-	CheckCachedIPErrors()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine displays the cached error messages after the preprocessor
-		// errors have been checked and produced.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iostatus;
-		std::string ErrorMessage;
-
-		gio::close( CacheIPErrorFile );
-		gio::open( CacheIPErrorFile, DataStringGlobals::outputIperrFileName );
-		iostatus = 0;
-		while ( iostatus == 0 ) {
-			{ IOFlags flags; gio::read( CacheIPErrorFile, fmtA, flags ) >> ErrorMessage; iostatus = flags.ios(); }
-			if ( iostatus != 0 ) break;
-			if ( is_blank( ErrorMessage ) ) continue;
-			ShowErrorMessage( ErrorMessage );
-			if ( sqlite ) {
-				// Following code relies on specific formatting of Severes, Warnings, and continues
-				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
-				// automatic sending of error messages to SQLite are turned on.
-				if ( ErrorMessage[ 4 ] == 'S' ) {
-					sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
-				} else if ( ErrorMessage[ 4 ] == 'W' ) {
-					sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
-				} else if ( ErrorMessage[ 6 ] == '~' ) {
-					sqlite->updateSQLiteErrorRecord( ErrorMessage );
-				}
-			}
-		}
-
-		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
-
-	}
+//	void
+//	CheckCachedIPErrors()
+//	{
+//
+//		// SUBROUTINE INFORMATION:
+//		//       AUTHOR         Linda Lawrie
+//		//       DATE WRITTEN   August 2010
+//		//       MODIFIED       na
+//		//       RE-ENGINEERED  na
+//
+//		// PURPOSE OF THIS SUBROUTINE:
+//		// This routine displays the cached error messages after the preprocessor
+//		// errors have been checked and produced.
+//
+//		// METHODOLOGY EMPLOYED:
+//		// na
+//
+//		// REFERENCES:
+//		// na
+//
+//		// Using/Aliasing
+//
+//		// Locals
+//		// SUBROUTINE ARGUMENT DEFINITIONS:
+//		// na
+//
+//		// SUBROUTINE PARAMETER DEFINITIONS:
+//
+//		// INTERFACE BLOCK SPECIFICATIONS:
+//		// na
+//
+//		// DERIVED TYPE DEFINITIONS:
+//		// na
+//
+//		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+//		int iostatus;
+//		std::string ErrorMessage;
+//
+//		gio::close( CacheIPErrorFile );
+//		gio::open( CacheIPErrorFile, DataStringGlobals::outputIperrFileName );
+//		iostatus = 0;
+//		while ( iostatus == 0 ) {
+//			{ IOFlags flags; gio::read( CacheIPErrorFile, fmtA, flags ) >> ErrorMessage; iostatus = flags.ios(); }
+//			if ( iostatus != 0 ) break;
+//			if ( is_blank( ErrorMessage ) ) continue;
+//			ShowErrorMessage( ErrorMessage );
+//			if ( sqlite ) {
+//				// Following code relies on specific formatting of Severes, Warnings, and continues
+//				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
+//				// automatic sending of error messages to SQLite are turned on.
+//				if ( ErrorMessage[ 4 ] == 'S' ) {
+//					sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
+//				} else if ( ErrorMessage[ 4 ] == 'W' ) {
+//					sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
+//				} else if ( ErrorMessage[ 6 ] == '~' ) {
+//					sqlite->updateSQLiteErrorRecord( ErrorMessage );
+//				}
+//			}
+//		}
+//
+//		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
+//
+//	}
 
 } // SimulationManager
 

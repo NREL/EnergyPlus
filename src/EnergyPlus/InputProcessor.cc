@@ -603,7 +603,7 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				need_new_object_name = false;
 				if ( cur_obj_name.find( "Parametric:" ) != std::string::npos ) {
 					u64toa( line_num + 1, s );
-					errors.push_back( "You must run Parametric Preprocesor for \"" + cur_obj_name + "\" at line " + s );
+					errors.push_back( "You must run Parametric Preprocessor for \"" + cur_obj_name + "\" at line " + s );
 				} else if ( cur_obj_name.find( "Template" ) != std::string::npos ) {
 					u64toa( line_num + 1, s );
 					errors.push_back( "You must run the ExpandObjects program for \"" + cur_obj_name + "\" at line " + s );
@@ -624,10 +624,13 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 
 			if ( !is_in_extensibles ) {
 				auto req = obj_required.find( key );
-				if ( req != obj_required.end() )
+				if ( req != obj_required.end() ) {
 					req->second = true; // required field is now accounted for, for this specific object
+				}
 				req = root_required.find( key );
-				if ( req != root_required.end() ) req->second = true; // root_required field is now accounted for
+				if ( req != root_required.end() ) {
+					req->second = true; // root_required field is now accounted for
+				}
 			} else {
 				auto req = extensible_required.find( key );
 				if ( req != extensible_required.end() ) req->second = true;
@@ -891,39 +894,39 @@ namespace EnergyPlus {
 		}
 		echo_stream = gio::out_stream( EchoInputFile );
 
-		{
-			IOFlags flags;
-			gio::inquire( outputIperrFileName, flags );
-			FileExists = flags.exists();
-		}
-		if ( FileExists ) {
-			CacheIPErrorFile = GetNewUnitNumber();
-			{
-				IOFlags flags;
-				flags.ACTION( "read" );
-				gio::open( CacheIPErrorFile, outputIperrFileName, flags );
-				read_stat = flags.ios();
-			}
-			if ( read_stat != 0 ) {
-				ShowFatalError( "EnergyPlus: Could not open file " + outputIperrFileName + " for input (read)." );
-			}
-			{
-				IOFlags flags;
-				flags.DISPOSE( "delete" );
-				gio::close( CacheIPErrorFile, flags );
-			}
-		}
-		CacheIPErrorFile = GetNewUnitNumber();
-		{
-			IOFlags flags;
-			flags.ACTION( "write" );
-			gio::open( CacheIPErrorFile, outputIperrFileName, flags );
-			write_stat = flags.ios();
-		}
-		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) " + outputIperrFileName );
-			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
-		}
+//		{
+//			IOFlags flags;
+//			gio::inquire( outputIperrFileName, flags );
+//			FileExists = flags.exists();
+//		}
+//		if ( FileExists ) {
+//			CacheIPErrorFile = GetNewUnitNumber();
+//			{
+//				IOFlags flags;
+//				flags.ACTION( "read" );
+//				gio::open( CacheIPErrorFile, outputIperrFileName, flags );
+//				read_stat = flags.ios();
+//			}
+//			if ( read_stat != 0 ) {
+//				ShowFatalError( "EnergyPlus: Could not open file " + outputIperrFileName + " for input (read)." );
+//			}
+//			{
+//				IOFlags flags;
+//				flags.DISPOSE( "delete" );
+//				gio::close( CacheIPErrorFile, flags );
+//			}
+//		}
+//		CacheIPErrorFile = GetNewUnitNumber();
+//		{
+//			IOFlags flags;
+//			flags.ACTION( "write" );
+//			gio::open( CacheIPErrorFile, outputIperrFileName, flags );
+//			write_stat = flags.ios();
+//		}
+//		if ( write_stat != 0 ) {
+//			DisplayString( "Could not open (write) " + outputIperrFileName );
+//			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
+//		}
 	}
 
 	void

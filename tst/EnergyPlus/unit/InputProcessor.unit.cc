@@ -1139,7 +1139,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 2);
 		if (InputProcessor::state.errors.size() >= 2) {
 			EXPECT_NE(InputProcessor::state.errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("You must run Parametric Preprocesor for \"Parametric:Logic\" at line"), std::string::npos);
+			EXPECT_NE(InputProcessor::state.errors[1].find("You must run Parametric Preprocessor for \"Parametric:Logic\" at line"), std::string::npos);
 		}
 	}
 
@@ -1171,14 +1171,50 @@ namespace EnergyPlus {
 												}
 										}
 								}
-						}
+						},
+                        {
+                                "GlobalGeometryRules",
+                                {
+                                        {
+                                                "",
+                                                {
+                                                        {"starting_vertex_position", "UpperLeftCorner"},
+                                                        {"vertex_entry_direction", "Counterclockwise"},
+                                                        {"coordinate_system", "Relative"},
+                                                        {"daylighting_reference_point_coordinate_system", "Relative"},
+                                                        {"rectangular_surface_coordinate_system", "Relative"}
+                                                }
+                                        }
+                                }
+                        },
+                        {
+                                "Building",
+                                {
+                                        {
+                                                "Bldg",
+                                                {
+                                                        {"north_axis", 0.0},
+                                                        {"terrain", "Suburbs"},
+                                                        {"loads_convergence_tolerance_value", 0.04},
+                                                        {"temperature_convergence_tolerance_value", 0.4000},
+                                                        {"solar_distribution", "FullExterior"},
+                                                        {"maximum_number_of_warmup_days", 25},
+                                                        {"minimum_number_of_warmup_days", 6}
+                                                }
+                                        }
+                                }
+                        }
+
 				};
 
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 2);
+		EXPECT_EQ(InputProcessor::state.errors.size(), 2);
+        EXPECT_EQ(InputProcessor::state.warnings.size(), 0);
 		if (InputProcessor::state.errors.size() >= 2) {
 			EXPECT_NE(InputProcessor::state.errors[0].find("Key \"non_existent_field_1\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
 			EXPECT_NE(InputProcessor::state.errors[1].find("Key \"non_existent_field_2\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+//            EXPECT_NE(InputProcessor::state.errors[2].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
+//            EXPECT_NE(InputProcessor::state.errors[3].find("Required object \"Building\" was not provided"), std::string::npos);
 		}
 	}
 
@@ -1211,19 +1247,54 @@ namespace EnergyPlus {
 												}
 										}
 								}
-						}
+						},
+                        {
+                            "GlobalGeometryRules",
+                                    {
+                                            {
+                                                    "",
+                                                    {
+                                                            {"starting_vertex_position", "UpperLeftCorner"},
+                                                            {"vertex_entry_direction", "Counterclockwise"},
+                                                            {"coordinate_system", "Relative"},
+                                                            {"daylighting_reference_point_coordinate_system", "Relative"},
+                                                            {"rectangular_surface_coordinate_system", "Relative"}
+                                                    }
+                                            }
+                                    }
+                        },
+                        {
+                            "Building",
+                                    {
+                                            {
+                                                    "Bldg",
+                                                    {
+                                                            {"north_axis", 0.0},
+                                                            {"terrain", "Suburbs"},
+                                                            {"loads_convergence_tolerance_value", 0.04},
+                                                            {"temperature_convergence_tolerance_value", 0.4000},
+                                                            {"solar_distribution", "FullExterior"},
+                                                            {"maximum_number_of_warmup_days", 25},
+                                                            {"minimum_number_of_warmup_days", 6}
+                                                    }
+                                            }
+                                    }
+                        }
 				};
 
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 4);
+		EXPECT_EQ(InputProcessor::state.errors.size(), 4);
+        EXPECT_EQ(InputProcessor::state.warnings.size(), 0);
 		if (InputProcessor::state.errors.size() >= 4) {
 			EXPECT_NE(InputProcessor::state.errors[0].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
 			EXPECT_NE(InputProcessor::state.errors[1].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
 			EXPECT_NE(InputProcessor::state.errors[2].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
 			EXPECT_NE(InputProcessor::state.errors[2].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
 			EXPECT_NE(InputProcessor::state.errors[3].find("Required field \"construction_name\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+//            EXPECT_NE(InputProcessor::state.errors[4].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
+//            EXPECT_NE(InputProcessor::state.errors[5].find("Required object \"Building\" was not provided"), std::string::npos);
 		}
-	}
+    }
 
 
 	TEST_F(InputProcessorFixture, min_and_max_validation) {
@@ -1269,10 +1340,26 @@ namespace EnergyPlus {
 												},
 										},
 								}
-						}
+						},
+                        {
+                            "GlobalGeometryRules",
+                                    {
+                                            {
+                                                    "",
+                                                    {
+                                                            {"starting_vertex_position", "UpperLeftCorner"},
+                                                            {"vertex_entry_direction", "Counterclockwise"},
+                                                            {"coordinate_system", "Relative"},
+                                                            {"daylighting_reference_point_coordinate_system", "Relative"},
+                                                            {"rectangular_surface_coordinate_system", "Relative"}
+                                                    }
+                                            }
+                                    }
+                        },
 				};
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 5);
+		EXPECT_EQ(InputProcessor::state.errors.size(), 5);
+        EXPECT_EQ(InputProcessor::state.warnings.size(), 0);
 		if (InputProcessor::state.errors.size() >= 5) {
 			EXPECT_NE(InputProcessor::state.errors[0].find("Value \"0.000000\" parsed at line"), std::string::npos);
 			EXPECT_NE(InputProcessor::state.errors[0].find("is less than or equal to the exclusive minimum"), std::string::npos);
