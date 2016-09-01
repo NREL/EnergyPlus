@@ -2445,8 +2445,6 @@ Zone,Average,Surface Heat Storage Gain Rate [W]
 Zone,Average,Surface Heat Storage Loss Rate [W]
 Zone,Average,Surface Heat Storage Rate per Area [W/m2]
 Zone,Sum,Surface Heat Storage Energy [J]
-Zone,Average,Surface Internal Source Location Temperature [C]
-Zone,Average,Surface Internal User Specified Location Temperature [C]
 Zone,Average,Zone Opaque Surface Inside Face Conduction [W]
 Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate [W]
 Zone,Average,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate [W]
@@ -2887,15 +2885,6 @@ Different versions of the reports are available. The basic heat conduction rate 
 These ``heat storage'' output variables combine the inside face conduction and outside face conduction reports together to describe the thermal storage situation in a heat transfer surface in a nominal way. This is simply the difference between the inside and outside face conduction, but with the sign convention arranged so that positive values indicate heat being added to the core of the surface.
 
 Different versions of the reports are available. The basic heat storage rate (W) and a per unit area flux (W/m\(^{2}\)) can have positive or negative values with the sign convention that positive indicates heat being added to the surface's mass. There are also directed ``gain'' and ``loss'' versions that have only positive values or zero when the heat storage direction opposes (W). Finally there is a version for total energy stored (J).
-
-\subsubsection{Surface Internal Source Location Temperature {[}C{]}}\label{surface-internal-source-location-temperature-c}
-
-When a surface has an internal source or sink (defined using Construction:InternalSource) then this output is available for the temperature within the surface at the location of the source/sink.
-
-\subsubsection{Surface Internal User Specified Location Temperature {[}C{]}}\label{surface-internal-user—specified-location-temperature-c}
-
-When a surface has an internal source or sink (defined using Construction:InternalSource) then this output is available for the temperature within the construction at the location requested by the user.  It is defined using the Construction:InternalSource input as after a particular layer.  This output will calculate the interior temperature at that location.
-
 
 \subsubsection{Zone Opaque Surface Inside Face Conduction {[}W{]}}\label{zone-opaque-surface-inside-face-conduction-w}
 
