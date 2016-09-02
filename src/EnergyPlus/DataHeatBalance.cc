@@ -450,6 +450,7 @@ namespace DataHeatBalance {
 	bool StormWinChangeThisDay( false ); // True if a storm window has been added or removed from any
 	// window during the current day; can only be true for first
 	// time step of the day.
+	bool AnyConstructInternalSourceInInput( false ); // true if the user has entered any constructions with internal sources
 	bool AdaptiveComfortRequested_CEN15251( false ); // true if people objects have adaptive comfort requests. CEN15251
 	bool AdaptiveComfortRequested_ASH55( false ); // true if people objects have adaptive comfort requests. ASH55
 	int NumRefrigeratedRacks( 0 ); // Total number of refrigerated case compressor racks in input
@@ -625,10 +626,6 @@ namespace DataHeatBalance {
 
 	Array1D< Real64 > const GasSpecificHeatRatio( 10, { 1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // Gas specific heat ratios.  Used for gasses in low pressure
 
-	//Variables Dimensioned to Number of Zones
-	Array1D< Real64 > MVFC; // Design Mixing Flow Rate [m3/s] (Cross Zone Mixing)
-	Array1D< Real64 > MTC; // Control Temperature For Mixing [C] (Cross Zone Mixing)
-
 	Real64 ZeroPointerVal( 0.0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
@@ -774,6 +771,7 @@ namespace DataHeatBalance {
 		TotCO2Gen = 0;
 		CalcWindowRevealReflection = false;
 		StormWinChangeThisDay = false;
+		AnyConstructInternalSourceInInput = false;
 		AdaptiveComfortRequested_CEN15251 = false;
 		AdaptiveComfortRequested_ASH55 = false;
 		NumRefrigeratedRacks = 0;
@@ -888,8 +886,6 @@ namespace DataHeatBalance {
 		CosIncAng.deallocate();
 		BackSurfaces.deallocate();
 		OverlapAreas.deallocate();
-		MVFC.deallocate();
-		MTC.deallocate();
 		ZeroPointerVal = 0.0;
 		ZonePreDefRep.deallocate();
 		BuildingPreDefRep = ZonePreDefRepType();

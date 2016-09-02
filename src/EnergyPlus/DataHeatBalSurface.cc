@@ -110,6 +110,7 @@ namespace DataHeatBalSurface {
 	Array1D< Real64 > HSkyExtSurf; // Outside Convection Coefficient
 	Array1D< Real64 > HGrdExtSurf; // Outside Convection Coefficient
 	Array1D< Real64 > TempSource; // Temperature at the source location for each heat transfer surface
+	Array1D< Real64 > TempUserLoc; // Temperature at the user specified location for each heat transfer surface
 	Array1D< Real64 > TempSurfInRep; // Temperature of the Inside Surface for each heat transfer surface
 	// (report)
 	Array1D< Real64 > QConvInReport; // Surface convection heat gain at inside face [J]
@@ -243,8 +244,10 @@ namespace DataHeatBalSurface {
 	Array3D< Real64 > THM; // Master Temperature History (on the time step for the construct)
 	Array3D< Real64 > QHM; // Master Flux History (on the time step for the construct)
 	Array2D< Real64 > TsrcHist; // Temperature history at the source location (SurfNum,Term)
+	Array2D< Real64 > TuserHist; // Temperature history at the user specified location (SurfNum,Term)
 	Array2D< Real64 > QsrcHist; // Heat source/sink history for the surface (SurfNum,Term)
 	Array2D< Real64 > TsrcHistM; // Master temperature history at the source location (SurfNum,Term)
+	Array2D< Real64 > TuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
 	Array2D< Real64 > QsrcHistM; // Master heat source/sink history for the surface (SurfNum,Term)
 
 	Array2D< Real64 > FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
@@ -270,6 +273,7 @@ namespace DataHeatBalSurface {
 		HSkyExtSurf.deallocate();
 		HGrdExtSurf.deallocate();
 		TempSource.deallocate();
+		TempUserLoc.deallocate();
 		TempSurfInRep.deallocate();
 		QConvInReport.deallocate();
 		QdotConvInRep.deallocate();

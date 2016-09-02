@@ -13,7 +13,7 @@ The following situations require the use of a Setpoint Manager:
 \item
   use of Controller:OutdoorAir with \emph{Economizer Control Type} set to anything but \emph{NoEconomizer};
 \item
-  use of Coil:Heating:Gas or Coil: Heating: Electric with the field \emph{Temperature Setpoint Node Name} set to a node name;
+  use of Coil:Heating:Fuel or Coil: Heating: Electric with the field \emph{Temperature Setpoint Node Name} set to a node name;
 \item
   any use of CoilSystem:Cooling:DX;
 \item
@@ -432,14 +432,6 @@ The use of this object requires that a ZoneControl:Humidistat object be specifie
 
 A unique, user-assigned name for an instance of a single zone minimum humidity setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
 
-\paragraph{Field: Control Variable}\label{field-control-variable-6}
-
-Deprecated Field. This field is not used and will be deleted in a future release.
-
-\paragraph{Field: Schedule Name}\label{field-schedule-name-2-002}
-
-Deprecated Field. This field is not used and will be deleted in a future release.
-
 \paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-6}
 
 The name of the HVAC system node where the calculated humidity ratio setpoint is set. If the setpoint is being placed on more than one node, this input should be the name of a NodeList.
@@ -453,17 +445,15 @@ An IDF example for this setpoint manager is shown below with the required humidi
 \begin{lstlisting}
 
 SetpointManager:SingleZone:Humidity:Minimum,
-  Zone Min Set Point Manager,   !- Name
-  ,   !- Control Variable
-  ,   !- Schedule Name
-  Air Loop Outlet Node,   !- Setpoint Node or NodeList Name
-  Zone 2 Node;                     !- Control Zone Air Node Name
+  Zone Min Set Point Manager,  !- Name
+  Air Loop Outlet Node,        !- Setpoint Node or NodeList Name
+  Zone 2 Node;                 !- Control Zone Air Node Name
 
 
   ZoneControl:Humidistat,
-  Zone 2 Humidistat,             !- Name
-  ZONE 2,                                   !-Zone Name
-  Min rel Hum Set Sch2;       !- Humidifying Relative Humidity Setpoint Schedule Name
+  Zone 2 Humidistat,           !- Name
+  ZONE 2,                      !-Zone Name
+  Min rel Hum Set Sch2;        !- Humidifying Relative Humidity Setpoint Schedule Name
 \end{lstlisting}
 
 \subsection{SetpointManager:SingleZone:Humidity:Maximum}\label{setpointmanagersinglezonehumiditymaximum}
@@ -480,14 +470,6 @@ The use of this object requires that a ZoneControl:Humidistat object be specifie
 
 A unique, user-assigned name for an instance of a single zone maximum humidity setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
 
-\paragraph{Field: Control Variable}\label{field-control-variable-7}
-
-Deprecated Field. This field is not used and will be deleted in a future release.
-
-\paragraph{Field: Schedule Name}\label{field-schedule-name-3-001}
-
-Deprecated Field. This field is not used and will be deleted in a future release.
-
 \paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-7}
 
 The name of the HVAC system node where the calculated humidity ratio setpoint is set. If the setpoint is being placed on more than one node, this input should be the name of a NodeList.
@@ -501,36 +483,34 @@ An example of this object in an input data file (IDF), along with a temperature 
 \begin{lstlisting}
 
 SetpointManager:SingleZone:Humidity:Maximum,
-  Zone Max Set Point Manager,                     !- Name
-  ,                                                                         !- Control Variable
-  ,                                                                         !- Schedule Name
-  VAV Sys 1 Outlet Node,                               !- Setpoint Node or NodeList Name
-  Zone 2 Node;                                                   !-Control Zone Air Node Name
+  Zone Max Set Point Manager,           !- Name
+  VAV Sys 1 Outlet Node,                !- Setpoint Node or NodeList Name
+  Zone 2 Node;                          !-Control Zone Air Node Name
 
 
   SetpointManager:Scheduled,
-  Scheduled Set Point Manager 1,               !- Name
-  Temperature,                                                   !- Control Variable
-  Seasonal Reset Supply Air Temp Sch,     !- Schedule Name
-  VAV Sys 1 Outlet Node;                               !- Setpoint Node or NodeList Name
+  Scheduled Set Point Manager 1,        !- Name
+  Temperature,                          !- Control Variable
+  Seasonal Reset Supply Air Temp Sch,   !- Schedule Name
+  VAV Sys 1 Outlet Node;                !- Setpoint Node or NodeList Name
 
 
   ZoneControl:Humidistat,
-  Zone 2 Humidistat,             !-Name
-  ZONE 2,                                   !- Zone Name
-  Min rel Hum Set Sch2;       !- Humidifying Relative Humidity Setpoint Schedule Name
+  Zone 2 Humidistat,                    !-Name
+  ZONE 2,                               !- Zone Name
+  Min rel Hum Set Sch2;                 !- Humidifying Relative Humidity Setpoint Schedule Name
 
 
   Controller:WaterCoil,
-  Central Cooling Coil Contoller 1,         !- Name
-  TEMPandHUMRAT,                                               !- Control Variable
-  Reverse,                                                           !- Action
-  FLOW,                                                                 !- Actuator Variable
-  VAV Sys 1 Outlet Node,                               !- Sensor Node Name
+  Central Cooling Coil Contoller 1,     !- Name
+  TEMPandHUMRAT,                        !- Control Variable
+  Reverse,                              !- Action
+  FLOW,                                 !- Actuator Variable
+  VAV Sys 1 Outlet Node,                !- Sensor Node Name
   Main Cooling Coil 1 Water Inlet Node, !- Actuator Node Name
-  0.002,                                                               !- Controller Convergence Tolerance {deltaC}
-  0.025,                                                               !- Maximum Actuated Flow {m3/s}
-  0.0;                                                                   !- Minimum Actuated Flow {m3/s}
+  0.002,                                !- Controller Convergence Tolerance {deltaC}
+  0.025,                                !- Maximum Actuated Flow {m3/s}
+  0.0;                                  !- Minimum Actuated Flow {m3/s}
 \end{lstlisting}
 
 \subsection{SetpointManager:MixedAir}\label{setpointmanagermixedair}

@@ -120,6 +120,7 @@ namespace DataZoneEquipment {
 	extern int const RefrigerationAirChillerSet_Num;
 	extern int const UserDefinedZoneHVACForcedAir_Num;
 	extern int const ZoneUnitarySystem_Num; // AirloopHVAC:UnitarySystem configured as zone equipment
+	extern int const CoolingPanel_Num;
 	extern int const TotalNumZoneEquipType;
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types

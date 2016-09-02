@@ -79,6 +79,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
 #include <DataWindowEquivalentLayer.hh>
+#include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
@@ -1928,11 +1929,8 @@ namespace SurfaceGeometry {
 		}
 
 		int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection;
-		int NumDElightControls = GetNumObjectsFound( "Daylighting:DElight:Controls" );
-		int NumDElightRefPt = GetNumObjectsFound( "Daylighting:DElight:ReferencePoint" );
 		int NumDElightCmplxFen = GetNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
-		int TotDElightObj = NumDElightControls + NumDElightRefPt + NumDElightCmplxFen;
-		if ( TotShadSurf > 0 && TotDElightObj > 0 ){
+		if ( TotShadSurf > 0 && ( NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight() ) ){
 			ShowWarningError( RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored." );
 		}
 	}
@@ -9154,15 +9152,6 @@ namespace SurfaceGeometry {
 						Material( TotMaterials ).WinShadeLeftOpeningMult = 0.0;
 						Material( TotMaterials ).WinShadeRightOpeningMult = 0.0;
 						Material( TotMaterials ).WinShadeAirFlowPermeability = 0.0;
-						Material( TotMaterials ).EMPDVALUE = 0.0;
-						Material( TotMaterials ).MoistACoeff = 0.0;
-						Material( TotMaterials ).MoistBCoeff = 0.0;
-						Material( TotMaterials ).MoistCCoeff = 0.0;
-						Material( TotMaterials ).MoistDCoeff = 0.0;
-						Material( TotMaterials ).EMPDaCoeff = 0.0;
-						Material( TotMaterials ).EMPDbCoeff = 0.0;
-						Material( TotMaterials ).EMPDcCoeff = 0.0;
-						Material( TotMaterials ).EMPDdCoeff = 0.0;
 					} // End of check if new air layer material has to be created
 				}
 
