@@ -292,6 +292,7 @@ namespace EnergyPlus {
 		DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
 		DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
 		DataHeatBalance::Construct.allocate(DataHeatBalance::TotConstructs);
+		DataHeatBalance::AnyConstructInternalSourceInInput = true;
 
 		AllocateSurfaceHeatBalArrays(); // allocates a host of variables related to CTF calculations
 		
