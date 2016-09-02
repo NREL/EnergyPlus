@@ -668,8 +668,8 @@ namespace WaterThermalTanks {
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankType = CompType;
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankName = CompName;
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankID = CompIndex;
-				IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).LoopNum = LoopNum; 
-				IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).LoopSideNum = LoopSideNum;
+				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).LoopNum = LoopNum; 
+				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).LoopSideNum = LoopSideNum;
 
 
 				IHPMode = GetCurWorkMode( HPWaterHeater( CompNum ).DXCoilNum );
