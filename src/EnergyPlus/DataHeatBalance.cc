@@ -771,6 +771,7 @@ namespace DataHeatBalance {
 		TotCO2Gen = 0;
 		CalcWindowRevealReflection = false;
 		StormWinChangeThisDay = false;
+		AnyConstructInternalSourceInInput = false;
 		AdaptiveComfortRequested_CEN15251 = false;
 		AdaptiveComfortRequested_ASH55 = false;
 		NumRefrigeratedRacks = 0;

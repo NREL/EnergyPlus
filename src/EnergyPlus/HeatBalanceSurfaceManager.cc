@@ -4067,8 +4067,6 @@ namespace HeatBalanceSurfaceManager {
 		l21 = l211;
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum, ++l11, ++l21 ) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
 			auto const & surface( Surface( SurfNum ) );
-			int const ConstrNum( surface.Construction );
-			auto const & construct( Construct( ConstrNum ) );
 
 			if ( surface.Class == SurfaceClass_Window || ! surface.HeatTransSurf ) continue;
 			if ( ( surface.HeatTransferAlgorithm != HeatTransferModel_CTF ) && ( surface.HeatTransferAlgorithm != HeatTransferModel_EMPD ) && ( surface.HeatTransferAlgorithm != HeatTransferModel_TDD ) ) continue;
@@ -4077,7 +4075,7 @@ namespace HeatBalanceSurfaceManager {
 				TempInt1( SurfNum ) = TempSurfIn( SurfNum );
 				QExt1( SurfNum ) = QH[ l11 ];
 				QInt1( SurfNum ) = QH[ l21 ];
-				if ( construct.SourceSinkPresent ) {
+				if ( AnyConstructInternalSourceInInput ) {
 					Tsrc1( SurfNum ) = TsrcHist( SurfNum, 1 );
 					Tuser1( SurfNum ) = TuserHist( SurfNum, 1 );
 					Qsrc1( SurfNum ) = QsrcHist( SurfNum, 1 );
