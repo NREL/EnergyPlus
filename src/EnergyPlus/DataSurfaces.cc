@@ -829,6 +829,20 @@ namespace DataSurfaces {
       return QRadSWOutIncident( t_SurfNum ) + QS( Zone );
     }
 
+    int SurfaceData::getTotLayers() const {
+      // SUBROUTINE INFORMATION:
+      //       AUTHOR         Simon Vidanovic
+      //       DATE WRITTEN   August 2016
+      //       MODIFIED       na
+      //       RE-ENGINEERED  na
+
+      // PURPOSE OF THIS SUBROUTINE:
+      // Returns total number of layer for current surface
+
+      auto & construction( Construct( Construction ) );
+      return construction.TotLayers;
+    }
+
 		// Computed Shape Category
 		ShapeCat
 		SurfaceData::
@@ -1170,6 +1184,30 @@ namespace DataSurfaces {
 		return ClassName;
 
 	}
+
+  double SurfaceWindowCalc::AbsorptanceFromInteriorFrontSide() const {
+    return ( IntBeamAbsByShade + IntSWAbsByShade ) * ShadeAbsFacFace( 2 );
+  }
+
+  double SurfaceWindowCalc::AbsorptanceFromExteriorFrontSide() const {
+    return ( ExtBeamAbsByShade + ExtDiffAbsByShade ) * ShadeAbsFacFace( 1 );
+  }
+
+  double SurfaceWindowCalc::AbsFrontSide() const {
+    return AbsorptanceFromExteriorFrontSide() + AbsorptanceFromInteriorFrontSide();
+  }
+
+  double SurfaceWindowCalc::AbsorptanceFromInteriorBackSide() const {
+    return ( IntBeamAbsByShade + IntSWAbsByShade ) * ShadeAbsFacFace( 1 );
+  }
+
+  double SurfaceWindowCalc::AbsorptanceFromExteriorBackSide() const {
+    return ( ExtBeamAbsByShade + ExtDiffAbsByShade ) * ShadeAbsFacFace( 2 );
+  }
+
+  double SurfaceWindowCalc::AbsBackSide() const {
+    return AbsorptanceFromExteriorBackSide() + AbsorptanceFromInteriorBackSide();
+  }
 
 } // DataSurfaces
 

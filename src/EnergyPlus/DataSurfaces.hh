@@ -902,6 +902,9 @@ namespace DataSurfaces {
     double
     getSWIncident( const int t_SurfNum ) const;
 
+    int
+    getTotLayers() const;
+
 	private: // Methods
 
 		// Computed Shape Category
@@ -1393,6 +1396,24 @@ namespace DataSurfaces {
 			SkySolarInc = 0.0;
 			GndSolarInc = 0.0;
 		}
+
+    double
+    AbsorptanceFromExteriorFrontSide() const;
+
+    double
+    AbsorptanceFromInteriorFrontSide() const;
+
+    double
+    AbsFrontSide() const;
+
+    double
+    AbsorptanceFromExteriorBackSide() const;
+
+    double
+    AbsorptanceFromInteriorBackSide() const;
+
+    double
+    AbsBackSide() const;
 	};
 
 	struct FrameDividerProperties

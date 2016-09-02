@@ -67,6 +67,7 @@ namespace Tarcog {
   class CBaseIGUTarcogLayer;
   class CTarEnvironment;
   class CTarIGU;
+  class CTarcogSystem;
 
 }
 
@@ -80,6 +81,8 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
+    enum class ShadePosition { NoShade, Interior, Exterior, Between };
+
     void CalcWindowHeatBalanceExternalRoutines(
       int const SurfNum, // Surface number
       Real64 const HextConvCoeff, // Outside air film conductance coefficient
@@ -88,15 +91,39 @@ namespace EnergyPlus {
     );
 
     // Class that is used to create layers for Windows-CalcEngine
-    class CWCELayerFactory {
+    class CWCEFactory {
     public:
 
-      CWCELayerFactory();
+      CWCEFactory( const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
 
-      std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getIGULayer(
-        const EnergyPlus::DataHeatBalance::MaterialProperties &material, 
-        const EnergyPlus::DataSurfaces::SurfaceData &surface = EnergyPlus::DataSurfaces::SurfaceData(),
-        const int t_SurfNum = 0 );
+      std::shared_ptr< Tarcog::CTarcogSystem > getTarcogSystem( const double t_HextConvCoeff );
+
+      std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getIGULayer( const int t_Index );
+      std::shared_ptr< Tarcog::CTarEnvironment > getIndoor();
+      std::shared_ptr< Tarcog::CTarEnvironment > getOutdoor( const double t_Hext );
+      std::shared_ptr< Tarcog::CTarIGU > getIGU( );
+
+      // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
+      // It probably needs to be removed since calculation is no different from any other case. It is left over from
+      // old EnergyPlus code and it needs to be checked.
+      bool isInteriorShade() const;
+
+    private:
+      size_t m_SolidLayerIndex;
+      EnergyPlus::DataSurfaces::SurfaceData m_Surface;
+      EnergyPlus::DataSurfaces::SurfaceWindowCalc m_Window;
+      ShadePosition m_ShadePosition;
+      int m_SurfNum;
+      int m_ConstructionNumber;
+      int m_TotLay;
+
+      // Next two booleans are to keep track of order for shading devices. Some variables
+      // are kept in separate arrays for specular glazings and shading devices and it is 
+      // important to keep index numbering in order to extract correct results
+      bool m_InteriorBSDFShade;
+      bool m_ExteriorShade;
+
+      int getNumOfLayers() const;
 
       std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getSolidLayer(
         const EnergyPlus::DataSurfaces::SurfaceData &surface,
@@ -106,22 +133,14 @@ namespace EnergyPlus {
       std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getGapLayer(
         const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
+      std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getShadeToGlassLayer( const int t_Index );
+
       std::shared_ptr< Tarcog::CBaseIGUTarcogLayer > getComplexGapLayer(
         const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
-      std::shared_ptr< Tarcog::CTarEnvironment > getIndoor(
-        const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
-
-      std::shared_ptr< Tarcog::CTarEnvironment > getOutdoor(
-        const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum,
-        const double t_Hext );
-
-      std::shared_ptr< Tarcog::CTarIGU > getIGU(
-        const EnergyPlus::DataSurfaces::SurfaceData &surface );
-
-    private:
-      size_t m_SolidLayerIndex;
       std::shared_ptr< Gases::CGas > getGas( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+      std::shared_ptr< Gases::CGas > getAir();
+      EnergyPlus::DataHeatBalance::MaterialProperties* getLayerMaterial( const int t_Index );
 
     };        
 
