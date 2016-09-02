@@ -1479,7 +1479,8 @@ namespace EnergyPlus {
 					IntegratedHeatPumps( DXCoilNum ).WHtankType, IntegratedHeatPumps( DXCoilNum ).WHtankName,
 					IntegratedHeatPumps( DXCoilNum ).WHtankID,
 					false, false,
-					MyLoad, MaxCap, MinCap, OptCap, true // TRUE if First iteration of simulation
+					MyLoad, MaxCap, MinCap, OptCap, true, IntegratedHeatPumps(DXCoilNum).LoopNum, 
+					IntegratedHeatPumps(DXCoilNum).LoopSideNum
 				);
 			}
 			IntegratedHeatPumps( DXCoilNum ).CheckWHCall = false;//clear checking flag
