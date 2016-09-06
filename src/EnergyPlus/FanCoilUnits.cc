@@ -1938,8 +1938,13 @@ namespace FanCoilUnits {
 			}
 			// obtain unit output with no active heating/cooling
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
-
-			// get the loads at the coils
+			if ( FirstHVACIteration ) {
+ 				FanCoil( FanCoilNum ).QUnitOutNoHC = QUnitOutNoHC;
+ 			}
+ 			else {
+ 				QUnitOutNoHC = FanCoil( FanCoilNum ).QUnitOutNoHC;
+ 			}
+ 			// get the loads at the coils
 			QCoilHeatSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP - QUnitOutNoHC;
 			QCoilCoolSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP - QUnitOutNoHC;
 
@@ -2219,10 +2224,11 @@ namespace FanCoilUnits {
 			QCoilCoolSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP - QUnitOutNoHC;
 
 			// speed fan selection only for multispeed cycling fan
-			if( UnitOn && ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan ) ) {
-
+			if ( UnitOn && ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan ) ) {
+				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired;
+ 
 				// set water side mass flow rate
-				if( QCoilCoolSP < 0 ) {
+				if ( QCoilCoolSP < 0 ) {
 					Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = FanCoil( FanCoilNum ).MaxColdWaterFlow;
 				} else if( QCoilHeatSP > 0 && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) {
 					Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = FanCoil( FanCoilNum ).MaxHotWaterFlow;
@@ -2232,13 +2238,13 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).SpeedFanSel = 1;
 				FanCoil( FanCoilNum ).SpeedFanRatSel = FanCoil( FanCoilNum ).LowSpeedRatio;
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
-				if( std::abs( QUnitOutMax ) < std::abs( QZnReq ) ) {
+				if ( std::abs( QUnitOutMax ) < std::abs( QZnReq ) ) {
 					Node( InletNode ).MassFlowRateMax = FanCoil( FanCoilNum ).MedSpeedRatio * FanCoil( FanCoilNum ).MaxAirMassFlow;
 					FanCoil( FanCoilNum ).SpeedFanSel = 2;
 					FanCoil( FanCoilNum ).SpeedFanRatSel = FanCoil( FanCoilNum ).MedSpeedRatio;
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
 				}
-				if( std::abs( QUnitOutMax ) < std::abs( QZnReq ) ) {
+				if ( std::abs( QUnitOutMax ) < std::abs( QZnReq ) ) {
 					FanCoil( FanCoilNum ).SpeedFanSel = 3;
 					FanCoil( FanCoilNum ).SpeedFanRatSel = 1.0;
 					Node( InletNode ).MassFlowRateMax = FanCoil( FanCoilNum ).MaxAirMassFlow;
@@ -2248,7 +2254,7 @@ namespace FanCoilUnits {
 			}
 
 			// meet the coil load adjusted for fan operation
-			if( UnitOn && QCoilCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
+			if ( UnitOn && QCoilCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
 				// cooling coil action, maximum cold water flow
 				mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
 				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
@@ -2320,7 +2326,7 @@ namespace FanCoilUnits {
 				// at the end calculate output
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
 
-			} else if( UnitOn && QCoilHeatSP > SmallLoad && TempControlType( ZoneNum ) != SingleCoolingSetPoint ) {
+			} else if ( UnitOn && QCoilHeatSP > SmallLoad && TempControlType( ZoneNum ) != SingleCoolingSetPoint ) {
 				// heating coil action, maximun hot water flow
 
 				if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {

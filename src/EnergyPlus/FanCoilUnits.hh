@@ -221,6 +221,7 @@ namespace FanCoilUnits {
 		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
 		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
 		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
+		Real64 QUnitOutNoHC; // unit output when no active heating or cooling [W]
 		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
 		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
 		int LimitErrCountH; // count of SolveRegulaFalsi limit errors
@@ -316,6 +317,7 @@ namespace FanCoilUnits {
 			MinSATempCooling( 0.0 ),
 			MaxSATempHeating( 0.0 ),
 			ASHRAETempControl( false ),
+			QUnitOutNoHC( 0.0 ),
 			QUnitOutMaxH( 0.0 ),
 			QUnitOutMaxC( 0.0 ),
 			LimitErrCountH( 0 ),
