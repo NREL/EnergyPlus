@@ -1584,7 +1584,7 @@ If actCol >= 0 Then
       End If
   End Select
   ' for any type of field, if it is required and blank show that it is out of range
-  If IDDField(actField).required And Trim(IDFValue(actValue).entry) = "" Then
+  If IDDField(actField).required And Trim(IDFValue(actValue).entry) = "" And Not IDDField(actField).defSpecified Then
     grdNew.Cell(flexcpBackColor, Row, Col) = outOfRangeColor
   End If
 End If
@@ -2893,7 +2893,7 @@ Do While curObject > 0
       End If
     End If
     ' for any type of field, if it is required and blank show that it is out of range
-    If IDDField(curField).required And Trim(grdNew.TextMatrix(j, i)) = "" Then
+    If IDDField(curField).required And Trim(grdNew.TextMatrix(j, i)) = "" And Not IDDField(curField).defSpecified Then
       grdNew.Cell(flexcpBackColor, j, i) = outOfRangeColor
     End If
     
@@ -5354,7 +5354,7 @@ For iObject = 1 To maxUsedObject
             newMsg = "Invalid reference"
           End If
       End Select
-      If IDDField(fieldIndx).required And Trim(curAlphaValue) = "" Then
+      If IDDField(fieldIndx).required And Trim(curAlphaValue) = "" And Not IDDField(fieldIndx).defSpecified Then
         newMsg = "Blank value for required field"
       End If
       If newMsg <> "" Then
