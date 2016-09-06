@@ -435,7 +435,7 @@
 
   Construction:InternalSource,
     Slab Floor with Radiant, !- Name
-    4,                       !- Source Present After Layer Number
+    3,                       !- Source Present After Layer Number
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
@@ -1972,6 +1972,8 @@
   Output:Variable,*,Zone Radiant HVAC Outlet Temperature,timestep;
 
   Output:Variable,*,Surface Internal Source Location Temperature,timestep;
+
+  Output:Variable,*,Surface Internal User Specified Location Temperature,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 
