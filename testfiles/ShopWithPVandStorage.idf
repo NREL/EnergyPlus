@@ -3051,28 +3051,23 @@
 
   Branch,
     ZN_1_FLR_1_SEC_1:Sys Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1:Sys_OA, !- Component 1 Name
     ZN_1_FLR_1_SEC_1:Sys Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     ZN_1_FLR_1_SEC_1:Sys_OA-ZN_1_FLR_1_SEC_1:SysCoolCNode,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     ZN_1_FLR_1_SEC_1:SysCoolC,  !- Component 2 Name
     ZN_1_FLR_1_SEC_1:Sys_OA-ZN_1_FLR_1_SEC_1:SysCoolCNode,  !- Component 2 Inlet Node Name
     ZN_1_FLR_1_SEC_1:SysCoolC-ZN_1_FLR_1_SEC_1:SysHeatCNode,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Electric,   !- Component 3 Object Type
     ZN_1_FLR_1_SEC_1:SysHeatC,  !- Component 3 Name
     ZN_1_FLR_1_SEC_1:SysCoolC-ZN_1_FLR_1_SEC_1:SysHeatCNode,  !- Component 3 Inlet Node Name
     ZN_1_FLR_1_SEC_1:SysHeatC-ZN_1_FLR_1_SEC_1:Sys FanNode,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     ZN_1_FLR_1_SEC_1:Sys Fan,!- Component 4 Name
     ZN_1_FLR_1_SEC_1:SysHeatC-ZN_1_FLR_1_SEC_1:Sys FanNode,  !- Component 4 Inlet Node Name
-    ZN_1_FLR_1_SEC_1:Sys Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    ZN_1_FLR_1_SEC_1:Sys Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     ZN_1_FLR_1_SEC_1:Sys_OAControllers,  !- Name
@@ -3333,28 +3328,23 @@
 
   Branch,
     ZN_1_FLR_1_SEC_2:Sys Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2:Sys_OA, !- Component 1 Name
     ZN_1_FLR_1_SEC_2:Sys Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     ZN_1_FLR_1_SEC_2:Sys_OA-ZN_1_FLR_1_SEC_2:SysCoolCNode,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     ZN_1_FLR_1_SEC_2:SysCoolC,  !- Component 2 Name
     ZN_1_FLR_1_SEC_2:Sys_OA-ZN_1_FLR_1_SEC_2:SysCoolCNode,  !- Component 2 Inlet Node Name
     ZN_1_FLR_1_SEC_2:SysCoolC-ZN_1_FLR_1_SEC_2:SysHeatCNode,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Electric,   !- Component 3 Object Type
     ZN_1_FLR_1_SEC_2:SysHeatC,  !- Component 3 Name
     ZN_1_FLR_1_SEC_2:SysCoolC-ZN_1_FLR_1_SEC_2:SysHeatCNode,  !- Component 3 Inlet Node Name
     ZN_1_FLR_1_SEC_2:SysHeatC-ZN_1_FLR_1_SEC_2:Sys FanNode,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     ZN_1_FLR_1_SEC_2:Sys Fan,!- Component 4 Name
     ZN_1_FLR_1_SEC_2:SysHeatC-ZN_1_FLR_1_SEC_2:Sys FanNode,  !- Component 4 Inlet Node Name
-    ZN_1_FLR_1_SEC_2:Sys Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    ZN_1_FLR_1_SEC_2:Sys Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     ZN_1_FLR_1_SEC_2:Sys_OAControllers,  !- Name
@@ -3615,28 +3605,23 @@
 
   Branch,
     ZN_1_FLR_1_SEC_3:Sys Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3:Sys_OA, !- Component 1 Name
     ZN_1_FLR_1_SEC_3:Sys Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     ZN_1_FLR_1_SEC_3:Sys_OA-ZN_1_FLR_1_SEC_3:SysCoolCNode,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     ZN_1_FLR_1_SEC_3:SysCoolC,  !- Component 2 Name
     ZN_1_FLR_1_SEC_3:Sys_OA-ZN_1_FLR_1_SEC_3:SysCoolCNode,  !- Component 2 Inlet Node Name
     ZN_1_FLR_1_SEC_3:SysCoolC-ZN_1_FLR_1_SEC_3:SysHeatCNode,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Electric,   !- Component 3 Object Type
     ZN_1_FLR_1_SEC_3:SysHeatC,  !- Component 3 Name
     ZN_1_FLR_1_SEC_3:SysCoolC-ZN_1_FLR_1_SEC_3:SysHeatCNode,  !- Component 3 Inlet Node Name
     ZN_1_FLR_1_SEC_3:SysHeatC-ZN_1_FLR_1_SEC_3:Sys FanNode,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     ZN_1_FLR_1_SEC_3:Sys Fan,!- Component 4 Name
     ZN_1_FLR_1_SEC_3:SysHeatC-ZN_1_FLR_1_SEC_3:Sys FanNode,  !- Component 4 Inlet Node Name
-    ZN_1_FLR_1_SEC_3:Sys Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    ZN_1_FLR_1_SEC_3:Sys Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     ZN_1_FLR_1_SEC_3:Sys_OAControllers,  !- Name
@@ -3897,28 +3882,23 @@
 
   Branch,
     ZN_1_FLR_1_SEC_4:Sys Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4:Sys_OA, !- Component 1 Name
     ZN_1_FLR_1_SEC_4:Sys Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     ZN_1_FLR_1_SEC_4:Sys_OA-ZN_1_FLR_1_SEC_4:SysCoolCNode,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     ZN_1_FLR_1_SEC_4:SysCoolC,  !- Component 2 Name
     ZN_1_FLR_1_SEC_4:Sys_OA-ZN_1_FLR_1_SEC_4:SysCoolCNode,  !- Component 2 Inlet Node Name
     ZN_1_FLR_1_SEC_4:SysCoolC-ZN_1_FLR_1_SEC_4:SysHeatCNode,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Electric,   !- Component 3 Object Type
     ZN_1_FLR_1_SEC_4:SysHeatC,  !- Component 3 Name
     ZN_1_FLR_1_SEC_4:SysCoolC-ZN_1_FLR_1_SEC_4:SysHeatCNode,  !- Component 3 Inlet Node Name
     ZN_1_FLR_1_SEC_4:SysHeatC-ZN_1_FLR_1_SEC_4:Sys FanNode,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     ZN_1_FLR_1_SEC_4:Sys Fan,!- Component 4 Name
     ZN_1_FLR_1_SEC_4:SysHeatC-ZN_1_FLR_1_SEC_4:Sys FanNode,  !- Component 4 Inlet Node Name
-    ZN_1_FLR_1_SEC_4:Sys Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    ZN_1_FLR_1_SEC_4:Sys Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     ZN_1_FLR_1_SEC_4:Sys_OAControllers,  !- Name
@@ -4179,28 +4159,23 @@
 
   Branch,
     ZN_1_FLR_1_SEC_5:Sys Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5:Sys_OA, !- Component 1 Name
     ZN_1_FLR_1_SEC_5:Sys Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     ZN_1_FLR_1_SEC_5:Sys_OA-ZN_1_FLR_1_SEC_5:SysCoolCNode,  !- Component 1 Outlet Node Name
-    PASSIVE,                 !- Component 1 Branch Control Type
     CoilSystem:Cooling:DX,   !- Component 2 Object Type
     ZN_1_FLR_1_SEC_5:SysCoolC,  !- Component 2 Name
     ZN_1_FLR_1_SEC_5:Sys_OA-ZN_1_FLR_1_SEC_5:SysCoolCNode,  !- Component 2 Inlet Node Name
     ZN_1_FLR_1_SEC_5:SysCoolC-ZN_1_FLR_1_SEC_5:SysHeatCNode,  !- Component 2 Outlet Node Name
-    PASSIVE,                 !- Component 2 Branch Control Type
     Coil:Heating:Electric,   !- Component 3 Object Type
     ZN_1_FLR_1_SEC_5:SysHeatC,  !- Component 3 Name
     ZN_1_FLR_1_SEC_5:SysCoolC-ZN_1_FLR_1_SEC_5:SysHeatCNode,  !- Component 3 Inlet Node Name
     ZN_1_FLR_1_SEC_5:SysHeatC-ZN_1_FLR_1_SEC_5:Sys FanNode,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
     Fan:ConstantVolume,      !- Component 4 Object Type
     ZN_1_FLR_1_SEC_5:Sys Fan,!- Component 4 Name
     ZN_1_FLR_1_SEC_5:SysHeatC-ZN_1_FLR_1_SEC_5:Sys FanNode,  !- Component 4 Inlet Node Name
-    ZN_1_FLR_1_SEC_5:Sys Supply Equipment Outlet Node,  !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+    ZN_1_FLR_1_SEC_5:Sys Supply Equipment Outlet Node;  !- Component 4 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     ZN_1_FLR_1_SEC_5:Sys_OAControllers,  !- Name
@@ -4476,23 +4451,19 @@
 
   Branch,
     SHWSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     SHWSys1 Pump,            !- Component 1 Name
     SHWSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
     SHWSys1 Water Heater,    !- Component 1 Name
     SHWSys1 Pump-SHWSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    SHWSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     SHWSys1 Pump,            !- Name
@@ -4567,13 +4538,11 @@
 
   Branch,
     SHWSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     SHWSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    SHWSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -4582,13 +4551,11 @@
 
   Branch,
     SHWSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Supply Outlet Pipe,  !- Component 1 Name
     SHWSys1 Supply Mixer-SHWSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Supply Outlet Pipe,  !- Name
@@ -4635,13 +4602,11 @@
 
   Branch,
     SHWSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Inlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Inlet Pipe,  !- Name
@@ -4650,63 +4615,51 @@
 
   Branch,
     SHWSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5SHW_DEFAULT,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5SHW_DEFAULT Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     SHWSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Bypass Pipe,  !- Component 1 Name
     SHWSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    SHWSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Bypass Pipe,  !- Name
@@ -4715,13 +4668,11 @@
 
   Branch,
     SHWSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     SHWSys1 Demand Outlet Pipe,  !- Component 1 Name
     SHWSys1 Demand Mixer-SHWSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    SHWSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    SHWSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     SHWSys1 Demand Outlet Pipe,  !- Name

@@ -470,6 +470,15 @@ namespace HVACUnitarySystem {
 		int iterationCounter; // track time step iterations
 		Array1D< int > iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
 
+		// connect ZoneHVAC to DOAS
+		bool ATMixerExists; // True if there is an ATMixer
+		std::string ATMixerName; // name of air terminal mixer
+		int ATMixerIndex; // index to the air terminal mixer
+		int ATMixerType; // 1 = inlet side mixer, 2 = supply side mixer
+		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
+		int ATMixerSecNode; // secondary air inlet node number for the air terminal mixer
+		int ATMixerOutNode; // outlet air node number for the air terminal mixer
+
 		// Default Constructor
 		UnitarySystemData() :
 			UnitarySystemType_Num( 0 ),
@@ -719,7 +728,13 @@ namespace HVACUnitarySystem {
 			FirstPass( true ),
 			SingleMode( 0 ),
 			iterationCounter( 0 ),
-			iterationMode( 0 )
+			iterationMode( 0 ),
+			ATMixerExists( false ),
+			ATMixerIndex( 0 ),
+			ATMixerType( 0 ),
+			ATMixerPriNode( 0 ),
+			ATMixerSecNode( 0 ),
+			ATMixerOutNode( 0 )
 			{}
 
 	};

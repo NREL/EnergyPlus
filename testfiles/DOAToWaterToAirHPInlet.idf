@@ -13,7 +13,7 @@
 !                          Illustrates the use of a dedicated outdoor air system  (DOAS) with water to air heatpumps (WLHP)
 !                          The DOAS air is ducted to the inlet side of the WLHP units and mixed with zone (exhaust) air
 !                          through the use of inlet side mixer terminal units.
-! Highlights:              DOAS ducted to inlet side of zonal water to air heat pumps using AirTerminal:SingleDuct:InletSideMixer
+! Highlights:              DOAS ducted to inlet side of zonal water to air heat pumps using AirTerminal:SingleDuct:Mixer
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -2644,7 +2644,7 @@ ZoneHVAC:WaterToAirHeatPump,
     60.0,                    !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE1-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2675,7 +2675,7 @@ ZoneHVAC:WaterToAirHeatPump,
     60.0,                    !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE2-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2706,7 +2706,7 @@ ZoneHVAC:WaterToAirHeatPump,
     60.0,                    !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE3-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2737,7 +2737,7 @@ ZoneHVAC:WaterToAirHeatPump,
     60.0,                    !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE4-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2768,7 +2768,7 @@ ZoneHVAC:WaterToAirHeatPump,
     60.0,                    !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
     SPACE5-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2777,47 +2777,52 @@ ZoneHVAC:WaterToAirHeatPump,
     CyclingFanSch;           !- Supply Air Fan Operating Mode Schedule Name
 
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER ===========
+!-   ===========  ALL OBJECTS IN CLASS: AirTerminal:SingleDuct:Mixer ===========
 
-AirTerminal:SingleDuct:InletSideMixer,
+AirTerminal:SingleDuct:Mixer,
     SPACE1-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Terminal Unit Object Type
-    SPACE1-1 Heat Pump,      !- ZoneHVAC Terminal Unit Name
-    SPACE1-1 Heat Pump Inlet,!- Terminal Unit Outlet Node Name
-    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
+    SPACE1-1 Heat Pump,      !- ZoneHVAC Unit Object Name
+    SPACE1-1 Heat Pump Inlet,!- Mixer Outlet Node Name
+    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-AirTerminal:SingleDuct:InletSideMixer,
+AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Terminal Unit Object Type
-    SPACE2-1 Heat Pump,      !- ZoneHVAC Terminal Unit Name
-    SPACE2-1 Heat Pump Inlet,!- Terminal Unit Outlet Node Name
-    SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE2-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
+    SPACE2-1 Heat Pump,      !- ZoneHVAC Unit Object Name
+    SPACE2-1 Heat Pump Inlet,!- Mixer Outlet Node Name
+    SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE2-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-AirTerminal:SingleDuct:InletSideMixer,
+AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Terminal Unit Object Type
-    SPACE3-1 Heat Pump,      !- ZoneHVAC Terminal Unit Name
-    SPACE3-1 Heat Pump Inlet,!- Terminal Unit Outlet Node Name
-    SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE3-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
+    SPACE3-1 Heat Pump,      !- ZoneHVAC Unit Object Name
+    SPACE3-1 Heat Pump Inlet,!- Mixer Outlet Node Name
+    SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-AirTerminal:SingleDuct:InletSideMixer,
+AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Terminal Unit Object Type
-    SPACE4-1 Heat Pump,      !- ZoneHVAC Terminal Unit Name
-    SPACE4-1 Heat Pump Inlet,!- Terminal Unit Outlet Node Name
-    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE4-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
+    SPACE4-1 Heat Pump,      !- ZoneHVAC Unit Object Name
+    SPACE4-1 Heat Pump Inlet,!- Mixer Outlet Node Name
+    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE4-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
-AirTerminal:SingleDuct:InletSideMixer,
+AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
-    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Terminal Unit Object Type
-    SPACE5-1 Heat Pump,      !- ZoneHVAC Terminal Unit Name
-    SPACE5-1 Heat Pump Inlet,!- Terminal Unit Outlet Node Name
-    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name
-    SPACE5-1 Air Terminal Mixer Secondary Inlet;  !- Terminal Unit Secondary Air Inlet Node Name
+    ZoneHVAC:WaterToAirHeatPump,  !- ZoneHVAC Unit Object Type
+    SPACE5-1 Heat Pump,      !- ZoneHVAC Unit Object Name
+    SPACE5-1 Heat Pump Inlet,!- Mixer Outlet Node Name
+    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
+    SPACE5-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
+    InletSide;                                  !- Mixer Connection Type
 
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
@@ -2825,31 +2830,31 @@ AirTerminal:SingleDuct:InletSideMixer,
 ZoneHVAC:AirDistributionUnit,
     SPACE1-1 DOAS ATU,       !- Name
     SPACE1-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
     SPACE2-1 DOAS ATU,       !- Name
     SPACE2-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
     SPACE3-1 DOAS ATU,       !- Name
     SPACE3-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE3-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
     SPACE4-1 DOAS ATU,       !- Name
     SPACE4-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE4-1 DOAS Air Terminal;  !- Air Terminal Name
 
 ZoneHVAC:AirDistributionUnit,
     SPACE5-1 DOAS ATU,       !- Name
     SPACE5-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:InletSideMixer,  !- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE5-1 DOAS Air Terminal;  !- Air Terminal Name
 
 
@@ -3034,44 +3039,49 @@ Fan:OnOff,
     SPACE5-1 Zone Unit Fan Outlet;  !- Air Outlet Node Name
 
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE1-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE1-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE1-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE2-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE2-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE2-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE3-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE3-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE3-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE4-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE4-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE4-1 Supply Inlet;   !- Air Outlet Node Name
 
-Coil:Heating:Gas,
+Coil:Heating:Fuel,
     SPACE5-1 HP Supp Coil,   !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     SPACE5-1 Heating Coil Outlet,  !- Air Inlet Node Name
     SPACE5-1 Supply Inlet;   !- Air Outlet Node Name
@@ -3485,188 +3495,151 @@ AirLoopHVAC:ReturnPath,
 
 Branch,
     SPACE1-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE1-1 HP Cooling Mode,!- Component 1 Name
     SPACE1-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE1-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE1-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE1-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE1-1 HP Heating Mode,!- Component 1 Name
     SPACE1-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE1-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE1-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE2-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE2-1 HP Cooling Mode,!- Component 1 Name
     SPACE2-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE2-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE2-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE2-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE2-1 HP Heating Mode,!- Component 1 Name
     SPACE2-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE2-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE2-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE3-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE3-1 HP Cooling Mode,!- Component 1 Name
     SPACE3-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE3-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE3-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE3-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE3-1 HP Heating Mode,!- Component 1 Name
     SPACE3-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE3-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE3-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE4-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE4-1 HP Cooling Mode,!- Component 1 Name
     SPACE4-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE4-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE4-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE4-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE4-1 HP Heating Mode,!- Component 1 Name
     SPACE4-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE4-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE4-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE5-1 HP Cooling Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE5-1 HP Cooling Mode,!- Component 1 Name
     SPACE5-1 HP Cooling Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE5-1 HP Cooling Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE5-1 HP Cooling Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     SPACE5-1 HP Heating Mode Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type
     SPACE5-1 HP Heating Mode,!- Component 1 Name
     SPACE5-1 HP Heating Water Inlet,  !- Component 1 Inlet Node Name
-    SPACE5-1 HP Heating Water Outlet,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    SPACE5-1 HP Heating Water Outlet;  !- Component 1 Outlet Node Name
 
 Branch,
     DOAS Main Branch,        !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     DOAS OA System,          !- Component 1 Name
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     Fan:VariableVolume,      !- Component 2 Object Type
     DOAS Supply Fan,         !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
-    DOAS Supply Fan Outlet,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    DOAS Supply Fan Outlet;  !- Component 2 Outlet Node Name
 
 Branch,
     Condenser Supply Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     Cond Circ Pump,          !- Component 1 Name
     Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Pump Outlet Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Supply GHE Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     GroundHeatExchanger:Vertical,  !- Component 1 Object Type
     Vertical Ground Heat Exchanger,  !- Component 1 Name
     GHE Inlet Node,          !- Component 1 Inlet Node Name
-    GHE Outlet Node,         !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
+    GHE Outlet Node;         !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Supply Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Side Bypass,  !- Component 1 Name
     Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Supply Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Supply Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Supply Outlet, !- Component 1 Name
     Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Supply Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Demand Inlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Inlet Pipe,  !- Component 1 Name
     Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Entrance Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Demand Bypass Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Side Bypass,  !- Component 1 Name
     Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    Cond Demand Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    BYPASS;                  !- Component 1 Branch Control Type
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
 Branch,
     Condenser Demand Outlet Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Condenser Demand Outlet Pipe,  !- Component 1 Name
     Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    Condenser Demand Outlet Node,  !- Component 1 Outlet Node Name
-    PASSIVE;                 !- Component 1 Branch Control Type
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
 
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
