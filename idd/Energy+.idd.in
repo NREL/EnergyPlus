@@ -20936,10 +20936,10 @@ Daylighting:Controls,
        \type object-list
        \object-list DaylightReferencePointNames
   N5,  \field Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
-       \required-field
        \units deg
        \minimum 0
        \maximum 360
+       \default 0
   N6,  \field Maximum Allowable Discomfort Glare Index
        \type real
        \minimum 1

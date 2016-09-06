@@ -1361,13 +1361,6 @@ namespace SimulationManager {
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
-		// Open the DElight In File
-		//OutputDElightIn = GetNewUnitNumber();
-		//{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputDElightIn, DataStringGlobals::outputDelightInFileName, flags ); write_stat = flags.ios(); }
-		//if ( write_stat != 0 ) {
-		//	ShowFatalError( "DElight.in: Could not open file " + DataStringGlobals::outputDelightInFileName + " for output (write)." );
-		//}
-		//delightin_stream = gio::out_stream( OutputDElightIn );
 	}
 
 	void
@@ -1562,14 +1555,6 @@ namespace SimulationManager {
 			{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeters, flags ); }
 		}
 		mtr_stream = nullptr;
-
-		// close the DElight in file
-		//if ( delightin_stream->tellp() > 0 ){  //test if the stream has any content
-		//	gio::close( OutputDElightIn );
-		//} else {
-		//	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputDElightIn, flags ); }
-		//}
-		//delightin_stream = nullptr;
 
 	}
 
