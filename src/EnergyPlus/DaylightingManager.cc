@@ -4697,7 +4697,12 @@ namespace DaylightingManager {
 				ShowContinueError( "No glare calculation performed, and the simulation continues." );
 			}
 
-			zone_daylight.ViewAzimuthForGlare = rNumericArgs( 5 ); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+			if ( !lNumericFieldBlanks( 5 ) ){
+				zone_daylight.ViewAzimuthForGlare = rNumericArgs( 5 ); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+			} else{
+				zone_daylight.ViewAzimuthForGlare = 0.;
+			}
+
 			zone_daylight.MaxGlareallowed = rNumericArgs( 6 ); // Field: Maximum Allowable Discomfort Glare Index
 			zone_daylight.DElightGriddingResolution = rNumericArgs( 7 ); // Field: DElight Gridding Resolution
 
