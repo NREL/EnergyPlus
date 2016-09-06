@@ -30,31 +30,55 @@ An alternative to the AvailabilityManager:Scheduled object is the \emph{Availabi
 
 The input object AvailabilityManager:NightCycle is to specify when a system that has been scheduled off during unoccupied hours should cycle on to prevent building temperatures from becoming too hot or too cold. This manager can not be used to force a system off. The inputs are:
 
-·~~~~~~~~A manager applicability schedule;
+\begin{itemize}
+\item  A manager applicability schedule;
 
-·~~~~~~~~The name of the fan schedule this manager will override;
+\item  The name of the fan schedule this manager will override;
 
-·~~~~~~~~The control type: \emph{Stay Off}, \emph{Cycle On Any}, \emph{Cycle On Control Zone}, or \emph{Cycle On Any - Zone Fans Only};
+\item  The control type: \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly} \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyCoolingZone}, \emph{CycleOnAnyHeatingZone}, or \emph{CycleOnAnyHeatingZoneFansOnly};
 
-·~~~~~~~~Thermostat on/off tolerance \emph{T\(_{tol}\)} (degrees C);
+\item  Thermostat on/off tolerance \emph{T\(_{tol}\)} (degrees C);
 
-·~~~~~~~~Cycling run time in seconds; used to calculate a stop time (in time steps since the start of the current run period) once the status has become \emph{Cycle On}.
+\item  Cycling run time in seconds; used to calculate a stop time (in time steps since the start of the current run period) once the status has become \emph{Cycle On}.
+
+\item  A control zone or zone list name.
+
+\item  Cooling control zone or zone list name.
+
+\item  Heating control zone or zone list name.
+
+\item  Heating zone fans only control zone or zone list name.
+
+\end{itemize}
 
 If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) ~0 or if the program is in warmup, \emph{AvailStatus = NoAction}.
 
-Otherwise,
+Otherwise:
 
-1.~~~~if current time (in time steps since the start of the run period) is greater than the start time and less than the stop time, \emph{AvailStatus = CycleOn} (or \emph{CycleOnZoneFansOnly} if the control type is \emph{Cycle On Any -- Zone Fans only}).
+\begin{enumerate}
+\item  If current time (in time steps since the start of the run period) is greater than the start time and less than the stop time, \emph{AvailStatus = CycleOn} (or \emph{CycleOnZoneFansOnly} if the control type is \emph{Cycle On Any -- Zone Fans only}).
 
-2.~~~~If the current time equals the stop time, \emph{AvailStatus = NoAction} ~and the fan schedule will determine if the system is on.
+\item  If the current time equals the stop time, \emph{AvailStatus = NoAction} ~and the fan schedule will determine if the system is on.
 
-3.~~~~~If the current time is greater than the stop time, the manager can potentially cycle the system on.
+\item  If the current time is greater than the stop time, the manager can potentially cycle the system on.
 
-a.~~~~For control types \emph{Cycle On Any} and \emph{Cycle On Any -- Zone Fans Only} the manger looks at each zone served by the air loop and detects whether the zone temperature at the thermostat is greater than the cooling setpoint plus ½\emph{T\(_{tol}\)} or less than the heating setpoint minus ½\emph{T\(_{tol}\)}. If it is, \emph{AvailStatus} is set to \emph{CycleOn} (or \emph{CycleOnZoneFansOnly}). If not, \emph{AvailStatus} is set to \emph{NoAction}.
+  \begin{enumerate}
+  \item  For control types \emph{CycleOnAny} and \emph{CycleOnAnyZoneFansOnly} the manger looks at each zone served by the air loop and detects whether the zone temperature at the thermostat is greater than the cooling setpoint plus ½\emph{T\(_{tol}\)} or less than the heating setpoint minus ½\emph{T\(_{tol}\)}. If it is, \emph{AvailStatus} is set to \emph{CycleOn} (or \emph{CycleOnZoneFansOnly}). If not, \emph{AvailStatus} is set to \emph{NoAction}.
 
-b.~~~For control type \emph{Cycle On Control Zone}, the manager does the same check just for the control zone.
+  \item  For control type \emph{CycleOnControlZone}, the manager does the same check just for the control zone or zone list.
 
-Lastly if the new status is CycleOn the start time is reset to the current time and the stop time is reset. When this availability manager is specified for a zone component then the only allowed control types are \emph{Stay Off} \emph{and} \emph{Cycle On Control Zone.}
+  \item  For control type \emph{CycleOnAnyCoolingOrHeatingZone}, the manager checks the cooling setpoint for the cooling control zone or zone list and sets \emph{AvailStatus} to \emph{CycleOn}, then it checks the heating setpoint for the heating control zone or zone list and sets \emph{AvailStatus} to \emph{CycleOn}. If the \emph{AvailStatus} is still \emph{NoAction}, then the manager checks the heating setpoint for the heating zone fans only zone or zone list and sets \emph{AvailStatus} to \emph{CycleOnZoneFansOnly}). If none of these checks are true then \emph{AvailStatus} is set to \emph{NoAction}.
+
+  \item  For control type \emph{CycleOnAnyCoolingZone}, the manager checks the cooling setpoint for the cooling control zone or zone list and sets \emph{AvailStatus} to \emph{CycleOn}. If none of these checks are true then \emph{AvailStatus} is set to \emph{NoAction}.
+
+  \item  For control type \emph{CycleOnAnyHeatingZone}, the manager checks the heating setpoint for the heating control zone or zone list and sets \emph{AvailStatus} to \emph{CycleOn}. If the \emph{AvailStatus} is still \emph{NoAction}, then the manager checks the heating setpoint for the heating zone fans only zone or zone list and sets \emph{AvailStatus} to \emph{CycleOnZoneFansOnly}). If none of these checks are true then \emph{AvailStatus} is set to \emph{NoAction}.
+
+  \item  For control type \emph{CycleOnAnyHeatingZoneFansOnly}, the manager checks the heating setpoint for the heating zone fans only zone or zone list and sets \emph{AvailStatus} to \emph{CycleOnZoneFansOnly}). If none of these checks are true then \emph{AvailStatus} is set to \emph{NoAction}.
+
+  \end{enumerate}
+
+\item  Lastly if the new status is CycleOn the start time is reset to the current time and the stop time is reset. When this availability manager is specified for a zone component then the only allowed control types are \emph{StayOff} \emph{and} \emph{CycleOnControlZone.}
+\end{enumerate}
 
 \subsection{Night Ventilation}\label{night-ventilation}
 

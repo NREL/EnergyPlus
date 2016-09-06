@@ -56,7 +56,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Gas
+! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -86,7 +86,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -106,7 +106,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -126,7 +126,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -146,7 +146,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -4518,18 +4518,15 @@
 
   Branch,
     FURNACE_PACU_CAV:1 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV:1_OA,   !- Component 1 Name
     FURNACE_PACU_CAV:1 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     FURNACE_PACU_CAV:1_OA-FURNACE_PACU_CAV:1_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     FURNACE_PACU_CAV:1_Unitary_Package,  !- Component 2 Name
     FURNACE_PACU_CAV:1_OA-FURNACE_PACU_CAV:1_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    FURNACE_PACU_CAV:1 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    FURNACE_PACU_CAV:1 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     FURNACE_PACU_CAV:1_OA_Controllers,  !- Name
@@ -4659,10 +4656,11 @@
     FURNACE_PACU_CAV:1_OA-FURNACE_PACU_CAV:1_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:1 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -4817,18 +4815,15 @@
 
   Branch,
     FURNACE_PACU_CAV:2 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV:2_OA,   !- Component 1 Name
     FURNACE_PACU_CAV:2 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     FURNACE_PACU_CAV:2_OA-FURNACE_PACU_CAV:2_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     FURNACE_PACU_CAV:2_Unitary_Package,  !- Component 2 Name
     FURNACE_PACU_CAV:2_OA-FURNACE_PACU_CAV:2_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    FURNACE_PACU_CAV:2 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    FURNACE_PACU_CAV:2 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     FURNACE_PACU_CAV:2_OA_Controllers,  !- Name
@@ -4928,10 +4923,11 @@
     FURNACE_PACU_CAV:2_OA-FURNACE_PACU_CAV:2_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:2 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -5086,18 +5082,15 @@
 
   Branch,
     FURNACE_PACU_CAV:3 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV:3_OA,   !- Component 1 Name
     FURNACE_PACU_CAV:3 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     FURNACE_PACU_CAV:3_OA-FURNACE_PACU_CAV:3_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     FURNACE_PACU_CAV:3_Unitary_Package,  !- Component 2 Name
     FURNACE_PACU_CAV:3_OA-FURNACE_PACU_CAV:3_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    FURNACE_PACU_CAV:3 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    FURNACE_PACU_CAV:3 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     FURNACE_PACU_CAV:3_OA_Controllers,  !- Name
@@ -5222,10 +5215,11 @@
     FURNACE_PACU_CAV:3_OA-FURNACE_PACU_CAV:3_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:3 Supply Equipment Outlet Node;  !- Air Outlet Node Name
@@ -5380,18 +5374,15 @@
 
   Branch,
     FURNACE_PACU_CAV:4 Air Loop Main Branch,  !- Name
-    AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     FURNACE_PACU_CAV:4_OA,   !- Component 1 Name
     FURNACE_PACU_CAV:4 Supply Equipment Inlet Node,  !- Component 1 Inlet Node Name
     FURNACE_PACU_CAV:4_OA-FURNACE_PACU_CAV:4_Unitary_PackageNode,  !- Component 1 Outlet Node Name
-    Passive,                 !- Component 1 Branch Control Type
     AirLoopHVAC:UnitaryHeatCool,  !- Component 2 Object Type
     FURNACE_PACU_CAV:4_Unitary_Package,  !- Component 2 Name
     FURNACE_PACU_CAV:4_OA-FURNACE_PACU_CAV:4_Unitary_PackageNode,  !- Component 2 Inlet Node Name
-    FURNACE_PACU_CAV:4 Supply Equipment Outlet Node,  !- Component 2 Outlet Node Name
-    Active;                  !- Component 2 Branch Control Type
+    FURNACE_PACU_CAV:4 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
   AirLoopHVAC:ControllerList,
     FURNACE_PACU_CAV:4_OA_Controllers,  !- Name
@@ -5516,10 +5507,11 @@
     FURNACE_PACU_CAV:4_OA-FURNACE_PACU_CAV:4_Unitary_PackageNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet;  !- Air Outlet Node Name
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     AUTOSIZE,                !- Nominal Capacity {W}
     FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:4 Supply Equipment Outlet Node;  !- Air Outlet Node Name

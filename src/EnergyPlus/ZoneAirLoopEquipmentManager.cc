@@ -276,6 +276,9 @@ namespace ZoneAirLoopEquipmentManager {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DualDuct::GetDualDuctOutdoorAirRecircUse;
 		using SingleDuct::GetATMixerPriNode;
+		using SingleDuct::GetATMixerTypeNum;
+		using DataHVACGlobals::ATMixer_InletSide;
+		using DataHVACGlobals::ATMixer_SupplySide;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -310,7 +313,7 @@ namespace ZoneAirLoopEquipmentManager {
 		static Array1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
 		static int ATMixerPriNode( 0 ); // primary air inlet node for air terminal mixers
-
+		static int ATMixerTypeNum( 0 ); // terminal mixer type number
 		// make sure the input data is read in only once
 		if ( ! GetAirDistUnitsFlag ) {
 			return;
@@ -464,18 +467,10 @@ namespace ZoneAirLoopEquipmentManager {
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:UserDefined" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctUserDefined;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:InletSideMixer" ) ) {
-					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctInletATMixer;
-					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
-					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
-					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
-						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
-						ShowContinueError( "Simple duct leakage model not available for " + cAlphaFields( 3 ) + " = " + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) );
-						ErrorsFound = true;
-					}
-				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:SupplySideMixer" ) ) {
-					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctSupplyATMixer;
+				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:Mixer" ) ) {					
+					GetATMixerTypeNum( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerTypeNum );
+					if ( ATMixerTypeNum == ATMixer_InletSide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctInletATMixer;
+					if ( ATMixerTypeNum == ATMixer_SupplySide ) AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctSupplyATMixer;
 					GetATMixerPriNode( AirDistUnit( AirDistUnitNum ).EquipName( 1 ), ATMixerPriNode );
 					AirDistUnit( AirDistUnitNum ).InletNodeNum = ATMixerPriNode;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {

@@ -63,17 +63,6 @@
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
-
-// HBIRE_USE_OMP defined, then openMP instructions are used.  Compiler may have to have switch for openmp
-// HBIRE_NO_OMP defined, then old code is used without any openmp instructions
-
-// HBIRE - loop in HeatBalanceIntRadExchange.cc
-#ifdef HBIRE_USE_OMP
-#undef HBIRE_NO_OMP
-#else
-#define HBIRE_NO_OMP
-#endif
-
 namespace SimulationManager {
 
 	// Data
@@ -134,9 +123,6 @@ namespace SimulationManager {
 
 	void
 	CheckCachedIPErrors();
-
-	void
-	CheckThreading();
 
 } // SimulationManager
 

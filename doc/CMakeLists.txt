@@ -6,6 +6,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build)
 # add a configure rule to the header file though
 configure_file(${CMAKE_SOURCE_DIR}/doc/header.tex ${CMAKE_BINARY_DIR}/doc-build/header.tex COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/doc/title.tex ${CMAKE_BINARY_DIR}/doc-build/title.tex COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/doc/index.html ${CMAKE_BINARY_DIR}/doc-build/index.html COPYONLY)
 
 # add each of the documents, they have their own CMakeLists.txt files
 add_subdirectory(acknowledgements)

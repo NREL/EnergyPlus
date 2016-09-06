@@ -1102,6 +1102,7 @@
 
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

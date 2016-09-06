@@ -963,6 +963,7 @@
 
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
+    None,                    !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
@@ -1153,13 +1154,11 @@
 
   Branch,
     AHU 1 Main Branch,       !- Name
-    autosize,                !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:Unitary:Furnace:HeatCool,  !- Component 1 Object Type
     AHU 1 Furnace with DX Cooling,  !- Component 1 Name
     AHU 1 Air Loop Inlet,    !- Component 1 Inlet Node Name
-    AHU 1 Air Loop Outlet,   !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    AHU 1 Air Loop Outlet;   !- Component 1 Outlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
 
@@ -1223,7 +1222,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     AHU 1 Supply Fan,        !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,        !- Heating Coil Object Type
     AHU 1 Heating Coil,      !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     AHU 1 Cooling Coil,      !- Cooling Coil Name
@@ -1304,10 +1303,11 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:GAS:HEATING ===========
 
-  Coil:Heating:Gas,
+  Coil:Heating:Fuel,
     AHU 1 Heating Coil,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.8,                     !- Gas Burner Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     AHU 1 Supply Fan Outlet, !- Air Inlet Node Name
     AHU 1 Heating Coil Outlet,  !- Air Outlet Node Name
