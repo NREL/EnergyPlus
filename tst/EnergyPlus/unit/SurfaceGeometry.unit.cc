@@ -417,7 +417,7 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SurfaceShape )
 		" Construction,",
 		"    External door,           !- Name",
 		"    Painted Oak;             !- Outside Layer",
-	
+
 		" Material,",
 		"    MAT-CC05 4 HW CONCRETE,  !- Name",
 		"    Rough,                   !- Roughness",
@@ -758,4 +758,37 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 }
 
 
+TEST_F( EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealisticZ )
+{
+	TotSurfaces = 10;
+	Surface.allocate( TotSurfaces );
+
+	Surface( 1 ).Class = SurfaceClass_Roof;
+	Surface( 1 ).GrossArea = 1000.;
+	Surface( 1 ).Sides = 4;
+	Surface( 1 ).Vertex.allocate( 4 );
+
+	Surface( 1 ).Vertex( 1 ).x = 2000.;
+	Surface( 1 ).Vertex( 1 ).y = -1000.;
+	Surface( 1 ).Vertex( 1 ).z = 10.;
+
+	Surface( 1 ).Vertex( 2 ).x = 1.;
+	Surface( 1 ).Vertex( 2 ).y = 0.;
+	Surface( 1 ).Vertex( 2 ).z = 10.;
+
+	Surface( 1 ).Vertex( 3 ).x = 2000.;
+	Surface( 1 ).Vertex( 3 ).y = 1000.;
+	Surface( 1 ).Vertex( 3 ).z = 10.;
+
+	Surface( 1 ).Vertex( 4 ).x = 0.;
+	Surface( 1 ).Vertex( 4 ).y = 0.;
+	Surface( 1 ).Vertex( 4 ).z = 10.;
+
+	CalcSurfaceCentroid();
+
+	EXPECT_EQ( Surface( 1 ).Centroid.x, 667. );
+	EXPECT_EQ( Surface( 1 ).Centroid.y, 0. );
+	EXPECT_EQ( Surface( 1 ).Centroid.z, 10. );
+
+}
 

@@ -224,6 +224,14 @@ Begin VB.Form frmOptions
       TabIndex        =   2
       Top             =   3840
       Width           =   4215
+      Begin VB.CheckBox chkDisMultiThrd 
+         Caption         =   "Disable Multi-Threading"
+         Height          =   375
+         Left            =   240
+         TabIndex        =   34
+         Top             =   1800
+         Width           =   3495
+      End
       Begin VB.ComboBox cmbNumberProcesses 
          Height          =   315
          Left            =   2880
@@ -365,6 +373,11 @@ For i = 0 To cmbNumberProcesses.ListCount - 1
     Exit For
   End If
 Next i
+If eplUI.disableMultiThreading Then
+  chkDisMultiThrd.Value = vbChecked
+Else
+  chkDisMultiThrd.Value = vbUnchecked
+End If
 If found > -1 Then
   cmbNumberProcesses.ListIndex = found
 Else
@@ -478,6 +491,11 @@ Else
 End If
 'Number of simultaneous threads for simulation processes
 eplUI.numberOfSimProcessesAllowed = Val(cmbNumberProcesses.List(cmbNumberProcesses.ListIndex))
+If chkDisMultiThrd.Value = vbChecked Then
+  eplUI.disableMultiThreading = True
+Else
+  eplUI.disableMultiThreading = False
+End If
 '
 '========== INTERFACE CONTROL
 '

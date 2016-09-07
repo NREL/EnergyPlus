@@ -1372,6 +1372,7 @@ Const maxWeatherListSize = 20  'number of items allowed in weather file pull dow
 Const maxGroupListSize = 20  'number of items allowed in group file pull down list
 Const batchFileName = "EPL-run.bat"
 Const noWeatherFile = "No Weather File"
+Const searchLinesVersion = 500 'number of lines that the version detection algorithm will check
 Dim q As String
 Public inputFileName As String
 Dim outputFileName As String
@@ -1416,6 +1417,7 @@ Public createCSVprocFile As Boolean
 Public CreateRunEPBatch As Boolean
 Public enableParametricPreprocessor As Boolean
 Public numberOfSimProcessesAllowed As Integer
+Public disableMultiThreading As Boolean
 Public viewAllOutputTabSelected As Boolean
 Dim firstActivateCall As Boolean
 Dim appPath As String
@@ -2614,21 +2616,12 @@ If testViewConvertOld Then
         cancelDueToVersionCheck = True
       End If
     ElseIf IDFversion = "VERSION NOT FOUND" Then
-      msg = "The VERSION object was not found in the file:" & vbCrLf & vbCrLf
+      msg = "The VERSION object was not found in the first " & Str(searchLinesVersion) & " lines of file:" & vbCrLf & vbCrLf
       msg = msg & "  " & inName & vbCrLf & vbCrLf
-      msg = msg & "You may wish to else turn off version checking under View..Option..Miscellaneous." & vbCrLf & vbCrLf
+      msg = msg & "You may wish to use a text editor to reposition the VERSION object or else turn off version checking under View..Option..Miscellaneous." & vbCrLf & vbCrLf
       msg = msg & "The simulation will proceed when you press OK."
       MsgBox msg, vbInformation, "VERSION object missing"
       cancelDueToVersionCheck = False
-    ElseIf isNewerVersion(IDFversion, currentVersion) Then
-      msg = "The file:" & vbCrLf & vbCrLf
-      msg = msg & "  " & inName & vbCrLf & vbCrLf
-      msg = msg & "is an not the same version (" & IDFversion & ") as the EnergyPlus version (" & currentVersion & ")."
-      msg = msg & "You may need download EnergyPlus from http://www.energyplus.net/." & vbCrLf & vbCrLf
-      msg = msg & "Proceed with simulation using the different version?"
-      If MsgBox(msg, vbOKCancel, "Check File Version") = vbCancel Then
-        cancelDueToVersionCheck = True
-      End If
     ElseIf IDFversion <> currentVersion Then
       msg = "The file:" & vbCrLf & vbCrLf
       msg = msg & "  " & inName & vbCrLf & vbCrLf
@@ -2875,6 +2868,7 @@ Dim outFN As Integer
 Dim minWindow As Boolean
 Dim showMessages As Boolean
 Dim lineOfBatch As String
+Dim countOfNotRunOrActive As Integer
 Dim i As Integer
 'If startSimulationActive Then Exit Sub 'exit if already running once
 'startSimulationActive = True
@@ -2885,6 +2879,17 @@ wthrName = simQueue(simQueueIndex).nameWthr
 outName = simQueue(simQueueIndex).nameOut
 showMessages = simQueue(simQueueIndex).messagesShow
 simQueue(simQueueIndex).timeStart = Time()
+' see if other simulations are running or about to run
+countOfNotRunOrActive = 0
+For i = 1 To numSimQueue
+  If simQueue(i).status = qStatNotRun Or simQueue(i).status = qStatActive Then
+    countOfNotRunOrActive = countOfNotRunOrActive + 1
+  End If
+Next i
+' limit count of other simulations to the number of processes allowed
+If countOfNotRunOrActive > numberOfSimProcessesAllowed Then
+  countOfNotRunOrActive = numberOfSimProcessesAllowed
+End If
 ' check if all files available first
 On Error Resume Next
 flNum = FreeFile
@@ -3021,6 +3026,12 @@ If CreateRunEPBatch Then
     Print #outFN, "SET procCSV=N"
   End If
   Print #outFN, "SET epPath="; appPath
+  Print #outFN, "SET cntActv="; Trim(Str(countOfNotRunOrActive))
+  If disableMultiThreading Then 'note that this is an inverse since the VB parameter is "disable" and the batch parameter is "enable"
+    Print #outFN, "SET multithrd=N"
+  Else
+    Print #outFN, "SET multithrd=Y"
+  End If
   ' now copy the batch file contents to the temporary batch file
   flNum = FreeFile
   Open appPath & batchFileName For Input As flNum
@@ -3079,6 +3090,14 @@ Else
     cmdLn = cmdLn & "Y "
   Else
     cmdLn = cmdLn & "N "
+  End If
+  ' %cntActv% or %10
+  cmdLn = cmdLn & Str(countOfNotRunOrActive) & " "
+  'multithrd or %11
+  If disableMultiThreading Then 'note that this is an inverse since the VB parameter is "disable" and the batch parameter is "enable"
+    cmdLn = cmdLn & "N "
+  Else
+    cmdLn = cmdLn & "Y "
   End If
   'if using parameter passing, append the command line parameters to the batch file name
   runBatchFile = runBatchFile & cmdLn
@@ -4127,6 +4146,11 @@ Else
     SaveSetting "EP-Launch", "Location", "UseParametricPreprocessor", "False"
 End If
 SaveSetting "EP-Launch", "Location", "MaxNumProcesses", Str(numberOfSimProcessesAllowed)
+If disableMultiThreading Then
+    SaveSetting "EP-Launch", "Location", "DisableMultiThreading", "True"
+Else
+    SaveSetting "EP-Launch", "Location", "DisableMultiThreading", "False"
+End If
 If viewAllOutputTabSelected Then
     SaveSetting "EP-Launch", "Location", "ViewAllOutputTabSelected", "True"
 Else
@@ -4273,6 +4297,7 @@ If firstUse = "True" Then
   CreateRunEPBatch = False
   enableParametricPreprocessor = True
   numberOfSimProcessesAllowed = 2
+  disableMultiThreading = False
   viewAllOutputTabSelected = False
   'update checking
   updateLastAnchor = ""
@@ -4403,6 +4428,11 @@ Else
   numberOfSimProcessesAllowed = Val(GetSetting("EP-Launch", "Location", "MaxNumProcesses"))
   If numberOfSimProcessesAllowed <= 1 Or numberOfSimProcessesAllowed > 1024 Then
     numberOfSimProcessesAllowed = 2
+  End If
+  If Left(GetSetting("EP-Launch", "Location", "DisableMultiThreading"), 1) = "T" Then
+    disableMultiThreading = True
+  Else
+    disableMultiThreading = False
   End If
   If Left(GetSetting("EP-Launch", "Location", "ViewAllOutputTabSelected"), 1) = "T" Then
     viewAllOutputTabSelected = True
@@ -5666,7 +5696,6 @@ Dim i As Integer
 Dim startTime As Single
 Dim versionObjectFound As Boolean
 Dim foundEOF As Boolean
-Dim lineCount As Long
 startTime = Timer
 flv = FreeFile
 checkIDFVersion = ""
@@ -5675,8 +5704,7 @@ Open inFile For Input As flv
 If Err.Number <> 0 Then Exit Function
 versionObjectFound = False
 Call getNextLine(flv, lineIn, foundEOF, True) 'get first line and clear buffer
-lineCount = 1
-Do
+For i = 1 To searchLinesVersion
   'Line Input #flv, lineIn
   lineIn = LTrim(lineIn)
   If Left(lineIn, 1) <> "!" Then
@@ -5699,66 +5727,19 @@ Do
         versionFound = ""
       End If
       checkIDFVersion = versionFound
-      Exit Do
     End If
   End If
   'If EOF(flv) Then Exit For
-  If foundEOF Then Exit Do
+  If foundEOF Then Exit For
   Call getNextLine(flv, lineIn, foundEOF)
-  lineCount = lineCount + 1
-Loop
+Next i
 Close flv
 If Not versionObjectFound Then
   checkIDFVersion = "VERSION NOT FOUND"
 End If
-'MsgBox "Version of IDF: " & checkIDFVersion & " -- " & lineCount & " -- " & Timer - startTime, vbOKOnly, "CheckIDFVersion"
+'MsgBox "Version of IDF: ", checkIDFVersion
 Debug.Print "Time to check for version: "; Timer - startTime
 End Function
-
-'=======================================================
-' Return true if version A is newer than version B and
-' false if not or if it cannot be determined
-'=======================================================
-Function isNewerVersion(versionA, versionB) As Boolean
-Dim aVerNum As Long
-Dim bVerNum As Long
-aVerNum = convertVersionToNumber(versionA)
-bVerNum = convertVersionToNumber(versionB)
-If aVerNum > 0 And bVerNum > 0 Then
-    If aVerNum > bVerNum Then
-        isNewerVersion = True
-    Else
-        isNewerVersion = False
-    End If
-Else
-    isNewerVersion = False
-End If
-End Function
-
-'=======================================================
-' Convert a version string in the format of 8.5.1 into
-' an integer of 80501
-'=======================================================
-Function convertVersionToNumber(versionString) As Long
-Dim parts() As String
-Dim verNum As Long
-Dim i As Integer
-parts = Split(versionString, ".")
-verNum = 0
-If UBound(parts) = 2 Then
-    For i = 0 To UBound(parts)
-        If IsNumeric(parts(i)) Then
-            verNum = verNum * 100 + Val(parts(i))
-        Else
-            verNum = 0 ' if any parts are not numeric then exit function with a zero.
-            Exit For
-        End If
-    Next i
-End If
-convertVersionToNumber = verNum
-'MsgBox "convertVersionToNumber: " & versionString & " into " & verNum, vbOKOnly
-End Function
-
 
 '=======================================================
 ' Remove the part of the string
