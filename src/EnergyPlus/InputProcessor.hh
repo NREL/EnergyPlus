@@ -137,10 +137,10 @@ public:
 	std::vector < std::string > errors, warnings;
 
 	int print_errors() {
-		if ( warnings.size() ) std::cout << "Warnings: " << warnings.size() << std::endl;
-		for ( auto const & s: warnings ) std::cout << s << std::endl;
-		if ( errors.size() ) std::cout << "Errors: " << errors.size() << std::endl;
-		for ( auto const & s : errors ) std::cout << s << std::endl;
+		if ( warnings.size() ) EnergyPlus::ShowContinueError("Warnings: " + std::to_string(errors.size()));
+		for ( auto const & s: warnings ) EnergyPlus::ShowContinueError( s );
+		if ( errors.size() ) EnergyPlus::ShowWarningError("Errors: " + std::to_string(errors.size()));
+		for ( auto const & s : errors ) EnergyPlus::ShowWarningError( s );
 		return errors.size() + warnings.size();
 	}
 

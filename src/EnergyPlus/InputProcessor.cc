@@ -1305,7 +1305,7 @@ namespace EnergyPlus {
 									Numbers( numerics_index + 1 ) = 0;
 								}
 							} else {
-                                ShowWarningError( "field " + field + " not found in object \"" + Object + "\"" );
+                                ShowWarningError( "field " + field + " not found in object \"" + Object + "\", named \"" + obj.key() + "\"" );
 							}
 						} else if ( object_in_schema->find( "properties" ) != object_in_schema->end() ) {
 							if ( object_in_schema->at( "properties" )[ field ].find( "default" ) !=

@@ -580,6 +580,7 @@ namespace EnergyPlus {
 		}
 		InputProcessor::InitFiles();
 		SimulationManager::PostIPProcessing();
+		InputProcessor::state.print_errors();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
