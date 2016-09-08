@@ -145,8 +145,9 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 					name = obj[ "name" ].get < std::string >();
 					obj.erase( "name" );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
-						if ( obj_name != "RunPeriod" )
+						if ( obj_name != "RunPeriod" ) {
 							EnergyPlus::ShowWarningMessage("Duplicate names!! name: " + name);
+						}
 						// name = name + " " + s;
 					}
 				}
@@ -246,15 +247,20 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 					auto const val = parse_value( idf, index, success, obj_loc[ "properties" ][ field ] );
 					root[ field ] = std::move( val );
 				} else {
-					std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
+                    u64toa( cur_line_num, s );
+					EnergyPlus::ShowWarningMessage( "Field " + field + " was not found at line " + s );
 				}
 				legacy_idd_index++;
 				continue;
 			}
 			auto const & tmp = obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
 			if ( tmp.find( field ) == tmp.end() ) {
-				if ( field == "name" ) root[ field ] = parse_string( idf, index, success );
-				else std::cout << "Field " << field << " was not found at line " << cur_line_num << std::endl;
+				if ( field == "name" ) {
+					root[ field ] = parse_string( idf, index, success );
+				} else {
+					u64toa( cur_line_num, s );
+					EnergyPlus::ShowWarningMessage( "Field " + field + " was not found at line " + s );
+				}
 			} else {
 				auto const val = parse_value( idf, index, success, tmp[ field ] );
 				root[ field ] = std::move( val );
@@ -479,12 +485,13 @@ void IdfParser::decrement_both_index( size_t & index, size_t & line_index ) {
 }
 
 void IdfParser::print_out_line_error( std::string const & idf, bool obj_found ) {
-	if ( obj_found ) std::cout << "error: \"extra field(s)\" ";
-	else std::cout << "error: \"obj not found in schema\" ";
-	std::cout << "at line number " << cur_line_num << " (index " << index_into_cur_line << ")\n";
-	std::cout << "Line: ";
-	while ( idf[ beginning_of_line_index++ ] != '\n' ) std::cout << idf[ beginning_of_line_index ];
-	std::cout << std::endl;
+	std::string line;
+	if ( obj_found ) EnergyPlus::ShowWarningError( "error: \"extra field(s)\" " );
+	else EnergyPlus::ShowWarningError( "error: \"obj not found in schema\" " );
+    EnergyPlus::ShowWarningError( "at line number " + std::to_string( cur_line_num )
+								  + " (index " + std::to_string(index_into_cur_line)  + ")\nLine:\n" );
+	while ( idf[ beginning_of_line_index++ ] != '\n' ) line += idf[ beginning_of_line_index ];
+    EnergyPlus::ShowWarningError( line );
 }
 
 void IdfParser::eat_whitespace( std::string const & idf, size_t & index ) {
@@ -933,13 +940,13 @@ namespace EnergyPlus {
 	InputProcessor::ProcessInput() {
 		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {
-			std::cout << " file path " << inputJddFileName << " not found" << std::endl;
+            ShowSevereError( "jdd file path " + inputJddFileName + " not found" );
 			return;
 		}
 		InputProcessor::schema = json::parse(jdd_stream);
 		std::ifstream idf_stream( inputIdfFileName , std::ifstream::in | std::ios::ate);
 		if ( !idf_stream.is_open() ) {
-			std::cout << " file path " << inputIdfFileName << " not found" << std::endl;
+			ShowSevereError( "idf file path " + inputIdfFileName + " not found" );
 			return;
 		}
 		std::ifstream::pos_type size = idf_stream.tellg();
@@ -1298,7 +1305,7 @@ namespace EnergyPlus {
 									Numbers( numerics_index + 1 ) = 0;
 								}
 							} else {
-								std::cout << "field " << field << " not found in object " << Object << std::endl;
+                                ShowWarningError( "field " + field + " not found in object \"" + Object + "\"" );
 							}
 						} else if ( object_in_schema->find( "properties" ) != object_in_schema->end() ) {
 							if ( object_in_schema->at( "properties" )[ field ].find( "default" ) !=
