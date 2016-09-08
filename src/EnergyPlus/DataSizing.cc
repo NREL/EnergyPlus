@@ -297,6 +297,7 @@ namespace DataSizing {
 	int DataDesicDehumNum( 0 ); // index to desiccant dehumidifier
 	bool DataDesicRegCoil( false ); // TRUE if heating coil desiccant regeneration coil
 	bool HRFlowSizingFlag( false ); // True, if it is a heat recovery heat exchanger flow sizing
+	bool DataNomCapInpMeth( false ); // True if heating coil is sized by CoilPerfInpMeth == NomCa
 
 	// Object Data
 	Array1D< OARequirementsData > OARequirements;
@@ -432,6 +433,7 @@ namespace DataSizing {
 		ZoneHVACSizing.deallocate();
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
+		DataNomCapInpMeth = false;
 	}
 
 } // DataSizing

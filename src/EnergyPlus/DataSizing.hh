@@ -1,3 +1,4 @@
+
 // EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
@@ -299,6 +300,7 @@ namespace DataSizing {
 	extern int DataDesicDehumNum; // index to desiccant dehumidifier
 	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
 	extern bool HRFlowSizingFlag; // True, if it is a heat recovery heat exchanger flow sizing
+	extern bool DataNomCapInpMeth; // True if heating coil is sized by CoilPerfInpMeth == NomCap
 
 	// Types
 
