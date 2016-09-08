@@ -108,7 +108,7 @@ namespace EnergyPlus {
 			"	 0.80;                    !- Fraction of Radiant Energy to Surface 1",
 		} );
 		
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		Zone.allocate( 1 );
 		Zone( 1 ).Name = "ZONE1";
@@ -121,7 +121,7 @@ namespace EnergyPlus {
 		GetHighTempRadiantSystem( ErrorsFound );
 
 		std::string const error_string01 = delimited_string( {
-			"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",
+			"   ** Severe  ** heating_setpoint_temperature_schedule_name not found: RADIANT HEATING SETPOINTS",
    			"   **   ~~~   ** Occurs for ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER",
 			"   ** Severe  ** Fraction of radiation distributed to surfaces and people sums up to less than 1 for ZONERADHEATER",
 			"   **   ~~~   ** This would result in some of the radiant energy delivered by the high temp radiant heater being lost.",
