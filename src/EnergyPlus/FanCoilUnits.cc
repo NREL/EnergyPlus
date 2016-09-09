@@ -1939,12 +1939,12 @@ namespace FanCoilUnits {
 			// obtain unit output with no active heating/cooling
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
 			if ( FirstHVACIteration ) {
- 				FanCoil( FanCoilNum ).QUnitOutNoHC = QUnitOutNoHC;
- 			}
- 			else {
- 				QUnitOutNoHC = FanCoil( FanCoilNum ).QUnitOutNoHC;
- 			}
- 			// get the loads at the coils
+				FanCoil( FanCoilNum ).QUnitOutNoHC = QUnitOutNoHC;
+			}
+			else {
+				QUnitOutNoHC = FanCoil( FanCoilNum ).QUnitOutNoHC;
+			}
+			// get the loads at the coils
 			QCoilHeatSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP - QUnitOutNoHC;
 			QCoilCoolSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP - QUnitOutNoHC;
 
