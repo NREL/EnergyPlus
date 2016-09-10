@@ -1075,15 +1075,16 @@ namespace EnergyPlus {
 			object_in_jdf = &jdf[ Object ];
 		}
 
-		json * object_in_schema;
-		if ( schema[ "properties" ].find( Object ) == schema[ "properties" ].end() ) {
+		json * object_in_schema = &schema[ "properties" ];
+		if ( object_in_schema->find( Object ) == object_in_schema->end() ) {
 			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
 			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+				ShowWarningError( "Did not find object " + Object + " in schema" );
 				return;
 			}
-			object_in_schema = &schema[ "properties" ][ tmp_umit->second ];
+			object_in_schema = & (*object_in_schema)[ tmp_umit->second ];
 		} else {
-			object_in_schema = &schema[ "properties" ][ Object ];
+			object_in_schema = & (*object_in_schema)[ Object ];
 		}
 
 		NumAlphas = 0;
@@ -1098,6 +1099,7 @@ namespace EnergyPlus {
 		auto const & schema_patternProperties = object_in_schema->at( "patternProperties" );
 		auto const & schema_dot_star = schema_patternProperties[ ".*" ];
 		auto const & schema_obj_props = schema_dot_star[ "properties" ];
+
 		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
 		auto const & legacy_idd = object_in_schema->at( "legacy_idd" );
 		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
@@ -1109,9 +1111,9 @@ namespace EnergyPlus {
 
 		auto const & obj = object_in_jdf->begin() + Number - 1;
 		auto const & obj_val = obj.value();
-		auto const & alphas_fields = object_in_schema->at( "legacy_idd" )[ "alphas" ][ "fields" ];
-		for ( int i = 0; i < alphas_fields.size(); ++i ) {
-			std::string const field = alphas_fields[ i ];
+		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
+		for ( int i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
+			std::string const field = legacy_idd_alphas_fields[ i ];
 			if ( field == "name" ) {
 				auto const name_iter = object_in_schema->at("name");
                 if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
@@ -1165,14 +1167,14 @@ namespace EnergyPlus {
 			if ( is_AlphaFieldNames ) AlphaFieldNames()( i + 1 ) = field;
 		}
 
-		auto legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
+		auto const & legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
 		if ( legacy_idd_alphas_extension_iter != legacy_idd_alphas.end() ) {
 			auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
-			auto const & obj_in_jdf_extensions = obj.value()[ "extensions" ];
-			auto const & schema_alphas_extension = schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
-			auto alphas_index = alphas_fields.size();
+			auto const & jdf_extensions_array = obj.value()[ "extensions" ];
+			auto const & schema_extension_fields = schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
+			int alphas_index = legacy_idd_alphas_fields.size();
 
-			for ( auto it = obj_in_jdf_extensions.begin(); it != obj_in_jdf_extensions.end(); ++it ) {
+			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
 
 				for ( auto i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
@@ -1182,7 +1184,7 @@ namespace EnergyPlus {
 					if ( jdf_obj_field_iter != jdf_extension_obj.end() ) {
 						auto const & jdf_field_val = jdf_obj_field_iter.value();
 						if ( jdf_field_val.is_string() ) {
-							auto const & schema_field = schema_alphas_extension[ field_name ];
+							auto const & schema_field = schema_extension_fields[ field_name ];
 							std::string val = jdf_field_val;
                             auto const & tmp_find_default_iter = schema_field.find( "default" );
 							if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
@@ -1197,9 +1199,9 @@ namespace EnergyPlus {
 									}
 									val = s;
 								}
-								if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = true;
+								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
 							} else {
-								if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = val.empty();
+								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = val.empty();
 							}
 							if ( schema_field.find("retaincase") != schema_field.end() ) {
 								Alphas( alphas_index + 1 ) = val;
@@ -1213,22 +1215,22 @@ namespace EnergyPlus {
 								dtoa( jdf_field_val.get < double >(), s );
 							}
 							Alphas( alphas_index + 1 ) = s;
-							if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = false;
+							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = false;
 						}
 						NumAlphas++;
 					} else {
 						Alphas( alphas_index + 1 ) = "";
-						if ( present( AlphaBlank ) ) AlphaBlank()( alphas_index + 1 ) = true;
+						if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
 					}
-					if ( present( AlphaFieldNames ) ) AlphaFieldNames()( alphas_index + 1 ) = field_name;
+					if ( is_AlphaFieldNames ) AlphaFieldNames()( alphas_index + 1 ) = field_name;
 					alphas_index++;
 				}
 			}
 		}
 
-		auto const & numerics_fields = object_in_schema->at( "legacy_idd" )[ "numerics" ][ "fields" ];
-		for ( int i = 0; i < numerics_fields.size(); ++i ) {
-			std::string const field = numerics_fields[ i ];
+		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
+		for ( int i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
+			std::string const field = legacy_idd_numerics_fields[ i ];
 			auto it = obj.value().find( field );
 			if ( it != obj.value().end() ) {
 				if ( !it.value().is_string() ) {
@@ -1236,11 +1238,12 @@ namespace EnergyPlus {
 					if ( is_NumBlank ) NumBlank()( i + 1 ) = false;
 				} else {
 					if ( it.value().get < std::string >().empty() ) {
-						auto const & schema_obj = object_in_schema->at(
-						"patternProperties" )[ ".*" ][ "properties" ][ field ];
-						if ( schema_obj.find( "default" ) != schema_obj.end() ) {
-							if ( schema_obj[ "default" ].is_string() ) Numbers( i + 1 ) = -99999;
-							else Numbers( i + 1 ) = schema_obj[ "default" ].get < double >();
+						auto const & schema_obj = schema_obj_props[ field ];
+                        auto const & schema_default_iter = schema_obj.find( "default" );
+						if ( schema_default_iter != schema_obj.end() ) {
+							auto const & schema_default_val = schema_default_iter.value();
+							if ( schema_default_val.is_string() ) Numbers( i + 1 ) = -99999;
+							else Numbers( i + 1 ) = schema_default_val.get < double >();
 						} else {
 							Numbers( i + 1 ) = 0;
 						}
@@ -1255,20 +1258,25 @@ namespace EnergyPlus {
 				if ( is_NumBlank )
 					NumBlank()( i + 1 ) = true;
 			}
-			if ( present( NumericFieldNames ) ) NumericFieldNames()( i + 1 ) = field;
+			if ( is_NumericFieldNames ) NumericFieldNames()( i + 1 ) = field;
 		}
 
+		auto const & legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
+		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() ) {
+			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
+			auto const & schema_extension_fields = schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
+			auto const & jdf_extensions_array = obj.value()[ "extensions" ];
+			int numerics_index = legacy_idd_numerics_fields.size();
 
-		if ( object_in_schema->at( "legacy_idd" )[ "numerics" ].find( "extensions" ) != object_in_schema->at( "legacy_idd" )[ "numerics" ].end() ) {
-			auto const & numerics_extensions = object_in_schema->at( "legacy_idd" )[ "numerics" ][ "extensions" ];
-			auto const & extensions = obj.value()[ "extensions" ];
-			int numerics_index = numerics_fields.size();
-			for ( auto it = extensions.begin(); it != extensions.end(); ++it ) {
+			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
-				for ( auto i = 0; i < numerics_extensions.size(); i++ ) {
-					std::string const field = numerics_extensions[ i ];
-					if ( jdf_extension_obj.find( field ) != jdf_extension_obj.end() ) {
-						auto const & val = jdf_extension_obj[ field ];
+
+				for ( auto i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
+					std::string const field = legacy_idd_numerics_extensions[ i ];
+                    auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
+
+					if ( jdf_extension_field_iter != jdf_extension_obj.end() ) {
+						auto const & val = jdf_extension_field_iter.value();
 						if ( !val.is_string() ) {
 							if ( val.is_number_integer() ) {
 								Numbers( numerics_index + 1 ) = val.get < int >();
@@ -1278,15 +1286,16 @@ namespace EnergyPlus {
 							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = false;
 						} else {
 							if ( val.get < std::string >().empty() ) {
-								auto const & schema_obj = object_in_schema->at(
-								"patternProperties" )[ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field ];
-								if ( schema_obj.find( "default" ) != schema_obj.end() ) {
-									if ( schema_obj[ "default" ].is_string() ) {
+								auto const & schema_obj = schema_extension_fields[ field ];
+								auto const & default_iter = schema_obj.find( "default" );
+								if ( default_iter != schema_obj.end() ) {
+									auto const & default_val = default_iter.value();
+									if ( default_val.is_string() ) {
 										Numbers( numerics_index + 1 ) = -99999;
-									} else if ( schema_obj[ "default" ].is_number_integer() ) {
-										Numbers( numerics_index + 1 ) = schema_obj[ "default" ].get < int >();
+									} else if ( default_val.is_number_integer() ) {
+										Numbers( numerics_index + 1 ) = default_val.get < int >();
 									} else {
-										Numbers( numerics_index + 1 ) = schema_obj[ "default" ].get < double >();
+										Numbers( numerics_index + 1 ) = default_val.get < double >();
 									}
 								} else {
 									Numbers( numerics_index + 1 ) = 0;
@@ -1298,33 +1307,28 @@ namespace EnergyPlus {
 						}
 						NumNumbers++;
 					} else {
-						auto const & pattern_props = object_in_schema->find( "patternProperties" );
-						if ( pattern_props != object_in_schema->end() ) {
-							auto const & field_in_schema = pattern_props.value()[ ".*" ][ "properties" ];
-							if ( field_in_schema.find( field ) != field_in_schema.end() ) {
-								if ( field_in_schema[ field ].find( "default" ) != field_in_schema[ field ].end() ) {
-									auto const & default_val = field_in_schema[ field ][ "default" ];
-									if ( default_val.is_number_integer() ) {
-										Numbers( numerics_index + 1 ) = default_val.get < int >();
-									} else if ( default_val.is_number_float() ) {
-										Numbers( numerics_index + 1 ) = default_val.get < double >();
-									} else {
-										if ( it.value().get < std::string >().empty() ) {
-											Numbers( numerics_index + 1 ) = 0;
-										} else {
-											Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
-										}
-									}
+						auto const & schema_field_iter = schema_extension_fields.find( field );
+						if ( schema_field_iter == schema_extension_fields.end() ) {
+							ShowWarningError( "field " + field + " not found in object \"" + Object + "\", named \"" + obj.key() + "\"" );
+							continue;
+						}
+
+						if ( schema_field_iter != schema_extension_fields.end() ) {
+							auto const & schema_field = schema_extension_fields[ field ];
+							auto const & schema_field_default_iter = schema_field.find( "default" );
+							if ( schema_field_default_iter != schema_field.end() ) {
+								auto const & schema_field_default_val = schema_field_default_iter.value();
+								if ( schema_field_default_val.is_number_integer() ) {
+									Numbers( numerics_index + 1 ) = schema_field_default_val.get < int >();
+								} else if ( schema_field_default_val.is_number_float() ) {
+									Numbers( numerics_index + 1 ) = schema_field_default_val.get < double >();
 								} else {
-									Numbers( numerics_index + 1 ) = 0;
+									if ( it.value().get < std::string >().empty() ) {
+										Numbers( numerics_index + 1 ) = 0;
+									} else {
+										Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
+									}
 								}
-							} else {
-                                ShowWarningError( "field " + field + " not found in object \"" + Object + "\", named \"" + obj.key() + "\"" );
-							}
-						} else if ( object_in_schema->find( "properties" ) != object_in_schema->end() ) {
-							if ( object_in_schema->at( "properties" )[ field ].find( "default" ) !=
-							     object_in_schema->at( "properties" )[ field ].end() ) {
-								Numbers( numerics_index + 1 ) = object_in_schema->at( "properties" )[ field ][ "default" ].get < double >();
 							} else {
 								Numbers( numerics_index + 1 ) = 0;
 							}
