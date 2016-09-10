@@ -1307,31 +1307,23 @@ namespace EnergyPlus {
 						}
 						NumNumbers++;
 					} else {
-						auto const & schema_field_iter = schema_extension_fields.find( field );
-						if ( schema_field_iter == schema_extension_fields.end() ) {
-							ShowWarningError( "field " + field + " not found in object \"" + Object + "\", named \"" + obj.key() + "\"" );
-							continue;
-						}
-
-						if ( schema_field_iter != schema_extension_fields.end() ) {
-							auto const & schema_field = schema_extension_fields[ field ];
-							auto const & schema_field_default_iter = schema_field.find( "default" );
-							if ( schema_field_default_iter != schema_field.end() ) {
-								auto const & schema_field_default_val = schema_field_default_iter.value();
-								if ( schema_field_default_val.is_number_integer() ) {
-									Numbers( numerics_index + 1 ) = schema_field_default_val.get < int >();
-								} else if ( schema_field_default_val.is_number_float() ) {
-									Numbers( numerics_index + 1 ) = schema_field_default_val.get < double >();
-								} else {
-									if ( it.value().get < std::string >().empty() ) {
-										Numbers( numerics_index + 1 ) = 0;
-									} else {
-										Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
-									}
-								}
+						auto const & schema_field = schema_extension_fields[ field ];
+						auto const & schema_field_default_iter = schema_field.find( "default" );
+						if ( schema_field_default_iter != schema_field.end() ) {
+							auto const & schema_field_default_val = schema_field_default_iter.value();
+							if ( schema_field_default_val.is_number_integer() ) {
+								Numbers( numerics_index + 1 ) = schema_field_default_val.get < int >();
+							} else if ( schema_field_default_val.is_number_float() ) {
+								Numbers( numerics_index + 1 ) = schema_field_default_val.get < double >();
 							} else {
-								Numbers( numerics_index + 1 ) = 0;
+								if ( it.value().get < std::string >().empty() ) {
+									Numbers( numerics_index + 1 ) = 0;
+								} else {
+									Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
+								}
 							}
+						} else {
+							Numbers( numerics_index + 1 ) = 0;
 						}
 						if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = true;
 					}
