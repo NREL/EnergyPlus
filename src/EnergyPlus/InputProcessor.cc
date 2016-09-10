@@ -735,9 +735,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 			auto const & parsed_string = parsed.get < std::string >();
 			for ( i = 0; i < enum_array_size; i++ ) {
 				auto const & enum_string = enum_array[ i ].get< std::string >();
-				if ( icompare( enum_string, parsed_string ) ) {
-					break;
-				}
+				if ( icompare( enum_string, parsed_string ) ) break;
 			}
 			if ( i == enum_array_size ) {
 				u64toa( line_num, s );
@@ -757,8 +755,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 				                  + ": \"" + s2 + "\" was not found in the enum" );
 			}
 		}
-	}
-	else if ( parsed.is_number() ) {
+	} else if ( parsed.is_number() ) {
 		double const val = parsed.get < double >();
 		auto const found_anyOf = loc->find( "anyOf" );
 		if ( found_anyOf != loc->end() ) {
@@ -790,8 +787,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 			                    + ", type == " + loc->at( "type" ).get < std::string >()
 			                    + " but parsed value = " + s2 );
 		}
-	}
-	else if ( parsed.is_string() ) {
+	} else if ( parsed.is_string() ) {
 		auto const found_anyOf = loc->find( "anyOf" );
 		if ( found_anyOf != loc->end() ) {
 			int i;
@@ -1090,9 +1086,8 @@ namespace EnergyPlus {
 			object_in_schema = &schema[ "properties" ][ Object ];
 		}
 
-		//Autodesk:Uninit Initialize variables used uninitialized
-		NumAlphas = 0; //Autodesk:Uninit Force default initialization
-		NumNumbers = 0; //Autodesk:Uninit Force default initialization
+		NumAlphas = 0;
+		NumNumbers = 0;
 
 		Status = -1;
 
@@ -1105,7 +1100,8 @@ namespace EnergyPlus {
 		for ( int i = 0; i < alphas_fields.size(); ++i ) {
 			std::string const field = alphas_fields[ i ];
 			if ( field == "name" ) {
-                if ( object_in_schema->at( "name" ).find( "retaincase" ) != object_in_schema->at( "name" ).end() ) {
+				auto const name_iter = object_in_schema->at("name");
+                if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
 				} else {
 					Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
