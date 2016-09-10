@@ -1938,7 +1938,7 @@ namespace FanCoilUnits {
 			}
 			// obtain unit output with no active heating/cooling
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
-			if ( FirstHVACIteration ) {
+			if ( ! ColdFlowLocked && ! HotFlowLocked ) {
 				FanCoil( FanCoilNum ).QUnitOutNoHC = QUnitOutNoHC;
 			}
 			else {
