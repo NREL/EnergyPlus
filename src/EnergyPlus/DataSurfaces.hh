@@ -553,7 +553,16 @@ namespace DataSurfaces {
 		bool
 		operator ==( Surface2D const & a, Surface2D const & b )
 		{
-			return eq( a.vertices, b.vertices );
+			auto const & v1 = a.vertices;
+			auto const & v2 = b.vertices;
+			assert( v1.size_bounded() );
+			assert( v1.conformable( v2 ) );
+			if ( v1.empty() ) return true;
+			size_type l( 0u );
+			for ( int i = 1, e = v2.u(); i <= e; ++i, ++l ) {
+				if ( ! ( v1[ l ] == v2( i ) ) ) return false;
+			}
+			return true;		
 		}
 
 		// Inequality
