@@ -159,7 +159,7 @@ namespace EnergyPlus {
 	SurfaceOctreeCube::
 	valid() const
 	{
-		if ( ( ( l_.x <= c_.x ) && ( l_.y <= c_.y ) ) && ( ( c_.x <= u_.x ) && ( c_.y <= u_.y ) ) ) {
+		if ( ( ( l_.x <= c_.x ) && ( l_.y <= c_.y ) && ( l_.z <= c_.z ) ) && ( ( c_.x <= u_.x ) && ( c_.y <= u_.y ) && ( c_.z <= u_.z ) ) ) {
 			Real const tol2( std::max( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
 			if ( ObjexxFCL::distance_squared( c_, cen( l_, u_ ) ) <= tol2 ) {
 				Real const tol( std::max( std::sqrt( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
@@ -221,7 +221,7 @@ namespace EnergyPlus {
 		std::uint8_t const k( ctr.z <= c_.z ? 0 : 1 );
 		SurfaceOctreeCube * & cube = cubes_[ ( i << 2 ) + ( j << 1 ) + k ];
 		if ( cube != nullptr ) { // Candidate cube exists
-			if ( ( ( cube->l_.x <= sl.x ) && ( cube->l_.y <= sl.y ) ) && ( ( su.x <= cube->u_.x ) && ( su.y <= cube->u_.y ) ) ) { // Surface is contained in sub-cube
+			if ( ( ( cube->l_.x <= sl.x ) && ( cube->l_.y <= sl.y ) && ( cube->l_.z <= sl.z ) ) && ( ( su.x <= cube->u_.x ) && ( su.y <= cube->u_.y ) && ( su.z <= cube->u_.z ) ) ) { // Surface is contained in sub-cube
 				cube->add( surface );
 			} else { // Surface stays in this cube
 				surfaces_.push_back( &surface );
@@ -232,7 +232,7 @@ namespace EnergyPlus {
 			Real const z( k * h );
 			Vertex const l( l_.x + x, l_.y + y, l_.z + z );
 			Vertex const u( c_.x + x, c_.y + y, c_.z + z );
-			if ( ( ( l.x <= sl.x ) && ( l.y <= sl.y ) ) && ( ( su.x <= u.x ) && ( su.y <= u.y ) ) ) { // Surface is contained in sub-cube
+			if ( ( ( l.x <= sl.x ) && ( l.y <= sl.y ) && ( l.z <= sl.z ) ) && ( ( su.x <= u.x ) && ( su.y <= u.y ) && ( su.z <= u.z ) ) ) { // Surface is contained in sub-cube
 				cube = new SurfaceOctreeCube( d_ + 1, l, u, h );
 				cube->add( surface );
 			} else { // Surface stays in this cube
