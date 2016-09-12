@@ -3314,8 +3314,8 @@ namespace WaterCoils {
 		AirInletCoilSurfTemp = PsyTsatFnHPb( EnthSatAirCoilSurfaceEntryTemp, OutBaroPress );
 
 		// Calculate outlet air temperature and humidity from enthalpies and surface conditions.
-		TotWaterCoilLoad = AirMassFlow * ( EnthAirInlet - EnthAirOutlet );
-		OutletWaterTemp = WaterTempIn + TotWaterCoilLoad / max( WaterMassFlowRate, SmallNo ) / Cp;
+		TotWaterCoilLoad = WaterCoil( CoilNum ).InletAirMassFlowRate * ( EnthAirInlet - EnthAirOutlet );
+		OutletWaterTemp = WaterTempIn + TotWaterCoilLoad / max( WaterCoil( CoilNum ).InletWaterMassFlowRate, SmallNo ) / Cp;
 
 		// Calculates out put variable for  the completely wet coil
 		WetCoilOutletCondition( CoilNum, AirTempIn, EnthAirInlet, EnthAirOutlet, UAExternalTotal, OutletAirTemp, OutletAirHumRat, SenWaterCoilLoad );
