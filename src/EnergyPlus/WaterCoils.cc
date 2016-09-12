@@ -2046,9 +2046,9 @@ namespace WaterCoils {
 				// We now have the design load if it was autosized. For the case of CoilPerfInpMeth == NomCap, calculate the air flow rate specified 
 				// by the NomCap inputs. This overrides all previous values
 				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) {
-					WaterCoil( CoilNum ).DesAirVolFlowRate = WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( Cp*( WaterCoil( CoilNum ).DesOutletAirTemp -
+					WaterCoil( CoilNum ).InletAirMassFlowRate = WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( CpAirStd*( WaterCoil( CoilNum ).DesOutletAirTemp -
 						WaterCoil( CoilNum ).DesInletAirTemp ) );
-					WaterCoil( CoilNum ).InletAirMassFlowRate = StdRhoAir * WaterCoil( CoilNum ).DesAirVolFlowRate;
+					WaterCoil( CoilNum ).DesAirVolFlowRate = WaterCoil( CoilNum ).DesAirVolFlowRate / StdRhoAir;
 					DataAirFlowUsedForSizing = WaterCoil( CoilNum ).DesAirVolFlowRate;
 					DataFlowUsedForSizing = WaterCoil( CoilNum ).DesAirVolFlowRate;
 				}
