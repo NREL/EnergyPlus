@@ -11,10 +11,10 @@
 : cores and then starts each of the batch files. No load balancing between the cores 
 : is achieved using this method. The RunDirMulti.bat file should be located in a 
 : directory that contains the IDF files.
-
+:
+SET maindir=
+:
 : Main routine
-: maindir - change if you did not install in default folder (to be safe, use quotes)
-SET maindir="C:\EnergyPlusV7-1-0\"
 : The default weather file name if not provided as an argument.
 SET weather=USA_IL_Chicago-OHare.Intl.AP.725300_TMY3
 : The default number of separate processor cores that the simulations should use if 
@@ -22,6 +22,28 @@ SET weather=USA_IL_Chicago-OHare.Intl.AP.725300_TMY3
 SET numProc=4
 IF "%1" NEQ "" SET weather=%1
 IF "%2" NEQ "" SET numProc=%2
+IF NOT DEFINED maindir (
+  ECHO:
+  ECHO ===========================================================================
+  ECHO:
+  ECHO RunDirMult.bat does not have the maindir variable set. Please edit the line
+  ECHO in the RunDirMulti.bat file that says:
+  ECHO:
+  ECHO   SET maindir=
+  ECHO:
+  ECHO Add the full path for the directory that EnergyPlus is installed after the  
+  ECHO equals sign and include double quotes around the path. Make sure the end  
+  ECHO of the path ends with a trailing backslash. For example:
+  ECHO:
+  ECHO   SET maindir="c:\EnergyPlusVx-x-x\"
+  ECHO:
+  ECHO where the x's are replaced with the actual version number if EnergyPlus was 
+  ECHO installed in the default installation directory.
+  ECHO:
+  ECHO ===========================================================================
+  ECHO:
+  GOTO:eof
+ )
 SET count=0
 : Loop through the temporary directories and delete the temporary batch files.
 for /L %%G in (1,1,%numProc%) do call :clean1 %%G

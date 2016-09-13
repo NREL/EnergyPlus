@@ -82,11 +82,12 @@
 #include <SimulationManager.hh>
 #include <SingleDuct.hh>
 #include <ZoneAirLoopEquipmentManager.hh>
+#include <DataSizing.hh>
 
 using namespace EnergyPlus;
 using namespace SimulationManager;
+using namespace DataSizing;
 using DataHeatBalance::Zone;
-
 
 TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	std::string const idf_objects = delimited_string( {
@@ -144,7 +145,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 0;
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
+	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 );
 	ScheduleManager::UpdateScheduleValues();
 
 	bool ErrorsFound = false;
@@ -277,7 +278,11 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		"    Zone 1 Reheat Coil,      !- Reheat Coil Name",
 		"    ,                        !- Maximum Hot Water or Steam Flow Rate{m3/s}",
 		"    ,                        !- Minimum Hot Water or Steam Flow Rate{m3/s}",
-		"    Zone 1 Supply Inlet;     !- Air Outlet Node Name",
+		"    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+		"    0.001,                   !- Convergence Tolerance",
+		"    ,                        !- Damper Heating Action",
+		"    ,                        !- Maximum Flow per Zone Floor Area During Reheat",
+		"    ;                        !- Maximum Flow Fraction During Reheat",
 		"Coil:Heating:Electric,",
 		"    Zone 1 Reheat Coil,      !- Name",
 		"    ,                        !- Availability Schedule Name",
@@ -311,7 +316,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 	DataEnvironment::DayOfWeek = 2;
 	DataEnvironment::HolidayIndex = 0;
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
+	DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 );
 	ScheduleManager::UpdateScheduleValues();
 
 	bool ErrorsFound = false;
@@ -662,13 +667,13 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    0.3,                     !- Constant Minimum Air Flow Fraction",
 		"    ,                        !- Fixed Minimum Air Flow Rate {m3/s}",
 		"    ,                        !- Minimum Air Flow Fraction Schedule Name",
-		"    Coil:Heating:Gas,        !- Reheat Coil Object Type",
+		"    Coil:Heating:Fuel,        !- Reheat Coil Object Type",
 		"    SPACE1-1 Zone Coil,      !- Reheat Coil Name",
 		"    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 		"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 		"    SPACE In Node,           !- Air Outlet Node Name",
 		"    0.001,                   !- Convergence Tolerance",
-		"    Reverse,                 !- Damper Heating Action",
+		"    ReverseWithLimits,       !- Damper Heating Action",
 		"    AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}",
 		"    AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat",
 
@@ -682,13 +687,13 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    0.3,                     !- Constant Minimum Air Flow Fraction",
 		"    ,                        !- Fixed Minimum Air Flow Rate {m3/s}",
 		"    ,                        !- Minimum Air Flow Fraction Schedule Name",
-		"    Coil:Heating:Gas,        !- Reheat Coil Object Type",
+		"    Coil:Heating:Fuel,        !- Reheat Coil Object Type",
 		"    SPACE2-1 Zone Coil,      !- Reheat Coil Name",
 		"    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 		"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 		"    SPACE2 In Node,          !- Air Outlet Node Name",
 		"    0.001,                   !- Convergence Tolerance",
-		"    Reverse,                 !- Damper Heating Action",
+		"    ReverseWithLimits,       !- Damper Heating Action",
 		"    AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}",
 		"    AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat",
 
@@ -698,28 +703,23 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 
 		"  Branch,",
 		"    VAV Sys 1 Main Branch,   !- Name",
-		"    autosize,                !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 		"    OA Sys 1,                !- Component 1 Name",
 		"    VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name",
 		"    Mixed Air Node 1,        !- Component 1 Outlet Node Name",
-		"    PASSIVE,                 !- Component 1 Branch Control Type",
 		"    CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 		"    DX Cooling Coil System 1,!- Component 2 Name",
 		"    Mixed Air Node 1,        !- Component 2 Inlet Node Name",
 		"    Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name",
-		"    PASSIVE,                 !- Component 2 Branch Control Type",
-		"    Coil:Heating:Gas,        !- Component 3 Object Type",
+		"    Coil:Heating:Fuel,        !- Component 3 Object Type",
 		"    Main Heating Coil 1,     !- Component 3 Name",
 		"    Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name",
 		"    Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name",
-		"    PASSIVE,                 !- Component 3 Branch Control Type",
 		"    Fan:VariableVolume,      !- Component 4 Object Type",
 		"    Supply Fan 1,            !- Component 4 Name",
 		"    Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name",
-		"    VAV Sys 1 Outlet Node,   !- Component 4 Outlet Node Name",
-		"    ACTIVE;                  !- Component 4 Branch Control Type",
+		"    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
 
 		"  AirLoopHVAC,",
 		"    VAV Sys 1,               !- Name",
@@ -835,17 +835,19 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    FixedMinimum,            !- Minimum Limit Type",
 		"    AvailSched;              !- Minimum Outdoor Air Schedule Name",
 
-		"  Coil:Heating:Gas,",
+		"  Coil:Heating:Fuel,",
 		"    SPACE1-1 Zone Coil,      !- Name",
 		"    AvailSched,              !- Availability Schedule Name",
+		"    Gas,                     !- Fuel Type",
 		"    0.8,                     !- Gas Burner Efficiency",
 		"    autosize,                !- Nominal Capacity {W}",
 		"    SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
 		"    Space In Node;          !- Air Outlet Node Name",
 
-		"  Coil:Heating:Gas,",
+		"  Coil:Heating:Fuel,",
 		"    SPACE2-1 Zone Coil,      !- Name",
 		"    AvailSched,              !- Availability Schedule Name",
+		"    Gas,                     !- Fuel Type",
 		"    0.8,                     !- Gas Burner Efficiency",
 		"    autosize,                !- Nominal Capacity {W}",
 		"    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -887,9 +889,10 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"    0.0,                   !- Crankcase Heater Capacity",
 		"    10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
-		"  Coil:Heating:Gas,",
+		"  Coil:Heating:Fuel,",
 		"    Main heating Coil 1,     !- Name",
 		"    AvailSched,              !- Availability Schedule Name",
+		"    Gas,                     !- Fuel Type",
 		"    0.8,                     !- Gas Burner Efficiency",
 		"    autosize,                !- Nominal Capacity {W}",
 		"    Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name",
@@ -1266,11 +1269,15 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 	//compare_err_stream( "" ); // just for debugging
 
 	//zone floor area of zone 1 = 0, zone 2 > 0. Expect TU MaxAirVolFlowRateDuringReheat = 0 only for zone 1.
-	Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea, SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
+	// this test isn't relevant anymore since defaulting is done differently
+	Real64 MaxAirVolFlowRateDuringReheatDes = min( FinalZoneSizing( 1 ).DesHeatVolFlowMax, SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
+	//Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea, SingleDuct::Sys( 1 ).MaxAirVolFlowRate );
 	// apply limit based on min stop
 	MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( SingleDuct::Sys( 1 ).MaxAirVolFlowRate * SingleDuct::Sys( 1 ).ZoneMinAirFrac ) );
 
-	Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea / SingleDuct::Sys( 1 ).MaxAirVolFlowRate ) );
+	// This isn't relevant any more since the default is calculated differently
+	Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( FinalZoneSizing( 1 ).DesHeatVolFlowMax / SingleDuct::Sys( 1 ).MaxAirVolFlowRate ) );
+	// Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 1 ).ZoneFloorArea / SingleDuct::Sys( 1 ).MaxAirVolFlowRate ) );
 	// apply limit based on min stop
 	MaxAirVolFractionDuringReheatDes = max( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 1 ).ZoneMinAirFrac );
 	// apply model math
@@ -1280,9 +1287,9 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 	EXPECT_NEAR( SingleDuct::Sys( 1 ).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001 );
 	EXPECT_NEAR( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 1 ).MaxAirVolFractionDuringReheat, 0.0000000000001 );
 
-	MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * SingleDuct::Sys( 2 ).ZoneFloorArea, SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
+	MaxAirVolFlowRateDuringReheatDes = min( FinalZoneSizing( 2 ).DesHeatVolFlowMax, SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
 	MaxAirVolFlowRateDuringReheatDes = max( MaxAirVolFlowRateDuringReheatDes, ( SingleDuct::Sys( 2 ).MaxAirVolFlowRate * SingleDuct::Sys( 2 ).ZoneMinAirFrac ) );
-	MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * SingleDuct::Sys( 2 ).ZoneFloorArea / SingleDuct::Sys( 2 ).MaxAirVolFlowRate ) );
+	MaxAirVolFractionDuringReheatDes = min( 1.0, ( FinalZoneSizing( 2 ).DesHeatVolFlowMax / SingleDuct::Sys( 2 ).MaxAirVolFlowRate ) );
 	MaxAirVolFractionDuringReheatDes = max( MaxAirVolFractionDuringReheatDes, SingleDuct::Sys( 2 ).ZoneMinAirFrac );
 	MaxAirVolFlowRateDuringReheatDes = min( max( MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * SingleDuct::Sys( 2 ).MaxAirVolFlowRate ), SingleDuct::Sys( 2 ).MaxAirVolFlowRate );
 

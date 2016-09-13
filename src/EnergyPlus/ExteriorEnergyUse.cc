@@ -527,66 +527,48 @@ namespace ExteriorEnergyUse {
 		if ( SameString( FuelTypeAlpha, "Electricity" ) || SameString( FuelTypeAlpha, "Electric" ) ) {
 			FuelTypeNumber = ElecUse;
 			FuelTypeString = "Electric";
-		}
-		if ( SameString( FuelTypeAlpha, "Gas" ) || SameString( FuelTypeAlpha, "NaturalGas" ) ) {
-			if ( SameString( FuelTypeAlpha, "Gas" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"NaturalGas\"." );
-			}
+		} else if ( SameString( FuelTypeAlpha, "NaturalGas" ) ) {
 			FuelTypeNumber = GasUse;
 			FuelTypeString = "Gas";
-		}
-		if ( SameString( FuelTypeAlpha, "Coal" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Coal" ) ) {
 			FuelTypeNumber = CoalUse;
 			FuelTypeString = "Coal";
-		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
 			FuelTypeNumber = FuelOil1Use;
 			FuelTypeString = "FuelOil#1";
-		}
-		if ( SameString( FuelTypeAlpha, "PropaneGas" ) || SameString( FuelTypeAlpha, "LPG" ) ) {
-			if ( SameString( FuelTypeAlpha, "LPG" ) ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-				ShowContinueError( "Deprecated value in " + CurrentField + "=\"" + FuelTypeAlpha + "\", using \"PropaneGas\"." );
-			}
+		} else if ( SameString( FuelTypeAlpha, "PropaneGas" ) ) {
 			FuelTypeNumber = LPGUse;
 			FuelTypeString = "Propane";
-		}
-		if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
 			FuelTypeNumber = GasolineUse;
 			FuelTypeString = "Gasoline";
-		}
-		if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
 			FuelTypeNumber = DieselUse;
 			FuelTypeString = "Diesel";
-		}
-		if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
 			FuelTypeNumber = FuelOil2Use;
 			FuelTypeString = "FuelOil#2";
-		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel1";
-		}
-		if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel2";
-		}
-		if ( SameString( FuelTypeAlpha, "Water" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Water" ) ) {
 			FuelTypeNumber = WaterUse;
 			FuelTypeString = "Water";
-		}
-		if ( SameString( FuelTypeAlpha, "Steam" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "Steam" ) ) {
 			FuelTypeNumber = SteamUse;
 			FuelTypeString = "Steam";
-		}
-		if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
 			FuelTypeNumber = DistrictCoolUse;
 			FuelTypeString = "DistrictCooling";
-		}
-		if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
+		} else if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
 			FuelTypeNumber = DistrictHeatUse;
 			FuelTypeString = "DistrictHeating";
+		} else {
+			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
+			ShowFatalError( "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha );
 		}
 
 	}
