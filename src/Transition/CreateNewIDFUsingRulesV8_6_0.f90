@@ -11,7 +11,7 @@ SUBROUTINE SetThisVersionVariables()
       VerString='Conversion 8.5 => 8.6'
       VersionNum=8.6
       sVersionNum='8.6'
-      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-5-0-Energy+.idd'
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-6-0-Energy+.idd'
       NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-6-0-Energy+.idd'
       RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-5-0 to 8-6-0.csv'
 END SUBROUTINE

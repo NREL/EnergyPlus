@@ -2030,17 +2030,17 @@
     Yes,                     !- 100% Outdoor Air in Heating
     0.00924,                 !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.003,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ZoneSum,                 !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2258,8 +2258,8 @@
     SPACE1-1 Fan Coil,       !- ZoneHVAC Unit Object Name
     SPACE1-1 Fan Coil Inlet, !- Mixer Outlet Node Name
     SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
-    InletSide;                                  !- Mixer Connection Type
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;               !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
@@ -2267,8 +2267,8 @@
     SPACE2-1 Fan Coil,       !- ZoneHVAC Unit Object Name
     SPACE2-1 Fan Coil Inlet, !- Mixer Outlet Node Name
     SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE2-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
-    InletSide;                                  !- Mixer Connection Type
+    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;               !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
@@ -2276,8 +2276,8 @@
     SPACE3-1 Fan Coil,       !- ZoneHVAC Unit Object Name
     SPACE3-1 Fan Coil Inlet, !- Mixer Outlet Node Name
     SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE3-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
-    InletSide;                                  !- Mixer Connection Type
+    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;               !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
@@ -2285,8 +2285,8 @@
     SPACE4-1 Fan Coil,       !- ZoneHVAC Unit Object Name
     SPACE4-1 Fan Coil Inlet, !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE4-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
-    InletSide;                                  !- Mixer Connection Type
+    SPACE4-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;               !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
@@ -2294,8 +2294,8 @@
     SPACE5-1 Fan Coil,       !- ZoneHVAC Unit Object Name
     SPACE5-1 Fan Coil Inlet, !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
-    SPACE5-1 Air Terminal Mixer Secondary Inlet,!- Mixer Secondary Air Inlet Node Name
-    InletSide;                                  !- Mixer Connection Type
+    SPACE5-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
+    InletSide;               !- Mixer Connection Type
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 ! SPACE1-1 Supply Inlet,   !- Air Distribution Unit Outlet Node Name
@@ -3486,16 +3486,16 @@
     Chilled Water Loop CndW Supply Pump,  !- Name
     Chilled Water Loop CndW Supply Inlet,  !- Inlet Node Name
     Chilled Water Loop CndW Pump Outlet,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0,                       !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !-   ===========  ALL OBJECTS IN CLASS: PUMP:CONSTANTSPEED ===========
@@ -3504,9 +3504,9 @@
     Hot Water Loop HW Supply Pump,  !- Name
     Hot Water Loop HW Supply Inlet,  !- Inlet Node Name
     Hot Water Loop HW Pump Outlet,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0,                       !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type
@@ -3515,9 +3515,9 @@
     Chilled Water Loop ChW Supply Pump,  !- Name
     Chilled Water Loop ChW Supply Inlet,  !- Inlet Node Name
     Chilled Water Loop ChW Pump Outlet,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0,                       !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type

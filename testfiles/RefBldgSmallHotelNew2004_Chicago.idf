@@ -17922,12 +17922,12 @@
     GuestRoom101 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom101 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom101 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -17944,12 +17944,12 @@
     GuestRoom102 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom102 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom102 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -17966,12 +17966,12 @@
     GuestRoom103 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom103 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom103 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -17988,12 +17988,12 @@
     GuestRoom104 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom104 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom104 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18010,12 +18010,12 @@
     GuestRoom105 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom105 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom105 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18032,12 +18032,12 @@
     GuestRoom201 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom201 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom201 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18054,12 +18054,12 @@
     GuestRoom202_205 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom202_205 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom202_205 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18076,12 +18076,12 @@
     GuestRoom206_208 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom206_208 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom206_208 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18098,12 +18098,12 @@
     GuestRoom209_212 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom209_212 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom209_212 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18120,12 +18120,12 @@
     GuestRoom213 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom213 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom213 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18142,12 +18142,12 @@
     GuestRoom214 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom214 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom214 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18164,12 +18164,12 @@
     GuestRoom215_218 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom215_218 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom215_218 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18186,12 +18186,12 @@
     GuestRoom219 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom219 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom219 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18208,12 +18208,12 @@
     GuestRoom220_223 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom220_223 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom220_223 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18230,12 +18230,12 @@
     GuestRoom224 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom224 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom224 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18252,12 +18252,12 @@
     GuestRoom301 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom301 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom301 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18274,12 +18274,12 @@
     GuestRoom302_305 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom302_305 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom302_305 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18296,12 +18296,12 @@
     GuestRoom306_308 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom306_308 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom306_308 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18318,12 +18318,12 @@
     GuestRoom309_312 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom309_312 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom309_312 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18340,12 +18340,12 @@
     GuestRoom313 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom313 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom313 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18362,12 +18362,12 @@
     GuestRoom314 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom314 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom314 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18384,12 +18384,12 @@
     GuestRoom315_318 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom315_318 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom315_318 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18406,12 +18406,12 @@
     GuestRoom319 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom319 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom319 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18428,12 +18428,12 @@
     GuestRoom320_323 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom320_323 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom320_323 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18450,12 +18450,12 @@
     GuestRoom324 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom324 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom324 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18472,12 +18472,12 @@
     GuestRoom401 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom401 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom401 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18494,12 +18494,12 @@
     GuestRoom402_405 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom402_405 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom402_405 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18516,12 +18516,12 @@
     GuestRoom406_408 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom406_408 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom406_408 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18538,12 +18538,12 @@
     GuestRoom409_412 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom409_412 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom409_412 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18560,12 +18560,12 @@
     GuestRoom413 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom413 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom413 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18582,12 +18582,12 @@
     GuestRoom414 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom414 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom414 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18604,12 +18604,12 @@
     GuestRoom415_418 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom415_418 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom415_418 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18626,12 +18626,12 @@
     GuestRoom419 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom419 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom419 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18648,12 +18648,12 @@
     GuestRoom420_423 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom420_423 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom420_423 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -18670,12 +18670,12 @@
     GuestRoom424 PTAC Inlet Node,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     GuestRoom424 PTAC OA mixer,  !- Outdoor Air Mixer Name
-    AUTOSIZE,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    AUTOSIZE,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
+    AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOFF,               !- Supply Air Fan Object Type
     GuestRoom424 PTACFan,    !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -21973,17 +21973,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22012,17 +22012,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22051,17 +22051,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22090,17 +22090,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22129,17 +22129,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22168,17 +22168,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22207,17 +22207,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22246,17 +22246,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22285,17 +22285,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22324,17 +22324,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22363,17 +22363,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -22402,17 +22402,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -24340,7 +24340,7 @@
     PSZ-HEATCOOL:1_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:1_OA-PSZ-HEATCOOL:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:1_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:1_CoolC-PSZ-HEATCOOL:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:1_HeatC-PSZ-HEATCOOL:1_FanNode,  !- Component 3 Outlet Node Name
@@ -24360,7 +24360,7 @@
     PSZ-HEATCOOL:10_CoolC,   !- Component 2 Name
     PSZ-HEATCOOL:10_OA-PSZ-HEATCOOL:10_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:10_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:10_CoolC-PSZ-HEATCOOL:10_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:10_HeatC-PSZ-HEATCOOL:10_FanNode,  !- Component 3 Outlet Node Name
@@ -24380,7 +24380,7 @@
     PSZ-HEATCOOL:11_CoolC,   !- Component 2 Name
     PSZ-HEATCOOL:11_OA-PSZ-HEATCOOL:11_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:11_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:11_CoolC-PSZ-HEATCOOL:11_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:11_HeatC-PSZ-HEATCOOL:11_FanNode,  !- Component 3 Outlet Node Name
@@ -24400,7 +24400,7 @@
     PSZ-HEATCOOL:12_CoolC,   !- Component 2 Name
     PSZ-HEATCOOL:12_OA-PSZ-HEATCOOL:12_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:12_HeatC,   !- Component 3 Name
     PSZ-HEATCOOL:12_CoolC-PSZ-HEATCOOL:12_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:12_HeatC-PSZ-HEATCOOL:12_FanNode,  !- Component 3 Outlet Node Name
@@ -24420,7 +24420,7 @@
     PSZ-HEATCOOL:2_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:2_OA-PSZ-HEATCOOL:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:2_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:2_CoolC-PSZ-HEATCOOL:2_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:2_HeatC-PSZ-HEATCOOL:2_FanNode,  !- Component 3 Outlet Node Name
@@ -24440,7 +24440,7 @@
     PSZ-HEATCOOL:3_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:3_OA-PSZ-HEATCOOL:3_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:3_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:3_CoolC-PSZ-HEATCOOL:3_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:3_HeatC-PSZ-HEATCOOL:3_FanNode,  !- Component 3 Outlet Node Name
@@ -24460,7 +24460,7 @@
     PSZ-HEATCOOL:4_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:4_OA-PSZ-HEATCOOL:4_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:4_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:4_CoolC-PSZ-HEATCOOL:4_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:4_HeatC-PSZ-HEATCOOL:4_FanNode,  !- Component 3 Outlet Node Name
@@ -24480,7 +24480,7 @@
     PSZ-HEATCOOL:5_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:5_OA-PSZ-HEATCOOL:5_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:5_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:5_CoolC-PSZ-HEATCOOL:5_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:5_HeatC-PSZ-HEATCOOL:5_FanNode,  !- Component 3 Outlet Node Name
@@ -24500,7 +24500,7 @@
     PSZ-HEATCOOL:6_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:6_OA-PSZ-HEATCOOL:6_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:6_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:6_CoolC-PSZ-HEATCOOL:6_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:6_HeatC-PSZ-HEATCOOL:6_FanNode,  !- Component 3 Outlet Node Name
@@ -24520,7 +24520,7 @@
     PSZ-HEATCOOL:7_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:7_OA-PSZ-HEATCOOL:7_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:7_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:7_CoolC-PSZ-HEATCOOL:7_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:7_HeatC-PSZ-HEATCOOL:7_FanNode,  !- Component 3 Outlet Node Name
@@ -24540,7 +24540,7 @@
     PSZ-HEATCOOL:8_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:8_OA-PSZ-HEATCOOL:8_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:8_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:8_CoolC-PSZ-HEATCOOL:8_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:8_HeatC-PSZ-HEATCOOL:8_FanNode,  !- Component 3 Outlet Node Name
@@ -24560,7 +24560,7 @@
     PSZ-HEATCOOL:9_CoolC,    !- Component 2 Name
     PSZ-HEATCOOL:9_OA-PSZ-HEATCOOL:9_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-HEATCOOL:9_HeatC,    !- Component 3 Name
     PSZ-HEATCOOL:9_CoolC-PSZ-HEATCOOL:9_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-HEATCOOL:9_HeatC-PSZ-HEATCOOL:9_FanNode,  !- Component 3 Outlet Node Name
@@ -25924,16 +25924,16 @@
     SWHSys1 Pump,            !- Name
     SWHSys1 Supply Inlet Node,  !- Inlet Node Name
     SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 

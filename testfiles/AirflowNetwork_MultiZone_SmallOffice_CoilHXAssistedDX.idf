@@ -2492,7 +2492,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Furnace Heating Coil 1,  !- Coil Name
-    Coil:Heating:Fuel,        !- Coil Object Type
+    Coil:Heating:Fuel,       !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2930,7 +2930,7 @@
     Fan:ConstantVolume,      !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     CoilSystem:Cooling:DX:HeatExchangerAssisted,  !- Cooling Coil Object Type
     Heat Exchanger Assisted Cooling Coil 1,  !- Cooling Coil Name

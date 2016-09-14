@@ -1751,17 +1751,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2810,16 +2810,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -3050,16 +3050,16 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3070,28 +3070,28 @@
     ScheduleNameOnly;        !- Control Option
 
   DemandManagerAssignmentList,
-    Demand Manager,                   !- Name
-    Electricity:Facility,             !- Meter Name
-    Limit Schedule,                   !- Demand Limit Schedule Name
-    1.0,                              !- Demand Limit Safety Fraction
-    ,                                 !- Billing Period Schedule Name
-    ,                                 !- Peak Period Schedule Name
-    15,                               !- Demand Window Length {minutes}
-    SEQUENTIAL,                       !- Demand Manager Priority
-    DemandManager:Ventilation,        !- DemandManager 1 Object Type
-    Ventilation Manager,              !- DemandManager 1 Name
-    DemandManager:ExteriorLights,     !- DemandManager 2 Object Type
-    Ext Lights Manager,               !- DemandManager 2 Name
+    Demand Manager,          !- Name
+    Electricity:Facility,    !- Meter Name
+    Limit Schedule,          !- Demand Limit Schedule Name
+    1.0,                     !- Demand Limit Safety Fraction
+    ,                        !- Billing Period Schedule Name
+    ,                        !- Peak Period Schedule Name
+    15,                      !- Demand Window Length {minutes}
+    SEQUENTIAL,              !- Demand Manager Priority
+    DemandManager:Ventilation,  !- DemandManager 1 Object Type
+    Ventilation Manager,     !- DemandManager 1 Name
+    DemandManager:ExteriorLights,  !- DemandManager 2 Object Type
+    Ext Lights Manager,      !- DemandManager 2 Name
     DemandManager:ElectricEquipment,  !- DemandManager 3 Object Type
-    Eq Mgr Stage 1,                   !- DemandManager 3 Name
+    Eq Mgr Stage 1,          !- DemandManager 3 Name
     DemandManager:ElectricEquipment,  !- DemandManager 4 Object Type
-    Eq Mgr Stage 2,                   !- DemandManager 4 Name
+    Eq Mgr Stage 2,          !- DemandManager 4 Name
     DemandManager:ElectricEquipment,  !- DemandManager 5 Object Type
-    Eq Mgr Stage 3,                   !- DemandManager 5 Name
-    DemandManager:Lights,             !- DemandManager 6 Object Type
-    Lights Manager,                   !- DemandManager 6 Name
-    DemandManager:Thermostats,        !- DemandManager 7 Object Type
-    Thermostats Manager;              !- DemandManager 7 Name
+    Eq Mgr Stage 3,          !- DemandManager 5 Name
+    DemandManager:Lights,    !- DemandManager 6 Object Type
+    Lights Manager,          !- DemandManager 6 Name
+    DemandManager:Thermostats,  !- DemandManager 7 Object Type
+    Thermostats Manager;     !- DemandManager 7 Name
 
   Schedule:Compact,
     Limit Schedule,          !- Name
@@ -3168,32 +3168,43 @@
     ALL,                     !- Selection Control
     ,                        !- Rotation Duration {minutes}
     AllControlledZones Thermostat;  !- Thermostat 1 Name
-    
+
   DemandManager:Ventilation,
-    Ventilation Manager,      !- Name
-    ,                         !- Availability Schedule Name
-    FixedRate,                !- Limit Control
-    60,                       !- Minimum Limit Duration {minutes}
-    0.002,                    !- Fixed Rate {m3/person}
-    ,                         !- Reduction Ratio {% of reduction}
-    ,                         !- Limit Step Change
-    ALL,                      !- Selection Control
-    ,                         !- Rotation Duration {minutes}
-    OA Controller 1;          !- Controller:OutdoorAir Name
+    Ventilation Manager,     !- Name
+    ,                        !- Availability Schedule Name
+    FixedRate,               !- Limit Control
+    60,                      !- Minimum Limit Duration {minutes}
+    0.002,                   !- Fixed Rate {m3/s}
+    ,                        !- Reduction Ratio
+    ,                        !- Limit Step Change
+    ALL,                     !- Selection Control
+    ,                        !- Rotation Duration {minutes}
+    OA Controller 1;         !- Controller Outdoor Air 1 Name
 
   Output:Variable,*,Lights Electric Power,TIMESTEP;
+
   Output:Variable,*,Electric Equipment Electric Power,TIMESTEP;
+
   Output:Variable,*,Chiller Electric Power,TIMESTEP;
+
   Output:Variable,*,Demand Manager Meter Demand Power,TIMESTEP;
-  Output:Variable,*,Demand Manager Scheduled Limit Power,TIMESTEP; 
+
+  Output:Variable,*,Demand Manager Scheduled Limit Power,TIMESTEP;
+
   Output:Variable,*,Fan Electric Power,TIMESTEP;
+
   Output:Variable,*,Exterior Lights Electric Power,TIMESTEP;
+
   Output:Variable,*,Boiler Ancillary Electric Power,TIMESTEP;
+
   Output:Variable,*,Pump Electric Power,TIMESTEP;
+
   Output:Variable,*,Air System Outdoor Air Mass Flow Rate,TIMESTEP;
-  
+
   Output:VariableDictionary,Regular;
+
   Output:Surfaces:Drawing,dxf;
+
   Output:Constructions,Constructions;
 
   OutputControl:Table:Style,
@@ -3236,3 +3247,4 @@
     4.23,                    !- Block 2 Cost per Unit Value or Variable Name
     remaining,               !- Block Size 3 Value or Variable Name
     3.60;                    !- Block 3 Cost per Unit Value or Variable Name
+
