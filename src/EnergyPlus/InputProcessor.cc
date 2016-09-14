@@ -1113,9 +1113,9 @@ namespace EnergyPlus {
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
 		for ( int i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
-			std::string const field = legacy_idd_alphas_fields[ i ];
+			std::string const & field = legacy_idd_alphas_fields[ i ];
 			if ( field == "name" ) {
-				auto const name_iter = object_in_schema->at("name");
+				auto const & name_iter = object_in_schema->at("name");
                 if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
 				} else {
@@ -1128,12 +1128,13 @@ namespace EnergyPlus {
 			}
 			auto it = obj_val.find( field );
 			if ( it != obj_val.end() ) {
-				std::string val;
 				if ( it.value().is_string() ) {
+					std::string val;
 					auto const & schema_field_obj = schema_obj_props[ field ];
+					auto const & find_default = schema_field_obj.find( "default" );
 					if ( it.value().get < std::string >().empty() &&
-					     schema_field_obj.find( "default" ) != schema_field_obj.end() ) {
-						auto const & default_val = schema_field_obj[ "default" ];
+					     find_default != schema_field_obj.end() ) {
+						auto const & default_val = find_default.value();
 						if ( default_val.is_string() ) {
 							val = default_val.get < std::string >();
 						} else {
@@ -1178,7 +1179,7 @@ namespace EnergyPlus {
 				auto const & jdf_extension_obj = it.value();
 
 				for ( auto i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
-					std::string const field_name = legacy_idd_alphas_extensions[ i ];
+					std::string const & field_name = legacy_idd_alphas_extensions[ i ];
 					auto const & jdf_obj_field_iter = jdf_extension_obj.find( field_name );
 
 					if ( jdf_obj_field_iter != jdf_extension_obj.end() ) {
@@ -1230,7 +1231,7 @@ namespace EnergyPlus {
 
 		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
 		for ( int i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
-			std::string const field = legacy_idd_numerics_fields[ i ];
+			std::string const & field = legacy_idd_numerics_fields[ i ];
 			auto it = obj.value().find( field );
 			if ( it != obj.value().end() ) {
 				if ( !it.value().is_string() ) {
@@ -1272,7 +1273,7 @@ namespace EnergyPlus {
 				auto const & jdf_extension_obj = it.value();
 
 				for ( auto i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
-					std::string const field = legacy_idd_numerics_extensions[ i ];
+					std::string const & field = legacy_idd_numerics_extensions[ i ];
                     auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
 
 					if ( jdf_extension_field_iter != jdf_extension_obj.end() ) {
