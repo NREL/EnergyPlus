@@ -65,9 +65,12 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SwimmingPool;
+using namespace EnergyPlus::DataSurfaces;
 
 TEST_F( EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow )
 {
@@ -84,4 +87,49 @@ TEST_F( EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow )
 	EXPECT_EQ( -180, MakeUpWaterVolFunct( -9, .05 ) );
 	EXPECT_NE( 10, MakeUpWaterVolFunct( 10, 0.01 ) );
 
+}
+
+TEST_F( EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap )
+{
+	int SurfNum;
+	int PoolNum;
+	Real64 MAT;
+	Real64 HumRat;
+	Real64 EvapRate;
+	
+	// Tests for CalcSwimmingPoolEvap--Evaporate Rate Calculation for Swimming Pools
+	SwimmingPool::clear_state();
+	DataSurfaces::clear_state();
+
+	NumSwimmingPools = 1;
+	Pool.allocate( 1 );
+	DataSurfaces::Surface.allocate( 1 );
+	Surface( 1 ).Area = 10.0;
+	SurfNum = 1;
+	PoolNum = 1;
+	DataEnvironment::OutBaroPress = 101400.0;
+	
+	// Test 1
+	Pool( PoolNum ).PoolWaterTemp = 30.0;
+	MAT = 20.0;
+	HumRat = 0.005;
+	Pool( PoolNum ).CurActivityFactor = 0.5;
+	Pool( PoolNum ).CurCoverEvapFac = 0.3;
+	CalcSwimmingPoolEvap( EvapRate, PoolNum, SurfNum, MAT, HumRat );
+	EXPECT_NEAR( 0.000207, EvapRate, 0.000001 );
+	EXPECT_NEAR( 4250.0, Pool( PoolNum ).SatPressPoolWaterTemp, 10.0 );
+	EXPECT_NEAR( 810.0, Pool( PoolNum ).PartPressZoneAirTemp, 10.0 );
+
+	// Test 2
+	Pool( PoolNum ).PoolWaterTemp = 27.0;
+	MAT = 22.0;
+	HumRat = 0.010;
+	Pool( PoolNum ).CurActivityFactor = 1.0;
+	Pool( PoolNum ).CurCoverEvapFac = 1.0;
+	CalcSwimmingPoolEvap( EvapRate, PoolNum, SurfNum, MAT, HumRat );
+	EXPECT_NEAR( 0.000788, EvapRate, 0.000001 );
+	EXPECT_NEAR( 3570.0, Pool( PoolNum ).SatPressPoolWaterTemp, 10.0 );
+	EXPECT_NEAR( 1600.0, Pool( PoolNum ).PartPressZoneAirTemp, 10.0 );
+	
+	
 }

@@ -862,12 +862,7 @@ namespace SwimmingPool {
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZoneAirHumRat;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataConversions::CFA;
-		using DataConversions::CFMF;
-		using Psychrometrics::PsyPsatFnTemp;
-		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyHfgAirFnWTdb;
-		using DataEnvironment::OutBaroPress;
 		using DataHeatBalance::QRadThermInAbs;
 		using DataHeatBalSurface::NetLWRadToSurf;
 		using DataHeatBalFanSys::QHTRadSysSurf;
@@ -895,7 +890,6 @@ namespace SwimmingPool {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcSwimmingPool" );
-		static Real64 const CFinHg( 0.00029613 ); // Multiple pressure in Pa by this constant to get inches of Hg
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -907,8 +901,6 @@ namespace SwimmingPool {
 		Real64 HConvIn; // convection coefficient for pool
 		Real64 EvapRate; // evaporation rate for pool in kg/s
 		Real64 EvapEnergyLossPerArea; // energy effect of evaporation rate per unit area in W/m2
-		Real64 PSatPool; // saturation pressure at pool water temperature
-		Real64 PParAir; // partial pressure of vapor of zone air
 		int ZoneNum; // index to zone array
 		Real64 LWtotal; // total flux from long-wavelength radiation to surface
 		Real64 LWsum; // summation of all long-wavelenth radiation going to surface
@@ -937,16 +929,7 @@ namespace SwimmingPool {
 		// Convection coefficient calculation
 		HConvIn = 0.22 * std::pow( abs( Pool( PoolNum ).PoolWaterTemp - MAT( ZoneNum ) ), 1.0 / 3.0 ) * Pool( PoolNum ).CurCoverConvFac;
 
-		// Evaporation calculation:
-		// Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
-		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
-		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
-		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
-		PParAir = PsyPsatFnTemp( MAT( ZoneNum ), RoutineName ) * PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
-		if ( PSatPool < PParAir ) PSatPool = PParAir;
-		Pool( PoolNum ).SatPressPoolWaterTemp = PSatPool;
-		Pool( PoolNum ).PartPressZoneAirTemp = PParAir;
-		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
+		CalcSwimmingPoolEvap( EvapRate, PoolNum, SurfNum, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) );
 		Pool( PoolNum ).MakeUpWaterMassFlowRate = EvapRate;
 		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
 		Pool( PoolNum ).EvapHeatLossRate = EvapEnergyLossPerArea * Surface( SurfNum ).Area;
@@ -1000,6 +983,42 @@ namespace SwimmingPool {
 		SumLatentPool( ZoneNum ) += EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) );
 	}
 
+	void
+	CalcSwimmingPoolEvap(
+		Real64 & EvapRate, // evaporation rate of pool
+		int const PoolNum, // pool index
+		int const SurfNum, // surface index
+		Real64 const MAT,  // mean air temperature
+		Real64 const HumRat // zone air humidity ratio
+	)
+	{
+
+		using Psychrometrics::PsyPsatFnTemp;
+		using Psychrometrics::PsyRhFnTdbWPb;
+		using DataEnvironment::OutBaroPress;
+		using DataConversions::CFA;
+		using DataConversions::CFMF;
+		
+		static std::string const RoutineName( "CalcSwimmingPoolEvap" );
+		static Real64 const CFinHg( 0.00029613 ); // Multiple pressure in Pa by this constant to get inches of Hg
+
+		Real64 PSatPool;
+		Real64 PParAir;
+		
+		// Evaporation calculation:
+		// Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
+		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
+		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
+		
+		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
+		PParAir = PsyPsatFnTemp( MAT, RoutineName ) * PsyRhFnTdbWPb( MAT, HumRat, OutBaroPress );
+		if ( PSatPool < PParAir ) PSatPool = PParAir;
+		Pool( PoolNum ).SatPressPoolWaterTemp = PSatPool;
+		Pool( PoolNum ).PartPressZoneAirTemp = PParAir;
+		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
+
+	}
+	
 	void
 	UpdateSwimmingPool(
 		int const PoolNum // number of the swimming pool

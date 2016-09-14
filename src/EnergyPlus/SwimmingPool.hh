@@ -248,6 +248,14 @@ namespace SwimmingPool {
 		int const PoolNum // Index of the swimming pool under consideration within the derived types
 	);
 
+	void CalcSwimmingPoolEvap(
+		Real64 & EvapRate, // Evaporation rate
+		int const PoolNum, // Pool index
+		int const SurfNum, // Surface index
+		Real64 const MAT, // mean air temperature
+		Real64 const HumRat // zone air humidity ratio
+	);
+	
 	void
 	UpdateSwimmingPool(
 		int const PoolNum // Index of the swimming pool under consideration within the derived types
