@@ -143,6 +143,8 @@ namespace SwimmingPool {
 		Real64 PeopleHeatGain; // Current heat gain from people
 		int GlycolIndex; // index in fluid property routines for water
 		Real64 WaterMass; // pool water mass
+		Real64 SatPressPoolWaterTemp; // Saturation pressure at the pool water temperature
+		Real64 PartPressZoneAirTemp; // Partial pressure of water vapor in the air
 		// Report data
 		Real64 PoolWaterTemp; // Average pool water temperature
 		Real64 WaterInletTemp; // water inlet temperature
@@ -198,6 +200,8 @@ namespace SwimmingPool {
 			PeopleHeatGain( 0.0 ),
 			GlycolIndex( 0 ),
 			WaterMass( 0.0 ),
+			SatPressPoolWaterTemp( 0.0 ),
+			PartPressZoneAirTemp( 0.0 ),
 			PoolWaterTemp( 23.0 ),
 			WaterInletTemp( 0.0 ),
 			WaterOutletTemp( 0.0 ),

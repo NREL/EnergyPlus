@@ -574,6 +574,12 @@ namespace SwimmingPool {
 			SetupOutputVariable( "Indoor Pool Current Cover Factor []", Pool( Item ).CurCoverSchedVal, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Rate [W]", Pool( Item ).EvapHeatLossRate, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Energy [J]", Pool( Item ).EvapEnergyLoss, "System", "Sum", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Saturation Pressure at Pool Temperature [Pa]", Pool( Item ).SatPressPoolWaterTemp, "System", "Average", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Partial Pressure of Water Vapor in Air [Pa]", Pool( Item ).PartPressZoneAirTemp, "System", "Average", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Current Cover Evaporation Factor []", Pool( Item ).CurCoverEvapFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover Convective Factor []", Pool( Item ).CurCoverConvFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover SW Radiation Factor []", Pool( Item ).CurCoverSWRadFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover LW Radiation Factor []", Pool( Item ).CurCoverLWRadFac, "System", "Average", Pool( Item ).Name );
 		}
 
 	}
@@ -854,7 +860,7 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using DataHeatBalFanSys::MAT;
-		using DataHeatBalFanSys::ZoneAirHumRatAvg;
+		using DataHeatBalFanSys::ZoneAirHumRat;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataConversions::CFA;
 		using DataConversions::CFMF;
@@ -936,11 +942,13 @@ namespace SwimmingPool {
 		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
 		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
 		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
-		PParAir = PsyPsatFnTemp( MAT( ZoneNum ), RoutineName ) * PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRatAvg( ZoneNum ), OutBaroPress );
+		PParAir = PsyPsatFnTemp( MAT( ZoneNum ), RoutineName ) * PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
 		if ( PSatPool < PParAir ) PSatPool = PParAir;
+		Pool( PoolNum ).SatPressPoolWaterTemp = PSatPool;
+		Pool( PoolNum ).PartPressZoneAirTemp = PParAir;
 		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
 		Pool( PoolNum ).MakeUpWaterMassFlowRate = EvapRate;
-		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
+		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
 		Pool( PoolNum ).EvapHeatLossRate = EvapEnergyLossPerArea * Surface( SurfNum ).Area;
 		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
 		// to the air directly and added to the zone air heat balance
@@ -989,7 +997,7 @@ namespace SwimmingPool {
 
 		// Finally take care of the latent and convective gains resulting from the pool
 		SumConvPool( ZoneNum ) += Pool( PoolNum ).RadConvertToConvect;
-		SumLatentPool( ZoneNum ) += EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) );
+		SumLatentPool( ZoneNum ) += EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) );
 	}
 
 	void
