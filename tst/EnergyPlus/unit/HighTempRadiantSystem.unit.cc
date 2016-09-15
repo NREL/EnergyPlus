@@ -56,18 +56,86 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+// EnergyPlus::Low Temperature Radiant Unit Tests
 
-//#define TIMER_CPU_TIME
-#define TIMER_F90_EPTIME
+// Google Test Headers
+#include <gtest/gtest.h>
 
-#if defined(TIMER_F90_EPTIME)
-#  define TSTART(x) x=epelapsedtime()
-#  define TSTOP(x)  x=epelapsedtime()
-#  define TSTAMP(x) x=epelapsedtime()
-#elif defined(TIMER_CPU_TIME)
-#  define TSTART(x) CPU_TIME(x)
-#  define TSTOP(x)  CPU_TIME(x)
-#  define TSTAMP(x) CPU_TIME(x)
-#else
-  NEED_TO_SPECIFY_TIMER
-#endif
+// EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <ObjexxFCL/gio.hh>
+
+
+using namespace EnergyPlus;
+using namespace EnergyPlus::HighTempRadiantSystem;
+using namespace ObjexxFCL;
+using namespace EnergyPlus::DataHeatBalance;
+using namespace DataGlobals;
+using namespace EnergyPlus::DataSurfaces;
+
+
+namespace EnergyPlus {
+	
+	TEST_F( EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem )
+	{
+
+		bool ErrorsFound;
+	
+		std::string const idf_objects = delimited_string( {
+		    "  ZoneHVAC:HighTemperatureRadiant,",
+			"    ZONERADHEATER,           !- Name",
+			"    ,                        !- Availability Schedule Name",
+			"	 ZONE1,                   !- Zone Name",
+			"	 HeatingDesignCapacity,   !- Heating Design Capacity Method",
+			"	 10000,                   !- Heating Design Capacity {W}",
+			"	 ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+			"	 ,                        !- Fraction of Autosized Heating Design Capacity",
+			"	 Electricity,             !- Fuel Type",
+			"	 1.0,                     !- Combustion Efficiency",
+			"	 0.80,                    !- Fraction of Input Converted to Radiant Energy",
+			"	 0.00,                    !- Fraction of Input Converted to Latent Energy",
+			"	 0.00,                    !- Fraction of Input that Is Lost",
+			"	 MeanAirTemperature,      !- Temperature Control Type",
+			"	 2.0,                     !- Heating Throttling Range {deltaC}",
+			"	 Radiant Heating Setpoints, !- Heating Setpoint Temperature Schedule Name",
+			"	 0.04,                    !- Fraction of Radiant Energy Incident on People",
+			"	 WALL1,                   !- Surface 1 Name",
+			"	 0.80;                    !- Fraction of Radiant Energy to Surface 1",
+		} );
+		
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		Zone.allocate( 1 );
+		Zone( 1 ).Name = "ZONE1";
+		Surface.allocate( 1 );
+		Surface( 1 ).Name = "WALL1";
+		Surface( 1 ).Zone = 1;
+	
+		ErrorsFound = false;
+
+		GetHighTempRadiantSystem( ErrorsFound );
+
+		std::string const error_string01 = delimited_string( {
+			"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",
+   			"   **   ~~~   ** Occurs for ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER",
+			"   ** Severe  ** Fraction of radiation distributed to surfaces and people sums up to less than 1 for ZONERADHEATER",
+			"   **   ~~~   ** This would result in some of the radiant energy delivered by the high temp radiant heater being lost.",
+			"   **   ~~~   ** The sum of all radiation fractions to surfaces = 0.80000",
+			"   **   ~~~   ** The radiant fraction to people = 4.00000E-002",
+			"   **   ~~~   ** So, all radiant fractions including surfaces and people = 0.84000",
+			"   **   ~~~   ** This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = 0.16000",
+			"   **   ~~~   ** Please check and correct this so that all radiant energy is accounted for in ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER"
+			} );
+	
+		EXPECT_TRUE( compare_err_stream( error_string01, true ) );
+		EXPECT_TRUE( ErrorsFound );
+
+	}
+
+}
+

@@ -794,15 +794,6 @@ ConvergenceLimits,
        \default 8
        \minimum 2
 
-ProgramControl,
-       \memo used to support various efforts in time reduction for simulation including threading
-       \memo This object is currently disabled
-  N1 ; \field Number of Threads Allowed
-       \type integer
-       \minimum 0
-       \note This is currently used only in the Interior Radiant Exchange module -- view factors on # surfaces
-       \note if value is 0, then maximum number allowed will be used.
-
 \group Compliance Objects
 
 Compliance:Building,
