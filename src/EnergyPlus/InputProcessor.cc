@@ -178,6 +178,11 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	auto const & schema_dot_star = schema_patternProperties[ ".*" ];
 	auto const & schema_obj_props = schema_dot_star[ "properties" ];
 
+	json const * schema_obj_extensions = nullptr;
+    if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
+		schema_obj_extensions = & schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
+	}
+
 	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
 
     index += 1;
@@ -194,14 +199,12 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				int ext_size = 0;
 				if ( legacy_idd_index < legacy_idd_fields_array.size() ) {
 					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-//					add_missing_field_value( field_name, root, extensible, schema_obj_loc, legacy_idd, legacy_idd_index );
                     root[ field_name ] = "";
 				} else {
                     auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
 					ext_size = static_cast<int>( legacy_idd_extensibles_array.size() );
 					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
 					extensible_index++;
-//					add_missing_field_value( field_name, root, extensible, schema_obj_loc, legacy_idd, legacy_idd_index );
                     extensible[ field_name ] = "";
 				}
 				if ( ext_size && extensible_index % ext_size == 0 ) {
@@ -219,7 +222,6 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				}
                 for (; legacy_idd_index < min_fields; legacy_idd_index++) {
 					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-//					add_missing_field_value(name, root, extensible, schema_obj_loc, legacy_idd, legacy_idd_index);
                     root[ field_name ] = "";
 				}
 				if ( extensible.size() ) {
@@ -238,8 +240,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
 			auto const size = legacy_idd_extensibles_array.size();
 			std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % size ];
-			auto const val = parse_value( idf, index, success,
-			                        schema_obj_props[ "extensions" ][ "items" ][ "properties" ][ field_name ] );
+			auto const val = parse_value( idf, index, success, schema_obj_extensions->at( field_name ) );
 			extensible[ field_name ] = std::move( val );
 			was_value_parsed = true;
 			extensible_index++;
@@ -250,18 +251,6 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		} else {
 			was_value_parsed = true;
 			std::string const & field = legacy_idd_fields_array[ legacy_idd_index ];
-//			auto it = schema_obj_loc.find( "patternProperties" );
-//			if ( it == schema_obj_loc.end() ) {
-//				if ( schema_obj_loc.find( "properties" ) != schema_obj_loc.end() ) {
-//					auto const val = parse_value( idf, index, success, schema_obj_loc[ "properties" ][ field ] );
-//					root[ field ] = std::move( val );
-//				} else {
-//                    u64toa( cur_line_num, s );
-//					EnergyPlus::ShowWarningMessage( "Field " + field + " was not found at line " + s );
-//				}
-//				legacy_idd_index++;
-//				continue;
-//			}
 			auto const & find_field_iter = schema_obj_props.find( field );
 			if ( find_field_iter == schema_obj_props.end() ) {
 				if ( field == "name" ) {
