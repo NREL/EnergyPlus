@@ -482,11 +482,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
                 OutArgs=InArgs
                 IF (SameString(InArgs(16), 'REVERSE')) THEN
-                  IF ( (.NOT. SameString(InArgs(17),'')) .OR. (.NOT.
-                  SameString(InArgs(18),''))  ) THEN
+                  IF ( (.NOT. SameString(InArgs(17),'')) .OR. (.NOT. SameString(InArgs(18),''))  ) THEN
                     OutArgs(16)='ReverseWithLimits'
-                  END IF 
-                END IF          
+                  END IF
+                END IF
 
             CASE('BRANCH')
                 ObjectName='Branch'
