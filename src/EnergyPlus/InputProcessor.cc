@@ -236,7 +236,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			auto const size = legacy_idd_extensibles_array.size();
 			std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % size ];
 			auto const val = parse_value( idf, index, success,
-			                        schema_obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field_name ] );
+			                        schema_obj_props[ "extensions" ][ "items" ][ "properties" ][ field_name ] );
 			extensible[ field_name ] = std::move( val );
 			was_value_parsed = true;
 			extensible_index++;
@@ -283,13 +283,20 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 
 void IdfParser::add_missing_field_value( std::string const & field_name, json & root, json & extensible, json const & obj_loc,
                                          json const & loc, int legacy_idd_index ) {
+	// This can be changed significantly by passing only the json object you are going to modify in, i.e. root or
+	// extensible, and pass only the currect object location in as well, either the whole
+	// patternProperties->.*->properties thing or the extensions->items->properties thing, this way you can get rid of a
+	// lot of if statements as well as map lookups, also patternProperties is ALWAYS there now bc we removed the special
+	// casing of the version object which did not contain patternProperties
 	json const * tmp;
 	int ext_size = 0;
 	if ( obj_loc.find( "patternProperties" ) != obj_loc.end() ) {
 		tmp = & obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
-	} else if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
-		tmp = & obj_loc[ "properties" ][ field_name ];
 	}
+
+//	else if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
+//		tmp = & obj_loc[ "properties" ][ field_name ];
+//	}
 	if ( legacy_idd_index >= loc[ "fields" ].size() ) {
 		tmp = & tmp->at( "extensions" )[ "items" ][ "properties" ];
 		ext_size = static_cast<int>(loc[ "extensibles" ].size());
