@@ -1885,6 +1885,7 @@ namespace FanCoilUnits {
 		Real64 HWFlowBypass; // hot water bypassed mass flow rate [kg/s]
 		bool ColdFlowLocked; // if true cold water flow is locked
 		bool HotFlowLocked; // if true Hot water flow is locked
+
 		// FLOW
 		FanElecPower = 0.0;
 		// initialize local variables
@@ -1924,6 +1925,15 @@ namespace FanCoilUnits {
 
 			if ( AirMassFlow < SmallMassFlow ) UnitOn = false;
 			// zero the hot & cold water flows
+
+			// first find out what the no water flow (coil off) air-side capacity is to use to offset zone load
+			Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = 0.0;
+			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
+				Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = 0.0;
+			}
+			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
+
+			// then set water coil flow rate properly given what the plant thinks the flow should be
 			mdot = 0.0;
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
 			if ( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).LoopSide( FanCoil( FanCoilNum ).CWLoopSide ).FlowLock == FlowLocked ) {
@@ -1936,17 +1946,13 @@ namespace FanCoilUnits {
 					HotFlowLocked = true; // save locked flow
 				}
 			}
-			// obtain unit output with no active heating/cooling
-			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
-			if ( ! ColdFlowLocked && ! HotFlowLocked ) {
-				FanCoil( FanCoilNum ).QUnitOutNoHC = QUnitOutNoHC;
-			}
-			else {
-				QUnitOutNoHC = FanCoil( FanCoilNum ).QUnitOutNoHC;
-			}
-			// get the loads at the coils
+
+			// then calculate the loads at the coils
 			QCoilHeatSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP - QUnitOutNoHC;
 			QCoilCoolSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP - QUnitOutNoHC;
+
+			// finally, obtain unit output using plant dictated flow rates in case no operation is needed (i.e., code falls through to ELSE block below where QUnitOut = QUnitOutNoHC)
+			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 );
 
 			// if cooling
 			if ( UnitOn && QCoilCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
