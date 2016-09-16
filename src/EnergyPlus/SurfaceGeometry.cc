@@ -10052,7 +10052,7 @@ namespace SurfaceGeometry {
 				Triangle2( 3 ) = vertex( 4 );
 
 				// get total Area of quad.
-				Real64 const TotalArea( surface.GrossArea );
+				Real64 TotalArea( surface.GrossArea );
 				if ( TotalArea <= 0.0 ) {
 					//catch a problem....
 					ShowWarningError( "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name );
@@ -10060,8 +10060,28 @@ namespace SurfaceGeometry {
 				}
 
 				// get area fraction of triangles.
-				Real64 const Tri1Area( AreaPolygon( 3, Triangle1 ) / TotalArea );
-				Real64 const Tri2Area( AreaPolygon( 3, Triangle2 ) / TotalArea );
+				Real64 Tri1Area( AreaPolygon( 3, Triangle1 ) / TotalArea );
+				Real64 Tri2Area( AreaPolygon( 3, Triangle2 ) / TotalArea );
+
+				// check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex quadralateral using the wrong two triangles
+				if ( (Tri1Area + Tri2Area) > 1.05 ) {
+
+					// if so repeat the process with the other two possible triangles (notice the vertices are in a different order this time)
+					// split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+					Triangle1( 1 ) = vertex( 1 );
+					Triangle1( 2 ) = vertex( 2 );
+					Triangle1( 3 ) = vertex( 4 );
+					Triangle2( 1 ) = vertex( 2 );
+					Triangle2( 2 ) = vertex( 3 );
+					Triangle2( 3 ) = vertex( 4 );
+
+					// get area fraction of triangles.
+					Real64 AreaTriangle1 = AreaPolygon( 3, Triangle1 );
+					Real64 AreaTriangle2 = AreaPolygon( 3, Triangle2 );
+					TotalArea = AreaTriangle1 + AreaTriangle2;
+					Tri1Area = AreaTriangle1 / TotalArea;
+					Tri2Area = AreaTriangle2 / TotalArea;
+				}
 
 				// get centroid of Triangle 1
 				Vector cen1( cen( Triangle1( 1 ), Triangle1( 2 ), Triangle1( 3 ) ) );
