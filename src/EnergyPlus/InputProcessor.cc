@@ -30,7 +30,9 @@ IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
 State EnergyPlus::InputProcessor::state = State();
 char EnergyPlus::InputProcessor::s[] = { 0 };
 std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
-std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > > EnergyPlus::InputProcessor::jdf_jdd_cache_map = std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > >();
+std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > >
+		EnergyPlus::InputProcessor::jdd_jdf_cache_map =
+		std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > ();
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
@@ -880,7 +882,7 @@ namespace EnergyPlus {
 		state.errors.clear();
 		state.warnings.clear();
 		jdf.clear();
-		jdf_jdd_cache_map.clear();
+		jdd_jdf_cache_map.clear();
 		EchoInputFile = 0;
 		echo_stream = nullptr;
 	}
@@ -941,20 +943,21 @@ namespace EnergyPlus {
 
 	void
 	InputProcessor::InitializeCacheMap() {
-		jdf_jdd_cache_map.clear();
+		jdd_jdf_cache_map.clear();
+		jdd_jdf_cache_map.reserve( jdf.size() );
+		auto const & schema_properties = schema[ "properties" ];
 
-		auto const & schema_properties = InputProcessor::schema.at( "properties" );
-		jdf_jdd_cache_map.reserve( InputProcessor::jdf.size() );
+		for (auto jdf_iter = jdf.begin(); jdf_iter != jdf.end(); jdf_iter++) {
 
-		for ( json::const_iterator jdf_obj_it = jdf.begin(); jdf_obj_it != jdf.end(); ++jdf_obj_it ) {
-			auto const & val = jdf_obj_it.value();
-			json::const_iterator jdd_it = schema_properties.find( jdf_obj_it.key() );
-			std::vector< std::pair< json::const_iterator, json::const_iterator > > iterator_vector;
-			iterator_vector.reserve( jdf_obj_it->size() );
-			for ( json::const_iterator jdf_it = val.begin(); jdf_it != val.end(); ++jdf_it ) {
-				iterator_vector.emplace_back( jdf_it, jdd_it );
+			auto const & objects = jdf_iter.value();
+			std::vector < json::const_iterator > jdf_obj_iterators_vec;
+			jdf_obj_iterators_vec.reserve( objects.size() );
+			for (auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); jdf_obj_iter++) {
+				jdf_obj_iterators_vec.emplace_back(jdf_obj_iter);
 			}
-			jdf_jdd_cache_map[ jdf_obj_it.key() ] = std::move( iterator_vector );
+			auto const & schema_iter = schema_properties.find( jdf_iter.key() );
+			auto pair = std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) );
+			jdd_jdf_cache_map[ schema_iter.key() ] = pair;
 		}
 	}
 
@@ -1091,14 +1094,14 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-		auto find_iterators = jdf_jdd_cache_map.find( Object );
-		if ( find_iterators == jdf_jdd_cache_map.end() ) {
+		auto find_iterators = jdd_jdf_cache_map.find( Object );
+		if ( find_iterators == jdd_jdf_cache_map.end() ) {
 			auto const tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
 			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
 			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
-			find_iterators = jdf_jdd_cache_map.find( tmp_umit->second );
+			find_iterators = jdd_jdf_cache_map.find( tmp_umit->second );
 		}
 
 		NumAlphas = 0;
@@ -1109,8 +1112,8 @@ namespace EnergyPlus {
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
 
-		auto const & jdf_it = find_iterators->second.at( Number - 1 ).first;
-		auto const & jdd_it = find_iterators->second.at( Number - 1 ).second;
+		auto const & jdf_it = find_iterators->second.second[ Number - 1 ];
+		auto const & jdd_it = find_iterators->second.first;
 		auto const & jdd_it_val = jdd_it.value();
 
         // Locations in JSON schema relating to normal fields

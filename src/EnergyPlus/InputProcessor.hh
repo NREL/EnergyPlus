@@ -174,7 +174,7 @@ namespace EnergyPlus {
 	class InputProcessor {
 	private:
 		static char s[ 129 ];
-		static std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > > jdf_jdd_cache_map;
+		static std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > jdd_jdf_cache_map;
 
 	public:
 		static IdfParser idf_parser;
