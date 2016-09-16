@@ -289,9 +289,6 @@ void IdfParser::add_missing_field_value( std::string const & field_name, json & 
 		tmp = & obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
 	}
 
-//	else if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
-//		tmp = & obj_loc[ "properties" ][ field_name ];
-//	}
 	if ( legacy_idd_index >= loc[ "fields" ].size() ) {
 		tmp = & tmp->at( "extensions" )[ "items" ][ "properties" ];
 		ext_size = static_cast<int>(loc[ "extensibles" ].size());
@@ -945,19 +942,19 @@ namespace EnergyPlus {
 	InputProcessor::InitializeCacheMap() {
 		jdd_jdf_cache_map.clear();
 		jdd_jdf_cache_map.reserve( jdf.size() );
-		auto const & schema_properties = schema[ "properties" ];
+		auto const & schema_properties = schema.at( "properties" );
 
-		for (auto jdf_iter = jdf.begin(); jdf_iter != jdf.end(); jdf_iter++) {
-
+		for ( auto jdf_iter = jdf.begin(); jdf_iter != jdf.end(); ++jdf_iter ) {
 			auto const & objects = jdf_iter.value();
 			std::vector < json::const_iterator > jdf_obj_iterators_vec;
 			jdf_obj_iterators_vec.reserve( objects.size() );
-			for (auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); jdf_obj_iter++) {
-				jdf_obj_iterators_vec.emplace_back(jdf_obj_iter);
+			for ( auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); ++jdf_obj_iter ) {
+				jdf_obj_iterators_vec.emplace_back( jdf_obj_iter );
 			}
 			auto const & schema_iter = schema_properties.find( jdf_iter.key() );
-			auto pair = std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) );
-			jdd_jdf_cache_map[ schema_iter.key() ] = pair;
+			// auto pair = std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) );
+			// jdd_jdf_cache_map[ schema_iter.key() ] = pair;
+			jdd_jdf_cache_map.emplace( schema_iter.key(), std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) ) );
 		}
 	}
 
@@ -1112,7 +1109,7 @@ namespace EnergyPlus {
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
 
-		auto const & jdf_it = find_iterators->second.second[ Number - 1 ];
+		auto const & jdf_it = find_iterators->second.second.at( Number - 1 );
 		auto const & jdd_it = find_iterators->second.first;
 		auto const & jdd_it_val = jdd_it.value();
 
