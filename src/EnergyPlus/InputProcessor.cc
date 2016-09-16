@@ -30,6 +30,7 @@ IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
 State EnergyPlus::InputProcessor::state = State();
 char EnergyPlus::InputProcessor::s[] = { 0 };
 std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
+std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > > EnergyPlus::InputProcessor::jdf_jdd_cache_map = std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > >();
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
@@ -879,6 +880,7 @@ namespace EnergyPlus {
 		state.errors.clear();
 		state.warnings.clear();
 		jdf.clear();
+		jdf_jdd_cache_map.clear();
 		EchoInputFile = 0;
 		echo_stream = nullptr;
 	}
@@ -938,6 +940,27 @@ namespace EnergyPlus {
 	}
 
 	void
+	InputProcessor::InitializeCacheMap() {
+		jdf_jdd_cache_map.clear();
+
+		auto const & schema_properties = InputProcessor::schema.at( "properties" );
+		jdf_jdd_cache_map.reserve( InputProcessor::jdf.size() );
+
+		for ( json::const_iterator jdf_obj_it = jdf.begin(); jdf_obj_it != jdf.end(); ++jdf_obj_it ) {
+			auto const & val = jdf_obj_it.value();
+			json::const_iterator jdd_it = schema_properties.find( jdf_obj_it.key() );
+			std::vector< std::pair< json::const_iterator, json::const_iterator > > iterator_vector;
+			iterator_vector.reserve( jdf_obj_it->size() );
+			for ( json::const_iterator jdf_it = val.begin(); jdf_it != val.end(); ++jdf_it ) {
+				iterator_vector.emplace_back( jdf_it, jdd_it );
+			}
+			if ( !jdf_obj_it->size() || iterator_vector.empty() )
+				assert( false );
+			jdf_jdd_cache_map[ jdf_obj_it.key() ] = std::move( iterator_vector );
+		}
+	}
+
+	void
 	InputProcessor::ProcessInput() {
 		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {
@@ -975,6 +998,8 @@ namespace EnergyPlus {
 //		ofs << encoded << std::endl;
 //		std::ofstream ofs("json_dump.json", std::ofstream::out);
 //		ofs << InputProcessor::jdf.dump(4) << std::endl;
+
+		InitializeCacheMap();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -1068,28 +1093,14 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-		json * object_in_jdf;
-		if ( jdf.find( Object ) == jdf.end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
+		auto find_iterators = jdf_jdd_cache_map.find( Object );
+		if ( find_iterators == jdf_jdd_cache_map.end() ) {
+			auto const tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
 			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
 			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
-			object_in_jdf = &jdf[ tmp_umit->second ];
-		} else {
-			object_in_jdf = &jdf[ Object ];
-		}
-
-		json * object_in_schema = &schema[ "properties" ];
-		if ( object_in_schema->find( Object ) == object_in_schema->end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
-				ShowWarningError( "Did not find object " + Object + " in schema" );
-				return;
-			}
-			object_in_schema = & (*object_in_schema)[ tmp_umit->second ];
-		} else {
-			object_in_schema = & (*object_in_schema)[ Object ];
+			find_iterators = jdf_jdd_cache_map.find( tmp_umit->second );
 		}
 
 		NumAlphas = 0;
@@ -1100,27 +1111,30 @@ namespace EnergyPlus {
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
 
+		auto const & jdf_it = find_iterators->second.at( Number - 1 ).first;
+		auto const & jdd_it = find_iterators->second.at( Number - 1 ).second;
+		auto const & jdd_it_val = jdd_it.value();
+
         // Locations in JSON schema relating to normal fields
-		auto const & schema_patternProperties = object_in_schema->at( "patternProperties" );
-		auto const & schema_dot_star = schema_patternProperties[ ".*" ];
-		auto const & schema_obj_props = schema_dot_star[ "properties" ];
+		auto const & schema_obj_props = jdd_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
 
 		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
-		auto const & legacy_idd = object_in_schema->at( "legacy_idd" );
+		auto const & legacy_idd = jdd_it_val[ "legacy_idd" ];
 		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
 		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
+		auto const & schema_name_field = jdd_it_val.find( "name" );
 
 
 		Alphas = "";
 		Numbers = 0;
 
-		auto const & obj = object_in_jdf->begin() + Number - 1;
+		auto const & obj = jdf_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
 		for ( int i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_alphas_fields[ i ];
-			if ( field == "name" ) {
-				auto const & name_iter = object_in_schema->at("name");
+			if ( field == "name" && schema_name_field != jdd_it_val.end() ) {
+				auto const & name_iter = schema_name_field.value();
                 if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
 				} else {

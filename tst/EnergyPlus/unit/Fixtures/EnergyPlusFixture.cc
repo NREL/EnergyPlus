@@ -578,6 +578,7 @@ namespace EnergyPlus {
 					}
 			};
 		}
+		InputProcessor::InitializeCacheMap();
 		InputProcessor::InitFiles();
 		SimulationManager::PostIPProcessing();
 		InputProcessor::state.print_errors();

@@ -174,6 +174,7 @@ namespace EnergyPlus {
 	class InputProcessor {
 	private:
 		static char s[ 129 ];
+		static std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > > jdf_jdd_cache_map;
 
 	public:
 		static IdfParser idf_parser;
@@ -195,6 +196,10 @@ namespace EnergyPlus {
 		static
 		void
 		InitFiles();
+
+		static
+		void
+		InitializeCacheMap();
 
 		static
 		void
