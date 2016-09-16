@@ -554,8 +554,12 @@ SET( SRC
   WindowEquivalentLayer.hh
   WindowManager.cc
   WindowManager.hh
-  WindowManagerExterior.cc
-  WindowManagerExterior.hh
+  WindowManagerExteriorData.cc
+  WindowManagerExteriorData.hh
+  WindowManagerExteriorThermal.cc
+  WindowManagerExteriorThermal.hh
+  WindowManagerExteriorOptical.cc
+  WindowManagerExteriorOptical.hh
   WindowModel.cc
   WindowModel.hh
   ZoneAirLoopEquipmentManager.cc

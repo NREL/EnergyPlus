@@ -91,7 +91,8 @@
 #include <Vectors.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
-#include <WindowManagerExterior.hh>
+#include <WindowManagerExteriorThermal.hh>
+#include <WindowManagerExteriorOptical.hh>
 #include <WindowModel.hh>
 
 namespace EnergyPlus {
@@ -370,6 +371,32 @@ namespace WindowManager {
 		CosPhiIndepVar = Array1D< Real64 >( 10, 0.0 );
 	}
 
+  void
+  InitWindowOpticalCalculations() 
+  {
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Simon Vidanovic
+    //       DATE WRITTEN   September 2016
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Manages if optical calculation will be performed with internal or external routines
+
+    // METHODOLOGY EMPLOYED:
+    // na
+
+    // REFERENCES:
+    // na
+    // check and read custom solar and/or visible spectrum data if any
+    CheckAndReadCustomSprectrumData();
+    if( inExtWindowModel->getWindowsModel() == WindowsModel::External ) {
+      InitWCEOpticalData();
+    } else {
+      InitGlassOpticalCalculations();
+    }
+  }
+
 	void
 	InitGlassOpticalCalculations()
 	{
@@ -566,9 +593,6 @@ namespace WindowManager {
 
 		//EndDebug
 
-		// check and read custom solar and/or visible spectrum data if any
-		CheckAndReadCustomSprectrumData();
-
 		W5InitGlassParameters();
 
 		// Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
@@ -589,7 +613,11 @@ namespace WindowManager {
 			TotLay = Construct( ConstrNum ).TotLayers;
 
 			// First layer must be glass, shade, screen or blind to be a glazing construction
-			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
+			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass && 
+           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && 
+           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && 
+           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && 
+           Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
 
 			ShadeLayNum = 0;
 			ExtShade = false;

@@ -56,8 +56,8 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef WindowManagerExterior_hh_INCLUDED
-#define WindowManagerExterior_hh_INCLUDED
+#ifndef WindowManagerExteriorThermal_hh_INCLUDED
+#define WindowManagerExteriorThermal_hh_INCLUDED
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -91,10 +91,10 @@ namespace EnergyPlus {
     );
 
     // Class that is used to create layers for Windows-CalcEngine
-    class CWCEFactory {
+    class CWCEHeatTransferFactory {
     public:
 
-      CWCEFactory( const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
+      CWCEHeatTransferFactory( const EnergyPlus::DataSurfaces::SurfaceData &surface, const int t_SurfNum );
 
       std::shared_ptr< Tarcog::CTarcogSystem > getTarcogSystem( const double t_HextConvCoeff );
 
@@ -143,7 +143,6 @@ namespace EnergyPlus {
       EnergyPlus::DataHeatBalance::MaterialProperties* getLayerMaterial( const int t_Index );
 
     };        
-
   }
 
 }

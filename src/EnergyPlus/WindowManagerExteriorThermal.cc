@@ -56,7 +56,7 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#include< memory >
+// #include< memory >
 
 // EnergyPlus headers
 #include "DataEnvironment.hh"
@@ -69,7 +69,7 @@
 
 
 // Windows library headers
-#include "WindowManagerExterior.hh"
+#include "WindowManagerExteriorThermal.hh"
 #include "WindowManager.hh"
 #include "TarIGU.hpp"
 #include "TarIGUSolidLayer.hpp"
@@ -79,18 +79,19 @@
 #include "LayerInterfaces.hpp"
 #include "TarSurface.hpp"
 #include "TarcogSystem.hpp"
-#include "FenestrationCommon.hpp"
 #include "GasProperties.hpp"
 #include "GasData.hpp"
 #include "GasItem.hpp"
-
-using namespace std;
-using namespace Tarcog;
-using namespace Gases;
-using namespace FenestrationCommon;
+#include "FenestrationCommon.hpp"
+#include "Series.hpp"
 
 
 namespace EnergyPlus {
+
+  using namespace std;
+  using namespace Tarcog;
+  using namespace Gases;
+  using namespace FenestrationCommon;
 
   using namespace DataEnvironment;
   using namespace DataSurfaces;
@@ -126,7 +127,7 @@ namespace EnergyPlus {
       const double solutionTolerance = 0.02;
 
       // Tarcog thermal system for solving heat transfer through the window
-      CWCEFactory aFactory = CWCEFactory( surface, SurfNum );
+      CWCEHeatTransferFactory aFactory = CWCEHeatTransferFactory( surface, SurfNum );
       shared_ptr< CTarcogSystem > aSystem = aFactory.getTarcogSystem( HextConvCoeff );
       aSystem->setTolerance( solutionTolerance );
 
@@ -248,9 +249,10 @@ namespace EnergyPlus {
         WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
       }
       
-      // double TransDiff = Construct( ConstrNum ).TransDiff;
-      // WinHeatGain( SurfNum ) -= QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
-      // WinHeatTransfer( SurfNum ) -= QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
+      double TransDiff = construction.TransDiff;
+      WinHeatGain( SurfNum ) -= QS( surface.Zone ) * surface.Area * TransDiff;
+      WinHeatTransfer( SurfNum ) -= QS( surface.Zone ) * surface.Area * TransDiff;
+      
       for( int k = 1; k <= surface.getTotLayers(); ++k ) {
         SurfaceWindow( SurfNum ).ThetaFace( 2 * k - 1 ) = thetas( 2 * k - 1 );
         SurfaceWindow( SurfNum ).ThetaFace( 2 * k ) = thetas( 2 * k );
@@ -263,10 +265,10 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    //  CWCEFactory
+    //  CWCEHeatTransferFactory
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    CWCEFactory::CWCEFactory( const SurfaceData &surface, const int t_SurfNum  ) : m_Surface( surface ), 
+    CWCEHeatTransferFactory::CWCEHeatTransferFactory( const SurfaceData &surface, const int t_SurfNum  ) : m_Surface( surface ), 
 	    m_SurfNum( t_SurfNum ), m_SolidLayerIndex( 0 ), m_InteriorBSDFShade( false ), 
       m_ExteriorShade( false ) {
       m_Window = SurfaceWindow( t_SurfNum );
@@ -298,7 +300,8 @@ namespace EnergyPlus {
 
     };
 
-    shared_ptr< CTarcogSystem > CWCEFactory::getTarcogSystem( const double t_HextConvCoeff ) {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CTarcogSystem > CWCEHeatTransferFactory::getTarcogSystem( const double t_HextConvCoeff ) {
       shared_ptr< CTarEnvironment > Indoor = getIndoor();
       shared_ptr< CTarEnvironment > Outdoor = getOutdoor( t_HextConvCoeff );
       shared_ptr< CTarIGU > aIGU = getIGU();
@@ -325,7 +328,8 @@ namespace EnergyPlus {
       return aSystem;
     }
 
-    MaterialProperties* CWCEFactory::getLayerMaterial( const int t_Index ) {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    MaterialProperties* CWCEHeatTransferFactory::getLayerMaterial( const int t_Index ) {
       int ConstrNum = m_Surface.Construction;
 
       if( m_Window.ShadingFlag == IntShadeOn || m_Window.ShadingFlag == ExtShadeOn ||
@@ -341,7 +345,8 @@ namespace EnergyPlus {
       return &Material( LayPtr );
     }
 
-    shared_ptr< CBaseIGUTarcogLayer > CWCEFactory::getIGULayer( const int t_Index ) {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CBaseIGUTarcogLayer > CWCEHeatTransferFactory::getIGULayer( const int t_Index ) {
       shared_ptr< CBaseIGUTarcogLayer > aLayer = nullptr;
 
       MaterialProperties* material = getLayerMaterial( t_Index );
@@ -361,12 +366,13 @@ namespace EnergyPlus {
       return aLayer;
     }
 
-    int CWCEFactory::getNumOfLayers() const {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    int CWCEHeatTransferFactory::getNumOfLayers() const {
       return Construct( m_ConstructionNumber ).TotLayers;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CBaseIGUTarcogLayer > CWCEFactory::getSolidLayer( const SurfaceData &surface, 
+    shared_ptr< CBaseIGUTarcogLayer > CWCEHeatTransferFactory::getSolidLayer( const SurfaceData &surface, 
       const MaterialProperties &material, const int t_Index, const int t_SurfNum ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
@@ -452,7 +458,8 @@ namespace EnergyPlus {
       return aSolidLayer;
     }
 
-    shared_ptr< CBaseIGUTarcogLayer > CWCEFactory::getGapLayer( const MaterialProperties &material ) {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CBaseIGUTarcogLayer > CWCEHeatTransferFactory::getGapLayer( const MaterialProperties &material ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -468,7 +475,8 @@ namespace EnergyPlus {
       return aLayer;
     }
 
-    shared_ptr< CBaseIGUTarcogLayer > CWCEFactory::getShadeToGlassLayer( const int t_Index ) {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CBaseIGUTarcogLayer > CWCEHeatTransferFactory::getShadeToGlassLayer( const int t_Index ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   August 2016
@@ -492,7 +500,8 @@ namespace EnergyPlus {
       return aLayer;
     }
 
-    shared_ptr< CBaseIGUTarcogLayer > CWCEFactory::getComplexGapLayer( const MaterialProperties &material ) {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CBaseIGUTarcogLayer > CWCEHeatTransferFactory::getComplexGapLayer( const MaterialProperties &material ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -510,7 +519,8 @@ namespace EnergyPlus {
       return aLayer;
     }
 
-    shared_ptr< CGas > CWCEFactory::getGas( const MaterialProperties &material ) {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CGas > CWCEHeatTransferFactory::getGas( const MaterialProperties &material ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -544,7 +554,8 @@ namespace EnergyPlus {
       return aGas;
     }
 
-    shared_ptr< CGas > CWCEFactory::getAir() {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CGas > CWCEHeatTransferFactory::getAir() {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   August 2016
@@ -558,7 +569,7 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CTarEnvironment > CWCEFactory::getIndoor() {
+    shared_ptr< CTarEnvironment > CWCEHeatTransferFactory::getIndoor() {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -579,7 +590,7 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CTarEnvironment > CWCEFactory::getOutdoor( const double t_Hext ) {
+    shared_ptr< CTarEnvironment > CWCEHeatTransferFactory::getOutdoor( const double t_Hext ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -607,7 +618,7 @@ namespace EnergyPlus {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CTarIGU > CWCEFactory::getIGU() {
+    shared_ptr< CTarIGU > CWCEHeatTransferFactory::getIGU() {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   July 2016
@@ -624,7 +635,8 @@ namespace EnergyPlus {
       return aIGU;
     }
 
-    bool CWCEFactory::isInteriorShade() const {
+    /////////////////////////////////////////////////////////////////////////////////////////
+    bool CWCEHeatTransferFactory::isInteriorShade() const {
       return m_InteriorBSDFShade;
     }
 

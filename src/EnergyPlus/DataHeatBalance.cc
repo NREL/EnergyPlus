@@ -2150,6 +2150,21 @@ namespace DataHeatBalance {
 		return NominalUwithConvCoeffs;
 	}
 
+  bool ConstructionData::isGlazingConstruction() const {
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Simon Vidanovic
+    //       DATE WRITTEN   September 2016
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Commonly used routine in several places in EnergyPlus which examines if current
+    // construcdtion is glazing construction
+    auto MaterialGroup = Material( LayerPoint( 1 ) ).Group;
+    return MaterialGroup == WindowGlass || MaterialGroup == Shade || MaterialGroup == Screen ||
+      MaterialGroup == WindowBlind || MaterialGroup == WindowSimpleGlazing;
+  }
+
 } // DataHeatBalance
 
 } // EnergyPlus

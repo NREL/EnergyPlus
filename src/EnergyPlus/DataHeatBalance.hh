@@ -1262,6 +1262,9 @@ namespace DataHeatBalance {
 			TransDiffBackEQL( 0.0 )
 		{}
 
+    bool
+    isGlazingConstruction() const;
+
 	};
 
 	struct SpectralDataProperties

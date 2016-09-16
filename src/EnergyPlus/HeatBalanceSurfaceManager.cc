@@ -2389,7 +2389,10 @@ namespace HeatBalanceSurfaceManager {
 											// from the sky.  Second item (AWinSurf(SurfNum,Lay) * BeamSolar) is accounting for absorbed solar radiation
 											// originating from beam on exterior side.  Third item (AWinCFOverlap(SurfNum,Lay)) is accounting for
 											// absorptances from beam hitting back of the window which passes through rest of exterior windows
-											QRadSWwinAbs( Lay, SurfNum ) = SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyFtAbs( Lay ) * SkySolarInc + SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyGndAbs( Lay ) * GndSolarInc + AWinSurf( Lay, SurfNum ) * BeamSolar + AWinCFOverlap( Lay, SurfNum ) * BeamSolar;
+											QRadSWwinAbs( Lay, SurfNum ) = 
+                        SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyFtAbs( Lay ) * SkySolarInc + 
+                        SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyGndAbs( Lay ) * GndSolarInc + 
+                        AWinSurf( Lay, SurfNum ) * BeamSolar + AWinCFOverlap( Lay, SurfNum ) * BeamSolar;
 										}
 										// Total solar absorbed in solid layer (W), for reporting
 										QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
