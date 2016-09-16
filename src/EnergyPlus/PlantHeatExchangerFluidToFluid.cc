@@ -748,7 +748,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			BranchNum = FluidHX( CompNum ).OtherCompSupplySideLoop.BranchNum;
 			LoopCompNum = FluidHX( CompNum ).OtherCompSupplySideLoop.CompNum;
 
-			PlantLoop( LoopNum2 ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( LoopCompNum ).FreeCoolCntrlMinCntrlTemp = Node( FluidHX( CompNum ).SetPointNodeNum ).TempSetPoint;
+			PlantLoop( LoopNum2 ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( LoopCompNum ).FreeCoolCntrlMinCntrlTemp = Node( FluidHX( CompNum ).SetPointNodeNum ).TempSetPoint - FluidHX( CompNum ).TempControlTol;  // issue #5626, include control tolerance
 		}
 
 	}
