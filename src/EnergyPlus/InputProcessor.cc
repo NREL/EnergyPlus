@@ -954,8 +954,6 @@ namespace EnergyPlus {
 			for ( json::const_iterator jdf_it = val.begin(); jdf_it != val.end(); ++jdf_it ) {
 				iterator_vector.emplace_back( jdf_it, jdd_it );
 			}
-			if ( !jdf_obj_it->size() || iterator_vector.empty() )
-				assert( false );
 			jdf_jdd_cache_map[ jdf_obj_it.key() ] = std::move( iterator_vector );
 		}
 	}
