@@ -183,13 +183,8 @@ namespace EnergyPlus {
         shared_ptr< CTarIGUSolidLayer > aShadeLayer = aLayers[ totLayers - 1 ];
         shared_ptr< CTarIGUSolidLayer > aGlassLayer = aLayers[ totLayers - 2 ];
         double ShadeArea = Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea;
-        // double sconsh = scon( ngllayer + 1 ) / thick( ngllayer + 1 );
-        double sconsh = aShadeLayer->getConductivity() / aShadeLayer->getThickness();
         shared_ptr< CTarSurface > frontSurface = aShadeLayer->getSurface( Side::Front );
         shared_ptr< CTarSurface > backSurface = aShadeLayer->getSurface( Side::Back );
-        double CondHeatGainShade = ShadeArea * sconsh * ( thetas( nglfacep - 1 ) - thetas( nglfacep ) );
-        // double EpsShIR1 = emis( nglface + 1 );
-        // double EpsShIR2 = emis( nglface + 2 );
         double EpsShIR1 = frontSurface->getEmissivity();
         double EpsShIR2 = backSurface->getEmissivity();
         double TauShIR = frontSurface->getTransmittance();
@@ -231,8 +226,6 @@ namespace EnergyPlus {
         // 
         size_t totLayers = aLayers.size();
         shared_ptr< CTarIGUSolidLayer > aGlassLayer = aLayers[ totLayers - 1 ];
-        double conductivity = aGlassLayer->getConductivity();
-        double thickness = aGlassLayer->getThickness();
         shared_ptr< CTarSurface > backSurface = aGlassLayer->getSurface( Side::Back );
         
         double h_cin = aSystem->getIndoor()->getConductionConvectionCoefficient();
@@ -244,7 +237,6 @@ namespace EnergyPlus {
           ( sigma * pow( backSurface->getTemperature(), 4 ) - rmir );
 
         WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
-        // WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) - heatFlow;
 
         WinHeatTransfer( SurfNum ) = WinHeatGain( SurfNum );
       }
@@ -298,7 +290,7 @@ namespace EnergyPlus {
         m_ShadePosition = ShadePosition::Between;
       }
 
-    };
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////
     shared_ptr< CTarcogSystem > CWCEHeatTransferFactory::getTarcogSystem( const double t_HextConvCoeff ) {
@@ -627,9 +619,6 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Creates IGU object from surface properties in EnergyPlus
-      int tilt = m_Surface.Tilt;
-      double height = m_Surface.Height;
-      double width = m_Surface.Width;
 
       shared_ptr< CTarIGU > aIGU = make_shared< CTarIGU >( m_Surface.Width, m_Surface.Height, m_Surface.Tilt );
       return aIGU;

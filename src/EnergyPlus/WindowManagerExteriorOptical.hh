@@ -100,7 +100,7 @@ namespace EnergyPlus {
     void StoreOpticalData( const CWCEIntegrator& t_Integrator, const FenestrationCommon::WavelengthRange t_Range,
       const int t_ConstrNum );
 
-    std::unique_ptr< CWCEIntegrator > getIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties& material );
+    std::shared_ptr< CWCEIntegrator > getIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties& material );
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecturmProperties

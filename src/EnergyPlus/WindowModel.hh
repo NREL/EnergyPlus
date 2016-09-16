@@ -14,7 +14,7 @@ namespace EnergyPlus {
     EnumParser() {};
 
     T StringToEnum( const std::string &value ) {
-      std::map< std::string, T >::const_iterator iValue = m_Map.find( value );
+      auto iValue = m_Map.find( value );
       if( iValue == m_Map.end() )
         throw std::runtime_error( "Incorrect enumerator assigned." );
       return iValue->second;
@@ -27,7 +27,7 @@ namespace EnergyPlus {
 
     enum WindowsModel { BuiltIn, External };
 
-    // Class that reads IDD object and decides if interior or exterior window models
+    // Class that reads IDF object and decides if interior or exterior window models
     // will be used.
     class CWindowModel {
     public:

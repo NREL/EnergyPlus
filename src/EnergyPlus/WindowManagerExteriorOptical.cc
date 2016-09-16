@@ -109,7 +109,7 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
-    unique_ptr< CWCEIntegrator > getIntegrator( const MaterialProperties& material ) {
+    shared_ptr< CWCEIntegrator > getIntegrator( const MaterialProperties& material ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   September 2016
@@ -118,15 +118,15 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Integrators are dependent on type of material the layer.
-      unique_ptr< CWCEIntegrator > aInteg = nullptr;
+      shared_ptr< CWCEIntegrator > aInteg = nullptr;
       if( material.Group == WindowGlass ) {
-        aInteg = make_unique< CWCESpecularIntegrator >( material );
+        aInteg = make_shared< CWCESpecularIntegrator >( material );
       } else if( material.Group == WindowBlind ) {
-        aInteg = make_unique< CWCEVenetianBlindIntegrator >( material );
+        aInteg = make_shared< CWCEVenetianBlindIntegrator >( material );
       } else if( material.Group == Screen ) {
-        aInteg = make_unique< CWCEScreenIntegrator >( material );
+        aInteg = make_shared< CWCEScreenIntegrator >( material );
       } else if( material.Group == Shade ) {
-        aInteg = make_unique< CWCEDiffuseShadeIntegrator >( material );
+        aInteg = make_shared< CWCEDiffuseShadeIntegrator >( material );
       }
       return aInteg;
     }
@@ -190,7 +190,7 @@ namespace EnergyPlus {
       // Handles solar radiation spetrum from defalut location or IDF
       shared_ptr< CSeries > solarRadiation = make_shared< CSeries >();
 
-      for( auto i = 1; i <= nume; ++i ) {
+      for( size_t i = 1; i <= nume; ++i ) {
         solarRadiation->addProperty( wle( i ), e( i ) );
       }
 

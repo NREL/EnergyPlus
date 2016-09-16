@@ -109,11 +109,11 @@ namespace EnergyPlus {
       bool isInteriorShade() const;
 
     private:
-      size_t m_SolidLayerIndex;
       EnergyPlus::DataSurfaces::SurfaceData m_Surface;
       EnergyPlus::DataSurfaces::SurfaceWindowCalc m_Window;
       ShadePosition m_ShadePosition;
       int m_SurfNum;
+      size_t m_SolidLayerIndex;
       int m_ConstructionNumber;
       int m_TotLay;
 

@@ -7,12 +7,13 @@ using namespace std;
 
 namespace EnergyPlus {  
 
-  EnumParser< WindowManager::WindowsModel >::EnumParser() {
+  template<>
+  EnumParser< EnergyPlus::WindowManager::WindowsModel >::EnumParser() {
     m_Map[ "BUILTINWINDOWSMODEL" ] = WindowManager::WindowsModel::BuiltIn;
     m_Map[ "EXTERNALWINDOWSMODEL" ] = WindowManager::WindowsModel::External;
   }
 
-  namespace WindowManager {     
+  namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     //  CWindowModel
@@ -34,11 +35,9 @@ namespace EnergyPlus {
 
       // PURPOSE OF THIS SUBROUTINE:
       // Reads input and creates instance of WindowModel object
-      bool found = false;
       int NumNums;
       int NumAlphas;
       int IOStat;
-      bool ErrorsFound = false;
 
       shared_ptr< CWindowModel > aModel = make_shared< CWindowModel >();
       int numCurrModels = InputProcessor::GetNumObjectsFound( objectName );
