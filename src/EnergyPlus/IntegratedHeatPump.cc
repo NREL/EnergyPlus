@@ -198,6 +198,9 @@ namespace EnergyPlus {
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
+						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex,
+							CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+							CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCCoilIndex,
 							CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -207,9 +210,7 @@ namespace EnergyPlus {
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
-						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
+
 
 						IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop = airMassFlowRate;
 					}
