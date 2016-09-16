@@ -108,7 +108,7 @@ namespace EnergyPlus {
     class CWCESpecturmProperties {
     public:
       static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
-      static std::shared_ptr< FenestrationCommon::CSeries > getSolarRadiationSpecturm();
+      static std::shared_ptr< FenestrationCommon::CSeries > getSolarRadiationSpectrum();
       static std::shared_ptr< FenestrationCommon::CSeries > getVisiblePhotopicResponse();
     };
 

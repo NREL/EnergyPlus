@@ -179,7 +179,7 @@ namespace EnergyPlus {
     ///////////////////////////////////////////////////////////////////////////////
     //       CWCESpecturmProperties
     ///////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CSeries > CWCESpecturmProperties::getSolarRadiationSpecturm() {
+    shared_ptr< CSeries > CWCESpecturmProperties::getSolarRadiationSpectrum() {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   September 2016
@@ -190,7 +190,7 @@ namespace EnergyPlus {
       // Handles solar radiation spetrum from defalut location or IDF
       shared_ptr< CSeries > solarRadiation = make_shared< CSeries >();
 
-      for( size_t i = 1; i <= nume; ++i ) {
+      for( auto i = 1; i <= nume; ++i ) {
         solarRadiation->addProperty( wle( i ), e( i ) );
       }
 
@@ -283,7 +283,7 @@ namespace EnergyPlus {
       // PURPOSE OF THIS SUBROUTINE:
       // Integrator constructor for specular layers. It integratates optical properties over certain spectral range
       // and for angles between 0 and 90.
-      shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getSolarRadiationSpecturm();
+      shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getSolarRadiationSpectrum();
       shared_ptr< CSpectralSampleData > aSampleData = CWCESpecturmProperties::getSpectralSample( material.GlassSpectralDataPtr );
       shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
       CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
