@@ -30,6 +30,7 @@ IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
 State EnergyPlus::InputProcessor::state = State();
 char EnergyPlus::InputProcessor::s[] = { 0 };
 std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
+std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > > EnergyPlus::InputProcessor::jdf_jdd_cache_map = std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > >();
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
@@ -112,6 +113,7 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
 	json root;
 	Token token;
+    auto const & schema_properties = schema[ "properties" ];
 
 	while ( true ) {
 		token = look_ahead( idf, index );
@@ -134,16 +136,17 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 				continue;
 			}
 
-			json const &obj_loc = schema[ "properties" ][ obj_name ];
-			json const &loc = obj_loc[ "legacy_idd" ];
-			json obj = parse_object( idf, index, success, loc, obj_loc );
+			json const & obj_loc = schema_properties[ obj_name ];
+			json const & legacy_idd = obj_loc[ "legacy_idd" ];
+			json obj = parse_object( idf, index, success, legacy_idd, obj_loc );
 			if ( !success ) print_out_line_error( idf, true );
 			u64toa( root[ obj_name ].size() + 1, s );
 			std::string name = obj_name + " " + s;
 			if ( !obj.is_null() ) {
-				if ( obj.find( "name" ) != obj.end() ) {
-					name = obj[ "name" ].get < std::string >();
-					obj.erase( "name" );
+                auto const & name_iter = obj.find( "name" );
+				if ( name_iter != obj.end() ) {
+					name = name_iter.value();
+					obj.erase( name_iter );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
 						if ( obj_name != "RunPeriod" ) {
 							EnergyPlus::ShowWarningMessage("Duplicate names!! name: " + name);
@@ -161,15 +164,29 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 }
 
 json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
-                              json const & loc, json const & obj_loc ) {
+                              json const & legacy_idd, json const & schema_obj_loc ) {
 	json root = json::object();
 	json extensible = json::object();
 	json array_of_extensions = json::array();
 	Token token;
-	index += 1;
 	int legacy_idd_index = 0, extensible_index = 0;
 	success = true;
 	bool was_value_parsed = false;
+	auto const & legacy_idd_fields_array = legacy_idd[ "fields" ];
+    auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
+
+	auto const & schema_patternProperties = schema_obj_loc[ "patternProperties" ];
+	auto const & schema_dot_star = schema_patternProperties[ ".*" ];
+	auto const & schema_obj_props = schema_dot_star[ "properties" ];
+
+	json const * schema_obj_extensions = nullptr;
+    if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
+		schema_obj_extensions = & schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
+	}
+
+	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
+
+    index += 1;
 
 	while ( true ) {
 		token = look_ahead( idf, index );
@@ -181,38 +198,32 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		} else if ( token == Token::COMMA || token == Token::SEMICOLON ) {
 			if ( !was_value_parsed ) {
 				int ext_size = 0;
-				// std::string const & field_name;
-				if ( legacy_idd_index < loc[ "fields" ].size() ) {
-					std::string const & field_name = loc[ "fields" ][ legacy_idd_index ];
-					add_missing_field_value( field_name, root, extensible, obj_loc, loc, legacy_idd_index );
+				if ( legacy_idd_index < legacy_idd_fields_array.size() ) {
+					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+                    root[ field_name ] = "";
 				} else {
-					ext_size = static_cast<int>(loc[ "extensibles" ].size());
-					std::string const & field_name = loc[ "extensibles" ][ extensible_index % ext_size ];
+                    auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
+					ext_size = static_cast<int>( legacy_idd_extensibles_array.size() );
+					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
 					extensible_index++;
-					add_missing_field_value( field_name, root, extensible, obj_loc, loc, legacy_idd_index );
+                    extensible[ field_name ] = "";
 				}
-				// add_missing_field_value( field_name, root, extensible, obj_loc, loc, legacy_idd_index );
 				if ( ext_size && extensible_index % ext_size == 0 ) {
 					array_of_extensions.push_back( extensible );
 					extensible.clear();
 				}
 			}
-
 			legacy_idd_index++;
 			was_value_parsed = false;
 			next_token( idf, index );
 			if ( token == Token::SEMICOLON ) {
 				int min_fields = 0;
-				auto const found_min_fields = obj_loc.find( "min_fields" );
-				if ( found_min_fields != obj_loc.end() ) {
+				if ( found_min_fields != schema_obj_loc.end() ) {
 					min_fields = found_min_fields.value();
 				}
-				// what about if this is in extensibles? should check for that before running this loop
-				// so if legacy_idd_index > loc[ "fields" ].size() then must be in extensibles, then mod operation
-				// TODO: find out if filling in objects UP TO MIN FIELDS applies to extensible objects
                 for (; legacy_idd_index < min_fields; legacy_idd_index++) {
-					std::string const & name = loc[ "fields" ][ legacy_idd_index ];
-					add_missing_field_value(name, root, extensible, obj_loc, loc, legacy_idd_index);
+					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+                    root[ field_name ] = "";
 				}
 				if ( extensible.size() ) {
 					array_of_extensions.push_back( extensible );
@@ -222,15 +233,15 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			}
 		} else if ( token == Token::EXCLAMATION ) {
 			eat_comment( idf, index );
-		} else if ( legacy_idd_index >= loc[ "fields" ].size() ) {
-			if ( loc.find( "extensibles" ) == loc.end() ) {
+		} else if ( legacy_idd_index >= legacy_idd_fields_array.size() ) {
+			if ( legacy_idd_extensibles_iter == legacy_idd.end() ) {
 				success = false;
 				return root;
 			}
-			auto const size = loc[ "extensibles" ].size();
-			std::string const & field_name = loc[ "extensibles" ][ extensible_index % size ];
-			auto const val = parse_value( idf, index, success,
-			                        obj_loc[ "patternProperties" ][ ".*" ][ "properties" ][ "extensions" ][ "items" ][ "properties" ][ field_name ] );
+			auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
+			auto const size = legacy_idd_extensibles_array.size();
+			std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % size ];
+			auto const val = parse_value( idf, index, success, schema_obj_extensions->at( field_name ) );
 			extensible[ field_name ] = std::move( val );
 			was_value_parsed = true;
 			extensible_index++;
@@ -240,21 +251,9 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			}
 		} else {
 			was_value_parsed = true;
-			std::string const & field = loc[ "fields" ][ legacy_idd_index ];
-			auto it = obj_loc.find( "patternProperties" );
-			if ( it == obj_loc.end() ) {
-				if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
-					auto const val = parse_value( idf, index, success, obj_loc[ "properties" ][ field ] );
-					root[ field ] = std::move( val );
-				} else {
-                    u64toa( cur_line_num, s );
-					EnergyPlus::ShowWarningMessage( "Field " + field + " was not found at line " + s );
-				}
-				legacy_idd_index++;
-				continue;
-			}
-			auto const & tmp = obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
-			if ( tmp.find( field ) == tmp.end() ) {
+			std::string const & field = legacy_idd_fields_array[ legacy_idd_index ];
+			auto const & find_field_iter = schema_obj_props.find( field );
+			if ( find_field_iter == schema_obj_props.end() ) {
 				if ( field == "name" ) {
 					root[ field ] = parse_string( idf, index, success );
 				} else {
@@ -262,7 +261,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 					EnergyPlus::ShowWarningMessage( "Field " + field + " was not found at line " + s );
 				}
 			} else {
-				auto const val = parse_value( idf, index, success, tmp[ field ] );
+				auto const val = parse_value( idf, index, success, find_field_iter.value() );
 				root[ field ] = std::move( val );
 			}
 			if ( !success ) return root;
@@ -277,13 +276,20 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 
 void IdfParser::add_missing_field_value( std::string const & field_name, json & root, json & extensible, json const & obj_loc,
                                          json const & loc, int legacy_idd_index ) {
+	// This can be changed significantly by passing only the json object you are going to modify in, i.e. root or
+	// extensible, and pass only the currect object location in as well, either the whole
+	// patternProperties->.*->properties thing or the extensions->items->properties thing, this way you can get rid of a
+	// lot of if statements as well as map lookups, also patternProperties is ALWAYS there now bc we removed the special
+	// casing of the version object which did not contain patternProperties
 	json const * tmp;
 	int ext_size = 0;
 	if ( obj_loc.find( "patternProperties" ) != obj_loc.end() ) {
 		tmp = & obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
-	} else if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
-		tmp = & obj_loc[ "properties" ][ field_name ];
 	}
+
+//	else if ( obj_loc.find( "properties" ) != obj_loc.end() ) {
+//		tmp = & obj_loc[ "properties" ][ field_name ];
+//	}
 	if ( legacy_idd_index >= loc[ "fields" ].size() ) {
 		tmp = & tmp->at( "extensions" )[ "items" ][ "properties" ];
 		ext_size = static_cast<int>(loc[ "extensibles" ].size());
@@ -874,6 +880,7 @@ namespace EnergyPlus {
 		state.errors.clear();
 		state.warnings.clear();
 		jdf.clear();
+		jdf_jdd_cache_map.clear();
 		EchoInputFile = 0;
 		echo_stream = nullptr;
 	}
@@ -933,6 +940,25 @@ namespace EnergyPlus {
 	}
 
 	void
+	InputProcessor::InitializeCacheMap() {
+		jdf_jdd_cache_map.clear();
+
+		auto const & schema_properties = InputProcessor::schema.at( "properties" );
+		jdf_jdd_cache_map.reserve( InputProcessor::jdf.size() );
+
+		for ( json::const_iterator jdf_obj_it = jdf.begin(); jdf_obj_it != jdf.end(); ++jdf_obj_it ) {
+			auto const & val = jdf_obj_it.value();
+			json::const_iterator jdd_it = schema_properties.find( jdf_obj_it.key() );
+			std::vector< std::pair< json::const_iterator, json::const_iterator > > iterator_vector;
+			iterator_vector.reserve( jdf_obj_it->size() );
+			for ( json::const_iterator jdf_it = val.begin(); jdf_it != val.end(); ++jdf_it ) {
+				iterator_vector.emplace_back( jdf_it, jdd_it );
+			}
+			jdf_jdd_cache_map[ jdf_obj_it.key() ] = std::move( iterator_vector );
+		}
+	}
+
+	void
 	InputProcessor::ProcessInput() {
 		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {
@@ -970,6 +996,8 @@ namespace EnergyPlus {
 //		ofs << encoded << std::endl;
 //		std::ofstream ofs("json_dump.json", std::ofstream::out);
 //		ofs << InputProcessor::jdf.dump(4) << std::endl;
+
+		InitializeCacheMap();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -1063,28 +1091,14 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-		json * object_in_jdf;
-		if ( jdf.find( Object ) == jdf.end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
+		auto find_iterators = jdf_jdd_cache_map.find( Object );
+		if ( find_iterators == jdf_jdd_cache_map.end() ) {
+			auto const tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
 			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
 			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
-			object_in_jdf = &jdf[ tmp_umit->second ];
-		} else {
-			object_in_jdf = &jdf[ Object ];
-		}
-
-		json * object_in_schema = &schema[ "properties" ];
-		if ( object_in_schema->find( Object ) == object_in_schema->end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
-				ShowWarningError( "Did not find object " + Object + " in schema" );
-				return;
-			}
-			object_in_schema = & (*object_in_schema)[ tmp_umit->second ];
-		} else {
-			object_in_schema = & (*object_in_schema)[ Object ];
+			find_iterators = jdf_jdd_cache_map.find( tmp_umit->second );
 		}
 
 		NumAlphas = 0;
@@ -1095,27 +1109,30 @@ namespace EnergyPlus {
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
 
+		auto const & jdf_it = find_iterators->second.at( Number - 1 ).first;
+		auto const & jdd_it = find_iterators->second.at( Number - 1 ).second;
+		auto const & jdd_it_val = jdd_it.value();
+
         // Locations in JSON schema relating to normal fields
-		auto const & schema_patternProperties = object_in_schema->at( "patternProperties" );
-		auto const & schema_dot_star = schema_patternProperties[ ".*" ];
-		auto const & schema_obj_props = schema_dot_star[ "properties" ];
+		auto const & schema_obj_props = jdd_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
 
 		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
-		auto const & legacy_idd = object_in_schema->at( "legacy_idd" );
+		auto const & legacy_idd = jdd_it_val[ "legacy_idd" ];
 		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
 		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
+		auto const & schema_name_field = jdd_it_val.find( "name" );
 
 
 		Alphas = "";
 		Numbers = 0;
 
-		auto const & obj = object_in_jdf->begin() + Number - 1;
+		auto const & obj = jdf_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
 		for ( int i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
-			std::string const field = legacy_idd_alphas_fields[ i ];
-			if ( field == "name" ) {
-				auto const name_iter = object_in_schema->at("name");
+			std::string const & field = legacy_idd_alphas_fields[ i ];
+			if ( field == "name" && schema_name_field != jdd_it_val.end() ) {
+				auto const & name_iter = schema_name_field.value();
                 if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
 				} else {
@@ -1128,12 +1145,13 @@ namespace EnergyPlus {
 			}
 			auto it = obj_val.find( field );
 			if ( it != obj_val.end() ) {
-				std::string val;
 				if ( it.value().is_string() ) {
+					std::string val;
 					auto const & schema_field_obj = schema_obj_props[ field ];
+					auto const & find_default = schema_field_obj.find( "default" );
 					if ( it.value().get < std::string >().empty() &&
-					     schema_field_obj.find( "default" ) != schema_field_obj.end() ) {
-						auto const & default_val = schema_field_obj[ "default" ];
+					     find_default != schema_field_obj.end() ) {
+						auto const & default_val = find_default.value();
 						if ( default_val.is_string() ) {
 							val = default_val.get < std::string >();
 						} else {
@@ -1178,7 +1196,7 @@ namespace EnergyPlus {
 				auto const & jdf_extension_obj = it.value();
 
 				for ( auto i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
-					std::string const field_name = legacy_idd_alphas_extensions[ i ];
+					std::string const & field_name = legacy_idd_alphas_extensions[ i ];
 					auto const & jdf_obj_field_iter = jdf_extension_obj.find( field_name );
 
 					if ( jdf_obj_field_iter != jdf_extension_obj.end() ) {
@@ -1230,7 +1248,7 @@ namespace EnergyPlus {
 
 		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
 		for ( int i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
-			std::string const field = legacy_idd_numerics_fields[ i ];
+			std::string const & field = legacy_idd_numerics_fields[ i ];
 			auto it = obj.value().find( field );
 			if ( it != obj.value().end() ) {
 				if ( !it.value().is_string() ) {
@@ -1272,7 +1290,7 @@ namespace EnergyPlus {
 				auto const & jdf_extension_obj = it.value();
 
 				for ( auto i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
-					std::string const field = legacy_idd_numerics_extensions[ i ];
+					std::string const & field = legacy_idd_numerics_extensions[ i ];
                     auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
 
 					if ( jdf_extension_field_iter != jdf_extension_obj.end() ) {
@@ -1683,24 +1701,24 @@ namespace EnergyPlus {
 		// name already and that this name is not blank).
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
+		// int Found;
 
-		ErrorFound = false;
-		if ( NumOfNames > 0 ) {
-			Found = FindItem( NameToVerify, NamesList, NumOfNames );
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
+		// ErrorFound = false;
+		// if ( NumOfNames > 0 ) {
+		// 	Found = FindItem( NameToVerify, NamesList, NumOfNames );
+		// 	if ( Found != 0 ) {
+		// 		ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+		// 		ErrorFound = true;
+		// 	}
+		// }
 
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-		} else {
-			IsBlank = false;
-		}
+		// if ( NameToVerify.empty() ) {
+		// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
+		// 	ErrorFound = true;
+		// 	IsBlank = true;
+		// } else {
+		// 	IsBlank = false;
+		// }
 
 	}
 
@@ -1726,24 +1744,24 @@ namespace EnergyPlus {
 		// name already and that this name is not blank).
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
+		// int Found;
 
-		ErrorFound = false;
-		if ( NumOfNames > 0 ) {
-			Found = FindItem( NameToVerify, NamesList, NumOfNames );
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
+		// ErrorFound = false;
+		// if ( NumOfNames > 0 ) {
+		// 	Found = FindItem( NameToVerify, NamesList, NumOfNames );
+		// 	if ( Found != 0 ) {
+		// 		ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+		// 		ErrorFound = true;
+		// 	}
+		// }
 
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-		} else {
-			IsBlank = false;
-		}
+		// if ( NameToVerify.empty() ) {
+		// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
+		// 	ErrorFound = true;
+		// 	IsBlank = true;
+		// } else {
+		// 	IsBlank = false;
+		// }
 
 	}
 

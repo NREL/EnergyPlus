@@ -174,6 +174,7 @@ namespace EnergyPlus {
 	class InputProcessor {
 	private:
 		static char s[ 129 ];
+		static std::unordered_map< std::string, std::vector< std::pair< json::const_iterator, json::const_iterator > > > jdf_jdd_cache_map;
 
 	public:
 		static IdfParser idf_parser;
@@ -195,6 +196,10 @@ namespace EnergyPlus {
 		static
 		void
 		InitFiles();
+
+		static
+		void
+		InitializeCacheMap();
 
 		static
 		void
@@ -664,19 +669,19 @@ namespace EnergyPlus {
 			bool & IsBlank,
 			std::string const & StringToDisplay
 		) {
-			IsBlank = false;
-			ErrorFound = false;
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-				return;
-			}
-			int Found = FindItem( first, last, NameToVerify );
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
+			// IsBlank = false;
+			// ErrorFound = false;
+			// if ( NameToVerify.empty() ) {
+			// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
+			// 	ErrorFound = true;
+			// 	IsBlank = true;
+			// 	return;
+			// }
+			// int Found = FindItem( first, last, NameToVerify );
+			// if ( Found != 0 ) {
+			// 	ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			// 	ErrorFound = true;
+			// }
 		}
 
 		static
@@ -713,23 +718,23 @@ namespace EnergyPlus {
 			bool & IsBlank,
 			std::string const & StringToDisplay
 		) { // Overload for member arrays: Implemented here to avoid copy to Array_string to forward to other VerifyName
-			ErrorFound = false;
-			if ( NumOfNames > 0 ) {
-				int const Found = FindItem( NameToVerify, NamesList,
-				                            NumOfNames ); // Calls FindItem overload that accepts member arrays
-				if ( Found != 0 ) {
-					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-					ErrorFound = true;
-				}
-			}
+			// ErrorFound = false;
+			// if ( NumOfNames > 0 ) {
+			// 	int const Found = FindItem( NameToVerify, NamesList,
+			// 	                            NumOfNames ); // Calls FindItem overload that accepts member arrays
+			// 	if ( Found != 0 ) {
+			// 		ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			// 		ErrorFound = true;
+			// 	}
+			// }
 
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-			} else {
-				IsBlank = false;
-			}
+			// if ( NameToVerify.empty() ) {
+			// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
+			// 	ErrorFound = true;
+			// 	IsBlank = true;
+			// } else {
+			// 	IsBlank = false;
+			// }
 		}
 
 		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
@@ -745,23 +750,23 @@ namespace EnergyPlus {
 			bool & IsBlank,
 			std::string const & StringToDisplay
 		) {
-			ErrorFound = false;
-			if ( NumOfNames > 0 ) {
-				int const Found = FindItem( NameToVerify, NamesList,
-				                            NumOfNames ); // Calls FindItem overload that accepts member arrays
-				if ( Found != 0 ) {
-					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-					ErrorFound = true;
-				}
-			}
+			// ErrorFound = false;
+			// if ( NumOfNames > 0 ) {
+			// 	int const Found = FindItem( NameToVerify, NamesList,
+			// 	                            NumOfNames ); // Calls FindItem overload that accepts member arrays
+			// 	if ( Found != 0 ) {
+			// 		ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			// 		ErrorFound = true;
+			// 	}
+			// }
 
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-			} else {
-				IsBlank = false;
-			}
+			// if ( NameToVerify.empty() ) {
+			// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
+			// 	ErrorFound = true;
+			// 	IsBlank = true;
+			// } else {
+			// 	IsBlank = false;
+			// }
 		}
 
 		template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
@@ -778,22 +783,22 @@ namespace EnergyPlus {
 			bool & IsBlank,
 			std::string const & StringToDisplay
 		) {
-			ErrorFound = false;
-			if ( NumOfNames > 0 ) {
-				int const Found = FindItem( NameToVerify, NamesList, name_p, NumOfNames );
-				if ( Found != 0 ) {
-					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-					ErrorFound = true;
-				}
-			}
+			// ErrorFound = false;
+			// if ( NumOfNames > 0 ) {
+			// 	int const Found = FindItem( NameToVerify, NamesList, name_p, NumOfNames );
+			// 	if ( Found != 0 ) {
+			// 		ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			// 		ErrorFound = true;
+			// 	}
+			// }
 
-			if ( NameToVerify.empty() ) {
-				ShowSevereError( StringToDisplay + ", cannot be blank" );
-				ErrorFound = true;
-				IsBlank = true;
-			} else {
-				IsBlank = false;
-			}
+			// if ( NameToVerify.empty() ) {
+			// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
+			// 	ErrorFound = true;
+			// 	IsBlank = true;
+			// } else {
+			// 	IsBlank = false;
+			// }
 		}
 
 		static
