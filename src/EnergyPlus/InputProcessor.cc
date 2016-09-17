@@ -1701,24 +1701,24 @@ namespace EnergyPlus {
 		// name already and that this name is not blank).
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// int Found;
+		int Found;
 
-		// ErrorFound = false;
-		// if ( NumOfNames > 0 ) {
-		// 	Found = FindItem( NameToVerify, NamesList, NumOfNames );
-		// 	if ( Found != 0 ) {
-		// 		ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-		// 		ErrorFound = true;
-		// 	}
-		// }
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames );
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
 
-		// if ( NameToVerify.empty() ) {
-		// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
-		// 	ErrorFound = true;
-		// 	IsBlank = true;
-		// } else {
-		// 	IsBlank = false;
-		// }
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
 
 	}
 
@@ -1744,24 +1744,24 @@ namespace EnergyPlus {
 		// name already and that this name is not blank).
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// int Found;
+		int Found;
 
-		// ErrorFound = false;
-		// if ( NumOfNames > 0 ) {
-		// 	Found = FindItem( NameToVerify, NamesList, NumOfNames );
-		// 	if ( Found != 0 ) {
-		// 		ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-		// 		ErrorFound = true;
-		// 	}
-		// }
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames );
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
 
-		// if ( NameToVerify.empty() ) {
-		// 	ShowSevereError( StringToDisplay + ", cannot be blank" );
-		// 	ErrorFound = true;
-		// 	IsBlank = true;
-		// } else {
-		// 	IsBlank = false;
-		// }
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
 
 	}
 
