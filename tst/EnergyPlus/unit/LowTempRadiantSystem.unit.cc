@@ -83,6 +83,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/General.hh>
 
 
 using namespace EnergyPlus;
@@ -106,7 +107,7 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::SurfaceGeometry;
-
+using namespace EnergyPlus::General;
 
 
 
@@ -1176,6 +1177,9 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystem )
 {
+
+	bool InitErrorFound;
+
 	RadSysNum = 1;
 	SystemType = ConstantFlowSystem;
 	NumOfCFloLowTempRadSys = 1;
@@ -1199,14 +1203,165 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystem )
 	
 	CFloRadSys( RadSysNum ).CoolingSystem = true;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
-	InitLowTempRadiantSystem( false, RadSysNum, SystemType );
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	EXPECT_EQ( 3.0, CFloRadSys( RadSysNum ).ChWaterMassFlowRate );
 	EXPECT_EQ( 0.0, CFloRadSys( RadSysNum ).WaterMassFlowRate );
 	
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = true;
-	InitLowTempRadiantSystem( false, RadSysNum, SystemType );
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	EXPECT_EQ( 2.0, CFloRadSys( RadSysNum ).HotWaterMassFlowRate );
 	EXPECT_EQ( 0.0, CFloRadSys( RadSysNum ).WaterMassFlowRate );
+}
+
+TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
+{
+
+	bool InitErrorFound;
+	
+	// Test 1: with autosize for max flow, nothing should happen
+	LowTempRadiantSystem::clear_state();
+	RadSysNum = 1;
+	SystemType = ConstantFlowSystem;
+	NumOfCFloLowTempRadSys = 1;
+	CFloRadSys.allocate( NumOfCFloLowTempRadSys );
+	CFloRadSys( RadSysNum ).NumOfSurfaces = 0;
+	CFloRadSys( RadSysNum ).Name = "NoNameRadSys";
+	TotalNumOfRadSystems = 0;
+	BeginEnvrnFlag = false;
+	DataZoneEquipment::ZoneEquipInputsFilled = false;
+	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
+	BeginTimeStepFlag = false;
+	CFloRadSys( RadSysNum ).VolFlowSchedPtr = 0;
+	CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot = false;
+	CFloRadSys( RadSysNum ).WaterMassFlowRate = 1.0;
+	CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate = 2.0;
+	CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate = 3.0;
+	CFloRadSys( RadSysNum ).CWLoopNum = 0;
+	CFloRadSys( RadSysNum ).HWLoopNum = 0;
+	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
+	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
+	CFloRadSys( RadSysNum ).MotorEffic = 1.0;
+	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
+	CFloRadSys( RadSysNum ).CoolingSystem = false;
+	CFloRadSys( RadSysNum ).HeatingSystem = false;
+	
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
+	EXPECT_EQ( CFloRadSys( RadSysNum ).PumpEffic, 0.0 );
+	EXPECT_EQ( InitErrorFound, false );
+	
+	// Test 2: pump efficiency below 50%
+	LowTempRadiantSystem::clear_state();
+	RadSysNum = 1;
+	SystemType = ConstantFlowSystem;
+	NumOfCFloLowTempRadSys = 1;
+	CFloRadSys.allocate( NumOfCFloLowTempRadSys );
+	CFloRadSys( RadSysNum ).NumOfSurfaces = 0;
+	CFloRadSys( RadSysNum ).Name = "NoNameRadSys";
+	TotalNumOfRadSystems = 0;
+	BeginEnvrnFlag = false;
+	DataZoneEquipment::ZoneEquipInputsFilled = false;
+	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
+	BeginTimeStepFlag = false;
+	CFloRadSys( RadSysNum ).VolFlowSchedPtr = 0;
+	CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot = false;
+	CFloRadSys( RadSysNum ).WaterMassFlowRate = 1.0;
+	CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate = 2.0;
+	CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate = 3.0;
+	CFloRadSys( RadSysNum ).CWLoopNum = 0;
+	CFloRadSys( RadSysNum ).HWLoopNum = 0;
+	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
+	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
+	CFloRadSys( RadSysNum ).MotorEffic = 1.0;
+	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
+	CFloRadSys( RadSysNum ).CoolingSystem = false;
+	CFloRadSys( RadSysNum ).HeatingSystem = false;
+
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = 0.4; // because of how other parameters are set, this value is equal to the pump efficiency
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
+		std::string const error_string02 = delimited_string( {
+		"   ** Warning ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits( CFloRadSys( RadSysNum ).PumpEffic, 5 ) + "% which is less than 50%, for pump in radiant system " + CFloRadSys( RadSysNum ).Name
+	} );
+	EXPECT_EQ( CFloRadSys( RadSysNum ).WaterVolFlowMax, CFloRadSys( RadSysNum ).PumpEffic );
+	EXPECT_TRUE( compare_err_stream( error_string02, true ) );
+	EXPECT_EQ( InitErrorFound, false );
+
+	// Test 3: pump efficiency between 95% and 100%
+	LowTempRadiantSystem::clear_state();
+	RadSysNum = 1;
+	SystemType = ConstantFlowSystem;
+	NumOfCFloLowTempRadSys = 1;
+	CFloRadSys.allocate( NumOfCFloLowTempRadSys );
+	CFloRadSys( RadSysNum ).NumOfSurfaces = 0;
+	CFloRadSys( RadSysNum ).Name = "NoNameRadSys";
+	TotalNumOfRadSystems = 0;
+	BeginEnvrnFlag = false;
+	DataZoneEquipment::ZoneEquipInputsFilled = false;
+	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
+	BeginTimeStepFlag = false;
+	CFloRadSys( RadSysNum ).VolFlowSchedPtr = 0;
+	CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot = false;
+	CFloRadSys( RadSysNum ).WaterMassFlowRate = 1.0;
+	CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate = 2.0;
+	CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate = 3.0;
+	CFloRadSys( RadSysNum ).CWLoopNum = 0;
+	CFloRadSys( RadSysNum ).HWLoopNum = 0;
+	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
+	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
+	CFloRadSys( RadSysNum ).MotorEffic = 1.0;
+	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
+	CFloRadSys( RadSysNum ).CoolingSystem = false;
+	CFloRadSys( RadSysNum ).HeatingSystem = false;
+	
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = 0.98; // because of how other parameters are set, this value is equal to the pump efficiency
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
+	std::string const error_string03 = delimited_string( {
+		"   ** Warning ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits( CFloRadSys( RadSysNum ).PumpEffic, 5 ) + "% is approaching 100%, for pump in radiant system " + CFloRadSys( RadSysNum ).Name
+	} );
+	EXPECT_EQ( CFloRadSys( RadSysNum ).WaterVolFlowMax, CFloRadSys( RadSysNum ).PumpEffic );
+	EXPECT_TRUE( compare_err_stream( error_string03, true ) );
+	EXPECT_EQ( InitErrorFound, false );
+
+	// Test 4: pump efficiency over 100%
+	LowTempRadiantSystem::clear_state();
+	RadSysNum = 1;
+	SystemType = ConstantFlowSystem;
+	NumOfCFloLowTempRadSys = 1;
+	CFloRadSys.allocate( NumOfCFloLowTempRadSys );
+	CFloRadSys( RadSysNum ).NumOfSurfaces = 0;
+	CFloRadSys( RadSysNum ).Name = "NoNameRadSys";
+	TotalNumOfRadSystems = 0;
+	BeginEnvrnFlag = false;
+	DataZoneEquipment::ZoneEquipInputsFilled = false;
+	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
+	BeginTimeStepFlag = false;
+	CFloRadSys( RadSysNum ).VolFlowSchedPtr = 0;
+	CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot = false;
+	CFloRadSys( RadSysNum ).WaterMassFlowRate = 1.0;
+	CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate = 2.0;
+	CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate = 3.0;
+	CFloRadSys( RadSysNum ).CWLoopNum = 0;
+	CFloRadSys( RadSysNum ).HWLoopNum = 0;
+	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
+	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
+	CFloRadSys( RadSysNum ).MotorEffic = 1.0;
+	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
+	CFloRadSys( RadSysNum ).CoolingSystem = false;
+	CFloRadSys( RadSysNum ).HeatingSystem = false;
+	
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = 1.23; // because of how other parameters are set, this value is equal to the pump efficiency
+	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
+	std::string const error_string04 = delimited_string( {
+		"   ** Severe  ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits( CFloRadSys( RadSysNum ).PumpEffic, 5 ) + "% which is bigger than 100%, for pump in radiant system " + CFloRadSys( RadSysNum ).Name
+	} );
+	EXPECT_EQ( CFloRadSys( RadSysNum ).WaterVolFlowMax, CFloRadSys( RadSysNum ).PumpEffic );
+	EXPECT_TRUE( compare_err_stream( error_string04, true ) );
+	EXPECT_EQ( InitErrorFound, true );
+
 }
 

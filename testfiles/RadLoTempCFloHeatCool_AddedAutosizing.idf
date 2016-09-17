@@ -54,15 +54,15 @@
 !
 !      (0,0,0)             (6.069,0,0)               (12.192,0,0)
 !
-! Internal gains description:     ZONE West      - lighting is 0 watts, equip is 2928.751 watts, 3 occupants
-! Internal gains description:     ZONE North     - lighting is 878.6252 watts, equip is 2928.751 watts, 4 occupants
-! Internal gains description:     ZONE East      - lighting is 1464.375 watts, equip is 1464.375 watts, 3 occupants
+! Internal gains description:     ZONE West      - lighting is 0 watts, equip is 928.751 watts, 3 occupants
+! Internal gains description:     ZONE North     - lighting is 464.375 watts, equip is 464.375 watts, 4 occupants
+! Internal gains description:     ZONE East      - lighting is 464.375 watts, equip is 464.375 watts, 3 occupants
 !
 ! Interzone Surfaces:             3 interzone surfaces (see diagram)
 ! Internal Mass:                  None
 ! People:                         10
-! Lights:                         2343 W
-! Equipment:                      7323 W
+! Lights:                         929 W
+! Equipment:                      1857 W
 ! Windows:                        1 - single pane clear 3mm glass
 ! Detached Shading:               None
 ! Daylight:                       None
@@ -541,7 +541,7 @@
     West Zone,               !- Zone or ZoneList Name
     BLDG Sch   2,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    2928.751,                !- Design Level {W}
+    928.751,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -575,7 +575,7 @@
     EAST ZONE,               !- Zone or ZoneList Name
     BLDG Sch   3,            !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    1464.375,                !- Lighting Level {W}
+    464.375,                 !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Return Air Fraction
@@ -589,7 +589,7 @@
     EAST ZONE,               !- Zone or ZoneList Name
     BLDG Sch   2,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    1464.375,                !- Design Level {W}
+    464.375,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -623,7 +623,7 @@
     NORTH ZONE,              !- Zone or ZoneList Name
     BLDG Sch   3,            !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    878.6252,                !- Lighting Level {W}
+    464.375,                 !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Return Air Fraction
@@ -637,7 +637,7 @@
     NORTH ZONE,              !- Zone or ZoneList Name
     BLDG Sch   2,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    2928.751,                !- Design Level {W}
+    464.375,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -1326,7 +1326,7 @@
     0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
     0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
     0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
-    5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+    5.0,                     !- Chilled Water Outlet Temperature Lower Limit {C}
     LeavingSetpointModulated;!- Chiller Flow Mode
 
   SetpointManager:Scheduled,
@@ -1949,8 +1949,8 @@
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
     Cooling,                 !- Loop Type
-    7,                       !- Design Loop Exit Temperature
-    15;                      !- Loop Design Temperature Difference
+    0.5,                     !- Design Loop Exit Temperature
+    2.0;                     !- Loop Design Temperature Difference
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name
@@ -1978,8 +1978,8 @@
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
     RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
     RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
-    SimpleOff,               !- Condensation Control Type
-    1.0,                     !- Condensation Control Dewpoint Offset {C}
+    Off,                     !- Condensation Control Type
+    ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
@@ -2009,8 +2009,8 @@
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
     RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
     RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
-    VariableOff,             !- Condensation Control Type
-    0.0,                     !- Condensation Control Dewpoint Offset {C}
+    Off,                     !- Condensation Control Type
+    ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
@@ -2041,7 +2041,7 @@
     RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
     RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
     Off,                     !- Condensation Control Type
-    0.0,                     !- Condensation Control Dewpoint Offset {C}
+    ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
@@ -2106,6 +2106,16 @@
   Output:Variable,*,Surface Internal Source Location Temperature,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
+
+  Output:Variable,*,District Cooling Outlet Temperature,timestep;
+
+  Output:Variable,*,Chiller Evaporator Outlet Temperature,timestep;
+
+  Output:Variable,*,Chiller Evaporator Cooling Rate,timestep;
+
+  Output:Variable,*,Plant Supply Side Outlet Temperature,timestep;
+
+  Output:Variable,*,Plant Supply Side Inlet Temperature,timestep;
 
   Output:VariableDictionary,Regular;
 
@@ -2230,7 +2240,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,7.00;       !- Field 3
+    Until: 24:00,5.00;       !- Field 3
 
   Schedule:Compact,
     HW LOOP TEMP SCHEDULE,   !- Name
@@ -2279,14 +2289,14 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,15.00;      !- Field 3
+    Until: 24:00,7.00;       !- Field 3
 
   Schedule:Compact,
     RADCOOLLOWWATERTEMP,     !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,10.00;      !- Field 3
+    Until: 24:00,5.00;       !- Field 3
 
   Schedule:Compact,
     RADCOOLHIGHCONTROLTEMP,  !- Name
