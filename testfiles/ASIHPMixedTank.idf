@@ -2698,30 +2698,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
-	Output:Variable,*,Air Loop Flow Rate,timestep; !- HVAC Average [kg/s]
-Output:Variable,*,Condenser Water Flow Rate,timestep; !- HVAC Average [kg/s]
-Output:Variable,*,Heating Coil Total Air Heating Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Total Water Heating Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Total Electric Power,timestep; !- HVAC Average [W]
-Output:Variable,*,Total Latent Cooling Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Total Source Energy Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Total COP,timestep; !- HVAC Average []
-Output:Variable,*,Total Electric Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Total Cooling Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Total Air Heating Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Total Water Heating Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Total Latent Cooling Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Total Source Energy,timestep; !- HVAC Sum [J]
-
-Output:Variable,*,Cooling Coil Total Cooling Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Sensible Cooling Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Latent Cooling Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Latent Cooling Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Electric Power,timestep; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Electric Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Runtime Fraction,timestep; !- HVAC Average []
-Output:Variable,*,Cooling Coil Source Side Heat Transfer Energy,timestep; !- HVAC Sum [J]
-Output:Variable,*,Water Heater Tank Temperature,timestep; !- HVAC Average [C]
-

@@ -1090,21 +1090,21 @@ namespace EnergyPlus {
 //				                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
 //				                     "System", "Average",
 //				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Loop Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Condenser Water Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Loop Mass Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Condenser Water Mass Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalCoolingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Air Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalSpaceHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Water Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalWaterHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Electric Power [W]", IntegratedHeatPumps( DXCoilNum ).TotalPower, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalLatentLoad, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Source Energy Rate [W]", IntegratedHeatPumps( DXCoilNum ).Qsource, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Rate [W]", IntegratedHeatPumps( DXCoilNum ).Qsource, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump COP []", IntegratedHeatPumps( DXCoilNum ).TotalCOP, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Electric Energy [J]", IntegratedHeatPumps( DXCoilNum ).Energy, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalCooling, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Air Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Water Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalWaterHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLatent, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Source Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergySource, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergySource, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 			}
 
 		}
