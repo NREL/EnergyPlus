@@ -958,7 +958,7 @@
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1UnitHeatFan,        !- Supply Air Fan Name
     0.84,                    !- Maximum Supply Air Flow Rate {m3/s}
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Zone1UnitHeatHeatingCoil,!- Heating Coil Name
     ,                        !- Supply Air Fan Operating Mode Schedule Name
     Yes;                     !- Supply Air Fan Operation During No Heating

@@ -1269,7 +1269,7 @@
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.47,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -1293,7 +1293,7 @@
     Zone 3 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 3 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.47,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 3,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -1413,9 +1413,9 @@
     0.8,                     !- Coil Maximum Efficiency
     0.16,                    !- Coil Flow Ratio
     225.,                    !- Recirculating Water Pump Power Consumption {W}
-    1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    200.0,                   !- Secondary Fan Delta Pressure {Pa}
+    1.0,                     !- Secondary Air Fan Flow Rate {m3/s}
+    0.7,                     !- Secondary Air Fan Total Efficiency
+    200.0,                   !- Secondary Air Fan Delta Pressure {Pa}
     EvapCoolerIndirectInletAirNode,  !- Primary Air Inlet Node Name
     EvapCoolerDirectInletAirNode,  !- Primary Air Outlet Node Name
     Constant,                !- Control Type

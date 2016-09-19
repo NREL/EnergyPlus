@@ -13,7 +13,6 @@
 ! These are representative of materials and constructions used in
 ! Cooling and Heating Load Calculations.
 !===============================================================================
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Construction,

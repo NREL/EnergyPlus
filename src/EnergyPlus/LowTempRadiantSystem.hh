@@ -116,6 +116,7 @@ namespace LowTempRadiantSystem {
 	extern int OperatingMode; // Used to keep track of whether system is in heating or cooling mode
 	extern int MaxCloNumOfSurfaces; // Used to set allocate size in CalcClo routine
 	extern bool VarOffCond; // Set to true when in cooling for constant flow system + variable off condensation predicted
+	extern bool FirstTimeInit; // Set to true initially and set to false once the first pass is made through the initialization routine
 	extern Real64 LoopReqTemp; // Temperature required at the inlet of the pump (from the loop) to meet control logic
 	extern Array1D< Real64 > QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
 	extern Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -548,7 +549,8 @@ namespace LowTempRadiantSystem {
 	InitLowTempRadiantSystem(
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
-		int const SystemType // Type of radiant system: hydronic, constant flow, or electric
+		int const SystemType, // Type of radiant system: hydronic, constant flow, or electric
+		bool & InitErrorFound // Set to true when a severe or worse error is discovered during initialization
 	);
 
 	void

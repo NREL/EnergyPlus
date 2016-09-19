@@ -13,7 +13,6 @@
 !   Sacred Power Corporation, Albuquerque, NM.
 !   2001
 !   mc-Si
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   PhotovoltaicPerformance:Sandia,
@@ -55,8 +54,8 @@
     0.03,                    !- Sandia Database Parameter c5 {dimensionless}
     34.10,                   !- Sandia Database Parameter Ix0
     21.60,                   !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Array composed of eight BP Solar BP-275 c-Si modules. Two modules
 !   in series in each module string with four module strings in parallel.
@@ -104,8 +103,8 @@
     0.02,                    !- Sandia Database Parameter c5 {dimensionless}
     18.00,                   !- Sandia Database Parameter Ix0
     11.60,                   !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Array composed of eight Kyocera KC-80 mc-Si modules. Two modules
 !   in series in each module string with four module strings in parallel.
@@ -153,8 +152,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     17.70,                   !- Sandia Database Parameter Ix0
     11.76,                   !- Sandia Database Parameter Ixx0
-    1.09,                    !- Sandia Database Parameter c6
-    -0.09;                   !- Sandia Database Parameter c7
+    1.09,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.09;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.828 m^2, (33.8 x 38.0). Weight = 12 kg (26 lb).
 !   Module with 2 parallel strings of 36 (100 cm^2) EFG multicrystalline
@@ -206,8 +205,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     6.32,                    !- Sandia Database Parameter Ix0
     4.12,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.828 m^2, (33.8 x 38.0). Weight = 12 kg (26 lb).
 !   Module with 2 parallel strings of 36 (100 cm^2) EFG multicrystalline
@@ -259,8 +258,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.53,                    !- Sandia Database Parameter Ix0
     3.65,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.828 m^2, (33.8 x 38.0). Weight = 12 kg (26 lb).
 !   Module with 2 parallel strings of 36 (100 cm^2) EFG multicrystalline
@@ -312,8 +311,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.93,                    !- Sandia Database Parameter Ix0
     3.86,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.828 m^2, (33.8 x 38.0). Weight = 12 kg (26 lb).
 !   Module with 72 (100 cm^2) EFG multicrystalline silicon cells
@@ -365,8 +364,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.16,                    !- Sandia Database Parameter Ix0
     2.06,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.828 m^2, (33.8 x 38.0). Weight = 12 kg (26 lb).
 !   Module with 72 (100 cm^2) EFG multicrystalline silicon cells
@@ -418,8 +417,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.76,                    !- Sandia Database Parameter Ix0
     1.78,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.828 m^2, (33.8 x 38.0). Weight = 12 kg (26 lb).
 !   Module with 72 (100 cm^2) EFG multicrystalline silicon cells
@@ -471,8 +470,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.96,                    !- Sandia Database Parameter Ix0
     1.92,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 2.427 m^2, (50.5 x 74.5). Weight = 48 kg (107 lb).
 !   Module with 216 (100 cm^2) EFG multicrystalline silicon cells,
@@ -524,8 +523,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     17.10,                   !- Sandia Database Parameter Ix0
     11.30,                   !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 2.427 m^2, (50.5 x 74.5). Weight = 48 kg (107 lb).
 !   Module with 216 (100 cm^2) EFG multicrystalline silicon cells,
@@ -577,8 +576,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     18.20,                   !- Sandia Database Parameter Ix0
     12.00,                   !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 2.427 m^2, (50.5 x 74.5). Weight = 48 kg (107 lb).
 !   Module with 216 (100 cm^2) EFG multicrystalline silicon cells,
@@ -630,8 +629,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     18.90,                   !- Sandia Database Parameter Ix0
     12.50,                   !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 2.427 m^2, (50.5 x 74.5). Weight = 48 kg (107 lb).
 !   Module with 216 (100 cm^2) EFG multicrystalline silicon cells,
@@ -683,8 +682,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     6.25,                    !- Sandia Database Parameter Ix0
     4.02,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 2.427 m^2, (50.5 x 74.5). Weight = 48 kg (107 lb).
 !   Module with 216 (100 cm^2) EFG multicrystalline silicon cells,
@@ -736,8 +735,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.74,                    !- Sandia Database Parameter Ix0
     3.90,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 2.427 m^2, (50.5 x 74.5). Weight = 48 kg (107 lb).
 !   Module with 216 (100 cm^2) EFG multicrystalline silicon cells,
@@ -789,8 +788,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     6.13,                    !- Sandia Database Parameter Ix0
     4.02,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 2.427 m^2, (50.5 x 74.5). Weight = 48 kg (107 lb).
 !   Module with 216 (100 cm^2) EFG multicrystalline silicon cells,
@@ -842,8 +841,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     6.43,                    !- Sandia Database Parameter Ix0
     4.24,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.435 m^2, (17.8 x 38.0). Weight = 6.1 kg (13.5
 !   lb). Module with 36 (100 cm^2) EFG multicrystalline silicon cells
@@ -895,8 +894,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.07,                    !- Sandia Database Parameter Ix0
     2.00,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.435 m^2, (17.8 x 38.0). Weight = 6.1 kg (13.5
 !   lb). Module with 36 (100 cm^2) EFG multicrystalline silicon cells
@@ -948,8 +947,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.86,                    !- Sandia Database Parameter Ix0
     1.85,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.435 m^2, (17.8 x 38.0). Weight = 6.1 kg (13.5
 !   lb). Module with 36 (100 cm^2) EFG multicrystalline silicon cells
@@ -1001,8 +1000,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.16,                    !- Sandia Database Parameter Ix0
     2.04,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.974 m^2, (26.0 x 58.1). Weight = 11.9 kg (26.1 lb).
 !   Module with 36 large-area (240 cm^2) crystalline silicon cells
@@ -1051,8 +1050,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     7.00,                    !- Sandia Database Parameter Ix0
     4.32,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.974 m^2, (26.0 x 58.1). Weight = 11.9 kg (26.1 lb).
 !   Module with 36 large-area (240 cm^2) crystalline silicon cells
@@ -1101,8 +1100,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     7.30,                    !- Sandia Database Parameter Ix0
     4.60,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.974 m^2, (26.0 x 58.1). Weight = 11.9 kg (26.1 lb).
 !   Module with 36 large-area (240 cm^2) crystalline silicon cells
@@ -1151,8 +1150,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     7.55,                    !- Sandia Database Parameter Ix0
     5.00,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.974 m^2, (26.0 x 58.1). Weight = 11.9 kg (26.1 lb).
 !   Module with 36 large-area (240 cm^2) crystalline silicon cells
@@ -1201,8 +1200,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     7.26,                    !- Sandia Database Parameter Ix0
     4.67,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.567 m^2, (26.0 x33.8). Weight = 7.5 kg (16.6 lb). Module
 !   with 40 (120 cm^2) crystalline silicon cells connected in series.
@@ -1251,8 +1250,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.25,                    !- Sandia Database Parameter Ix0
     2.15,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.631 m^2, (20.7 x 47.2). Weight = 8.2 kg (18.1 lb).
 !   Module with 36 (150 cm^2) crystalline silicon cells connected
@@ -1301,8 +1300,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     4.47,                    !- Sandia Database Parameter Ix0
     2.78,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.631 m^2, (20.7 x 47.2). Weight = 8.2 kg (18.1 lb).
 !   Module with 36 (150 cm^2) crystalline silicon cells connected
@@ -1351,8 +1350,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     4.75,                    !- Sandia Database Parameter Ix0
     3.05,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.974 m^2, (26.0 x 58.1). Weight = 11.9 kg (26.1 lb).
 !   Module with 36 large-area (240 cm^2) Silicon-Film polycrystalline
@@ -1401,8 +1400,8 @@
     0.03,                    !- Sandia Database Parameter c5 {dimensionless}
     5.67,                    !- Sandia Database Parameter Ix0
     3.53,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.566 m^2, (26.0 x 33.8). Weight = 7.5 kg (16.6 lb).
 !   Module with 40 (120 cm^2) Silicon-Film polycrystalline silicon
@@ -1451,8 +1450,8 @@
     0.03,                    !- Sandia Database Parameter c5 {dimensionless}
     2.86,                    !- Sandia Database Parameter Ix0
     1.77,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.078 m^2, (26.0 x 64.3). Weight = 13.7 kg (30.2 lb).
 !   Module with 40 large-area (240 cm^2) Silicon-Film polycrystalline
@@ -1501,8 +1500,8 @@
     0.03,                    !- Sandia Database Parameter c5 {dimensionless}
     5.74,                    !- Sandia Database Parameter Ix0
     3.55,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.26 m^2, (31.1 x 62.8). Weight = 20.5 kg (45 lb). Module
 !   with 72 (145 cm^2) crystalline silicon cells connected in series.
@@ -1551,8 +1550,8 @@
     7.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.47,                    !- Sandia Database Parameter Ix0
     3.05,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.26 m^2, (31.1 x 62.8). Weight = 20.5 kg (45 lb). Module
 !   with 72 (145 cm^2) crystalline silicon cells connected in series.
@@ -1601,8 +1600,8 @@
     7.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.74,                    !- Sandia Database Parameter Ix0
     3.30,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.630 m^2, (20.9 x 46.8). Weight = 7.5 kg (16.5 lb).
 !   Module with 36 (145 cm^2) crystalline silicon cells connected
@@ -1651,8 +1650,8 @@
     7.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.47,                    !- Sandia Database Parameter Ix0
     3.05,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.630 m^2, (20.9 x 46.8). Weight = 7.5 kg (16.5 lb).
 !   Module with 36 (145 cm^2) crystalline silicon cells connected
@@ -1701,8 +1700,8 @@
     7.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.74,                    !- Sandia Database Parameter Ix0
     3.30,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.09 m^2, (31.7 x 53.1). Weight = 13.0 kg (28.6 lb).
 !   Module with 60 (145 cm^2) laser-grooved buried-grid crystalline
@@ -1751,8 +1750,8 @@
     7.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.79,                    !- Sandia Database Parameter Ix0
     3.30,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.630 m^2, (20.9 x 46.8). Weight = 7.5 kg (16.5 lb).
 !   Module with 36 (145 cm^2) laser-grooved buried-grid crystalline
@@ -1801,8 +1800,8 @@
     7.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.69,                    !- Sandia Database Parameter Ix0
     3.30,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.630 m^2, (20.9 x 46.8). Weight = 7.5 kg (16.5 lb).
 !   Module with 36 (145 cm^2) laser-grooved buried-grid crystalline
@@ -1851,8 +1850,8 @@
     7.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.99,                    !- Sandia Database Parameter Ix0
     3.44,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.945 m^2, (24.0 x 61.0). Weight = 15.1 kg (33.3 lb).
 !   Thin-film module with BP Apollo technology, cadmium telluride
@@ -1902,8 +1901,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.78,                    !- Sandia Database Parameter Ix0
     1.73,                    !- Sandia Database Parameter Ixx0
-    1.09,                    !- Sandia Database Parameter c6
-    -0.09;                   !- Sandia Database Parameter c7
+    1.09,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.09;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.945 m^2, (24.0 x 61.0). Weight = 15.1 kg (33.3 lb).
 !   Thin-film module with BP Apollo technology, cadmium telluride
@@ -1953,8 +1952,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.84,                    !- Sandia Database Parameter Ix0
     1.87,                    !- Sandia Database Parameter Ixx0
-    1.09,                    !- Sandia Database Parameter c6
-    -0.09;                   !- Sandia Database Parameter c7
+    1.09,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.09;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Large area = 3.18 m^2, (34 x 144). Weight = 100 kg (220 lb).
 !   Module has 37 (39 cm^2) crystalline silicon concentrator cells
@@ -2005,8 +2004,8 @@
     5.3e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     22.66,                   !- Sandia Database Parameter Ix0
     15.90,                   !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.791 m^2, (25 x 49). Weight = 13.2 kg (29 lb). Thin-film
 !   module with tandem junction amorphous silicon (p-i-n/p-i-n) monolithically-integrated
@@ -2056,8 +2055,8 @@
     -0.02,                   !- Sandia Database Parameter c5 {dimensionless}
     1.06,                    !- Sandia Database Parameter Ix0
     0.63,                    !- Sandia Database Parameter Ixx0
-    1.09,                    !- Sandia Database Parameter c6
-    -0.09;                   !- Sandia Database Parameter c7
+    1.09,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.09;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.720 m^2, (23.6 x 47.2). Weight = 11.4 kg (25 lb). Thin-film
 !   module with cadmium telluride (CdTe) cells, 116 cells connected
@@ -2107,8 +2106,8 @@
     -0.05,                   !- Sandia Database Parameter c5 {dimensionless}
     0.88,                    !- Sandia Database Parameter Ix0
     0.48,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.720 m^2, (23.6 x 47.2). Weight = 11.4 kg (25 lb). Thin-film
 !   module with cadmium telluride (CdTe) cells, 116 cells connected
@@ -2158,8 +2157,8 @@
     -0.05,                   !- Sandia Database Parameter c5 {dimensionless}
     0.91,                    !- Sandia Database Parameter Ix0
     0.52,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.929 m^2, (25.7 x 68.1). Weight = 11.9 kg (26.2 lb).
 !   Module with 36 large-area (230 cm^2) multicrystalline silicon
@@ -2208,8 +2207,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     6.90,                    !- Sandia Database Parameter Ix0
     4.55,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.929 m^2, (25.7 x 68.1). Weight = 11.9 kg (26.2 lb).
 !   Module with 36 large-area (230 cm^2) multicrystalline silicon
@@ -2258,8 +2257,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     7.44,                    !- Sandia Database Parameter Ix0
     5.30,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.343 m^2, (25.7 x 20.7). Weight = 6.0 kg (13.2 lb).
 !   Module with 36 (75 cm^2) multicrystalline silicon cells connected
@@ -2308,8 +2307,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.47,                    !- Sandia Database Parameter Ix0
     1.70,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.489 m^2, (25.7 x 29.6). Weight = 7.8 kg (17.2 lb).
 !   Module with 36 (115 cm^2) multicrystalline silicon cells connected
@@ -2358,8 +2357,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.73,                    !- Sandia Database Parameter Ix0
     2.62,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.636 m^2, (25.7 x 38.4). Weight = 9.6 kg (21.2 lb).
 !   Module with 36 (155 cm^2) multicrystalline silicon cells connected
@@ -2408,8 +2407,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     4.90,                    !- Sandia Database Parameter Ix0
     3.46,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.636 m^2, (25.7 x 38.4). Weight = 9.6 kg (21.2 lb).
 !   Module with 36 (155 cm^2) multicrystalline silicon cells connected
@@ -2458,8 +2457,8 @@
     6.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.69,                    !- Sandia Database Parameter Ix0
     3.16,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2509,8 +2508,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.98,                    !- Sandia Database Parameter Ix0
     4.40,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2560,8 +2559,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.99,                    !- Sandia Database Parameter Ix0
     2.20,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2611,8 +2610,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     6.28,                    !- Sandia Database Parameter Ix0
     4.63,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2662,8 +2661,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.14,                    !- Sandia Database Parameter Ix0
     2.31,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2714,8 +2713,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.07,                    !- Sandia Database Parameter Ix0
     1.92,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2765,8 +2764,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.58,                    !- Sandia Database Parameter Ix0
     4.09,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2816,8 +2815,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.79,                    !- Sandia Database Parameter Ix0
     2.05,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2867,8 +2866,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.78,                    !- Sandia Database Parameter Ix0
     4.25,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.898 m^2, (26.5 x 52.5). Weight = 10.5 kg (23.1
 !   lb). Module with 72 (105 cm^2) multicrystalline silicon cells
@@ -2918,8 +2917,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.90,                    !- Sandia Database Parameter Ix0
     2.12,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.152 m^2, (10.3 x 22.9). Weight = 3.4 kg (7.5
 !   lb). Module with 36 (25 cm^2) multicrystalline silicon cells
@@ -2968,8 +2967,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     0.70,                    !- Sandia Database Parameter Ix0
     0.58,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.266 m^2, (14.5 x 28.3). Weight = 5.2 kg (11.4
 !   lb). Module with 36 (51 cm^2) multicrystalline silicon cells
@@ -3018,8 +3017,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     1.39,                    !- Sandia Database Parameter Ix0
     1.19,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.463 m^2, (18.2 x 39.4). Weight = 9.2 kg (20.2
 !   lb). Module with 36 (102 cm^2) multicrystalline silicon cells
@@ -3068,8 +3067,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.07,                    !- Sandia Database Parameter Ix0
     2.05,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.450 m^2, (17.0 x 41.0). Weight = 9.2 kg (20.2
 !   lb). Module with 36 (102 cm^2) multicrystalline silicon cells
@@ -3118,8 +3117,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.68,                    !- Sandia Database Parameter Ix0
     1.88,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.450 m^2, (17.0 x 41.0). Weight = 9.2 kg (20.2
 !   lb). Module with 36 (102 cm^2) multicrystalline silicon cells
@@ -3168,8 +3167,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.05,                    !- Sandia Database Parameter Ix0
     2.00,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.450 m^2, (17.0 x 41.0). Weight = 9.2 kg (20.2
 !   lb). Module with 36 (102 cm^2) multicrystalline silicon cells
@@ -3218,8 +3217,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.25,                    !- Sandia Database Parameter Ix0
     2.18,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.707 m^2, (21.9 x 50.1). Weight = 13 kg (28.6
 !   lb). Module with 36 (156 cm^2) multicrystalline silicon cells
@@ -3269,8 +3268,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     4.45,                    !- Sandia Database Parameter Ix0
     3.15,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.707 m^2, (21.9 x 50.1). Weight = 13 kg (28.6
 !   lb). Module with 36 (156 cm^2) multicrystalline silicon cells
@@ -3320,8 +3319,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     4.65,                    !- Sandia Database Parameter Ix0
     3.18,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Module area = 0.707 m^2, (21.9 x 50.1). Weight = 13 kg (28.6
 !   lb). Module with 36 (156 cm^2) multicrystalline silicon cells
@@ -3371,8 +3370,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     4.94,                    !- Sandia Database Parameter Ix0
     3.38,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area =1.148 m^2, (34.6 x 51.4). Weight = 15 kg (33 lb). Module
 !   with 96 large-area (100 cm^2) HIT (heterojunction with intrinsic
@@ -3423,8 +3422,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.57,                    !- Sandia Database Parameter Ix0
     2.43,                    !- Sandia Database Parameter Ixx0
-    1.06,                    !- Sandia Database Parameter c6
-    -0.06;                   !- Sandia Database Parameter c7
+    1.06,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.06;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area =1.301 m^2, (32.5 x 62.0). Weight = 17 kg (37 lb). Module
 !   with 72 large-area (156 cm^2) multicrystalline silicon cells
@@ -3474,8 +3473,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.40,                    !- Sandia Database Parameter Ix0
     3.35,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area =0.96 m^2, (31.6 x 47.2). Weight = 12.5 kg (27.5 lb). Module
 !   with 54 large-area (156 cm^2) textured multicrystalline silicon
@@ -3525,8 +3524,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.20,                    !- Sandia Database Parameter Ix0
     3.27,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.119 m^2, (14.2 x 13.0). Weight = 1.8 kg (3.7 lb). Module
 !   with 34 (25 cm^2) pyramidally-textured crystalline silicon cells
@@ -3576,8 +3575,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     0.70,                    !- Sandia Database Parameter Ix0
     0.41,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.186 m^2, (12.9 x 22.3). Weight = 2.5 kg (5.6 lb). Module
 !   with 30 (50 cm^2) pyramidally-textured crystalline silicon cells
@@ -3627,8 +3626,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     1.59,                    !- Sandia Database Parameter Ix0
     0.95,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.356 m^2, (13 x 42.7). Weight = 4.6 kg (10.2 lb). Module
 !   with 30 (100 cm^2) pyramidally-textured crystalline silicon cells
@@ -3678,8 +3677,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     3.33,                    !- Sandia Database Parameter Ix0
     2.39,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.425 m^2, (13 x 50.9). Weight = 5.5 kg (12 lb). Module
 !   with 36 (100 cm^2) pyramidally-textured crystalline silicon cells
@@ -3729,8 +3728,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     3.38,                    !- Sandia Database Parameter Ix0
     2.25,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.401 m^2, (13 x 48). Weight = 5.2 kg (11.5 lb). Module
 !   with 33 (100 cm^2) pyramidally-textured crystalline silicon cells
@@ -3780,8 +3779,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     3.33,                    !- Sandia Database Parameter Ix0
     2.39,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.425 m^2, (13 x 50.9). Weight = 5.5 kg (12 lb). Module
 !   with 36 (100 cm^2) pyramidally-textured crystalline silicon cells
@@ -3830,8 +3829,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     3.30,                    !- Sandia Database Parameter Ix0
     2.24,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.425 m^2, (13 x 50.9). Weight = 5.5 kg (12 lb). Module
 !   with 36 (100 cm^2) pyramidally-textured crystalline silicon cells
@@ -3881,8 +3880,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     3.43,                    !- Sandia Database Parameter Ix0
     2.33,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.058 m^2, (6.9 x 13.0). Weight = 1.0 kg (2.2 lb). Module
 !   with 33 (15 cm^2) pyramidally-textured crystalline silicon cells
@@ -3932,8 +3931,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     0.41,                    !- Sandia Database Parameter Ix0
     0.29,                    !- Sandia Database Parameter Ixx0
-    1.12,                    !- Sandia Database Parameter c6
-    -0.12;                   !- Sandia Database Parameter c7
+    1.12,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.12;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.058 m^2, (6.9 x 13.0). Weight = 1.0 kg (2.2 lb). Module
 !   with 33 (15 cm^2) pyramidally-textured crystalline silicon cells
@@ -3983,8 +3982,8 @@
     -0.01,                   !- Sandia Database Parameter c5 {dimensionless}
     0.38,                    !- Sandia Database Parameter Ix0
     0.24,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.317 m^2, (32.0 x 63.8). Weight = 14.8 kg (32.6 lb).
 !   Module with 72 (140 cm^2) pyramidally-textured crystalline silicon
@@ -4034,8 +4033,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.48,                    !- Sandia Database Parameter Ix0
     2.80,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.317 m^2, (32.0 x 63.8). Weight = 14.8 kg (32.6 lb).
 !   Module with 72 (140 cm^2) pyramidally-textured crystalline silicon
@@ -4085,8 +4084,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.69,                    !- Sandia Database Parameter Ix0
     3.01,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.317 m^2, (32.0 x 63.8). Weight = 14.8 kg (32.6 lb).
 !   Module with 72 (140 cm^2) pyramidally-textured crystalline silicon
@@ -4136,8 +4135,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.79,                    !- Sandia Database Parameter Ix0
     3.12,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.174 m^2, (10.8 x 24.9). Weight = 2.7 kg (5.9 lb). Module
 !   with 36 (35 cm^2) pyramidally-textured crystalline silicon cells
@@ -4187,8 +4186,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     1.20,                    !- Sandia Database Parameter Ix0
     0.78,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.174 m^2, (10.8 x 24.9). Weight = 2.7 kg (5.9 lb). Module
 !   with 2 parallel strings of 18 (70 cm^2) pyramidally-textured
@@ -4239,8 +4238,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     2.40,                    !- Sandia Database Parameter Ix0
     1.40,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.333 m^2, (20.8 x 24.9). Weight = 4.3 kg (9.5 lb). Module
 !   with 36 (70 cm^2) pyramidally-textured crystalline silicon cells
@@ -4290,8 +4289,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     2.40,                    !- Sandia Database Parameter Ix0
     1.40,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.333 m^2, (20.8 x 24.9). Weight = 4.3 kg (9.5 lb). Module
 !   with 2 parallel strings of 18 (70 cm^2) pyramidally-textured
@@ -4342,8 +4341,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.79,                    !- Sandia Database Parameter Ix0
     2.85,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.633 m^2, (20.8 x47.3). Weight = 7.6 kg (16.7 lb). Module
 !   with 36 (140 cm^2) pyramidally-textured crystalline silicon cells
@@ -4393,8 +4392,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.48,                    !- Sandia Database Parameter Ix0
     2.80,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.633 m^2, (20.8 x47.3). Weight = 7.6 kg (16.7 lb). Module
 !   with 36 (140 cm^2) pyramidally-textured crystalline silicon cells
@@ -4444,8 +4443,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.69,                    !- Sandia Database Parameter Ix0
     3.01,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.633 m^2, (20.8 x47.3). Weight = 7.6 kg (16.7 lb). Module
 !   with 2 parallel strings of 18 (140 cm^2) pyramidally-textured
@@ -4496,8 +4495,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     9.38,                    !- Sandia Database Parameter Ix0
     6.02,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.633 m^2, (20.8 x47.3). Weight = 7.6 kg (16.7 lb). Module
 !   with 36 (140 cm^2) pyramidally-textured crystalline silicon cells
@@ -4547,8 +4546,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.58,                    !- Sandia Database Parameter Ix0
     2.96,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.633 m^2, (20.8 x47.3). Weight = 7.6 kg (16.7 lb). Module
 !   with 36 (140 cm^2) pyramidally-textured crystalline silicon cells
@@ -4598,8 +4597,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.79,                    !- Sandia Database Parameter Ix0
     3.12,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.633 m^2, (20.8 x47.3). Weight = 7.6 kg (16.7 lb). Module
 !   with 2 parallel strings of 18 (140 cm^2) pyramidally-textured
@@ -4650,8 +4649,8 @@
     2.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     9.58,                    !- Sandia Database Parameter Ix0
     6.24,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.890 m^2, (23.4 x 59.0). Weight = 10.9 kg (24.0 lb).
 !   Module with 36 circular (175 cm^2) pyramidally-textured crystalline
@@ -4702,8 +4701,8 @@
     9.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     6.24,                    !- Sandia Database Parameter Ix0
     3.85,                    !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.890 m^2, (23.4 x 59.0). Weight = 10.9 kg (24.0 lb).
 !   Module with 2 parallel strings of18 circular (175 cm^2) pyramidally-textured
@@ -4754,8 +4753,8 @@
     9.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     12.48,                   !- Sandia Database Parameter Ix0
     7.72,                    !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.465 m^2, (23.4 x 30.8). Weight = 5.9 kg (13.0 lb).
 !   Module with 36 semi-circular (95 cm^2) pyramidally-textured crystalline
@@ -4806,8 +4805,8 @@
     9.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     3.19,                    !- Sandia Database Parameter Ix0
     2.10,                    !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.465 m^2, (23.4 x 30.8). Weight = 5.9 kg (13.0 lb).
 !   Module with 2 parallel strings of 18 semi-circular (95 cm^2)
@@ -4858,8 +4857,8 @@
     9.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     6.39,                    !- Sandia Database Parameter Ix0
     4.20,                    !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.890 m^2, (23.4 x 59.0). Weight = 10.9 kg (24.0 lb).
 !   Module with 36 circular (175 cm^2) pyramidally-textured crystalline
@@ -4910,8 +4909,8 @@
     9.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     5.35,                    !- Sandia Database Parameter Ix0
     3.46,                    !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.890 m^2, (23.4 x 59.0). Weight = 10.9 kg (24.0 lb).
 !   Module with 36 circular (175 cm^2) pyramidally-textured crystalline
@@ -4962,8 +4961,8 @@
     9.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     6.04,                    !- Sandia Database Parameter Ix0
     3.72,                    !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.890 m^2, (23.4 x 59.0). Weight = 10.9 kg (24.0 lb).
 !   Module with 2 parallel strings of 18 circular (175 cm^2) pyramidally-textured
@@ -5014,8 +5013,8 @@
     9.0e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     12.08,                   !- Sandia Database Parameter Ix0
     7.43,                    !- Sandia Database Parameter Ixx0
-    1.14,                    !- Sandia Database Parameter c6
-    -0.14;                   !- Sandia Database Parameter c7
+    1.14,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.14;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Small area = 0.127 m^2, (12.9 x 15.2). Weight = 2.4 kg (5.2
 !   lb). Thin-film module with multiple layer copper-indium-diselenide
@@ -5066,8 +5065,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     0.72,                    !- Sandia Database Parameter Ix0
     0.44,                    !- Sandia Database Parameter Ixx0
-    1.04,                    !- Sandia Database Parameter c6
-    -0.04;                   !- Sandia Database Parameter c7
+    1.04,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.04;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Small area = 0.128 m^2, (12.9 x 15.2). Weight = 2.4 kg (5.2
 !   lb). Thin-film module with multiple layer copper-indium-diselenide
@@ -5118,8 +5117,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     0.63,                    !- Sandia Database Parameter Ix0
     0.39,                    !- Sandia Database Parameter Ixx0
-    1.04,                    !- Sandia Database Parameter c6
-    -0.04;                   !- Sandia Database Parameter c7
+    1.04,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.04;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Small area = 0.245 m^2, (12.9 x 29.4). Weight = 4.1 kg (8.8
 !   lb). Thin-film module with multiple layer copper-indium-diselenide
@@ -5170,8 +5169,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     1.44,                    !- Sandia Database Parameter Ix0
     0.91,                    !- Sandia Database Parameter Ixx0
-    1.04,                    !- Sandia Database Parameter c6
-    -0.04;                   !- Sandia Database Parameter c7
+    1.04,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.04;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Small area = 0.424 m^2, (12.9 x 50.9). Weight = 3.2 kg (7 lb).
 !   Thin-film module with multiple layer copper-indium-diselenide
@@ -5222,8 +5221,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     2.55,                    !- Sandia Database Parameter Ix0
     1.75,                    !- Sandia Database Parameter Ixx0
-    1.04,                    !- Sandia Database Parameter c6
-    -0.04;                   !- Sandia Database Parameter c7
+    1.04,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.04;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Small area = 0.0676 m^2, (12.9 x 8.1). Weight = 1.4 kg (3.0
 !   lb). Thin-film module with multiple layer copper-indium-diselenide
@@ -5274,8 +5273,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     0.36,                    !- Sandia Database Parameter Ix0
     0.21,                    !- Sandia Database Parameter Ixx0
-    1.04,                    !- Sandia Database Parameter c6
-    -0.04;                   !- Sandia Database Parameter c7
+    1.04,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.04;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Small area = 0.0676 m^2, (12.9 x 8.1). Weight = 1.4 kg (3.0
 !   lb). Thin-film module with multiple layer copper-indium-diselenide
@@ -5326,8 +5325,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     0.38,                    !- Sandia Database Parameter Ix0
     0.23,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.825 m^2, (25.3 x 50.4). Weight = 10 kg (22.0 lb). Module
 !   with 72 ASE Americas (100 cm^2) EFG multicrystalline silicon
@@ -5376,8 +5375,8 @@
     0.02,                    !- Sandia Database Parameter c5 {dimensionless}
     3.24,                    !- Sandia Database Parameter Ix0
     2.23,                    !- Sandia Database Parameter Ixx0
-    1.06,                    !- Sandia Database Parameter c6
-    -0.06;                   !- Sandia Database Parameter c7
+    1.06,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.06;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.973 m^2, (26.0 x 58.1). Weight = 10 kg (22.0 lb). Module
 !   with 36 AstroPower large-area (240 cm^2) crystalline silicon
@@ -5426,8 +5425,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     7.47,                    !- Sandia Database Parameter Ix0
     4.83,                    !- Sandia Database Parameter Ixx0
-    1.15,                    !- Sandia Database Parameter c6
-    -0.15;                   !- Sandia Database Parameter c7
+    1.15,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.15;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.822 m^2, (26.3 x 48.5). Weight = 16 kg (35 lb). Thin-film
 !   module with tandem junction amorphous silicon cells, 4 parallel
@@ -5478,8 +5477,8 @@
     -0.01,                   !- Sandia Database Parameter c5 {dimensionless}
     3.10,                    !- Sandia Database Parameter Ix0
     1.75,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.822 m^2, (26.3 x 48.5). Weight = 16 kg (35 lb). Thin-film
 !   module with tandem junction amorphous silicon cells, 4 parallel
@@ -5530,8 +5529,8 @@
     -0.01,                   !- Sandia Database Parameter c5 {dimensionless}
     3.00,                    !- Sandia Database Parameter Ix0
     1.75,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.822 m^2, (26.3 x 48.5). Weight = 16 kg (35 lb). Mid-voltage,
 !   thin-film module with tandem-junction amorphous silicon cells,
@@ -5582,8 +5581,8 @@
     -0.01,                   !- Sandia Database Parameter c5 {dimensionless}
     0.69,                    !- Sandia Database Parameter Ix0
     0.41,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.822 m^2, (26.3 x 48.5). Weight = 16 kg (35 lb). Mid-voltage,
 !   thin-film module with tandem-junction amorphous silicon cells,
@@ -5634,8 +5633,8 @@
     -0.01,                   !- Sandia Database Parameter c5 {dimensionless}
     0.72,                    !- Sandia Database Parameter Ix0
     0.41,                    !- Sandia Database Parameter Ixx0
-    1.08,                    !- Sandia Database Parameter c6
-    -0.08;                   !- Sandia Database Parameter c7
+    1.08,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.08;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area =1.098 m^2, (39.0 x 43.6). Weight = 13 kg (29 lb). Module
 !   with 72 large-area (130 cm^2) multicrystalline silicon cells
@@ -5686,8 +5685,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.66,                    !- Sandia Database Parameter Ix0
     2.45,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area =1.098 m^2, (39.0 x 43.6). Weight = 14 kg (31 lb). Module
 !   with 72 large-area (130 cm^2) multicrystalline silicon cells
@@ -5738,8 +5737,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.76,                    !- Sandia Database Parameter Ix0
     2.67,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area =1.098 m^2, (39.0 x 43.6). Weight = 13 kg (29 lb). Module
 !   with 72 large-area (130 cm^2) multicrystalline silicon cells
@@ -5790,8 +5789,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.84,                    !- Sandia Database Parameter Ix0
     2.65,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area =2.120 m^2, (44.1 x 74.5). Weight = 21.2 kg (46.4 lb).
 !   Module with 144 large-area (130 cm^2) multicrystalline silicon
@@ -5842,8 +5841,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.77,                    !- Sandia Database Parameter Ix0
     2.67,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.556 m^2, (19.75 x 43.63). Weight = 7.2 kg (15.9 lb).
 !   Module with 36 large-area (130 cm^2) multicrystalline silicon
@@ -5894,8 +5893,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.75,                    !- Sandia Database Parameter Ix0
     2.67,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.556 m^2, (19.75 x 43.63). Weight = 7.2 kg (15.9 lb).
 !   Module with 36 large-area (130 cm^2) multicrystalline silicon
@@ -5946,8 +5945,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.96,                    !- Sandia Database Parameter Ix0
     2.75,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.556 m^2, (19.75 x 43.63). Weight = 7.2 kg (15.9 lb).
 !   Module with 36 large-area (130 cm^2) multicrystalline silicon
@@ -5998,8 +5997,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     3.81,                    !- Sandia Database Parameter Ix0
     2.49,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Prototype with SiNx anti-reflection coating on cells. Area =
 !   0.556 m^2, (19.75 x 43.63). Weight = 7.2 kg (15.9 lb). Module
@@ -6051,8 +6050,8 @@
     6.9e-03,                 !- Sandia Database Parameter c5 {dimensionless}
     4.03,                    !- Sandia Database Parameter Ix0
     2.68,                    !- Sandia Database Parameter Ixx0
-    1.10,                    !- Sandia Database Parameter c6
-    -0.10;                   !- Sandia Database Parameter c7
+    1.10,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.10;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.732 m^2, (26.0 x 43.6). Weight = 9.5 kg (20.9 lb).
 !   Module with 36 large-area (175 cm^2) multicrystalline silicon
@@ -6103,8 +6102,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     4.96,                    !- Sandia Database Parameter Ix0
     3.40,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.732 m^2, (26.0 x 43.6). Weight = 9.5 kg (20.9 lb).
 !   Module with 36 large-area (175 cm^2) multicrystalline silicon
@@ -6155,8 +6154,8 @@
     0.01,                    !- Sandia Database Parameter c5 {dimensionless}
     5.22,                    !- Sandia Database Parameter Ix0
     3.63,                    !- Sandia Database Parameter Ixx0
-    1.11,                    !- Sandia Database Parameter c6
-    -0.11;                   !- Sandia Database Parameter c7
+    1.11,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.11;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.356 m^2, (15.1 x 36.5). Weight = 3.0 kg (6.6 lb). Flexible,
 !   light-weight, thin-film module with large-area (270 cm^2) triple-junction
@@ -6206,8 +6205,8 @@
     -0.04,                   !- Sandia Database Parameter c5 {dimensionless}
     1.47,                    !- Sandia Database Parameter Ix0
     0.88,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.525 m^2, (15.1 x 53.8). Weight = 4.8 kg (10.6 lb).
 !   Flexible, light-weight, thin-film module with large-area (410
@@ -6258,8 +6257,8 @@
     -0.04,                   !- Sandia Database Parameter c5 {dimensionless}
     2.42,                    !- Sandia Database Parameter Ix0
     1.44,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.525 m^2, (15.1 x 53.8). Weight = 4.8 kg (10.6 lb).
 !   Flexible, light-weight, thin-film module with large-area (410
@@ -6310,8 +6309,8 @@
     -0.04,                   !- Sandia Database Parameter c5 {dimensionless}
     2.36,                    !- Sandia Database Parameter Ix0
     1.45,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.525 m^2, (15.1 x 53.8). Weight = 4.8 kg (10.6 lb).
 !   Flexible, light-weight, thin-film module with large-area (410
@@ -6362,8 +6361,8 @@
     -0.04,                   !- Sandia Database Parameter c5 {dimensionless}
     2.22,                    !- Sandia Database Parameter Ix0
     1.36,                    !- Sandia Database Parameter Ixx0
-    1.13,                    !- Sandia Database Parameter c6
-    -0.13;                   !- Sandia Database Parameter c7
+    1.13,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.13;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 0.688 m^2, (29.2 x 36.5). Weight = 6.3 kg (13.8 lb).
 !   Flexible, light-weight, thin-film module with large-area (270
@@ -6414,8 +6413,8 @@
     -0.05,                   !- Sandia Database Parameter c5 {dimensionless}
     2.93,                    !- Sandia Database Parameter Ix0
     1.76,                    !- Sandia Database Parameter Ixx0
-    1.18,                    !- Sandia Database Parameter c6
-    -0.18;                   !- Sandia Database Parameter c7
+    1.18,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.18;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.01 m^2, (29.2 x 53.8). Weight = 9.2 kg (20.2 lb). Flexible,
 !   light-weight, thin-film module with large-area (410 cm^2) triple-junction
@@ -6466,8 +6465,8 @@
     -0.05,                   !- Sandia Database Parameter c5 {dimensionless}
     4.78,                    !- Sandia Database Parameter Ix0
     2.87,                    !- Sandia Database Parameter Ixx0
-    1.18,                    !- Sandia Database Parameter c6
-    -0.18;                   !- Sandia Database Parameter c7
+    1.18,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.18;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.01 m^2, (29.2 x 53.8). Weight = 9.2 kg (20.2 lb). Flexible,
 !   light-weight, thin-film module with large-area (410 cm^2) triple-junction
@@ -6518,8 +6517,8 @@
     -0.05,                   !- Sandia Database Parameter c5 {dimensionless}
     4.50,                    !- Sandia Database Parameter Ix0
     2.75,                    !- Sandia Database Parameter Ixx0
-    1.18,                    !- Sandia Database Parameter c6
-    -0.18;                   !- Sandia Database Parameter c7
+    1.18,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.18;                   !- Sandia Database Parameter c7 {dimensionless}
 
 !   Area = 1.01 m^2, (29.2 x 53.8). Weight = 9.2 kg (20.2 lb). Flexible,
 !   light-weight, thin-film module with large-area (410 cm^2) triple-junction
@@ -6570,6 +6569,6 @@
     -0.05,                   !- Sandia Database Parameter c5 {dimensionless}
     4.75,                    !- Sandia Database Parameter Ix0
     2.95,                    !- Sandia Database Parameter Ixx0
-    1.18,                    !- Sandia Database Parameter c6
-    -0.18;                   !- Sandia Database Parameter c7
+    1.18,                    !- Sandia Database Parameter c6 {dimensionless}
+    -0.18;                   !- Sandia Database Parameter c7 {dimensionless}
 

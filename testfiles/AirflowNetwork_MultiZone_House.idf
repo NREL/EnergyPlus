@@ -1685,7 +1685,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Supp Heating Coil 1,     !- Coil Name
-    Coil:Heating:Fuel,        !- Coil Object Type
+    Coil:Heating:Fuel,       !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.000;                   !- Air Path Hydraulic Diameter {m}
 
@@ -1833,9 +1833,9 @@
     HVACAvailSched,          !- Availability Schedule Name
     Air Loop Inlet Node,     !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    1.18,                    !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.18,                    !- Supply Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    1.18,                    !- Cooling Supply Air Flow Rate {m3/s}
+    1.18,                    !- Heating Supply Air Flow Rate {m3/s}
+    0,                       !- No Load Supply Air Flow Rate {m3/s}
     LIVING ZONE,             !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     Supply Fan 1,            !- Supply Air Fan Name
@@ -1843,7 +1843,7 @@
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 1,              !- Cooling Coil Name
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Heating Coil 1,     !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}

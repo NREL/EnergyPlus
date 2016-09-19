@@ -174,7 +174,23 @@ namespace HighTempRadiantSystem {
 	Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
+	void
+ 	clear_state()
+ 	{
+		NumOfHighTempRadSys = 0;
+		QHTRadSource.deallocate();
+		QHTRadSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQHTRadSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		HighTempRadSys.deallocate();
+		HighTempRadSysNumericFields.deallocate();
+	}
 
+	
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
@@ -219,11 +235,14 @@ namespace HighTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
+		bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
 		int RadSysNum; // Radiant system number/index in local derived types
 
 		// FLOW:
 		if ( GetInputFlag ) {
-			GetHighTempRadiantSystem();
+			ErrorsFoundInGet = false;
+			GetHighTempRadiantSystem( ErrorsFoundInGet );
+			if ( ErrorsFoundInGet ) ShowFatalError( "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination." );
 			GetInputFlag = false;
 		}
 
@@ -263,7 +282,9 @@ namespace HighTempRadiantSystem {
 	}
 
 	void
-	GetHighTempRadiantSystem()
+	GetHighTempRadiantSystem(
+			bool & ErrorsFound // TRUE if errors are found on processing the input
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -325,12 +346,13 @@ namespace HighTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant, latent, and lost (must be <= 1)
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
+		Real64 FracOfRadPotentiallyLost; // Difference between unity and AllFracsSummed for error reporting
 		int IOStatus; // Used in GetObjectItem
 		int Item; // Item to be "gotten"
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int SurfNum; // Surface number DO loop counter
+		Real64 TotalFracToSurfs; // Sum of fractions of radiation to surfaces
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
@@ -624,9 +646,16 @@ namespace HighTempRadiantSystem {
 				ErrorsFound = true;
 			}
 			if ( AllFracsSummed < ( MaxFraction - 0.01 ) ) { // User didn't distribute all of the radiation warn that some will be lost
-				ShowWarningError( "Fraction of radiation distributed to surfaces sums up to less than 1 for " + cAlphaArgs( 1 ) );
-				ShowContinueError( "As a result, some of the radiant energy delivered by the high temp radiant heater will be lost." );
-				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				TotalFracToSurfs = AllFracsSummed - HighTempRadSys( Item ).FracDistribPerson;
+				FracOfRadPotentiallyLost = 1.0 - AllFracsSummed;
+				ShowSevereError( "Fraction of radiation distributed to surfaces and people sums up to less than 1 for " + cAlphaArgs( 1 ) );
+				ShowContinueError( "This would result in some of the radiant energy delivered by the high temp radiant heater being lost." );
+				ShowContinueError( "The sum of all radiation fractions to surfaces = " + TrimSigDigits( TotalFracToSurfs, 5) );
+				ShowContinueError( "The radiant fraction to people = " + TrimSigDigits( HighTempRadSys( Item ).FracDistribPerson, 5) );
+				ShowContinueError( "So, all radiant fractions including surfaces and people = " + TrimSigDigits( AllFracsSummed, 5) );
+				ShowContinueError( "This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = " +  TrimSigDigits( FracOfRadPotentiallyLost, 5) );
+				ShowContinueError( "Please check and correct this so that all radiant energy is accounted for in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
+				ErrorsFound = true;
 			}
 
 		} // ...end of DO loop through all of the high temperature radiant heaters
@@ -644,10 +673,6 @@ namespace HighTempRadiantSystem {
 				SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", HighTempRadSys( Item ).ElecEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
 			}
 
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
 		}
 
 	}
