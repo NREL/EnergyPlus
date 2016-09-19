@@ -2661,6 +2661,24 @@
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 
+  Output:Variable,*,Integrated Heat Pump Air Loop Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+  Output:Variable,*,Integrated Heat Pump Condenser Water Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+  Output:Variable,*,Integrated Heat Pump Air Total Cooling Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Air Heating Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Water Heating Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Electric Power,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Air Latent Cooling Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Source Heat Transfer Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump COP,timestep; !- HVAC Average []
+
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Building,monthly;
@@ -2685,7 +2703,7 @@
 
   Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
 
-  Output:VariableDictionary,Regular;
+  Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf;
 
