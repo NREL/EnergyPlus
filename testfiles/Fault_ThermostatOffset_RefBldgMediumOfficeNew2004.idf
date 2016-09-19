@@ -78,7 +78,7 @@
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    YES;                      !- Run Simulation for Weather File Run Periods
+    YES;                     !- Run Simulation for Weather File Run Periods
 
   Building,
     Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name
@@ -5735,17 +5735,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -5774,17 +5774,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -5813,17 +5813,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -6457,7 +6457,7 @@
     VAV_1_CoolC,             !- Component 2 Name
     VAV_1_OA-VAV_1_CoolCNode,!- Component 2 Inlet Node Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     VAV_1_HeatC,             !- Component 3 Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_1_HeatC-VAV_1_FanNode,  !- Component 3 Outlet Node Name
@@ -6477,7 +6477,7 @@
     VAV_2_CoolC,             !- Component 2 Name
     VAV_2_OA-VAV_2_CoolCNode,!- Component 2 Inlet Node Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     VAV_2_HeatC,             !- Component 3 Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_2_HeatC-VAV_2_FanNode,  !- Component 3 Outlet Node Name
@@ -6497,7 +6497,7 @@
     VAV_3_CoolC,             !- Component 2 Name
     VAV_3_OA-VAV_3_CoolCNode,!- Component 2 Inlet Node Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     VAV_3_HeatC,             !- Component 3 Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_3_HeatC-VAV_3_FanNode,  !- Component 3 Outlet Node Name
@@ -6923,9 +6923,9 @@
     SWHSys1 Pump,            !- Name
     SWHSys1 Supply Inlet Node,  !- Inlet Node Name
     SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.85,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent,            !- Pump Control Type
@@ -7880,7 +7880,6 @@
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
-
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn10,        !- Name
     Core_bottom Thermostat,  !- Thermostat Name
@@ -7890,28 +7889,28 @@
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn11,        !- Name
-    Perimeter_bot_ZN_1 Thermostat, 		 !- Thermostat Name
+    Perimeter_bot_ZN_1 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn12,        !- Name
-    Perimeter_bot_ZN_2 Thermostat, 		 !- Thermostat Name
+    Perimeter_bot_ZN_2 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn13,        !- Name
-    Perimeter_bot_ZN_3 Thermostat, 		 !- Thermostat Name
+    Perimeter_bot_ZN_3 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn14,        !- Name
-    Perimeter_bot_ZN_4 Thermostat, 		 !- Thermostat Name
+    Perimeter_bot_ZN_4 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
@@ -7925,7 +7924,7 @@
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn21,        !- Name
-    Perimeter_mid_ZN_1 Thermostat, !- Thermostat Name
+    Perimeter_mid_ZN_1 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
@@ -7946,42 +7945,42 @@
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn24,        !- Name
-    Perimeter_mid_ZN_4 Thermostat, 		 !- Thermostat Name
+    Perimeter_mid_ZN_4 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn30,        !- Name
-    Core_top Thermostat, 	 !- Thermostat Name
+    Core_top Thermostat,     !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn31,        !- Name
-    Perimeter_top_ZN_1 Thermostat, !- Thermostat Name
+    Perimeter_top_ZN_1 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn32,        !- Name
-    Perimeter_top_ZN_2 Thermostat, !- Thermostat Name
+    Perimeter_top_ZN_2 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn33,        !- Name
-    Perimeter_top_ZN_3 Thermostat, !- Thermostat Name
+    Perimeter_top_ZN_3 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
 
   FaultModel:ThermostatOffset,
     Ther_Offset_Zn34,        !- Name
-    Perimeter_top_ZN_4 Thermostat, !- Thermostat Name
+    Perimeter_top_ZN_4 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
