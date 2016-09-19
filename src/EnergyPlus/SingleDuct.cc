@@ -4665,7 +4665,7 @@ namespace SingleDuct {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE
-		// Get input for inlet side air temrinal mixers and store it in the inlet side air terminal mixer array
+		// Get input for inlet side air terminal mixers and store it in the inlet side air terminal mixer array
 
 		// METHODOLOGY EMPLOYED:
 		// Use the Get routines from the InputProcessor module.
