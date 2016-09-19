@@ -54,15 +54,15 @@
 !
 !      (0,0,0)             (6.069,0,0)               (12.192,0,0)
 !
-! Internal gains description:     ZONE West      - lighting is 0 watts, equip is 2928.751 watts, 3 occupants
-! Internal gains description:     ZONE North     - lighting is 878.6252 watts, equip is 2928.751 watts, 4 occupants
-! Internal gains description:     ZONE East      - lighting is 1464.375 watts, equip is 1464.375 watts, 3 occupants
+! Internal gains description:     ZONE West      - lighting is 0 watts, equip is 928.751 watts, 3 occupants
+! Internal gains description:     ZONE North     - lighting is 464.375 watts, equip is 464.375 watts, 4 occupants
+! Internal gains description:     ZONE East      - lighting is 464.375 watts, equip is 464.375 watts, 3 occupants
 !
 ! Interzone Surfaces:             3 interzone surfaces (see diagram)
 ! Internal Mass:                  None
 ! People:                         10
-! Lights:                         2343 W
-! Equipment:                      7323 W
+! Lights:                         929 W
+! Equipment:                      1857 W
 ! Windows:                        1
 ! Detached Shading:               None
 ! Daylight:                       None
@@ -566,7 +566,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,10.00;      !- Field 3
+    Until: 24:00,5.00;       !- Field 3
 
   Schedule:Compact,
     HW LOOP TEMP SCHEDULE,   !- Name
@@ -705,7 +705,7 @@
     West Zone,               !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    2928.751,                !- Design Level {W}
+    928.751,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -739,7 +739,7 @@
     EAST ZONE,               !- Zone or ZoneList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    1464.375,                !- Lighting Level {W}
+    464.375,                 !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Return Air Fraction
@@ -753,7 +753,7 @@
     EAST ZONE,               !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    1464.375,                !- Design Level {W}
+    464.375,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -787,7 +787,7 @@
     NORTH ZONE,              !- Zone or ZoneList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
-    878.6252,                !- Lighting Level {W}
+    464.375,                 !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Return Air Fraction
@@ -801,7 +801,7 @@
     NORTH ZONE,              !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
-    2928.751,                !- Design Level {W}
+    464.375,                 !- Design Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
@@ -1293,7 +1293,7 @@
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
     cooling,                 !- Loop Type
-    6.7,                     !- Design Loop Exit Temperature {C}
+    5.0,                     !- Design Loop Exit Temperature {C}
     2;                       !- Loop Design Temperature Difference {deltaC}
 
   PlantLoop,
@@ -1868,7 +1868,7 @@
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
@@ -1899,7 +1899,7 @@
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
@@ -1930,7 +1930,7 @@
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    ,                        !- Condensation Control Type
+    Off,                     !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
