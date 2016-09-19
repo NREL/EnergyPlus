@@ -2111,7 +2111,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2298,7 +2298,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU2,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2482,7 +2482,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU3,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2666,7 +2666,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU4,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2850,7 +2850,7 @@
     60,                      !- Heat Pump Time Constant {s}
     0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU5,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -3293,9 +3293,9 @@
     Plant Circ Pump,         !- Name
     Plant Supply Inlet Node, !- Inlet Node Name
     Plant Pump Outlet Node,  !- Outlet Node Name
-    0.007,                   !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    50,                      !- Rated Power Consumption {W}
+    0.007,                   !- Design Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    50,                      !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     CONTINUOUS;              !- Pump Control Type
