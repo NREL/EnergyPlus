@@ -668,6 +668,10 @@ namespace WaterThermalTanks {
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankType = CompType;
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankName = CompName;
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankID = CompIndex;
+				if ( present( LoopNum ) ) {
+					IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).LoopNum = LoopNum;
+					IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).LoopSideNum = LoopSideNum;
+				}
 
 
 				IHPMode = GetCurWorkMode( HPWaterHeater( CompNum ).DXCoilNum );
@@ -5582,7 +5586,7 @@ namespace WaterThermalTanks {
 				SizeIHP( HPWaterHeater( HPNum ).DXCoilNum );//
 				//SimIHP(BlankString, HPWaterHeater(HPNum).DXCoilNum,
 				//	0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
-				VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCDWHCoolCoilIndex;
+				VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCWHCoilIndex;
 				HPWaterHeater( HPNum ).NumofSpeed = VarSpeedCoil( VSCoilID ).NumOfSpeeds;
 
 			}
@@ -5600,7 +5604,7 @@ namespace WaterThermalTanks {
 
 			if ( HPWaterHeater( HPNum ).NumofSpeed > 0 ) {
 
-				if ( HPWaterHeater( HPNum ).bIsIHP ) VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCDWHCoolCoilIndex;
+				if ( HPWaterHeater( HPNum ).bIsIHP ) VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCWHCoilIndex;
 				else VSCoilID = HPWaterHeater( HPNum ).DXCoilNum;
 
 				// scale air flow rates

@@ -644,7 +644,7 @@
     SHDWHWHCoil1,            !- Name
     10,                      !- Number of Speeds {dimensionless}
     10,                      !- Nominal Speed Level {dimensionless}
-    4000.0,                  !- Rated Water Heating Capacity {W}
+    400.0,                   !- Rated Water Heating Capacity {W}
     29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
     22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
     55.72,                   !- Rated Condenser Inlet Water Temperature {C}
@@ -788,7 +788,7 @@
     PlantHPWHSch,            !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     100.0,                   !- Pressure Rise {Pa}
-    2.2685,                  !- Maximum Flow Rate {m3/s}
+    0.26850,                 !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     HPOutdoorAirInletNode,   !- Air Inlet Node Name
@@ -2663,6 +2663,24 @@
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 
+  Output:Variable,*,Integrated Heat Pump Air Loop Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+  Output:Variable,*,Integrated Heat Pump Condenser Water Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+  Output:Variable,*,Integrated Heat Pump Air Total Cooling Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Air Heating Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Water Heating Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Electric Power,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Air Latent Cooling Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump Source Heat Transfer Rate,timestep; !- HVAC Average [W]
+
+  Output:Variable,*,Integrated Heat Pump COP,timestep; !- HVAC Average []
+
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Building,monthly;
@@ -2687,7 +2705,7 @@
 
   Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
 
-  Output:VariableDictionary,Regular;
+  Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf;
 
@@ -2701,4 +2719,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
