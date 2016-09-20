@@ -2142,6 +2142,7 @@ namespace HVACManager {
 		using DataHVACGlobals::CycleOn;
 		using DataHVACGlobals::CycleOnZoneFansOnly;
 		using DataHeatBalFanSys::MCPI; // , MCPTI, MCPTV, MCPM, MCPTM, MixingMassFlowZone
+		using DataHeatBalFanSys::MCPIHM; // Added by Sang Hoon Lee February 2016
 		using DataHeatBalFanSys::MCPV;
 		using DataHeatBalFanSys::MDotOA;
 		using DataHeatBalFanSys::MDotCPOA;
@@ -2166,6 +2167,7 @@ namespace HVACManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName3( "ReportAirHeatBalance:3" );
+		static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration"); // Added by Sang Hoon Lee February 2016
 		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -2253,10 +2255,22 @@ namespace HVACManager {
 
 			// first calculate mass flows using outside air heat capacity for consistency with input to heat balance
 			CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneLoop ).OutDryBulbTemp );
+			AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneLoop).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration); // Added by Sang Hoon Lee Febuary 2016 For Hybrid Modeling 
 			ZnAirRpt( ZoneLoop ).InfilMass = ( MCPI( ZoneLoop ) / CpAir ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 			ZnAirRpt( ZoneLoop ).InfilMdot = ( MCPI( ZoneLoop ) / CpAir ) * ADSCorrectionFactor;
 			ZnAirRpt( ZoneLoop ).VentilMass = ( MCPV( ZoneLoop ) / CpAir ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 			ZnAirRpt( ZoneLoop ).VentilMdot = ( MCPV( ZoneLoop ) / CpAir ) * ADSCorrectionFactor;
+			
+			ZnAirRpt(ZoneLoop).InfilOAAirChangeRate = (MCPI(ZoneLoop) / CpAir / AirDensity) * TimeStepSys * SecInHour * ADSCorrectionFactor / (TimeStepSys * Zone(ZoneLoop).Volume);
+
+			ZnAirRpt(ZoneLoop).MCPIHMCalculated = Zone(ZoneLoop).MCPIHM; // Added by Sang Hoon Lee for Hybrid Modeling:Infiltration, February 2016
+			ZnAirRpt(ZoneLoop).MCPI = MCPI(ZoneLoop); // Added by Sang Hoon Lee for Hybrid Modeling:Infiltration, February 2016
+			ZnAirRpt(ZoneLoop).InfilMassHM = (ZnAirRpt(ZoneLoop).MCPIHMCalculated / CpAir) * TimeStepSys * SecInHour * ADSCorrectionFactor; // Added by Sang Hoon Lee for Hybrid Modeling:Infiltration, February 2016
+			ZnAirRpt(ZoneLoop).InfilMdotHM = (ZnAirRpt(ZoneLoop).MCPIHMCalculated / CpAir) * ADSCorrectionFactor; // Added by Sang Hoon Lee for Hybrid Modeling:Infiltration, February 2016
+
+			ZnAirRpt(ZoneLoop).InfilVolumeOADensityHM = (ZnAirRpt(ZoneLoop).MCPIHMCalculated / CpAir / AirDensity) * TimeStepSys * SecInHour * ADSCorrectionFactor; //Added by Sang Hoon Lee for Hybrid Modeling: Infiltration, February 2016
+			ZnAirRpt(ZoneLoop).InfilOAAirChangeRateHM = ZnAirRpt(ZoneLoop).InfilVolumeOADensityHM / (TimeStepSys * Zone(ZoneLoop).Volume); //Added by Sang Hoon Lee for Hybrid Modeling: Infiltration, February 2016
+			ZnAirRpt(ZoneLoop).InfilVdotOADensityHM = (ZnAirRpt(ZoneLoop).MCPIHMCalculated / CpAir / AirDensity) * ADSCorrectionFactor; //Added by Sang Hoon Lee for Hybrid Modeling: Infiltration, February 2016
 
 			//CR7751  second, calculate using indoor conditions for density property
 			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneLoop ), ZoneAirHumRatAvg( ZoneLoop ), RoutineName3 );
@@ -2267,6 +2281,10 @@ namespace HVACManager {
 			ZnAirRpt( ZoneLoop ).VentilVolumeCurDensity = ( MCPV( ZoneLoop ) / CpAir / AirDensity ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 			ZnAirRpt( ZoneLoop ).VentilAirChangeRate = ZnAirRpt( ZoneLoop ).VentilVolumeCurDensity / ( TimeStepSys * Zone( ZoneLoop ).Volume );
 			ZnAirRpt( ZoneLoop ).VentilVdotCurDensity = ( MCPV( ZoneLoop ) / CpAir / AirDensity ) * ADSCorrectionFactor;
+			
+			ZnAirRpt(ZoneLoop).InfilVolumeCurDensityHM = (ZnAirRpt(ZoneLoop).MCPIHMCalculated / CpAir / AirDensity) * TimeStepSys * SecInHour * ADSCorrectionFactor; //Added by Sang Hoon Lee for Hybrid Modeling: Infiltration, February 2016
+			ZnAirRpt(ZoneLoop).InfilAirChangeRateHM = ZnAirRpt(ZoneLoop).InfilVolumeCurDensityHM / ( TimeStepSys * Zone( ZoneLoop ).Volume ); //Added by Sang Hoon Lee for Hybrid Modeling: Infiltration, February 2016
+			ZnAirRpt(ZoneLoop).InfilVdotCurDensityHM = (ZnAirRpt(ZoneLoop).MCPIHMCalculated / CpAir / AirDensity) * ADSCorrectionFactor; //Added by Sang Hoon Lee for Hybrid Modeling: Infiltration, February 2016
 
 			//CR7751 third, calculate using standard dry air at nominal elevation
 			AirDensity = StdRhoAir;

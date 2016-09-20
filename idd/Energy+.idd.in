@@ -716,11 +716,14 @@ ZoneAirMassFlowConservation,
        \default MixingSourceZonesOnly
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
-       \unique-object
        \format singleLine
        \memo Multiplier altering the relative capacitance of the air compared to an empty zone
        \min-fields 4
-  N1 , \field Temperature Capacity Multiplier
+ A1 , \field Zone Name
+       \required-field
+       \type object-list
+       \object-list Zone Names
+ N1 , \field Temperature Capacity Multiplier
        \type real
        \default 1.0
        \minimum> 0.0
@@ -60397,6 +60400,57 @@ SolarCollectorPerformance:FlatPlate,
        \type real
        \note 2nd order term
 
+\ group Hybrid Model
+
+HybridModel:Zone,
+       \memo Zones with measured air temperature data and a range of dates.
+       \memo A range of dates may differ from zones.
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Zone or ZoneList Name
+       \required-field
+       \type object-list
+       \object-list ZoneAndZoneListNames
+  A3 , \field Calculate Zone Internal Thermal Mass
+       \note Use measured temperature data to calculate zone temperature capacity multiplier
+	   \type choice
+       \key NO
+       \key YES
+	   \default NO
+  A4 , \field Calculate Zone Air Infiltration Rate
+       \note Use measured temperature data to calculate zone air infiltration air flow rate
+	   \type choice
+       \key NO
+       \key YES
+	   \default NO
+  A5 , \field Zone Measured Air Temperature Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+	   \note from Schedule:File
+  N1 , \field Begin Month
+       \required-field
+       \minimum 1
+       \maximum 12
+       \type integer
+  N2 , \field Begin Day of Month
+       \required-field
+       \minimum 1
+       \maximum 31
+       \type integer
+  N3 , \field End Month
+       \required-field
+       \minimum 1
+       \maximum 12
+       \type integer
+  N4 ; \field End Day of Month
+       \required-field
+       \minimum 1
+       \maximum 31
+       \type integer
+	   
+	   
 SolarCollector:FlatPlate:Water,
        \memo Flat plate water solar collector (single glazed, unglazed, or evacuated tube).
        \memo Thermal and optical properties are taken from the referenced

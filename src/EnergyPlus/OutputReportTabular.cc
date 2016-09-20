@@ -81,6 +81,7 @@
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
+#include <DataGlobals.hh> // Added by Sang Hoon Lee August 2015
 #include <DataGlobalConstants.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -9384,6 +9385,7 @@ namespace OutputReportTabular {
 		using ExteriorEnergyUse::NumExteriorLights;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
+		using namespace DataGlobals; // Added by Sang Hoon Lee August 2015
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9458,6 +9460,7 @@ namespace OutputReportTabular {
 		Real64 totLightPower;
 		Real64 totNumPeople;
 		Real64 totPlugProcess;
+		Real64 HMMultiplier; //Added by Sang Hoon Lee August 2015
 		Real64 frameWidth;
 		Real64 frameArea;
 
@@ -9907,10 +9910,10 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			columnHead.allocate( 12 );
-			columnWidth.allocate( 12 );
+			columnHead.allocate( 13 );
+			columnWidth.allocate( 13 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 12, NumOfZones + 4 );
+			tableBody.allocate( 13, NumOfZones + 4 );
 
 			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
@@ -9924,6 +9927,7 @@ namespace OutputReportTabular {
 			columnHead( 10 ) = "Lighting " + Wm2_unitName;
 			columnHead( 11 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
 			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
+			columnHead( 13 ) = "Capacitance Multiplier "; //Added by Sang Hoon Lee August 2015
 
 			rowHead = "";
 
@@ -10012,6 +10016,9 @@ namespace OutputReportTabular {
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
 					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
+				// HM Multiplier Added by Sang Hoon Lee August 2015
+				HMMultiplier = Zone(iZone).ZoneVolCapMultpSensHMAverage;
+				tableBody(13, iZone) = RealToStr(HMMultiplier, 2);
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
 					zstArea( grandTotal ) += mult * Zone( iZone ).FloorArea;

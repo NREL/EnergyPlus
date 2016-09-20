@@ -136,6 +136,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZoneAirHumRatOld; // Last Time Steps Zone AIR Humidity Ratio
 
 	extern Array1D< Real64 > MCPI; // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
+	extern Array1D< Real64 > MCPIHM; // MCPI inversely calculated for Hybrid Modeling, Added by Sang Hoon Lee February 2016
 	extern Array1D< Real64 > MCPTI; // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
 	extern Array1D< Real64 > MCPV; // VENTILATION MASS FLOW * AIR SPECIFIC HEAT
 	extern Array1D< Real64 > MCPTV; // VENTILATION MASS FLOW * AIR CP * AIR TEMPERATURE
@@ -215,6 +216,10 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	extern Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
 	extern Array1D< Real64 > ZTM3; // zone air temperature at previous T-3
+	// Hybrid Modeling
+	extern Array1D< Real64 > PreviousMeasuredZT1; // Hybrid model internal mass multiplier at previous timestep
+	extern Array1D< Real64 > PreviousMeasuredZT2; // Hybrid model internal mass multiplier at previous timestep
+	extern Array1D< Real64 > PreviousMeasuredZT3; // Hybrid model internal mass multiplier at previous timestep
 	// Exact and Euler solutions
 	extern Array1D< Real64 > ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	extern Array1D< Real64 > ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
