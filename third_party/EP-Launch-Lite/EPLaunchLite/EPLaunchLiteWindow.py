@@ -300,7 +300,7 @@ class Window(gtk.Window):
 
     def run_simulation(self, widget):
         self.running_simulation_thread = EnergyPlusThread(
-            os.path.join(self.ep_run_folder, 'EnergyPlus'),
+            os.path.join(self.ep_run_folder, 'energyplus'),
             self.input_file_path.get_text(),
             self.weather_file_path.get_text(),
             self.message,
@@ -327,10 +327,10 @@ class Window(gtk.Window):
     def cancelled_simulation(self):
         self.update_run_buttons(running=False)
 
-    def callback_handler_failure(self, std_out, run_dir):
-        gobject.idle_add(self.failed_simulation, std_out, run_dir)
+    def callback_handler_failure(self, std_out, run_dir, cmd_line):
+        gobject.idle_add(self.failed_simulation, std_out, run_dir, cmd_line)
 
-    def failed_simulation(self, std_out, run_dir):
+    def failed_simulation(self, std_out, run_dir, cmd_line):
         self.update_run_buttons(running=False)
         message = gtk.MessageDialog(parent=self,
                                     flags=0,

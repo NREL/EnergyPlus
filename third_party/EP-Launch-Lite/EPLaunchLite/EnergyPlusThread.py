@@ -26,7 +26,7 @@ class EnergyPlusThread(threading.Thread):
         self.cancelled = False
         base_file_name = os.path.splitext(os.path.basename(self.input_file))[0]
         self.run_dir = os.path.join(os.path.dirname(self.input_file), 'output-' + base_file_name)
-        self.p = subprocess.Popen([
+        command_line_tokens = [
             self.run_script,
             '-r',
             '-x',
@@ -38,7 +38,9 @@ class EnergyPlusThread(threading.Thread):
             '-w',
             self.weather_file,
             self.input_file
-        ],
+        ]
+        self.p = subprocess.Popen(
+            command_line_tokens,
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -53,7 +55,7 @@ class EnergyPlusThread(threading.Thread):
                 self.success_callback(self.std_out, self.run_dir)
             else:
                 self.msg_callback(_("Simulation failed"))
-                self.failure_callback(self.std_out, self.run_dir)
+                self.failure_callback(self.std_out, self.run_dir, subprocess.list2cmdline(command_line_tokens))
 
     @staticmethod
     def get_ep_version(run_script):
