@@ -64,3 +64,15 @@ See [5652](https://github.com/NREL/EnergyPlus/pull/5652).
 Changes to the single duct VAV air terminal unit's sizing routines (AirTerminal:SingleDuct:VAV:Reheat) also included revisions to the sizing summary data reported to the EIO and Component Sizing Summary tabular data.  Sizing for AirTerminal:SingleDuct:VAV:Reheat has been expanded to calculate and report a design size for the VAV minimum stop, or minimum flow fraction, as well as the user-specified constant minimum flow fraction.  New sizing reports to watch for include: Design Size Constant Minimum Air Flow Fraction, User-Specified Constant Minimum Air Flow Fraction, and Design Size Minimum Air Flow Rate [m3/s].
 
 See [5646](https://github.com/NREL/EnergyPlus/pull/5646).
+
+### Daylighting output variables reference control object rather than zone object
+
+The variables such as these (as well as ones with higher numbers) use the name of the Daylighting:Controls object instead of the name of the zone.
+
+- Daylighting Reference Point 1 Illuminance 
+- Daylighting Reference Point 1 Glare Index []
+- Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time [hr]
+- Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time [hr]
+- Daylighting Lighting Power Multiplier []
+
+See [5725](https://github.com/NREL/EnergyPlus/pull/5725) and [5826](https://github.com/NREL/EnergyPlus/pull/5826).

@@ -4259,7 +4259,6 @@ namespace DaylightingManager {
 				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
-			SetupDElightOutput4EPlus();
 		}
 		// RJH DElight Modification End - Calls to DElight preprocessing subroutines
 
@@ -4780,9 +4779,7 @@ namespace DaylightingManager {
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", will use 1" );
 				zone_daylight.LightControlSteps = 1;
 			}
-			if ( zone_daylight.DaylightMethod == SplitFluxDaylighting ){
-				SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", zone_daylight.Name );
-			}
+			SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", zone_daylight.Name );
 		}
 
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {

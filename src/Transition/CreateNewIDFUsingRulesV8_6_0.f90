@@ -721,11 +721,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
                  ! For Output:Variable that reference a specific Daylighting:Controls object need update to the new reference point name
                  IF (InArgs(1) .NE. '*') THEN
-                   IF (SameString(InArgs(2)(1:29),'Daylighting Reference Point 1')) THEN
-                     OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt1'
+                   IF (SameString(InArgs(2)(1:27),'Daylighting Reference Point')) THEN
+                     OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
                    ENDIF
-                   IF (SameString(InArgs(2)(1:29),'Daylighting Reference Point 2')) THEN
-                     OutArgs(1) = TRIM(InArgs(1)) // '_DaylRefPt2'
+                   IF (SameString(InArgs(2),'Daylighting Lighting Power Multiplier')) THEN
+                     OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
                    ENDIF
                  ENDIF
 
