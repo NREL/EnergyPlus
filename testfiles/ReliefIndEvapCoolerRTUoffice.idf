@@ -3855,7 +3855,7 @@
     DX Cooling Coil System ZN1,  !- Component 3 Name
     Evap Cooler Outlet Node ZN1,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN1,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN1,  !- Component 4 Outlet Node Name
@@ -3994,22 +3994,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    0.8,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    0.8,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN1,      !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN1, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN1,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN1,     !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN1 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN1,   !- Sensor Node Name
-    Relief Air Outlet Node ZN1, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN1 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN1,!- Sensor Node Name
+    Relief Air Outlet Node ZN1,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -4184,7 +4184,7 @@
     DX Cooling Coil System ZN3,  !- Component 3 Name
     Evap Cooler Outlet Node ZN3,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN3,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN3,  !- Component 4 Outlet Node Name
@@ -4323,22 +4323,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    1.0,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.0,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN3,      !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN3, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN3,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN3,     !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN3 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN3,   !- Sensor Node Name
-    Relief Air Outlet Node ZN3, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN3 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN3,!- Sensor Node Name
+    Relief Air Outlet Node ZN3,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -4513,7 +4513,7 @@
     DX Cooling Coil System ZN5,  !- Component 3 Name
     Evap Cooler Outlet Node ZN5,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN5,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN5,  !- Component 4 Outlet Node Name
@@ -4652,22 +4652,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    1.4,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.4,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN5,      !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN5, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN5,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN5,     !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN5 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN5,   !- Sensor Node Name
-    Relief Air Outlet Node ZN5, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN5 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN5,!- Sensor Node Name
+    Relief Air Outlet Node ZN5,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -4842,7 +4842,7 @@
     DX Cooling Coil System ZN7,  !- Component 3 Name
     Evap Cooler Outlet Node ZN7,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN7,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN7,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN7,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN7,  !- Component 4 Outlet Node Name
@@ -4981,22 +4981,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    0.8,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    0.8,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN7,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN7,  !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN7,     !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN7 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN7,   !- Sensor Node Name
-    Relief Air Outlet Node ZN7, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN7 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN7,!- Sensor Node Name
+    Relief Air Outlet Node ZN7,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -5171,7 +5171,7 @@
     DX Cooling Coil System ZN9,  !- Component 3 Name
     Evap Cooler Outlet Node ZN9,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN9,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN9,   !- Component 4 Name
     Cooling Coil Air Outlet Node ZN9,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN9,  !- Component 4 Outlet Node Name
@@ -5310,22 +5310,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    1.1,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.1,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN9,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN9,  !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN9,     !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN9 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN9,   !- Sensor Node Name
-    Relief Air Outlet Node ZN9, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN9 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN9,!- Sensor Node Name
+    Relief Air Outlet Node ZN9,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -5425,7 +5425,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     ;                        !- Outdoor Air Flow per Zone {m3/s}
 
-   Sizing:System,
+  Sizing:System,
     Direct DX air Loop ZN11, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
@@ -5500,7 +5500,7 @@
     DX Cooling Coil System ZN11,  !- Component 3 Name
     Evap Cooler Outlet Node ZN11,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN11,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN11,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN11,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN11,  !- Component 4 Outlet Node Name
@@ -5633,28 +5633,28 @@
     Air Loop Outlet Node ZN11;  !- Temperature Setpoint Node Name
 
   EvaporativeCooler:Indirect:ResearchSpecial,
-    Indirect Evap ZN11,       !- Name
+    Indirect Evap ZN11,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
     1.2,                     !- Cooler Wetbulb Design Effectiveness
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    0.9,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    0.9,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN11,     !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN11, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN11,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
-    Purge Air Inlet ZN11,     !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN11 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN11,   !- Sensor Node Name
-    Relief Air Outlet Node ZN11, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN11,    !- Secondary Air Inlet Node Name
+    Purge Air Inlet ZN11 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN11,  !- Sensor Node Name
+    Relief Air Outlet Node ZN11,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -5829,7 +5829,7 @@
     DX Cooling Coil System ZN13,  !- Component 3 Name
     Evap Cooler Outlet Node ZN13,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN13,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN13,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN13,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN13,  !- Component 4 Outlet Node Name
@@ -5968,22 +5968,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    1.2,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.2,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN13,     !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN13, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN13,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN13,    !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN13 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN13,   !- Sensor Node Name
-    Relief Air Outlet Node ZN13, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN13 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN13,  !- Sensor Node Name
+    Relief Air Outlet Node ZN13,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -6158,7 +6158,7 @@
     DX Cooling Coil System ZN15,  !- Component 3 Name
     Evap Cooler Outlet Node ZN15,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN15,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN15,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN15,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN15,  !- Component 4 Outlet Node Name
@@ -6297,22 +6297,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    1.5,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.5,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN15,     !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN15, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN15,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN15,    !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN15 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN15,   !- Sensor Node Name
-    Relief Air Outlet Node ZN15, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN15 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN15,  !- Sensor Node Name
+    Relief Air Outlet Node ZN15,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -6487,7 +6487,7 @@
     DX Cooling Coil System ZN17,  !- Component 3 Name
     Evap Cooler Outlet Node ZN17,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN17,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN17,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN17,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN17,  !- Component 4 Outlet Node Name
@@ -6626,22 +6626,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    0.9,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    0.9,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN17,     !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN17, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN17,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN17,    !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN17 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN17,   !- Sensor Node Name
-    Relief Air Outlet Node ZN17, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN17 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN17,  !- Sensor Node Name
+    Relief Air Outlet Node ZN17,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
@@ -6816,7 +6816,7 @@
     DX Cooling Coil System ZN19,  !- Component 3 Name
     Evap Cooler Outlet Node ZN19,  !- Component 3 Inlet Node Name
     Cooling Coil Air Outlet Node ZN19,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil ZN19,  !- Component 4 Name
     Cooling Coil Air Outlet Node ZN19,  !- Component 4 Inlet Node Name
     Heating Coil Air Outlet Node ZN19,  !- Component 4 Outlet Node Name
@@ -6955,22 +6955,22 @@
     ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
-    30.0,                    !- Recirculating Water Pump Power Consumption {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    30.0,                    !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    1.8,                     !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    428.571428571429,        !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.8,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    428.571428571429,        !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     Mixed Air Node ZN19,     !- Primary Air Inlet Node Name
-    Evap Cooler Outlet Node ZN19, !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    Evap Cooler Outlet Node ZN19,  !- Primary Air Outlet Node Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN19,    !- Secondary Air Inlet Node Name
-    Purge Air Inlet ZN19 Outlet Node, !- Secondary Air Outlet Node Name
-    Air Loop Outlet Node ZN19,   !- Sensor Node Name
-    Relief Air Outlet Node ZN19, !- Relief Air Inlet Node Name
+    Purge Air Inlet ZN19 Outlet Node,  !- Secondary Air Outlet Node Name
+    Air Loop Outlet Node ZN19,  !- Sensor Node Name
+    Relief Air Outlet Node ZN19,  !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio

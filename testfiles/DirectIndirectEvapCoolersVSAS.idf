@@ -86,7 +86,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -106,7 +106,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -126,7 +126,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -146,7 +146,7 @@
     Fan:OnOff,               !- Supply Fan Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
@@ -4597,34 +4597,33 @@
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
     30.0000,                 !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     Autosize,                !- Secondary Air Design Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:1_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:1_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9000,                  !- Dewpoint Effectiveness Factor
     FURNACE_PACU_CAV:1_OAIndRDD Evap CoolerOA node,  !- Secondary Air Inlet Node Name
-    FURNACE_PACU_CAV:1_OAIndRDD Evap CoolerOA Outlet Node, !- Secondary Air Outlet Node Name
+    FURNACE_PACU_CAV:1_OAIndRDD Evap CoolerOA Outlet Node,  !- Secondary Air Outlet Node Name
     FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode,  !- Sensor Node Name
     ,                        !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
     0.2,                     !- Drift Loss Fraction
     3;                       !- Blowdown Concentration Ratio
 
-
   EvaporativeCooler:Direct:ResearchSpecial,
     FURNACE_PACU_CAV:1_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                !- Primary Design Air Flow Rate  
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     30.0,                    !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:1_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:1_OADirect Evap CoolerNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:1_OADirect Evap Cooler-FURNACE_PACU_CAV:1_OAMixing BoxNode,  !- Air Outlet Node Name
@@ -4889,9 +4888,9 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                !- Primary Design Air Flow Rate  
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     30.0,                    !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:2_OAInlet Node,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:2_OADirect Evap Cooler-FURNACE_PACU_CAV:2_OAMixing BoxNode,  !- Air Outlet Node Name
@@ -5161,16 +5160,16 @@
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
     30.0000,                 !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
-    Autosize,                !- Secondary Air Design Air Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    Autosize,                !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    207.6666666666666667,    !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:3_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:3_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9000,                  !- Dewpoint Effectiveness Factor
     FURNACE_PACU_CAV:3_OAIndRDD Evap CoolerOA node,  !- Secondary Air Inlet Node Name
     FURNACE_PACU_CAV:3_OAIndRDD Evap CoolerOA Outlet Node,  !- Secondary Air Outlet Node Name
@@ -5181,9 +5180,9 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                !- Primary Design Air Flow Rate  
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     30.0,                    !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:3_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:3_OADirect Evap CoolerNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:3_OADirect Evap Cooler-FURNACE_PACU_CAV:3_OAMixing BoxNode,  !- Air Outlet Node Name
@@ -5453,19 +5452,19 @@
     ,                        !- Cooler Drybulb Design Effectiveness
     ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
     30.0000,                 !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor W /(m3/s)air
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     Autosize,                !- Secondary Air Design Flow Rate {m3/s}
-    1.0,                     !- Secondary Air Flow Sizing Factor
-    autosize,                !- Secondary Air Fan Design Power
-    207.66666666666666,      !- Secondary Air Fan Sizing Specific Power W /(m3/s)
-    ,                        !- Secondary Fan Power Modifier Curve Name
+    1.0,                     !- Secondary Air Flow Scaling Factor {dimensionless}
+    autosize,                !- Secondary Air Fan Design Power {W}
+    207.66666666666666,      !- Secondary Air Fan Sizing Specific Power {W/(m3/s)}
+    ,                        !- Secondary Air Fan Power Modifier Curve Name
     FURNACE_PACU_CAV:4_OAInlet Node,  !- Primary Air Inlet Node Name
     FURNACE_PACU_CAV:4_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:4_OADirect Evap CoolerNode,  !- Primary Air Outlet Node Name
-    autosize,                !- Primary Design Air Flow Rate
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9000,                  !- Dewpoint Effectiveness Factor
     FURNACE_PACU_CAV:4_OAIndRDD Evap CoolerOA node,  !- Secondary Air Inlet Node Name
-    FURNACE_PACU_CAV:4_OAIndRDD Evap CoolerOA Outlet Node,     !- Secondary Air Outlet Node Name
+    FURNACE_PACU_CAV:4_OAIndRDD Evap CoolerOA Outlet Node,  !- Secondary Air Outlet Node Name
     FURNACE_PACU_CAV:4_OADirect Evap Cooler-FURNACE_PACU_CAV:4_OAMixing BoxNode;  !- Sensor Node Name
 
   EvaporativeCooler:Direct:ResearchSpecial,
@@ -5473,9 +5472,9 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
-    autosize,                !- Primary Design Air Flow Rate  
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     30.0,                    !- Recirculating Water Pump Design Power {W}
-    ,                        !- Water Pump Power Sizing Factor
+    ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name
     FURNACE_PACU_CAV:4_OAIndRDD Evap Cooler-FURNACE_PACU_CAV:4_OADirect Evap CoolerNode,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:4_OADirect Evap Cooler-FURNACE_PACU_CAV:4_OAMixing BoxNode,  !- Air Outlet Node Name

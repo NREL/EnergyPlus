@@ -1297,14 +1297,14 @@
     Air Loop Outlet Node,    !- Furnace Air Outlet Node Name
     CyclingFanSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    1.32,                    !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.32,                    !- Supply Air Flow Rate During Heating Operation {m3/s}
-    0.00,                    !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    1.32,                    !- Cooling Supply Air Flow Rate {m3/s}
+    1.32,                    !- Heating Supply Air Flow Rate {m3/s}
+    0.00,                    !- No Load Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     CoilSystem:Cooling:DX:HeatExchangerAssisted,  !- Cooling Coil Object Type
     Heat Exchanger Assisted Cooling Coil 1,  !- Cooling Coil Name

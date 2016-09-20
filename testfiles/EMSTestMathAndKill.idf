@@ -3974,17 +3974,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -4025,7 +4025,7 @@
     PSZ-AC:1_CoolC,          !- Component 2 Name
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:1_HeatC,          !- Component 3 Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:1_HeatC-PSZ-AC:1_FanNode,  !- Component 3 Outlet Node Name
@@ -4271,17 +4271,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -4322,7 +4322,7 @@
     PSZ-AC:2_CoolC,          !- Component 2 Name
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:2_HeatC,          !- Component 3 Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:2_HeatC-PSZ-AC:2_FanNode,  !- Component 3 Outlet Node Name
@@ -4568,17 +4568,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -4619,7 +4619,7 @@
     PSZ-AC:3_CoolC,          !- Component 2 Name
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:3_HeatC,          !- Component 3 Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:3_HeatC-PSZ-AC:3_FanNode,  !- Component 3 Outlet Node Name
@@ -4865,17 +4865,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -4916,7 +4916,7 @@
     PSZ-AC:4_CoolC,          !- Component 2 Name
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:4_HeatC,          !- Component 3 Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:4_HeatC-PSZ-AC:4_FanNode,  !- Component 3 Outlet Node Name
@@ -5162,17 +5162,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -5213,7 +5213,7 @@
     PSZ-AC:5_CoolC,          !- Component 2 Name
     PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     PSZ-AC:5_HeatC,          !- Component 3 Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Component 3 Inlet Node Name
     PSZ-AC:5_HeatC-PSZ-AC:5_FanNode,  !- Component 3 Outlet Node Name
@@ -5518,9 +5518,9 @@
     SHWSys1 Pump,            !- Name
     SHWSys1 Supply Inlet Node,  !- Inlet Node Name
     SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    0.001,                   !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Flow Rate {m3/s}
+    0.001,                   !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     1,                       !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent,            !- Pump Control Type
@@ -6635,12 +6635,12 @@
 
   EnergyManagementSystem:Subroutine,
     DoCurveandTableTests,    !- Name
-    Set dum1 = 0.0,
-    Set dum2 = 0.0,
-    Set dum3 = 0.0,
-    Set dum4 = 0.0,
-    Set dummy = DX10Ton_CapFT_ptr,  !- Program Line 1
-    Set CapFT_result = @CurveValue DX10Ton_CapFT_ptr 18.0 30.0 dum1 dum2 dum3,  !- Program Line 2
+    Set dum1 = 0.0,          !- Program Line 1
+    Set dum2 = 0.0,          !- Program Line 2
+    Set dum3 = 0.0,          !- <none>
+    Set dum4 = 0.0,          !- <none>
+    Set dummy = DX10Ton_CapFT_ptr,  !- <none>
+    Set CapFT_result = @CurveValue DX10Ton_CapFT_ptr 18.0 30.0 dum1 dum2 dum3,  !- <none>
     Set CapFT_result = @CurveValue DX10Ton_CapFT_ptr 17.0 46.0 dum1 dum2 dum3,  !- <none>
     Set CapFT_result_limit = @CurveValue DX10Ton_CapFT_ptr 15.0 50.0 dum1 dum2 dum3,  !- <none>
     Set dummy = Curve_Quadratic_Ptr,  !- <none>
@@ -6804,8 +6804,8 @@
     Set A = (2 + 2) * 3,     !- <none>
     Set B = (2 + 2) * (1+2), !- <none>
     Set C = (2 + 2) / (3 + 1),  !- <none>
-    Set D = myuninitvar,
-    Set D = myuninitvar2 + myuninitvar3;
+    Set D = myuninitvar,     !- <none>
+    Set D = myuninitvar2 + myuninitvar3;  !- <none>
 
   EnergyManagementSystem:Subroutine,
     DoRandomNumberTests,     !- Name

@@ -182,7 +182,6 @@
 ! Compressor Type = Centrifugal, Condenser Type = Water
 ! Refrigerant = N/A, Voltage & Phase = N/A
 ! Unloading Mechanism = Inlet Vanes
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Chiller:Electric:EIR,

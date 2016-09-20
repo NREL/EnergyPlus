@@ -270,9 +270,9 @@
     Branch Pump 1,           !- Name
     Branch Pump 1 Inlet Node,!- Inlet Node Name
     Supply Heating 1 Inlet Node,  !- Outlet Node Name
-    0.002,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1000,                    !- Rated Power Consumption {W}
+    0.002,                   !- Design Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1000,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type
@@ -299,9 +299,9 @@
     Branch Pump 2,           !- Name
     Branch Pump 2 Inlet Node,!- Inlet Node Name
     Supply Heating 2 Inlet Node,  !- Outlet Node Name
-    0.003,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1200,                    !- Rated Power Consumption {W}
+    0.003,                   !- Design Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1200,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT;            !- Pump Control Type
@@ -360,16 +360,16 @@
     Demand Pump 1,           !- Name
     Demand Inlet Node,       !- Inlet Node Name
     Demand Pipe-Load Profile Node,  !- Outlet Node Name
-    0.002,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1250,                    !- Rated Power Consumption {W}
+    0.002,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1250,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,

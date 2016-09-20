@@ -126,7 +126,6 @@
 !
 ! The method described here was used to create the following 4 "cubic" curve objects.
 !
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Curve:Cubic,

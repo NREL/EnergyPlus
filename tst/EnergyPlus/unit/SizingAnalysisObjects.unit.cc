@@ -539,4 +539,72 @@ TEST_F( SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour )
 
 }
 
+TEST_F( SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTimestamp )
+{
+	// similar to PlantCoincidentAnalyObjTest but excersize logic problem resolved as issue #5665
+	std::string loopName;
+	int loopNum;
+	int nodeNum;
+	Real64 density;
+	Real64 cp;
+	int timestepsInAvg;
+	int plantSizingIndex;
+
+	loopName = "Test Plant Loop 1";
+	loopNum = 1;
+	nodeNum = 1;
+	density = 1000;
+	cp = 1.0;
+	timestepsInAvg = 1;
+	plantSizingIndex = 1;
+
+	PlantCoinicidentAnalysis TestAnalysisObj(
+		loopName,
+		loopNum,
+		nodeNum,
+		density,
+		cp,
+		timestepsInAvg,
+		plantSizingIndex
+		);
+
+	// fill first step in log with zone step data
+	int KindOfSim( 4 );
+	int Envrn( 4 );
+	int DayOfSim( 1 );
+	int HourofDay( 1 );
+	int timeStp( 1 );
+	Real64 timeStepDuration( 0.25 );
+	int numTimeStepsInHour ( 4 );
+
+	ZoneTimestepObject tmpztStepStamp1( // call full constructor
+		KindOfSim,
+		Envrn,
+		DayOfSim,
+		HourofDay,
+		timeStp,
+		timeStepDuration,
+		numTimeStepsInHour
+	);
+	LogVal = 1.5; // kg/s
+	tmpztStepStamp1.runningAvgDataValue = 1.5;
+	sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep( tmpztStepStamp1 );
+
+	ZoneTimestepObject tmpNullztStep2; // call default constructor
+	
+	TestAnalysisObj.newFoundMassFlowRateTimeStamp = tmpNullztStep2; // use null timestap and check to logic works with a valid max demand timestamp
+	TestAnalysisObj.peakMdotCoincidentDemand = 1000.0;
+	TestAnalysisObj.peakMdotCoincidentReturnTemp = 10.0;
+	TestAnalysisObj.NewFoundMaxDemandTimeStamp = tmpztStepStamp1;
+	TestAnalysisObj.peakDemandMassFlow = 1.5;
+	TestAnalysisObj.peakDemandReturnTemp = 10.0;
+
+	EXPECT_DOUBLE_EQ( 0.002, PlantLoop( 1 ).MaxVolFlowRate ); //  m3/s
+
+	TestAnalysisObj.ResolveDesignFlowRate( 1 );
+
+	EXPECT_NEAR( 0.00015, PlantLoop( 1 ).MaxVolFlowRate, 0.00001 ); //  m3/s
+	EXPECT_NEAR( 0.15, PlantLoop( 1 ).MaxMassFlowRate, 0.001 ); //  m3/s
+	EXPECT_TRUE( TestAnalysisObj.anotherIterationDesired );
+}
 
