@@ -2128,17 +2128,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -3055,16 +3055,16 @@
     Circ Pump,               !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    0.0011,                  !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    500,                     !- Rated Power Consumption {W}
+    0.0011,                  !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    500,                     !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   CondenserLoop,
@@ -3304,16 +3304,16 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    0.0011,                  !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    500,                     !- Rated Power Consumption {W}
+    0.0011,                  !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    500,                     !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -3564,16 +3564,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    0.0043,                  !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    2000,                    !- Rated Power Consumption {W}
+    0.0043,                  !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    2000,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictHeating,

@@ -1593,9 +1593,9 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    1.60,                    !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.60,                    !- Supply Air Flow Rate During Heating Operation {m3/s}
-    1.60,                    !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    1.60,                    !- Cooling Supply Air Flow Rate {m3/s}
+    1.60,                    !- Heating Supply Air Flow Rate {m3/s}
+    1.60,                    !- No Load Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     Supply Fan 1,            !- Supply Air Fan Name
@@ -1603,7 +1603,7 @@
     HP DX Heating Coil 1,    !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     HatPump DXCoil 1,        !- Cooling Coil Name
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Heating Coil,       !- Supplemental Heating Coil Name
     80,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     20,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -2271,16 +2271,16 @@
     DHW Loop Pump,           !- Name
     Storage Tank Use Loop Inlet Node,  !- Inlet Node Name
     DHW Use Side Pump Outlet,!- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
@@ -2585,16 +2585,16 @@
     Collector Loop Pump,     !- Name
     Storage Tank Source Loop Inlet Node,  !- Inlet Node Name
     Storage Tank Source Pump-Water Heater Node,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,

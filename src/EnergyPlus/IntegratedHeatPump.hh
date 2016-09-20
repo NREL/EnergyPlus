@@ -149,6 +149,8 @@ namespace EnergyPlus {
 			int WHtankType;
 			std::string WHtankName;
 			int WHtankID;
+			int LoopNum; 
+			int LoopSideNum; 
 			bool IsWHCallAvail;
 			//whether water heating call available
 			bool CheckWHCall;
@@ -240,6 +242,8 @@ namespace EnergyPlus {
 				TimeLimitSHDWH( 0.0 ),
 				WHtankType( 0 ),
 				WHtankID( 0 ),
+				LoopNum( 0 ), 
+				LoopSideNum( 0 ),
 				IsWHCallAvail( false ),
 				CheckWHCall( false ),
 				CurMode( IHPOperationMode::IdleMode ),

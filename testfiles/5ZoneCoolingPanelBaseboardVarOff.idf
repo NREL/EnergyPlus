@@ -2109,17 +2109,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2252,31 +2252,31 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER ===========
 
   ZoneHVAC:CoolingPanel:RadiantConvective:Water,
-    SPACE2 Cooling Panel,   !- Name
-    CoolingCoilAvailSched,     !- Availability schedule
-    SPACE2 Cooling Panel Water Inlet Node,      !- Inlet node name
-    SPACE2 Cooling Panel Water Outlet Node,     !- Outlet node name
-    5.0,                       !- Rated Water Inlet Temperature {C}
-    24.0,                      !- Rated Space Temperature {C}
-    0.63,                      !- Rated Water Mass Flow Rate {kg/s}
-    CoolingDesignCapacity,     !- Cooling Capacity Method
-    600.0,                     !- Rated Cooling Capacity {W}
-    0.0,                       !- Cooling Capacity per Floor Area {W/m2}
-    0.0,                       !- Fraction of Autosized Cooling Capacity
-    0.001,                     !- Maximum water flow rate {m3/s}
-    MeanAirTemperature,        !- Temperature Control Type
-    1.0,                       !- Cooling Control Throttling Range
-    Clg-SetP-Sch,              !- Cooling Control Temperature Schedule Name
-    VariableOff,               !- Condensation Control Type
-    0.5,                       !- Condensation Control Dewpoint Offset
-    0.65,                      !- Fraction Radiant
-    0.10,                      !- Fraction of Radiant Energy Incident on People
-    F2-1,                      !- Surface 1 Name
-    0.45,                      !- Fraction of Radiant Energy to Surface 1
-    RIGHT-1,                   !- Surface 2 Name
-    0.25,                      !- Fraction of Radiant Energy to Surface 2
-    SB21,                      !- Surface 3 Name
-    0.2;                       !- Fraction of Radiant Energy to Surface 3
+    SPACE2 Cooling Panel,    !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    SPACE2 Cooling Panel Water Inlet Node,  !- Water Inlet Node Name
+    SPACE2 Cooling Panel Water Outlet Node,  !- Water Outlet Node Name
+    5.0,                     !- Rated Inlet Water Temperature {C}
+    24.0,                    !- Rated Inlet Space Temperature {C}
+    0.63,                    !- Rated Water Mass Flow Rate {kg/s}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    600.0,                   !- Cooling Design Capacity {W}
+    0.0,                     !- Cooling Design Capacity Per Floor Area {W/m2}
+    0.0,                     !- Fraction of Autosized Cooling Design Capacity
+    0.001,                   !- Maximum Chilled Water Flow Rate {m3/s}
+    MeanAirTemperature,      !- Control Type
+    1.0,                     !- Cooling Control Throttling Range {deltaC}
+    Clg-SetP-Sch,            !- Cooling Control Temperature Schedule Name
+    VariableOff,             !- Condensation Control Type
+    0.5,                     !- Condensation Control Dewpoint Offset {C}
+    0.65,                    !- Fraction Radiant
+    0.10,                    !- Fraction of Radiant Energy Incident on People
+    F2-1,                    !- Surface 1 Name
+    0.45,                    !- Fraction of Radiant Energy to Surface 1
+    RIGHT-1,                 !- Surface 2 Name
+    0.25,                    !- Fraction of Radiant Energy to Surface 2
+    SB21,                    !- Surface 3 Name
+    0.2;                     !- Fraction of Radiant Energy to Surface 3
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
 
@@ -2407,14 +2407,14 @@
     SPACE2 Cooling Panel,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    SPACE2-1 ATU,            !- Zone Equipment 1 Name
-    2,                       !- Zone Equipment 1 Cooling Sequence
-    2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:Baseboard:RadiantConvective:Water,  !- Zone Equipment 2 Object Type
-    SPACE2-1 Baseboard,      !- Zone Equipment 2 Name
-    3,                       !- Zone Equipment 2 Cooling Sequence
-    3;                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    SPACE2-1 ATU,            !- Zone Equipment 2 Name
+    2,                       !- Zone Equipment 2 Cooling Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ZoneHVAC:Baseboard:RadiantConvective:Water,  !- Zone Equipment 3 Object Type
+    SPACE2-1 Baseboard,      !- Zone Equipment 3 Name
+    3,                       !- Zone Equipment 3 Cooling Sequence
+    3;                       !- Zone Equipment 3 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -2876,8 +2876,8 @@
   Branch,
     Cooling Panel Branch,    !- Name
     ,                        !- Pressure Drop Curve Name
-    ZoneHVAC:CoolingPanel:RadiantConvective:Water,      !- Component 1 Object Type
-    SPACE2 Cooling Panel,     !- Component 1 Name
+    ZoneHVAC:CoolingPanel:RadiantConvective:Water,  !- Component 1 Object Type
+    SPACE2 Cooling Panel,    !- Component 1 Name
     SPACE2 Cooling Panel Water Inlet Node,  !- Component 1 Inlet Node Name
     SPACE2 Cooling Panel Water Outlet Node;  !- Component 1 Outlet Node Name
 
@@ -3228,32 +3228,32 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Pump:VariableSpeed,
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3261,16 +3261,16 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 

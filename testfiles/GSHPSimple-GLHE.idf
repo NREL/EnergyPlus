@@ -1329,9 +1329,9 @@
     Circ Pump,               !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    0.0033,                  !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    25,                      !- Rated Power Consumption {W}
+    0.0033,                  !- Design Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    25,                      !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     CONTINUOUS;              !- Pump Control Type
@@ -1587,9 +1587,9 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    0.0043,                  !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    35,                      !- Rated Power Consumption {W}
+    0.0043,                  !- Design Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    35,                      !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     CONTINUOUS;              !- Pump Control Type
@@ -1828,7 +1828,7 @@
     2.66667E-02,             !- Pipe Out Diameter {m}
     2.53977E-02,             !- U-Tube Distance {m}
     2.41285E-03,             !- Pipe Thickness {m}
-    2,                       !- Maximum Length of Simulation
+    2,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     35,                      !- Number of Data Pairs of the G Function
     -15.2996,                !- G-Function Ln(T/Ts) Value 1
@@ -1906,9 +1906,9 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    0.0033,                  !- Rated Flow Rate {m3/s}
-    5000,                    !- Rated Pump Head {Pa}
-    25,                      !- Rated Power Consumption {W}
+    0.0033,                  !- Design Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    25,                      !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     CONTINUOUS;              !- Pump Control Type
