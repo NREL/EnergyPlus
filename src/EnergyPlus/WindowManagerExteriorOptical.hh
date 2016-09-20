@@ -86,6 +86,8 @@ namespace SpectralAveraging {
 namespace LayerOptics {
 
   class CBSDFLayer;
+  class CCellDescription;
+  class CMaterialBand;
 
 }
 
@@ -97,10 +99,10 @@ namespace EnergyPlus {
 
     // Initialize window optical properties with Windows-CalcEngine routines
     void InitWCEOpticalData();
-    void StoreOpticalData( const CWCEIntegrator& t_Integrator, const FenestrationCommon::WavelengthRange t_Range,
-      const int t_ConstrNum );
 
-    std::shared_ptr< CWCEIntegrator > getIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties& material );
+    std::shared_ptr< LayerOptics::CBSDFLayer > getBSDFLayer(
+      const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+      const FenestrationCommon::WavelengthRange t_Range );
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCESpecturmProperties
@@ -108,187 +110,141 @@ namespace EnergyPlus {
     class CWCESpecturmProperties {
     public:
       static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
-      static std::shared_ptr< FenestrationCommon::CSeries > getSolarRadiationSpectrum();
-      static std::shared_ptr< FenestrationCommon::CSeries > getVisiblePhotopicResponse();
+      static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
+      static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCERangeIntegrator
+    //   CWCEMaterialFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCERangeIntegrator {
+    class CWCEMaterialFactory {
     public:
-      CWCERangeIntegrator();
+      CWCEMaterialFactory();
 
-      virtual double getProperty( const FenestrationCommon::Side t_Side, 
-        const FenestrationCommon::Property t_Property ) const = 0;
+      std::shared_ptr< LayerOptics::CMaterialBand > getMaterial() const;
 
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // CWCEIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEIntegrator {
-    public:
-      CWCEIntegrator();
-
-      double getProperty( const FenestrationCommon::Side t_Side, const FenestrationCommon::Property t_Property,
-        const FenestrationCommon::WavelengthRange t_Range ) const;
-    
     protected:
-      std::map< FenestrationCommon::WavelengthRange, std::shared_ptr< CWCERangeIntegrator > > m_Integrator;
+      std::shared_ptr< LayerOptics::CMaterialBand > m_Material;
+
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCESpecularRangeIntegrator
+    //   CWCESpecularMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCESpecularRangeIntegrator : public CWCERangeIntegrator {
+    class CWCESpecularMaterialsFactory : public CWCEMaterialFactory {
     public:
-      CWCESpecularRangeIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material, 
+      CWCESpecularMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
-      double getProperty( const FenestrationCommon::Side t_Side, const FenestrationCommon::Property t_Property ) const;
-
-    private:
-      void calculateProperties( const FenestrationCommon::Side t_Side, const double lowLambda, const double highLambda );
-      double calculateProperty( const FenestrationCommon::Side t_Side,
-        const FenestrationCommon::Property t_Property, const double lowLambda, const double highLambda );
-
-      std::shared_ptr< SpectralAveraging::CAngularSpectralSample > m_AngularSample;
-      std::map< std::pair< FenestrationCommon::Side, FenestrationCommon::Property >, double > m_Results;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCESpecularIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCESpecularIntegrator : public CWCEIntegrator {
-    public:
-      CWCESpecularIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
-
-      double getProperty( const FenestrationCommon::Side t_Side, const FenestrationCommon::Property t_Property,
-        const FenestrationCommon::WavelengthRange t_Range ) const;
-
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEShadeMaterialFactory
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEShadeMaterialFactory {
-    public:
-      CWCEShadeMaterialFactory();
-
-      double getProperty( const FenestrationCommon::WavelengthRange t_Range,
-        const FenestrationCommon::Side t_Side, const FenestrationCommon::Property t_Property ) const;
-
-    protected:
-      std::map< std::pair< FenestrationCommon::Side, FenestrationCommon::Property >, double > m_Solar;
-      std::map< std::pair< FenestrationCommon::Side, FenestrationCommon::Property >, double > m_Visible;
-
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEShadeRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEShadeRangeIntegrator : public CWCERangeIntegrator {
-    public:
-      CWCEShadeRangeIntegrator();
-
-      double getProperty( const FenestrationCommon::Side t_Side, 
-        const FenestrationCommon::Property t_Property ) const;
-
-    protected:
-      std::shared_ptr< LayerOptics::CBSDFLayer > m_Shade;
     };
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEVenetianBlindMaterialsFactory : public CWCEShadeMaterialFactory {
+    class CWCEVenetianBlindMaterialsFactory : public CWCEMaterialFactory {
     public:
-      CWCEVenetianBlindMaterialsFactory( const EnergyPlus::DataHeatBalance::WindowBlindProperties& blind );
-
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEVenetianBlindRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEVenetianBlindRangeIntegrator : public CWCEShadeRangeIntegrator {
-    public:
-      CWCEVenetianBlindRangeIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material,
+      CWCEVenetianBlindMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
-
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEVenetianBlindIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEVenetianBlindIntegrator : public CWCEIntegrator {
-    public:
-      CWCEVenetianBlindIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
     };
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEScreenMaterialsFactory : public CWCEShadeMaterialFactory {
+    class CWCEScreenMaterialsFactory : public CWCEMaterialFactory {
     public:
-      CWCEScreenMaterialsFactory( const EnergyPlus::DataHeatBalance::MaterialProperties& material );
-
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEScreenRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEScreenRangeIntegrator : public CWCEShadeRangeIntegrator {
-    public:
-      CWCEScreenRangeIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material,
+      CWCEScreenMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
-
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEScreenIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEScreenIntegrator : public CWCEIntegrator {
-    public:
-      CWCEScreenIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
 
     };
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEDiffuseShadeMaterialsFactory : public CWCEShadeMaterialFactory {
+    class CWCEDiffuseShadeMaterialsFactory : public CWCEMaterialFactory {
     public:
-      CWCEDiffuseShadeMaterialsFactory( const EnergyPlus::DataHeatBalance::MaterialProperties& material );
-
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEDiffuseShadeRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCEDiffuseShadeRangeIntegrator : public CWCERangeIntegrator {
-    public:
-      CWCEDiffuseShadeRangeIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material,
+      CWCEDiffuseShadeMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
-      double getProperty( const FenestrationCommon::Side t_Side,
-        const FenestrationCommon::Property t_Property ) const;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEBSDFLayerFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    class CWCEBSDFLayerFactory {
+    public:
+      CWCEBSDFLayerFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+        const FenestrationCommon::WavelengthRange t_Range );
+
+      std::shared_ptr< LayerOptics::CBSDFLayer > getBSDFLayer();
+
+    protected:
+      void init();
+
+      virtual void createMaterialFactory() = 0;
+      virtual std::shared_ptr< LayerOptics::CCellDescription > getCellDescription() = 0;
+
+      const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties > m_Material;
+      const FenestrationCommon::WavelengthRange m_Range;
+      bool m_Initialized;
+
+      std::shared_ptr< CWCEMaterialFactory > m_MaterialFactory;
+      std::shared_ptr< LayerOptics::CBSDFLayer > m_BSDFLayer;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCESpecularLayerFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    class CWCESpecularLayerFactory : public CWCEBSDFLayerFactory {
+    public:
+      CWCESpecularLayerFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+        const FenestrationCommon::WavelengthRange t_Range );
 
     private:
-      void storeProperties( const FenestrationCommon::WavelengthRange t_Range,
-        const EnergyPlus::DataHeatBalance::MaterialProperties &material );
-
-      std::map< std::pair< FenestrationCommon::Side, FenestrationCommon::Property >, double > m_Results;
+      void createMaterialFactory();
+      std::shared_ptr< LayerOptics::CCellDescription > getCellDescription();
 
     };
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEDiffuseShadeIntegrator
+    //   CWCEVenetianBlindLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEDiffuseShadeIntegrator : public CWCEIntegrator {
+    class CWCEVenetianBlindLayerFactory : public CWCEBSDFLayerFactory {
     public:
-      CWCEDiffuseShadeIntegrator( const EnergyPlus::DataHeatBalance::MaterialProperties &material );
+      CWCEVenetianBlindLayerFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+        const FenestrationCommon::WavelengthRange t_Range );
+
+    private:
+      void createMaterialFactory();
+      std::shared_ptr< LayerOptics::CCellDescription > getCellDescription();
+
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEScreenLayerFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    class CWCEScreenLayerFactory : public CWCEBSDFLayerFactory {
+    public:
+      CWCEScreenLayerFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+        const FenestrationCommon::WavelengthRange t_Range );
+
+    private:
+      void createMaterialFactory();
+      std::shared_ptr< LayerOptics::CCellDescription > getCellDescription();
+
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEDiffuseShadeLayerFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    class CWCEDiffuseShadeLayerFactory : public CWCEBSDFLayerFactory {
+    public:
+      CWCEDiffuseShadeLayerFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+        const FenestrationCommon::WavelengthRange t_Range );
+
+    private:
+      void createMaterialFactory();
+      std::shared_ptr< LayerOptics::CCellDescription > getCellDescription();
 
     };
 

@@ -72,7 +72,7 @@ namespace FenestrationCommon {
 
 namespace LayerOptics {
 
-  class CLayer;
+  class CBSDFLayer;
 
 }
 
@@ -80,7 +80,9 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
-    typedef std::vector< std::shared_ptr< LayerOptics::CLayer > > IGU_Layers;
+    typedef std::vector< std::shared_ptr< LayerOptics::CBSDFLayer > > IGU_Layers;
+    // Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers 
+    // in between. So we will just use map to store layers so that we get optimized search.
     typedef std::map< int, std::shared_ptr< IGU_Layers > > Layers_Map;
 
     class CWindowConstructions {
@@ -88,6 +90,9 @@ namespace EnergyPlus {
       static CWindowConstructions& instance();
 
       std::shared_ptr< IGU_Layers > getLayers( const int t_Index, FenestrationCommon::WavelengthRange t_Range );
+      
+      void pushBSDFLayer( const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum,
+        const std::shared_ptr< LayerOptics::CBSDFLayer >& t_Layer );
 
     private:
       CWindowConstructions();

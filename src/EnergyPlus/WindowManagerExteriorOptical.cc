@@ -84,8 +84,10 @@
 #include "IntegratorStrategy.hpp"
 #include "WavelengthRange.hpp"
 #include "CellDescription.hpp"
+#include "SpecularCellDescription.hpp"
 #include "VenetianCellDescription.hpp"
 #include "WovenCellDescription.hpp"
+#include "PerfectDiffuseCellDescription.hpp"
 #include "BSDFDirections.hpp"
 #include "BSDFLayerMaker.hpp"
 #include "BSDFLayer.hpp"
@@ -109,7 +111,7 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
-    shared_ptr< CWCEIntegrator > getIntegrator( const MaterialProperties& material ) {
+    shared_ptr< CBSDFLayer > getBSDFLayer( const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   September 2016
@@ -117,18 +119,19 @@ namespace EnergyPlus {
       //       RE-ENGINEERED  na
 
       // PURPOSE OF THIS SUBROUTINE:
-      // Integrators are dependent on type of material the layer.
-      shared_ptr< CWCEIntegrator > aInteg = nullptr;
-      if( material.Group == WindowGlass ) {
-        aInteg = make_shared< CWCESpecularIntegrator >( material );
-      } else if( material.Group == WindowBlind ) {
-        aInteg = make_shared< CWCEVenetianBlindIntegrator >( material );
-      } else if( material.Group == Screen ) {
-        aInteg = make_shared< CWCEScreenIntegrator >( material );
-      } else if( material.Group == Shade ) {
-        aInteg = make_shared< CWCEDiffuseShadeIntegrator >( material );
+      // Returns correctly create BSDF layer
+      shared_ptr< CBSDFLayer > aLayer = nullptr;
+      shared_ptr< CWCEBSDFLayerFactory > aFactory = nullptr;
+      if( t_Material->Group == WindowGlass ) {
+        aFactory = make_shared< CWCESpecularLayerFactory >( t_Material, t_Range );
+      } else if( t_Material->Group == WindowBlind ) {
+        aFactory = make_shared< CWCEVenetianBlindLayerFactory >( t_Material, t_Range );
+      } else if( t_Material->Group == Screen ) {
+        aFactory = make_shared< CWCEScreenLayerFactory >( t_Material, t_Range );
+      } else if( t_Material->Group == Shade ) {
+        aFactory = make_shared< CWCEDiffuseShadeLayerFactory >( t_Material, t_Range );
       }
-      return aInteg;
+      return aLayer;
     }
 
     void InitWCEOpticalData() {
@@ -142,44 +145,32 @@ namespace EnergyPlus {
       // Calculation of diffuse optical properties for IGU layers. These properties that are calculated one
       // time only since they are independent on sun position.
 
+      CWindowConstructions aWinConst = CWindowConstructions::instance();
       for( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
         auto& construction( Construct( ConstrNum ) );
         if( construction.isGlazingConstruction() ) {
           for( auto LayNum = 1; LayNum <= construction.TotSolidLayers; ++LayNum ) {
             auto& material( Material( construction.LayerPoint( LayNum ) ) );
-            CWCEIntegrator aInteg = *getIntegrator( material );
+            shared_ptr< MaterialProperties > aMaterial = make_shared< MaterialProperties >();
+            *aMaterial = material;
 
-            StoreOpticalData( aInteg, WavelengthRange::Solar, ConstrNum );
-            StoreOpticalData( aInteg, WavelengthRange::Visible, ConstrNum );
+            auto aRange = WavelengthRange::Solar;
+            shared_ptr< CBSDFLayer > aSolarLayer = getBSDFLayer( aMaterial, aRange );
+            aWinConst.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
+
+            aRange = WavelengthRange::Visible;
+            shared_ptr< CBSDFLayer > aVisibleLayer = getBSDFLayer( aMaterial, aRange );
+            aWinConst.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
+
           }
         }
       }
     }
 
-    void StoreOpticalData( const CWCEIntegrator& t_Integrator, const WavelengthRange t_Range,
-      const int t_ConstrNum ) {
-      // All window constructions used by Windows-CalcEngine are kept in separate locations
-      CWindowConstructions aWinConst = CWindowConstructions::instance();
-      shared_ptr< IGU_Layers > aLayers = aWinConst.getLayers( t_ConstrNum, t_Range );
-
-      double Trans = t_Integrator.getProperty( Side::Front, Property::T, t_Range );
-      double Rf = t_Integrator.getProperty( Side::Front, Property::R, t_Range );
-      double Rb = t_Integrator.getProperty( Side::Back, Property::R, t_Range );
-
-      // Only diffuse properties are calculated here so far. Direct-direct and direct-diffuse will
-      // be calculated layer (at each timestep)
-      shared_ptr< CLayer > aLayer = make_shared< CLayer >( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        Trans, Rf, Trans, Rb );
-
-      // This is first time we use created layer, so push it onto array
-      aLayers->push_back( aLayer );
-
-    }
-
     ///////////////////////////////////////////////////////////////////////////////
     //       CWCESpecturmProperties
     ///////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CSeries > CWCESpecturmProperties::getSolarRadiationSpectrum() {
+    shared_ptr< CSeries > CWCESpecturmProperties::getDefaultSolarRadiationSpectrum() {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   September 2016
@@ -198,7 +189,7 @@ namespace EnergyPlus {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CSeries > CWCESpecturmProperties::getVisiblePhotopicResponse() {
+    shared_ptr< CSeries > CWCESpecturmProperties::getDefaultVisiblePhotopicResponse() {
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Simon Vidanovic
       //       DATE WRITTEN   September 2016
@@ -242,403 +233,237 @@ namespace EnergyPlus {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCERangeIntegrator
+    //   CWCEMaterialFactory
     ///////////////////////////////////////////////////////////////////////////////
-    // CLASS INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   September 2016
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS CLASS:
-    // Virtual class that provides common interface for calling in EnergyPlus routines
-    CWCERangeIntegrator::CWCERangeIntegrator() {
+    CWCEMaterialFactory::CWCEMaterialFactory() {
 
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // CWCEIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEIntegrator::CWCEIntegrator() {
-      m_Integrator[ WavelengthRange::Solar ] = nullptr;
-      m_Integrator[ WavelengthRange::Visible ] = nullptr;
-    }
-
-    double CWCEIntegrator::getProperty( const Side t_Side, const Property t_Property, 
-      const WavelengthRange t_Range ) const {
-      return m_Integrator.at( t_Range )->getProperty( t_Side, t_Property );
+    shared_ptr< CMaterialBand > CWCEMaterialFactory::getMaterial() const {
+      return m_Material;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    //       CWCESpecularRangeIntegrator
+    //   CWCESpecularMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCESpecularRangeIntegrator::CWCESpecularRangeIntegrator( const MaterialProperties &material,
-      const WavelengthRange t_Range ) {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Integrator constructor for specular layers. It integratates optical properties over certain spectral range
-      // and for angles between 0 and 90.
-      shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getSolarRadiationSpectrum();
-      shared_ptr< CSpectralSampleData > aSampleData = CWCESpecturmProperties::getSpectralSample( material.GlassSpectralDataPtr );
+    CWCESpecularMaterialsFactory::CWCESpecularMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) : CWCEMaterialFactory() {
+      shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
+      shared_ptr< CSpectralSampleData > aSampleData = CWCESpecturmProperties::getSpectralSample( t_Material->GlassSpectralDataPtr );
       shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
+
+      SpecularMaterialType aType = SpecularMaterialType::Monolithic;
       CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
       CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
       if( t_Range == WavelengthRange::Visible ) {
-        shared_ptr< CSeries > aPhotopicResponse = CWCESpecturmProperties::getVisiblePhotopicResponse();
+        shared_ptr< CSeries > aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse();
         aSample->setDetectorData( aPhotopicResponse );
       }
 
-      m_AngularSample = make_shared< CAngularSpectralSample >( aSample, material.Thickness, 
-        SpecularMaterialType::Monolithic );
-      calculateProperties( Side::Front, lowLambda, highLambda );
-      calculateProperties( Side::Back, lowLambda, highLambda );
-    }
-
-    double CWCESpecularRangeIntegrator::getProperty( const Side t_Side, const Property t_Property ) const {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Reads specific property from private map
-      return m_Results.at( make_pair( t_Side, t_Property ) );
-    }
-
-    void CWCESpecularRangeIntegrator::calculateProperties( const Side t_Side, const double lowLambda, 
-      const double highLambda ) {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Calculate all properties for given spectral range
-      m_Results[ make_pair( t_Side, Property::T ) ] = calculateProperty( t_Side, Property::T, lowLambda, highLambda );
-      m_Results[ make_pair( t_Side, Property::R ) ] = calculateProperty( t_Side, Property::R, lowLambda, highLambda );
-      m_Results[ make_pair( t_Side, Property::Abs ) ] =
-        1 - m_Results.at( make_pair( t_Side, Property::T ) ) - m_Results.at( make_pair( t_Side, Property::R ) );
-    }
-
-    double CWCESpecularRangeIntegrator::calculateProperty( const Side t_Side, const Property t_Property,
-      const double lowLambda, const double highLambda ) {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Calculate single property for given spectral range.
-      vector< double > angle{ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
-
-      CSeries aSeries;
-
-      for( auto i = 0; i < angle.size(); ++i ) {
-        aSeries.addProperty( angle[ i ], m_AngularSample->getProperty( lowLambda, highLambda, 
-          t_Property, t_Side, angle[ i ] ) );
-      }
-
-      CHemispherical2DIntegrator aIntegrator = CHemispherical2DIntegrator( aSeries, IntegrationType::Trapezoidal );
-
-      return aIntegrator.value();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //       CWCESpecularIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCESpecularIntegrator::CWCESpecularIntegrator( const MaterialProperties &material ) : CWCEIntegrator() {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Provides integrators for several spectral ranges (Visible and Solar)
-      m_Integrator[ WavelengthRange::Solar ] = 
-        make_shared< CWCESpecularRangeIntegrator >( material, WavelengthRange::Solar );
-      m_Integrator[ WavelengthRange::Visible ] = 
-        make_shared< CWCESpecularRangeIntegrator >( material, WavelengthRange::Visible );
-    }
-
-    double CWCESpecularIntegrator::getProperty( const Side t_Side, const Property t_Property,
-      const WavelengthRange t_Range ) const {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Returns property from private map field
-      return m_Integrator.at( t_Range )->getProperty( t_Side, t_Property );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEShadeMaterialFactory
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEShadeMaterialFactory::CWCEShadeMaterialFactory() {
-
-    }
-
-    double CWCEShadeMaterialFactory::getProperty( const WavelengthRange t_Range, const Side t_Side,
-      const Property t_Property ) const {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Provides common interface for all shade material factories (Venetian, Woven, etc)
-      if( t_Range == WavelengthRange::Solar ) {
-        return m_Solar.at( make_pair( t_Side, t_Property ) );
-      } else {
-        return m_Visible.at( make_pair( t_Side, t_Property ) );
-      }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEShadeRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEShadeRangeIntegrator::CWCEShadeRangeIntegrator() : CWCERangeIntegrator() {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Common interface initialization for integrator over single spectral range
-      m_Shade = nullptr;
-    }
-
-    double CWCEShadeRangeIntegrator::getProperty( const Side t_Side, const Property t_Property ) const {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Extraction of data from shadnig device results.
-      shared_ptr< CBSDFResults > aResults = m_Shade->getResults();
-
-      if( t_Property == Property::T ) {
-        return aResults->TauDiff( t_Side );
-      } else {
-        return aResults->RhoDiff( t_Side );
-      }
+      double thickness = t_Material->Thickness;
+      m_Material = make_shared< CMaterialSample >( aSample, thickness, aType, lowLambda, highLambda );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindMaterialsFactory::CWCEVenetianBlindMaterialsFactory( const WindowBlindProperties& blind ) :
-      CWCEShadeMaterialFactory() {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Reads optical data from blind object that has been read from IDF
-      m_Solar[ make_pair( Side::Front, Property::T ) ] = blind.SlatTransSolDiffDiff;
-      m_Solar[ make_pair( Side::Back, Property::T ) ] = blind.SlatTransSolDiffDiff;
-      m_Solar[ make_pair( Side::Front, Property::R ) ] = blind.SlatFrontReflSolDiffDiff;
-      m_Solar[ make_pair( Side::Back, Property::R ) ] = blind.SlatBackReflSolDiffDiff;
-
-      m_Visible[ make_pair( Side::Front, Property::T ) ] = blind.SlatTransVisDiffDiff;
-      m_Visible[ make_pair( Side::Back, Property::T ) ] = blind.SlatTransVisDiffDiff;
-      m_Visible[ make_pair( Side::Front, Property::R ) ] = blind.SlatFrontReflVisDiffDiff;
-      m_Visible[ make_pair( Side::Back, Property::R ) ] = blind.SlatBackReflVisDiffDiff;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEVenetianBlindRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindRangeIntegrator::CWCEVenetianBlindRangeIntegrator( const MaterialProperties &material,
-      const WavelengthRange t_Range ) : CWCEShadeRangeIntegrator() {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Constructor for venetian blind properties over single spectrum range
-      int blindDataPtr = material.BlindDataPtr;
+    CWCEVenetianBlindMaterialsFactory::CWCEVenetianBlindMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) : CWCEMaterialFactory() {
+      int blindDataPtr = t_Material->BlindDataPtr;
       auto& blind( Blind( blindDataPtr ) );
       assert( blindDataPtr > 0 );
+
       CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
       CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
+
+      double Tf = 0;
+      double Tb = 0;
+      double Rf = 0;
+      double Rb = 0;
+      if( t_Range == WavelengthRange::Solar ) {
+        Tf = blind.SlatTransSolDiffDiff;
+        Tb = blind.SlatTransSolDiffDiff;
+        Rf = blind.SlatFrontReflSolDiffDiff;
+        Rb = blind.SlatBackReflSolDiffDiff;
+      } else if( t_Range == WavelengthRange::Visible ) {
+        Tf = blind.SlatTransVisDiffDiff;
+        Tb = blind.SlatTransVisDiffDiff;
+        Rf = blind.SlatFrontReflVisDiffDiff;
+        Rb = blind.SlatBackReflVisDiffDiff;
+      }
+
+      m_Material = make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEScreenMaterialsFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEScreenMaterialsFactory::CWCEScreenMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) : CWCEMaterialFactory() {
+      // Current EnergyPlus model does not support material transmittance different from zero.
+      // To enable that, it would be necessary to change input in IDF
+      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
+      double lowLambda = aRange.minLambda();
+      double highLambda = aRange.maxLambda();
+
+      double Tf = 0;
+      double Tb = 0;
+      double Rf = 0;
+      double Rb = 0;
+      if( t_Range == WavelengthRange::Solar ) {
+        Rf = t_Material->ReflectShade;
+        Rb = t_Material->ReflectShade;
+      } else if( t_Range == WavelengthRange::Visible ) {
+        Rf = t_Material->ReflectShadeVis;
+        Rb = t_Material->ReflectShadeVis;
+      }
+
+      m_Material = make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEDiffuseShadeMaterialsFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEDiffuseShadeMaterialsFactory::CWCEDiffuseShadeMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) {
+      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
+      double lowLambda = aRange.minLambda();
+      double highLambda = aRange.maxLambda();
+
+      double Tf = 0;
+      double Tb = 0;
+      double Rf = 0;
+      double Rb = 0;
+      if( t_Range == WavelengthRange::Solar ) {
+        Tf = t_Material->Trans;
+        Tb = t_Material->Trans;
+        Rf = t_Material->ReflectShade;
+        Rb = t_Material->ReflectShade;
+      } else if( t_Range == WavelengthRange::Visible ) {
+        Tf = t_Material->TransVis;
+        Tb = t_Material->TransVis;
+        Rf = t_Material->ReflectShadeVis;
+        Rb = t_Material->ReflectShadeVis;
+      }
+
+      m_Material = make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEBSDFLayerFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEBSDFLayerFactory::CWCEBSDFLayerFactory(
+      const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
+      m_Material( t_Material ), m_Range( t_Range ), m_MaterialFactory( nullptr ) {
       
-      CWCEVenetianBlindMaterialsFactory aMatBld = CWCEVenetianBlindMaterialsFactory( blind );
+    }
 
-      double Tf = aMatBld.getProperty( t_Range, Side::Front, Property::T );
-      double Tb = aMatBld.getProperty( t_Range, Side::Back, Property::T );
-      double Rf = aMatBld.getProperty( t_Range, Side::Front, Property::R );
-      double Rb = aMatBld.getProperty( t_Range, Side::Back, Property::R );
+    void CWCEBSDFLayerFactory::init() {
+      createMaterialFactory();
+      shared_ptr< CMaterialBand > aMaterial = m_MaterialFactory->getMaterial();;
+      assert( aMaterial != nullptr );
+      shared_ptr< CCellDescription > aCellDescription = getCellDescription( );
+      assert( aCellDescription != nullptr );
+      shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Small );
 
-      shared_ptr< CMaterialBand > aMaterial =
-        make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+      CBSDFLayerMaker aMaker = CBSDFLayerMaker( aMaterial, aBSDF, aCellDescription );
+      m_BSDFLayer = aMaker.getLayer();
+    }
+
+    shared_ptr< CBSDFLayer > CWCEBSDFLayerFactory::getBSDFLayer() {
+      if( !m_Initialized ) {
+        init();
+        m_Initialized = true;
+      }
+      return m_BSDFLayer;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCESpecularLayerFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCESpecularLayerFactory::CWCESpecularLayerFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) : CWCEBSDFLayerFactory( t_Material, t_Range ) {
+
+    }
+
+    void CWCESpecularLayerFactory::createMaterialFactory() {
+      m_MaterialFactory = make_shared< CWCESpecularMaterialsFactory >( m_Material, m_Range );
+    }
+
+    shared_ptr< CCellDescription > CWCESpecularLayerFactory::getCellDescription() {
+      return make_shared< CSpecularCellDescription >();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEVenetianBlindLayerFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEVenetianBlindLayerFactory::CWCEVenetianBlindLayerFactory( 
+      const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
+      CWCEBSDFLayerFactory( t_Material, t_Range ) {
+
+    }
+
+    void CWCEVenetianBlindLayerFactory::createMaterialFactory() {
+      m_MaterialFactory = make_shared< CWCEVenetianBlindMaterialsFactory >( m_Material, m_Range );
+    }
+
+    shared_ptr< CCellDescription > CWCEVenetianBlindLayerFactory::getCellDescription() {
+      int blindDataPtr = m_Material->BlindDataPtr;
+      auto& blind( Blind( blindDataPtr ) );
+      assert( blindDataPtr > 0 );
 
       double slatWidth = blind.SlatWidth;
       double slatSpacing = blind.SlatSeparation;
       double slatTiltAngle = blind.SlatAngle;
       double curvatureRadius = 0; // No curvature radius in current IDF definition
       size_t numOfSlatSegments = 5; // Number of segments to use in venetian calculations
-      shared_ptr< CCellDescription > aCellDescription =
-        make_shared< CVenetianCellDescription >( slatWidth, slatSpacing, slatTiltAngle,
+      return make_shared< CVenetianCellDescription >( slatWidth, slatSpacing, slatTiltAngle,
           curvatureRadius, numOfSlatSegments );
-
-      shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Full );
-
-      CBSDFLayerMaker aMaker = CBSDFLayerMaker( aMaterial, aBSDF, aCellDescription );
-      m_Shade = aMaker.getLayer();
-
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEVenetianBlindIntegrator
+    //   CWCEScreenLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEVenetianBlindIntegrator::CWCEVenetianBlindIntegrator( const MaterialProperties &material ) :
-      CWCEIntegrator() {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Intialization specific for venetian blind integrators
-      m_Integrator[ WavelengthRange::Solar ] =
-        make_shared< CWCEVenetianBlindRangeIntegrator >( material, WavelengthRange::Solar );
-      m_Integrator[ WavelengthRange::Visible ] =
-        make_shared< CWCEVenetianBlindRangeIntegrator >( material, WavelengthRange::Visible );
+    CWCEScreenLayerFactory::CWCEScreenLayerFactory( 
+      const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
+      CWCEBSDFLayerFactory( t_Material, t_Range ) {
+      
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEScreenMaterialsFactory
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenMaterialsFactory::CWCEScreenMaterialsFactory( const MaterialProperties& material ) :
-      CWCEShadeMaterialFactory() {
-      // Current EnergyPlus model does not support material transmittance different from zero.
-      // To enable that, it would be necessary to change input in IDF
-      m_Solar[ make_pair( Side::Front, Property::T ) ] = 0;
-      m_Solar[ make_pair( Side::Back, Property::T ) ] = 0;
-      m_Solar[ make_pair( Side::Front, Property::R ) ] = material.ReflectShade;
-      m_Solar[ make_pair( Side::Back, Property::R ) ] = material.ReflectShade;
-
-      m_Visible[ make_pair( Side::Front, Property::T ) ] = 0;
-      m_Visible[ make_pair( Side::Back, Property::T ) ] = 0;
-      m_Visible[ make_pair( Side::Front, Property::R ) ] = material.ReflectShadeVis;
-      m_Visible[ make_pair( Side::Back, Property::R ) ] = material.ReflectShadeVis;
+    void CWCEScreenLayerFactory::createMaterialFactory() {
+      m_MaterialFactory = make_shared< CWCEScreenMaterialsFactory >( m_Material, m_Range );
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEScreenRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenRangeIntegrator::CWCEScreenRangeIntegrator( const MaterialProperties &material,
-      const WavelengthRange t_Range ) {
-
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
-      double lowLambda = aRange.minLambda();
-      double highLambda = aRange.maxLambda();
-
-      CWCEScreenMaterialsFactory aMatBld = CWCEScreenMaterialsFactory( material );
-
-      double Tf = aMatBld.getProperty( t_Range, Side::Front, Property::T );
-      double Tb = aMatBld.getProperty( t_Range, Side::Back, Property::T );
-      double Rf = aMatBld.getProperty( t_Range, Side::Front, Property::R );
-      double Rb = aMatBld.getProperty( t_Range, Side::Back, Property::R );
-
-      shared_ptr< CMaterialBand > aMaterial =
-        make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
-
-      double diameter = material.Thickness; // Thickness in this case is diameter
-      //double spacing = diameter / material.ScreenDiameterToSpacingRatio;
-      // Program did not keep spacing from input format but rather calculated transmittance
-      // as material.Trans = pow_2( 1.0 - diameter / spacing );
-      double ratio = 1.0 - std::sqrt( material.Trans );
+    shared_ptr< CCellDescription > CWCEScreenLayerFactory::getCellDescription() {
+      double diameter = m_Material->Thickness; // Thickness in this case is diameter
+      // ratio is not saved withing material but rather calculated from transmittance
+      double ratio = 1.0 - std::sqrt( m_Material->Trans );
       double spacing = diameter / ratio;
-      shared_ptr< CCellDescription > aCellDescription =
-        make_shared< CWovenCellDescription >( diameter, spacing );
-
-      shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Full );
-
-      CBSDFLayerMaker aMaker = CBSDFLayerMaker( aMaterial, aBSDF, aCellDescription );
-      m_Shade = aMaker.getLayer();
+      return make_shared< CWovenCellDescription >( diameter, spacing );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEScreenIntegrator
+    //   CWCEDiffuseShadeLayerFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEScreenIntegrator::CWCEScreenIntegrator( const MaterialProperties &material ) {
-      m_Integrator[ WavelengthRange::Solar ] =
-        make_shared< CWCEScreenRangeIntegrator >( material, WavelengthRange::Solar );
-      m_Integrator[ WavelengthRange::Visible ] =
-        make_shared< CWCEScreenRangeIntegrator >( material, WavelengthRange::Visible );
+    CWCEDiffuseShadeLayerFactory::CWCEDiffuseShadeLayerFactory(
+      const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) :
+      CWCEBSDFLayerFactory( t_Material, t_Range ) {
+
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEDiffuseShadeMaterialsFactory
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeMaterialsFactory::CWCEDiffuseShadeMaterialsFactory( const MaterialProperties& material ) {
-      m_Solar[ make_pair( Side::Front, Property::T ) ] = material.Trans;
-      m_Solar[ make_pair( Side::Back, Property::T ) ] = material.Trans;
-      m_Solar[ make_pair( Side::Front, Property::R ) ] = material.ReflectShade;
-      m_Solar[ make_pair( Side::Back, Property::R ) ] = material.ReflectShade;
-
-      m_Visible[ make_pair( Side::Front, Property::T ) ] = material.TransVis;
-      m_Visible[ make_pair( Side::Back, Property::T ) ] = material.TransVis;
-      m_Visible[ make_pair( Side::Front, Property::R ) ] = material.ReflectShadeVis;
-      m_Visible[ make_pair( Side::Back, Property::R ) ] = material.ReflectShadeVis;
+    void CWCEDiffuseShadeLayerFactory::createMaterialFactory() {
+      m_MaterialFactory = make_shared< CWCEDiffuseShadeMaterialsFactory >( m_Material, m_Range );
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEDiffuseShadeRangeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeRangeIntegrator::CWCEDiffuseShadeRangeIntegrator( const MaterialProperties &material, 
-      const WavelengthRange t_Range ) : CWCERangeIntegrator() {
-      storeProperties( t_Range, material );
-    }
-
-    double CWCEDiffuseShadeRangeIntegrator::getProperty( const Side t_Side, const Property t_Property ) const {
-      return m_Results.at( make_pair( t_Side, t_Property ) );
-    }
-
-    void CWCEDiffuseShadeRangeIntegrator::storeProperties( const WavelengthRange t_Range,
-      const MaterialProperties &material ) {
-      CWCEDiffuseShadeMaterialsFactory aFactory = CWCEDiffuseShadeMaterialsFactory( material );
-      m_Results[ make_pair( Side::Front, Property::T ) ] = aFactory.getProperty( t_Range, Side::Front, Property::T );
-      m_Results[ make_pair( Side::Back, Property::T ) ] = aFactory.getProperty( t_Range, Side::Back, Property::T );
-      m_Results[ make_pair( Side::Front, Property::R ) ] = aFactory.getProperty( t_Range, Side::Front, Property::R );
-      m_Results[ make_pair( Side::Back, Property::R ) ] = aFactory.getProperty( t_Range, Side::Back, Property::R );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWCEDiffuseShadeIntegrator
-    ///////////////////////////////////////////////////////////////////////////////
-    CWCEDiffuseShadeIntegrator::CWCEDiffuseShadeIntegrator( const MaterialProperties &material ) {
-      m_Integrator[ WavelengthRange::Solar ] =
-        make_shared< CWCEDiffuseShadeRangeIntegrator >( material, WavelengthRange::Solar );
-      m_Integrator[ WavelengthRange::Visible ] =
-        make_shared< CWCEDiffuseShadeRangeIntegrator >( material, WavelengthRange::Visible );
+    shared_ptr< CCellDescription > CWCEDiffuseShadeLayerFactory::getCellDescription() {
+      return make_shared< CPerfectDiffuseCellDescription >();
     }
 
   }

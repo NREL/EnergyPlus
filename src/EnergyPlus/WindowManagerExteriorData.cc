@@ -90,6 +90,12 @@ namespace EnergyPlus {
       }
     }
 
+    void CWindowConstructions::pushBSDFLayer( const WavelengthRange t_Range, const int t_ConstrNum, 
+      const shared_ptr< CBSDFLayer >& t_Layer ) {
+      Layers_Map aLayers = *m_Layers.at( t_Range );
+      aLayers[ t_ConstrNum ]->push_back( t_Layer );
+    }
+
   }
 
 }
