@@ -18,7 +18,7 @@ ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/GrndTempCalc/SlabGHT.idd" 
 
 mv "$2@CPACK_PACKAGING_INSTALL_PREFIX@/energyplus.1" /usr/local/share/man/man1/
 
-chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@/ExampleFiles"
+chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@"
 chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/Contents/MacOS/"
 chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/"
 if [ -e "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/" ]; then 
