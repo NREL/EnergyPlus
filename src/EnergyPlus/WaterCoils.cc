@@ -1719,6 +1719,7 @@ namespace WaterCoils {
 		Real64 DesCoilAirFlow; // design air flow rate for the coil [m3/s]
 		Real64 DesCoilExitTemp; // design coil exit temperature [C]
 		Real64 Cp;
+		bool NomCapUserInp = false; // flag for whether user has onput a nominal heating capacity
 
 		ErrorsFound = false;
 		PltSizCoolNum = 0;
@@ -1999,6 +2000,20 @@ namespace WaterCoils {
 					PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp,
 					PlantLoop( DataWaterLoopNum ).FluidIndex, RoutineName );
+				if ( WaterCoil( CoilNum ).DesTotWaterCoilLoad > 0.0 ) {
+					NomCapUserInp = true;
+				}
+				else if ( CurSysNum > 0 ) {
+					if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea ) {
+						NomCapUserInp = true;
+					} else if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && 
+						FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0 ) {
+						NomCapUserInp = true;
+					} 
+				}
+				else {
+					NomCapUserInp = false;
+				}
 				bPRINT = false; // do not print this sizing request
 				TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
 				SizingString.clear(); // doesn't matter
@@ -2027,7 +2042,7 @@ namespace WaterCoils {
 				DataFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air flow rate, save this value
 
 				bPRINT = true;
-				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) {
+				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
 					TempSize = WaterCoil( CoilNum ).DesTotWaterCoilLoad;
 					DataNomCapInpMeth = true;
 				} else {
@@ -2045,10 +2060,10 @@ namespace WaterCoils {
 
 				// We now have the design load if it was autosized. For the case of CoilPerfInpMeth == NomCap, calculate the air flow rate specified 
 				// by the NomCap inputs. This overrides all previous values
-				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) {
+				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
 					WaterCoil( CoilNum ).InletAirMassFlowRate = WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( CpAirStd*( WaterCoil( CoilNum ).DesOutletAirTemp -
 						WaterCoil( CoilNum ).DesInletAirTemp ) );
-					WaterCoil( CoilNum ).DesAirVolFlowRate = WaterCoil( CoilNum ).DesAirVolFlowRate / StdRhoAir;
+					WaterCoil( CoilNum ).DesAirVolFlowRate = WaterCoil( CoilNum ).InletAirMassFlowRate / StdRhoAir;
 					DataAirFlowUsedForSizing = WaterCoil( CoilNum ).DesAirVolFlowRate;
 					DataFlowUsedForSizing = WaterCoil( CoilNum ).DesAirVolFlowRate;
 				}
@@ -2056,7 +2071,7 @@ namespace WaterCoils {
 
 				FieldNum = 2; // N2 , \field Maximum Water Flow Rate
 				SizingString = WaterCoilNumericFields( CoilNum ).FieldNames( FieldNum ) + " [m3/s]";
-				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) {
+				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
 					if ( WaterCoil( CoilNum ).DesTotWaterCoilLoad > SmallLoad ) {
 						WaterCoil( CoilNum ).MaxWaterVolFlowRate = DataCapacityUsedForSizing
 							/ ( Cp * rho * ( WaterCoil( CoilNum ).DesInletWaterTemp - WaterCoil( CoilNum ).DesOutletWaterTemp ) );
@@ -2082,10 +2097,10 @@ namespace WaterCoils {
 				// initialize the water coil inlet conditions
 				bPRINT = false; // no need to print to eio since we only need the values
 				DataFlowUsedForSizing = DataAirFlowUsedForSizing;
-				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) {
+				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
 					WaterCoil( CoilNum ).InletAirTemp = WaterCoil( CoilNum ).DesInletAirTemp;
 					WaterCoil( CoilNum ).InletAirHumRat = PsyWFnTdbRhPb( WaterCoil( CoilNum ).DesInletAirTemp, 0.5, StdBaroPress, RoutineName );
-					WaterCoil( CoilNum ).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir;
+					WaterCoil( CoilNum ).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir; // don't need this
 					DataDesOutletAirTemp = WaterCoil( CoilNum ).DesOutletAirTemp; // for error messages
 					DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.5, StdBaroPress, RoutineName ); // for error messages
 					WaterCoil( CoilNum ).InletWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
@@ -2121,7 +2136,7 @@ namespace WaterCoils {
 				DataDesInletAirHumRat = WaterCoil ( CoilNum ).InletAirHumRat; // used in error mesages
 				DataFlowUsedForSizing = DataAirFlowUsedForSizing * StdRhoAir; // used in error mesages
 				WaterCoil( CoilNum ).MaxWaterVolFlowRate = DataWaterFlowUsedForSizing;  // why is this here?
-				if ( !( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) ) {
+				if ( !( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) ) {
 					TempSize = AutoSize;
 					RequestSizing( CompType, CompName, HeatingWaterDesCoilLoadUsedForUASizing, SizingString, TempSize, bPRINT, RoutineName );
 					DataCapacityUsedForSizing = TempSize;
@@ -2140,7 +2155,7 @@ namespace WaterCoils {
 				SizingString = WaterCoilNumericFields( CoilNum ).FieldNames( FieldNum ) + " [W/K]";
 				DataCoilNum = CoilNum;
 				DataFanOpMode = ContFanCycCoil;
-				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) {
+				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
 					TempSize = AutoSize;
 				} else {
 					TempSize = WaterCoil( CoilNum ).UACoil;
