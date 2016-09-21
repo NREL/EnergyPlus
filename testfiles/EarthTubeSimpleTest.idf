@@ -443,7 +443,7 @@
     3,                       !- Pipe Depth Under Ground Surface {m}
     HeavyAndSaturated,       !- Soil Condition
     12.68846,                !- Average Soil Surface Temperature {C}
-    5.893740,                !- Amplitude of Soil Surface Temperature {C}
+    5.893740,                !- Amplitude of Soil Surface Temperature {deltaC}
     2,                       !- Phase Constant of Soil Surface Temperature {days}
     0.6060000,               !- Constant Term Flow Coefficient
     2.0199999E-02,           !- Temperature Term Flow Coefficient
@@ -516,7 +516,7 @@
     3,                       !- Pipe Depth Under Ground Surface {m}
     HeavyAndSaturated,       !- Soil Condition
     12.68846,                !- Average Soil Surface Temperature {C}
-    5.893740,                !- Amplitude of Soil Surface Temperature {C}
+    5.893740,                !- Amplitude of Soil Surface Temperature {deltaC}
     2,                       !- Phase Constant of Soil Surface Temperature {days}
     0.6060000,               !- Constant Term Flow Coefficient
     2.0199999E-02,           !- Temperature Term Flow Coefficient
@@ -589,7 +589,7 @@
     3.0,                     !- Pipe Depth Under Ground Surface {m}
     HeavyAndSaturated,       !- Soil Condition
     12.68846,                !- Average Soil Surface Temperature {C}
-    5.893740,                !- Amplitude of Soil Surface Temperature {C}
+    5.893740,                !- Amplitude of Soil Surface Temperature {deltaC}
     2,                       !- Phase Constant of Soil Surface Temperature {days}
     0.6060000,               !- Constant Term Flow Coefficient
     2.0199999E-02,           !- Temperature Term Flow Coefficient

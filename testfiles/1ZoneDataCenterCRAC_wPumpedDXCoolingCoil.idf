@@ -10,7 +10,7 @@
 !                          1zoneuncontrolled
 !
 ! Simulation Location/Run: Denver Centennial Golden CO USA WMO=724666, 2 design days, 1 run period,
-!                          
+!
 !
 ! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5°C
 !                          Denver Centennial  Golden CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
@@ -50,14 +50,14 @@
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                      !- Run Simulation for Sizing Periods
-    No;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    Jan,                  !- Name
+    Jan,                     !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -67,10 +67,10 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    Jul,                  !- Name
+    Jul,                     !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
-    7,                      !- End Month
+    7,                       !- End Month
     31,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -391,15 +391,15 @@
     ,                        !- Latent Capacity Time Constant {s}
     ,                        !- Condenser Air Inlet Node Name
     ,                        !- Condenser Type
-    ,                        !- Evaporative Condenser Effectiveness
-    ,                        !- Evaporative Condenser Air Flow Rate
-    ,                        !- Evaporative Condenser Pump Rated Power Consumption
-    ,                        !- Crankcase Heater Capacity
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
-    ,                        !- Basin Heater Capacity
-    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
@@ -795,9 +795,9 @@
     Main Zone Baseboard,     !- Name
     System Availability Schedule,  !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    8000,                    !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    8000,                    !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneControl:Thermostat,
@@ -840,7 +840,7 @@
     For: AllDays,            !- Field 2
     Until: 24:00,29.3;       !- Field 3
 
-ElectricEquipment:ITE:AirCooled,
+  ElectricEquipment:ITE:AirCooled,
     Data Center Servers,     !- Name
     Main Zone,               !- Zone Name
     Watts/Unit,              !- Design Power Input Calculation Method
@@ -870,20 +870,20 @@ ElectricEquipment:ITE:AirCooled,
     ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
 
   Curve:Quadratic,
-    ECM FanPower fFlow,          !- Name
+    ECM FanPower fFlow,      !- Name
     0.0,                     !- Coefficient1 Constant
     1.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
-    99.0;                     !- Maximum Value of x
+    99.0;                    !- Maximum Value of x
 
   Curve:Quadratic,
-    UPS Efficiency fPLR,          !- Name
+    UPS Efficiency fPLR,     !- Name
     1.0,                     !- Coefficient1 Constant
     0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
-    99.0;                     !- Maximum Value of x
+    99.0;                    !- Maximum Value of x
 
   Curve:Biquadratic,
     Data Center Servers Power fLoadTemp,  !- Name
@@ -899,7 +899,7 @@ ElectricEquipment:ITE:AirCooled,
     99.0,                    !- Maximum Value of y
     0.0,                     !- Minimum Curve Output
     99.0,                    !- Maximum Curve Output
-    Dimensionless,             !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
@@ -917,7 +917,7 @@ ElectricEquipment:ITE:AirCooled,
     99.0,                    !- Maximum Value of y
     0.0,                     !- Minimum Curve Output
     99.0,                    !- Maximum Curve Output
-    Dimensionless,             !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
@@ -935,18 +935,18 @@ ElectricEquipment:ITE:AirCooled,
     99.0,                    !- Maximum Value of y
     0.0,                     !- Minimum Curve Output
     99.0,                    !- Maximum Curve Output
-    Dimensionless,             !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Schedule:Constant, Data Center Operation Schedule, Any Number, 1.0;
+  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;
 
   Schedule:Compact,
     Data Center CPU Loading Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 1/31,           !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,1.0,       !- Field 3
+    Until: 24:00,1.0,        !- Field 3
     Through: 2/29,           !- Field 5
     For: AllDays,            !- Field 6
     Until: 24:00,0.50,       !- Field 7
@@ -1074,41 +1074,75 @@ ElectricEquipment:ITE:AirCooled,
 
   Output:Variable,*,Schedule Value,Hourly;
 
-Output:Variable,*,ITE CPU Electric Power,Hourly; !- Zone Average [W]
-Output:Variable,*,ITE Fan Electric Power,Hourly; !- Zone Average [W]
-Output:Variable,*,ITE UPS Electric Power,Hourly; !- Zone Average [W]
-Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,Hourly; !- Zone Average [W]
-Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,Hourly; !- Zone Average [W]
-Output:Variable,*,ITE UPS Heat Gain to Zone Rate,Hourly; !- Zone Average [W]
-Output:Variable,*,ITE Total Heat Gain to Zone Rate,Hourly; !- Zone Average [W]
-Output:Variable,*,ITE Standard Density Air Volume Flow Rate,Hourly; !- Zone Average [m3/s]
-Output:Variable,*,ITE Air Mass Flow Rate,Hourly; !- Zone Average [kg/s]
-Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature,Hourly; !- Zone Average [C]
-Output:Variable,*,ITE Air Inlet Dewpoint Temperature,Hourly; !- Zone Average [C]
-Output:Variable,*,ITE Air Inlet Relative Humidity,Hourly; !- Zone Average [%]
-Output:Variable,*,ITE Air Outlet Dry-Bulb Temperature,Hourly; !- Zone Average [C]
-Output:Variable,*,ITE Supply Heat Index,Hourly; !- Zone Average []
-Output:Variable,*,ITE Air Inlet Operating Range Exceeded Time,Hourly; !- Zone Sum [hr]
-Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time,Hourly; !- Zone Sum [hr]
-Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time,Hourly; !- Zone Sum [hr]
-Output:Variable,*,ITE Air Inlet Dewpoint Temperature Above Operating Range Time,Hourly; !- Zone Sum [hr]
-Output:Variable,*,ITE Air Inlet Dewpoint Temperature Below Operating Range Time,Hourly; !- Zone Sum [hr]
-Output:Variable,*,ITE Air Inlet Relative Humidity Above Operating Range Time,Hourly; !- Zone Sum [hr]
-Output:Variable,*,ITE Air Inlet Relative Humidity Below Operating Range Time,Hourly; !- Zone Sum [hr]
-Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range,Hourly; !- Zone Average [deltaC]
-Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range,Hourly; !- Zone Average [deltaC]
-Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range,Hourly; !- Zone Average [deltaC]
-Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range,Hourly; !- Zone Average [deltaC]
-Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,Hourly; !- Zone Average [%]
-Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,Hourly; !- Zone Average [%]
-Output:Variable,*,Zone Air Temperature,Hourly; !- HVAC Average [C]
-Output:Variable,*,Zone Air Heat Balance Internal Convective Heat Gain Rate,Hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Air Heat Balance Surface Convection Rate,Hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Air Heat Balance Interzone Air Transfer Rate,Hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Air Heat Balance Outdoor Air Transfer Rate,Hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Air Heat Balance System Air Transfer Rate,Hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Air Heat Balance System Convective Heat Gain Rate,Hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,Hourly; !- HVAC Average [W]
+  Output:Variable,*,ITE CPU Electric Power,Hourly;
+
+  Output:Variable,*,ITE Fan Electric Power,Hourly;
+
+  Output:Variable,*,ITE UPS Electric Power,Hourly;
+
+  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,Hourly;
+
+  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,Hourly;
+
+  Output:Variable,*,ITE UPS Heat Gain to Zone Rate,Hourly;
+
+  Output:Variable,*,ITE Total Heat Gain to Zone Rate,Hourly;
+
+  Output:Variable,*,ITE Standard Density Air Volume Flow Rate,Hourly;
+
+  Output:Variable,*,ITE Air Mass Flow Rate,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity,Hourly;
+
+  Output:Variable,*,ITE Air Outlet Dry-Bulb Temperature,Hourly;
+
+  Output:Variable,*,ITE Supply Heat Index,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Operating Range Exceeded Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Above Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Below Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Above Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Below Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,Hourly;
+
+  Output:Variable,*,Zone Air Temperature,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Internal Convective Heat Gain Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Surface Convection Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Interzone Air Transfer Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Outdoor Air Transfer Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance System Air Transfer Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance System Convective Heat Gain Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,Hourly;
 
 ! custom EMS output variables
 ! SCOP
@@ -1233,3 +1267,4 @@ Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,Hourly; !- HVAC 
     set PUE = whole_building_power / IT_Equip_power;  !- Program Line 1
 
   Output:Variable,*,PUE,Hourly;
+

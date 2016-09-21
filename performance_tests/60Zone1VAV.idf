@@ -31817,7 +31817,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_1_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_1_C Reheat Coil,     !- Name
@@ -31919,7 +31921,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_3_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_3_C Reheat Coil,     !- Name
@@ -32021,7 +32025,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_4_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_4_C Reheat Coil,     !- Name
@@ -32123,7 +32129,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_5_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_5_C Reheat Coil,     !- Name
@@ -32225,7 +32233,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_6_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_6_C Reheat Coil,     !- Name
@@ -32327,7 +32337,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_7_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_7_C Reheat Coil,     !- Name
@@ -32429,7 +32441,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_8_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_8_C Reheat Coil,     !- Name
@@ -32531,7 +32545,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_9_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_9_C Reheat Coil,     !- Name
@@ -32633,7 +32649,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_10_C Supply Inlet,   !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_10_C Reheat Coil,    !- Name
@@ -32735,7 +32753,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm1_2_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm1_2_C Reheat Coil,     !- Name
@@ -32837,7 +32857,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_1_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_1_C Reheat Coil,     !- Name
@@ -32939,7 +32961,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_2_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_2_C Reheat Coil,     !- Name
@@ -33041,7 +33065,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_3_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_3_C Reheat Coil,     !- Name
@@ -33143,7 +33169,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_4_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_4_C Reheat Coil,     !- Name
@@ -33245,7 +33273,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_5_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_5_C Reheat Coil,     !- Name
@@ -33347,7 +33377,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_6_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_6_C Reheat Coil,     !- Name
@@ -33449,7 +33481,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_7_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_7_C Reheat Coil,     !- Name
@@ -33551,7 +33585,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_8_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_8_C Reheat Coil,     !- Name
@@ -33653,7 +33689,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_9_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_9_C Reheat Coil,     !- Name
@@ -33755,7 +33793,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm2_10_C Supply Inlet,   !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm2_10_C Reheat Coil,    !- Name
@@ -33857,7 +33897,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_1_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_1_C Reheat Coil,     !- Name
@@ -33959,7 +34001,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_2_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_2_C Reheat Coil,     !- Name
@@ -34061,7 +34105,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_3_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_3_C Reheat Coil,     !- Name
@@ -34163,7 +34209,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_4_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_4_C Reheat Coil,     !- Name
@@ -34265,7 +34313,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_5_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_5_C Reheat Coil,     !- Name
@@ -34367,7 +34417,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_6_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_6_C Reheat Coil,     !- Name
@@ -34469,7 +34521,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_7_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_7_C Reheat Coil,     !- Name
@@ -34571,7 +34625,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_8_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_8_C Reheat Coil,     !- Name
@@ -34673,7 +34729,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_9_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_9_C Reheat Coil,     !- Name
@@ -34775,7 +34833,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm3_10_C Supply Inlet,   !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm3_10_C Reheat Coil,    !- Name
@@ -34877,7 +34937,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_1_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_1_C Reheat Coil,     !- Name
@@ -34979,7 +35041,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_2_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_2_C Reheat Coil,     !- Name
@@ -35081,7 +35145,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_3_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_3_C Reheat Coil,     !- Name
@@ -35183,7 +35249,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_4_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_4_C Reheat Coil,     !- Name
@@ -35285,7 +35353,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_5_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_5_C Reheat Coil,     !- Name
@@ -35387,7 +35457,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_6_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_6_C Reheat Coil,     !- Name
@@ -35489,7 +35561,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_7_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_7_C Reheat Coil,     !- Name
@@ -35591,7 +35665,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_8_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_8_C Reheat Coil,     !- Name
@@ -35693,7 +35769,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_9_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_9_C Reheat Coil,     !- Name
@@ -35795,7 +35873,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm4_10_C Supply Inlet,   !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm4_10_C Reheat Coil,    !- Name
@@ -35897,7 +35977,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_1_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_1_C Reheat Coil,     !- Name
@@ -35999,7 +36081,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_2_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_2_C Reheat Coil,     !- Name
@@ -36101,7 +36185,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_3_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_3_C Reheat Coil,     !- Name
@@ -36203,7 +36289,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_4_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_4_C Reheat Coil,     !- Name
@@ -36305,7 +36393,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_5_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_5_C Reheat Coil,     !- Name
@@ -36407,7 +36497,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_6_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_6_C Reheat Coil,     !- Name
@@ -36509,7 +36601,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_7_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_7_C Reheat Coil,     !- Name
@@ -36611,7 +36705,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_8_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_8_C Reheat Coil,     !- Name
@@ -36713,7 +36809,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_9_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_9_C Reheat Coil,     !- Name
@@ -36815,7 +36913,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm5_10_C Supply Inlet,   !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm5_10_C Reheat Coil,    !- Name
@@ -36917,7 +37017,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_1_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_1_C Reheat Coil,     !- Name
@@ -37019,7 +37121,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_2_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_2_C Reheat Coil,     !- Name
@@ -37121,7 +37225,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_3_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_3_C Reheat Coil,     !- Name
@@ -37223,7 +37329,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_4_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_4_C Reheat Coil,     !- Name
@@ -37325,7 +37433,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_5_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_5_C Reheat Coil,     !- Name
@@ -37427,7 +37537,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_6_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_6_C Reheat Coil,     !- Name
@@ -37529,7 +37641,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_7_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_7_C Reheat Coil,     !- Name
@@ -37631,7 +37745,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_8_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_8_C Reheat Coil,     !- Name
@@ -37733,7 +37849,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_9_C Supply Inlet,    !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_9_C Reheat Coil,     !- Name
@@ -37835,7 +37953,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     rm6_10_C Supply Inlet,   !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     rm6_10_C Reheat Coil,    !- Name
@@ -38589,9 +38709,9 @@
     BoilerPlant HW Circ Pump,!- Name
     BoilerPlant HW Supply Inlet Node,  !- Inlet Node Name
     BoilerPlant HW Pump Outlet Node,  !- Outlet Node Name
-    0.02386212,              !- Rated Flow Rate {m3/s}
-    89672.01,                !- Rated Pump Head {Pa}
-    3594.038,                !- Rated Power Consumption {W}
+    0.02386212,              !- Design Flow Rate {m3/s}
+    89672.01,                !- Design Pump Head {Pa}
+    3594.038,                !- Design Power Consumption {W}
     0.85,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent;            !- Pump Control Type
@@ -38910,9 +39030,9 @@
     ChillerPlant ChW Circ Pump,  !- Name
     ChillerPlant ChW Supply Inlet Node,  !- Inlet Node Name
     ChillerPlant ChW Pump Outlet Node,  !- Outlet Node Name
-    0.04833522,              !- Rated Flow Rate {m3/s}
-    89672.01,                !- Rated Pump Head {Pa}
-    6016.192,                !- Rated Power Consumption {W}
+    0.04833522,              !- Design Flow Rate {m3/s}
+    89672.01,                !- Design Pump Head {Pa}
+    6016.192,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent;            !- Pump Control Type
@@ -39165,16 +39285,16 @@
     ChillerPlant Cnd Circ Pump,  !- Name
     ChillerPlant Cnd Supply Inlet Node,  !- Inlet Node Name
     ChillerPlant Cnd Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    298906.7,                !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    298906.7,                !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.,                      !- Fraction of Motor Inefficiencies to Fluid Stream
     0.,                      !- Coefficient 1 of the Part Load Performance Curve
     1.,                      !- Coefficient 2 of the Part Load Performance Curve
     0.,                      !- Coefficient 3 of the Part Load Performance Curve
     0.,                      !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   Branch,

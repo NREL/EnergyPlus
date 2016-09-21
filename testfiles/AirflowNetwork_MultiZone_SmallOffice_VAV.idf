@@ -1775,7 +1775,7 @@
     DX Cooling Coil System 1,!- Component 3 Name
     Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil 1,     !- Component 4 Name
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
     Air Loop Outlet Node;    !- Component 4 Outlet Node Name
@@ -2557,7 +2557,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Main Heating Coil 1,     !- Coil Name
-    Coil:Heating:Fuel,        !- Coil Object Type
+    Coil:Heating:Fuel,       !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2989,7 +2989,7 @@
     0.10,                    !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     Minimum OA Sch,          !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -3011,7 +3011,7 @@
     0.10,                    !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     Minimum OA Sch,          !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -3033,7 +3033,7 @@
     0.10,                    !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     Minimum OA Sch,          !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 3,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}

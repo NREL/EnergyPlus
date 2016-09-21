@@ -12,7 +12,7 @@
 !                          electric humidifier. Also, the example file demonstrates the uses of multizone humidity
 !                          SetPoint managers: SetpointManager:MultiZone:Humidity:Minimum, and
 !                          SetpointManager:MultiZone:Humidity:Maximum. This example file was created by modifying the
-!                          "5ZoneWaterCooled_MultizoneMinMaxRHControl.idf" example file. Replaced the electric steam humidifier  
+!                          "5ZoneWaterCooled_MultizoneMinMaxRHControl.idf" example file. Replaced the electric steam humidifier
 !                          with gas fired steam humidifier.
 !
 ! Simulation Location/Run: Chicago Ohare Intl Ap IL USA WMO=725300, 2 design days, 2 run periods,
@@ -1909,30 +1909,40 @@
     VAV Sys 1,               !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    0.3,                     !- Minimum System Air Flow Ratio
+    0.3,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8,                    !- Central Cooling Design Supply Air Temperature {C}
     16.7,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    ;                        !- Central Cooling Capacity Control Method
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -2621,7 +2631,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     autosize,                !- Rated Capacity {m3/s}
     autosize,                !- Rated Gas Use Rate {W}
-    0.80,                    !- Thermal Efficiency {-} 
+    0.80,                    !- Thermal Efficiency {dimensionless}
     ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name
     0,                       !- Rated Fan Power {W}
     0,                       !- Auxiliary Electric Power {W}
@@ -3065,16 +3075,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -3305,16 +3315,16 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3528,16 +3538,16 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3609,16 +3619,16 @@
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
-  Output:Variable,*,Humidifier Gas USe Rate, hourly;
+  Output:Variable,*,Humidifier Gas USe Rate,hourly;
 
-  Output:Variable,*,Humidifier Gas Use Energy, hourly;
+  Output:Variable,*,Humidifier Gas Use Energy,hourly;
 
-  Output:Variable,*,Humidifier Auxiliary Electric Power, hourly;
+  Output:Variable,*,Humidifier Auxiliary Electric Power,hourly;
 
-  Output:Variable,*,Humidifier Auxiliary Electric Energy, hourly; 
+  Output:Variable,*,Humidifier Auxiliary Electric Energy,hourly;
 
-  Output:Variable,*,Air System Humidifier Gas Energy, hourly;  
-  
+  Output:Variable,*,Air System Humidifier Gas Energy,hourly;
+
   Output:VariableDictionary,Regular;
 
   Output:Surfaces:Drawing,dxf:wireframe;
@@ -3658,10 +3668,10 @@
   Output:Meter,Humidifier:Electricity,monthly;
 
   Output:Meter,Humidifier:Electricity,runperiod;
-  
+
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
- 
+

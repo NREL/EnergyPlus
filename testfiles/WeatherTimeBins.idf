@@ -110,7 +110,6 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month

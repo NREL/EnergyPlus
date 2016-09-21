@@ -118,13 +118,13 @@
     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
     R410A,                   !- Refrigerant Type
     autosize,                !- Rated Evaporative Capacity {W}
-    0.214,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
+    0.214,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {dimensionless}
     -6,                      !- Minimum Outdoor Air Temperature in Cooling Only Mode {C}
     43,                      !- Maximum Outdoor Air Temperature in Cooling Only Mode {C}
     -20,                     !- Minimum Outdoor Air Temperature in Heating Only Mode {C}
     26,                      !- Maximum Outdoor Air Temperature in Heating Only Mode {C}
-    -20,                     !- Minimum Outdoor Air Temperature in Heat Recovery Mode {C}
-    26,                      !- Maximum Outdoor Air Temperature in Heat Recovery Mode {C}
+    -20,                     !- Minimum Outdoor Temperature in Heat Recovery Mode {C}
+    26,                      !- Maximum Outdoor Temperature in Heat Recovery Mode {C}
     VariableTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
     ,                        !- Reference Evaporating Temperature for Indoor Unit {C}
     ,                        !- Reference Condensing Temperature for Indoor Unit {C}
@@ -132,27 +132,27 @@
     14,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
     36,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
     46,                      !- Variable Condensing Temperature Maximum for Indoor Unit {C}
-    3,                       !- Outdoor Unit Evaporator Reference Superheating {C}
-    3,                       !- Outdoor Unit Condenser Reference Subcooling {C}
-    0.28,                    !- Outdoor Unit Evaporator Rated Bypass Factor
-    0.05,                    !- Outdoor Unit Condenser Rated Bypass Factor
-    ,                        !- Difference between Outdoor Unit Evaporating Temperature and Outdoor Air Temperature in Heat Recovery Mode {C}
-    0.3,                     !- Outdoor Unit Heat Exchanger Capacity Ratio
-    2.67E-2,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {W/W}
+    3,                       !- Outdoor Unit Evaporator Reference Superheating {deltaC}
+    3,                       !- Outdoor Unit Condenser Reference Subcooling {deltaC}
+    0.28,                    !- Outdoor Unit Evaporator Rated Bypass Factor {dimensionless}
+    0.05,                    !- Outdoor Unit Condenser Rated Bypass Factor {dimensionless}
+    ,                        !- Difference between Outdoor Unit Evaporating Temperature and Outdoor Air Temperature in Heat Recovery Mode {deltaC}
+    0.3,                     !- Outdoor Unit Heat Exchanger Capacity Ratio {dimensionless}
+    2.67E-2,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {dimensionless}
     1.13E-4,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
     0.0349,                  !- Diameter of Main Pipe for Suction Gas {m}
     0.0286,                  !- Diameter of Main Pipe for Discharge Gas {m}
-    30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
-    36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
-    5,                       !- Height difference between the outdoor unit node and indoor unit node of the main pipe {m}
-    0.02,                    !- Insulation thickness of the main pipe {m}
-    0.032,                   !- Thermal conductivity of the main pipe insulation material {W/m-K}
+    30,                      !- Length of Main Pipe Connecting Outdoor Unit to Indoor Units {m}
+    36,                      !- Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units {m}
+    5,                       !- Height Difference Between Outdoor Unit and Indoor Units {m}
+    0.02,                    !- Main Pipe Insulation Thickness {m}
+    0.032,                   !- Main Pipe Insulation Thermal Conductivity {W/m-K}
     33,                      !- Crankcase Heater Power per Compressor {W}
-    3,                       !- Number of Compressors
-    0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity
-    7,                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+    3,                       !- Number of Compressors {dimensionless}
+    0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}
+    7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
     ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
@@ -168,8 +168,8 @@
     ,                        !- Initial Heat Recovery Heating Energy Fraction {W/W}
     ,                        !- Heat Recovery Heating Energy Time Constant {hr}
     4500000,                 !- Compressor maximum delta Pressure {Pa}
-    0.95,                    !- Compressor Inverter Efficiency
-    ,                        !- Compressor Evaporative Capacity Correction Factor
+    0.95,                    !- Compressor Inverter Efficiency {dimensionless}
+    ,                        !- Compressor Evaporative Capacity Correction Factor {dimensionless}
     3,                       !- Number of Compressor Loading Index Entries
     1500,                    !- Compressor Speed at Loading Index 1 {rev/min}
     MinSpdCooling,           !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
