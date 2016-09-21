@@ -59,16 +59,16 @@
 #include <assert.h>
 #include <algorithm>
 
-// EnergyPlus headers
-#include "DataEnvironment.hh"
-#include "DataSurfaces.hh"
-#include "DataHeatBalance.hh"
-#include "DataHeatBalFanSys.hh"
-#include "DataGlobals.hh"
-#include "InputProcessor.hh"
-#include "General.hh"
-#include "WindowManager.hh"
 
+
+// EnergyPlus headers
+#include <DataEnvironment.hh>
+#include <DataSurfaces.hh>
+#include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataGlobals.hh>
+#include <InputProcessor.hh>
+#include <General.hh>
 
 // Windows library headers
 #include "WindowManagerExteriorOptical.hh"

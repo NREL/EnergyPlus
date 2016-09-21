@@ -64,8 +64,11 @@
 #include <tuple>
 #include <memory>
 
-// EnergyPlus Headers
-#include <EnergyPlus.hh>
+namespace EnergyPlus {
+	namespace DataHeatBalance {
+		struct MaterialProperties;
+	}
+}
 
 namespace FenestrationCommon {
 

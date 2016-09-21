@@ -56,21 +56,15 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// #include< memory >
-
 // EnergyPlus headers
-#include "DataEnvironment.hh"
-#include "DataSurfaces.hh"
-#include "DataHeatBalance.hh"
-#include "DataHeatBalFanSys.hh"
-#include "DataGlobals.hh"
-#include "InputProcessor.hh"
-#include "General.hh"
-
+#include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
+#include <General.hh>
+#include <WindowManager.hh>
 
 // Windows library headers
 #include "WindowManagerExteriorThermal.hh"
-#include "WindowManager.hh"
 #include "TarIGU.hpp"
 #include "TarIGUSolidLayer.hpp"
 #include "TarIGUGapLayer.hpp"
@@ -84,7 +78,6 @@
 #include "GasItem.hpp"
 #include "FenestrationCommon.hpp"
 #include "Series.hpp"
-
 
 namespace EnergyPlus {
 

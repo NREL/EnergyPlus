@@ -97,15 +97,15 @@ namespace EnergyPlus {
     // in between. So we will just use map to store layers so that we get optimized search.
     typedef std::map< int, std::shared_ptr< IGU_Layers > > Layers_Map;
 
-	///////////////////////////////////////////////////////////////////////////////
-	//   CWCESpecturmProperties
-	///////////////////////////////////////////////////////////////////////////////
-	class CWCESpecturmProperties {
-	public:
-		static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
-		static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
-		static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
-	};
+	  ///////////////////////////////////////////////////////////////////////////////
+	  //   CWCESpecturmProperties
+	  ///////////////////////////////////////////////////////////////////////////////
+	  class CWCESpecturmProperties {
+	  public:
+	  	static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
+	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
+	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
+	  };
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWindowConstructionsBSDF
@@ -123,8 +123,8 @@ namespace EnergyPlus {
 
     private:
       CWindowConstructionsBSDF();
-      std::shared_ptr< std::vector< double > > getCommonWavelengths( const FenestrationCommon::WavelengthRange t_Range,
-        const int t_ConstrNum ) const;
+      std::shared_ptr< std::vector< double > > getCommonWavelengths( 
+        const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum ) const;
       std::shared_ptr< IGU_Layers > getLayers( const FenestrationCommon::WavelengthRange t_Range,
         const int t_ConstrNum ) const;
 

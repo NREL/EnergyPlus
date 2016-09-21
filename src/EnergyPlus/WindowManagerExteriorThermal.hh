@@ -59,8 +59,17 @@
 #ifndef WindowManagerExteriorThermal_hh_INCLUDED
 #define WindowManagerExteriorThermal_hh_INCLUDED
 
-// EnergyPlus Headers
-#include <EnergyPlus.hh>
+namespace EnergyPlus {
+  
+  namespace DataSurfaces {
+    struct SurfaceData;
+  }
+  
+  namespace DataHeatBalance {
+    struct MaterialProperties;
+  }
+
+}
 
 namespace Tarcog {
 

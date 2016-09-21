@@ -58,6 +58,10 @@
 
 #include <assert.h>
 
+// #include <WindowManager.hh>
+#include <DataHeatBalance.hh>
+#include <WindowManager.hh>
+
 #include "WindowManagerExteriorData.hh"
 #include "OpticalLayer.hpp"
 #include "FenestrationCommon.hpp"
@@ -67,9 +71,6 @@
 #include "EquivalentBSDFLayer.hpp"
 #include "FenestrationCommon.hpp"
 #include "MeasuredSampleData.hpp"
-
-#include "WindowManager.hh"
-#include "DataHeatBalance.hh"
 
 namespace EnergyPlus {
 
@@ -103,7 +104,7 @@ namespace EnergyPlus {
 		  for( auto i = 1; i <= nume; ++i ) {
 		    solarRadiation->addProperty( wle( i ), e( i ) );
 		  }
-
+      
 		  return solarRadiation;
 	  }
 
@@ -122,7 +123,7 @@ namespace EnergyPlus {
 		  for( auto i = 1; i <= numt3; ++i ) {
 			  visibleResponse->addProperty( wlt3( i ), y30( i ) );
 		  }
-
+      
 		  return visibleResponse;
 	  }
 
