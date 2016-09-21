@@ -2162,6 +2162,7 @@ namespace WaterCoils {
 				}
 				RequestSizing( CompType, CompName, WaterHeatingCoilUASizing, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil ( CoilNum ).UACoil = TempSize;
+				WaterCoil( CoilNum ).UACoilVariable = TempSize;
 				WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
 				DataWaterLoopNum = 0; // reset all globals to 0 to ensure correct sizing for other child components
 				DataPltSizHeatNum = 0;
