@@ -3,11 +3,11 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! 5ZoneCoolingPanelBaseboardTotalLoad.idf
+! 5ZoneCoolingPanelBaseboardAuto.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Controls to a relative humidity set point with a chilled water coil and a simple controller
-!                          using a TempandHumRat control setting.  Also uses the simple cooling panel in one of the zones.
+!                          using a TempandHumRat control setting.  Also uses the simple cooling panel with autosizing in one of the zones.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -2259,12 +2259,12 @@
     5.0,                     !- Rated Inlet Water Temperature {C}
     24.0,                    !- Rated Inlet Space Temperature {C}
     0.63,                    !- Rated Water Mass Flow Rate {kg/s}
-    CapacityPerFloorArea,    !- Cooling Design Capacity Method
-    0.0,                     !- Cooling Design Capacity {W}
-    30.0,                    !- Cooling Design Capacity Per Floor Area {W/m2}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    0.0,                     !- Cooling Design Capacity Per Floor Area {W/m2}
     0.0,                     !- Fraction of Autosized Cooling Design Capacity
-    0.001,                   !- Maximum Chilled Water Flow Rate {m3/s}
-    ZoneTotalLoad,           !- Control Type
+    autosize,                !- Maximum Chilled Water Flow Rate {m3/s}
+    MeanAirTemperature,      !- Control Type
     1.0,                     !- Cooling Control Throttling Range {deltaC}
     Clg-SetP-Sch,            !- Cooling Control Temperature Schedule Name
     Off,                     !- Condensation Control Type
