@@ -705,11 +705,6 @@ namespace CoolingPanelSimple {
 		int ZoneNum;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 MDot; // local mass flow rate
-		Real64 MDotXCp; // local mass flow rate times specific heat
-		Real64 Qrated; // local rated capacity
-		Real64 Tinletr; // local rated inlet fluid temperature
-		Real64 Tzoner; // local rated zone air temperature
 		bool errFlag;
 
 		// Do the one time initializations
@@ -736,27 +731,6 @@ namespace CoolingPanelSimple {
 			MyOneTimeFlag = false;
 			SetLoopIndexFlag = true;
 			
-			// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
-			Cp = 4120.0; // Just an approximation, don't need to get an exact number
-			MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
-			MDotXCp = Cp * MDot;
-			Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
-			Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
-			Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
-			if ( Tinletr >= Tzoner ) {
-				ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
-				ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-				ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
-				CoolingPanel( CoolingPanelNum ).UA = 1.0;
-			} else {
-				CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
-				if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-					ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
-					ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-					ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
-				}
-			}
-
 		}
 
 		if ( CoolingPanel( CoolingPanelNum ).ZonePtr <= 0 ) CoolingPanel( CoolingPanelNum ).ZonePtr = ZoneEquipConfig( ControlledZoneNumSub ).ActualZoneNum;
@@ -1052,6 +1026,32 @@ namespace CoolingPanelSimple {
 		}
 		
 		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
+
+		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
+		Real64 MDot;
+		Real64 MDotXCp;
+		Real64 Qrated;
+		Real64 Tinletr;
+		Real64 Tzoner;
+		Cp = 4120.0; // Just an approximation, don't need to get an exact number
+		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
+		MDotXCp = Cp * MDot;
+		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
+		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
+		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+		if ( Tinletr >= Tzoner ) {
+			ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
+			ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+		} else {
+			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
+			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
+				ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
+				ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			}
+		}
 		
 	}
 	
