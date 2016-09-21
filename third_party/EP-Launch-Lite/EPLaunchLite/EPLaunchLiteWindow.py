@@ -246,7 +246,7 @@ class Window(gtk.Window):
 
     def open_input_file(self, widget):
         try:
-            subprocess.Popen(['open', self.input_file_path.get_text()], shell=False)
+            subprocess.check_call(['open', self.input_file_path.get_text()], shell=False)
         except Exception:
             self.simple_error_dialog(
                 _("Could not open input file, set default application by opening the file separately first.")
