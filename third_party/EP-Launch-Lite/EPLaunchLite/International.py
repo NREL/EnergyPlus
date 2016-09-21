@@ -1,9 +1,10 @@
 class Languages:
     English = 'english'
     Spanish = 'spanish'
+    French = 'french'
 
 
-CurrentLanguage = Languages.Spanish
+CurrentLanguage = Languages.English
 
 
 def set_language(lang):
@@ -95,9 +96,51 @@ SpanishDictionary = {
 }
 
 
+FrenchDictionary = {
+    'About...': 'A propos de...',
+    'About this program:': 'A propos de ce logiciel:',
+    'ABOUT_DIALOG': 'Ce logiciel a ete cree par NREL pour United States Department of Energy.',
+    'Cancel': 'Annuler',
+    'Cancelled!': 'Annule!',
+    'Choose Input File..': 'Choisir fichier d\'entree..',
+    'Choose Weather File..': 'Choisir fichier meteo..',
+    'Close': 'Fermer',
+    'Could not open run directory': 'Erreur d\'ouverture du repertoire de demarrage',
+    'Could not open input file, set default application by opening the file separately first.':
+    'Erreur d\'ouverture du fichier d\'entree, definissez l\'application par default en ouvrant le fichier separement.',
+    'Edit Input File..': 'Modifier fichier d\'entree..',
+    'E+ Version': 'Version E+',
+    'EnergyPlus Failed': 'EnergyPlus a echoue',
+    'EnergyPlus Failed!': 'EnergyPlus a echoue!',
+    'EnergyPlus Simulation Output:': 'Sortie de simulation EnergyPlus:',
+    'EPW files': 'Fichiers EPW',
+    'Error file is the best place to start.  Would you like to open the Run Folder?':
+    'Le fichier d\'erreurs est le meilleur endroit pour commencer. Voulez-vous ouvrir le repertoire de demarrage?',
+    'Error performing prior action:': 'Erreur pendant l\'execution de l\'action precedente:',
+    'Exit': 'Quitter',
+    'File': 'Fichier',
+    'IDF files': 'Fichiers IDF',
+    'Input and/or Weather file paths are invalid': 'Chemin de fichiers d\'entree et/ou meteo non valide',
+    'Message': 'Message',
+    'Open Run Directory': 'Ouvrir le repertoire de demarrage',
+    'Ready for launch': 'Pret pour lancement',
+    'You must restart the app to make the language change take effect.  Would you like to restart now?':
+        'Vous devez relancer le logiciel pour effectuer le changement de langue. Voulez-vous relancer maintenant?',
+    'Select input file': 'Selectionner fichier d\'entree',
+    'Select weather file': 'Selectioner fichier meteo',
+    'Simulate': 'Simuler',
+    'Simulation cancelled': 'Simulation annulee',
+    'Simulation Output': 'Sortie de simulation',
+    'Simulation completed': 'Simulation complete',
+    'Simulation failed': 'Simulation echouee',
+    'Simulation started': 'Simulation commencee',
+    'Switch language': 'Changer la langue'
+}
+
+
 def report_missing_keys():
     base_keys = EnglishDictionary.keys()
-    for dict_name, dictionary in {'Spanish': SpanishDictionary}.iteritems():  # add more here
+    for dict_name, dictionary in {'Spanish': SpanishDictionary, 'French': FrenchDictionary}.iteritems():  # add here
         print("Processing missing keys from dictionary: " + dict_name)
         for key in base_keys:
             if key not in dictionary:
@@ -113,6 +156,8 @@ def translate(key):
     dictionary = EnglishDictionary
     if CurrentLanguage == Languages.Spanish:
         dictionary = SpanishDictionary
+    elif CurrentLanguage == Languages.French:
+        dictionary = FrenchDictionary
 
     # if the key is there, return it, otherwise return a big flashy problematic statement
     if key in dictionary:

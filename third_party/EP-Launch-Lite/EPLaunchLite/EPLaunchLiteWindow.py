@@ -135,6 +135,11 @@ class Window(gtk.Window):
         menu_item_spanish.show()
         if self.settings[Keys.language] == Languages.Spanish:
             menu_item_spanish.set_sensitive(False)
+        menu_item_french = gtk.MenuItem("Langue: Francais")
+        menu_item_french.connect("activate", self.switch_language, Languages.French)
+        menu_item_french.show()
+        if self.settings[Keys.language] == Languages.French:
+            menu_item_french.set_sensitive(False)
 
         # create the list of items that will eventually be dropped down, and append items in the right order
         filemenu = gtk.Menu()
@@ -144,11 +149,12 @@ class Window(gtk.Window):
         langmenu = gtk.Menu()
         langmenu.append(menu_item_english)
         langmenu.append(menu_item_spanish)
+        langmenu.append(menu_item_french)
 
         # create the root drop-down-able menu items, and assign their submenus to the lists above
         menu_item_file = gtk.MenuItem(_("File"))
         menu_item_file.set_submenu(filemenu)
-        menu_item_lang = gtk.MenuItem("Language/Idioma")
+        menu_item_lang = gtk.MenuItem("Language/Idioma/Langue")
         menu_item_lang.set_submenu(langmenu)
 
         # attach the root menus to the main menu bar
