@@ -63,24 +63,24 @@ Q_{conv} = h \cdot A \cdot (T_p - T_a)
 \end{equation}
 
 \begin{equation}
-h = 0.22 \cdot (T_p - T_a)^{\sfrac{1}{3}}
+h = 0.22 \cdot (T_p - T_a)^{1/3}
 \end{equation}
 
 where
 
-\(Q_{conv}\) = Convective heat transfer rate (Btu/h·ft²)
+\(Q_{conv}\) = Convective heat transfer rate (W/m²)
 
-\(h\) = Convection heat transfer coefficient (Btu/h· ft²·°F)
+\(h\) = Convection heat transfer coefficient (W/m²·°C)
 
-\(T_p\) = Pool water temperature (°F)
+\(T_p\) = Pool water temperature (°C)
 
-\(T_a\) = Air temperature over pool (°F)
+\(T_a\) = Air temperature over pool (°C)
 
 When a cover is present, the cover and the cover convection factor reduce the heat transfer coefficient proportionally. For example, if the pool is half covered and the pool cover reduces convection by 50\%, the convective heat transfer coefficient is reduced by 25\% from the value calculated using the above equation.
 
 \subsection{Evaporation from the pool water surface}\label{evaporation-from-the-pool-water-surface}
 
-There are 5 main variables used to calculate the evaporation rate (\(Q_{evap}\)):
+There are 5 main variables used to calculate the evaporation rate (\(Q_{evap}\)).  Note that the units of the equation below are IP units, but this equation is used with conversion factors internally in the EnergyPlus code.
 
 \begin{itemize}
 \tightlist
@@ -141,7 +141,7 @@ Wave Pool, Water Slides & 1.5 – 2.0 \tabularnewline
 
 When a cover is present, the cover and the cover evaporation factor reduce the amount of evaporation proportionally. For example, if the pool is half covered and the pool cover reduces convection by 50\%, the convective heat transfer coefficient is reduced by 25\% from the value calculated using the above equation. The value is converted to a latent gain (loss) through multiplication of the evaporation rate by the heat of vaporization of water.
 
-The user should be aware of two key assumptions built into the equations for calculating the evaporation from the pool.  First, when the activity factor is zero, no evaporation will take place.  Thus, activity factor is not the same thing and should not be zero when there are no people in the pool as that will completely eliminate evaporation.  Second, when the cover evaporation factor is zero, the cover will not reduce evaporation at all.  A cover factor of 1.0 means that the cover will completely block evaporation.
+The user should be aware of two key assumptions built into the equations for calculating the evaporation from the pool.  First, when the activity factor is zero, no evaporation will take place.  Thus, activity factor is not the same thing as occupancy and should not be zero when there are no people in the pool as that will completely eliminate evaporation.  Second, when the cover evaporation factor is zero, the cover will not reduce evaporation at all.  A cover factor of 1.0 means that the cover will completely block evaporation.
 
 \subsection{Radiation exchange with the pool water surface}\label{radiation-exchange-with-the-pool-water-surface}
 
@@ -159,13 +159,13 @@ Q_{fw} = \dot{m}_{fw} \cdot cw \cdot (T_p - T_{fw})
 
 where
 
-\(m_{fw}\) = Mass flow rate of fresh water (lb·s)
+\(m_{fw}\) = Mass flow rate of fresh water (kg/s)
 
-\(c_w\) = Specific heat of water (Btu/lb·°F)
+\(c_w\) = Specific heat of water (J/kg·°C)
 
-\(T_p\) = Pool water temperature (°F)
+\(T_p\) = Pool water temperature (°C)
 
-\(T_{fw}\) = Fresh water supply temperature (°F)
+\(T_{fw}\) = Fresh water supply temperature (°C)
 
 \subsection{Heat Gain from People}\label{heat-gain-from-people}
 
@@ -179,13 +179,13 @@ Q_{fw} = \dot{m}_{hw} \cdot c_w \cdot (T_p - T_{hw})
 
 where
 
-\(m_{hw}\) = Mass flow rate (lb·s)
+\(m_{hw}\) = Mass flow rate (kg/s)
 
-\(c_w\) = Specific heat of water (Btu/lb·°F)
+\(c_w\) = Specific heat of water (J/kg·°C)
 
-\(T_p\) = Pool water temperature (°F)
+\(T_p\) = Pool water temperature (°C)
 
-\(T_{hw}\) = Heated water supply temperature (°F)
+\(T_{hw}\) = Heated water supply temperature (°C)
 
 \subsection{Pool Heating to Control the Pool Water Temperature}\label{pool-heating-to-control-the-pool-water-temperature}
 
@@ -197,19 +197,19 @@ The equation used to determine the flow rate request of hot water from the plant
 
 where
 
-\(m_w\) = mass of pool water (lb)
+\(m_w\) = mass of pool water (kg)
 
-\(cp\) = specific heat of water (Btu/lb·°F)
+\(cp\) = specific heat of water (J/kg·°C)
 
 \(\Delta t\) = time step length (s)
 
-\(T_{set}\) = desired pool water temperature (°F)
+\(T_{set}\) = desired pool water temperature (°C)
 
-\(T_{old}\) = temperature of water at the last time step (°F)
+\(T_{old}\) = temperature of water at the last time step (°C)
 
-\(m_p\) = needed mass flow rate of water from the plant (lb·s)
+\(m_p\) = needed mass flow rate of water from the plant (kg/s)
 
-\(T_{in}\) = inlet water temperature from the plant (°F)
+\(T_{in}\) = inlet water temperature from the plant (°C)
 
 This equation is rearranged to solve for the needed mass flow rate of water from the plant since all of the other terms are known or given based on user input. This establishes a flow request to the plant and is capped at the maximum value defined in input by the user.
 
