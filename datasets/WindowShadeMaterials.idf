@@ -5,7 +5,6 @@
 ! Terminology used in window shade names:
 ! REFLECT        Solar or visible reflectance (assumed independent of angle of incidence)
 ! TRANS          Solar or visible transmittance (assumed independent of angle of incidence)
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   WindowMaterial:Shade,

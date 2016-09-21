@@ -3822,6 +3822,7 @@ namespace HeatBalanceManager {
 		ConstrNum = 0;
 
 		CurrentModuleObject = "Construction:InternalSource";
+		if ( TotSourceConstructs > 0 ) AnyConstructInternalSourceInInput = true;
 		for ( Loop = 1; Loop <= TotSourceConstructs; ++Loop ) { // Loop through all constructs with sources in the input...
 
 			//Get the object names for each construction from the input processor

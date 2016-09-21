@@ -128,10 +128,10 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
   SimulationControl,
-    Yes,                      !- Do Zone Sizing Calculation
-    Yes,                      !- Do System Sizing Calculation
-    Yes,                      !- Do Plant Sizing Calculation
-    Yes,                      !- Run Simulation for Sizing Periods
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    Yes,                     !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
@@ -1451,19 +1451,19 @@
     Air Loop Outlet Node,    !- Furnace Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    5.5,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    5.5,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-    5.5,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    5.5,                     !- Cooling Supply Air Flow Rate {m3/s}
+    5.5,                     !- Heating Supply Air Flow Rate {m3/s}
+    5.5,                     !- No Load Supply Air Flow Rate {m3/s}
     SalesFloor,              !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Humidistat Reheat Coil 1;!- Reheat Coil Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
@@ -2426,21 +2426,21 @@
     displayallwarnings;      !- Key 1
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 
   FaultModel:ThermostatOffset,
-    Ther_Offset_SalesFloor, !- Name
-    SalesFloor Thermostat,  !- Thermostat Name
-    ,                       !- Availability Schedule Name
-    ,                       !- Severity Schedule Name
-    1.0;                    !- Reference Thermostat Offset {deltaC}
-	
-  FaultModel:HumidistatOffset, 
-    Humi_Offset_SalesFloor, !- Name
-    SalesFloor Humidistat,  !- Humidistat Name
-    ThermostatOffsetDependent, !- Humidistat Offset Type
-    ,                       !- Availability Schedule Name
-    ,                       !- Severity Schedule Name
-    ,                       !- Reference Humidistat Offset {percent}
-    Ther_Offset_SalesFloor; !- Related Thermostat Offset Fault Name
+    Ther_Offset_SalesFloor,  !- Name
+    SalesFloor Thermostat,   !- Thermostat Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
+
+  FaultModel:HumidistatOffset,
+    Humi_Offset_SalesFloor,  !- Name
+    SalesFloor Humidistat,   !- Humidistat Name
+    ThermostatOffsetDependent,  !- Humidistat Offset Type
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    ,                        !- Reference Humidistat Offset {percent}
+    Ther_Offset_SalesFloor;  !- Related Thermostat Offset Fault Name
 

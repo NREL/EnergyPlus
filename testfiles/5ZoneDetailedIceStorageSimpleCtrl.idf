@@ -1830,17 +1830,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2772,16 +2772,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -2970,22 +2970,22 @@
 
   PlantEquipmentOperation:ThermalEnergyStorage,
     Chiller and Partial Ice Storage,  !- Name
-    OnPeakEnergy,            !- On-Peak Schedule Name
-    ChargingAvail,           !- Charging Availability Schedule Name
-    7.22,                    !- Non-charging Chilled Water Temperature
-    -5.0,                    !- Off-Peak Chilled Water Temperature
-    Chiller:Electric,        !- Equipment 1 Object Type
-    Central Chiller,         !- Equipment 1 Name
-    Central Chiller Inlet Node,  !- Demand Calculation 1 Node Name
-    Central Chiller Outlet Node,  !- Setpoint 1 Node Name
+    OnPeakEnergy,            !- On-Peak Schedule
+    ChargingAvail,           !- Charging Availability Schedule
+    7.22,                    !- Non-Charging Chilled Water Temperature {C}
+    -5.0,                    !- Charging Chilled Water Temperature {C}
+    Chiller:Electric,        !- Component 1 Object Type
+    Central Chiller,         !- Component 1 Name
+    Central Chiller Inlet Node,  !- Component 1 Demand Calculation Node Name
+    Central Chiller Outlet Node,  !- Component 1 Setpoint Node Name
     autosize,                !- Component 1 Flow Rate {m3/s}
-    COOLING,                 !- Operation 1 Type
-    ThermalStorage:Ice:Detailed,  !- Equipment 2 Object Type
-    Ice Tank,                !- Equipment 2 Name
-    Ice Tank Inlet Node,     !- Demand Calculation 2 Node Name
-    Ice Tank Outlet Node,    !- Setpoint 2 Node Name
+    COOLING,                 !- Component 1 Operation Type
+    ThermalStorage:Ice:Detailed,  !- Component 2 Object Type
+    Ice Tank,                !- Component 2 Name
+    Ice Tank Inlet Node,     !- Component 2 Demand Calculation Node Name
+    Ice Tank Outlet Node,    !- Component 2 Setpoint Node Name
     0.13506E-02,             !- Component 2 Flow Rate {m3/s}
-    DUAL;                    !- Operation 2 Type
+    DUAL;                    !- Component 2 Operation Type
 
 ! Chilled water supply outlet setpoint schedule, must be set low to creat "load"
 ! during ice storage charging
@@ -3076,9 +3076,9 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     CONTINUOUS;              !- Pump Control Type
@@ -3096,14 +3096,14 @@
     For: AllOtherDays,       !- Field 9
     Until: 24:00,0.0;        !- Field 10
 
-Schedule:Compact,
+  Schedule:Compact,
     ChargingAvail,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays SummerDesignDay, !- Field 2
     Until: 24:00,1.0,        !- Field 3
-    For: AllOtherDays,       !- Field 4
-    Until: 24:00,0.0;        !- Field 5
+    For: AllOtherDays,       !- Field 5
+    Until: 24:00,0.0;        !- Field 6
 
 ! Off Peak Energy Period, all hours except 9 a.m. to 10 p.m., Weekdays (Chicago ComEd, Rate 6 TOU)
 
@@ -3328,16 +3328,16 @@ Schedule:Compact,
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3745,3 +3745,4 @@ Schedule:Compact,
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,1.00;       !- Field 3
+

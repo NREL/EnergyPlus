@@ -2019,7 +2019,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_1 VAV Box Reheat Coil,  !- Name
@@ -2421,7 +2423,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_1 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_1 VAV Box Reheat Coil,  !- Name
@@ -2823,7 +2827,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_2 VAV Box Reheat Coil,  !- Name
@@ -3225,7 +3231,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_2 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_2 VAV Box Reheat Coil,  !- Name
@@ -3627,7 +3635,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_3 VAV Box Reheat Coil,  !- Name
@@ -4029,7 +4039,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_3 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_3 VAV Box Reheat Coil,  !- Name
@@ -4431,7 +4443,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_4 VAV Box Reheat Coil,  !- Name
@@ -4833,7 +4847,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_4 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_4 VAV Box Reheat Coil,  !- Name
@@ -5235,7 +5251,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_5 VAV Box Reheat Coil,  !- Name
@@ -5637,7 +5655,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_5 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_5 VAV Box Reheat Coil,  !- Name
@@ -6039,7 +6059,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_6 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_6 VAV Box Reheat Coil,  !- Name
@@ -6441,7 +6463,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_6 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_6 VAV Box Reheat Coil,  !- Name
@@ -6843,7 +6867,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_7 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_7 VAV Box Reheat Coil,  !- Name
@@ -7245,7 +7271,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_7 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_7 VAV Box Reheat Coil,  !- Name
@@ -7647,7 +7675,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_8 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_8 VAV Box Reheat Coil,  !- Name
@@ -8049,7 +8079,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_8 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_8 VAV Box Reheat Coil,  !- Name
@@ -8451,7 +8483,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_9 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_9 VAV Box Reheat Coil,  !- Name
@@ -8853,7 +8887,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_9 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_9 VAV Box Reheat Coil,  !- Name
@@ -9255,7 +9291,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_10 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_10 VAV Box Reheat Coil,  !- Name
@@ -9657,7 +9695,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_10 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_10 VAV Box Reheat Coil,  !- Name
@@ -10059,7 +10099,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_11 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_11 VAV Box Reheat Coil,  !- Name
@@ -10461,7 +10503,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_11 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_11 VAV Box Reheat Coil,  !- Name
@@ -10863,7 +10907,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_12 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_12 VAV Box Reheat Coil,  !- Name
@@ -11265,7 +11311,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_12 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_12 VAV Box Reheat Coil,  !- Name
@@ -11643,7 +11691,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_13 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_13 VAV Box Reheat Coil,  !- Name
@@ -12021,7 +12071,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_13 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_13 VAV Box Reheat Coil,  !- Name
@@ -12367,7 +12419,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_14 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_14 VAV Box Reheat Coil,  !- Name
@@ -12713,7 +12767,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_14 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_14 VAV Box Reheat Coil,  !- Name
@@ -13091,7 +13147,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_1_SEC_15 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_1_SEC_15 VAV Box Reheat Coil,  !- Name
@@ -13469,7 +13527,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     ZN_1_FLR_2_SEC_15 VAV Box Outlet Node,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    Reverse;                 !- Damper Heating Action
+    Reverse,                 !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   Coil:Heating:Water,
     ZN_1_FLR_2_SEC_15 VAV Box Reheat Coil,  !- Name

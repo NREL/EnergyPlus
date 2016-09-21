@@ -1509,19 +1509,19 @@
     Air Loop Outlet Node,    !- Furnace Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    5.5,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    5.5,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-    5.5,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    5.5,                     !- Cooling Supply Air Flow Rate {m3/s}
+    5.5,                     !- Heating Supply Air Flow Rate {m3/s}
+    5.5,                     !- No Load Supply Air Flow Rate {m3/s}
     SalesFloor,              !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Humidistat Reheat Coil 1;!- Reheat Coil Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
@@ -2154,7 +2154,7 @@
   Refrigeration:Condenser:AirCooled,
     SharedCondenser,         !- Name
     SharedCondenserHRCurve,  !- Rated Effective Total Heat Rejection Rate Curve Name
-    0.,                      !- Rated Subcooling Temperature Difference {DeltaC}
+    0.,                      !- Rated Subcooling Temperature Difference {deltaC}
     VariableSpeed,           !- Condenser Fan Speed Control Type
     6600.,                   !- Rated Fan Power {W}
     0.25,                    !- Minimum Fan Air Flow Ratio {dimensionless}

@@ -57623,17 +57623,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -58181,17 +58181,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -58741,17 +58741,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -59233,17 +59233,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -59757,17 +59757,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -60280,17 +60280,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -60706,16 +60706,16 @@
     SWHSys1 Pump,            !- Name
     SWHSys1 Supply Inlet Node,  !- Inlet Node Name
     SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    0.1,                     !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    0.1,                     !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     1,                       !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 
@@ -62393,16 +62393,16 @@
     HeatSys1 Pump,           !- Name
     HeatSys1 Supply Inlet Node,  !- Inlet Node Name
     HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.75,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 
@@ -64323,16 +64323,16 @@
     CoolSys1 Pump,           !- Name
     CoolSys1 Supply Inlet Node,  !- Inlet Node Name
     CoolSys1 Pump-CoolSys1 ChillerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.75,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent,            !- Pump Control Type
     ;                        !- Pump Flow Rate Schedule Name
 
@@ -64736,9 +64736,9 @@
     CoolSys1 Chiller TowerSys Pump,  !- Name
     CoolSys1 Chiller TowerSys Supply Inlet Node,  !- Inlet Node Name
     CoolSys1 Chiller TowerSys Pump-CoolSys1 Chiller TowerSys CoolTowerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent,            !- Pump Control Type
@@ -65125,7 +65125,7 @@
   Refrigeration:Condenser:AirCooled,
     RackA_RefrigCond,        !- Name
     RackA_RefrigCond_HeatRejectionCurve,  !- Rated Effective Total Heat Rejection Rate Curve Name
-    0.0,                     !- Rated Subcooling Temperature Difference {DeltaC}
+    0.0,                     !- Rated Subcooling Temperature Difference {deltaC}
     Fixed,                   !- Condenser Fan Speed Control Type
     12190,                   !- Rated Fan Power {W}
     ,                        !- Minimum Fan Air Flow Ratio {dimensionless}
@@ -65383,7 +65383,7 @@
   Refrigeration:Condenser:AirCooled,
     RackB_RefrigCond,        !- Name
     RackB_RefrigCond_HeatRejectionCurve,  !- Rated Effective Total Heat Rejection Rate Curve Name
-    0.0,                     !- Rated Subcooling Temperature Difference {DeltaC}
+    0.0,                     !- Rated Subcooling Temperature Difference {deltaC}
     Fixed,                   !- Condenser Fan Speed Control Type
     12190,                   !- Rated Fan Power {W}
     ,                        !- Minimum Fan Air Flow Ratio {dimensionless}
@@ -70906,7 +70906,7 @@
 
   EnergyManagementSystem:ProgramCallingManager,
     Initialize_RE_Variables, !- Name
-    BeginNewEnvironment,  !- EnergyPlus Model Calling Point
+    BeginNewEnvironment,     !- EnergyPlus Model Calling Point
     Initialize;              !- Program Name 1
 
   EnergyManagementSystem:ProgramCallingManager,
@@ -71578,8 +71578,8 @@
 
   EnergyManagementSystem:Program,
     Initialize,              !- Name
-    SET Flr_1_Cafe_RE = 0,   !- Program Line 2
-    SET Flr_1_Clean_RE = 0,  !- <none>
+    SET Flr_1_Cafe_RE = 0,   !- Program Line 1
+    SET Flr_1_Clean_RE = 0,  !- Program Line 2
     SET Flr_1_Conf_RE = 0,   !- <none>
     SET Flr_1_Dining_RE = 0, !- <none>
     SET Flr_1_Elev_RE = 0,   !- <none>
@@ -71858,7 +71858,6 @@
     SET AHU_4_Economize = 0, !- <none>
     SET AHU_5_Economize = 0, !- <none>
     SET AHU_6_Economize = 0; !- <none>
-
 
   EnergyManagementSystem:Program,
     Flr_1_Cafe_Coil_Reheat_Energy_Program,  !- Name
@@ -72270,11 +72269,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Off3_P2_DT1 = Flr_1_Off3_P2_Coil_Outlet_Air_Temp - Flr_1_Off3_P2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Off3_P2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_1_Off3_P2_DT1 > 0.0,
+    IF Flr_1_Off3_P2_DT1 > 0.0,  !- <none>
     SET Flr_1_Off3_P2_Ratio = @Min (Flr_1_Off3_P2_DT2 / Flr_1_Off3_P2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Off3_P2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Off3_P2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Off3_P2_RE = Flr_1_Off3_P2_RE + (Flr_1_Off3_P2_Ratio * Flr_1_Off3_P2_Coil_Energy),  !- <none>
     SET Flr_1_Off3_P2_Heat = Flr_1_Off3_P2_Heat + ((1-Flr_1_Off3_P2_Ratio) * Flr_1_Off3_P2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72293,11 +72292,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Off3_P3_DT1 = Flr_1_Off3_P3_Coil_Outlet_Air_Temp - Flr_1_Off3_P3_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Off3_P3_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_1_Off3_P3_DT1 > 0.0,
+    IF Flr_1_Off3_P3_DT1 > 0.0,  !- <none>
     SET Flr_1_Off3_P3_Ratio = @Min (Flr_1_Off3_P3_DT2 / Flr_1_Off3_P3_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Off3_P3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Off3_P3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Off3_P3_RE = Flr_1_Off3_P3_RE + (Flr_1_Off3_P3_Ratio * Flr_1_Off3_P3_Coil_Energy),  !- <none>
     SET Flr_1_Off3_P3_Heat = Flr_1_Off3_P3_Heat + ((1-Flr_1_Off3_P3_Ratio) * Flr_1_Off3_P3_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72316,11 +72315,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Pat_DT1 = Flr_1_Pat_Coil_Outlet_Air_Temp - Flr_1_Pat_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Pat_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_1_Pat_DT1 > 0.0,
+    IF Flr_1_Pat_DT1 > 0.0,  !- <none>
     SET Flr_1_Pat_Ratio = @Min (Flr_1_Pat_DT2 / Flr_1_Pat_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Pat_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Pat_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Pat_RE = Flr_1_Pat_RE + (Flr_1_Pat_Ratio * Flr_1_Pat_Coil_Energy),  !- <none>
     SET Flr_1_Pat_Heat = Flr_1_Pat_Heat + ((1-Flr_1_Pat_Ratio) * Flr_1_Pat_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72339,11 +72338,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Pharm_DT1 = Flr_1_Pharm_Coil_Outlet_Air_Temp - Flr_1_Pharm_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Pharm_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_1_Pharm_DT1 > 0.0,
+    IF Flr_1_Pharm_DT1 > 0.0,!- <none>
     SET Flr_1_Pharm_Ratio = @Min (Flr_1_Pharm_DT2 / Flr_1_Pharm_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Pharm_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Pharm_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Pharm_RE = Flr_1_Pharm_RE + (Flr_1_Pharm_Ratio * Flr_1_Pharm_Coil_Energy),  !- <none>
     SET Flr_1_Pharm_Heat = Flr_1_Pharm_Heat + ((1-Flr_1_Pharm_Ratio) * Flr_1_Pharm_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72362,11 +72361,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_PT_DT1 = Flr_1_PT_Coil_Outlet_Air_Temp - Flr_1_PT_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_PT_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_1_PT_DT1 > 0.0,
+    IF Flr_1_PT_DT1 > 0.0,   !- <none>
     SET Flr_1_PT_Ratio = @Min (Flr_1_PT_DT2 / Flr_1_PT_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_PT_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_PT_Ratio = 1.0,!- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_PT_RE = Flr_1_PT_RE + (Flr_1_PT_Ratio * Flr_1_PT_Coil_Energy),  !- <none>
     SET Flr_1_PT_Heat = Flr_1_PT_Heat + ((1-Flr_1_PT_Ratio) * Flr_1_PT_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72385,11 +72384,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Receive_DT1 = Flr_1_Receive_Coil_Outlet_Air_Temp - Flr_1_Receive_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Receive_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_1_Receive_DT1 > 0.0,
+    IF Flr_1_Receive_DT1 > 0.0,  !- <none>
     SET Flr_1_Receive_Ratio = @Min (Flr_1_Receive_DT2 / Flr_1_Receive_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Receive_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Receive_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Receive_RE = Flr_1_Receive_RE + (Flr_1_Receive_Ratio * Flr_1_Receive_Coil_Energy),  !- <none>
     SET Flr_1_Receive_Heat = Flr_1_Receive_Heat + ((1-Flr_1_Receive_Ratio) * Flr_1_Receive_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72408,11 +72407,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Recep_DT1 = Flr_1_Recep_Coil_Outlet_Air_Temp - Flr_1_Recep_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Recep_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_1_Recep_DT1 > 0.0,
+    IF Flr_1_Recep_DT1 > 0.0,!- <none>
     SET Flr_1_Recep_Ratio = @Min (Flr_1_Recep_DT2 / Flr_1_Recep_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Recep_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Recep_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Recep_RE = Flr_1_Recep_RE + (Flr_1_Recep_Ratio * Flr_1_Recep_Coil_Energy),  !- <none>
     SET Flr_1_Recep_Heat = Flr_1_Recep_Heat + ((1-Flr_1_Recep_Ratio) * Flr_1_Recep_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72431,11 +72430,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Soil_DT1 = Flr_1_Soil_Coil_Outlet_Air_Temp - Flr_1_Soil_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Soil_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_1_Soil_DT1 > 0.0,
+    IF Flr_1_Soil_DT1 > 0.0, !- <none>
     SET Flr_1_Soil_Ratio = @Min (Flr_1_Soil_DT2 / Flr_1_Soil_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Soil_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Soil_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Soil_RE = Flr_1_Soil_RE + (Flr_1_Soil_Ratio * Flr_1_Soil_Coil_Energy),  !- <none>
     SET Flr_1_Soil_Heat = Flr_1_Soil_Heat + ((1-Flr_1_Soil_Ratio) * Flr_1_Soil_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72454,11 +72453,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Stor_DT1 = Flr_1_Stor_Coil_Outlet_Air_Temp - Flr_1_Stor_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Stor_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_1_Stor_DT1 > 0.0,
+    IF Flr_1_Stor_DT1 > 0.0, !- <none>
     SET Flr_1_Stor_Ratio = @Min (Flr_1_Stor_DT2 / Flr_1_Stor_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Stor_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Stor_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Stor_RE = Flr_1_Stor_RE + (Flr_1_Stor_Ratio * Flr_1_Stor_Coil_Energy),  !- <none>
     SET Flr_1_Stor_Heat = Flr_1_Stor_Heat + ((1-Flr_1_Stor_Ratio) * Flr_1_Stor_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72477,11 +72476,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_1_Waiting_DT1 = Flr_1_Waiting_Coil_Outlet_Air_Temp - Flr_1_Waiting_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_1_Waiting_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_1_Waiting_DT1 > 0.0,
+    IF Flr_1_Waiting_DT1 > 0.0,  !- <none>
     SET Flr_1_Waiting_Ratio = @Min (Flr_1_Waiting_DT2 / Flr_1_Waiting_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_1_Waiting_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_1_Waiting_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_1_Waiting_RE = Flr_1_Waiting_RE + (Flr_1_Waiting_Ratio * Flr_1_Waiting_Coil_Energy),  !- <none>
     SET Flr_1_Waiting_Heat = Flr_1_Waiting_Heat + ((1-Flr_1_Waiting_Ratio) * Flr_1_Waiting_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72500,11 +72499,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Chapel_DT1 = Flr_2_Chapel_Coil_Outlet_Air_Temp - Flr_2_Chapel_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Chapel_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Chapel_DT1 > 0.0,
+    IF Flr_2_Chapel_DT1 > 0.0,  !- <none>
     SET Flr_2_Chapel_Ratio = @Min (Flr_2_Chapel_DT2 / Flr_2_Chapel_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Chapel_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Chapel_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Chapel_RE = Flr_2_Chapel_RE + (Flr_2_Chapel_Ratio * Flr_2_Chapel_Coil_Energy),  !- <none>
     SET Flr_2_Chapel_Heat = Flr_2_Chapel_Heat + ((1-Flr_2_Chapel_Ratio) * Flr_2_Chapel_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72523,11 +72522,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Clean_1_DT1 = Flr_2_Clean_1_Coil_Outlet_Air_Temp - Flr_2_Clean_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Clean_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Clean_1_DT1 > 0.0,
+    IF Flr_2_Clean_1_DT1 > 0.0,  !- <none>
     SET Flr_2_Clean_1_Ratio = @Min (Flr_2_Clean_1_DT2 / Flr_2_Clean_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Clean_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Clean_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Clean_1_RE = Flr_2_Clean_1_RE + (Flr_2_Clean_1_Ratio * Flr_2_Clean_1_Coil_Energy),  !- <none>
     SET Flr_2_Clean_1_Heat = Flr_2_Clean_1_Heat + ((1-Flr_2_Clean_1_Ratio) * Flr_2_Clean_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72546,11 +72545,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Clean_2_DT1 = Flr_2_Clean_2_Coil_Outlet_Air_Temp - Flr_2_Clean_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Clean_2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Clean_2_DT1 > 0.0 ,
+    IF Flr_2_Clean_2_DT1 > 0.0,  !- <none>
     SET Flr_2_Clean_2_Ratio = @Min (Flr_2_Clean_2_DT2 / Flr_2_Clean_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Clean_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Clean_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Clean_2_RE = Flr_2_Clean_2_RE + (Flr_2_Clean_2_Ratio * Flr_2_Clean_2_Coil_Energy),  !- <none>
     SET Flr_2_Clean_2_Heat = Flr_2_Clean_2_Heat + ((1-Flr_2_Clean_2_Ratio) * Flr_2_Clean_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72569,11 +72568,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Cor_DT1 = Flr_2_Cor_Coil_Outlet_Air_Temp - Flr_2_Cor_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Cor_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Cor_DT1 > 0.0,
+    IF Flr_2_Cor_DT1 > 0.0,  !- <none>
     SET Flr_2_Cor_Ratio = @Min (Flr_2_Cor_DT2 / Flr_2_Cor_DT1) 1,  !- <none>
-    Else,
-    Set Flr_2_Cor_Ratio = 1.0,
-    ENDIF,
+    Else,                    !- <none>
+    Set Flr_2_Cor_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Cor_RE = Flr_2_Cor_RE + (Flr_2_Cor_Ratio * Flr_2_Cor_Coil_Energy),  !- <none>
     SET Flr_2_Cor_Heat = Flr_2_Cor_Heat + ((1-Flr_2_Cor_Ratio) * Flr_2_Cor_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72592,11 +72591,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Elev_DT1 = Flr_2_Elev_Coil_Outlet_Air_Temp - Flr_2_Elev_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Elev_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Elev_DT1 > 0.0,
+    IF Flr_2_Elev_DT1 > 0.0, !- <none>
     SET Flr_2_Elev_Ratio = @Min (Flr_2_Elev_DT2 / Flr_2_Elev_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Elev_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Elev_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Elev_RE = Flr_2_Elev_RE + (Flr_2_Elev_Ratio * Flr_2_Elev_Coil_Energy),  !- <none>
     SET Flr_2_Elev_Heat = Flr_2_Elev_Heat + ((1-Flr_2_Elev_Ratio) * Flr_2_Elev_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72615,11 +72614,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Exam_1_DT1 = Flr_2_Exam_1_Coil_Outlet_Air_Temp - Flr_2_Exam_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Exam_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Exam_1_DT1 > 0.0,
+    IF Flr_2_Exam_1_DT1 > 0.0,  !- <none>
     SET Flr_2_Exam_1_Ratio = @Min (Flr_2_Exam_1_DT2 / Flr_2_Exam_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Exam_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Exam_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Exam_1_RE = Flr_2_Exam_1_RE + (Flr_2_Exam_1_Ratio * Flr_2_Exam_1_Coil_Energy),  !- <none>
     SET Flr_2_Exam_1_Heat = Flr_2_Exam_1_Heat + ((1-Flr_2_Exam_1_Ratio) * Flr_2_Exam_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72638,11 +72637,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Exam_2_DT1 = Flr_2_Exam_2_Coil_Outlet_Air_Temp - Flr_2_Exam_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Exam_2_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Exam_2_DT1 > 0.0,
+    IF Flr_2_Exam_2_DT1 > 0.0,  !- <none>
     SET Flr_2_Exam_2_Ratio = @Min (Flr_2_Exam_2_DT2 / Flr_2_Exam_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Exam_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Exam_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Exam_2_RE = Flr_2_Exam_2_RE + (Flr_2_Exam_2_Ratio * Flr_2_Exam_2_Coil_Energy),  !- <none>
     SET Flr_2_Exam_2_Heat = Flr_2_Exam_2_Heat + ((1-Flr_2_Exam_2_Ratio) * Flr_2_Exam_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72661,11 +72660,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Exam_3_DT1 = Flr_2_Exam_3_Coil_Outlet_Air_Temp - Flr_2_Exam_3_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Exam_3_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Exam_3_DT1 > 0.0,
+    IF Flr_2_Exam_3_DT1 > 0.0,  !- <none>
     SET Flr_2_Exam_3_Ratio = @Min (Flr_2_Exam_3_DT2 / Flr_2_Exam_3_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Exam_3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Exam_3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Exam_3_RE = Flr_2_Exam_3_RE + (Flr_2_Exam_3_Ratio * Flr_2_Exam_3_Coil_Energy),  !- <none>
     SET Flr_2_Exam_3_Heat = Flr_2_Exam_3_Heat + ((1-Flr_2_Exam_3_Ratio) * Flr_2_Exam_3_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72684,11 +72683,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Exam_4_DT1 = Flr_2_Exam_4_Coil_Outlet_Air_Temp - Flr_2_Exam_4_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Exam_4_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Exam_4_DT1 > 0.0,
+    IF Flr_2_Exam_4_DT1 > 0.0,  !- <none>
     SET Flr_2_Exam_4_Ratio = @Min (Flr_2_Exam_4_DT2 / Flr_2_Exam_4_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Exam_4_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Exam_4_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Exam_4_RE = Flr_2_Exam_4_RE + (Flr_2_Exam_4_Ratio * Flr_2_Exam_4_Coil_Energy),  !- <none>
     SET Flr_2_Exam_4_Heat = Flr_2_Exam_4_Heat + ((1-Flr_2_Exam_4_Ratio) * Flr_2_Exam_4_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72707,11 +72706,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Gift_DT1 = Flr_2_Gift_Coil_Outlet_Air_Temp - Flr_2_Gift_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Gift_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Gift_DT1 > 0.0,
+    IF Flr_2_Gift_DT1 > 0.0, !- <none>
     SET Flr_2_Gift_Ratio = @Min (Flr_2_Gift_DT2 / Flr_2_Gift_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Gift_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Gift_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Gift_RE = Flr_2_Gift_RE + (Flr_2_Gift_Ratio * Flr_2_Gift_Coil_Energy),  !- <none>
     SET Flr_2_Gift_Heat = Flr_2_Gift_Heat + ((1-Flr_2_Gift_Ratio) * Flr_2_Gift_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72730,11 +72729,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Image_1_DT1 = Flr_2_Image_1_Coil_Outlet_Air_Temp - Flr_2_Image_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Image_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Image_1_DT1 > 0.0,
+    IF Flr_2_Image_1_DT1 > 0.0,  !- <none>
     SET Flr_2_Image_1_Ratio = @Min (Flr_2_Image_1_DT2 / Flr_2_Image_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Image_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Image_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Image_1_RE = Flr_2_Image_1_RE + (Flr_2_Image_1_Ratio * Flr_2_Image_1_Coil_Energy),  !- <none>
     SET Flr_2_Image_1_Heat = Flr_2_Image_1_Heat + ((1-Flr_2_Image_1_Ratio) * Flr_2_Image_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72753,11 +72752,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Image_2_DT1 = Flr_2_Image_2_Coil_Outlet_Air_Temp - Flr_2_Image_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Image_2_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Image_2_DT1 > 0.0,
+    IF Flr_2_Image_2_DT1 > 0.0,  !- <none>
     SET Flr_2_Image_2_Ratio = @Min (Flr_2_Image_2_DT2 / Flr_2_Image_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Image_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Image_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Image_2_RE = Flr_2_Image_2_RE + (Flr_2_Image_2_Ratio * Flr_2_Image_2_Coil_Energy),  !- <none>
     SET Flr_2_Image_2_Heat = Flr_2_Image_2_Heat + ((1-Flr_2_Image_2_Ratio) * Flr_2_Image_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72776,11 +72775,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Image_3_DT1 = Flr_2_Image_3_Coil_Outlet_Air_Temp - Flr_2_Image_3_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Image_3_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Image_3_DT1 > 0.0,
+    IF Flr_2_Image_3_DT1 > 0.0,  !- <none>
     SET Flr_2_Image_3_Ratio = @Min (Flr_2_Image_3_DT2 / Flr_2_Image_3_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Image_3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Image_3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Image_3_RE = Flr_2_Image_3_RE + (Flr_2_Image_3_Ratio * Flr_2_Image_3_Coil_Energy),  !- <none>
     SET Flr_2_Image_3_Heat = Flr_2_Image_3_Heat + ((1-Flr_2_Image_3_Ratio) * Flr_2_Image_3_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72799,11 +72798,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Lab_1_DT1 = Flr_2_Lab_1_Coil_Outlet_Air_Temp - Flr_2_Lab_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Lab_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Lab_1_DT1 > 0.0,
+    IF Flr_2_Lab_1_DT1 > 0.0,!- <none>
     SET Flr_2_Lab_1_Ratio = @Min (Flr_2_Lab_1_DT2 / Flr_2_Lab_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Lab_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Lab_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Lab_1_RE = Flr_2_Lab_1_RE + (Flr_2_Lab_1_Ratio * Flr_2_Lab_1_Coil_Energy),  !- <none>
     SET Flr_2_Lab_1_Heat = Flr_2_Lab_1_Heat + ((1-Flr_2_Lab_1_Ratio) * Flr_2_Lab_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72822,11 +72821,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Lab_2_DT1 = Flr_2_Lab_2_Coil_Outlet_Air_Temp - Flr_2_Lab_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Lab_2_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Lab_2_DT1 > 0.0,
+    IF Flr_2_Lab_2_DT1 > 0.0,!- <none>
     SET Flr_2_Lab_2_Ratio = @Min (Flr_2_Lab_2_DT2 / Flr_2_Lab_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Lab_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Lab_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Lab_2_RE = Flr_2_Lab_2_RE + (Flr_2_Lab_2_Ratio * Flr_2_Lab_2_Coil_Energy),  !- <none>
     SET Flr_2_Lab_2_Heat = Flr_2_Lab_2_Heat + ((1-Flr_2_Lab_2_Ratio) * Flr_2_Lab_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72845,11 +72844,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Lounge1_DT1 = Flr_2_Lounge1_Coil_Outlet_Air_Temp - Flr_2_Lounge1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Lounge1_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Lounge1_DT1 > 0.0,
+    IF Flr_2_Lounge1_DT1 > 0.0,  !- <none>
     SET Flr_2_Lounge1_Ratio = @Min (Flr_2_Lounge1_DT2 / Flr_2_Lounge1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Lounge1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Lounge1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Lounge1_RE = Flr_2_Lounge1_RE + (Flr_2_Lounge1_Ratio * Flr_2_Lounge1_Coil_Energy),  !- <none>
     SET Flr_2_Lounge1_Heat = Flr_2_Lounge1_Heat + ((1-Flr_2_Lounge1_Ratio) * Flr_2_Lounge1_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72868,11 +72867,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Lounge2_DT1 = Flr_2_Lounge2_Coil_Outlet_Air_Temp - Flr_2_Lounge2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Lounge2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Lounge2_DT1 > 0.0,
+    IF Flr_2_Lounge2_DT1 > 0.0,  !- <none>
     SET Flr_2_Lounge2_Ratio = @Min (Flr_2_Lounge2_DT2 / Flr_2_Lounge2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Lounge2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Lounge2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Lounge2_RE = Flr_2_Lounge2_RE + (Flr_2_Lounge2_Ratio * Flr_2_Lounge2_Coil_Energy),  !- <none>
     SET Flr_2_Lounge2_Heat = Flr_2_Lounge2_Heat + ((1-Flr_2_Lounge2_Ratio) * Flr_2_Lounge2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72891,11 +72890,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Lockers_DT1 = Flr_2_Lockers_Coil_Outlet_Air_Temp - Flr_2_Lockers_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Lockers_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Lockers_DT1 > 0.0,
+    IF Flr_2_Lockers_DT1 > 0.0,  !- <none>
     SET Flr_2_Lockers_Ratio = @Min (Flr_2_Lockers_DT2 / Flr_2_Lockers_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Lockers_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Lockers_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Lockers_RE = Flr_2_Lockers_RE + (Flr_2_Lockers_Ratio * Flr_2_Lockers_Coil_Energy),  !- <none>
     SET Flr_2_Lockers_Heat = Flr_2_Lockers_Heat + ((1-Flr_2_Lockers_Ratio) * Flr_2_Lockers_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72914,11 +72913,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_NS_1_DT1 = Flr_2_NS_1_Coil_Outlet_Air_Temp - Flr_2_NS_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_NS_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_NS_1_DT1 > 0.0,
+    IF Flr_2_NS_1_DT1 > 0.0, !- <none>
     SET Flr_2_NS_1_Ratio = @Min (Flr_2_NS_1_DT2 / Flr_2_NS_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_NS_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_NS_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_NS_1_RE = Flr_2_NS_1_RE + (Flr_2_NS_1_Ratio * Flr_2_NS_1_Coil_Energy),  !- <none>
     SET Flr_2_NS_1_Heat = Flr_2_NS_1_Heat + ((1-Flr_2_NS_1_Ratio) * Flr_2_NS_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72937,11 +72936,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_NS_2_DT1 = Flr_2_NS_2_Coil_Outlet_Air_Temp - Flr_2_NS_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_NS_2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_NS_2_DT1 > 0.0,
+    IF Flr_2_NS_2_DT1 > 0.0, !- <none>
     SET Flr_2_NS_2_Ratio = @Min (Flr_2_NS_2_DT2 / Flr_2_NS_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_NS_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_NS_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_NS_2_RE = Flr_2_NS_2_RE + (Flr_2_NS_2_Ratio * Flr_2_NS_2_Coil_Energy),  !- <none>
     SET Flr_2_NS_2_Heat = Flr_2_NS_2_Heat + ((1-Flr_2_NS_2_Ratio) * Flr_2_NS_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -72960,11 +72959,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Off_1_DT1 = Flr_2_Off_1_Coil_Outlet_Air_Temp - Flr_2_Off_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Off_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Off_1_DT1 > 0.0,
+    IF Flr_2_Off_1_DT1 > 0.0,!- <none>
     SET Flr_2_Off_1_Ratio = @Min (Flr_2_Off_1_DT2 / Flr_2_Off_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Off_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Off_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Off_1_RE = Flr_2_Off_1_RE + (Flr_2_Off_1_Ratio * Flr_2_Off_1_Coil_Energy),  !- <none>
     SET Flr_2_Off_1_Heat = Flr_2_Off_1_Heat + ((1-Flr_2_Off_1_Ratio) * Flr_2_Off_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -72983,11 +72982,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Off_2_DT1 = Flr_2_Off_2_Coil_Outlet_Air_Temp - Flr_2_Off_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Off_2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Off_2_DT1 > 0.0,
+    IF Flr_2_Off_2_DT1 > 0.0,!- <none>
     SET Flr_2_Off_2_Ratio = @Min (Flr_2_Off_2_DT2 / Flr_2_Off_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Off_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Off_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Off_2_RE = Flr_2_Off_2_RE + (Flr_2_Off_2_Ratio * Flr_2_Off_2_Coil_Energy),  !- <none>
     SET Flr_2_Off_2_Heat = Flr_2_Off_2_Heat + ((1-Flr_2_Off_2_Ratio) * Flr_2_Off_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73006,11 +73005,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Off_3_DT1 = Flr_2_Off_3_Coil_Outlet_Air_Temp - Flr_2_Off_3_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Off_3_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Off_3_DT1 > 0.0,
+    IF Flr_2_Off_3_DT1 > 0.0,!- <none>
     SET Flr_2_Off_3_Ratio = @Min (Flr_2_Off_3_DT2 / Flr_2_Off_3_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Off_3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Off_3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Off_3_RE = Flr_2_Off_3_RE + (Flr_2_Off_3_Ratio * Flr_2_Off_3_Coil_Energy),  !- <none>
     SET Flr_2_Off_3_Heat = Flr_2_Off_3_Heat + ((1-Flr_2_Off_3_Ratio) * Flr_2_Off_3_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73029,11 +73028,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Off_4_DT1 = Flr_2_Off_4_Coil_Outlet_Air_Temp - Flr_2_Off_4_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Off_4_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Off_4_DT1 > 0.0,
+    IF Flr_2_Off_4_DT1 > 0.0,!- <none>
     SET Flr_2_Off_4_Ratio = @Min (Flr_2_Off_4_DT2 / Flr_2_Off_4_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Off_4_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Off_4_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Off_4_RE = Flr_2_Off_4_RE + (Flr_2_Off_4_Ratio * Flr_2_Off_4_Coil_Energy),  !- <none>
     SET Flr_2_Off_4_Heat = Flr_2_Off_4_Heat + ((1-Flr_2_Off_4_Ratio) * Flr_2_Off_4_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73052,11 +73051,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Sterile_DT1 = Flr_2_Sterile_Coil_Outlet_Air_Temp - Flr_2_Sterile_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Sterile_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Sterile_DT1 > 0.0,
+    IF Flr_2_Sterile_DT1 > 0.0,  !- <none>
     SET Flr_2_Sterile_Ratio = @Min (Flr_2_Sterile_DT2 / Flr_2_Sterile_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Sterile_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Sterile_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Sterile_RE = Flr_2_Sterile_RE + (Flr_2_Sterile_Ratio * Flr_2_Sterile_Coil_Energy),  !- <none>
     SET Flr_2_Sterile_Heat = Flr_2_Sterile_Heat + ((1-Flr_2_Sterile_Ratio) * Flr_2_Sterile_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73075,11 +73074,11 @@
     ELSEIF (AHU_3_CCoil_Energy > 0 && AHU_3_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_OR_DT1 = Flr_2_OR_Coil_Outlet_Air_Temp - Flr_2_OR_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_OR_DT2 = @Max (AHU_3_CoolC_Inlet_Node_Temp - AHU_3_Fan_Out) 0,  !- <none>
-    IF Flr_2_OR_DT1 > 0.0,
+    IF Flr_2_OR_DT1 > 0.0,   !- <none>
     SET Flr_2_OR_Ratio = @Min (Flr_2_OR_DT2 / Flr_2_OR_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_OR_Ratio = 1.0,    
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_OR_Ratio = 1.0,!- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_OR_RE = Flr_2_OR_RE + (Flr_2_OR_Ratio * Flr_2_OR_Coil_Energy),  !- <none>
     SET Flr_2_OR_Heat = Flr_2_OR_Heat + ((1-Flr_2_OR_Ratio) * Flr_2_OR_Coil_Energy),  !- <none>
     ELSEIF (AHU_3_CCoil_Energy == 0 && AHU_3_HCoil1_Energy == 0),  !- <none>
@@ -73098,11 +73097,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_PACU_DT1 = Flr_2_PACU_Coil_Outlet_Air_Temp - Flr_2_PACU_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_PACU_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_PACU_DT1 > 0.0,
+    IF Flr_2_PACU_DT1 > 0.0, !- <none>
     SET Flr_2_PACU_Ratio = @Min (Flr_2_PACU_DT2 / Flr_2_PACU_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_PACU_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_PACU_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_PACU_RE = Flr_2_PACU_RE + (Flr_2_PACU_Ratio * Flr_2_PACU_Coil_Energy),  !- <none>
     SET Flr_2_PACU_Heat = Flr_2_PACU_Heat + ((1-Flr_2_PACU_Ratio) * Flr_2_PACU_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73121,11 +73120,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Pat_1_DT1 = Flr_2_Pat_1_Coil_Outlet_Air_Temp - Flr_2_Pat_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Pat_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Pat_1_DT1 > 0.0,
+    IF Flr_2_Pat_1_DT1 > 0.0,!- <none>
     SET Flr_2_Pat_1_Ratio = @Min (Flr_2_Pat_1_DT2 / Flr_2_Pat_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Pat_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Pat_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Pat_1_RE = Flr_2_Pat_1_RE + (Flr_2_Pat_1_Ratio * Flr_2_Pat_1_Coil_Energy),  !- <none>
     SET Flr_2_Pat_1_Heat = Flr_2_Pat_1_Heat + ((1-Flr_2_Pat_1_Ratio) * Flr_2_Pat_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73144,11 +73143,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Pat_2_DT1 = Flr_2_Pat_2_Coil_Outlet_Air_Temp - Flr_2_Pat_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Pat_2_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Pat_2_DT1 > 0.0,
+    IF Flr_2_Pat_2_DT1 > 0.0,!- <none>
     SET Flr_2_Pat_2_Ratio = @Min (Flr_2_Pat_2_DT2 / Flr_2_Pat_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Pat_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Pat_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Pat_2_RE = Flr_2_Pat_2_RE + (Flr_2_Pat_2_Ratio * Flr_2_Pat_2_Coil_Energy),  !- <none>
     SET Flr_2_Pat_2_Heat = Flr_2_Pat_2_Heat + ((1-Flr_2_Pat_2_Ratio) * Flr_2_Pat_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73167,11 +73166,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Proc_1_DT1 = Flr_2_Proc_1_Coil_Outlet_Air_Temp - Flr_2_Proc_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Proc_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Proc_1_DT1 > 0.0,
+    IF Flr_2_Proc_1_DT1 > 0.0,  !- <none>
     SET Flr_2_Proc_1_Ratio = @Min (Flr_2_Proc_1_DT2 / Flr_2_Proc_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Proc_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Proc_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Proc_1_RE = Flr_2_Proc_1_RE + (Flr_2_Proc_1_Ratio * Flr_2_Proc_1_Coil_Energy),  !- <none>
     SET Flr_2_Proc_1_Heat = Flr_2_Proc_1_Heat + ((1-Flr_2_Proc_1_Ratio) * Flr_2_Proc_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73190,11 +73189,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Proc_2_DT1 = Flr_2_Proc_2_Coil_Outlet_Air_Temp - Flr_2_Proc_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Proc_2_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Proc_2_DT1 > 0.0,
+    IF Flr_2_Proc_2_DT1 > 0.0,  !- <none>
     SET Flr_2_Proc_2_Ratio = @Min (Flr_2_Proc_2_DT2 / Flr_2_Proc_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Proc_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Proc_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Proc_2_RE = Flr_2_Proc_2_RE + (Flr_2_Proc_2_Ratio * Flr_2_Proc_2_Coil_Energy),  !- <none>
     SET Flr_2_Proc_2_Heat = Flr_2_Proc_2_Heat + ((1-Flr_2_Proc_2_Ratio) * Flr_2_Proc_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73213,11 +73212,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Recep_DT1 = Flr_2_Recep_Coil_Outlet_Air_Temp - Flr_2_Recep_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Recep_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Recep_DT1 > 0.0,
+    IF Flr_2_Recep_DT1 > 0.0,!- <none>
     SET Flr_2_Recep_Ratio = @Min (Flr_2_Recep_DT2 / Flr_2_Recep_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Recep_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Recep_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Recep_RE = Flr_2_Recep_RE + (Flr_2_Recep_Ratio * Flr_2_Recep_Coil_Energy),  !- <none>
     SET Flr_2_Recep_Heat = Flr_2_Recep_Heat + ((1-Flr_2_Recep_Ratio) * Flr_2_Recep_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73236,11 +73235,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Rest_1_DT1 = Flr_2_Rest_1_Coil_Outlet_Air_Temp - Flr_2_Rest_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Rest_1_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Rest_1_DT1 > 0.0,
+    IF Flr_2_Rest_1_DT1 > 0.0,  !- <none>
     SET Flr_2_Rest_1_Ratio = @Min (Flr_2_Rest_1_DT2 / Flr_2_Rest_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Rest_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Rest_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Rest_1_RE = Flr_2_Rest_1_RE + (Flr_2_Rest_1_Ratio * Flr_2_Rest_1_Coil_Energy),  !- <none>
     SET Flr_2_Rest_1_Heat = Flr_2_Rest_1_Heat + ((1-Flr_2_Rest_1_Ratio) * Flr_2_Rest_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73259,11 +73258,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Rest_2_DT1 = Flr_2_Rest_2_Coil_Outlet_Air_Temp - Flr_2_Rest_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Rest_2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Rest_2_DT1 > 0.0,
+    IF Flr_2_Rest_2_DT1 > 0.0,  !- <none>
     SET Flr_2_Rest_2_Ratio = @Min (Flr_2_Rest_2_DT2 / Flr_2_Rest_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Rest_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Rest_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Rest_2_RE = Flr_2_Rest_2_RE + (Flr_2_Rest_2_Ratio * Flr_2_Rest_2_Coil_Energy),  !- <none>
     SET Flr_2_Rest_2_Heat = Flr_2_Rest_2_Heat + ((1-Flr_2_Rest_2_Ratio) * Flr_2_Rest_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73282,11 +73281,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Soil_1_DT1 = Flr_2_Soil_1_Coil_Outlet_Air_Temp - Flr_2_Soil_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Soil_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Soil_1_DT1 > 0.0,
+    IF Flr_2_Soil_1_DT1 > 0.0,  !- <none>
     SET Flr_2_Soil_1_Ratio = @Min (Flr_2_Soil_1_DT2 / Flr_2_Soil_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Soil_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Soil_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Soil_1_RE = Flr_2_Soil_1_RE + (Flr_2_Soil_1_Ratio * Flr_2_Soil_1_Coil_Energy),  !- <none>
     SET Flr_2_Soil_1_Heat = Flr_2_Soil_1_Heat + ((1-Flr_2_Soil_1_Ratio) * Flr_2_Soil_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73305,11 +73304,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Soil_2_DT1 = Flr_2_Soil_2_Coil_Outlet_Air_Temp - Flr_2_Soil_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Soil_2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    If Flr_2_Soil_2_DT1 > 0.0,
+    If Flr_2_Soil_2_DT1 > 0.0,  !- <none>
     SET Flr_2_Soil_2_Ratio = @Min (Flr_2_Soil_2_DT2 / Flr_2_Soil_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Soil_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Soil_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Soil_2_RE = Flr_2_Soil_2_RE + (Flr_2_Soil_2_Ratio * Flr_2_Soil_2_Coil_Energy),  !- <none>
     SET Flr_2_Soil_2_Heat = Flr_2_Soil_2_Heat + ((1-Flr_2_Soil_2_Ratio) * Flr_2_Soil_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73328,11 +73327,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Stor_1_DT1 = Flr_2_Stor_1_Coil_Outlet_Air_Temp - Flr_2_Stor_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Stor_1_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Stor_1_DT1 > 0.0,
+    IF Flr_2_Stor_1_DT1 > 0.0,  !- <none>
     SET Flr_2_Stor_1_Ratio = @Min (Flr_2_Stor_1_DT2 / Flr_2_Stor_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Stor_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Stor_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Stor_1_RE = Flr_2_Stor_1_RE + (Flr_2_Stor_1_Ratio * Flr_2_Stor_1_Coil_Energy),  !- <none>
     SET Flr_2_Stor_1_Heat = Flr_2_Stor_1_Heat + ((1-Flr_2_Stor_1_Ratio) * Flr_2_Stor_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73351,11 +73350,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Stor_2_DT1 = Flr_2_Stor_2_Coil_Outlet_Air_Temp - Flr_2_Stor_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Stor_2_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Stor_2_DT1 > 0.0,
+    IF Flr_2_Stor_2_DT1 > 0.0,  !- <none>
     SET Flr_2_Stor_2_Ratio = @Min (Flr_2_Stor_2_DT2 / Flr_2_Stor_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Stor_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Stor_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Stor_2_RE = Flr_2_Stor_2_RE + (Flr_2_Stor_2_Ratio * Flr_2_Stor_2_Coil_Energy),  !- <none>
     SET Flr_2_Stor_2_Heat = Flr_2_Stor_2_Heat + ((1-Flr_2_Stor_2_Ratio) * Flr_2_Stor_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73374,11 +73373,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Trauma_DT1 = Flr_2_Trauma_Coil_Outlet_Air_Temp - Flr_2_Trauma_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Trauma_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Trauma_DT1 > 0.0,
+    IF Flr_2_Trauma_DT1 > 0.0,  !- <none>
     SET Flr_2_Trauma_Ratio = @Min (Flr_2_Trauma_DT2 / Flr_2_Trauma_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Trauma_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Trauma_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Trauma_RE = Flr_2_Trauma_RE + (Flr_2_Trauma_Ratio * Flr_2_Trauma_Coil_Energy),  !- <none>
     SET Flr_2_Trauma_Heat = Flr_2_Trauma_Heat + ((1-Flr_2_Trauma_Ratio) * Flr_2_Trauma_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73397,11 +73396,11 @@
     ELSEIF (AHU_2_CCoil_Energy > 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Triage_DT1 = Flr_2_Triage_Coil_Outlet_Air_Temp - Flr_2_Triage_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Triage_DT2 = @Max (AHU_2_CoolC_Inlet_Node_Temp - AHU_2_Fan_Out) 0,  !- <none>
-    IF Flr_2_Triage_DT1 > 0.0,
+    IF Flr_2_Triage_DT1 > 0.0,  !- <none>
     SET Flr_2_Triage_Ratio = @Min (Flr_2_Triage_DT2 / Flr_2_Triage_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Triage_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Triage_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Triage_RE = Flr_2_Triage_RE + (Flr_2_Triage_Ratio * Flr_2_Triage_Coil_Energy),  !- <none>
     SET Flr_2_Triage_Heat = Flr_2_Triage_Heat + ((1-Flr_2_Triage_Ratio) * Flr_2_Triage_Coil_Energy),  !- <none>
     ELSEIF (AHU_2_CCoil_Energy == 0 && AHU_2_HCoil1_Energy == 0),  !- <none>
@@ -73420,11 +73419,11 @@
     ELSEIF (AHU_1_CCoil_Energy > 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
     SET Flr_2_Waiting_DT1 = Flr_2_Waiting_Coil_Outlet_Air_Temp - Flr_2_Waiting_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_2_Waiting_DT2 = @Max (AHU_1_CoolC_Inlet_Node_Temp - AHU_1_Fan_Out) 0,  !- <none>
-    IF Flr_2_Waiting_DT1 > 0.0,
+    IF Flr_2_Waiting_DT1 > 0.0,  !- <none>
     SET Flr_2_Waiting_Ratio = @Min (Flr_2_Waiting_DT2 / Flr_2_Waiting_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_2_Waiting_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_2_Waiting_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_2_Waiting_RE = Flr_2_Waiting_RE + (Flr_2_Waiting_Ratio * Flr_2_Waiting_Coil_Energy),  !- <none>
     SET Flr_2_Waiting_Heat = Flr_2_Waiting_Heat + ((1-Flr_2_Waiting_Ratio) * Flr_2_Waiting_Coil_Energy),  !- <none>
     ELSEIF (AHU_1_CCoil_Energy == 0 && AHU_1_HCoil1_Energy == 0),  !- <none>
@@ -73443,11 +73442,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Clean_DT1 = Flr_3_Clean_Coil_Outlet_Air_Temp - Flr_3_Clean_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Clean_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_3_Clean_DT1 > 0.0,
+    IF Flr_3_Clean_DT1 > 0.0,!- <none>
     SET Flr_3_Clean_Ratio = @Min (Flr_3_Clean_DT2 / Flr_3_Clean_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Clean_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Clean_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Clean_RE = Flr_3_Clean_RE + (Flr_3_Clean_Ratio * Flr_3_Clean_Coil_Energy),  !- <none>
     SET Flr_3_Clean_Heat = Flr_3_Clean_Heat + ((1-Flr_3_Clean_Ratio) * Flr_3_Clean_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73466,11 +73465,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Elev_DT1 = Flr_3_Elev_Coil_Outlet_Air_Temp - Flr_3_Elev_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Elev_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Elev_DT1 > 0.0,
+    IF Flr_3_Elev_DT1 > 0.0, !- <none>
     SET Flr_3_Elev_Ratio = @Min (Flr_3_Elev_DT2 / Flr_3_Elev_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Elev_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Elev_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Elev_RE = Flr_3_Elev_RE + (Flr_3_Elev_Ratio * Flr_3_Elev_Coil_Energy),  !- <none>
     SET Flr_3_Elev_Heat = Flr_3_Elev_Heat + ((1-Flr_3_Elev_Ratio) * Flr_3_Elev_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73489,11 +73488,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Exam_DT1 = Flr_3_Exam_Coil_Outlet_Air_Temp - Flr_3_Exam_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Exam_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Exam_DT1 > 0.0,
+    IF Flr_3_Exam_DT1 > 0.0, !- <none>
     SET Flr_3_Exam_Ratio = @Min (Flr_3_Exam_DT2 / Flr_3_Exam_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Exam_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Exam_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Exam_RE = Flr_3_Exam_RE + (Flr_3_Exam_Ratio * Flr_3_Exam_Coil_Energy),  !- <none>
     SET Flr_3_Exam_Heat = Flr_3_Exam_Heat + ((1-Flr_3_Exam_Ratio) * Flr_3_Exam_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73512,11 +73511,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_ICU_DT1 = Flr_3_ICU_Coil_Outlet_Air_Temp - Flr_3_ICU_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_ICU_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_ICU_DT1 > 0.0,
+    IF Flr_3_ICU_DT1 > 0.0,  !- <none>
     SET Flr_3_ICU_Ratio = @Min (Flr_3_ICU_DT2 / Flr_3_ICU_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_ICU_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_ICU_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_ICU_RE = Flr_3_ICU_RE + (Flr_3_ICU_Ratio * Flr_3_ICU_Coil_Energy),  !- <none>
     SET Flr_3_ICU_Heat = Flr_3_ICU_Heat + ((1-Flr_3_ICU_Ratio) * Flr_3_ICU_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73535,11 +73534,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_NS_1_DT1 = Flr_3_NS_1_Coil_Outlet_Air_Temp - Flr_3_NS_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_NS_1_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_NS_1_DT1 > 0.0,
+    IF Flr_3_NS_1_DT1 > 0.0, !- <none>
     SET Flr_3_NS_1_Ratio = @Min (Flr_3_NS_1_DT2 / Flr_3_NS_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_NS_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_NS_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_NS_1_RE = Flr_3_NS_1_RE + (Flr_3_NS_1_Ratio * Flr_3_NS_1_Coil_Energy),  !- <none>
     SET Flr_3_NS_1_Heat = Flr_3_NS_1_Heat + ((1-Flr_3_NS_1_Ratio) * Flr_3_NS_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73558,11 +73557,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_NS_2_DT1 = Flr_3_NS_2_Coil_Outlet_Air_Temp - Flr_3_NS_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_NS_2_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_NS_2_DT1 > 0.0,
+    IF Flr_3_NS_2_DT1 > 0.0, !- <none>
     SET Flr_3_NS_2_Ratio = @Min (Flr_3_NS_2_DT2 / Flr_3_NS_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_NS_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_NS_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_NS_2_RE = Flr_3_NS_2_RE + (Flr_3_NS_2_Ratio * Flr_3_NS_2_Coil_Energy),  !- <none>
     SET Flr_3_NS_2_Heat = Flr_3_NS_2_Heat + ((1-Flr_3_NS_2_Ratio) * Flr_3_NS_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73581,11 +73580,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Nursery_DT1 = Flr_3_Nursery_Coil_Outlet_Air_Temp - Flr_3_Nursery_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Nursery_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Nursery_DT1 > 0.0,
+    IF Flr_3_Nursery_DT1 > 0.0,  !- <none>
     SET Flr_3_Nursery_Ratio = @Min (Flr_3_Nursery_DT2 / Flr_3_Nursery_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Nursery_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Nursery_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Nursery_RE = Flr_3_Nursery_RE + (Flr_3_Nursery_Ratio * Flr_3_Nursery_Coil_Energy),  !- <none>
     SET Flr_3_Nursery_Heat = Flr_3_Nursery_Heat + ((1-Flr_3_Nursery_Ratio) * Flr_3_Nursery_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73604,11 +73603,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Off_DT1 = Flr_3_Off_Coil_Outlet_Air_Temp - Flr_3_Off_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Off_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Off_DT1 > 0.0,
+    IF Flr_3_Off_DT1 > 0.0,  !- <none>
     SET Flr_3_Off_Ratio = @Min (Flr_3_Off_DT2 / Flr_3_Off_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Off_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Off_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Off_RE = Flr_3_Off_RE + (Flr_3_Off_Ratio * Flr_3_Off_Coil_Energy),  !- <none>
     SET Flr_3_Off_Heat = Flr_3_Off_Heat + ((1-Flr_3_Off_Ratio) * Flr_3_Off_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73627,11 +73626,11 @@
     ELSEIF (AHU_3_CCoil_Energy > 0 && AHU_3_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_OR_DT1 = Flr_3_OR_Coil_Outlet_Air_Temp - Flr_3_OR_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_OR_DT2 = @Max (AHU_3_CoolC_Inlet_Node_Temp - AHU_3_Fan_Out) 0,  !- <none>
-    IF Flr_3_OR_DT1 > 0.0,
+    IF Flr_3_OR_DT1 > 0.0,   !- <none>
     SET Flr_3_OR_Ratio = @Min (Flr_3_OR_DT2 / Flr_3_OR_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_OR_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_OR_Ratio = 1.0,!- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_OR_RE = Flr_3_OR_RE + (Flr_3_OR_Ratio * Flr_3_OR_Coil_Energy),  !- <none>
     SET Flr_3_OR_Heat = Flr_3_OR_Heat + ((1-Flr_3_OR_Ratio) * Flr_3_OR_Coil_Energy),  !- <none>
     ELSEIF (AHU_3_CCoil_Energy == 0 && AHU_3_HCoil1_Energy == 0),  !- <none>
@@ -73650,11 +73649,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Pat_1_DT1 = Flr_3_Pat_1_Coil_Outlet_Air_Temp - Flr_3_Pat_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Pat_1_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_3_Pat_1_DT1 > 0.0,
+    IF Flr_3_Pat_1_DT1 > 0.0,!- <none>
     SET Flr_3_Pat_1_Ratio = @Min (Flr_3_Pat_1_DT2 / Flr_3_Pat_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Pat_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Pat_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Pat_1_RE = Flr_3_Pat_1_RE + (Flr_3_Pat_1_Ratio * Flr_3_Pat_1_Coil_Energy),  !- <none>
     SET Flr_3_Pat_1_Heat = Flr_3_Pat_1_Heat + ((1-Flr_3_Pat_1_Ratio) * Flr_3_Pat_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73673,11 +73672,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Pat_2_DT1 = Flr_3_Pat_2_Coil_Outlet_Air_Temp - Flr_3_Pat_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Pat_2_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_3_Pat_2_DT1 > 0.0,
+    IF Flr_3_Pat_2_DT1 > 0.0,!- <none>
     SET Flr_3_Pat_2_Ratio = @Min (Flr_3_Pat_2_DT2 / Flr_3_Pat_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Pat_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Pat_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Pat_2_RE = Flr_3_Pat_2_RE + (Flr_3_Pat_2_Ratio * Flr_3_Pat_2_Coil_Energy),  !- <none>
     SET Flr_3_Pat_2_Heat = Flr_3_Pat_2_Heat + ((1-Flr_3_Pat_2_Ratio) * Flr_3_Pat_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73696,11 +73695,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Pat_3_DT1 = Flr_3_Pat_3_Coil_Outlet_Air_Temp - Flr_3_Pat_3_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Pat_3_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Pat_3_DT1 > 0.0,
+    IF Flr_3_Pat_3_DT1 > 0.0,!- <none>
     SET Flr_3_Pat_3_Ratio = @Min (Flr_3_Pat_3_DT2 / Flr_3_Pat_3_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Pat_3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Pat_3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Pat_3_RE = Flr_3_Pat_3_RE + (Flr_3_Pat_3_Ratio * Flr_3_Pat_3_Coil_Energy),  !- <none>
     SET Flr_3_Pat_3_Heat = Flr_3_Pat_3_Heat + ((1-Flr_3_Pat_3_Ratio) * Flr_3_Pat_3_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73719,11 +73718,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Pat_4_DT1 = Flr_3_Pat_4_Coil_Outlet_Air_Temp - Flr_3_Pat_4_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Pat_4_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Pat_4_DT1 > 0.0,
+    IF Flr_3_Pat_4_DT1 > 0.0,!- <none>
     SET Flr_3_Pat_4_Ratio = @Min (Flr_3_Pat_4_DT2 / Flr_3_Pat_4_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Pat_4_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Pat_4_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Pat_4_RE = Flr_3_Pat_4_RE + (Flr_3_Pat_4_Ratio * Flr_3_Pat_4_Coil_Energy),  !- <none>
     SET Flr_3_Pat_4_Heat = Flr_3_Pat_4_Heat + ((1-Flr_3_Pat_4_Ratio) * Flr_3_Pat_4_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73742,11 +73741,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_PatCor1_DT1 = Flr_3_PatCor1_Coil_Outlet_Air_Temp - Flr_3_PatCor1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_PatCor1_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_PatCor1_DT1 > 0.0,
+    IF Flr_3_PatCor1_DT1 > 0.0,  !- <none>
     SET Flr_3_PatCor1_Ratio = @Min (Flr_3_PatCor1_DT2 / Flr_3_PatCor1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_PatCor1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_PatCor1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_PatCor1_RE = Flr_3_PatCor1_RE + (Flr_3_PatCor1_Ratio * Flr_3_PatCor1_Coil_Energy),  !- <none>
     SET Flr_3_PatCor1_Heat = Flr_3_PatCor1_Heat + ((1-Flr_3_PatCor1_Ratio) * Flr_3_PatCor1_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73765,11 +73764,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_PatCor2_DT1 = Flr_3_PatCor2_Coil_Outlet_Air_Temp - Flr_3_PatCor2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_PatCor2_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_3_PatCor2_DT1 > 0.0,
+    IF Flr_3_PatCor2_DT1 > 0.0,  !- <none>
     SET Flr_3_PatCor2_Ratio = @Min (Flr_3_PatCor2_DT2 / Flr_3_PatCor2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_PatCor2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_PatCor2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_PatCor2_RE = Flr_3_PatCor2_RE + (Flr_3_PatCor2_Ratio * Flr_3_PatCor2_Coil_Energy),  !- <none>
     SET Flr_3_PatCor2_Heat = Flr_3_PatCor2_Heat + ((1-Flr_3_PatCor2_Ratio) * Flr_3_PatCor2_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73788,11 +73787,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Proc_DT1 = Flr_3_Proc_Coil_Outlet_Air_Temp - Flr_3_Proc_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Proc_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Proc_DT1 > 0.0,
+    IF Flr_3_Proc_DT1 > 0.0, !- <none>
     SET Flr_3_Proc_Ratio = @Min (Flr_3_Proc_DT2 / Flr_3_Proc_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Proc_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Proc_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Proc_RE = Flr_3_Proc_RE + (Flr_3_Proc_Ratio * Flr_3_Proc_Coil_Energy),  !- <none>
     SET Flr_3_Proc_Heat = Flr_3_Proc_Heat + ((1-Flr_3_Proc_Ratio) * Flr_3_Proc_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73811,11 +73810,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Soil_DT1 = Flr_3_Soil_Coil_Outlet_Air_Temp - Flr_3_Soil_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Soil_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Soil_DT1 > 0.0,
+    IF Flr_3_Soil_DT1 > 0.0, !- <none>
     SET Flr_3_Soil_Ratio = @Min (Flr_3_Soil_DT2 / Flr_3_Soil_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Soil_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Soil_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Soil_RE = Flr_3_Soil_RE + (Flr_3_Soil_Ratio * Flr_3_Soil_Coil_Energy),  !- <none>
     SET Flr_3_Soil_Heat = Flr_3_Soil_Heat + ((1-Flr_3_Soil_Ratio) * Flr_3_Soil_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73834,11 +73833,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Supply_DT1 = Flr_3_Supply_Coil_Outlet_Air_Temp - Flr_3_Supply_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Supply_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_3_Supply_DT1 > 0.0,
+    IF Flr_3_Supply_DT1 > 0.0,  !- <none>
     SET Flr_3_Supply_Ratio = @Min (Flr_3_Supply_DT2 / Flr_3_Supply_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Supply_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Supply_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Supply_RE = Flr_3_Supply_RE + (Flr_3_Supply_Ratio * Flr_3_Supply_Coil_Energy),  !- <none>
     SET Flr_3_Supply_Heat = Flr_3_Supply_Heat + ((1-Flr_3_Supply_Ratio) * Flr_3_Supply_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73857,11 +73856,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Triage_DT1 = Flr_3_Triage_Coil_Outlet_Air_Temp - Flr_3_Triage_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Triage_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_3_Triage_DT1 > 0.0,
+    IF Flr_3_Triage_DT1 > 0.0,  !- <none>
     SET Flr_3_Triage_Ratio = @Min (Flr_3_Triage_DT2 / Flr_3_Triage_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Triage_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Triage_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Triage_RE = Flr_3_Triage_RE + (Flr_3_Triage_Ratio * Flr_3_Triage_Coil_Energy),  !- <none>
     SET Flr_3_Triage_Heat = Flr_3_Triage_Heat + ((1-Flr_3_Triage_Ratio) * Flr_3_Triage_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73880,11 +73879,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_3_Waiting_DT1 = Flr_3_Waiting_Coil_Outlet_Air_Temp - Flr_3_Waiting_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_3_Waiting_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_3_Waiting_DT1 > 0.0,
+    IF Flr_3_Waiting_DT1 > 0.0,  !- <none>
     SET Flr_3_Waiting_Ratio = @Min (Flr_3_Waiting_DT2 / Flr_3_Waiting_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_3_Waiting_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_3_Waiting_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_3_Waiting_RE = Flr_3_Waiting_RE + (Flr_3_Waiting_Ratio * Flr_3_Waiting_Coil_Energy),  !- <none>
     SET Flr_3_Waiting_Heat = Flr_3_Waiting_Heat + ((1-Flr_3_Waiting_Ratio) * Flr_3_Waiting_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73903,11 +73902,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Clean_DT1 = Flr46_Clean_Coil_Outlet_Air_Temp - Flr46_Clean_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Clean_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr46_Clean_DT1 > 0.0,
+    IF Flr46_Clean_DT1 > 0.0,!- <none>
     SET Flr46_Clean_Ratio = @Min (Flr46_Clean_DT2 / Flr46_Clean_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Clean_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Clean_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Clean_RE = Flr46_Clean_RE + (Flr46_Clean_Ratio * Flr46_Clean_Coil_Energy),  !- <none>
     SET Flr46_Clean_Heat = Flr46_Clean_Heat + ((1-Flr46_Clean_Ratio) * Flr46_Clean_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73926,11 +73925,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Elev_DT1 = Flr46_Elev_Coil_Outlet_Air_Temp - Flr46_Elev_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Elev_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr46_Elev_DT1 > 0.0,
+    IF Flr46_Elev_DT1 > 0.0, !- <none>
     SET Flr46_Elev_Ratio = @Min (Flr46_Elev_DT2 / Flr46_Elev_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Elev_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Elev_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Elev_RE = Flr46_Elev_RE + (Flr46_Elev_Ratio * Flr46_Elev_Coil_Energy),  !- <none>
     SET Flr46_Elev_Heat = Flr46_Elev_Heat + ((1-Flr46_Elev_Ratio) * Flr46_Elev_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73949,11 +73948,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr46_NS_DT1 = Flr46_NS_Coil_Outlet_Air_Temp - Flr46_NS_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_NS_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr46_NS_DT1 > 0.0,
+    IF Flr46_NS_DT1 > 0.0,   !- <none>
     SET Flr46_NS_Ratio = @Min (Flr46_NS_DT2 / Flr46_NS_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_NS_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_NS_Ratio = 1.0,!- <none>
+    ENDIF,                   !- <none>
     SET Flr46_NS_RE = Flr46_NS_RE + (Flr46_NS_Ratio * Flr46_NS_Coil_Energy),  !- <none>
     SET Flr46_NS_Heat = Flr46_NS_Heat + ((1-Flr46_NS_Ratio) * Flr46_NS_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -73972,11 +73971,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Off_DT1 = Flr46_Off_Coil_Outlet_Air_Temp - Flr46_Off_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Off_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr46_Off_DT1 > 0.0,
+    IF Flr46_Off_DT1 > 0.0,  !- <none>
     SET Flr46_Off_Ratio = @Min (Flr46_Off_DT2 / Flr46_Off_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Off_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Off_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Off_RE = Flr46_Off_RE + (Flr46_Off_Ratio * Flr46_Off_Coil_Energy),  !- <none>
     SET Flr46_Off_Heat = Flr46_Off_Heat + ((1-Flr46_Off_Ratio) * Flr46_Off_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -73995,11 +73994,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Pat_1_DT1 = Flr46_Pat_1_Coil_Outlet_Air_Temp - Flr46_Pat_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Pat_1_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr46_Pat_1_DT1 > 0.0,
+    IF Flr46_Pat_1_DT1 > 0.0,!- <none>
     SET Flr46_Pat_1_Ratio = @Min (Flr46_Pat_1_DT2 / Flr46_Pat_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Pat_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Pat_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Pat_1_RE = Flr46_Pat_1_RE + (Flr46_Pat_1_Ratio * Flr46_Pat_1_Coil_Energy),  !- <none>
     SET Flr46_Pat_1_Heat = Flr46_Pat_1_Heat + ((1-Flr46_Pat_1_Ratio) * Flr46_Pat_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74018,11 +74017,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Pat_2_DT1 = Flr46_Pat_2_Coil_Outlet_Air_Temp - Flr46_Pat_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Pat_2_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr46_Pat_2_DT1 > 0.0,
+    IF Flr46_Pat_2_DT1 > 0.0,!- <none>
     SET Flr46_Pat_2_Ratio = @Min (Flr46_Pat_2_DT2 / Flr46_Pat_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Pat_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Pat_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Pat_2_RE = Flr46_Pat_2_RE + (Flr46_Pat_2_Ratio * Flr46_Pat_2_Coil_Energy),  !- <none>
     SET Flr46_Pat_2_Heat = Flr46_Pat_2_Heat + ((1-Flr46_Pat_2_Ratio) * Flr46_Pat_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74041,11 +74040,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Pat_3_DT1 = Flr46_Pat_3_Coil_Outlet_Air_Temp - Flr46_Pat_3_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Pat_3_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr46_Pat_3_DT1 > 0.0,
+    IF Flr46_Pat_3_DT1 > 0.0,!- <none>
     SET Flr46_Pat_3_Ratio = @Min (Flr46_Pat_3_DT2 / Flr46_Pat_3_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Pat_3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Pat_3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Pat_3_RE = Flr46_Pat_3_RE + (Flr46_Pat_3_Ratio * Flr46_Pat_3_Coil_Energy),  !- <none>
     SET Flr46_Pat_3_Heat = Flr46_Pat_3_Heat + ((1-Flr46_Pat_3_Ratio) * Flr46_Pat_3_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74064,11 +74063,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Pat_4_DT1 = Flr46_Pat_4_Coil_Outlet_Air_Temp - Flr46_Pat_4_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Pat_4_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr46_Pat_4_DT1 > 0.0,
+    IF Flr46_Pat_4_DT1 > 0.0,!- <none>
     SET Flr46_Pat_4_Ratio = @Min (Flr46_Pat_4_DT2 / Flr46_Pat_4_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Pat_4_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Pat_4_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Pat_4_RE = Flr46_Pat_4_RE + (Flr46_Pat_4_Ratio * Flr46_Pat_4_Coil_Energy),  !- <none>
     SET Flr46_Pat_4_Heat = Flr46_Pat_4_Heat + ((1-Flr46_Pat_4_Ratio) * Flr46_Pat_4_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74087,11 +74086,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr46_PatCor1_DT1 = Flr46_PatCor1_Coil_Outlet_Air_Temp - Flr46_PatCor1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_PatCor1_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr46_PatCor1_DT1 > 0.0,
+    IF Flr46_PatCor1_DT1 > 0.0,  !- <none>
     SET Flr46_PatCor1_Ratio = @Min (Flr46_PatCor1_DT2 / Flr46_PatCor1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_PatCor1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_PatCor1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_PatCor1_RE = Flr46_PatCor1_RE + (Flr46_PatCor1_Ratio * Flr46_PatCor1_Coil_Energy),  !- <none>
     SET Flr46_PatCor1_Heat = Flr46_PatCor1_Heat + ((1-Flr46_PatCor1_Ratio) * Flr46_PatCor1_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74110,11 +74109,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr46_PatCor2_DT1 = Flr46_PatCor2_Coil_Outlet_Air_Temp - Flr46_PatCor2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_PatCor2_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr46_PatCor2_DT1 > 0.0,
+    IF Flr46_PatCor2_DT1 > 0.0,  !- <none>
     SET Flr46_PatCor2_Ratio = @Min (Flr46_PatCor2_DT2 / Flr46_PatCor2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_PatCor2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_PatCor2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_PatCor2_RE = Flr46_PatCor2_RE + (Flr46_PatCor2_Ratio * Flr46_PatCor2_Coil_Energy),  !- <none>
     SET Flr46_PatCor2_Heat = Flr46_PatCor2_Heat + ((1-Flr46_PatCor2_Ratio) * Flr46_PatCor2_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74133,11 +74132,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Soil_DT1 = Flr46_Soil_Coil_Outlet_Air_Temp - Flr46_Soil_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Soil_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr46_Soil_DT1 > 0.0,
+    IF Flr46_Soil_DT1 > 0.0, !- <none>
     SET Flr46_Soil_Ratio = @Min (Flr46_Soil_DT2 / Flr46_Soil_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Soil_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Soil_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Soil_RE = Flr46_Soil_RE + (Flr46_Soil_Ratio * Flr46_Soil_Coil_Energy),  !- <none>
     SET Flr46_Soil_Heat = Flr46_Soil_Heat + ((1-Flr46_Soil_Ratio) * Flr46_Soil_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74156,11 +74155,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr46_Supply_DT1 = Flr46_Supply_Coil_Outlet_Air_Temp - Flr46_Supply_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr46_Supply_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr46_Supply_DT1 > 0.0,
+    IF Flr46_Supply_DT1 > 0.0,  !- <none>
     SET Flr46_Supply_Ratio = @Min (Flr46_Supply_DT2 / Flr46_Supply_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr46_Supply_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr46_Supply_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr46_Supply_RE = Flr46_Supply_RE + (Flr46_Supply_Ratio * Flr46_Supply_Coil_Energy),  !- <none>
     SET Flr46_Supply_Heat = Flr46_Supply_Heat + ((1-Flr46_Supply_Ratio) * Flr46_Supply_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74179,11 +74178,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Clean_DT1 = Flr_7_Clean_Coil_Outlet_Air_Temp - Flr_7_Clean_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Clean_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_7_Clean_DT1 > 0.0,
+    IF Flr_7_Clean_DT1 > 0.0,!- <none>
     SET Flr_7_Clean_Ratio = @Min (Flr_7_Clean_DT2 / Flr_7_Clean_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Clean_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Clean_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Clean_RE = Flr_7_Clean_RE + (Flr_7_Clean_Ratio * Flr_7_Clean_Coil_Energy),  !- <none>
     SET Flr_7_Clean_Heat = Flr_7_Clean_Heat + ((1-Flr_7_Clean_Ratio) * Flr_7_Clean_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74202,11 +74201,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Elev_DT1 = Flr_7_Elev_Coil_Outlet_Air_Temp - Flr_7_Elev_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Elev_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_7_Elev_DT1 > 0.0,
+    IF Flr_7_Elev_DT1 > 0.0, !- <none>
     SET Flr_7_Elev_Ratio = @Min (Flr_7_Elev_DT2 / Flr_7_Elev_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Elev_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Elev_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Elev_RE = Flr_7_Elev_RE + (Flr_7_Elev_Ratio * Flr_7_Elev_Coil_Energy),  !- <none>
     SET Flr_7_Elev_Heat = Flr_7_Elev_Heat + ((1-Flr_7_Elev_Ratio) * Flr_7_Elev_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74225,11 +74224,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_NS_DT1 = Flr_7_NS_Coil_Outlet_Air_Temp - Flr_7_NS_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_NS_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_7_NS_DT1 > 0.0,
+    IF Flr_7_NS_DT1 > 0.0,   !- <none>
     SET Flr_7_NS_Ratio = @Min (Flr_7_NS_DT2 / Flr_7_NS_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_NS_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_NS_Ratio = 1.0,!- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_NS_RE = Flr_7_NS_RE + (Flr_7_NS_Ratio * Flr_7_NS_Coil_Energy),  !- <none>
     SET Flr_7_NS_Heat = Flr_7_NS_Heat + ((1-Flr_7_NS_Ratio) * Flr_7_NS_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74248,11 +74247,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Off_DT1 = Flr_7_Off_Coil_Outlet_Air_Temp - Flr_7_Off_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Off_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_7_Off_DT1 > 0.0,
+    IF Flr_7_Off_DT1 > 0.0,  !- <none>
     SET Flr_7_Off_Ratio = @Min (Flr_7_Off_DT2 / Flr_7_Off_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Off_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Off_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Off_RE = Flr_7_Off_RE + (Flr_7_Off_Ratio * Flr_7_Off_Coil_Energy),  !- <none>
     SET Flr_7_Off_Heat = Flr_7_Off_Heat + ((1-Flr_7_Off_Ratio) * Flr_7_Off_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74271,11 +74270,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Pat_1_DT1 = Flr_7_Pat_1_Coil_Outlet_Air_Temp - Flr_7_Pat_1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Pat_1_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_7_Pat_1_DT1 > 0.0,
+    IF Flr_7_Pat_1_DT1 > 0.0,!- <none>
     SET Flr_7_Pat_1_Ratio = @Min (Flr_7_Pat_1_DT2 / Flr_7_Pat_1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Pat_1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Pat_1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Pat_1_RE = Flr_7_Pat_1_RE + (Flr_7_Pat_1_Ratio * Flr_7_Pat_1_Coil_Energy),  !- <none>
     SET Flr_7_Pat_1_Heat = Flr_7_Pat_1_Heat + ((1-Flr_7_Pat_1_Ratio) * Flr_7_Pat_1_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74294,11 +74293,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Pat_2_DT1 = Flr_7_Pat_2_Coil_Outlet_Air_Temp - Flr_7_Pat_2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Pat_2_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_7_Pat_2_DT1 > 0.0,
+    IF Flr_7_Pat_2_DT1 > 0.0,!- <none>
     SET Flr_7_Pat_2_Ratio = @Min (Flr_7_Pat_2_DT2 / Flr_7_Pat_2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Pat_2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Pat_2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Pat_2_RE = Flr_7_Pat_2_RE + (Flr_7_Pat_2_Ratio * Flr_7_Pat_2_Coil_Energy),  !- <none>
     SET Flr_7_Pat_2_Heat = Flr_7_Pat_2_Heat + ((1-Flr_7_Pat_2_Ratio) * Flr_7_Pat_2_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74317,11 +74316,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Pat_3_DT1 = Flr_7_Pat_3_Coil_Outlet_Air_Temp - Flr_7_Pat_3_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Pat_3_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    If Flr_7_Pat_3_DT1 > 0.0,
+    If Flr_7_Pat_3_DT1 > 0.0,!- <none>
     SET Flr_7_Pat_3_Ratio = @Min (Flr_7_Pat_3_DT2 / Flr_7_Pat_3_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Pat_3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Pat_3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Pat_3_RE = Flr_7_Pat_3_RE + (Flr_7_Pat_3_Ratio * Flr_7_Pat_3_Coil_Energy),  !- <none>
     SET Flr_7_Pat_3_Heat = Flr_7_Pat_3_Heat + ((1-Flr_7_Pat_3_Ratio) * Flr_7_Pat_3_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74340,11 +74339,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Pat_4_DT1 = Flr_7_Pat_4_Coil_Outlet_Air_Temp - Flr_7_Pat_4_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Pat_4_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_7_Pat_4_DT1 > 0.0,
+    IF Flr_7_Pat_4_DT1 > 0.0,!- <none>
     SET Flr_7_Pat_4_Ratio = @Min (Flr_7_Pat_4_DT2 / Flr_7_Pat_4_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Pat_4_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Pat_4_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Pat_4_RE = Flr_7_Pat_4_RE + (Flr_7_Pat_4_Ratio * Flr_7_Pat_4_Coil_Energy),  !- <none>
     SET Flr_7_Pat_4_Heat = Flr_7_Pat_4_Heat + ((1-Flr_7_Pat_4_Ratio) * Flr_7_Pat_4_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74363,11 +74362,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_PatCor1_DT1 = Flr_7_PatCor1_Coil_Outlet_Air_Temp - Flr_7_PatCor1_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_PatCor1_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_7_PatCor1_DT1 > 0.0,
+    IF Flr_7_PatCor1_DT1 > 0.0,  !- <none>
     SET Flr_7_PatCor1_Ratio = @Min (Flr_7_PatCor1_DT2 / Flr_7_PatCor1_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_PatCor1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_PatCor1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_PatCor1_RE = Flr_7_PatCor1_RE + (Flr_7_PatCor1_Ratio * Flr_7_PatCor1_Coil_Energy),  !- <none>
     SET Flr_7_PatCor1_Heat = Flr_7_PatCor1_Heat + ((1-Flr_7_PatCor1_Ratio) * Flr_7_PatCor1_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74386,11 +74385,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_PatCor2_DT1 = Flr_7_PatCor2_Coil_Outlet_Air_Temp - Flr_7_PatCor2_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_PatCor2_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_7_PatCor2_DT1 > 0.0,
+    IF Flr_7_PatCor2_DT1 > 0.0,  !- <none>
     SET Flr_7_PatCor2_Ratio = @Min (Flr_7_PatCor2_DT2 / Flr_7_PatCor2_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_PatCor2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_PatCor2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_PatCor2_RE = Flr_7_PatCor2_RE + (Flr_7_PatCor2_Ratio * Flr_7_PatCor2_Coil_Energy),  !- <none>
     SET Flr_7_PatCor2_Heat = Flr_7_PatCor2_Heat + ((1-Flr_7_PatCor2_Ratio) * Flr_7_PatCor2_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74409,11 +74408,11 @@
     ELSEIF (AHU_4_CCoil_Energy > 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Soil_DT1 = Flr_7_Soil_Coil_Outlet_Air_Temp - Flr_7_Soil_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Soil_DT2 = @Max (AHU_4_CoolC_Inlet_Node_Temp - AHU_4_Fan_Out) 0,  !- <none>
-    IF Flr_7_Soil_DT1 > 0.0,
+    IF Flr_7_Soil_DT1 > 0.0, !- <none>
     SET Flr_7_Soil_Ratio = @Min (Flr_7_Soil_DT2 / Flr_7_Soil_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Soil_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Soil_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Soil_RE = Flr_7_Soil_RE + (Flr_7_Soil_Ratio * Flr_7_Soil_Coil_Energy),  !- <none>
     SET Flr_7_Soil_Heat = Flr_7_Soil_Heat + ((1-Flr_7_Soil_Ratio) * Flr_7_Soil_Coil_Energy),  !- <none>
     ELSEIF (AHU_4_CCoil_Energy == 0 && AHU_4_HCoil1_Energy == 0),  !- <none>
@@ -74432,11 +74431,11 @@
     ELSEIF (AHU_5_CCoil_Energy > 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
     SET Flr_7_Supply_DT1 = Flr_7_Supply_Coil_Outlet_Air_Temp - Flr_7_Supply_Coil_Inlet_Air_Temp,  !- <none>
     SET Flr_7_Supply_DT2 = @Max (AHU_5_CoolC_Inlet_Node_Temp - AHU_5_Fan_Out) 0,  !- <none>
-    IF Flr_7_Supply_DT1 > 0.0,
+    IF Flr_7_Supply_DT1 > 0.0,  !- <none>
     SET Flr_7_Supply_Ratio = @Min (Flr_7_Supply_DT2 / Flr_7_Supply_DT1) 1,  !- <none>
-    ELSE,
-    SET Flr_7_Supply_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET Flr_7_Supply_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET Flr_7_Supply_RE = Flr_7_Supply_RE + (Flr_7_Supply_Ratio * Flr_7_Supply_Coil_Energy),  !- <none>
     SET Flr_7_Supply_Heat = Flr_7_Supply_Heat + ((1-Flr_7_Supply_Ratio) * Flr_7_Supply_Coil_Energy),  !- <none>
     ELSEIF (AHU_5_CCoil_Energy == 0 && AHU_5_HCoil1_Energy == 0),  !- <none>
@@ -74455,11 +74454,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr1_Core_DT1 = MOB_Flr1_Core_Coil_Outlet_Air_Temp - MOB_Flr1_Core_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr1_Core_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr1_Core_DT1 > 0.0,
+    IF MOB_Flr1_Core_DT1 > 0.0,  !- <none>
     SET MOB_Flr1_Core_Ratio = @Min (MOB_Flr1_Core_DT2 / MOB_Flr1_Core_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr1_Core_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr1_Core_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr1_Core_RE = MOB_Flr1_Core_RE + (MOB_Flr1_Core_Ratio * MOB_Flr1_Core_Coil_Energy),  !- <none>
     SET MOB_Flr1_Core_Heat = MOB_Flr1_Core_Heat + ((1-MOB_Flr1_Core_Ratio) * MOB_Flr1_Core_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74478,11 +74477,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr1_Prm1_DT1 = MOB_Flr1_Prm1_Coil_Outlet_Air_Temp - MOB_Flr1_Prm1_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr1_Prm1_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr1_Prm1_DT1 > 0.0,
+    IF MOB_Flr1_Prm1_DT1 > 0.0,  !- <none>
     SET MOB_Flr1_Prm1_Ratio = @Min (MOB_Flr1_Prm1_DT2 / MOB_Flr1_Prm1_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr1_Prm1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr1_Prm1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr1_Prm1_RE = MOB_Flr1_Prm1_RE + (MOB_Flr1_Prm1_Ratio * MOB_Flr1_Prm1_Coil_Energy),  !- <none>
     SET MOB_Flr1_Prm1_Heat = MOB_Flr1_Prm1_Heat + ((1-MOB_Flr1_Prm1_Ratio) * MOB_Flr1_Prm1_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74501,11 +74500,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr1_Prm2_DT1 = MOB_Flr1_Prm2_Coil_Outlet_Air_Temp - MOB_Flr1_Prm2_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr1_Prm2_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr1_Prm2_DT1 > 0.0,
+    IF MOB_Flr1_Prm2_DT1 > 0.0,  !- <none>
     SET MOB_Flr1_Prm2_Ratio = @Min (MOB_Flr1_Prm2_DT2 / MOB_Flr1_Prm2_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr1_Prm2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr1_Prm2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr1_Prm2_RE = MOB_Flr1_Prm2_RE + (MOB_Flr1_Prm2_Ratio * MOB_Flr1_Prm2_Coil_Energy),  !- <none>
     SET MOB_Flr1_Prm2_Heat = MOB_Flr1_Prm2_Heat + ((1-MOB_Flr1_Prm2_Ratio) * MOB_Flr1_Prm2_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74524,11 +74523,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr1_Prm3_DT1 = MOB_Flr1_Prm3_Coil_Outlet_Air_Temp - MOB_Flr1_Prm3_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr1_Prm3_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr1_Prm3_DT1 > 0.0,
+    IF MOB_Flr1_Prm3_DT1 > 0.0,  !- <none>
     SET MOB_Flr1_Prm3_Ratio = @Min (MOB_Flr1_Prm3_DT2 / MOB_Flr1_Prm3_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr1_Prm3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr1_Prm3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr1_Prm3_RE = MOB_Flr1_Prm3_RE + (MOB_Flr1_Prm3_Ratio * MOB_Flr1_Prm3_Coil_Energy),  !- <none>
     SET MOB_Flr1_Prm3_Heat = MOB_Flr1_Prm3_Heat + ((1-MOB_Flr1_Prm3_Ratio) * MOB_Flr1_Prm3_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74547,11 +74546,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_24_Core_DT1 = MOB_24_Core_Coil_Outlet_Air_Temp - MOB_24_Core_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_24_Core_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_24_Core_DT1 > 0.0,
+    IF MOB_24_Core_DT1 > 0.0,!- <none>
     SET MOB_24_Core_Ratio = @Min (MOB_24_Core_DT2 / MOB_24_Core_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_24_Core_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_24_Core_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_24_Core_RE = MOB_24_Core_RE + (MOB_24_Core_Ratio * MOB_24_Core_Coil_Energy),  !- <none>
     SET MOB_24_Core_Heat = MOB_24_Core_Heat + ((1-MOB_24_Core_Ratio) * MOB_24_Core_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74570,11 +74569,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_24_Prm1_DT1 = MOB_24_Prm1_Coil_Outlet_Air_Temp - MOB_24_Prm1_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_24_Prm1_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_24_Prm1_DT1 > 0.0,
+    IF MOB_24_Prm1_DT1 > 0.0,!- <none>
     SET MOB_24_Prm1_Ratio = @Min (MOB_24_Prm1_DT2 / MOB_24_Prm1_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_24_Prm1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_24_Prm1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_24_Prm1_RE = MOB_24_Prm1_RE + (MOB_24_Prm1_Ratio * MOB_24_Prm1_Coil_Energy),  !- <none>
     SET MOB_24_Prm1_Heat = MOB_24_Prm1_Heat + ((1-MOB_24_Prm1_Ratio) * MOB_24_Prm1_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74593,11 +74592,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_24_Prm2_DT1 = MOB_24_Prm2_Coil_Outlet_Air_Temp - MOB_24_Prm2_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_24_Prm2_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_24_Prm2_DT1 > 0.0,
+    IF MOB_24_Prm2_DT1 > 0.0,!- <none>
     SET MOB_24_Prm2_Ratio = @Min (MOB_24_Prm2_DT2 / MOB_24_Prm2_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_24_Prm2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_24_Prm2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_24_Prm2_RE = MOB_24_Prm2_RE + (MOB_24_Prm2_Ratio * MOB_24_Prm2_Coil_Energy),  !- <none>
     SET MOB_24_Prm2_Heat = MOB_24_Prm2_Heat + ((1-MOB_24_Prm2_Ratio) * MOB_24_Prm2_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74616,11 +74615,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_24_Prm3_DT1 = MOB_24_Prm3_Coil_Outlet_Air_Temp - MOB_24_Prm3_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_24_Prm3_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_24_Prm3_DT1 > 0.0,
+    IF MOB_24_Prm3_DT1 > 0.0,!- <none>
     SET MOB_24_Prm3_Ratio = @Min (MOB_24_Prm3_DT2 / MOB_24_Prm3_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_24_Prm3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_24_Prm3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_24_Prm3_RE = MOB_24_Prm3_RE + (MOB_24_Prm3_Ratio * MOB_24_Prm3_Coil_Energy),  !- <none>
     SET MOB_24_Prm3_Heat = MOB_24_Prm3_Heat + ((1-MOB_24_Prm3_Ratio) * MOB_24_Prm3_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74639,11 +74638,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_24_Prm_4_DT1 = MOB_24_Prm_4_Coil_Outlet_Air_Temp - MOB_24_Prm_4_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_24_Prm_4_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_24_Prm_4_DT1 > 0.0,
+    IF MOB_24_Prm_4_DT1 > 0.0,  !- <none>
     SET MOB_24_Prm_4_Ratio = @Min (MOB_24_Prm_4_DT2 / MOB_24_Prm_4_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_24_Prm_4_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_24_Prm_4_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_24_Prm_4_RE = MOB_24_Prm_4_RE + (MOB_24_Prm_4_Ratio * MOB_24_Prm_4_Coil_Energy),  !- <none>
     SET MOB_24_Prm_4_Heat = MOB_24_Prm_4_Heat + ((1-MOB_24_Prm_4_Ratio) * MOB_24_Prm_4_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74662,11 +74661,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr5_Core_DT1 = MOB_Flr5_Core_Coil_Outlet_Air_Temp - MOB_Flr5_Core_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr5_Core_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr5_Core_DT1 > 0.0,
+    IF MOB_Flr5_Core_DT1 > 0.0,  !- <none>
     SET MOB_Flr5_Core_Ratio = @Min (MOB_Flr5_Core_DT2 / MOB_Flr5_Core_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr5_Core_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr5_Core_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr5_Core_RE = MOB_Flr5_Core_RE + (MOB_Flr5_Core_Ratio * MOB_Flr5_Core_Coil_Energy),  !- <none>
     SET MOB_Flr5_Core_Heat = MOB_Flr5_Core_Heat + ((1-MOB_Flr5_Core_Ratio) * MOB_Flr5_Core_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74685,11 +74684,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr5_Prm1_DT1 = MOB_Flr5_Prm1_Coil_Outlet_Air_Temp - MOB_Flr5_Prm1_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr5_Prm1_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr5_Prm1_DT1 > 0.0,
+    IF MOB_Flr5_Prm1_DT1 > 0.0,  !- <none>
     SET MOB_Flr5_Prm1_Ratio = @Min (MOB_Flr5_Prm1_DT2 / MOB_Flr5_Prm1_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr5_Prm1_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr5_Prm1_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr5_Prm1_RE = MOB_Flr5_Prm1_RE + (MOB_Flr5_Prm1_Ratio * MOB_Flr5_Prm1_Coil_Energy),  !- <none>
     SET MOB_Flr5_Prm1_Heat = MOB_Flr5_Prm1_Heat + ((1-MOB_Flr5_Prm1_Ratio) * MOB_Flr5_Prm1_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74708,11 +74707,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr5_Prm2_DT1 = MOB_Flr5_Prm2_Coil_Outlet_Air_Temp - MOB_Flr5_Prm2_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr5_Prm2_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr5_Prm2_DT1 > 0.0,
+    IF MOB_Flr5_Prm2_DT1 > 0.0,  !- <none>
     SET MOB_Flr5_Prm2_Ratio = @Min (MOB_Flr5_Prm2_DT2 / MOB_Flr5_Prm2_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr5_Prm2_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr5_Prm2_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr5_Prm2_RE = MOB_Flr5_Prm2_RE + (MOB_Flr5_Prm2_Ratio * MOB_Flr5_Prm2_Coil_Energy),  !- <none>
     SET MOB_Flr5_Prm2_Heat = MOB_Flr5_Prm2_Heat + ((1-MOB_Flr5_Prm2_Ratio) * MOB_Flr5_Prm2_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74731,11 +74730,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr5_Prm3_DT1 = MOB_Flr5_Prm3_Coil_Outlet_Air_Temp - MOB_Flr5_Prm3_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr5_Prm3_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr5_Prm3_DT1 > 0.0,
+    IF MOB_Flr5_Prm3_DT1 > 0.0,  !- <none>
     SET MOB_Flr5_Prm3_Ratio = @Min (MOB_Flr5_Prm3_DT2 / MOB_Flr5_Prm3_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr5_Prm3_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr5_Prm3_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr5_Prm3_RE = MOB_Flr5_Prm3_RE + (MOB_Flr5_Prm3_Ratio * MOB_Flr5_Prm3_Coil_Energy),  !- <none>
     SET MOB_Flr5_Prm3_Heat = MOB_Flr5_Prm3_Heat + ((1-MOB_Flr5_Prm3_Ratio) * MOB_Flr5_Prm3_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
@@ -74754,11 +74753,11 @@
     ELSEIF (AHU_6_CCoil_Energy > 0 && AHU_6_HCoil1_Energy == 0),  !- <none>
     SET MOB_Flr5_Prm4_DT1 = MOB_Flr5_Prm4_Coil_Outlet_Air_Temp - MOB_Flr5_Prm4_Coil_Inlet_Air_Temp,  !- <none>
     SET MOB_Flr5_Prm4_DT2 = @Max (AHU_6_CoolC_Inlet_Node_Temp - AHU_6_Fan_Out) 0,  !- <none>
-    IF MOB_Flr5_Prm4_DT1 > 0.0,
+    IF MOB_Flr5_Prm4_DT1 > 0.0,  !- <none>
     SET MOB_Flr5_Prm4_Ratio = @Min (MOB_Flr5_Prm4_DT2 / MOB_Flr5_Prm4_DT1) 1,  !- <none>
-    ELSE,
-    SET MOB_Flr5_Prm4_Ratio = 1.0,
-    ENDIF,
+    ELSE,                    !- <none>
+    SET MOB_Flr5_Prm4_Ratio = 1.0,  !- <none>
+    ENDIF,                   !- <none>
     SET MOB_Flr5_Prm4_RE = MOB_Flr5_Prm4_RE + (MOB_Flr5_Prm4_Ratio * MOB_Flr5_Prm4_Coil_Energy),  !- <none>
     SET MOB_Flr5_Prm4_Heat = MOB_Flr5_Prm4_Heat + ((1-MOB_Flr5_Prm4_Ratio) * MOB_Flr5_Prm4_Coil_Energy),  !- <none>
     ELSEIF (AHU_6_CCoil_Energy == 0 && AHU_6_HCoil1_Energy == 0),  !- <none>

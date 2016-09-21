@@ -10,7 +10,7 @@
 !
 ! Highlights:   "Smart" defaulting of minimum cooling flow fraction and Maximum reheat flow fraction of the VAV terminal units.
 !                Specification of minimum ventilation efficiency. Use of VRP method.
-!               
+!
 ! Description:  Three story, 15 zone office building.
 ! Form:         Area = 4,982 m2 (53,628 ft2); Number of Stories = 3; Shape = rectangle, Aspect ratio = 1.5
 ! Envelope:     Envelope thermal properties vary with climate according to ASHRAE Standard 90.1-2004.
@@ -78,8 +78,8 @@
     YES,                     !- Do Zone Sizing Calculation
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
-    NO,                     !- Run Simulation for Sizing Periods
-    YES;                      !- Run Simulation for Weather File Run Periods
+    NO,                      !- Run Simulation for Sizing Periods
+    YES;                     !- Run Simulation for Weather File Run Periods
 
   Building,
     Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name
@@ -4656,8 +4656,8 @@
     Core_bottom VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Core_bottom VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4666,9 +4666,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Core_bottom VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Core_mid VAV Box Component,  !- Name
@@ -4676,8 +4676,8 @@
     Core_mid VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Core_mid VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4686,9 +4686,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Core_mid VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Core_top VAV Box Component,  !- Name
@@ -4696,8 +4696,8 @@
     Core_top VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Core_top VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4706,9 +4706,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Core_top VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_bot_ZN_1 VAV Box Component,  !- Name
@@ -4716,8 +4716,8 @@
     Perimeter_bot_ZN_1 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_bot_ZN_1 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4726,9 +4726,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_bot_ZN_1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_bot_ZN_2 VAV Box Component,  !- Name
@@ -4736,8 +4736,8 @@
     Perimeter_bot_ZN_2 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_bot_ZN_2 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4746,9 +4746,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_bot_ZN_2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_bot_ZN_3 VAV Box Component,  !- Name
@@ -4756,8 +4756,8 @@
     Perimeter_bot_ZN_3 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_bot_ZN_3 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4766,9 +4766,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_bot_ZN_3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_bot_ZN_4 VAV Box Component,  !- Name
@@ -4776,8 +4776,8 @@
     Perimeter_bot_ZN_4 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_bot_ZN_4 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4786,9 +4786,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_bot_ZN_4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_mid_ZN_1 VAV Box Component,  !- Name
@@ -4796,8 +4796,8 @@
     Perimeter_mid_ZN_1 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_mid_ZN_1 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4806,9 +4806,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_mid_ZN_1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_mid_ZN_2 VAV Box Component,  !- Name
@@ -4816,8 +4816,8 @@
     Perimeter_mid_ZN_2 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_mid_ZN_2 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4826,9 +4826,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_mid_ZN_2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_mid_ZN_3 VAV Box Component,  !- Name
@@ -4836,8 +4836,8 @@
     Perimeter_mid_ZN_3 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_mid_ZN_3 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4846,9 +4846,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_mid_ZN_3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_mid_ZN_4 VAV Box Component,  !- Name
@@ -4856,8 +4856,8 @@
     Perimeter_mid_ZN_4 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_mid_ZN_4 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4866,9 +4866,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_mid_ZN_4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_top_ZN_1 VAV Box Component,  !- Name
@@ -4876,8 +4876,8 @@
     Perimeter_top_ZN_1 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_top_ZN_1 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4886,9 +4886,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_top_ZN_1 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_top_ZN_2 VAV Box Component,  !- Name
@@ -4896,8 +4896,8 @@
     Perimeter_top_ZN_2 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_top_ZN_2 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4906,9 +4906,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_top_ZN_2 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_top_ZN_3 VAV Box Component,  !- Name
@@ -4916,8 +4916,8 @@
     Perimeter_top_ZN_3 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_top_ZN_3 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4926,9 +4926,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_top_ZN_3 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   AirTerminal:SingleDuct:VAV:Reheat,
     Perimeter_top_ZN_4 VAV Box Component,  !- Name
@@ -4936,8 +4936,8 @@
     Perimeter_top_ZN_4 VAV Box Damper Node,  !- Damper Air Outlet Node Name
     Perimeter_top_ZN_4 VAV Box Inlet Node Name,  !- Air Inlet Node Name
     AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
-    ,                !- Zone Minimum Air Flow Input Method
-    ,                     !- Constant Minimum Air Flow Fraction
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Electric,   !- Reheat Coil Object Type
@@ -4946,9 +4946,9 @@
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     Perimeter_top_ZN_4 VAV Box Outlet Node Name,  !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
-    ,                  !- Damper Heating Action
-    ,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    ;           !- Maximum Flow Fraction During Reheat
+    ,                        !- Damper Heating Action
+    ,                        !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+    ;                        !- Maximum Flow Fraction During Reheat
 
   ZoneHVAC:EquipmentList,
     Core_bottom Equipment,   !- Name
@@ -5088,14 +5088,14 @@
     0.0125,                  !- Outdoor Air Flow per Person {m3/s-person}
     ,                        !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     ;                        !- Outdoor Air Flow per Zone {m3/s}
-    
+
   DesignSpecification:ZoneAirDistribution,
     ZoneAirDist,             !- Name
-    1.1,                     !- Zone Air Distribution Effectiveness in Cooling Mode
-    0.8,                     !- Zone Air Distribution Effectiveness in Heating Mode
+    1.1,                     !- Zone Air Distribution Effectiveness in Cooling Mode {dimensionless}
+    0.8,                     !- Zone Air Distribution Effectiveness in Heating Mode {dimensionless}
     ,                        !- Zone Air Distribution Effectiveness Schedule Name
-    0.0,                     !- Zone Secondary Recirculation Fraction
-    0.7;                     !- Minimum Zone Ventilation Efficiency
+    0.0,                     !- Zone Secondary Recirculation Fraction {dimensionless}
+    0.7;                     !- Minimum Zone Ventilation Efficiency {dimensionless}
 
   Sizing:Zone,
     Core_mid,                !- Zone or ZoneList Name
@@ -5759,18 +5759,18 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    VentilationRateProcedure, !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     autosize,                !- Cooling Design Capacity {W}
@@ -5798,18 +5798,18 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    VentilationRateProcedure, !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     autosize,                !- Cooling Design Capacity {W}
@@ -5837,18 +5837,18 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    VentilationRateProcedure, !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0.0,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0.0,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    VentilationRateProcedure,!- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     autosize,                !- Cooling Design Capacity {W}
@@ -5881,30 +5881,28 @@
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_1_OA_MechVent;       !- Mechanical Ventilation Controller Name
-    
+
   Controller:MechanicalVentilation,
     VAV_1_OA_MechVent,       !- Name
     ,                        !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure, !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction
-    Core_bottom,             !- Zone Name
-    SZ DSOA Core_bottom,     !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_bot_ZN_1,      !- Zone Name
-    SZ DSOA Perimeter_bot_ZN_1, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_bot_ZN_2,      !- Zone Name
-    SZ DSOA Perimeter_bot_ZN_2, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_bot_ZN_3,      !- Zone Name
-    SZ DSOA Perimeter_bot_ZN_3, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_bot_ZN_4,      !- Zone Name
-    SZ DSOA Perimeter_bot_ZN_4, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name    
-    
-    
+    VentilationRateProcedure,!- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    Core_bottom,             !- Zone 1 Name
+    SZ DSOA Core_bottom,     !- Design Specification Outdoor Air Object Name 1
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 1
+    Perimeter_bot_ZN_1,      !- Zone 2 Name
+    SZ DSOA Perimeter_bot_ZN_1,  !- Design Specification Outdoor Air Object Name 2
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 2
+    Perimeter_bot_ZN_2,      !- Zone 3 Name
+    SZ DSOA Perimeter_bot_ZN_2,  !- Design Specification Outdoor Air Object Name 3
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 3
+    Perimeter_bot_ZN_3,      !- Zone 4 Name
+    SZ DSOA Perimeter_bot_ZN_3,  !- Design Specification Outdoor Air Object Name 4
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 4
+    Perimeter_bot_ZN_4,      !- Zone 5 Name
+    SZ DSOA Perimeter_bot_ZN_4,  !- Design Specification Outdoor Air Object Name 5
+    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name 5
 
   Controller:OutdoorAir,
     VAV_2_OA_Controller,     !- Name
@@ -5926,29 +5924,29 @@
     MinOA_MotorizedDamper_Sched,  !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
-    VAV_2_OA_MechVent;                        !- Mechanical Ventilation Controller Name
-    
+    VAV_2_OA_MechVent;       !- Mechanical Ventilation Controller Name
+
   Controller:MechanicalVentilation,
     VAV_2_OA_MechVent,       !- Name
     ,                        !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure, !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction
-    Core_mid,                !- Zone Name
-    SZ DSOA Core_mid,        !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_mid_ZN_1,      !- Zone Name
-    SZ DSOA Perimeter_mid_ZN_1, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_mid_ZN_2,      !- Zone Name
-    SZ DSOA Perimeter_mid_ZN_2, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_mid_ZN_3,      !- Zone Name
-    SZ DSOA Perimeter_mid_ZN_3, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_mid_ZN_4,      !- Zone Name
-    SZ DSOA Perimeter_mid_ZN_4, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    VentilationRateProcedure,!- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    Core_mid,                !- Zone 1 Name
+    SZ DSOA Core_mid,        !- Design Specification Outdoor Air Object Name 1
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 1
+    Perimeter_mid_ZN_1,      !- Zone 2 Name
+    SZ DSOA Perimeter_mid_ZN_1,  !- Design Specification Outdoor Air Object Name 2
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 2
+    Perimeter_mid_ZN_2,      !- Zone 3 Name
+    SZ DSOA Perimeter_mid_ZN_2,  !- Design Specification Outdoor Air Object Name 3
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 3
+    Perimeter_mid_ZN_3,      !- Zone 4 Name
+    SZ DSOA Perimeter_mid_ZN_3,  !- Design Specification Outdoor Air Object Name 4
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 4
+    Perimeter_mid_ZN_4,      !- Zone 5 Name
+    SZ DSOA Perimeter_mid_ZN_4,  !- Design Specification Outdoor Air Object Name 5
+    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name 5
 
   Controller:OutdoorAir,
     VAV_3_OA_Controller,     !- Name
@@ -5971,28 +5969,28 @@
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     VAV_3_OA_MechVent;       !- Mechanical Ventilation Controller Name
-    
+
   Controller:MechanicalVentilation,
     VAV_3_OA_MechVent,       !- Name
     ,                        !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure, !- System Outdoor Air Method
-    1.0,                     !- Zone Maximum Outdoor Air Fraction
-    Core_top,                !- Zone Name
-    SZ DSOA Core_top,        !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_top_ZN_1,      !- Zone Name
-    SZ DSOA Perimeter_top_ZN_1, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_top_ZN_2,      !- Zone Name
-    SZ DSOA Perimeter_top_ZN_2, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_top_ZN_3,      !- Zone Name
-    SZ DSOA Perimeter_top_ZN_3, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name
-    Perimeter_top_ZN_4,      !- Zone Name
-    SZ DSOA Perimeter_top_ZN_4, !- Design Specification Outdoor Air Object Name
-    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name
+    VentilationRateProcedure,!- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    Core_top,                !- Zone 1 Name
+    SZ DSOA Core_top,        !- Design Specification Outdoor Air Object Name 1
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 1
+    Perimeter_top_ZN_1,      !- Zone 2 Name
+    SZ DSOA Perimeter_top_ZN_1,  !- Design Specification Outdoor Air Object Name 2
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 2
+    Perimeter_top_ZN_2,      !- Zone 3 Name
+    SZ DSOA Perimeter_top_ZN_2,  !- Design Specification Outdoor Air Object Name 3
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 3
+    Perimeter_top_ZN_3,      !- Zone 4 Name
+    SZ DSOA Perimeter_top_ZN_3,  !- Design Specification Outdoor Air Object Name 4
+    ZoneAirDist,             !- Design Specification Zone Air Distribution Object Name 4
+    Perimeter_top_ZN_4,      !- Zone 5 Name
+    SZ DSOA Perimeter_top_ZN_4,  !- Design Specification Outdoor Air Object Name 5
+    ZoneAirDist;             !- Design Specification Zone Air Distribution Object Name 5
 
 !- Stage 1 : Lennox LGE Measured Total Cooling Capacity Function of Temperature Curve
 !- bi-quadratic curve = a + b*wb + c*wb**2 + d*edb + e*edb**2 + f*wb*edb
@@ -6549,7 +6547,7 @@
     VAV_1_CoolC,             !- Component 2 Name
     VAV_1_OA-VAV_1_CoolCNode,!- Component 2 Inlet Node Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     VAV_1_HeatC,             !- Component 3 Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_1_HeatC-VAV_1_FanNode,  !- Component 3 Outlet Node Name
@@ -6569,7 +6567,7 @@
     VAV_2_CoolC,             !- Component 2 Name
     VAV_2_OA-VAV_2_CoolCNode,!- Component 2 Inlet Node Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     VAV_2_HeatC,             !- Component 3 Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_2_HeatC-VAV_2_FanNode,  !- Component 3 Outlet Node Name
@@ -6589,7 +6587,7 @@
     VAV_3_CoolC,             !- Component 2 Name
     VAV_3_OA-VAV_3_CoolCNode,!- Component 2 Inlet Node Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     VAV_3_HeatC,             !- Component 3 Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Component 3 Inlet Node Name
     VAV_3_HeatC-VAV_3_FanNode,  !- Component 3 Outlet Node Name
@@ -7015,9 +7013,9 @@
     SWHSys1 Pump,            !- Name
     SWHSys1 Supply Inlet Node,  !- Inlet Node Name
     SWHSys1 Pump-SWHSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.85,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent,            !- Pump Control Type
