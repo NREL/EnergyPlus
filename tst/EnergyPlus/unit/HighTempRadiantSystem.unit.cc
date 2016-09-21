@@ -146,8 +146,6 @@ namespace EnergyPlus {
 		int RadSysNum;
 		int SizingTypesNum;
 		
-		HighTempRadiantSystem::clear_state();
-		
 		DataSizing::DataScalableCapSizingON = false;
 		DataSizing::CurZoneEqNum = 1;
 		
