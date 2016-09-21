@@ -62,13 +62,13 @@
 
 #include <map>
 #include <tuple>
+#include <memory>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
 namespace FenestrationCommon {
 
-  class CSeries;
   enum class WavelengthRange;
   enum class Property;
   enum class Side;
@@ -88,6 +88,7 @@ namespace LayerOptics {
   class CBSDFLayer;
   class CCellDescription;
   class CMaterialBand;
+  class CMaterialSingleBand;
 
 }
 
@@ -105,26 +106,21 @@ namespace EnergyPlus {
       const FenestrationCommon::WavelengthRange t_Range );
 
     ///////////////////////////////////////////////////////////////////////////////
-    //   CWCESpecturmProperties
-    ///////////////////////////////////////////////////////////////////////////////
-    class CWCESpecturmProperties {
-    public:
-      static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
-      static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
-      static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
     //   CWCEMaterialFactory
     ///////////////////////////////////////////////////////////////////////////////
     class CWCEMaterialFactory {
     public:
-      CWCEMaterialFactory();
+      CWCEMaterialFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+        const FenestrationCommon::WavelengthRange t_Range );
 
-      std::shared_ptr< LayerOptics::CMaterialBand > getMaterial() const;
+      std::shared_ptr< LayerOptics::CMaterialBand > getMaterial();
 
     protected:
+      virtual void init() = 0;
       std::shared_ptr< LayerOptics::CMaterialBand > m_Material;
+      std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties > m_MaterialProperties;
+      FenestrationCommon::WavelengthRange m_Range;
+      bool m_Initialized;
 
     };
 
@@ -136,35 +132,67 @@ namespace EnergyPlus {
       CWCESpecularMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
 
+    private:
+      void init();
+
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEMaterialDualBandFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    class CWCEMaterialDualBandFactory : public CWCEMaterialFactory {
+    // Common interface class for devices with materials defined over visible and solar range.
+    // It is mainly intended from shading devices.
+    public:
+      CWCEMaterialDualBandFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
+        const FenestrationCommon::WavelengthRange t_Range );
+
+    protected:
+      void init();
+      virtual std::shared_ptr< LayerOptics::CMaterialSingleBand > createVisibleRangeMaterial() = 0;
+      virtual std::shared_ptr< LayerOptics::CMaterialSingleBand > createSolarRangeMaterial() = 0;
+
     };
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEVenetianBlindMaterialsFactory : public CWCEMaterialFactory {
+    class CWCEVenetianBlindMaterialsFactory : public CWCEMaterialDualBandFactory {
     public:
       CWCEVenetianBlindMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
+
+    private:
+      std::shared_ptr< LayerOptics::CMaterialSingleBand > createVisibleRangeMaterial();
+      std::shared_ptr< LayerOptics::CMaterialSingleBand > createSolarRangeMaterial();
 
     };
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEScreenMaterialsFactory : public CWCEMaterialFactory {
+    class CWCEScreenMaterialsFactory : public CWCEMaterialDualBandFactory {
     public:
       CWCEScreenMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
+
+    private:
+      std::shared_ptr< LayerOptics::CMaterialSingleBand > createVisibleRangeMaterial();
+      std::shared_ptr< LayerOptics::CMaterialSingleBand > createSolarRangeMaterial();
 
     };
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
-    class CWCEDiffuseShadeMaterialsFactory : public CWCEMaterialFactory {
+    class CWCEDiffuseShadeMaterialsFactory : public CWCEMaterialDualBandFactory {
     public:
       CWCEDiffuseShadeMaterialsFactory( const std::shared_ptr< EnergyPlus::DataHeatBalance::MaterialProperties >& t_Material,
         const FenestrationCommon::WavelengthRange t_Range );
+
+    private:
+      std::shared_ptr< LayerOptics::CMaterialSingleBand > createVisibleRangeMaterial();
+      std::shared_ptr< LayerOptics::CMaterialSingleBand > createSolarRangeMaterial();
 
     };
 

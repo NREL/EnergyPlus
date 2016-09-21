@@ -56,44 +56,168 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+#include <assert.h>
+
 #include "WindowManagerExteriorData.hh"
 #include "OpticalLayer.hpp"
 #include "FenestrationCommon.hpp"
+#include "CommonWavelengths.hpp"
+#include "BSDFLayer.hpp"
+#include "Series.hpp"
+#include "EquivalentBSDFLayer.hpp"
+#include "FenestrationCommon.hpp"
+#include "MeasuredSampleData.hpp"
 
-using namespace std;
-using namespace LayerOptics;
-using namespace FenestrationCommon;
+#include "WindowManager.hh"
+#include "DataHeatBalance.hh"
 
 namespace EnergyPlus {
 
+  using namespace std;
+
+  using namespace DataSurfaces;
+  using namespace DataHeatBalance;
+  using namespace DataGlobals;
+
+  using namespace LayerOptics;
+  using namespace FenestrationCommon;
+  using namespace SpectralAveraging;
+  using namespace MultiPane;
+
   namespace WindowManager {
 
-    CWindowConstructions& CWindowConstructions::instance() {
-      static CWindowConstructions p_inst;
+	  ///////////////////////////////////////////////////////////////////////////////
+	  //       CWCESpecturmProperties
+	  ///////////////////////////////////////////////////////////////////////////////
+	  shared_ptr< CSeries > CWCESpecturmProperties::getDefaultSolarRadiationSpectrum() {
+		  // SUBROUTINE INFORMATION:
+		  //       AUTHOR         Simon Vidanovic
+		  //       DATE WRITTEN   September 2016
+		  //       MODIFIED       na
+		  //       RE-ENGINEERED  na
+
+		  // PURPOSE OF THIS SUBROUTINE:
+		  // Handles solar radiation spetrum from defalut location or IDF
+		  shared_ptr< CSeries > solarRadiation = make_shared< CSeries >();
+
+		  for( auto i = 1; i <= nume; ++i ) {
+		    solarRadiation->addProperty( wle( i ), e( i ) );
+		  }
+
+		  return solarRadiation;
+	  }
+
+	  ///////////////////////////////////////////////////////////////////////////////
+	  shared_ptr< CSeries > CWCESpecturmProperties::getDefaultVisiblePhotopicResponse() {
+		  // SUBROUTINE INFORMATION:
+		  //       AUTHOR         Simon Vidanovic
+		  //       DATE WRITTEN   September 2016
+		  //       MODIFIED       na
+		  //       RE-ENGINEERED  na
+
+		  // PURPOSE OF THIS SUBROUTINE:
+		  // Handles solar radiation spetrum from defalut location or IDF
+		  shared_ptr< CSeries > visibleResponse = make_shared< CSeries >();
+
+		  for( auto i = 1; i <= numt3; ++i ) {
+			  visibleResponse->addProperty( wlt3( i ), y30( i ) );
+		  }
+
+		  return visibleResponse;
+	  }
+
+	  ///////////////////////////////////////////////////////////////////////////////
+	  shared_ptr< CSpectralSampleData > CWCESpecturmProperties::getSpectralSample( const int t_SampleDataPtr ) {
+		  // SUBROUTINE INFORMATION:
+		  //       AUTHOR         Simon Vidanovic
+		  //       DATE WRITTEN   September 2016
+		  //       MODIFIED       na
+		  //       RE-ENGINEERED  na
+
+		  // PURPOSE OF THIS SUBROUTINE:
+		  // Reads spectral data values
+		  assert( t_SampleDataPtr != 0 ); // It must not be called for zero value
+		  shared_ptr< CSpectralSampleData > aSampleData = make_shared< CSpectralSampleData >();
+		  auto spectralData = SpectralData( t_SampleDataPtr );
+		  int numOfWl = spectralData.NumOfWavelengths;
+		  for( auto i = 1; i <= numOfWl; ++i ) {
+			  double wl = spectralData.WaveLength( i );
+			  double T = spectralData.Trans( i );
+			  double Rf = spectralData.ReflFront( i );
+			  double Rb = spectralData.ReflBack( i );
+			  aSampleData->addRecord( wl, T, Rf, Rb );
+		  }
+
+		  return aSampleData;
+	  }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //       CWindowConstructionsBSDF
+    ///////////////////////////////////////////////////////////////////////////////
+    CWindowConstructionsBSDF& CWindowConstructionsBSDF::instance() {
+      static CWindowConstructionsBSDF p_inst;
       return p_inst;
     }
 
-    CWindowConstructions::CWindowConstructions() {
+    CWindowConstructionsBSDF::CWindowConstructionsBSDF() {
       m_Layers[ WavelengthRange::Solar ] = make_shared< Layers_Map >();
       m_Layers[ WavelengthRange::Visible ] = make_shared< Layers_Map >();
     }
 
-    shared_ptr< IGU_Layers > CWindowConstructions::getLayers( const int t_Index, WavelengthRange t_Range ) {
-      auto & aMap = *m_Layers.at( t_Range );
-      auto it = aMap.find( t_Index );
-      if( it != aMap.end() ) {
-        return it->second;
-      } else {
-        shared_ptr< IGU_Layers > aLayers = make_shared< IGU_Layers >();
-        aMap[ t_Index ] = aLayers;
-        return aLayers;
+    shared_ptr< vector< double > > CWindowConstructionsBSDF::getCommonWavelengths( const WavelengthRange t_Range,
+      const int t_ConstrNum ) const {
+      shared_ptr< IGU_Layers > iguLayers = getLayers( t_Range, t_ConstrNum );
+      CCommonWavelengths aCommonWL;
+      for( auto layer : *iguLayers ) {
+        aCommonWL.addWavelength( layer->getBandWavelengths() );
       }
+      
+      return aCommonWL.getCombinedWavelengths( Combine::Interpolate );
     }
 
-    void CWindowConstructions::pushBSDFLayer( const WavelengthRange t_Range, const int t_ConstrNum, 
+    shared_ptr< IGU_Layers > CWindowConstructionsBSDF::getLayers( const WavelengthRange t_Range,
+      const int t_ConstrNum ) const {
+      Layers_Map aMap = *m_Layers.at( t_Range );
+      auto it = aMap.find( t_ConstrNum );
+      if( it != aMap.end() ) {
+        throw runtime_error( "Incorrect construction selection." );
+      }
+      return aMap.at( t_ConstrNum );
+    }
+
+    void CWindowConstructionsBSDF::pushBSDFLayer( const WavelengthRange t_Range, const int t_ConstrNum, 
       const shared_ptr< CBSDFLayer >& t_Layer ) {
-      Layers_Map aLayers = *m_Layers.at( t_Range );
-      aLayers[ t_ConstrNum ]->push_back( t_Layer );
+      Layers_Map aMap = *m_Layers.at( t_Range );
+      auto it = aMap.find( t_ConstrNum );
+      shared_ptr< IGU_Layers > iguLayers = nullptr;
+      if( it != aMap.end() ) {
+        iguLayers = it->second;
+      } else {
+        iguLayers = make_shared< IGU_Layers >();
+        aMap[ t_ConstrNum ] = iguLayers;
+      }
+
+      iguLayers->push_back( t_Layer );
+    }
+
+    shared_ptr< CEquivalentBSDFLayer > CWindowConstructionsBSDF::getEquivalentLayer(
+      const WavelengthRange t_Range, const int t_ConstrNum ) {
+      auto it = m_Equivalent.find( make_pair( t_Range, t_ConstrNum ) );
+      if( it == m_Equivalent.end() ) {
+        // Layer was not requested before. Need to create it now.
+        shared_ptr< vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
+        shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
+        IGU_Layers iguLayers = *getLayers( t_Range, t_ConstrNum );
+        size_t i = iguLayers.size();
+        shared_ptr< CEquivalentBSDFLayer > aEqLayer = 
+          make_shared< CEquivalentBSDFLayer >( commonWl, aSolarSpectrum, iguLayers[ 0 ] );
+        for( auto i = 1; iguLayers.size(); ++i ) {
+          aEqLayer->addLayer( iguLayers[ i ] );
+        }
+        m_Equivalent[ make_pair( t_Range, t_ConstrNum ) ] = aEqLayer;
+      }
+    
+      return m_Equivalent.at( make_pair( t_Range, t_ConstrNum ) );
     }
 
   }

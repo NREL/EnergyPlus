@@ -63,16 +63,28 @@
 #include <vector>
 #include <map>
 
-
 namespace FenestrationCommon {
 
   enum class WavelengthRange;
+  class CSeries;
+
+}
+
+namespace SpectralAveraging {
+
+  class CSpectralSampleData;
 
 }
 
 namespace LayerOptics {
 
   class CBSDFLayer;
+
+}
+
+namespace MultiPane {
+
+  class CEquivalentBSDFLayer;
 
 }
 
@@ -85,20 +97,40 @@ namespace EnergyPlus {
     // in between. So we will just use map to store layers so that we get optimized search.
     typedef std::map< int, std::shared_ptr< IGU_Layers > > Layers_Map;
 
-    class CWindowConstructions {
-    public:
-      static CWindowConstructions& instance();
+	///////////////////////////////////////////////////////////////////////////////
+	//   CWCESpecturmProperties
+	///////////////////////////////////////////////////////////////////////////////
+	class CWCESpecturmProperties {
+	public:
+		static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
+		static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
+		static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
+	};
 
-      std::shared_ptr< IGU_Layers > getLayers( const int t_Index, FenestrationCommon::WavelengthRange t_Range );
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWindowConstructionsBSDF
+    ///////////////////////////////////////////////////////////////////////////////
+    // Singleton to keep window constructions in BSDF format.
+    class CWindowConstructionsBSDF {
+    public:
+      static CWindowConstructionsBSDF& instance();
       
       void pushBSDFLayer( const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum,
         const std::shared_ptr< LayerOptics::CBSDFLayer >& t_Layer );
 
-    private:
-      CWindowConstructions();
+      std::shared_ptr< MultiPane::CEquivalentBSDFLayer > getEquivalentLayer( 
+        const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum );
 
-      // Need separate optical layer properties for Solar and Visible range
+    private:
+      CWindowConstructionsBSDF();
+      std::shared_ptr< std::vector< double > > getCommonWavelengths( const FenestrationCommon::WavelengthRange t_Range,
+        const int t_ConstrNum ) const;
+      std::shared_ptr< IGU_Layers > getLayers( const FenestrationCommon::WavelengthRange t_Range,
+        const int t_ConstrNum ) const;
+
+      // Need separate layer properties for Solar and Visible range
       std::map< FenestrationCommon::WavelengthRange, std::shared_ptr< Layers_Map > > m_Layers;
+      std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiPane::CEquivalentBSDFLayer > > m_Equivalent;
       
     };
 

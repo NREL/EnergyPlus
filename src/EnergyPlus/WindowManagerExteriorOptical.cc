@@ -119,8 +119,8 @@ namespace EnergyPlus {
       //       RE-ENGINEERED  na
 
       // PURPOSE OF THIS SUBROUTINE:
-      // Returns correctly create BSDF layer
-      shared_ptr< CBSDFLayer > aLayer = nullptr;
+      // BSDF will be created in different ways that is based on material type
+
       shared_ptr< CWCEBSDFLayerFactory > aFactory = nullptr;
       if( t_Material->Group == WindowGlass ) {
         aFactory = make_shared< CWCESpecularLayerFactory >( t_Material, t_Range );
@@ -131,7 +131,7 @@ namespace EnergyPlus {
       } else if( t_Material->Group == Shade ) {
         aFactory = make_shared< CWCEDiffuseShadeLayerFactory >( t_Material, t_Range );
       }
-      return aLayer;
+      return aFactory->getBSDFLayer();
     }
 
     void InitWCEOpticalData() {
@@ -142,10 +142,9 @@ namespace EnergyPlus {
       //       RE-ENGINEERED  na
 
       // PURPOSE OF THIS SUBROUTINE:
-      // Calculation of diffuse optical properties for IGU layers. These properties that are calculated one
-      // time only since they are independent on sun position.
+      // Initialize construction layers in Solar and Visible spectrum.
 
-      CWindowConstructions aWinConst = CWindowConstructions::instance();
+      CWindowConstructionsBSDF aWinConst = CWindowConstructionsBSDF::instance();
       for( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
         auto& construction( Construct( ConstrNum ) );
         if( construction.isGlazingConstruction() ) {
@@ -168,78 +167,18 @@ namespace EnergyPlus {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    //       CWCESpecturmProperties
-    ///////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CSeries > CWCESpecturmProperties::getDefaultSolarRadiationSpectrum() {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Handles solar radiation spetrum from defalut location or IDF
-      shared_ptr< CSeries > solarRadiation = make_shared< CSeries >();
-
-      for( auto i = 1; i <= nume; ++i ) {
-        solarRadiation->addProperty( wle( i ), e( i ) );
-      }
-
-      return solarRadiation;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CSeries > CWCESpecturmProperties::getDefaultVisiblePhotopicResponse() {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Handles solar radiation spetrum from defalut location or IDF
-      shared_ptr< CSeries > visibleResponse = make_shared< CSeries >();
-
-      for( auto i = 1; i <= numt3; ++i ) {
-        visibleResponse->addProperty( wlt3( i ), y30( i ) );
-      }
-
-      return visibleResponse;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    shared_ptr< CSpectralSampleData > CWCESpecturmProperties::getSpectralSample( const int t_SampleDataPtr ) {
-      // SUBROUTINE INFORMATION:
-      //       AUTHOR         Simon Vidanovic
-      //       DATE WRITTEN   September 2016
-      //       MODIFIED       na
-      //       RE-ENGINEERED  na
-
-      // PURPOSE OF THIS SUBROUTINE:
-      // Reads spectral data values
-      assert( t_SampleDataPtr != 0 ); // It must not be called for zero value
-      shared_ptr< CSpectralSampleData > aSampleData = make_shared< CSpectralSampleData >();
-      auto spectralData = SpectralData( t_SampleDataPtr );
-      int numOfWl = spectralData.NumOfWavelengths;
-      for( auto i = 1; i <= numOfWl; ++i ) {
-        double wl = spectralData.WaveLength( i );
-        double T = spectralData.Trans( i );
-        double Rf = spectralData.ReflFront( i );
-        double Rb = spectralData.ReflBack( i );
-        aSampleData->addRecord( wl, T, Rf, Rb );
-      }
-
-      return aSampleData;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
     //   CWCEMaterialFactory
     ///////////////////////////////////////////////////////////////////////////////
-    CWCEMaterialFactory::CWCEMaterialFactory() {
+    CWCEMaterialFactory::CWCEMaterialFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) : m_MaterialProperties( t_Material ), m_Range( t_Range ), m_Initialized( false ) {
 
     }
 
-    shared_ptr< CMaterialBand > CWCEMaterialFactory::getMaterial() const {
+    shared_ptr< CMaterialBand > CWCEMaterialFactory::getMaterial() {
+      if( !m_Initialized ) {
+        init();
+        m_Initialized = true;
+      }
       return m_Material;
     }
 
@@ -247,113 +186,167 @@ namespace EnergyPlus {
     //   CWCESpecularMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
     CWCESpecularMaterialsFactory::CWCESpecularMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
-      const WavelengthRange t_Range ) : CWCEMaterialFactory() {
+      const WavelengthRange t_Range ) : CWCEMaterialFactory( t_Material, t_Range ) {
+      
+    }
+
+    void CWCESpecularMaterialsFactory::init() {
       shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
-      shared_ptr< CSpectralSampleData > aSampleData = CWCESpecturmProperties::getSpectralSample( t_Material->GlassSpectralDataPtr );
+      shared_ptr< CSpectralSampleData > aSampleData = 
+        CWCESpecturmProperties::getSpectralSample( m_MaterialProperties->GlassSpectralDataPtr );
       shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
 
       SpecularMaterialType aType = SpecularMaterialType::Monolithic;
       CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( m_Range );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
-      if( t_Range == WavelengthRange::Visible ) {
+
+      if( m_Range == WavelengthRange::Visible ) {
         shared_ptr< CSeries > aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse();
         aSample->setDetectorData( aPhotopicResponse );
       }
 
-      double thickness = t_Material->Thickness;
+      double thickness = m_MaterialProperties->Thickness;
       m_Material = make_shared< CMaterialSample >( aSample, thickness, aType, lowLambda, highLambda );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCEMaterialDualBandFactory
+    ///////////////////////////////////////////////////////////////////////////////
+    CWCEMaterialDualBandFactory::CWCEMaterialDualBandFactory( const shared_ptr< MaterialProperties >& t_Material,
+      const WavelengthRange t_Range ) : CWCEMaterialFactory( t_Material, t_Range ) {
+      
+    }
+
+    void CWCEMaterialDualBandFactory::init() {
+      if( m_Range == WavelengthRange::Visible ) {
+        m_Material = createVisibleRangeMaterial();
+      } else {
+        shared_ptr< CMaterialSingleBand > aVisibleRangeMaterial = createVisibleRangeMaterial();
+        shared_ptr< CMaterialSingleBand > aSolarRangeMaterial = createSolarRangeMaterial();
+        // Ratio visible to solar range. It can be calculated from solar spectrum.
+        double ratio = 0.49;
+        m_Material = make_shared< CMaterialDualBand >( aVisibleRangeMaterial, aSolarRangeMaterial, ratio );
+      }
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEVenetianBlindMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
     CWCEVenetianBlindMaterialsFactory::CWCEVenetianBlindMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
-      const WavelengthRange t_Range ) : CWCEMaterialFactory() {
-      int blindDataPtr = t_Material->BlindDataPtr;
+      const WavelengthRange t_Range ) : CWCEMaterialDualBandFactory( t_Material, t_Range ) {
+      
+    }
+
+    shared_ptr< CMaterialSingleBand > CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial() {
+      int blindDataPtr = m_MaterialProperties->BlindDataPtr;
+      auto& blind( Blind( blindDataPtr ) );
+      assert( blindDataPtr > 0 );
+      
+      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Visible );
+      double lowLambda = aRange.minLambda();
+      double highLambda = aRange.maxLambda();
+      
+      double Tf = blind.SlatTransVisDiffDiff;
+      double Tb = blind.SlatTransVisDiffDiff;
+      double Rf = blind.SlatFrontReflVisDiffDiff;
+      double Rb = blind.SlatBackReflVisDiffDiff;
+      
+      return make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+    }
+    
+    shared_ptr< CMaterialSingleBand > CWCEVenetianBlindMaterialsFactory::createSolarRangeMaterial() {
+      int blindDataPtr = m_MaterialProperties->BlindDataPtr;
       auto& blind( Blind( blindDataPtr ) );
       assert( blindDataPtr > 0 );
 
       CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Solar );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
-      double Tf = 0;
-      double Tb = 0;
-      double Rf = 0;
-      double Rb = 0;
-      if( t_Range == WavelengthRange::Solar ) {
-        Tf = blind.SlatTransSolDiffDiff;
-        Tb = blind.SlatTransSolDiffDiff;
-        Rf = blind.SlatFrontReflSolDiffDiff;
-        Rb = blind.SlatBackReflSolDiffDiff;
-      } else if( t_Range == WavelengthRange::Visible ) {
-        Tf = blind.SlatTransVisDiffDiff;
-        Tb = blind.SlatTransVisDiffDiff;
-        Rf = blind.SlatFrontReflVisDiffDiff;
-        Rb = blind.SlatBackReflVisDiffDiff;
-      }
+      double Tf = blind.SlatTransSolDiffDiff;
+      double Tb = blind.SlatTransSolDiffDiff;
+      double Rf = blind.SlatFrontReflSolDiffDiff;
+      double Rb = blind.SlatBackReflSolDiffDiff;
 
-      m_Material = make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+      return make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEScreenMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
     CWCEScreenMaterialsFactory::CWCEScreenMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
-      const WavelengthRange t_Range ) : CWCEMaterialFactory() {
+      const WavelengthRange t_Range ) : CWCEMaterialDualBandFactory( t_Material, t_Range ) {
       // Current EnergyPlus model does not support material transmittance different from zero.
       // To enable that, it would be necessary to change input in IDF
+ 
+    }
+
+    shared_ptr< CMaterialSingleBand > CWCEScreenMaterialsFactory::createVisibleRangeMaterial() {
       CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Visible );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
       double Tf = 0;
       double Tb = 0;
-      double Rf = 0;
-      double Rb = 0;
-      if( t_Range == WavelengthRange::Solar ) {
-        Rf = t_Material->ReflectShade;
-        Rb = t_Material->ReflectShade;
-      } else if( t_Range == WavelengthRange::Visible ) {
-        Rf = t_Material->ReflectShadeVis;
-        Rb = t_Material->ReflectShadeVis;
-      }
+      double Rf = m_MaterialProperties->ReflectShadeVis;
+      double Rb = m_MaterialProperties->ReflectShadeVis;
 
-      m_Material = make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+      return make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+    }
+
+    shared_ptr< CMaterialSingleBand > CWCEScreenMaterialsFactory::createSolarRangeMaterial() {
+      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Solar );
+      double lowLambda = aRange.minLambda();
+      double highLambda = aRange.maxLambda();
+
+      double Tf = 0;
+      double Tb = 0;
+      double Rf = m_MaterialProperties->ReflectShade;
+      double Rb = m_MaterialProperties->ReflectShade;
+
+      return make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     //   CWCEDiffuseShadeMaterialsFactory
     ///////////////////////////////////////////////////////////////////////////////
     CWCEDiffuseShadeMaterialsFactory::CWCEDiffuseShadeMaterialsFactory( const shared_ptr< MaterialProperties >& t_Material,
-      const WavelengthRange t_Range ) {
+      const WavelengthRange t_Range ) : CWCEMaterialDualBandFactory( t_Material, t_Range ) {
+      
+    }
+
+    shared_ptr< CMaterialSingleBand > CWCEDiffuseShadeMaterialsFactory::createVisibleRangeMaterial() {
       CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( t_Range );
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Visible );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
-      double Tf = 0;
-      double Tb = 0;
-      double Rf = 0;
-      double Rb = 0;
-      if( t_Range == WavelengthRange::Solar ) {
-        Tf = t_Material->Trans;
-        Tb = t_Material->Trans;
-        Rf = t_Material->ReflectShade;
-        Rb = t_Material->ReflectShade;
-      } else if( t_Range == WavelengthRange::Visible ) {
-        Tf = t_Material->TransVis;
-        Tb = t_Material->TransVis;
-        Rf = t_Material->ReflectShadeVis;
-        Rb = t_Material->ReflectShadeVis;
-      }
+      double Tf = m_MaterialProperties->TransVis;
+      double Tb = m_MaterialProperties->TransVis;
+      double Rf = m_MaterialProperties->ReflectShadeVis;
+      double Rb = m_MaterialProperties->ReflectShadeVis;
 
-      m_Material = make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+      return make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
+    }
 
+    shared_ptr< CMaterialSingleBand > CWCEDiffuseShadeMaterialsFactory::createSolarRangeMaterial() {
+      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
+      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Solar );
+      double lowLambda = aRange.minLambda();
+      double highLambda = aRange.maxLambda();
+
+      double Tf = m_MaterialProperties->Trans;
+      double Tb = m_MaterialProperties->Trans;
+      double Rf = m_MaterialProperties->ReflectShade;
+      double Rb = m_MaterialProperties->ReflectShade;
+
+      return make_shared< CMaterialSingleBand >( Tf, Tb, Rf, Rb, lowLambda, highLambda );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -361,7 +354,7 @@ namespace EnergyPlus {
     ///////////////////////////////////////////////////////////////////////////////
     CWCEBSDFLayerFactory::CWCEBSDFLayerFactory(
       const shared_ptr< MaterialProperties >& t_Material, const WavelengthRange t_Range ) : 
-      m_Material( t_Material ), m_Range( t_Range ), m_MaterialFactory( nullptr ) {
+      m_Material( t_Material ), m_Range( t_Range ), m_Initialized( false ), m_MaterialFactory( nullptr ) {
       
     }
 
