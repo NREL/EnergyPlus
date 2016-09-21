@@ -2092,7 +2092,7 @@
     DX Cooling Coil System 1,!- Component 2 Name
     Mixed Air Node 1,        !- Component 2 Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name
@@ -2120,7 +2120,7 @@
     Desiccant DXSystem Supply Fan,  !- Component 4 Name
     HX Process Outlet Node,  !- Component 4 Inlet Node Name
     Desiccant Supply Fan Outlet Node,  !- Component 4 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 5 Object Type
+    Coil:Heating:Fuel,       !- Component 5 Object Type
     Desiccant Process Heating Coil,  !- Component 5 Name
     Desiccant Supply Fan Outlet Node,  !- Component 5 Inlet Node Name
     Desiccant DXSystem Air Loop Outlet Node;  !- Component 5 Outlet Node Name
@@ -2468,7 +2468,7 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE1-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2488,7 +2488,7 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE2-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2508,7 +2508,7 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE3-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2528,7 +2528,7 @@
     0.3,                     !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     SPACE4-1 Zone Coil,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2837,7 +2837,7 @@
     Fan:ConstantVolume,      !- Regeneration Air Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
-    Coil:Heating:Fuel,        !- Regeneration Air Heater Object Type
+    Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type
     Desiccant Regen Coil,    !- Regeneration Air Heater Name
     46.111111,               !- Regeneration Inlet Air Setpoint Temperature {C}
     Coil:Cooling:DX:SingleSpeed,  !- Companion Cooling Coil Object Type
@@ -2961,7 +2961,7 @@
     Fan:OnOff,               !- Regeneration Air Fan Object Type
     OA Desiccant Regen Fan,  !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
-    Coil:Heating:Fuel,        !- Regeneration Air Heater Object Type
+    Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type
     OA Desiccant Regen Coil, !- Regeneration Air Heater Name
     46.111111;               !- Regeneration Inlet Air Setpoint Temperature {C}
 

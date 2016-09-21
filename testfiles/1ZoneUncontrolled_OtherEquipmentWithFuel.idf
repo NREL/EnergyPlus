@@ -385,10 +385,10 @@
   Output:Variable,*,Other Equipment Total Heating Energy,monthly;
 
   Output:Variable,*,Zone Other Equipment Total Heating Energy,monthly;
-  
-  Output:Variable,*,Other Equipment FuelOil#2 Rate,hourly; !- Zone Average [W]
-  
-  Output:Variable,*,Other Equipment Total Heating Rate,hourly; !- Zone Average [W]
+
+  Output:Variable,*,Other Equipment FuelOil#2 Rate,hourly;
+
+  Output:Variable,*,Other Equipment Total Heating Rate,hourly;
 
   Output:VariableDictionary,IDF;
 
@@ -402,7 +402,7 @@
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Facility,hourly;
 
-  Output:Meter,FuelOil#2:Facility,hourly; !- [J]
+  Output:Meter,FuelOil#2:Facility,hourly;
 
   OutputControl:Table:Style,
     ALL;                     !- Column Separator
@@ -452,13 +452,14 @@
   Schedule:Constant,AlwaysOn,On/Off,1.0;
 
   Schedule:Compact,
-    OthEqSch,
-    Fraction,
-    Through 12/31,
-    For: AllDays,
-    Until: 4:00, 0.1,
-    Until: 8:00, 0.4,
-    Until: 12:00, 0.6,
-    Until: 16:00, 0.8,
-    Until: 20:00, 1.0,
-    Until: 24:00, 0.5;
+    OthEqSch,                !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through 12/31,           !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 4:00,0.1,         !- Field 3
+    Until: 8:00,0.4,         !- Field 5
+    Until: 12:00,0.6,        !- Field 7
+    Until: 16:00,0.8,        !- Field 9
+    Until: 20:00,1.0,        !- Field 11
+    Until: 24:00,0.5;        !- Field 13
+

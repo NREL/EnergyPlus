@@ -18,9 +18,7 @@
 ! grout (k= 1.471 W/m.K). The flow rate per borehole is .1514 kg/s. The pipe given
 ! is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06
 ! (76.2m/4.572m [300ft/15ft])
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
-
 !************ LINE CONFIGURATION: 1 x 2, line, Standard Grout *****************
 ! The G-function is defined by the following data pairs
 
@@ -40,7 +38,7 @@
     0.0267,                  !- Pipe Out Diameter {m}
     0.0254,                  !- U-Tube Distance {m}
     0.00243,                 !- Pipe Thickness {m}
-    1,                       !- Maximum Length of Simulation
+    1,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     76,                      !- Number of Data Pairs of the G Function
     -14.583933,              !- G-Function Ln(T/Ts) Value 1
@@ -215,7 +213,7 @@
     0.0267,                  !- Pipe Out Diameter {m}
     0.0254,                  !- U-Tube Distance {m}
     0.00243,                 !- Pipe Thickness {m}
-    1,                       !- Maximum Length of Simulation
+    1,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     76,                      !- Number of Data Pairs of the G Function
     -14.583933,              !- G-Function Ln(T/Ts) Value 1
@@ -390,7 +388,7 @@
     0.0267,                  !- Pipe Out Diameter {m}
     0.0254,                  !- U-Tube Distance {m}
     0.00243,                 !- Pipe Thickness {m}
-    1,                       !- Maximum Length of Simulation
+    1,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     76,                      !- Number of Data Pairs of the G Function
     -14.583933,              !- G-Function Ln(T/Ts) Value 1
@@ -565,7 +563,7 @@
     0.0267,                  !- Pipe Out Diameter {m}
     0.0254,                  !- U-Tube Distance {m}
     0.00243,                 !- Pipe Thickness {m}
-    1,                       !- Maximum Length of Simulation
+    1,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     76,                      !- Number of Data Pairs of the G Function
     -14.583933,              !- G-Function Ln(T/Ts) Value 1
@@ -740,7 +738,7 @@
     0.0267,                  !- Pipe Out Diameter {m}
     0.0254,                  !- U-Tube Distance {m}
     0.00243,                 !- Pipe Thickness {m}
-    1,                       !- Maximum Length of Simulation
+    1,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     76,                      !- Number of Data Pairs of the G Function
     -14.583933,              !- G-Function Ln(T/Ts) Value 1
@@ -915,7 +913,7 @@
     0.0267,                  !- Pipe Out Diameter {m}
     0.0254,                  !- U-Tube Distance {m}
     0.00243,                 !- Pipe Thickness {m}
-    1,                       !- Maximum Length of Simulation
+    1,                       !- Maximum Length of Simulation {years}
     0.0005,                  !- G-Function Reference Ratio {dimensionless}
     76,                      !- Number of Data Pairs of the G Function
     -14.583933,              !- G-Function Ln(T/Ts) Value 1

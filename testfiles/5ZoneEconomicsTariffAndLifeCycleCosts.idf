@@ -1882,17 +1882,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2943,16 +2943,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -3183,16 +3183,16 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3200,9 +3200,9 @@
     Generator Load Center,   !- Name
     Generator list,          !- Generator List Name
     Baseload,                !- Generator Operation Scheme Type
-    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     AlternatingCurrent;      !- Electrical Buss Type
 
   ElectricLoadCenter:Generators,
@@ -3288,10 +3288,11 @@
     1.0;                     !- Maximum Value of x
 
 ! 1 gallon per minute is 0.0000631 m3/2
+
   WaterUse:Equipment,
     SPACE1-1 DHW 1,          !- Name
     Bathrooms,               !- End-Use Subcategory
-    0.0000631,                 !- Peak Flow Rate {m3/s}
+    0.0000631,               !- Peak Flow Rate {m3/s}
     Bathroom Flow Frac Sch,  !- Flow Rate Fraction Schedule Name
     Bathroom Target Temp Schedule,  !- Target Temperature Schedule Name
     Hot Water Supply Temp Schedule;  !- Hot Water Supply Temperature Schedule Name
@@ -3299,7 +3300,7 @@
   WaterUse:Equipment,
     SPACE2-1 DHW 1,          !- Name
     Kitchen Sink,            !- End-Use Subcategory
-    0.0000631,                  !- Peak Flow Rate {m3/s}
+    0.0000631,               !- Peak Flow Rate {m3/s}
     Kitchen Flow Frac Sch,   !- Flow Rate Fraction Schedule Name
     Kitchen Target Temp Schedule,  !- Target Temperature Schedule Name
     Hot Water Supply Temp Schedule;  !- Hot Water Supply Temperature Schedule Name
@@ -3307,11 +3308,10 @@
   WaterUse:Equipment,
     SPACE3-1 DHW 1,          !- Name
     Bathrooms,               !- End-Use Subcategory
-    0.0000631,                 !- Peak Flow Rate {m3/s}
+    0.0000631,               !- Peak Flow Rate {m3/s}
     Bathroom Flow Frac Sch,  !- Flow Rate Fraction Schedule Name
     Bathroom Target Temp Schedule,  !- Target Temperature Schedule Name
     Hot Water Supply Temp Schedule;  !- Hot Water Supply Temperature Schedule Name
-
 
   Schedule:Compact,
     Bathroom Flow Frac Sch,  !- Name
@@ -3344,9 +3344,9 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 10:00,0.0,        !- Field 7
-    UNTIL: 14:00,0.3,        !- Field 11
-    UNTIL: 24:00,0.0;        !- Field 13
+    UNTIL: 10:00,0.0,        !- Field 3
+    UNTIL: 14:00,0.3,        !- Field 5
+    UNTIL: 24:00,0.0;        !- Field 7
 
   Schedule:Compact,
     Kitchen Target Temp Schedule,  !- Name
@@ -3355,25 +3355,25 @@
     For: AllDays,            !- Field 2
     Until: 24:00,50.0;       !- Field 3
 
-UtilityCost:Tariff,
-  Water Tariff,                           !- Name
-  Water:Facility,                         !- Output Meter Name
-  UserDefined,                            !- Conversion Factor Choice
-  1,                                      !- Energy Conversion Factor
-  ,                                       !- Demand Conversion Factor
-  ,                                       !- Time of Use Period Schedule Name
-  ,                                       !- Season Schedule Name
-  ,                                       !- Month Schedule Name
-  ,                                       !- Demand Window Length
-  0.0;                                    !- Monthly Charge or Variable Name
+  UtilityCost:Tariff,
+    Water Tariff,            !- Name
+    Water:Facility,          !- Output Meter Name
+    UserDefined,             !- Conversion Factor Choice
+    1,                       !- Energy Conversion Factor
+    ,                        !- Demand Conversion Factor
+    ,                        !- Time of Use Period Schedule Name
+    ,                        !- Season Schedule Name
+    ,                        !- Month Schedule Name
+    ,                        !- Demand Window Length
+    0.0;                     !- Monthly Charge or Variable Name
 
-UtilityCost:Charge:Simple,
-  WaterTariffEnergyCharge,                !- Name
-  Water Tariff,                           !- Tariff Name
-  totalEnergy,                            !- Source Variable
-  Annual,                                 !- Season
-  EnergyCharges,                          !- Category Variable Name
-  7.0;                                   !- Cost per Unit Value or Variable Name
+  UtilityCost:Charge:Simple,
+    WaterTariffEnergyCharge, !- Name
+    Water Tariff,            !- Tariff Name
+    totalEnergy,             !- Source Variable
+    Annual,                  !- Season
+    EnergyCharges,           !- Category Variable Name
+    7.0;                     !- Cost per Unit Value or Variable Name
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 

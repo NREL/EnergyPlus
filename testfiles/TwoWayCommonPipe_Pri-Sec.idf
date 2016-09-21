@@ -2406,17 +2406,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2517,7 +2517,7 @@
     CycleOnAnyZoneFansOnly,  !- Control Type
     1,                       !- Thermostat Tolerance {deltaC}
     3600,                    !- Cycling Run Time {s}
-    ;                        !- Control Zone Name
+    ;                        !- Control Zone or Zone List Name
 
   Schedule:Compact,
     COMPACT HVAC-ALWAYS 14,  !- Name
@@ -2778,9 +2778,9 @@
     Hot Water Loop HW Supply Pump,  !- Name
     Hot Water Loop HW Supply Inlet,  !- Inlet Node Name
     Hot Water Loop HW Pump Outlet,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0,                       !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT,            !- Pump Control Type
@@ -2989,9 +2989,9 @@
     Chilled Water Loop Pri Supply Pump,  !- Name
     Chilled Water Loop Supply Inlet,  !- Inlet Node Name
     Chilled Water Loop Pri Pump Outlet,  !- Outlet Node Name
-    0.12396E-02,             !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    316.71,                  !- Rated Power Consumption {W}
+    0.12396E-02,             !- Design Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    316.71,                  !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0,                       !- Fraction of Motor Inefficiencies to Fluid Stream
     INTERMITTENT,            !- Pump Control Type
@@ -3097,16 +3097,16 @@
     Chilled Water Loop Demand Pump,  !- Name
     Chilled Water Loop Demand Inlet,  !- Inlet Node Name
     Chilled Water Loop Demand Pump Outlet,  !- Outlet Node Name
-    0.1E-02,                 !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    0.1E-02,                 !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0,                       !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     COMPACT HVAC-ALWAYS 1;   !- Pump Flow Rate Schedule Name
 
@@ -3342,16 +3342,16 @@
     Chilled Water Loop CndW Supply Pump,  !- Name
     Chilled Water Loop CndW Supply Inlet,  !- Inlet Node Name
     Chilled Water Loop CndW Pump Outlet,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0,                       !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     COMPACT HVAC-ALWAYS 1;   !- Pump Flow Rate Schedule Name
 
