@@ -2904,58 +2904,7 @@ namespace SystemReports {
 						TypeOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).TypeOf;
 						NameOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).Name;
 						NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
-						VarIndexes.allocate( NumVariables );
-						VarTypes.allocate( NumVariables );
-						IndexTypes.allocate( NumVariables );
-						UnitsStrings.allocate( NumVariables );
-						ResourceTypes.allocate( NumVariables );
-						EndUses.allocate( NumVariables );
-						Groups.allocate( NumVariables );
-						Names.allocate( NumVariables );
-						ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar.allocate( NumVariables );
-
-						ThisReportData.Branch( BranchNum ).Comp( CompNum ).NumMeteredVars = NumVariables;
-						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
-
-						ModeFlagOn = true;
-						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-							if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
-								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
-								}
-								ModeFlagOn = false;
-							} else if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
-								for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
-								}
-								ModeFlagOn = false;
-							} else if ( ModeFlagOn ) {
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
-							}
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
-						}
-
-						VarIndexes.deallocate();
-						VarTypes.deallocate();
-						IndexTypes.deallocate();
-						UnitsStrings.deallocate();
-						ResourceTypes.deallocate();
-						EndUses.deallocate();
-						Groups.deallocate();
-						Names.deallocate();
-
-						for ( SubCompNum = 1; SubCompNum <= ThisReportData.Branch( BranchNum ).Comp( CompNum ).NumSubComps; ++SubCompNum ) {
-							// Get complete list of components for complex branches
-							TypeOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
-							NameOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
-							NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+						if ( NumVariables > 0 ){
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
@@ -2964,33 +2913,34 @@ namespace SystemReports {
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
 							Names.allocate( NumVariables );
-							ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
+							ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar.allocate( NumVariables );
 
+							ThisReportData.Branch( BranchNum ).Comp( CompNum ).NumMeteredVars = NumVariables;
 							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
-								if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
+								if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
 									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-										ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+										ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
 									}
 									ModeFlagOn = false;
-								} else if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+								} else if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
 									for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
-										ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+										ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
 									}
 									ModeFlagOn = false;
 								} else if ( ModeFlagOn ) {
-									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
 								}
-								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
 							}
 
 							VarIndexes.deallocate();
@@ -3001,7 +2951,59 @@ namespace SystemReports {
 							EndUses.deallocate();
 							Groups.deallocate();
 							Names.deallocate();
+						}
+						for ( SubCompNum = 1; SubCompNum <= ThisReportData.Branch( BranchNum ).Comp( CompNum ).NumSubComps; ++SubCompNum ) {
+							// Get complete list of components for complex branches
+							TypeOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).TypeOf;
+							NameOfComp = ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).Name;
+							NumVariables = GetNumMeteredVariables( TypeOfComp, NameOfComp );
+							if ( NumVariables > 0 ){
+								VarIndexes.allocate( NumVariables );
+								VarTypes.allocate( NumVariables );
+								IndexTypes.allocate( NumVariables );
+								UnitsStrings.allocate( NumVariables );
+								ResourceTypes.allocate( NumVariables );
+								EndUses.allocate( NumVariables );
+								Groups.allocate( NumVariables );
+								Names.allocate( NumVariables );
+								ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
 
+								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+
+								ModeFlagOn = true;
+								for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarName = Names( VarNum );
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarUnits = UnitsStrings( VarNum );
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndex = VarIndexes( VarNum );
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarIndexType = IndexTypes( VarNum );
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ReportVarType = VarTypes( VarNum );
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).ResourceType = ResourceTypes( VarNum );
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse = EndUses( VarNum );
+									if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "HEATINGCOILS" && ModeFlagOn ) {
+										for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+											ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = HeatingOnly;
+										}
+										ModeFlagOn = false;
+									} else if ( ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse == "COOLINGCOILS" && ModeFlagOn ) {
+										for ( VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1 ) {
+											ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum1 ).EndUse_CompMode = CoolingOnly;
+										}
+										ModeFlagOn = false;
+									} else if ( ModeFlagOn ) {
+										ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).EndUse_CompMode = NoHeatNoCool;
+									}
+									ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).MeteredVar( VarNum ).Group = Groups( VarNum );
+								}
+
+								VarIndexes.deallocate();
+								VarTypes.deallocate();
+								IndexTypes.deallocate();
+								UnitsStrings.deallocate();
+								ResourceTypes.deallocate();
+								EndUses.deallocate();
+								Groups.deallocate();
+								Names.deallocate();
+							}
 							ThisReportData.Branch( BranchNum ).Comp( CompNum ).SubComp( SubCompNum ).NumMeteredVars = NumVariables;
 						}
 					}
