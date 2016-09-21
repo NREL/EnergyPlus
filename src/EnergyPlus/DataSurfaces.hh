@@ -553,7 +553,9 @@ namespace DataSurfaces {
 		bool
 		operator ==( Surface2D const & a, Surface2D const & b )
 		{
-			return eq( a.vertices, b.vertices );
+			auto const & v1 = a.vertices;
+			auto const & v2 = b.vertices;
+			return eq( v1, v2 );		
 		}
 
 		// Inequality
