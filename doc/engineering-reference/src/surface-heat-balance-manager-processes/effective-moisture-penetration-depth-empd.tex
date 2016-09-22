@@ -54,7 +54,7 @@ R_{MT,1} = \frac{d_{EMPD,1}} {2 \bar R_{water} T \delta_{perm}}
 
 where
 
-\({d_{EMPD,1}\) = depth of surface layer, m
+\(d_{EMPD,1}\) = depth of surface layer, m
 
 \(\bar R_{water}\) = universal gas constant for water (461.52 J/kg-K)
 
@@ -106,11 +106,11 @@ These moisture fluxes are used to update the moisture content (or equivalent RH,
 
 where
 
-\(\rho_{matl}\) = Material dry density, kg/m^3
+$\rho_{matl}$ = Material dry density, $kg/m^3$
 
-\(TimeStep\) = Simulation timestep, s
+$TimeStep$ = Simulation timestep, s
 
-\(\frac {du}{d\phi}\) = slope of moisture curve (change in moisture content / change in RH), kg/kg \cdot RH
+$\frac {du}{d\phi}$ = slope of moisture curve (change in moisture content / change in RH), kg/kg $\cdot$ RH
 
 The equivalent RH and equivalent vapor density are related with:
 
@@ -136,21 +136,21 @@ For further information on the EMPD model, see References below.
 
 \subsection{EMPD Nomenclature}\label{empd-nomenclature}
 \begin{align*}  
-  A  &= \text{surface area} \bracketunits{m^{2}} \\
-  d &= \text{penetration depth} \bracketunits{m} \\
-  j &= \text{water mass flux} \bracketunits{\frac{kg}{m^{2} \cdot s}} \\
-  \bar R_{water} &= \text{universal gas constant for water,} \; 452.61 \bracketunits{\frac{J}{kg \cdot K}}   \\
-  R_{MT} &= \text{Mass transfer resistance} \bracketunits{s/m} \\
-  T &= \text{temperature} \bracketunits{K} \\
-  u &= \text{moisture content} \bracketunits{\frac{kg}{kg}}
+  A  &= \text{surface area} \RB{m^{2}} \\
+  d &= \text{penetration depth} \RB{m} \\
+  j &= \text{water mass flux} \RB{\frac{kg}{m^{2} \cdot s}} \\
+  \bar R_{water} &= \text{universal gas constant for water,} \; 452.61 \RB{\frac{J}{kg \cdot K}}   \\
+  R_{MT} &= \text{Mass transfer resistance} \RB{s/m} \\
+  T &= \text{temperature} \RB{K} \\
+  u &= \text{moisture content} \RB{\frac{kg}{kg}}
 \end{align*}
 
 \subsubsection{Greek letters}\label{greek-letters}
 \begin{align*}  
-  \delta  &= \text{permeability} \bracketunits{\frac{kg}{m \cdot s \cdot Pa}} \\
+  \delta  &= \text{permeability} \RB{\frac{kg}{m \cdot s \cdot Pa}} \\
   \phi &= \text{relative humidity} \\
-  \rho &= \text{density} \bracketunits{\frac{kg}{m^{3}}} \\
-  \rho_{v} &= \text{vapor density} \bracketunits{\frac{kg}{m^{3}}} \\
+  \rho &= \text{density} \RB{\frac{kg}{m^{3}}} \\
+  \rho_{v} &= \text{vapor density} \RB{\frac{kg}{m^{3}}} \\
 \end{align*}
 
 \subsubsection{Subscripts}\label{subscripts-and-superscripts}
