@@ -64,3 +64,16 @@ See [5652](https://github.com/NREL/EnergyPlus/pull/5652).
 Changes to the single duct VAV air terminal unit's sizing routines (AirTerminal:SingleDuct:VAV:Reheat) also included revisions to the sizing summary data reported to the EIO and Component Sizing Summary tabular data.  Sizing for AirTerminal:SingleDuct:VAV:Reheat has been expanded to calculate and report a design size for the VAV minimum stop, or minimum flow fraction, as well as the user-specified constant minimum flow fraction.  New sizing reports to watch for include: Design Size Constant Minimum Air Flow Fraction, User-Specified Constant Minimum Air Flow Fraction, and Design Size Minimum Air Flow Rate [m3/s].
 
 See [5646](https://github.com/NREL/EnergyPlus/pull/5646).
+### Changes to Demand Controlled Ventilation table of the System Summary report
+
+Four new columns were added in the middle of this table which summarizes the Controller:MechanicalVentilation inputs:
+ - Outdoor Air Per Zone [m3/s]
+ - Outdoor Air ACH [ach]
+ - Outdoor Air Method (one of "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum")
+ - Outdoor Air Schedule Name (if no schedule is specified, then this column is blank)
+ 
+The following changes were made to existing columns
+ - Air Distribution Effectiveness in Cooling Mode and Air Distribution Effectiveness in Heating Mode are now blank if there is an Air Distribution Effectiveness Schedule Name specified (previously these columns would show 1.0)
+ - Air Distribution Effectiveness Schedule heading changed to Air Distribution Effectiveness Schedule Name
+ 
+See [5794](https://github.com/NREL/EnergyPlus/pull/5794).
