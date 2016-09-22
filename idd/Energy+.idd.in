@@ -36592,11 +36592,11 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \maximum 1
 
 ZoneHVAC:CoolingPanel:RadiantConvective:Water,
-  A1 , \field Name
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
        \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
        \memo groups to the end of the list
        \min-fields 18
+  A1 , \field Name
        \required-field
   A2 , \field Availability Schedule Name
        \required-field
