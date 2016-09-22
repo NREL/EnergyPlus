@@ -123,6 +123,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: cycling
   LOGICAL :: continuous
   CHARACTER(len=MaxNameLength) :: OutScheduleName
+  LOGICAL :: isDElightOutVar
 
 
   REAL MaterialDensity
@@ -727,15 +728,34 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   nodiff=.false.
                 ENDIF
 
-                 ! For Output:Variable that reference a specific Daylighting:Controls object need update to the new reference point name
-                 IF (InArgs(1) .NE. '*') THEN
-                   IF (SameString(InArgs(2)(1:27),'Daylighting Reference Point')) THEN
-                     OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
-                   ENDIF
-                   IF (SameString(InArgs(2),'Daylighting Lighting Power Multiplier')) THEN
-                     OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
-                   ENDIF
-                 ENDIF
+                ! For Output:Variable that reference a specific Daylighting:Controls object need update to the new reference point name
+                IF (InArgs(1) .NE. '*') THEN
+                  isDElightOutVar = .FALSE. ! first assume that it is not a DElight related variable
+                  IF (SameString(InArgs(2)(1:27),'Daylighting Reference Point')) THEN
+                    DO iRefPt = 1,NumDElightRefPt
+                      IF (MakeUPPERCase(InArgs(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%RefPtName)) THEN
+                        isDElightOutVar = .TRUE. ! if it is related to DElight than flip flag
+                      ENDIF
+                    ENDDO
+                    IF (.NOT. isDElightOutVar) THEN
+                      OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
+                     ENDIF
+                  ENDIF
+                  
+                  IF (SameString(InArgs(2),'Daylighting Lighting Power Multiplier')) THEN
+                    DO iRefPt = 1,NumDElightRefPt
+                      IF (MakeUPPERCase(InArgs(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%ZoneName)) THEN
+                        isDElightOutVar = .TRUE. ! if it is related to DElight than flip flag
+                        OutArgs(1) = DElightRefPt(iRefPt)%ControlName
+                      ENDIF
+                    ENDDO
+                    IF (.NOT. isDElightOutVar) THEN
+                      OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
+                     ENDIF
+                  ENDIF
+                ENDIF
+
+                
 
                 CALL ScanOutputVariablesForReplacement(  &
                    2,  &
