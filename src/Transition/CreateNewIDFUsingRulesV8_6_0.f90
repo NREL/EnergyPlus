@@ -489,16 +489,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! eliminate Control Type fields
                 ! Control Type fields are on: 8, 13, 18, 23, ...
                 I = 0
+                CurField = 4
+                NewField = 3
                 DO WHILE (.TRUE.)
-                    I = I + 1
-                    CurField = 5*(I-1) + 3
-                    NewField = 4*(I-1) + 2
-                    IF ( CurField > CurArgs ) EXIT
-                    OutArgs(NewField+1)=InArgs(CurField+1)  ! Type
-                    OutArgs(NewField+2)=InArgs(CurField+2)  ! Name
-                    OutArgs(NewField+3)=InArgs(CurField+3)  ! Inlet Node Name
-                    OutArgs(NewField+4)=InArgs(CurField+4)  ! Outlet Node Name
+                    OutArgs(NewField)=InArgs(CurField)  ! Type
+                    OutArgs(NewField+1)=InArgs(CurField+1)  ! Name
+                    OutArgs(NewField+2)=InArgs(CurField+2)  ! Inlet Node Name
+                    OutArgs(NewField+3)=InArgs(CurField+3)  ! Outlet Node Name
                     ! Remove Control Type
+                    CurField = CurField + 5
+                    NewField = NewField + 4
+                    IF(NewField > CurArgs) EXIT
                     CurArgs = CurArgs-1
                 END DO
 

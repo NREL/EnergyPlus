@@ -7075,10 +7075,11 @@ GetInternalVariableValue(
 		resultVal = 0.0;
 	} else if ( varType == 1 ) { // Integer
 		if ( keyVarIndex > NumOfIVariable ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index beyond range of array." );
+			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of integer variables = " + General::TrimSigDigits( NumOfIVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
 		IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
@@ -7086,10 +7087,11 @@ GetInternalVariableValue(
 		resultVal = double( IVar().Which );
 	} else if ( varType == 2 ) { // real
 		if ( keyVarIndex > NumOfRVariable ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Real variable passed index beyond range of array." );
+			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of real variables = " + General::TrimSigDigits( NumOfRVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
 		RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
@@ -7243,7 +7245,7 @@ GetNumMeteredVariables(
 		if ( ComponentName != RVariableTypes( Loop ).KeyNameOnlyUC ) continue;
 		RVar >>= RVariableTypes( Loop ).VarPtr;
 		if ( RVar().MeterArrayPtr == 0 ) continue;
-		++NumVariables;
+		if ( VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters > 0 ) ++NumVariables;
 	}
 
 	return NumVariables;
