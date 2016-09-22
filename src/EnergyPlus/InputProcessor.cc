@@ -276,32 +276,6 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	return root;
 }
 
-void IdfParser::add_missing_field_value( std::string const & field_name, json & root, json & extensible, json const & obj_loc,
-                                         json const & loc, int legacy_idd_index ) {
-	// This can be changed significantly by passing only the json object you are going to modify in, i.e. root or
-	// extensible, and pass only the currect object location in as well, either the whole
-	// patternProperties->.*->properties thing or the extensions->items->properties thing, this way you can get rid of a
-	// lot of if statements as well as map lookups, also patternProperties is ALWAYS there now bc we removed the special
-	// casing of the version object which did not contain patternProperties
-	json const * tmp;
-	int ext_size = 0;
-	if ( obj_loc.find( "patternProperties" ) != obj_loc.end() ) {
-		tmp = & obj_loc[ "patternProperties" ][ ".*" ][ "properties" ];
-	}
-
-	if ( legacy_idd_index >= loc[ "fields" ].size() ) {
-		tmp = & tmp->at( "extensions" )[ "items" ][ "properties" ];
-		ext_size = static_cast<int>(loc[ "extensibles" ].size());
-	}
-	if ( tmp->find( field_name ) != tmp->end() || obj_loc.find( field_name ) != obj_loc.end() ) {
-		if ( !ext_size ) {
-			root[ field_name ] = "";
-		} else {
-			extensible[ field_name ] = "";
-		}
-	}
-}
-
 json IdfParser::parse_number( std::string const & idf, size_t & index, bool & success ) {
 	size_t save_i = index;
 	eat_whitespace( idf, save_i );
@@ -887,8 +861,8 @@ namespace EnergyPlus {
 	void
 	InputProcessor::InitFiles() {
 		int write_stat;
-		int read_stat;
-		bool FileExists;
+//		int read_stat;
+//		bool FileExists;
 
 		EchoInputFile = GetNewUnitNumber();
 		{

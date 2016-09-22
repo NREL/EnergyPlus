@@ -55,9 +55,6 @@ public:
 	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
 	                   json const & obj_loc );
 
-	void add_missing_field_value( std::string const & field_name, json & root, json & extensible, json const & obj_loc,
-	                              json const & loc, int legacy_idd_index );
-
 	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
 
 	json parse_number( std::string const & idf, size_t & index, bool & success );
@@ -97,13 +94,13 @@ public:
 		return s;
 	}
 
-	std::string read_from_file( std::string const & input_file_name ) {
-		std::ifstream in( input_file_name, std::ios::in | std::ios::binary );
-		if ( in ) {
-			return ( std::string( ( std::istreambuf_iterator < char >( in ) ), std::istreambuf_iterator < char >() ) );
-		}
-		throw ( errno );
-	}
+//	std::string read_from_file( std::string const & input_file_name ) {
+//		std::ifstream in( input_file_name, std::ios::in | std::ios::binary );
+//		if ( in ) {
+//			return ( std::string( ( std::istreambuf_iterator < char >( in ) ), std::istreambuf_iterator < char >() ) );
+//		}
+//		throw ( errno );
+//	}
 
 private:
 	size_t cur_line_num = 1;
@@ -141,7 +138,7 @@ public:
 		for ( auto const & s: warnings ) EnergyPlus::ShowContinueError( s );
 		if ( errors.size() ) EnergyPlus::ShowWarningError("Errors: " + std::to_string(errors.size()));
 		for ( auto const & s : errors ) EnergyPlus::ShowWarningError( s );
-		return errors.size() + warnings.size();
+		return static_cast<int> ( errors.size() + warnings.size() );
 	}
 
 	bool icompare( std::string const & s1, std::string const & s2 ) {
