@@ -478,7 +478,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(3)=InArgs(5)
                 CurArgs = CurArgs-2
 
-              CASE('BRANCH')
+            CASE('AIRTERMINAL:SINGLEDUCT:VAV:REHEAT')
+                nodiff=.false.
+                OutArgs=InArgs
+                IF (SameString(InArgs(16), 'REVERSE')) THEN
+                  IF ( (.NOT. SameString(InArgs(17),'')) .OR. (.NOT. SameString(InArgs(18),''))  ) THEN
+                    OutArgs(16)='ReverseWithLimits'
+                  END IF
+                END IF
+
+            CASE('BRANCH')
                 ObjectName='Branch'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1)=InArgs(1) ! No change
