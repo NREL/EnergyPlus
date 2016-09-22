@@ -3402,7 +3402,7 @@
     PoolActivitySched,       !- Activity Factor Schedule Name
     MakeUpWaterSched,        !- Make-up Water Supply Schedule Name
     PoolCoverSched,          !- Cover Schedule Name
-    0.0,                     !- Cover Evaporation Factor
+    0.8,                     !- Cover Evaporation Factor
     0.2,                     !- Cover Convection Factor
     0.9,                     !- Cover Short-Wavelength Radiation Factor
     0.5,                     !- Cover Long-Wavelength Radiation Factor
@@ -3420,11 +3420,11 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: WeekDays SummerDesignDay, !- Field 2
-    Until: 6:00,0.0,         !- Field 3
+    Until: 6:00,0.1,         !- Field 3
     Until: 20:00,0.5,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
+    Until: 24:00,0.1,        !- Field 7
     For: AllOtherDays,       !- Field 9
-    Until: 24:00,0.0;        !- Field 10
+    Until: 24:00,0.1;        !- Field 10
 
   Schedule:Compact,
     MakeUpWaterSched,        !- Name
@@ -3514,6 +3514,18 @@
   Output:Variable,*,Indoor Pool Current Activity Factor,hourly;
 
   Output:Variable,*,Indoor Pool Current Cover Factor,hourly;
+
+  Output:Variable,*,Indoor Pool Saturation Pressure at Pool Temperature,hourly;
+
+  Output:Variable,*,Indoor Pool Partial Pressure of Water Vapor in Air,hourly;
+
+  Output:Variable,*,Indoor Pool Current Cover Evaporation Factor,hourly;
+
+  Output:Variable,*,Indoor Pool Current Cover Convective Factor,hourly;
+
+  Output:Variable,*,Indoor Pool Current Cover SW Radiation Factor,hourly;
+
+  Output:Variable,*,Indoor Pool Current Cover LW Radiation Factor,hourly;
 
   Output:Variable,*,Indoor Pool Evaporative Heat Loss Rate,hourly;
 
