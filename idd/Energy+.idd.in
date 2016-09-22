@@ -31038,33 +31038,39 @@ DesignSpecification:OutdoorAir,
       \default 0.00944
       \minimum 0
       \note 0.00944 m3/s is equivalent to 20 cfm per person
-      \note This input should be used if the field Outdoor Air Method is Flow/Person.
-      \note This input is used if the field Outdoor Air Method is Flow/Person, Sum, or Maximum
+      \note This input is only used if the field Outdoor Air Method is Flow/Person, Sum, or Maximum
+      \note For sizing, the design number of occupants is used. For outdoor air flow control, the use
+      \note of design occupants or current occupants depends on the component and DCV options.
+      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat use the DCV flag specified in Controller:MechanicalVentilation
+      \note AirTerminal:DualDuct:VAV:OutdoorAir and ZoneHVAC:IdealLoadsAirSystem have their own DCV control input.
+      \note ZoneHVAC:FourPipeFanCoil always uses current occupants.
   N2, \field Outdoor Air Flow per Zone Floor Area
       \units m3/s-m2
       \default 0.0
       \minimum 0
-      \note This input should be used if the field Outdoor Air Method is Flow/Area.
-      \note This input is used if the field Outdoor Air Method is Flow/Area, Sum, or Maximum
+      \note This input is only used if the field Outdoor Air Method is Flow/Area, Sum, or Maximum
   N3, \field Outdoor Air Flow per Zone
       \type real
       \units m3/s
       \default 0.0
       \minimum 0
-      \note This input should be used if the field Outdoor Air Method is Flow/Zone.
-      \note This input is used if the field Outdoor Air Method is Flow/Zone, Sum, or Maximum
+      \note This input is only used if the field Outdoor Air Method is Flow/Zone, Sum, or Maximum
   N4, \field Outdoor Air Flow Air Changes per Hour
       \units 1/hr
       \type real
       \default 0.0
       \minimum 0
-      \note This input should be used if the field Outdoor Air Method is AirChanges/Hour.
-      \note This input is used if the field Outdoor Air Method is AirChanges/Hour, Sum, or Maximum
-  A3; \field Outdoor Air Flow Rate Fraction Schedule Name
+      \note This input is only used if the field Outdoor Air Method is AirChanges/Hour, Sum, or Maximum
+  A3; \field Outdoor Air Schedule Name
       \type object-list
       \object-list ScheduleNames
       \note Schedule values are multiplied by the Outdoor Air Flow rate calculated using
-      \note the previous four inputs. Schedule values are limited to 0 to 1.
+      \note the previous four inputs. Schedule values are limited to 0 to 1. If left blank, the schedule defaults to 1.0.
+      \note This schedule is ignored during sizing.  All other components which reference this design specification
+      \note use the current schedule value to calculate the current outdoor air requirement. This includes
+      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir, 
+      \note ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem.
+      \note This schedule will also be applied by Controller:MechanicalVentilation for all System Outdoor Air Methods.
 
 DesignSpecification:ZoneAirDistribution,
   \min-fields 1
@@ -56138,6 +56144,9 @@ Controller:OutdoorAir,
        \required-field
        \note Outdoor air inlet node entering the first pre-treat component if any
   N1 , \field Minimum Outdoor Air Flow Rate
+       \note If there is a Mechanical Ventilation Controller (Controller:MechanicalVentilation), note
+       \note that this value times the Minimum Outdoor Air Schedule is a hard minimum that may 
+       \note override DCV or other advanced OA controls.
        \type real
        \required-field
        \units m3/s
@@ -56308,6 +56317,7 @@ Controller:MechanicalVentilation,
         \key ProportionalControlBasedOnDesignOccupancy
         \key ProportionalControlBasedonOccupancySchedule
         \key IndoorAirQualityProcedureGenericContaminant
+        \key IndoorAirQualityProcedureCombined
         \default VentilationRateProcedure
    N1,  \field Zone Maximum Outdoor Air Fraction
         \type real
@@ -56321,9 +56331,14 @@ Controller:MechanicalVentilation,
         \object-list ZoneAndZoneListNames
         \note A zone name or a zone list name may be used here
    A6,  \field Design Specification Outdoor Air Object Name 1
+        \note If left blank, the name will be taken from the Sizing:Zone object for this zone.
+        \note If no specification is found for this zone, then the default of 0.00944 m3/s-person will be used.
         \type object-list
         \object-list DesignSpecificationOutdoorAirNames
    A7,  \field Design Specification Zone Air Distribution Object Name 1
+        \note If left blank, the name will be taken from the Sizing:Zone object for this zone.
+        \note If no specification is found for this zone, then effectivness will be 1.0 and
+        \note and secondary recirculation will be zero.
         \type object-list
         \object-list DesignSpecificationZoneAirDistributionNames
    A8,  \field Zone 2 Name
