@@ -6,7 +6,7 @@ The EMPD (Effective Moisture Penetration Depth) model is a simplified, lumped ap
 
 \subsection{EMPD Model Description}\label{empd-model-description}
 
-The EMPD concept is based on the assumption of cyclical variations in humidity, and therefore material moisture content, $u$. In other words, the following constraint must be met:
+The EMPD concept is based on the assumption of cyclical variations in humidity, and therefore material moisture content, \(u\). In other words, the following constraint must be met:
 
 \begin{equation}
 \int_{{t_1}}^{{t_2}} {\frac{{du}}{{dt }}} dt  = 0
@@ -18,9 +18,9 @@ This is generally a reasonable assumption for buildings, with daily internal lat
 u = a \phi^b + c \phi^d
 \end{equation}
 
-where $a$, $b$, $c$, and $d$ are fitting parameters and \phi is relative humidity.
+where \(a\), \(b\), \(c\), and \(d\) are fitting parameters and \(\phi\) is relative humidity.
 
-This surface layer (labeled with subscript 1 below) exchanges moisture with the zone air based on the difference between the zone air vapor density and the material vapor density. The model converts the surface layer moisture content to a vapor density ($\rho_v$) through the material's sorption curve:
+This surface layer (labeled with subscript 1 below) exchanges moisture with the zone air based on the difference between the zone air vapor density and the material vapor density. The model converts the surface layer moisture content to a vapor density \(\rho_v\) through the material's sorption curve:
 
 \begin{equation}
 \rho_{v1} = \frac {0.622 \rho_{air} u_{1}} {\frac{du}{d\phi} \frac{P}{P_{sat}} - u_{1}}
@@ -28,13 +28,13 @@ This surface layer (labeled with subscript 1 below) exchanges moisture with the 
 
 where
 
-$\frac{du}{d\phi}$ = slope of the moisture sorption curve, kg/kg-RH
+\(\frac{du}{d\phi}\) = slope of the moisture sorption curve, kg/kg-RH
 
-$P_{sat}$ = saturated vapor pressure
+\(P_{sat}\) = saturated vapor pressure
 
-$\rho_{air}$ = dry-air density
+\(\rho_{air}\) = dry-air density
 
-The moisture flux between the material and the zone air, $j_{zone}$, is the difference in vapor densities divided by the overall mass transfer resistance, which is the sum of the diffusive resistance of the surface layer, the diffusive resistance of any coating, and the convective resistance of the air boundary layer:
+The moisture flux between the material and the zone air, \(j_{zone}\), is the difference in vapor densities divided by the overall mass transfer resistance, which is the sum of the diffusive resistance of the surface layer, the diffusive resistance of any coating, and the convective resistance of the air boundary layer:
 
 \begin{equation}
 j_{zone} = \frac{\rho_{v1} - \rho_{v,zone}}{R_{MT1} + R_{MT,coating} + R_{MT,BL}}
@@ -54,13 +54,13 @@ R_{MT,1} = \frac{d_{EMPD,1}} {2 \bar R_{water} T \delta_{perm}}
 
 where
 
-${d_{EMPD,1}$ = depth of surface layer, m
+\({d_{EMPD,1}\) = depth of surface layer, m
 
-$\bar R_{water}$ = universal gas constant for water (461.52 J/kg-K)
+\(\bar R_{water}\) = universal gas constant for water (461.52 J/kg-K)
 
-$T$ = temperature, K
+\(T\) = temperature, K
 
-$\delta_{perm}$ = water vapor permeability of the material, kg/m-s-Pa
+\(\delta_{perm}\) = water vapor permeability of the material, kg/m-s-Pa
 
 The coating resistance is:
 
@@ -70,11 +70,11 @@ R_{MT,coating} = \frac {t_{coating} P_{ambient}} {\delta_{perm,coating} \bar R_{
 
 where
 
-$t_{coating}$ = coating thickness, m
+\(t_{coating}\) = coating thickness, m
 
-$P_{ambient}$ = ambient pressure, Pa
+\(P_{ambient}\) = ambient pressure, Pa
 
-$\delta_{perm,coating}$ = permeability of the coating, kg/m-s-Pa.
+\(\delta_{perm,coating}\) = permeability of the coating, kg/m-s-Pa.
 
 Finally, the boundary layer mass-transfer resistance is calculated by converting the heat-transfer coefficient to mass transfer with the Lewis relation:
 
@@ -82,19 +82,19 @@ Finally, the boundary layer mass-transfer resistance is calculated by converting
 R_{MT,BL} = \frac{\rho_{air} Cp_{air}}{h_{conv}}
 \end{equation}
 
-Behind the surface layer is a deep layer (labeled with subscipt 2 below) of thickness $d_{EMPD,2}$. The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
+Behind the surface layer is a deep layer (labeled with subscipt 2 below) of thickness \(d_{EMPD,2}\). The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
 
 \begin{equation}
 j_{2} = \frac {\rho_{v,1} - \rho_{v,2}} {R_{MT,2}}
 \end{equation}
 
-where $R_{MT,2}$ is:
+where \(R_{MT,2}\) is:
 
 \begin{equation}
 R_{MT,2} = \frac {d_{EMPD,1} + d_{EMPD,2}} {2 \bar R_{water} T \delta_{perm} }
 \end{equation}
 
-These moisture fluxes are used to update the moisture content (or equivalent RH, $\phi$) of each layer:
+These moisture fluxes are used to update the moisture content (or equivalent RH, \(\phi\) of each layer:
 
 \begin{equation}
 \phi_{1}(t) = \phi_{1}(t-\delta t) - \frac { (j_{zone} + j_{2}) \cdot TimeStep} {\rho_{matl} d_{EMPD,2} \frac {du}{d\phi}}
@@ -106,11 +106,11 @@ These moisture fluxes are used to update the moisture content (or equivalent RH,
 
 where
 
-$\rho_{matl}$ = Material dry density, kg/m^3
+\(\rho_{matl}\) = Material dry density, kg/m^3
 
-$TimeStep$ = Simulation timestep, s
+\(TimeStep\) = Simulation timestep, s
 
-$\frac {du}{d\phi}$ = slope of moisture curve (change in moisture content / change in RH), kg/kg \cdot RH
+\(\frac {du}{d\phi}\) = slope of moisture curve (change in moisture content / change in RH), kg/kg \cdot RH
 
 The equivalent RH and equivalent vapor density are related with:
 
@@ -130,7 +130,7 @@ The zone flux is also used to calculate the sensible heat released (during adsor
 Q_{flux} = j_{zone} h_{fg}
 \end{equation}
 
-where $h_{fg}$ is the enthalpy of vaporization of water, assumed to be 2500 kJ/kg. This is added to the heat balance calculations at the interior surface.
+where \(h_{fg}\) is the enthalpy of vaporization of water, assumed to be 2500 kJ/kg. This is added to the heat balance calculations at the interior surface.
 
 For further information on the EMPD model, see References below.
 
