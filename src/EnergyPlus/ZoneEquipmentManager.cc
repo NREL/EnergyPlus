@@ -3133,6 +3133,7 @@ namespace ZoneEquipmentManager {
 			// Air loop system availability manager status only applies to PIU and exhaust fans
 			// Reset fan SAM operation flags for zone fans.
 			TurnFansOn = false;
+			TurnZoneFansOnlyOn = false;
 			TurnFansOff = false;
 
 			for ( EquipTypeNum = 1; EquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++EquipTypeNum ) {
@@ -3204,6 +3205,10 @@ namespace ZoneEquipmentManager {
 					if ( ZoneEquipAvail( ControlledZoneNum ) == CycleOn || ZoneEquipAvail( ControlledZoneNum ) == CycleOnZoneFansOnly ) {
 						TurnFansOn = true;
 					}
+					if ( ZoneEquipAvail( ControlledZoneNum ) == CycleOnZoneFansOnly ) {
+						// Currently used only by parallel powered induction unit
+						TurnZoneFansOnlyOn = true;
+					}
 					if ( ZoneEquipAvail( ControlledZoneNum ) == ForceOff ) {
 						TurnFansOff = true;
 					}
@@ -3212,6 +3217,7 @@ namespace ZoneEquipmentManager {
 
 					//            reset status flags for other zone equipment
 					TurnFansOn = false;
+					TurnZoneFansOnlyOn = false;
 					TurnFansOff = false;
 
 					NonAirSystemResponse( ActualZoneNum ) += NonAirSysOutput;
