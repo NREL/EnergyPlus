@@ -5700,6 +5700,8 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 
+		DataScalableCapSizingON = false;
+
 	}
 
 	void
