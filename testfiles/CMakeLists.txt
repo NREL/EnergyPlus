@@ -35,6 +35,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooled_VRPSizing.idf EPW_FILE USA_IL_Chicag
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooled_VRPSizing_MaxZd.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooled_ZoneAirMassFlowBalance.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneCoolingPanelBaseboard.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5ZoneCoolingPanelBaseboardAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneCoolingPanelBaseboardTotalLoad.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneCoolingPanelBaseboardVarOff.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooled_ZoneAirMassFlowBalance_Pressurized.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
