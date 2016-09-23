@@ -66,8 +66,10 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <ObjexxFCL/gio.hh>
 
 
@@ -76,7 +78,9 @@ using namespace EnergyPlus::HighTempRadiantSystem;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace DataGlobals;
+using namespace DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::DataSizing;
 
 
 namespace EnergyPlus {
@@ -137,5 +141,33 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemScalableFlagSetTest )
+	{
+		int RadSysNum;
+		int SizingTypesNum;
+		
+		DataSizing::DataScalableCapSizingON = false;
+		DataSizing::CurZoneEqNum = 1;
+		
+		RadSysNum = 1;
+		HighTempRadSys.allocate( RadSysNum );
+		HighTempRadSysNumericFields.allocate( RadSysNum );
+		HighTempRadSysNumericFields( RadSysNum ).FieldNames.allocate( 1 );
+		HighTempRadSys( RadSysNum ).Name = "TESTSCALABLEFLAG";
+		HighTempRadSys( RadSysNum ).ZonePtr = 1;
+		HighTempRadSys( RadSysNum ).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+		HighTempRadSys( RadSysNum ).ScaledHeatingCapacity = 100.0;
+		DataSizing::ZoneEqSizing.allocate( 1 );
+		DataHeatBalance::Zone.allocate( 1 );
+		Zone( 1 ).FloorArea = 10.0;
+		SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
+		if ( SizingTypesNum < 1 ) SizingTypesNum = 1;
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( DataHVACGlobals::NumOfSizingTypes );
+		
+		SizeHighTempRadiantSystem( RadSysNum );
+		EXPECT_FALSE( DataSizing::DataScalableSizingON );
+	
+	}
+	
 }
 

@@ -4147,6 +4147,8 @@ namespace PackagedTerminalHeatPump {
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
+		
+		DataScalableCapSizingON = false;
 
 	}
 
