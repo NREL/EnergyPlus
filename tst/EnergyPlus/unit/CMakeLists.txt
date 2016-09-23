@@ -112,6 +112,7 @@ set( test_src
   SiteFCFactorMethodGroundTemperatures.unit.cc
   SiteGroundDomain.unit.cc
   SiteShallowGroundTemperatures.unit.cc
+  SizeWaterHeatingCoil.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
