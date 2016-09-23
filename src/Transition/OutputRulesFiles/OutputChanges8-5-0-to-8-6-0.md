@@ -77,3 +77,15 @@ The following changes were made to existing columns
  - Air Distribution Effectiveness Schedule heading changed to Air Distribution Effectiveness Schedule Name
  
 See [5794](https://github.com/NREL/EnergyPlus/pull/5794).
+
+### Daylighting output variables reference control object rather than zone object
+
+The variables such as these (as well as ones with higher numbers) use the name of the Daylighting:Controls object instead of the name of the zone.
+
+- Daylighting Reference Point 1 Illuminance 
+- Daylighting Reference Point 1 Glare Index []
+- Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time [hr]
+- Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time [hr]
+- Daylighting Lighting Power Multiplier []
+
+See [5725](https://github.com/NREL/EnergyPlus/pull/5725) and [5826](https://github.com/NREL/EnergyPlus/pull/5826).
