@@ -339,6 +339,7 @@ namespace DataHVACGlobals {
 	extern Real64 BalancedExhMassFlow; // balanced zone exhaust (declared as so by user)  [kg/s]
 	extern Real64 PlenumInducedMassFlow; // secondary air mass flow rate induced from a return plenum [kg/s]
 	extern bool TurnFansOn; // If true overrides fan schedule and cycles fans on
+	extern bool TurnZoneFansOnlyOn; // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
 	extern bool TurnFansOff; // If True overides fan schedule and TurnFansOn and forces fans off
 	extern bool ZoneCompTurnFansOn; // If true overrides fan schedule and cycles fans on
 	extern bool ZoneCompTurnFansOff; // If True overides fan schedule and TurnFansOn and forces fans off
