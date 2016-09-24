@@ -2920,8 +2920,16 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 = rNumericArgs( 7 );
 
+					// adjust tank height used in these calculations for testing heater height
+					Real64 tankHeightForTesting = 0.0;
+					if ( WaterThermalTank( WaterThermalTankNum ).Shape == TankShapeHorizCylinder ) {
+						tankHeightForTesting = 2.0 * sqrt( ( WaterThermalTank( WaterThermalTankNum ).Volume / WaterThermalTank( WaterThermalTankNum ).Height ) / DataGlobals::Pi );
+					} else {
+						tankHeightForTesting = WaterThermalTank( WaterThermalTankNum ).Height;
+					}
+
 					//Test if Heater height is within range
-					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > tankHeightForTesting ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 1 is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 7 ) + " = " + RoundSigDigits( rNumericArgs( 7 ), 4 ) );
@@ -2949,7 +2957,7 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 = rNumericArgs( 10 );
 
 					//Test if Heater height is within range
-					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > tankHeightForTesting ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 2 is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 10 ) + " = " + RoundSigDigits( rNumericArgs( 10 ), 4 ) );
