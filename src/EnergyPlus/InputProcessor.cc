@@ -926,8 +926,6 @@ namespace EnergyPlus {
 				jdf_obj_iterators_vec.emplace_back( jdf_obj_iter );
 			}
 			auto const & schema_iter = schema_properties.find( jdf_iter.key() );
-			// auto pair = std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) );
-			// jdd_jdf_cache_map[ schema_iter.key() ] = pair;
 			jdd_jdf_cache_map.emplace( schema_iter.key(), std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) ) );
 		}
 	}
@@ -996,11 +994,15 @@ namespace EnergyPlus {
 		// METHODOLOGY EMPLOYED:
 		// Look up section in list of sections.  If there, return the
 		// number of sections of that kind found in the current input.  If not, return -1.
-		if ( jdf.find( "SectionWord" ) == jdf.end() ) return -1;
-		int num_sections_found = 0;
-		json obj = jdf[ "SectionWord" ];
-		for ( auto it = obj.begin(); it != obj.end(); ++it ) num_sections_found++;
-		return num_sections_found;
+		auto const & SectionWord_iter = jdf.find( "SectionWord" );
+		if ( SectionWord_iter == jdf.end() ) return -1;
+		return static_cast <int> ( SectionWord_iter.value().size() );
+
+//		if ( jdf.find( "SectionWord" ) == jdf.end() ) return -1;
+//		int num_sections_found = 0;
+//		json obj = jdf[ "SectionWord" ];
+//		for ( auto it = obj.begin(); it != obj.end(); ++it ) num_sections_found++;
+//		return num_sections_found;
 	}
 
 
@@ -1022,7 +1024,9 @@ namespace EnergyPlus {
 		// Look up object in list of objects.  If there, return the
 		// number of objects found in the current input.  If not, return 0.
 
-		if ( jdf.find( ObjectWord ) == jdf.end() ) {
+		auto const & find_obj = jdf.find( ObjectWord );
+
+		if ( find_obj == jdf.end() ) {
 			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
 			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
 			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
@@ -1030,16 +1034,8 @@ namespace EnergyPlus {
 			}
 			return static_cast<int>(jdf[ tmp_umit->second ].size());
 		} else {
-			return static_cast<int>(jdf[ ObjectWord ].size());
+			return static_cast<int>(find_obj.value().size());
 		}
-
-		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
-				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
-			}
-		}
-		return 0;
 	}
 
 	void
@@ -1164,7 +1160,7 @@ namespace EnergyPlus {
 			auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
 			auto const & jdf_extensions_array = obj.value()[ "extensions" ];
 			auto const & schema_extension_fields = schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
-			int alphas_index = legacy_idd_alphas_fields.size();
+			int alphas_index = static_cast <int> ( legacy_idd_alphas_fields.size() );
 
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
@@ -1258,7 +1254,7 @@ namespace EnergyPlus {
 			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
 			auto const & schema_extension_fields = schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
 			auto const & jdf_extensions_array = obj.value()[ "extensions" ];
-			int numerics_index = legacy_idd_numerics_fields.size();
+			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
 
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
@@ -1879,24 +1875,28 @@ namespace EnergyPlus {
 		NumArgs = 0;
 		NumAlpha = 0;
 		NumNumeric = 0;
+		auto const & schema_properties = schema.at( "properties" );
 
 		for ( json::iterator object = jdf.begin(); object != jdf.end(); ++object ) {
 			int num_alpha = 0;
 			int num_numeric = 0;
-			const json & legacy_idd = schema.at( "properties" ).at( object.key() ).at( "legacy_idd" );
+			const json & legacy_idd = schema_properties.at( object.key() ).at( "legacy_idd" );
 
 			size_t max_size = 0;
 			for ( auto const & obj : object.value() ) {
-				if ( obj.find( "extensions" ) != obj.end() ) {
-					auto const size = obj[ "extensions" ].size();
+                auto const & find_extensions = obj.find( "extensions" );
+				if ( find_extensions != obj.end() ) {
+					auto const size = find_extensions.value().size();
 					if ( size > max_size ) max_size = size;
 				}
 			}
 
-			if ( legacy_idd.find( "alphas" ) != legacy_idd.end() ) {
-				json const & alphas = legacy_idd[ "alphas" ];
-				if ( alphas.find( "fields" ) != alphas.end() ) {
-					num_alpha += alphas[ "fields" ].size();
+			auto const & find_alphas = legacy_idd.find( "alphas" );
+			if ( find_alphas != legacy_idd.end() ) {
+				json const & alphas = find_alphas.value();
+				auto const & find_fields = alphas.find( "fields" );
+				if ( find_fields != alphas.end() ) {
+					num_alpha += find_fields.value().size();
 				}
 				if ( alphas.find( "extensions" ) != alphas.end() ) {
 					num_alpha += alphas[ "extensions" ].size() * max_size;
