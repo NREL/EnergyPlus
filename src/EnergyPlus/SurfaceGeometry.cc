@@ -89,8 +89,11 @@
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
+#include <unordered_set>
 
 namespace EnergyPlus {
+
+	std::unordered_set < std::string > SurfaceTmp_set;
 
 namespace SurfaceGeometry {
 
@@ -1016,6 +1019,7 @@ namespace SurfaceGeometry {
 		TotSurfaces = ( TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg ) * 2 + TotHTSurfs + TotHTSubs + TotShdSubs * 2 + TotIntMass + TotOverhangs * 2 + TotOverhangsProjection * 2 + TotFins * 4 + TotFinsProjection * 4 + TotDetailedWalls + TotDetailedRoofs + TotDetailedFloors + TotRectWindows + TotRectDoors + TotRectGlazedDoors + TotRectIZWindows + TotRectIZDoors + TotRectIZGlazedDoors + TotRectExtWalls + TotRectIntWalls + TotRectIZWalls + TotRectUGWalls + TotRectRoofs + TotRectCeilings + TotRectIZCeilings + TotRectGCFloors + TotRectIntFloors + TotRectIZFloors;
 
 		SurfaceTmp.allocate( TotSurfaces ); // Allocate the Surface derived type appropriately
+		SurfaceTmp_set.reserve( TotSurfaces );
 		// SurfaceTmp structure is allocated via derived type initialization.
 
 		SurfNum = 0;
@@ -2365,12 +2369,23 @@ namespace SurfaceGeometry {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
+
+				auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+				std::string name( cAlphaArgs( 1 ) );
+				if ( find_name != SurfaceTmp_set.end() ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
 					continue;
+				} else {
+					SurfaceTmp_set.insert( name );
 				}
+
+//				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//				if ( ErrorInName ) {
+//					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//					ErrorsFound = true;
+//					continue;
+//				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -2526,12 +2541,23 @@ namespace SurfaceGeometry {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
+
+				auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+				std::string name( cAlphaArgs( 1 ) );
+				if ( find_name != SurfaceTmp_set.end() ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
 					continue;
+				} else {
+					SurfaceTmp_set.insert( name );
 				}
+
+//				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//				if ( ErrorInName ) {
+//					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//					ErrorsFound = true;
+//					continue;
+//				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -2771,12 +2797,23 @@ namespace SurfaceGeometry {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
+				auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+                std::string name( cAlphaArgs( 1 ) );
+				if ( find_name != SurfaceTmp_set.end() ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
 					continue;
+				} else {
+					SurfaceTmp_set.insert( name );
 				}
+
+
+//				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//				if ( ErrorInName ) {
+//					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//					ErrorsFound = true;
+//					continue;
+//				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -3172,12 +3209,23 @@ namespace SurfaceGeometry {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
+
+				auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+				std::string name( cAlphaArgs( 1 ) );
+				if ( find_name != SurfaceTmp_set.end() ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
 					continue;
+				} else {
+					SurfaceTmp_set.insert( name );
 				}
+
+//				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//				if ( ErrorInName ) {
+//					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//					ErrorsFound = true;
+//					continue;
+//				}
 
 				if ( NumNumbers < 7 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Too few number of numeric args=[" + TrimSigDigits( NumNumbers ) + "]." );
@@ -3658,12 +3706,23 @@ namespace SurfaceGeometry {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
+
+			auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+			std::string name( cAlphaArgs( 1 ) );
+			if ( find_name != SurfaceTmp_set.end() ) {
 				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 				ErrorsFound = true;
 				continue;
+			} else {
+				SurfaceTmp_set.insert( name );
 			}
+
+//			InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//			if ( ErrorInName ) {
+//				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//				ErrorsFound = true;
+//				continue;
+//			}
 
 			if ( SurfaceNumProp < 12 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Too few number of numeric args=[" + TrimSigDigits( SurfaceNumProp ) + "]." );
@@ -4006,12 +4065,24 @@ namespace SurfaceGeometry {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
+
+				auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+				std::string name( cAlphaArgs( 1 ) );
+				if ( find_name != SurfaceTmp_set.end() ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
 					continue;
+				} else {
+					SurfaceTmp_set.insert( name );
 				}
+
+
+//				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//				if ( ErrorInName ) {
+//					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//					ErrorsFound = true;
+//					continue;
+//				}
 
 				if ( NumNumbers < 5 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Too few number of numeric args=[" + TrimSigDigits( NumNumbers ) + "]." );
@@ -4848,12 +4919,23 @@ namespace SurfaceGeometry {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
+
+			auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+			std::string name( cAlphaArgs( 1 ) );
+			if ( find_name != SurfaceTmp_set.end() ) {
 				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 				ErrorsFound = true;
 				continue;
+			} else {
+				SurfaceTmp_set.insert( name );
 			}
+
+//			InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//			if ( ErrorInName ) {
+//				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//				ErrorsFound = true;
+//				continue;
+//			}
 
 			++SurfNum;
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -5051,12 +5133,23 @@ namespace SurfaceGeometry {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
+
+				auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+				std::string name( cAlphaArgs( 1 ) );
+				if ( find_name != SurfaceTmp_set.end() ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
 					continue;
+				} else {
+					SurfaceTmp_set.insert( name );
 				}
+
+//				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//				if ( ErrorInName ) {
+//					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//					ErrorsFound = true;
+//					continue;
+//				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -5400,12 +5493,23 @@ namespace SurfaceGeometry {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
+
+			auto const & find_name = SurfaceTmp_set.find( cAlphaArgs( 1 ) );
+			std::string name( cAlphaArgs( 1 ) );
+			if ( find_name != SurfaceTmp_set.end() ) {
 				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 				ErrorsFound = true;
 				continue;
+			} else {
+				SurfaceTmp_set.insert( name );
 			}
+
+//			InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfaceTmp, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+//			if ( ErrorInName ) {
+//				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
+//				ErrorsFound = true;
+//				continue;
+//			}
 
 			++SurfNum;
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -5659,6 +5763,8 @@ namespace SurfaceGeometry {
 			// first handle cAlphaArgs
 			ErrorInName = false;
 			IsBlank = false;
+
+
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExtVentedCavity, Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...cannot not duplicate other names" );
