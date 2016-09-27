@@ -152,25 +152,6 @@ namespace GlobalNames {
 			NumChillers = static_cast< int >( ChillerNames.size() );
 		}
 
-//		ErrorFound = false;
-//		int Found = 0;
-//		if ( NumChillers > 0 ) Found = InputProcessor::FindItemInList( NameToVerify, ChillerNames, &ComponentNameData::CompName, NumChillers );
-//		if ( Found != 0 ) {
-//			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + ChillerNames( Found ).CompType + "\"." );
-//			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
-//			ErrorFound = true;
-//		} else {
-//			if ( NumChillers == 0 ) {
-//				CurMaxChillers = 4;
-//				ChillerNames.allocate( CurMaxChillers );
-//			} else if ( NumChillers == CurMaxChillers ) {
-//				CurMaxChillers += 4;
-//				ChillerNames.redimension( CurMaxChillers );
-//			}
-//			++NumChillers;
-//			ChillerNames( NumChillers ).CompType = InputProcessor::MakeUPPERCase( TypeToVerify );
-//			ChillerNames( NumChillers ).CompName = NameToVerify;
-//		}
 	}
 
 	void
@@ -202,26 +183,7 @@ namespace GlobalNames {
             BaseboardNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
             NumBaseboards = static_cast< int >( BaseboardNames.size() );
         }
-/*
-		if ( NumBaseboards > 0 ) Found = InputProcessor::FindItemInList( NameToVerify, BaseboardNames, &ComponentNameData::CompName, NumBaseboards );
 
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + BaseboardNames( Found ).CompType + "\"." );
-			ShowContinueError( "...Current entry is Baseboard Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			if ( NumBaseboards == 0 ) {
-				CurMaxBaseboards = 4;
-				BaseboardNames.allocate( CurMaxBaseboards );
-			} else if ( NumBaseboards == CurMaxBaseboards ) {
-				CurMaxBaseboards += 4;
-				BaseboardNames.redimension( CurMaxBaseboards );
-			}
-			++NumBaseboards;
-			BaseboardNames( NumBaseboards ).CompType = TypeToVerify;
-			BaseboardNames( NumBaseboards ).CompName = NameToVerify;
-		}
-*/
 	}
 
 	void
@@ -253,26 +215,7 @@ namespace GlobalNames {
             BoilerNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
             NumBoilers = static_cast< int >( BoilerNames.size() );
         }
- /*
-		if ( NumBoilers > 0 ) Found = InputProcessor::FindItemInList( NameToVerify, BoilerNames, &ComponentNameData::CompName, NumBoilers );
 
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + BoilerNames( Found ).CompType + "\"." );
-			ShowContinueError( "...Current entry is Boiler Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			if ( NumBoilers == 0 ) {
-				CurMaxBoilers = 4;
-				BoilerNames.allocate( CurMaxBoilers );
-			} else if ( NumBoilers == CurMaxBoilers ) {
-				CurMaxBoilers += 4;
-				BoilerNames.redimension( CurMaxBoilers );
-			}
-			++NumBoilers;
-			BoilerNames( NumBoilers ).CompType = TypeToVerify;
-			BoilerNames( NumBoilers ).CompName = NameToVerify;
-		}
-*/
 	}
 
 	void
@@ -304,29 +247,7 @@ namespace GlobalNames {
             CoilNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
             NumCoils = static_cast< int >( CoilNames.size() );
         }
-/*
-        ErrorFound = false;
-		int Found = 0;
 
-		if ( NumCoils > 0 ) Found = InputProcessor::FindItemInList( NameToVerify, CoilNames, &ComponentNameData::CompName, NumCoils );
-
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
-			ShowContinueError( "...Current entry is Coil Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			if ( NumCoils == 0 ) {
-				CurMaxCoils = 4;
-				CoilNames.allocate( CurMaxCoils );
-			} else if ( NumCoils == CurMaxCoils ) {
-				CurMaxCoils += 4;
-				CoilNames.redimension( CurMaxCoils );
-			}
-			++NumCoils;
-			CoilNames( NumCoils ).CompType = InputProcessor::MakeUPPERCase( TypeToVerify );
-			CoilNames( NumCoils ).CompName = NameToVerify;
-		}
-*/
 	}
 
 	void
@@ -347,24 +268,7 @@ namespace GlobalNames {
             aDUNames.emplace( NameToVerify, InputProcessor::MakeUPPERCase( TypeToVerify ) );
             numAirDistUnits = static_cast< int >( aDUNames.size() );
         }
-/*
-		ComponentNameData aDUData;
-		ErrorFound = false;
-		int Found = 0;
 
-		if ( numAirDistUnits > 0 ) Found = InputProcessor::FindItemInList( NameToVerify, aDUNames, &ComponentNameData::CompName, numAirDistUnits );
-
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + aDUNames( Found ).CompType + "\"" );
-			ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			++numAirDistUnits;
-			aDUData.CompType = InputProcessor::MakeUPPERCase( TypeToVerify );
-			aDUData.CompName = NameToVerify;
-			aDUNames.push_back( aDUData );
-		}
-*/
 	}
 
 	// Clears the global data in GlobalNames.
