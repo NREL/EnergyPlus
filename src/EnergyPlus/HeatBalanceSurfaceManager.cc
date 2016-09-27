@@ -128,6 +128,7 @@
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -182,6 +183,7 @@ namespace HeatBalanceSurfaceManager {
 	using namespace ScheduleManager;
 	using namespace SolarShading;
 	using namespace DaylightingManager;
+  using namespace WindowManager;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -2305,74 +2307,85 @@ namespace HeatBalanceSurfaceManager {
 
 							} else { // Exterior window
 
-								if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) {
-									TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
-									for ( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
-										AbsDiffWin( Lay ) = Construct( ConstrNum ).AbsDiff( Lay );
-									}
+                if( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
+                  SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel &&
+                  !inExtWindowModel->isExternalLibraryModel() ) {
+                  TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
+                  for( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
+                    AbsDiffWin( Lay ) = Construct( ConstrNum ).AbsDiff( Lay );
+                  }
 
-									ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+                  ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
 
-									if ( ShadeFlag > 0 ) { // Shaded window
-										ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
-										if ( SurfaceWindow( SurfNum ).StormWinFlag == 1 ) ConstrNumSh = Surface( SurfNum ).StormWinShadedConstruction;
+                  if( ShadeFlag > 0 ) { // Shaded window
+                    ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
+                    if( SurfaceWindow( SurfNum ).StormWinFlag == 1 ) ConstrNumSh = Surface( SurfNum ).StormWinShadedConstruction;
 
-										if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) { // Shade/screen on
+                    if( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) { // Shade/screen on
 
-											for ( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
-												AbsDiffWin( Lay ) = Construct( ConstrNumSh ).AbsDiff( Lay );
-											}
-											SurfaceWindow( SurfNum ).ExtDiffAbsByShade = Construct( ConstrNumSh ).AbsDiffShade * ( SkySolarInc + GndSolarInc );
-										}
+                      for( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
+                        AbsDiffWin( Lay ) = Construct( ConstrNumSh ).AbsDiff( Lay );
+                      }
+                      SurfaceWindow( SurfNum ).ExtDiffAbsByShade = Construct( ConstrNumSh ).AbsDiffShade * ( SkySolarInc + GndSolarInc );
+                    }
 
-										if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) { // Blind on
-											for ( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
-												AbsDiffWin( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiff( {1,MaxSlatAngs}, Lay ) );
-												AbsDiffWinGnd( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( {1,MaxSlatAngs}, Lay ) );
-												AbsDiffWinSky( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( {1,MaxSlatAngs}, Lay ) );
-											}
-											SurfaceWindow( SurfNum ).ExtDiffAbsByShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBlind ) * ( SkySolarInc + GndSolarInc );
-											if ( Blind( SurfaceWindow( SurfNum ).BlindNumber ).SlatOrientation == Horizontal ) {
-												ACosTlt = std::abs( Surface( SurfNum ).CosTilt );
-												AbsDiffBlindGnd = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBlindGnd );
-												AbsDiffBlindSky = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBlindSky );
-												SurfaceWindow( SurfNum ).ExtDiffAbsByShade = SkySolarInc * ( 0.5 * ACosTlt * AbsDiffBlindGnd + ( 1.0 - 0.5 * ACosTlt ) * AbsDiffBlindSky ) + GndSolarInc * ( ( 1.0 - 0.5 * ACosTlt ) * AbsDiffBlindGnd + 0.5 * ACosTlt * AbsDiffBlindSky );
-											}
-										}
+                    if( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) { // Blind on
+                      for( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
+                        AbsDiffWin( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiff( { 1, MaxSlatAngs }, Lay ) );
+                        AbsDiffWinGnd( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( { 1, MaxSlatAngs }, Lay ) );
+                        AbsDiffWinSky( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( { 1, MaxSlatAngs }, Lay ) );
+                      }
+                      SurfaceWindow( SurfNum ).ExtDiffAbsByShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBlind ) * ( SkySolarInc + GndSolarInc );
+                      if( Blind( SurfaceWindow( SurfNum ).BlindNumber ).SlatOrientation == Horizontal ) {
+                        ACosTlt = std::abs( Surface( SurfNum ).CosTilt );
+                        AbsDiffBlindGnd = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBlindGnd );
+                        AbsDiffBlindSky = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBlindSky );
+                        SurfaceWindow( SurfNum ).ExtDiffAbsByShade = SkySolarInc * ( 0.5 * ACosTlt * AbsDiffBlindGnd + ( 1.0 - 0.5 * ACosTlt ) * AbsDiffBlindSky ) + GndSolarInc * ( ( 1.0 - 0.5 * ACosTlt ) * AbsDiffBlindGnd + 0.5 * ACosTlt * AbsDiffBlindSky );
+                      }
+                    }
 
-										// Correct for shadowing of divider onto interior shading device (note that dividers are
-										// not allowed in windows with between-glass shade/blind)
+                    // Correct for shadowing of divider onto interior shading device (note that dividers are
+                    // not allowed in windows with between-glass shade/blind)
 
-										if ( ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) && SurfaceWindow( SurfNum ).DividerArea > 0.0 ) SurfaceWindow( SurfNum ).ExtDiffAbsByShade *= SurfaceWindow( SurfNum ).GlazedFrac;
+                    if( ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) && SurfaceWindow( SurfNum ).DividerArea > 0.0 ) SurfaceWindow( SurfNum ).ExtDiffAbsByShade *= SurfaceWindow( SurfNum ).GlazedFrac;
 
-										if ( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
-											SwitchFac = SurfaceWindow( SurfNum ).SwitchingFactor;
-											for ( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
-												AbsDiffWin( Lay ) = InterpSw( SwitchFac, AbsDiffWin( Lay ), Construct( ConstrNumSh ).AbsDiff( Lay ) );
-											}
-										}
+                    if( ShadeFlag == SwitchableGlazing ) { // Switchable glazing
+                      SwitchFac = SurfaceWindow( SurfNum ).SwitchingFactor;
+                      for( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
+                        AbsDiffWin( Lay ) = InterpSw( SwitchFac, AbsDiffWin( Lay ), Construct( ConstrNumSh ).AbsDiff( Lay ) );
+                      }
+                    }
 
-									} // End of check if window has shading device on
+                  } // End of check if window has shading device on
 
-									QRadSWwinAbsTot( SurfNum ) = 0.0;
-									for ( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
-										QRadSWwinAbs( Lay, SurfNum ) = AbsDiffWin( Lay ) * ( SkySolarInc + GndSolarInc ) + AWinSurf( Lay, SurfNum ) * BeamSolar; // AWinSurf is from InteriorSolarDistribution
-										if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-											if ( Blind( SurfaceWindow( SurfNum ).BlindNumber ).SlatOrientation == Horizontal ) {
-												AbsDiffGlassLayGnd = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( {1,19}, Lay ) );
-												AbsDiffGlassLaySky = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( {1,19}, Lay ) );
-												QRadSWwinAbs( Lay, SurfNum ) = SkySolarInc * ( 0.5 * ACosTlt * AbsDiffGlassLayGnd + ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLaySky ) + GndSolarInc * ( ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky ) + AWinSurf( Lay, SurfNum ) * BeamSolar;
-											}
-										}
+                  QRadSWwinAbsTot( SurfNum ) = 0.0;
+                  for( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
+                    QRadSWwinAbs( Lay, SurfNum ) = AbsDiffWin( Lay ) * ( SkySolarInc + GndSolarInc ) + AWinSurf( Lay, SurfNum ) * BeamSolar; // AWinSurf is from InteriorSolarDistribution
+                    if( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
+                      if( Blind( SurfaceWindow( SurfNum ).BlindNumber ).SlatOrientation == Horizontal ) {
+                        AbsDiffGlassLayGnd = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( { 1, 19 }, Lay ) );
+                        AbsDiffGlassLaySky = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( { 1, 19 }, Lay ) );
+                        QRadSWwinAbs( Lay, SurfNum ) = SkySolarInc * ( 0.5 * ACosTlt * AbsDiffGlassLayGnd + ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLaySky ) + GndSolarInc * ( ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky ) + AWinSurf( Lay, SurfNum ) * BeamSolar;
+                      }
+                    }
 
-										// Total solar absorbed in solid layer (W), for reporting
-										QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
+                    // Total solar absorbed in solid layer (W), for reporting
+                    QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
 
-										// Total solar absorbed in all glass layers (W), for reporting
-										QRadSWwinAbsTot( SurfNum ) += QRadSWwinAbsLayer( Lay, SurfNum );
-									}
-									QRadSWwinAbsTotEnergy( SurfNum ) = QRadSWwinAbsTot( SurfNum ) * TimeStepZoneSec;
-
+                    // Total solar absorbed in all glass layers (W), for reporting
+                    QRadSWwinAbsTot( SurfNum ) += QRadSWwinAbsLayer( Lay, SurfNum );
+                  }
+                  QRadSWwinAbsTotEnergy( SurfNum ) = QRadSWwinAbsTot( SurfNum ) * TimeStepZoneSec;
+                // Need to do it this way for now beaucse of scheduled surface gains. They do work only with
+                // BSDF windows and overwriting absorbtances will work only for ordinary windows
+                } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
+                  SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel &&
+                  inExtWindowModel->isExternalLibraryModel() ) {
+                  TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
+                  for ( Lay = 1; Lay <= TotSolidLay; ++Lay ) {
+                    QRadSWwinAbs( Lay, SurfNum ) = AWinSurf( Lay, SurfNum ) * 
+                      ( QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
+                  }
 								} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
 									TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
 									CurrentState = SurfaceWindow( SurfNum ).ComplexFen.CurrentState;

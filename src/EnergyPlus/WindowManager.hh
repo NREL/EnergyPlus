@@ -59,7 +59,10 @@
 #ifndef WindowManager_hh_INCLUDED
 #define WindowManager_hh_INCLUDED
 
+#include <memory>
+
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array3D.hh>
@@ -194,6 +197,10 @@ namespace WindowManager {
 	extern Array1D< Real64 > rfvisPhi; // Glazing system visible front reflectance for each angle of incidence
 	extern Array1D< Real64 > rbvisPhi; // Glazing system visible back reflectance for each angle of incidence
 	extern Array1D< Real64 > CosPhiIndepVar; // Cos of incidence angles at 10-deg increments for curve fits
+
+  class CWindowModel;
+
+  extern std::shared_ptr< CWindowModel > inExtWindowModel;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines

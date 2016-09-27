@@ -390,7 +390,7 @@ namespace WindowManager {
     // na
     // check and read custom solar and/or visible spectrum data if any
     CheckAndReadCustomSprectrumData();
-    if( inExtWindowModel->getWindowsModel() == WindowsModel::External ) {
+    if( inExtWindowModel->isExternalLibraryModel() ) {
       InitWCEOpticalData();
     } else {
       InitGlassOpticalCalculations();
@@ -2156,7 +2156,7 @@ namespace WindowManager {
     // Subroutine to direct wheter to use exterior or interior window routines
     if( KickOffSizing || KickOffSimulation ) return;
     
-    if( inExtWindowModel->getWindowsModel() == WindowsModel::External ) {
+    if( inExtWindowModel->isExternalLibraryModel() ) {
       CalcWindowHeatBalanceExternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );
     } else {
       CalcWindowHeatBalanceInternalRoutines( SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp );

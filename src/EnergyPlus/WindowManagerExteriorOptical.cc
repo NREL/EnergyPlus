@@ -153,6 +153,11 @@ namespace EnergyPlus {
             shared_ptr< MaterialProperties > aMaterial = make_shared< MaterialProperties >();
             *aMaterial = material;
 
+            // This is necessary because rest of EnergyPlus code relies on TransDiff property 
+            // of construction. It will basically trigger Window optical calculations if this
+            // property is >0.
+            construction.TransDiff = material.Trans;
+
             auto aRange = WavelengthRange::Solar;
             shared_ptr< CBSDFLayer > aSolarLayer = getBSDFLayer( aMaterial, aRange );
             aWinConst.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
@@ -192,13 +197,17 @@ namespace EnergyPlus {
 
     void CWCESpecularMaterialsFactory::init() {
       shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
-      shared_ptr< CSpectralSampleData > aSampleData = 
-        CWCESpecturmProperties::getSpectralSample( m_MaterialProperties->GlassSpectralDataPtr );
+      shared_ptr< CSpectralSampleData > aSampleData = nullptr;
+      if( m_MaterialProperties->GlassSpectralDataPtr > 0 ) {
+        aSampleData = CWCESpecturmProperties::getSpectralSample( m_MaterialProperties->GlassSpectralDataPtr );
+      } else {
+        aSampleData = CWCESpecturmProperties::getSpectralSample( *m_MaterialProperties );
+      }
+      
       shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
 
       SpecularMaterialType aType = SpecularMaterialType::Monolithic;
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( m_Range );
+      CWavelengthRange aRange = CWavelengthRange( m_Range );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
@@ -244,8 +253,7 @@ namespace EnergyPlus {
       auto& blind( Blind( blindDataPtr ) );
       assert( blindDataPtr > 0 );
       
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Visible );
+      CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Visible );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
       
@@ -262,8 +270,7 @@ namespace EnergyPlus {
       auto& blind( Blind( blindDataPtr ) );
       assert( blindDataPtr > 0 );
 
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Solar );
+      CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
@@ -286,8 +293,7 @@ namespace EnergyPlus {
     }
 
     shared_ptr< CMaterialSingleBand > CWCEScreenMaterialsFactory::createVisibleRangeMaterial() {
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Visible );
+      CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Visible );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
@@ -300,8 +306,7 @@ namespace EnergyPlus {
     }
 
     shared_ptr< CMaterialSingleBand > CWCEScreenMaterialsFactory::createSolarRangeMaterial() {
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Solar );
+      CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
@@ -322,8 +327,7 @@ namespace EnergyPlus {
     }
 
     shared_ptr< CMaterialSingleBand > CWCEDiffuseShadeMaterialsFactory::createVisibleRangeMaterial() {
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Visible );
+      CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Visible );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 
@@ -336,8 +340,7 @@ namespace EnergyPlus {
     }
 
     shared_ptr< CMaterialSingleBand > CWCEDiffuseShadeMaterialsFactory::createSolarRangeMaterial() {
-      CWavelengthRangeFactory aWVFactory = CWavelengthRangeFactory();
-      CWavelengthRange aRange = *aWVFactory.getWavelengthRange( WavelengthRange::Solar );
+      CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
 

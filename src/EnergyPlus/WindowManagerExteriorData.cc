@@ -58,9 +58,10 @@
 
 #include <assert.h>
 
-// #include <WindowManager.hh>
-#include <DataHeatBalance.hh>
 #include <WindowManager.hh>
+#include <DataHeatBalance.hh>
+#include <WindowComplexManager.hh>
+#include <DataBSDFWindow.hh>
 
 #include "WindowManagerExteriorData.hh"
 #include "OpticalLayer.hpp"
@@ -71,6 +72,8 @@
 #include "EquivalentBSDFLayer.hpp"
 #include "FenestrationCommon.hpp"
 #include "MeasuredSampleData.hpp"
+#include "BSDFDirections.hpp"
+#include "MaterialDescription.hpp"
 
 namespace EnergyPlus {
 
@@ -79,6 +82,7 @@ namespace EnergyPlus {
   using namespace DataSurfaces;
   using namespace DataHeatBalance;
   using namespace DataGlobals;
+  using namespace WindowComplexManager;
 
   using namespace LayerOptics;
   using namespace FenestrationCommon;
@@ -86,6 +90,42 @@ namespace EnergyPlus {
   using namespace MultiPane;
 
   namespace WindowManager {
+
+    bool isSurfaceHit( const int t_SurfNum, const Vector& t_Ray ) {
+      double DotProd = dot( t_Ray, Surface( t_SurfNum ).NewellSurfaceNormalVector );
+      return ( DotProd > 0 );
+    }
+
+    pair< double, double > getBSDFCoordinates( const int t_SurfNum, const Vector& t_Ray,
+      const BSDFHemisphere t_Direction ) {
+      double Theta = 0;
+      double Phi = 0;
+      
+      //get window tilt and azimuth
+      double Gamma = DegToRadians * Surface( t_SurfNum ).Tilt;
+      double Alpha = DegToRadians * Surface( t_SurfNum ).Azimuth;
+
+      int RadType = Front_Incident;
+
+      if( t_Direction == BSDFHemisphere::Outgoing ) {
+        RadType = Back_Incident;
+      }
+
+      //get the corresponding local Theta, Phi for ray
+      W6CoordsFromWorldVect( t_Ray, RadType, Gamma, Alpha, Theta, Phi );
+
+      Theta = 180 / Pi * Theta;
+      Phi = 180 / Pi * Phi;
+
+      return make_pair( Theta, Phi );
+
+    }
+
+    pair< double, double > getSunBSDFCoordinates( const int t_SurfNum, const BSDFHemisphere t_Direction ) {
+      std::pair< double, double > Angles;
+      return getBSDFCoordinates( t_SurfNum, DataBSDFWindow::SUNCOSTS( TimeStep, HourOfDay, { 1, 3 } ), 
+        t_Direction );
+    }
 
 	  ///////////////////////////////////////////////////////////////////////////////
 	  //       CWCESpecturmProperties
@@ -136,7 +176,7 @@ namespace EnergyPlus {
 		  //       RE-ENGINEERED  na
 
 		  // PURPOSE OF THIS SUBROUTINE:
-		  // Reads spectral data values
+		  // Reads spectral data value
 		  assert( t_SampleDataPtr != 0 ); // It must not be called for zero value
 		  shared_ptr< CSpectralSampleData > aSampleData = make_shared< CSpectralSampleData >();
 		  auto spectralData = SpectralData( t_SampleDataPtr );
@@ -151,6 +191,34 @@ namespace EnergyPlus {
 
 		  return aSampleData;
 	  }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    shared_ptr< CSpectralSampleData > CWCESpecturmProperties::getSpectralSample(
+      const MaterialProperties& t_MaterialProperties ) {
+      double Tsol = t_MaterialProperties.Trans;
+      double Rfsol = t_MaterialProperties.ReflectSolBeamFront;
+      double Rbsol = t_MaterialProperties.ReflectSolBeamBack;
+      shared_ptr< CMaterialBand > aSolMat = 
+        make_shared< CMaterialSingleBand >( Tsol, Tsol, Rfsol, Rbsol, 0.3, 2.5 );
+
+      double Tvis = t_MaterialProperties.TransVis;
+      double Rfvis = t_MaterialProperties.ReflectVisBeamFront;
+      double Rbvis = t_MaterialProperties.ReflectVisBeamBack;
+      shared_ptr< CMaterialBand > aVisMat =
+        make_shared< CMaterialSingleBand >( Tvis, Tvis, Rfvis, Rbvis, 0.38, 0.78 );
+
+      CMaterialDualBand aMat = CMaterialDualBand( aVisMat, aSolMat, 0.49 );
+      vector< double > aWl = *aMat.getBandWavelengths();
+      vector< double > aTf = *aMat.getBandProperties( Property::T, Side::Front );
+      vector< double > aRf = *aMat.getBandProperties( Property::R, Side::Front );
+      vector< double > aRb = *aMat.getBandProperties( Property::R, Side::Back );
+      shared_ptr< CSpectralSampleData > aSampleData = make_shared< CSpectralSampleData >();
+      for( size_t i = 0; i < aWl.size(); ++i ) {
+        aSampleData->addRecord( aWl[ i ], aTf[ i ], aRf[ i ], aRb[ i ] );
+      }
+
+      return aSampleData;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     //       CWindowConstructionsBSDF
@@ -180,7 +248,7 @@ namespace EnergyPlus {
       const int t_ConstrNum ) const {
       Layers_Map aMap = *m_Layers.at( t_Range );
       auto it = aMap.find( t_ConstrNum );
-      if( it != aMap.end() ) {
+      if( it == aMap.end() ) {
         throw runtime_error( "Incorrect construction selection." );
       }
       return aMap.at( t_ConstrNum );
@@ -188,14 +256,14 @@ namespace EnergyPlus {
 
     void CWindowConstructionsBSDF::pushBSDFLayer( const WavelengthRange t_Range, const int t_ConstrNum, 
       const shared_ptr< CBSDFLayer >& t_Layer ) {
-      Layers_Map aMap = *m_Layers.at( t_Range );
-      auto it = aMap.find( t_ConstrNum );
+      shared_ptr< Layers_Map > aMap = m_Layers.at( t_Range );
+      auto it = aMap->find( t_ConstrNum );
       shared_ptr< IGU_Layers > iguLayers = nullptr;
-      if( it != aMap.end() ) {
+      if( it != aMap->end() ) {
         iguLayers = it->second;
       } else {
         iguLayers = make_shared< IGU_Layers >();
-        aMap[ t_ConstrNum ] = iguLayers;
+        ( *aMap )[ t_ConstrNum ] = iguLayers;
       }
 
       iguLayers->push_back( t_Layer );
@@ -212,7 +280,7 @@ namespace EnergyPlus {
         size_t i = iguLayers.size();
         shared_ptr< CEquivalentBSDFLayer > aEqLayer = 
           make_shared< CEquivalentBSDFLayer >( commonWl, aSolarSpectrum, iguLayers[ 0 ] );
-        for( auto i = 1; iguLayers.size(); ++i ) {
+        for( auto i = 1; i < iguLayers.size(); ++i ) {
           aEqLayer->addLayer( iguLayers[ i ] );
         }
         m_Equivalent[ make_pair( t_Range, t_ConstrNum ) ] = aEqLayer;

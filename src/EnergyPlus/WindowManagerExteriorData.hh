@@ -63,6 +63,15 @@
 #include <vector>
 #include <map>
 
+#include <Vectors.hh>
+
+namespace EnergyPlus {
+  namespace DataHeatBalance {
+    struct MaterialProperties;
+  }
+
+}
+
 namespace FenestrationCommon {
 
   enum class WavelengthRange;
@@ -79,6 +88,7 @@ namespace SpectralAveraging {
 namespace LayerOptics {
 
   class CBSDFLayer;
+  enum class BSDFHemisphere;
 
 }
 
@@ -97,12 +107,26 @@ namespace EnergyPlus {
     // in between. So we will just use map to store layers so that we get optimized search.
     typedef std::map< int, std::shared_ptr< IGU_Layers > > Layers_Map;
 
+    // Test if surface is hit by beam defined with vector
+    bool isSurfaceHit( const int t_SurfNum, const EnergyPlus::DataVectorTypes::Vector& t_Ray );
+
+    // Converts world coordinates (E+) into local surface coordinates that suites better for 
+    // BSDF operations. Return values are angles Theta and Phi that are used to define BSDF direction
+    std::pair< double, double > getBSDFCoordinates( const int t_SurfNum, 
+      const EnergyPlus::DataVectorTypes::Vector& t_Ray, const LayerOptics::BSDFHemisphere t_Direction );
+
+    // Returns Theta and Phi coordinates of surface BSDF for current Sun position
+    std::pair< double, double > getSunBSDFCoordinates( const int t_SurfNum,
+      const LayerOptics::BSDFHemisphere t_Direction );
+
 	  ///////////////////////////////////////////////////////////////////////////////
 	  //   CWCESpecturmProperties
 	  ///////////////////////////////////////////////////////////////////////////////
 	  class CWCESpecturmProperties {
 	  public:
 	  	static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( const int t_SampleDataPtr );
+      static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample( 
+        const EnergyPlus::DataHeatBalance::MaterialProperties& t_MaterialProperties );
 	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
 	  	static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
 	  };

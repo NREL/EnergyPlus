@@ -23,8 +23,6 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
-    class CWindowModel;
-
     enum WindowsModel { BuiltIn, External };
 
     // Class that reads IDF object and decides if interior or exterior window models
@@ -36,9 +34,11 @@ namespace EnergyPlus {
       static std::shared_ptr< CWindowModel > WindowModelFactory( std::string objectName );
 
       WindowsModel getWindowsModel() const;
+      bool isExternalLibraryModel() const;
 
     private:
       WindowsModel m_Model;
+
     };
   }
 

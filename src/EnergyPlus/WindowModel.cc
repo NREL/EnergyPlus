@@ -54,6 +54,10 @@ namespace EnergyPlus {
       return m_Model;
     }
 
+    bool CWindowModel::isExternalLibraryModel() const {
+      return m_Model == WindowsModel::External;
+    }
+
   }
 
 
