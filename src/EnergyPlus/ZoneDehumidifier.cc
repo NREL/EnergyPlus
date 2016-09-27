@@ -344,12 +344,10 @@ namespace ZoneDehumidifier {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), ZoneDehumid, ZoneDehumidIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( Alphas( 1 ).empty() ) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				Alphas( 1 ) = "xxxxx";
 			}
 
 			// A1,  \field Name
