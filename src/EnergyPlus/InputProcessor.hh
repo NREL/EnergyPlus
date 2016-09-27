@@ -9,6 +9,7 @@
 #include <vector>
 #include <unordered_map>
 #include <fstream>
+#include <set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -22,6 +23,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <GlobalNames.hh>
 #include <UtilityRoutines.hh>
 
 using json = nlohmann::json;
@@ -256,6 +258,7 @@ namespace EnergyPlus {
 			Array1_string const & ListOfItems,
 			int const NumItems
 		);
+
 
 		static
 		inline

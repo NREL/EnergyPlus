@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <unordered_map>
 
 namespace EnergyPlus {
 
@@ -106,11 +107,11 @@ namespace GlobalNames {
 	};
 
 	// Object Data
-	extern Array1D< ComponentNameData > ChillerNames;
-	extern Array1D< ComponentNameData > BoilerNames;
-	extern Array1D< ComponentNameData > BaseboardNames;
-	extern Array1D< ComponentNameData > CoilNames;
-	extern Array1D< ComponentNameData > aDUNames;
+	extern std::unordered_map < std::string, std::string > ChillerNames;
+	extern std::unordered_map < std::string, std::string > BoilerNames;
+	extern std::unordered_map < std::string, std::string > BaseboardNames;
+	extern std::unordered_map < std::string, std::string > CoilNames;
+	extern std::unordered_map < std::string, std::string > aDUNames;
 
 	// Functions
 
