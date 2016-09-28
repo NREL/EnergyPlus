@@ -62,6 +62,7 @@
 // EnergyPlus Headers
 #include <General.hh>
 #include <ObjexxFCL/gio.hh>
+#include <DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -88,6 +89,8 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataGlobals;
+using DataEnvironment::StdBaroPress;
+using DataEnvironment::StdRhoAir;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataPlant;
@@ -111,6 +114,7 @@ namespace EnergyPlus {
 		bool ErrorsFound( false );
 
 		InitializePsychRoutines();
+		DataEnvironment::StdRhoAir = 1.20;
 
 		std::string const idf_objects = delimited_string( {
 			"	Version,8.4;",
@@ -188,7 +192,7 @@ namespace EnergyPlus {
 			"	AirTerminal:SingleDuct:VAV:Reheat, !- Air Terminal Object Type",
 			"	SPACE1-1 VAV Reheat; !- Air Terminal Name",
 			"	Coil:Heating:Water,",
-			"	SPACE1-1 Zone Coil, !- Name",
+			"	Gronk1 Zone Coil, !- Name",
 			"	ReheatCoilAvailSched, !- Availability Schedule Name",
 			"	, !- U-Factor Times Area Value { W/K }",
 			"	, !- Maximum Water Flow Rate { m3/s }",
@@ -214,7 +218,7 @@ namespace EnergyPlus {
 			"	, !- Fixed Minimum Air Flow Rate { m3/s }",
 			"	, !- Minimum Air Flow Fraction Schedule Name",
 			"	Coil:Heating:Water, !- Reheat Coil Object Type",
-			"	SPACE1-1 Zone Coil, !- Reheat Coil Name",
+			"	Gronk1 Zone Coil, !- Reheat Coil Name",
 			"	autosize, !- Maximum Hot Water or Steam Flow Rate { m3/s }",
 			"	0.0, !- Minimum Hot Water or Steam Flow Rate { m3/s }",
 			"	SPACE1-1 In Node, !- Air Outlet Node Name",
@@ -234,6 +238,7 @@ namespace EnergyPlus {
 		TotNumLoops = 1;
 		PlantLoop.allocate( TotNumLoops );
 		PlantSizData.allocate( 1 );
+		NumPltSizInput = 1;
 		for ( int l = 1; l <= TotNumLoops; ++l ) {
 			auto & loop( PlantLoop( l ) );
 			loop.LoopSide.allocate( 2 );
@@ -253,8 +258,9 @@ namespace EnergyPlus {
 		ProcessScheduleInput();
 		ScheduleInputProcessed = true;
 		GetZoneAirLoopEquipment();
-		GetSysInput();
 		GetWaterCoilInput();
+		WaterCoils::GetWaterCoilsInputFlag = false;
+		GetSysInput();
 		WaterCoil( 1 ).WaterLoopNum = 1;
 		WaterCoil( 1 ).WaterLoopSide = 1;
 		WaterCoil( 1 ).WaterLoopBranchNum = 1;
@@ -267,8 +273,12 @@ namespace EnergyPlus {
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_SimpleHeating;
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 1 ).WaterInletNodeNum;
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = WaterCoil( 1 ).WaterOutletNodeNum;
+		PlantSizData( 1 ).DeltaT = 11.0;
+		PlantSizData( 1 ).ExitTemp = 82;
+		PlantSizData( 1 ).PlantLoopName = "HotWaterLoop";
+		PlantSizData( 1 ).LoopType = 1;
 		ZoneSizingRunDone = true;
-		CurZoneEqNum = 2;
+		CurZoneEqNum = 1;
 		Zone( 1 ).FloorArea = 99.16;
 		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
@@ -283,7 +293,6 @@ namespace EnergyPlus {
 		CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad = 3191.7;
 		CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.099;
 		CalcFinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.0038485;
-		PlantSizData( 1 ).DeltaT = 11.0;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2 = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea * Zone( 1 ).FloorArea;
