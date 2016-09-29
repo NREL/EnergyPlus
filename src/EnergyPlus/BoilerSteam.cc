@@ -299,8 +299,6 @@ namespace BoilerSteam {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int SteamFluidIndex; // Fluid Index for Steam
 		static bool ErrorsFound( false );
 		bool errFlag;

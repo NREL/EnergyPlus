@@ -1415,8 +1415,6 @@ namespace BranchInputManager {
 		////////////////////////////////////////////////
 		int BCount; // Actual Num of Branches
 		bool ErrFound; // Flag for error detection
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumAlphas; // Used to retrieve names from IDF
 		Array1D_string Alphas; // Used to retrieve names from IDF
 		Array1D_int NodeNums; // Possible Array of Node Numbers (only 1 allowed)

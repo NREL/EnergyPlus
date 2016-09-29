@@ -346,8 +346,6 @@ namespace ChillerIndirectAbsorption {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag; // GetInput error flag
 		Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 
@@ -372,13 +370,6 @@ namespace ChillerIndirectAbsorption {
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), IndirectAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;

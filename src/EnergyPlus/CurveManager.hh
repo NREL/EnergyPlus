@@ -434,6 +434,13 @@ namespace CurveManager {
 	GetCurveInput();
 
 	void
+	VerifyUniqueCurveName(
+			std::string const & TypeToVerify,
+			std::string const & NameToVerify,
+			bool & ErrorsFound
+	);
+
+	void
 	GetCurveInputData( bool & ErrorsFound );
 
 	void

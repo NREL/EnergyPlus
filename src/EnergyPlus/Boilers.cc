@@ -316,8 +316,6 @@ namespace Boilers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // Flag to show errors were found during GetInput
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag; // Flag to show errors were found during function call
 		Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 

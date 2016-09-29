@@ -331,8 +331,6 @@ namespace BaseboardRadiator {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		cCurrentModuleObject = cCMO_BBRadiator_Water;

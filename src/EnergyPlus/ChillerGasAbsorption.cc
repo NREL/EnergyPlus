@@ -313,8 +313,6 @@ namespace ChillerGasAbsorption {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string ChillerName;
 		bool errFlag;
 		bool Okay;
@@ -341,13 +339,6 @@ namespace ChillerGasAbsorption {
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				Get_ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				Get_ErrorsFound = true;
