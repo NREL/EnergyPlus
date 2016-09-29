@@ -1447,23 +1447,9 @@ namespace BranchInputManager {
 				lNumericBlanks.dimension( NumNumbers, true );
 				BCount = 0;
 				for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
-
 					InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrFound = true;
-						if ( IsBlank ) {
-							continue;
-						} else {
-							Alphas( 1 ) = Alphas( 1 ) + "--dup";
-						}
-					}
 					++BCount;
-
 					GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
-
 				}
 
 				NumOfBranches = BCount;
@@ -1661,8 +1647,6 @@ namespace BranchInputManager {
 		bool ErrFound; // True when error has occured (cannot find Branch List)
 		// Following are needed because routine calls GetBranchInput
 		// which would overwrite the module Alphas and NumAlphas
-		bool IsNotOK; // Flag for "VerifyName" routine
-		bool IsBlank; // Flag for "blank" name
 		int NumAlphas; // Used to retrieve Branch list from IDF
 		Array1D_string Alphas; // Used to retrieve names from IDF
 		int NumNumbers;
@@ -1699,13 +1683,6 @@ namespace BranchInputManager {
 		for ( Count = 1; Count <= NumOfBranchLists; ++Count ) {
 			CurrentModuleObject = "BranchList";
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), BranchList, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrFound = true;
-				continue;
-			}
 
 			++BCount;
 			BranchList( BCount ).Name = Alphas( 1 );

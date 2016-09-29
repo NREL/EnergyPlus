@@ -356,13 +356,6 @@ namespace BaseboardRadiator {
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					continue;
-				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;
