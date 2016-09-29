@@ -8,7 +8,6 @@
 ! enter gas properties; see description of
 ! WindowMaterial:Gas in Input/Output Reference Manual.
 ! Air
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   WindowMaterial:Gas,

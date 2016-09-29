@@ -1781,6 +1781,7 @@ namespace VentilatedSlab {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1874,6 +1875,7 @@ namespace VentilatedSlab {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1975,6 +1977,7 @@ namespace VentilatedSlab {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								SizingString = "";
 								PrintFlag = false;

@@ -60,15 +60,14 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-410A
 ! Expansion Valve Type = Balance port TXV, removable head
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Coil:Cooling:DX:SingleSpeed,
     Lennox KCA060S4,         !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18101.22,                !- Rated Total Cooling Capacity {W}
-    0.72,                    !- Rated Sensible Heat Ratio
-    4.07,                    !- Rated COP {W/W}
+    18101.22,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    4.07,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -184,9 +183,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KCA120S4 Stage 1, !- Name
-    17193.23,                !- Rated Total Cooling Capacity {W}
-    0.69,                    !- Rated Sensible Heat Ratio
-    3.54,                    !- Rated COP {W/W}
+    17193.23,                !- Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Gross Rated Sensible Heat Ratio
+    3.54,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.51,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox KCA120S4 Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -199,9 +198,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KCA120S4 Stage 1&2,  !- Name
-    35235.87,                !- Rated Total Cooling Capacity {W}
-    0.72,                    !- Rated Sensible Heat Ratio
-    3.88,                    !- Rated COP {W/W}
+    35235.87,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    3.88,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox KCA120S4 Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -379,9 +378,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KCA240S4 Stage 1, !- Name
-    46951.87,                !- Rated Total Cooling Capacity {W}
-    0.75,                    !- Rated Sensible Heat Ratio
-    3.74,                    !- Rated COP {W/W}
+    46951.87,                !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    3.74,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.33,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox KCA240S4 Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -394,9 +393,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KCA240S4 Stage 1&2,  !- Name
-    69944.52,                !- Rated Total Cooling Capacity {W}
-    0.78,                    !- Rated Sensible Heat Ratio
-    3.83,                    !- Rated COP {W/W}
+    69944.52,                !- Gross Rated Total Cooling Capacity {W}
+    0.78,                    !- Gross Rated Sensible Heat Ratio
+    3.83,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox KCA240S4 Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -560,9 +559,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Lennox SCA060H4B,        !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18452.7,                 !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    4.48,                    !- Rated COP {W/W}
+    18452.7,                 !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    4.48,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -678,9 +677,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox SCA120H4B Stage 1,!- Name
-    18218.38,                !- Rated Total Cooling Capacity {W}
-    0.67,                    !- Rated Sensible Heat Ratio
-    4.09,                    !- Rated COP {W/W}
+    18218.38,                !- Gross Rated Total Cooling Capacity {W}
+    0.67,                    !- Gross Rated Sensible Heat Ratio
+    4.09,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.5,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox SCA120H4B Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -693,9 +692,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox SCA120H4B Stage 1&2,  !- Name
-    36436.76,                !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    4.35,                    !- Rated COP {W/W}
+    36436.76,                !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    4.35,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox SCA120H4B Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -873,9 +872,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox SCA240H4B Stage 1,!- Name
-    35411.61,                !- Rated Total Cooling Capacity {W}
-    0.71,                    !- Rated Sensible Heat Ratio
-    3.76,                    !- Rated COP {W/W}
+    35411.61,                !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.76,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.51,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox SCA240H4B Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -888,9 +887,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox SCA240H4B Stage 1&2,  !- Name
-    72873.52,                !- Rated Total Cooling Capacity {W}
-    0.77,                    !- Rated Sensible Heat Ratio
-    4.26,                    !- Rated COP {W/W}
+    72873.52,                !- Gross Rated Total Cooling Capacity {W}
+    0.77,                    !- Gross Rated Sensible Heat Ratio
+    4.26,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox SCA240H4B Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1052,9 +1051,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Lennox TCA060S2,         !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18452.7,                 !- Rated Total Cooling Capacity {W}
-    0.75,                    !- Rated Sensible Heat Ratio
-    4.07,                    !- Rated COP {W/W}
+    18452.7,                 !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    4.07,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -1170,9 +1169,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox TCA120S Stage 1,  !- Name
-    18276.96,                !- Rated Total Cooling Capacity {W}
-    0.71,                    !- Rated Sensible Heat Ratio
-    3.54,                    !- Rated COP {W/W}
+    18276.96,                !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.54,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.51,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox TCA120S Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1185,9 +1184,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox TCA120S Stage 1&2,!- Name
-    37139.72,                !- Rated Total Cooling Capacity {W}
-    0.72,                    !- Rated Sensible Heat Ratio
-    3.68,                    !- Rated COP {W/W}
+    37139.72,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    3.68,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox TCA120S Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1365,9 +1364,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox TCA240S Stage 1,  !- Name
-    49207.2,                 !- Rated Total Cooling Capacity {W}
-    0.71,                    !- Rated Sensible Heat Ratio
-    3.47,                    !- Rated COP {W/W}
+    49207.2,                 !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.47,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.31,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox TCA240S Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1380,9 +1379,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox TCA240S Stage 1&2,!- Name
-    71174.7,                 !- Rated Total Cooling Capacity {W}
-    0.77,                    !- Rated Sensible Heat Ratio
-    3.45,                    !- Rated COP {W/W}
+    71174.7,                 !- Gross Rated Total Cooling Capacity {W}
+    0.77,                    !- Gross Rated Sensible Heat Ratio
+    3.45,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox TCA240S Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1544,9 +1543,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier Centurion 50PG06,!- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18276.96,                !- Rated Total Cooling Capacity {W}
-    0.74,                    !- Rated Sensible Heat Ratio
-    4.15,                    !- Rated COP {W/W}
+    18276.96,                !- Gross Rated Total Cooling Capacity {W}
+    0.74,                    !- Gross Rated Sensible Heat Ratio
+    4.15,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -1646,9 +1645,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier Centurion 50PG12,!- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    36788.24,                !- Rated Total Cooling Capacity {W}
-    0.76,                    !- Rated Sensible Heat Ratio
-    4.05,                    !- Rated COP {W/W}
+    36788.24,                !- Gross Rated Total Cooling Capacity {W}
+    0.76,                    !- Gross Rated Sensible Heat Ratio
+    4.05,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -1748,9 +1747,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier Centurion 50PG24,!- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    73810.8,                 !- Rated Total Cooling Capacity {W}
-    0.71,                    !- Rated Sensible Heat Ratio
-    3.95,                    !- Rated COP {W/W}
+    73810.8,                 !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.95,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -1850,9 +1849,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier Comfort 50ES060, !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17500.95,                !- Rated Total Cooling Capacity {W}
-    0.78,                    !- Rated Sensible Heat Ratio
-    3.9,                     !- Rated COP {W/W}
+    17500.95,                !- Gross Rated Total Cooling Capacity {W}
+    0.78,                    !- Gross Rated Sensible Heat Ratio
+    3.9,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -1952,9 +1951,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier Weathermaster 50HJ006,  !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18687,                   !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    3.9,                     !- Rated COP {W/W}
+    18687,                   !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.9,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2054,9 +2053,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier Weathermaster 50HJ012,  !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    36846.82,                !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    3.71,                    !- Rated COP {W/W}
+    36846.82,                !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.71,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2156,9 +2155,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier Weathermaster 50HJ024,  !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    73517.9,                 !- Rated Total Cooling Capacity {W}
-    0.76,                    !- Rated Sensible Heat Ratio
-    3.73,                    !- Rated COP {W/W}
+    73517.9,                 !- Gross Rated Total Cooling Capacity {W}
+    0.76,                    !- Gross Rated Sensible Heat Ratio
+    3.73,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2258,9 +2257,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Goodman CPC060,          !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17427.55,                !- Rated Total Cooling Capacity {W}
-    0.72,                    !- Rated Sensible Heat Ratio
-    3.95,                    !- Rated COP {W/W}
+    17427.55,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    3.95,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2360,9 +2359,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Affinity DNP060,    !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17200,                   !- Rated Total Cooling Capacity {W}
-    0.71,                    !- Rated Sensible Heat Ratio
-    3.88,                    !- Rated COP {W/W}
+    17200,                   !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.88,                    !- Gross Rated Cooling COP {W/W}
     0.8496,                  !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2462,9 +2461,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Affinity DNZ060,    !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17395.3,                 !- Rated Total Cooling Capacity {W}
-    0.68,                    !- Rated Sensible Heat Ratio
-    4.24,                    !- Rated COP {W/W}
+    17395.3,                 !- Gross Rated Total Cooling Capacity {W}
+    0.68,                    !- Gross Rated Sensible Heat Ratio
+    4.24,                    !- Gross Rated Cooling COP {W/W}
     0.826,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2564,9 +2563,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Lattitude SJ060,    !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17427.55,                !- Rated Total Cooling Capacity {W}
-    0.70,                    !- Rated Sensible Heat Ratio
-    4.25,                    !- Rated COP {W/W}
+    17427.55,                !- Gross Rated Total Cooling Capacity {W}
+    0.70,                    !- Gross Rated Sensible Heat Ratio
+    4.25,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2666,9 +2665,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Lattitude NM060,    !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17100,                   !- Rated Total Cooling Capacity {W}
-    0.70,                    !- Rated Sensible Heat Ratio
-    3.85,                    !- Rated COP {W/W}
+    17100,                   !- Gross Rated Total Cooling Capacity {W}
+    0.70,                    !- Gross Rated Sensible Heat Ratio
+    3.85,                    !- Gross Rated Cooling COP {W/W}
     0.8024,                  !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2768,9 +2767,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Predator ZF120,     !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    36905.4,                 !- Rated Total Cooling Capacity {W}
-    0.734,                   !- Rated Sensible Heat Ratio
-    4.06,                    !- Rated COP {W/W}
+    36905.4,                 !- Gross Rated Total Cooling Capacity {W}
+    0.734,                   !- Gross Rated Sensible Heat Ratio
+    4.06,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2870,9 +2869,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Sunline ZR060,      !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18687,                   !- Rated Total Cooling Capacity {W}
-    0.685,                   !- Rated Sensible Heat Ratio
-    3.98,                    !- Rated COP {W/W}
+    18687,                   !- Gross Rated Total Cooling Capacity {W}
+    0.685,                   !- Gross Rated Sensible Heat Ratio
+    3.98,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2972,9 +2971,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Sunline DR060,      !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17398.26,                !- Rated Total Cooling Capacity {W}
-    0.69,                    !- Rated Sensible Heat Ratio
-    4.05,                    !- Rated COP {W/W}
+    17398.26,                !- Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Gross Rated Sensible Heat Ratio
+    4.05,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -3074,9 +3073,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Sunline ZF240,      !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    81807,                   !- Rated Total Cooling Capacity {W}
-    0.70,                    !- Rated Sensible Heat Ratio
-    3.59,                    !- Rated COP {W/W}
+    81807,                   !- Gross Rated Total Cooling Capacity {W}
+    0.70,                    !- Gross Rated Sensible Heat Ratio
+    3.59,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -3176,9 +3175,9 @@
   Coil:Cooling:DX:SingleSpeed,
     York Sunline DJ240,      !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    73518,                   !- Rated Total Cooling Capacity {W}
-    0.75,                    !- Rated Sensible Heat Ratio
-    4.096,                   !- Rated COP {W/W}
+    73518,                   !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    4.096,                   !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name

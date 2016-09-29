@@ -8,7 +8,6 @@
 ! Capacity Curve for Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 !
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Curve:Bicubic,

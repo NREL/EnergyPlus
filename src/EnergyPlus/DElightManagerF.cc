@@ -739,61 +739,6 @@ namespace DElightManagerF {
 
 	}
 
-	void
-	SetupDElightOutput4EPlus()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Robert J. Hitchcock
-		//       DATE WRITTEN   February 2004
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine sets up EnergyPlus output variables for DElight related variables.
-		// RJH 2008-03-07: Only lighting power reduction factor is setup here
-		// Reference Point Daylight Illuminance [lux] is setup within DElightInputGenerator
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// Using/Aliasing
-		using namespace DataGlobals; // Gives access to NumOfZones
-		using DataDaylighting::ZoneDaylight;
-		using DataHeatBalance::Zone; // Gives access to Zone(izone)%var
-		using DataDaylighting::DElightDaylighting;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const var_name( "Daylighting Lighting Power Multiplier []" );
-		static std::string const Zone_str( "Zone" );
-		static std::string const Average_str( "Average" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
-			if ( ZoneDaylight( iZone ).TotalDaylRefPoints >= 1 && ZoneDaylight( iZone ).DaylightMethod == DElightDaylighting ) {
-				// Set up lighting power reduction factor for output for this DElight zone
-				SetupOutputVariable( var_name, ZoneDaylight( iZone ).ZonePowerReductionFactor, Zone_str, Average_str, Zone( iZone ).Name );
-			}
-		}
-
-	}
-
-
 	std::string
 	ReplaceBlanksWithUnderscores( std::string const & InputString ) // Input String
 	{

@@ -375,6 +375,7 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 
 }
 
+<<<<<<< HEAD
 TEST_F(EnergyPlusFixture, DElightManagerF_InputGenerator_Test)
 {
 	std::string const idf_objects = delimited_string({
@@ -648,5 +649,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_InputGenerator_Test)
 //	compare_delightin_stream(""); // this should fail since the delightin stream should be the DElight.in file
 
 }
+=======
+>>>>>>> NREL/develop
 
 

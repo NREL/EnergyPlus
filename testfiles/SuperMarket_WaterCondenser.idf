@@ -1892,32 +1892,32 @@
     Pump 2,                  !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Supply Pump-Heating Node,  !- Outlet Node Name
-    0.0008,                  !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    170,                     !- Rated Power Consumption {W}
+    0.0008,                  !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    170,                     !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     ,                        !- Fraction of Motor Inefficiencies to Fluid Stream
     ,                        !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     ,                        !- Coefficient 3 of the Part Load Performance Curve
     ,                        !- Coefficient 4 of the Part Load Performance Curve
-    ,                        !- Minimum Flow Rate {m3/s}
+    ,                        !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Pump:VariableSpeed,
     Pump 1,                  !- Name
     Supply Inlet Node,       !- Inlet Node Name
     Supply Pump-Cooling Node,!- Outlet Node Name
-    0.003,                   !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    750,                     !- Rated Power Consumption {W}
+    0.003,                   !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    750,                     !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     ,                        !- Fraction of Motor Inefficiencies to Fluid Stream
     ,                        !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     ,                        !- Coefficient 3 of the Part Load Performance Curve
     ,                        !- Coefficient 4 of the Part Load Performance Curve
-    ,                        !- Minimum Flow Rate {m3/s}
+    ,                        !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
 !-   ===========  ALL OBJECTS IN CLASS: COOLINGTOWER:SINGLESPEED ===========

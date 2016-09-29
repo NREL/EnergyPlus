@@ -1318,7 +1318,7 @@
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
@@ -1326,25 +1326,25 @@
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Humidistat Reheat Coil 1,!- Supplemental Heating Coil Name
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
-    1.6,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
-    SupplyAirFlowRate,       !- Supply air Flow Rate Method During Heating Operation
-    1.6,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area during Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    1.6,                     !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
-    ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
+    1.6,                     !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
+    1.6,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+    1.6,                     !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
     80;                      !- Maximum Supply Air Temperature {C}
 
 !    ,  !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation

@@ -609,7 +609,7 @@ namespace HeatBalanceSurfaceManager {
 					// extract reference point illuminance values from DElight Electric Lighting dump file for reporting
 					// Open DElight Electric Lighting Dump File for reading
 					iDElightErrorFile = GetNewUnitNumber();
-					{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); iwriteStatus = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightEldmpFileName, flags ); iwriteStatus = flags.ios(); }
 					//            IF (iwriteStatus /= 0) THEN
 					//              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
 					//            ENDIF
@@ -760,7 +760,7 @@ namespace HeatBalanceSurfaceManager {
 						TSC += construct.CTFTSourceOut( Term ) * TH11 + construct.CTFTSourceIn( Term ) * TH12 + construct.CTFTSourceQ( Term ) * QsrcHist1 + construct.CTFFlux( Term ) * TsrcHist( SurfNum, Term + 1 );
 
 						TUC += construct.CTFTUserOut( Term ) * TH11 + construct.CTFTUserIn( Term ) * TH12 + construct.CTFTUserSource( Term ) * QsrcHist1 + construct.CTFFlux( Term ) * TuserHist( SurfNum, Term + 1 );
-					
+
 					}
 
 				}
@@ -780,7 +780,7 @@ namespace HeatBalanceSurfaceManager {
 					CTFTsrcConstPart( SurfNum ) = 0.0;
 					CTFTuserConstPart( SurfNum ) = 0.0;
 				}
-				
+
 			}
 
 		} // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
@@ -4224,7 +4224,7 @@ namespace HeatBalanceSurfaceManager {
 					QsrcHist[ l2 ] = QsrcHistM[ l2 ] - ( QsrcHistM[ l2 ] - Qsrc1( SurfNum ) ) * sum_steps;
 					TuserHist[ l2 ] = TuserHistM[ l2 ] - ( TuserHistM[ l2 ] - Tuser1( SurfNum ) ) * sum_steps;
 				}
-				
+
 			}
 
 		} // ...end of loop over all (heat transfer) surfaces
@@ -5362,7 +5362,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			// check for saturation conditions of air
 			Real64 const HConvIn_surf( HConvInFD( SurfNum ) = HConvIn( SurfNum ) );
 			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb_fast( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
-			HMassConvInFD( SurfNum ) = HConvIn_surf / ( ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) + RhoVaporAirIn( SurfNum ) ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
+			HMassConvInFD( SurfNum ) = HConvIn_surf / ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
 
 			// Perform heat balance on the inside face of the surface ...
 			// The following are possibilities here:
