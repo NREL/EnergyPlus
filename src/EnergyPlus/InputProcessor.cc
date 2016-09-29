@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <istream>
 #include <iostream>
+#include <set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
@@ -9,6 +10,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
@@ -1518,6 +1520,7 @@ namespace EnergyPlus {
 		}
 		return 0; // Not found
 	}
+
 
 	int
 	EnergyPlus::InputProcessor::FindItemInSortedList(

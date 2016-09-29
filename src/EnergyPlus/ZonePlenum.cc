@@ -398,6 +398,8 @@ namespace ZonePlenum {
 			InputProcessor::GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
+
+			//TODO: rethink logic on verify name + find item in list
 			InputProcessor::VerifyName( AlphArray( 1 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -529,6 +531,7 @@ namespace ZonePlenum {
 
 			IsNotOK = false;
 			IsBlank = false;
+			//TODO: rethink logic on verify name + find item in list
 			InputProcessor::VerifyName( AlphArray( 1 ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -543,15 +546,6 @@ namespace ZonePlenum {
 				ShowContinueError( "..Only one " + CurrentModuleObject + " object may be connected to a given zone." );
 				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 				ErrorsFound = true;
-			}
-			if ( NumZoneReturnPlenums > 0 ) { // Check if this zone is also used in another plenum
-				IOStat = InputProcessor::FindItemInList( AlphArray( 2 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName );
-				if ( IOStat != 0 ) {
-					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
-					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone." );
-					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
-					ErrorsFound = true;
-				}
 			}
 			ZoneSupPlenCond( ZonePlenumNum ).ZoneName = AlphArray( 2 );
 			// put the X-Ref to the zone heat balance data structure
