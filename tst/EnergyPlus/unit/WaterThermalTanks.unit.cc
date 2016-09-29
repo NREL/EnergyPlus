@@ -1586,7 +1586,7 @@ TEST_F( EnergyPlusFixture, StratifiedTankUseEnergy )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	EXPECT_FALSE( WaterThermalTanks::GetWaterThermalTankInputData( ErrorsFound ) );

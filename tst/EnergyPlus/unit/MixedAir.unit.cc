@@ -4773,7 +4773,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );
@@ -4965,7 +4965,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );
