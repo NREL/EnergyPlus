@@ -2297,8 +2297,6 @@
 
   Output:Meter:MeterFileOnly,Gas:Building,runperiod;
 
-<<<<<<< HEAD
-=======
   Output:Table:Monthly,
     Zone Cooling Summary,    !- Name
     ,                        !- Digits After Decimal
@@ -2329,7 +2327,6 @@
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3
 
->>>>>>> NREL/develop
   Output:Table:Annual,
     Zone Electric Annual Summary,  !- Name
     ,                        !- Filter
@@ -2584,17 +2581,10 @@
     ,                        !- Digits After Decimal 2
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 3 Name
     Minimum,                 !- Aggregation Type for Variable or Meter 3
-<<<<<<< HEAD
-    ,                        !- field Digits After Decimal 3
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 4 Name
-    HourInTenBinsMinToMax,                 !- Aggregation Type for Variable or Meter 4
-    ;                        !- field Digits After Decimal 4
-=======
     ,                        !- Digits After Decimal 3
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter or EMS Variable or Field 4 Name
     HourInTenBinsMinToMax,   !- Aggregation Type for Variable or Meter 4
     ;                        !- Digits After Decimal 4
->>>>>>> NREL/develop
 
   Output:Table:Annual,
     Daytime Outdoor Temperature Min Max Bin Annual Report,  !- Name

@@ -1460,12 +1460,8 @@ namespace MixedAir {
 		if ( NumVentMechControllers > 0 ) {
 			VentilationMechanical.allocate( NumVentMechControllers );
 			for ( VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum ) {
-<<<<<<< HEAD
-				InputProcessor::GetObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-=======
 				auto & thisVentilationMechanical( VentilationMechanical( VentMechNum ) );
-				GetObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
->>>>>>> NREL/develop
+				InputProcessor::GetObjectItem( CurrentModuleObject, VentMechNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				MechVentZoneCount = 0;
 
@@ -1494,17 +1490,10 @@ namespace MixedAir {
 				}
 
 				// Adding new flag for DCV
-<<<<<<< HEAD
 				if ( InputProcessor::SameString( AlphArray( 3 ), "Yes" ) ) {
-					VentilationMechanical( VentMechNum ).DCVFlag = true;
-				} else if ( InputProcessor::SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
-					VentilationMechanical( VentMechNum ).DCVFlag = false;
-=======
-				if ( SameString( AlphArray( 3 ), "Yes" ) ) {
 					thisVentilationMechanical.DCVFlag = true;
-				} else if ( SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
+				} else if ( InputProcessor::SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
 					thisVentilationMechanical.DCVFlag = false;
->>>>>>> NREL/develop
 				} else {
 					ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid value " + cAlphaFields( 3 ) + "=\"" + AlphArray( 3 ) + "\"." );
 					ShowContinueError( "...Valid values are \"Yes\" or \"No\"." );
@@ -1604,19 +1593,11 @@ namespace MixedAir {
 						}
 					}
 
-<<<<<<< HEAD
-					ZoneNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), Zone );
+					ZoneNum = InputProcessor::FindItemInList( VentMechZoneOrListName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						++MechVentZoneCount;
 					} else {
-						ZoneListNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneList );
-=======
-					ZoneNum = FindItemInList( VentMechZoneOrListName( groupNum ), Zone );
-					if ( ZoneNum > 0 ) {
-						++MechVentZoneCount;
-					} else {
-						ZoneListNum = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneList );
->>>>>>> NREL/develop
+						ZoneListNum = InputProcessor::FindItemInList( VentMechZoneOrListName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							MechVentZoneCount += ZoneList( ZoneListNum ).NumOfZones;
 						} else {
@@ -1656,11 +1637,7 @@ namespace MixedAir {
 
 				//   Loop through zone names and list of zone names, remove duplicate zones, and store designspec names and indexes
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
-<<<<<<< HEAD
-					ZoneNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), Zone );
-=======
-					ZoneNum = FindItemInList( VentMechZoneOrListName( groupNum ), Zone );
->>>>>>> NREL/develop
+					ZoneNum = InputProcessor::FindItemInList( VentMechZoneOrListName( groupNum ), Zone );
 					if ( ZoneNum > 0 ) {
 						if ( any_eq( thisVentilationMechanical.VentMechZone, ZoneNum ) ) {
 							//          Disregard duplicate zone names, show warning and do not store data for this zone
@@ -1679,11 +1656,7 @@ namespace MixedAir {
 								thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-<<<<<<< HEAD
-									ObjIndex = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
-=======
-									ObjIndex = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
->>>>>>> NREL/develop
+									ObjIndex = InputProcessor::FindItemInList( VentMechZoneOrListName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										thisVentilationMechanical.ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 										thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1697,11 +1670,7 @@ namespace MixedAir {
 								thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
 							} else {
 								if ( DoZoneSizing ) {
-<<<<<<< HEAD
-									ObjIndex = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
-=======
-									ObjIndex = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
->>>>>>> NREL/develop
+									ObjIndex = InputProcessor::FindItemInList( VentMechZoneOrListName( groupNum ), ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 									if ( ObjIndex > 0 ) {
 										thisVentilationMechanical.ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 										thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -1711,11 +1680,7 @@ namespace MixedAir {
 						}
 					} else {
 						//       Not a zone name, must be a zone list
-<<<<<<< HEAD
-						ZoneListNum = InputProcessor::FindItemInList( VentMechZoneName( groupNum ), ZoneList );
-=======
-						ZoneListNum = FindItemInList( VentMechZoneOrListName( groupNum ), ZoneList );
->>>>>>> NREL/develop
+						ZoneListNum = InputProcessor::FindItemInList( VentMechZoneOrListName( groupNum ), ZoneList );
 						if ( ZoneListNum > 0 ) {
 							for ( int ScanZoneListNum = 1; ScanZoneListNum <= ZoneList( ZoneListNum ).NumOfZones; ++ScanZoneListNum ) {
 								ObjIndex = 0;
@@ -1737,11 +1702,7 @@ namespace MixedAir {
 										thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 									} else {
 										if ( DoZoneSizing ) {
-<<<<<<< HEAD
-											ObjIndex = InputProcessor::FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
-=======
-											ObjIndex = FindItemInList( Zone( ZoneNum ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
->>>>>>> NREL/develop
+											ObjIndex = InputProcessor::FindItemInList( Zone( ZoneNum ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												thisVentilationMechanical.ZoneDesignSpecOAObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).DesignSpecOAObjName;
 												thisVentilationMechanical.ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneDesignSpecOAIndex;
@@ -1755,11 +1716,7 @@ namespace MixedAir {
 										thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
 									} else {
 										if ( DoZoneSizing ) {
-<<<<<<< HEAD
-											ObjIndex = InputProcessor::FindItemInList( Zone( ZoneList( ZoneListNum ).Zone( ScanZoneListNum ) ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
-=======
-											ObjIndex = FindItemInList( Zone( ZoneNum ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
->>>>>>> NREL/develop
+											ObjIndex = InputProcessor::FindItemInList( Zone( ZoneNum ).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 											if ( ObjIndex > 0 ) {
 												thisVentilationMechanical.ZoneDesignSpecADObjName( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistEffObjName;
 												thisVentilationMechanical.ZoneDesignSpecADObjIndex( MechVentZoneCount ) = ZoneSizingInput( ObjIndex ).ZoneAirDistributionIndex;
@@ -2896,7 +2853,7 @@ namespace MixedAir {
 					PreDefTableEntry( pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate( jZone ), 6 );
 					PreDefTableEntry( pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate( jZone ), 6 );
 					PreDefTableEntry( pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate( jZone ), 6 );
-					PreDefTableEntry( pdchDCVMethod, zoneName, cOAFlowMethodTypes( vent_mech.ZoneOAFlowMethod( jZone ) ) ); 
+					PreDefTableEntry( pdchDCVMethod, zoneName, cOAFlowMethodTypes( vent_mech.ZoneOAFlowMethod( jZone ) ) );
 					if ( vent_mech.ZoneOASchPtr( jZone ) > 0 ) {
 						PreDefTableEntry( pdchDCVOASchName, zoneName, GetScheduleName( vent_mech.ZoneOASchPtr( jZone ) ) );
 					} else {
