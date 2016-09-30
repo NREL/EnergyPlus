@@ -24,7 +24,6 @@
 #include <milo/itoa.hpp>
 
 using json = nlohmann::json;
-#include <iomanip>
 
 json EnergyPlus::InputProcessor::jdf = json();
 json EnergyPlus::InputProcessor::schema = json();
@@ -35,6 +34,7 @@ std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
 std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > >
 		EnergyPlus::InputProcessor::jdd_jdf_cache_map =
 		std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > ();
+std::unordered_set < std::string > EnergyPlus::InputProcessor::SurfaceTmp_set = std::unordered_set < std::string > ();
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
@@ -849,13 +849,13 @@ namespace EnergyPlus {
 
 // Clears the global data in InputProcessor.
 // Needed for unit tests, should not be normally called.
-
 	void
 	InputProcessor::clear_state() {
 		state.errors.clear();
 		state.warnings.clear();
 		jdf.clear();
 		jdd_jdf_cache_map.clear();
+        SurfaceTmp_set.clear();
 		EchoInputFile = 0;
 		echo_stream = nullptr;
 	}

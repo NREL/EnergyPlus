@@ -283,8 +283,6 @@ namespace BaseboardElectric {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		int CtrlZone;   // index to constrolled zone number
@@ -312,13 +310,6 @@ namespace BaseboardElectric {
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = "";
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = cNumericFieldNames;
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipName, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					continue;
-				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;

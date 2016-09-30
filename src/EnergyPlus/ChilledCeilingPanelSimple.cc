@@ -324,8 +324,6 @@ namespace CoolingPanelSimple {
 		int SurfNum; // Surface number Do loop counter
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		NumCoolingPanels = InputProcessor::GetNumObjectsFound( cCMO_CoolingPanel_Simple );
 
@@ -339,13 +337,6 @@ namespace CoolingPanelSimple {
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 
 			InputProcessor::GetObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), CoolingPanel, &CoolingPanelParams::EquipID, CoolingPanelNum, IsNotOK, IsBlank, cCMO_CoolingPanel_Simple + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
 			if ( CoolingPanelNum > 1 ) {
 				for ( CoolPanelNumI = 2; CoolPanelNumI <= NumCoolingPanels; ++CoolPanelNumI ) {
 					if ( cAlphaArgs(1) == CoolingPanel( CoolPanelNumI ).EquipID) {

@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <unordered_set>
 
 namespace EnergyPlus {
 
@@ -1416,6 +1417,7 @@ namespace DataAirflowNetwork {
 	extern Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
 	extern Array1D< IntraZoneNodeProp > IntraZoneNodeData; //Intra zone data set
 	extern Array1D< IntraZoneLinkageProp > IntraZoneLinkageData; //Intra zone linakge adat set
+	extern std::unordered_set< std::string > UniqueAirflowNetworkSurfaceName; // AirflowNetwork:IntraZone:Linkage A5 field (AirflowNetwork:MultiZone:Surface Name) set
 	extern Array1D< DisSysNodeProp > DisSysNodeData;
 	extern Array1D< DisSysCompLeakProp > DisSysCompLeakData;
 	extern Array1D< DisSysCompELRProp > DisSysCompELRData;

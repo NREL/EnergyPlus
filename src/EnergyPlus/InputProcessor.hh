@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <fstream>
 #include <set>
 
@@ -181,6 +182,7 @@ namespace EnergyPlus {
 		static json schema;
 		static json jdf;
 		static std::ostream * echo_stream;
+        static std::unordered_set < std::string > SurfaceTmp_set;
 
 		template < class T >
 		struct is_shared_ptr : std::false_type {};
