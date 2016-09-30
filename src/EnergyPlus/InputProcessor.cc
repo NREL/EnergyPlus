@@ -20,9 +20,9 @@
 #include <SortAndStringUtilities.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
+#include <iomanip>
 
 using json = nlohmann::json;
-#include <iomanip>
 
 json EnergyPlus::InputProcessor::jdf = json();
 json EnergyPlus::InputProcessor::schema = json();
@@ -847,7 +847,6 @@ namespace EnergyPlus {
 
 // Clears the global data in InputProcessor.
 // Needed for unit tests, should not be normally called.
-
 	void
 	InputProcessor::clear_state() {
 		state.errors.clear();
