@@ -4715,12 +4715,10 @@ namespace SingleDuct {
 
 		for ( ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, ATMixerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SysATMixer, ATMixerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs(1).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxxxxx";
+				cAlphaArgs( 1 ) = "xxxxxxxx";
 			}
 			SysATMixer( ATMixerNum ).Name = cAlphaArgs( 1 );
 			if ( cAlphaArgs( 7 ) == "INLETSIDE" ) {

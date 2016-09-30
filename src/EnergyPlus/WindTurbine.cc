@@ -352,11 +352,6 @@ namespace WindTurbine {
 			InputProcessor::GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), WindTurbineSys, WindTurbineNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
 
 			WindTurbineSys( WindTurbineNum ).Name = cAlphaArgs( 1 ); // Name of wind turbine
 

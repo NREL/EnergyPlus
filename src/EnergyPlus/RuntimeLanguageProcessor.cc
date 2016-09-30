@@ -3033,12 +3033,10 @@ namespace RuntimeLanguageProcessor {
 				TrendVariable.allocate( NumErlTrendVariables );
 				for ( TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), TrendVariable, TrendNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
+					if ( cAlphaArgs( 1 ).empty() ) {
+						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+						cAlphaArgs( 1 ) = "xxxxx";
 					}
 
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );

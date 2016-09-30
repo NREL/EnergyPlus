@@ -281,8 +281,6 @@ namespace SplitterComponent {
 		int NodeNum;
 		int IOStat;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumParams;
 		int OutNodeNum1;
 		int OutNodeNum2;
@@ -315,12 +313,10 @@ namespace SplitterComponent {
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SplitterCond, &SplitterConditions::SplitterName, SplitterNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( AlphArray(1).empty()) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+				AlphArray( 1 ) = "xxxxx";
 			}
 			SplitterCond( SplitterNum ).SplitterName = AlphArray( 1 );
 			SplitterCond( SplitterNum ).InletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );

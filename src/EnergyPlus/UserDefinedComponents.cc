@@ -724,12 +724,10 @@ namespace UserDefinedComponents {
 			CheckUserPlantCompName.dimension( NumUserPlantComps, true );
 			for ( CompLoop = 1; CompLoop <= NumUserPlantComps; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), UserPlantComp, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if (cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				UserPlantComp( CompLoop ).Name = cAlphaArgs( 1 );
 
@@ -910,12 +908,10 @@ namespace UserDefinedComponents {
 			CheckUserCoilName.dimension( NumUserCoils, true );
 			for ( CompLoop = 1; CompLoop <= NumUserCoils; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), UserCoil, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()  ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
@@ -1063,12 +1059,10 @@ namespace UserDefinedComponents {
 			CheckUserZoneAirName.dimension( NumUserZoneAir, true );
 			for ( CompLoop = 1; CompLoop <= NumUserZoneAir; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), UserZoneAirHVAC, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if (cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				UserZoneAirHVAC( CompLoop ).Name = cAlphaArgs( 1 );
 
@@ -1215,12 +1209,10 @@ namespace UserDefinedComponents {
 			CheckUserAirTerminal.dimension( NumUserAirTerminals, true );
 			for ( CompLoop = 1; CompLoop <= NumUserAirTerminals; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), UserAirTerminal, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				UserAirTerminal( CompLoop ).Name = cAlphaArgs( 1 );
 

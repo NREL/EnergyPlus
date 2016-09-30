@@ -756,12 +756,10 @@ namespace RoomAirModelManager {
 
 			// get air node objects
 			InputProcessor::GetObjectItem( cCurrentModuleObject, AirNodeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), AirNode, AirNodeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			AirNode( AirNodeNum ).Name = cAlphaArgs( 1 );
 

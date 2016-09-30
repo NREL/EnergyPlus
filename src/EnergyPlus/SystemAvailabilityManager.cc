@@ -589,12 +589,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SchedSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				SchedSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				SchedSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_Scheduled;
@@ -623,12 +621,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SchedOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if (cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				SchedOnSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				SchedOnSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_ScheduledOn;
@@ -657,12 +653,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SchedOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				SchedOffSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				SchedOffSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_ScheduledOff;
@@ -692,12 +686,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), NCycSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				NCycSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				NCycSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_NightCycle;
@@ -860,12 +852,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), OptStartSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				OptStartSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				OptStartSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_OptimumStart;
@@ -988,12 +978,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), DiffTSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				DiffTSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				DiffTSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_DiffThermo;
@@ -1033,12 +1021,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), HiTurnOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				HiTurnOffSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				HiTurnOffSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_HiTempTOff;
@@ -1065,12 +1051,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), HiTurnOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				HiTurnOnSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				HiTurnOnSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_HiTempTOn;
@@ -1097,12 +1081,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), LoTurnOffSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				LoTurnOffSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				LoTurnOffSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_LoTempTOff;
@@ -1140,12 +1122,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), LoTurnOnSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				LoTurnOnSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				LoTurnOnSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_LoTempTOn;
@@ -1172,12 +1152,10 @@ namespace SystemAvailabilityManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), NVentSysAvailMgrData, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				NVentSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				NVentSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_NightVent;
@@ -1312,12 +1290,10 @@ namespace SystemAvailabilityManager {
 			for ( Item = 1; Item <= NumAvailManagerLists; ++Item ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SysAvailMgrListData, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				SysAvailMgrListData( Item ).Name = cAlphaArgs( 1 );
 
@@ -4167,12 +4143,10 @@ namespace SystemAvailabilityManager {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), HybridVentSysAvailMgrData, &DefineHybridVentSysAvailManager::AirLoopName, SysAvailNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if (cAlphaArgs( 1 ).empty()) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			HybridVentSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 			HybridVentSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_HybridVent;

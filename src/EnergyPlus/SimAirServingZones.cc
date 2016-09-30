@@ -197,6 +197,7 @@ namespace SimAirServingZones {
 	int const Fan_ComponentModel( 25 ); // cpw22Aug2010 (new)
 	int const DXHeatPumpSystem( 26 );
 	int const CoilUserDefined( 27 );
+	bool IsNotOK;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -475,8 +476,6 @@ namespace SimAirServingZones {
 		static Array1D_int OutletNodeNumbers; // Component outlet node numbers from GetBranchData call
 		Array1D_int DummyInteger( 2 ); // Placeholder for corresponding plant loop branch pressure drop info
 		static bool ErrorsFound( false ); // TRUE if errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static Array1D_bool PackagedUnit;
 		int test;
 		int count;
@@ -585,12 +584,10 @@ namespace SimAirServingZones {
 			// Assign the air system data to the simulation variables.
 			// Data needed to simulate the system goes into PrimaryAirSystem.
 			// Data connecting the air system to the zone equioment goes into AirToZoneNodeInfo (in DataLoopNode).
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), PrimaryAirSystem, AirSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( Alphas(1).empty() ) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				Alphas( 1 ) = "xxxxx";
 			}
 			PrimaryAirSystem( AirSysNum ).Name = Alphas( 1 );
 			AirToZoneNodeInfo( AirSysNum ).AirLoopName = Alphas( 1 );

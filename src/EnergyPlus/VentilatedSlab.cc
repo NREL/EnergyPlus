@@ -446,10 +446,10 @@ namespace VentilatedSlab {
 
 			IsNotOK = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), VentSlab, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 
 			VentSlab( Item ).Name = cAlphaArgs( 1 );

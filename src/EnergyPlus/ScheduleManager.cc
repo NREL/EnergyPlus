@@ -556,12 +556,10 @@ namespace ScheduleManager {
 		CurrentModuleObject = "ScheduleTypeLimits";
 		for ( LoopIndex = 1; LoopIndex <= NumScheduleTypes; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), ScheduleType( {1,NumScheduleTypes} ), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( Alphas( 1 ).empty() ) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				Alphas( 1 ) = "xxxxx";
 			}
 			ScheduleType( LoopIndex ).Name = Alphas( 1 );
 			if ( lNumericBlanks( 1 ) || lNumericBlanks( 2 ) ) {

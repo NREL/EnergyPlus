@@ -879,12 +879,10 @@ namespace SetPointManager {
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SchSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SchSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SchSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -970,13 +968,10 @@ namespace SetPointManager {
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), DualSchSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			DualSchSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			DualSchSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1056,13 +1051,10 @@ namespace SetPointManager {
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), OutAirSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			OutAirSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1145,13 +1137,10 @@ namespace SetPointManager {
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZRhSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SingZoneRhSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SingZoneRhSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SingZoneRhSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1222,13 +1211,10 @@ namespace SetPointManager {
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZHtSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SingZoneHtSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SingZoneHtSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SingZoneHtSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1298,13 +1284,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZClSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SingZoneClSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SingZoneClSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SingZoneClSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1374,13 +1357,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SZMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SZMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZMinHumSetPtMgr( SetPtMgrNum ).CtrlVarType = "MinimumHumidityRatio";
@@ -1452,13 +1432,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SZMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SZMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZMaxHumSetPtMgr( SetPtMgrNum ).CtrlVarType = "MaximumHumidityRatio";
@@ -1531,15 +1508,11 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:MixedAir";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MixedAirSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
-
 			MixedAirSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MixedAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			if ( InputProcessor::SameString( MixedAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
@@ -1613,15 +1586,11 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOAPretreatSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), OAPretreatSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
-
 			OAPretreatSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			OAPretreatSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			// setup program flow control integers.
@@ -1724,13 +1693,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:Warmest";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			WarmestSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			WarmestSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1801,13 +1767,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:Coldest";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ColdestSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ColdestSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			ColdestSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1878,13 +1841,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgrTempFlow, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			WarmestSetPtMgrTempFlow( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -1962,13 +1922,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), RABFlowSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			RABFlowSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			RABFlowSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -2021,13 +1978,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MZAverageCoolingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			MZAverageCoolingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
@@ -2080,13 +2034,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MZAverageHeatingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			MZAverageHeatingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
@@ -2139,13 +2090,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MZAverageMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			MZAverageMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
@@ -2198,13 +2146,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MZAverageMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			MZAverageMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
@@ -2257,13 +2202,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MZMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			MZMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
@@ -2316,13 +2258,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MZMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			MZMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
@@ -2376,13 +2315,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumFollowOATempSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), FollowOATempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			FollowOATempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -2457,13 +2393,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumFollowSysNodeTempSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), FollowSysNodeTempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			FollowSysNodeTempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -2540,13 +2473,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumGroundTempSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), GroundTempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			GroundTempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -2661,13 +2591,10 @@ namespace SetPointManager {
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), CondEntSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			CondEntSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			CondEntSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -2732,13 +2659,10 @@ namespace SetPointManager {
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), IdealCondEntSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			IdealCondEntSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			IdealCondEntSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
@@ -2787,13 +2711,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SZOneStageCoolingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).CtrlVarType = "Temperature";
@@ -2859,13 +2780,10 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SZOneStageHeatingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).CtrlVarType = "Temperature";
@@ -2932,14 +2850,10 @@ namespace SetPointManager {
 
 			// get the object inputs
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			// set up the name
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ReturnWaterResetChWSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 
@@ -2989,14 +2903,10 @@ namespace SetPointManager {
 
 			// get the object inputs
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			// set up the name
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ReturnWaterResetHWSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 

@@ -483,6 +483,7 @@ namespace WaterCoils {
 
 			IsNotOK = false;
 			IsBlank = false;
+
 			InputProcessor::VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;

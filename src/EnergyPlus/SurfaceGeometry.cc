@@ -5657,14 +5657,7 @@ namespace SurfaceGeometry {
 		for ( Item = 1; Item <= TotExtVentCav; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// first handle cAlphaArgs
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExtVentedCavity, Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ShowContinueError( "...cannot not duplicate other names" );
-				ErrorsFound = true;
-				continue;
-			}
+
 			ExtVentedCavity( Item ).Name = cAlphaArgs( 1 );
 
 			ExtVentedCavity( Item ).OSCMName = cAlphaArgs( 2 );
@@ -6850,14 +6843,6 @@ namespace SurfaceGeometry {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), WindowShadingControl, ControlNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
-
 			++ControlNum;
 			WindowShadingControl( ControlNum ).Name = cAlphaArgs( 1 ); // Set the Control Name in the Derived Type
 			WindowShadingControl( ControlNum ).ShadedConstruction = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
@@ -7637,13 +7622,6 @@ namespace SurfaceGeometry {
 		OSCNum = 0;
 		for ( Loop = 1; Loop <= TotOSC; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), OSC, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
 
 			++OSCNum;
 			OSC( OSCNum ).Name = cAlphaArgs( 1 );
@@ -7796,13 +7774,6 @@ namespace SurfaceGeometry {
 		OSCMNum = 0;
 		for ( Loop = 1; Loop <= TotOSCM; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat );
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), OSCM, OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
 
 			++OSCMNum;
 			OSCM( OSCMNum ).Name = cAlphaArgs( 1 );

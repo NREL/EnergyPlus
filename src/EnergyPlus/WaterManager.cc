@@ -376,10 +376,10 @@ namespace WaterManager {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterStorage, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
+					if ( cAlphaArgs( 1 ).empty() ) {
+						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+						cAlphaArgs( 1 ) = "xxxxx";
 					}
 					objNameMsg = cCurrentModuleObject + " = " + cAlphaArgs( 1 );
 
@@ -532,10 +532,10 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), RainCollector, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Named " );
-					if ( IsNotOK ) {
+					if (cAlphaArgs( 1 ).empty()) {
+						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+						cAlphaArgs( 1 ) = "xxxxx";
 					}
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 
@@ -634,10 +634,10 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), GroundwaterWell, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
+					if ( cAlphaArgs( 1 ).empty()) {
+						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+						cAlphaArgs( 1 ) = "xxxxx";
 					}
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 					GroundwaterWell( Item ).StorageTankName = cAlphaArgs( 2 );

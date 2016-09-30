@@ -323,14 +323,12 @@ namespace ZoneAirLoopEquipmentManager {
 
 			for ( AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, AirDistUnitNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), AirDistUnit, AirDistUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( AlphArray( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+					AlphArray( 1 ) = "xxxxx";
 				}
+
 				AirDistUnit( AirDistUnitNum ).Name = AlphArray( 1 );
 				//Input Outlet Node Num
 				AirDistUnit( AirDistUnitNum ).OutletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );

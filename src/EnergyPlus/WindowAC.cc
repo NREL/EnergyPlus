@@ -419,13 +419,10 @@ namespace WindowAC {
 			WindACNumericFields( WindACNum ).FieldNames.allocate( NumNumbers );
 			WindACNumericFields( WindACNum ).FieldNames = "";
 			WindACNumericFields( WindACNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), WindAC, WindACNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( Alphas( 1 ).empty()) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				Alphas( 1 ) = "xxxxx";
 			}
 			WindAC( WindACNum ).Name = Alphas( 1 );
 			WindAC( WindACNum ).UnitType = WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'

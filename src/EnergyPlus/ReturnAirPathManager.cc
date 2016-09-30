@@ -221,13 +221,10 @@ namespace ReturnAirPathManager {
 			for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				ReturnAirPath( PathNum ).Name = cAlphaArgs( 1 );
 				ReturnAirPath( PathNum ).NumOfComponents = nint( ( NumAlphas - 2.0 ) / 2.0 );

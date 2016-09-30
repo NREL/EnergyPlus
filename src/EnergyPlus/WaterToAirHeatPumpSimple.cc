@@ -418,7 +418,7 @@ namespace WaterToAirHeatPumpSimple {
 
 			IsNotOK = false;
 			IsBlank = false;
-
+			//TODO: re-think algorithm for duplicates
 			InputProcessor::VerifyName( AlphArray( 1 ), SimpleWatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;

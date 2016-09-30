@@ -270,17 +270,6 @@ namespace ThermalChimney {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// First Alpha is Thermal Chimney Name
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ThermalChimneySys, Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) {
-					continue;
-				} else {
-					cAlphaArgs( 1 ) = cAlphaArgs( 1 ) + "--dup";
-				}
-			}
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
 
 			// Second Alpha is Zone Name

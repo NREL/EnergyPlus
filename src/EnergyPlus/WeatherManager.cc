@@ -5440,6 +5440,7 @@ Label9999: ;
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
 				IsNotOK = false;
 				IsBlank = false;
+
 				InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
@@ -5860,6 +5861,7 @@ Label9999: ;
 
 			IsNotOK = false;
 			IsBlank = false;
+			//TODO: rethink algorithm for duplicates
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -5947,6 +5949,7 @@ Label9999: ;
 
 			IsNotOK = false;
 			IsBlank = false;
+
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Title" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -6134,13 +6137,11 @@ Label9999: ;
 		for ( Loop = 1; Loop <= NumSpecDays; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, AlphArray, NumAlphas, Duration, NumNumbers, IOStat );
-
-			InputProcessor::VerifyName( AlphArray( 1 ), SpecialDays, Count - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if (AlphArray(1).empty()) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+				AlphArray( 1 ) = "xxxxx";
 			}
-
 			SpecialDays( Count ).Name = AlphArray( 1 );
 
 			ProcessDateString( AlphArray( 2 ), PMonth, PDay, PWeekDay, DateType, ErrorsFound );
@@ -6488,12 +6489,10 @@ Label9999: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, DDLoop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//   A1, \field Name
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), DesDayInput, &DesignDayData::Title, EnvrnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if (cAlphaArgs(1).empty()) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			DesDayInput( EnvrnNum ).Title = cAlphaArgs( 1 ); // Environment name
 			Environment( EnvrnNum ).Title = DesDayInput( EnvrnNum ).Title;
@@ -7249,12 +7248,11 @@ Label9999: ;
 			}}
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), WPSkyTemperature, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+
+				if (cAlphaArgs(1).empty()) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				WPSkyTemperature( Item ).Name = cAlphaArgs( 1 ); // Name
 			} else {

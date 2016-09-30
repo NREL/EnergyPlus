@@ -398,12 +398,10 @@ namespace UnitHeater {
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = "";
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), UnitHeat, UnitHeatNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( Alphas(1).empty() ) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				Alphas( 1 ) = "xxxxx";
 			}
 
 			UnitHeat( UnitHeatNum ).Name = Alphas( 1 );

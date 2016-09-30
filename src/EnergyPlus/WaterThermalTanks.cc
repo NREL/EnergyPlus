@@ -1214,12 +1214,10 @@ namespace WaterThermalTanks {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, DesuperheaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterHeaterDesuperheater, DesuperheaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
+					if ( cAlphaArgs(1).empty() ) {
+						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+						cAlphaArgs( 1 ) = "xxxxx";
 					}
 					VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 					if ( errFlag ) {
@@ -1526,12 +1524,10 @@ namespace WaterThermalTanks {
 						hpwhAlphaBlank[ i ] = true;
 					}
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( hpwhAlpha[ 1 ], HPWaterHeater, HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
+					if ( hpwhAlpha[ 1 ].empty() ) {
+						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
-						if ( IsBlank ) hpwhAlpha[ 1 ] = "xxxxx";
+						hpwhAlpha[ 1 ] = "xxxxx";
 					}
 
 					// Name and type
@@ -2386,6 +2382,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
+
 					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
@@ -3590,6 +3587,7 @@ namespace WaterThermalTanks {
 
 					IsNotOK = false;
 					IsBlank = false;
+
 					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
