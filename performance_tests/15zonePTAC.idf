@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  VERSION,8.4;
+  VERSION,8.6;
 
   Timestep,4;
 
@@ -1764,25 +1764,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_1_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.500,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    7.500,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_1,  !- Name
@@ -2254,25 +2258,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_2_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    5.215,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    5.215,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_2,  !- Name
@@ -2744,25 +2752,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_3_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    5.000,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    5.000,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_3,  !- Name
@@ -3234,25 +3246,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_4_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    9.785,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    9.785,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_4,  !- Name
@@ -3724,25 +3740,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_5_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    7.500,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    7.500,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_5,  !- Name
@@ -4214,25 +4234,29 @@
     0.0000,30.8600,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_6_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_6,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    15.430,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_6_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_6,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    15.430,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_6,  !- Name
@@ -4704,25 +4728,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_7_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_7,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_7_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_7,        !- Zone Name
+    2.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_7,  !- Name
@@ -5194,25 +5222,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_8_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_8,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    5.215,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_8_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_8,        !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    5.215,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_8,  !- Name
@@ -5684,25 +5716,29 @@
     4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_9_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_9,        !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    9.570,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_9_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_9,        !- Zone Name
+    9.570,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_9,  !- Name
@@ -6174,25 +6210,29 @@
     0.0000,15.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_10_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_10,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    9.785,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_10_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_10,       !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    9.785,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_10,  !- Name
@@ -6664,25 +6704,29 @@
     -4.5700,4.5700,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_11_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_11,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.930,                   !- X-Coordinate of First Reference Point {m}
-    2.285,                   !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_11_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_11,       !- Zone Name
+    2.930,                   !- X-Coordinate of Reference Point {m}
+    2.285,                   !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_11,  !- Name
@@ -7154,25 +7198,29 @@
     0.0000,40.0000,3.8000;  !- X,Y,Z ==> Vertex 4 {m}
 
   Daylighting:Controls,
+    ZN_1_FLR_1_SEC_12_DaylCtrl,  !- Name
     ZN_1_FLR_1_SEC_12,       !- Zone Name
-    1,                       !- Total Daylighting Reference Points
-    2.285,                   !- X-Coordinate of First Reference Point {m}
-    20.000,                  !- Y-Coordinate of First Reference Point {m}
-    0.762,                   !- Z-Coordinate of First Reference Point {m}
-    0.000,                   !- X-Coordinate of Second Reference Point {m}
-    0.000,                   !- Y-Coordinate of Second Reference Point {m}
-    0.000,                   !- Z-Coordinate of Second Reference Point {m}
-    1.0000,                  !- Fraction of Zone Controlled by First Reference Point
-    0.0000,                  !- Fraction of Zone Controlled by Second Reference Point
-    398.2600,                !- Illuminance Setpoint at First Reference Point {lux}
-    398.2600,                !- Illuminance Setpoint at Second Reference Point {lux}
-    2,                       !- Lighting Control Type
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Glare Calculation Daylighting Reference Point Name
     180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
     20,                      !- Maximum Allowable Discomfort Glare Index
-    0.3000,                  !- Minimum Input Power Fraction for Continuous Dimming Control
-    0.2000,                  !- Minimum Light Output Fraction for Continuous Dimming Control
-    3,                       !- Number of Stepped Control Steps
-    1.0000;                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    ,                        !- DElight Gridding Resolution {m2}
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    398.2600;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    ZN_1_FLR_1_SEC_12_DaylRefPt1,  !- Name
+    ZN_1_FLR_1_SEC_12,       !- Zone Name
+    2.285,                   !- X-Coordinate of Reference Point {m}
+    20.000,                  !- Y-Coordinate of Reference Point {m}
+    0.762;                   !- Z-Coordinate of Reference Point {m}
 
   ComponentCost:LineItem,
     Daylighting:ZN_1_FLR_1_SEC_12,  !- Name
@@ -8974,38 +9022,34 @@
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pump:VariableSpeed,      !- Component 1 Object Type
     HeatSys1 Pump,           !- Component 1 Name
     HeatSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Equipment Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Boiler:HotWater,         !- Component 1 Object Type
     HeatSys1 Boiler,         !- Component 1 Name
     HeatSys1 Pump-HeatSys1 BoilerNode,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
     HeatSys1 Supply Inlet Node,  !- Inlet Node Name
     HeatSys1 Pump-HeatSys1 BoilerNodeviaConnector,  !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    15000,                   !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    15000,                   !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0.0,                     !- Minimum Flow Rate {m3/s}
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
   Output:PreprocessorMessage,
@@ -9048,13 +9092,11 @@
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
     HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Equipment Bypass Pipe,  !- Name
@@ -9063,13 +9105,11 @@
 
   Branch,
     HeatSys1 Supply Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Supply Outlet Pipe,  !- Component 1 Name
     HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Outlet Pipe,  !- Name
@@ -9146,13 +9186,11 @@
 
   Branch,
     HeatSys1 Demand Inlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Inlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Inlet Pipe,  !- Name
@@ -9161,163 +9199,131 @@
 
   Branch,
     HeatSys1 Demand Load Branch 1,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_1 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_1 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 2,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_2 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_2 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 3,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_3 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_3 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 4,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_4 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_4 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 5,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_5 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_5 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 6,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_6 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_6 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_6 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_6 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 7,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_7 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_7 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_7 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_7 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 8,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_8 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_8 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_8 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_8 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 9,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_9 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_9 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_9 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_9 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 10,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_10 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_10 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_10 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_10 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 11,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_11 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_11 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_11 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_11 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 12,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_12 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_12 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_12 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_12 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 13,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_13 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_13 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_13 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_13 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 14,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_14 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_14 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_14 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_14 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Load Branch 15,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
     ZN_1_FLR_1_SEC_15 PTAC heat coil,  !- Component 1 Name
     ZN_1_FLR_1_SEC_15 PTAC heat coilDemand Inlet Node,  !- Component 1 Inlet Node Name
-    ZN_1_FLR_1_SEC_15 PTAC heat coilDemand Outlet Node,  !- Component 1 Outlet Node Name
-    Active;                  !- Component 1 Branch Control Type
+    ZN_1_FLR_1_SEC_15 PTAC heat coilDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Demand Bypass Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Bypass Pipe,  !- Component 1 Name
     HeatSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name
-    Bypass;                  !- Component 1 Branch Control Type
+    HeatSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Bypass Pipe,  !- Name
@@ -9326,13 +9332,11 @@
 
   Branch,
     HeatSys1 Demand Outlet Branch,  !- Name
-    ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HeatSys1 Demand Outlet Pipe,  !- Component 1 Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
-    HeatSys1 Demand Outlet Node,  !- Component 1 Outlet Node Name
-    Passive;                 !- Component 1 Branch Control Type
+    HeatSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Demand Outlet Pipe,  !- Name

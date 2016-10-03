@@ -186,6 +186,8 @@ namespace DataGlobals {
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
+	extern int OutputDElightIn; // Unit number for the DElight In file
+	extern std::ostream * delightin_stream; // Internal stream used for DElight In file
 	extern bool ZoneSizingCalc; // TRUE if zone sizing calculation
 	extern bool SysSizingCalc; // TRUE if system sizing calculation
 	extern bool DoZoneSizing; // User input in SimulationControl object

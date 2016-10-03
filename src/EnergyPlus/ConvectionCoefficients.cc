@@ -6425,7 +6425,7 @@ namespace ConvectionCoefficients {
 								CoolingPriorityStack( EquipOnCount ) = ZoneEquipList( ZoneEquipConfig( ZoneNum ).EquipListIndex ).CoolingPriority( EquipNum );
 							}
 						}
-					} else if ( ( SELECT_CASE_var == BBSteam_Num ) || ( SELECT_CASE_var == BBWaterConvective_Num ) || ( SELECT_CASE_var == BBElectricConvective_Num ) || ( SELECT_CASE_var == BBWater_Num ) ) {
+					} else if ( ( SELECT_CASE_var == CoolingPanel_Num ) || ( SELECT_CASE_var == BBSteam_Num ) || ( SELECT_CASE_var == BBWaterConvective_Num ) || ( SELECT_CASE_var == BBElectricConvective_Num ) || ( SELECT_CASE_var == BBWater_Num ) ) {
 
 						if ( ZoneEquipList( ZoneEquipConfig( ZoneNum ).EquipListIndex ).EquipData( EquipNum ).ON ) {
 							EquipOnCount = min( EquipOnCount + 1, 10 );

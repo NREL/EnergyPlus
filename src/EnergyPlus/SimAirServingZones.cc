@@ -549,7 +549,7 @@ namespace SimAirServingZones {
 		NumPrimaryAirSys = GetNumObjectsFound( "AirLoopHVAC" );
 		TestUniqueNodes.allocate( NumPrimaryAirSys * 4 ); // used to look at specific nodes that must be unique, fields A6-A9
 
-		PrimaryAirSystem.allocate( NumPrimaryAirSys ); // alloacate the primary air sys data array
+		PrimaryAirSystem.allocate( NumPrimaryAirSys ); // allocate the primary air sys data array
 		AirToZoneNodeInfo.allocate( NumPrimaryAirSys ); // allocate the array that stores the air sys / zone equp connection data
 		AirToOANodeInfo.allocate( NumPrimaryAirSys ); // allocate the array that stores the OA node connections (reporting)
 		PackagedUnit.allocate( NumPrimaryAirSys );
@@ -1185,7 +1185,7 @@ namespace SimAirServingZones {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = WaterCoil_Cooling;
 					} else if ( componentType == "COIL:HEATING:ELECTRIC" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_ElectricHeat;
-					} else if ( componentType == "COIL:HEATING:GAS" ) {
+					} else if ( componentType == "COIL:HEATING:FUEL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Coil_GasHeat;
 
 						// Heat reclaim
@@ -1906,7 +1906,7 @@ namespace SimAirServingZones {
 							FoundCentralHeatCoil = true;
 						}
 					} // end of component loop
-				} // end of Branch loop			
+				} // end of Branch loop
 				PrimaryAirSystem( AirLoopNum ).CentralHeatCoilExists = FoundCentralHeatCoil;
 			} // end of AirLoop loop
 
@@ -2917,7 +2917,7 @@ namespace SimAirServingZones {
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 
 			// stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Gas'
+		} else if ( SELECT_CASE_var == Coil_GasHeat ) { // 'Coil:Heating:Fuel'
 			SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, QActual );
 			if ( QActual > 0.0 ) HeatingActive = true; // determine if coil is ON
 			// stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
@@ -4610,6 +4610,7 @@ namespace SimAirServingZones {
 		int MatchingCooledZoneNum; // temporary variable
 		Real64 termunitsizingtempfrac; // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
 		Real64 termunitsizingtemp; // (1.0+termunitsizing(ctrlzone)%inducrat)
+		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flaw rate [m3/s]
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		//  NumZonesCooled=0
@@ -4994,6 +4995,7 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5014,6 +5016,8 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
+									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum ); // Save previous EvzByZoneCool
@@ -5233,6 +5237,7 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5252,6 +5257,8 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
+									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum );
@@ -6027,7 +6034,7 @@ namespace SimAirServingZones {
 
 			// Specify the heating supply air Temp/HumRat for different system configurations
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				
+
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
@@ -6360,7 +6367,7 @@ namespace SimAirServingZones {
 
 	Real64
 	GetHeatingSATempForSizing(
-		int const IndexAirLoop // air loop index 
+		int const IndexAirLoop // air loop index
 	)
 	{
 
@@ -6371,8 +6378,8 @@ namespace SimAirServingZones {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine get the proper reheat coil inlet temperature for sizing, depending on 
-		// the system configurations: 
+		// This subroutine get the proper reheat coil inlet temperature for sizing, depending on
+		// the system configurations:
 		// (1) Central heating coils exist
 		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
 		// (3) No central heating coils; No preheating coils or OA heat-exchangers
@@ -6396,7 +6403,7 @@ namespace SimAirServingZones {
 		Real64 ReheatCoilInHumRatForSizing; // Humidity ratio of the reheat coil inlet air [kg/kg]
 		Real64 ReheatCoilInEnthalpyForSizing; // Enthalpy of the reheat coil inlet air [J/kg]
 		Real64 OutAirFrac;
-		
+
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -6409,12 +6416,12 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ){
 		//Case: Central heating coils exist
-			
+
 			ReheatCoilInTempForSizing = CalcSysSizing( IndexAirLoop ).HeatSupTemp;
-			
+
 		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
@@ -6427,26 +6434,26 @@ namespace SimAirServingZones {
 
 			// Mixed air humidity ratio and enthalpy
 			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
-			ReheatCoilInEnthalpyForSizing = OutAirFrac * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).PreheatTemp, FinalSysSizing( IndexAirLoop ).PreheatHumRat ) 
+			ReheatCoilInEnthalpyForSizing = OutAirFrac * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).PreheatTemp, FinalSysSizing( IndexAirLoop ).PreheatHumRat )
 			                      + ( 1 - OutAirFrac ) * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).HeatRetTemp, FinalSysSizing( IndexAirLoop ).HeatRetHumRat );
 
 			// Mixed air dry bulb temperature
 			ReheatCoilInTempForSizing = PsyTdbFnHW( ReheatCoilInEnthalpyForSizing, ReheatCoilInHumRatForSizing );
-			
+
 		} else {
 		//Case: No central heating coils; No preheating coils or OA heat-exchangers
-			
+
 			ReheatCoilInTempForSizing = FinalSysSizing( IndexAirLoop ).HeatMixTemp;
-		
+
 		}
 
 		return ReheatCoilInTempForSizing;
-		
+
 	}
 
 	Real64
 	GetHeatingSATempHumRatForSizing(
-		int const IndexAirLoop // air loop index 
+		int const IndexAirLoop // air loop index
 	)
 	{
 
@@ -6457,8 +6464,8 @@ namespace SimAirServingZones {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine get the proper reheat coil inlet humidity ratio for sizing, depending on 
-		// the system configurations: 
+		// This subroutine get the proper reheat coil inlet humidity ratio for sizing, depending on
+		// the system configurations:
 		// (1) Central heating coils exist
 		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
 		// (3) No central heating coils; No preheating coils or OA heat-exchangers
@@ -6472,13 +6479,13 @@ namespace SimAirServingZones {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataAirSystems::PrimaryAirSystem;
-		
+
 		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
 
 		// Locals
 		Real64 ReheatCoilInHumRatForSizing;
 		Real64 OutAirFrac;
-		
+
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -6491,12 +6498,12 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ) {
 		//Case: Central heating coils exist
-			
+
 			ReheatCoilInHumRatForSizing = CalcSysSizing( IndexAirLoop ).HeatSupHumRat;
-		
+
 		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
@@ -6508,18 +6515,18 @@ namespace SimAirServingZones {
 			}
 
 			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
-		
+
 		} else {
 		//Case: No central heating coils; No preheating coils or OA heat-exchangers
-		
+
 			ReheatCoilInHumRatForSizing = FinalSysSizing( IndexAirLoop ).HeatMixHumRat;
-		
+
 		}
 
 		return ReheatCoilInHumRatForSizing;
-		
+
 	}
-	
+
 
 	// End Algorithm Section of the Module
 	// *****************************************************************************
@@ -6532,6 +6539,51 @@ namespace SimAirServingZones {
 
 	//        Utility Subroutines for the SimAir Module
 	// *****************************************************************************
+
+	void
+		LimitZoneVentEff(
+		Real64 Xs,  // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
+		Real64 Voz,  // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
+		int CtrlZoneNum, //controlled zone number
+		Real64 & SystemCoolingEv // system ventilation efficiency
+		)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   November 2015
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Check that system ventilation eff is not less than input minimum system ventilation efficiency.
+		// If it is, back calculate and reset ZpzClgByZone and DesCoolVolFlowMin and system ventilation efficiency
+
+		// METHODOLOGY EMPLOYED:
+		// Ventilation Rate Procedure for single pass system
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
+		Real64 AvailSAFlow( 0.0 ); // available zone supply air flow [m3/s]
+
+		if ( SystemCoolingEv < FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff ) {
+			// reset ZoneOAFrac
+			ZoneOAFrac = 1.0 + Xs - FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+			// reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
+			AvailSAFlow = Voz/ZoneOAFrac;
+			// save ZoneOAFrac 
+			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
+			// save new (increased) minimum flow rate
+			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;
+			// set the system ventilation efficiency to the user specified minimum
+			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+		}
+	}
+
 
 	//        End of Utility subroutines for the SimAir Module
 	// *****************************************************************************

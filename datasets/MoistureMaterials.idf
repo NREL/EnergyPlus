@@ -2,88 +2,103 @@
 ! MoistureMaterials.idf
 !
 ! Moisture Material Reference Data Set for Effective Moisture Penetration Depth (EMPD) materials
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Gypsum,                  !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
-    0.072549,                !- Moisture Equation Coefficient a {dimensionless}
-    0.397173,                !- Moisture Equation Coefficient b {dimensionless}
-    0.007774,                !- Moisture Equation Coefficient c {dimensionless}
-    11.7057;                 !- Moisture Equation Coefficient d {dimensionless}
+    6,                       !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.0068,                  !- Moisture Equation Coefficient a {dimensionless}
+    0.939,                   !- Moisture Equation Coefficient b {dimensionless}
+    0.0202,                  !- Moisture Equation Coefficient c {dimensionless}
+    12.2,                    !- Moisture Equation Coefficient d {dimensionless}
+    0.019,                   !- Surface Layer Penetration Depth {m}
+    0.073,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    PaintedGypsum,           !- Name
+    6,                       !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.0068,                  !- Moisture Equation Coefficient a {dimensionless}
+    0.939,                   !- Moisture Equation Coefficient b {dimensionless}
+    0.0202,                  !- Moisture Equation Coefficient c {dimensionless}
+    12.2,                    !- Moisture Equation Coefficient d {dimensionless}
+    0.019,                   !- Surface Layer Penetration Depth {m}
+    0.073,                   !- Deep Layer Penetration Depth {m}
+    0.001,                   !- Coating Layer Thickness {m}
+    200;                     !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Carpet,                  !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
-    0.178457,                !- Moisture Equation Coefficient a {dimensionless}
-    0.583749,                !- Moisture Equation Coefficient b {dimensionless}
-    0.095156,                !- Moisture Equation Coefficient c {dimensionless}
-    3.51718;                 !- Moisture Equation Coefficient d {dimensionless}
+    4,                       !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.136,                   !- Moisture Equation Coefficient a {dimensionless}
+    0.48,                    !- Moisture Equation Coefficient b {dimensionless}
+    0.207,                   !- Moisture Equation Coefficient c {dimensionless}
+    9.5,                     !- Moisture Equation Coefficient d {dimensionless}
+    0.0088,                  !- Surface Layer Penetration Depth {m}
+    0.03,                    !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Concrete,                !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
-    0.018062,                !- Moisture Equation Coefficient a {dimensionless}
-    0.451879,                !- Moisture Equation Coefficient b {dimensionless}
-    0.026178,                !- Moisture Equation Coefficient c {dimensionless}
-    10.8356;                 !- Moisture Equation Coefficient d {dimensionless}
+    6.6,                     !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.045,                   !- Moisture Equation Coefficient a {dimensionless}
+    0.352,                   !- Moisture Equation Coefficient b {dimensionless}
+    0.0859,                  !- Moisture Equation Coefficient c {dimensionless}
+    14.8,                    !- Moisture Equation Coefficient d {dimensionless}
+    0.008,                   !- Surface Layer Penetration Depth {m}
+    0.03,                    !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Soil,                    !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
+    31.4298589662,           !- Water Vapor Diffusion Resistance Factor {dimensionless}
     0.020698,                !- Moisture Equation Coefficient a {dimensionless}
     0.730957,                !- Moisture Equation Coefficient b {dimensionless}
     0.02059,                 !- Moisture Equation Coefficient c {dimensionless}
-    4.33896;                 !- Moisture Equation Coefficient d {dimensionless}
+    4.33896,                 !- Moisture Equation Coefficient d {dimensionless}
+    0.004,                   !- Surface Layer Penetration Depth {m}
+    0,                       !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Plywood,                 !- Name
-    0.006,                   !- Moisture Penetration Depth {m}
-    0.183962,                !- Moisture Equation Coefficient a {dimensionless}
-    0.594185,                !- Moisture Equation Coefficient b {dimensionless}
-    0.111906,                !- Moisture Equation Coefficient c {dimensionless}
-    6.78432;                 !- Moisture Equation Coefficient d {dimensionless}
+    400,                     !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.218,                   !- Moisture Equation Coefficient a {dimensionless}
+    1.44,                    !- Moisture Equation Coefficient b {dimensionless}
+    0.535,                   !- Moisture Equation Coefficient c {dimensionless}
+    28.16,                   !- Moisture Equation Coefficient d {dimensionless}
+    0.0006,                  !- Surface Layer Penetration Depth {m}
+    0.0024,                  !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Wood,                    !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
-    0.144687,                !- Moisture Equation Coefficient a {dimensionless}
-    0.631307,                !- Moisture Equation Coefficient b {dimensionless}
-    0.122495,                !- Moisture Equation Coefficient c {dimensionless}
-    10.1203;                 !- Moisture Equation Coefficient d {dimensionless}
-
-  MaterialProperty:MoisturePenetrationDepth:Settings,
-    Block,                   !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
-    0.01385,                 !- Moisture Equation Coefficient a {dimensionless}
-    9.6382,                  !- Moisture Equation Coefficient b {dimensionless}
-    0.024615,                !- Moisture Equation Coefficient c {dimensionless}
-    0.676309;                !- Moisture Equation Coefficient d {dimensionless}
-
-  MaterialProperty:MoisturePenetrationDepth:Settings,
-    Vinyl,                   !- Name
-    0.002,                   !- Moisture Penetration Depth {m}
-    0.06246,                 !- Moisture Equation Coefficient a {dimensionless}
-    4.516,                   !- Moisture Equation Coefficient b {dimensionless}
-    0.07096,                 !- Moisture Equation Coefficient c {dimensionless}
-    0.4883;                  !- Moisture Equation Coefficient d {dimensionless}
-
-  MaterialProperty:MoisturePenetrationDepth:Settings,
-    Polystyrene,             !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
-    0.00038,                 !- Moisture Equation Coefficient a {dimensionless}
-    9.494,                   !- Moisture Equation Coefficient b {dimensionless}
-    0.00011,                 !- Moisture Equation Coefficient c {dimensionless}
-    0.0884;                  !- Moisture Equation Coefficient d {dimensionless}
+    150,                     !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.204,                   !- Moisture Equation Coefficient a {dimensionless}
+    2.32,                    !- Moisture Equation Coefficient b {dimensionless}
+    0.43,                    !- Moisture Equation Coefficient c {dimensionless}
+    72,                      !- Moisture Equation Coefficient d {dimensionless}
+    0.0011,                  !- Surface Layer Penetration Depth {m}
+    0.004,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Brick,                   !- Name
-    0.004,                   !- Moisture Penetration Depth {m}
+    19.5897433118,           !- Water Vapor Diffusion Resistance Factor {dimensionless}
     0.01385,                 !- Moisture Equation Coefficient a {dimensionless}
     9.638,                   !- Moisture Equation Coefficient b {dimensionless}
     0.02462,                 !- Moisture Equation Coefficient c {dimensionless}
-    0.6763;                  !- Moisture Equation Coefficient d {dimensionless}
+    0.6763,                  !- Moisture Equation Coefficient d {dimensionless}
+    0.017,                   !- Surface Layer Penetration Depth {m}
+    0.06,                    !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 
 ! Material Properties Reference Data Set for CombinedHeatAndMoistureFiniteElement materials
 !

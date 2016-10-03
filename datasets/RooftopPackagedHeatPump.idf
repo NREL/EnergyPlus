@@ -51,7 +51,6 @@
 ! with R-410A refrigerant is shown in here. Further information regarding the object "AirLoopHVAC:UnitaryHeatPump:AirToAir" can be
 ! found in InputOutput Reference. Information for supply fan, and supplementel heating coil needs to be specified by the user for
 ! their specific case. Following the example, only the curve fits of DX cooling and heating coils are provided.
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   AirLoopHVAC:UnitaryHeatPump:AirToAir,
@@ -59,9 +58,9 @@
     HVACAvailSched,          !- Availability Schedule Name
     Air Loop Inlet Node,     !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    0.944,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    0.944,                   !- Supply Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0.944,                   !- Cooling Supply Air Flow Rate {m3/s}
+    0.944,                   !- Heating Supply Air Flow Rate {m3/s}
+    0,                       !- No Load Supply Air Flow Rate {m3/s}
     ZoneName,                !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     SupplyFan,               !- Supply Air Fan Name
@@ -69,7 +68,7 @@
     JCI J05XP Heating,       !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     JCI J05XP Cooling,       !- Cooling Coil Name
-    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Heating Coil,       !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
@@ -86,9 +85,9 @@
   Coil:Cooling:DX:SingleSpeed,
     JCI J05XP Cooling,       !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17789.3,                 !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    3.8,                     !- Rated COP {W/W}
+    17789.3,                 !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.8,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -186,14 +185,14 @@
   Coil:Heating:DX:SingleSpeed,
     JCI J05XP Heating,       !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    16857.4,                 !- Rated Total Heating Capacity {W}
-    3.2,                     !- Rated COP {W/W}
+    16857.4,                 !- Gross Rated Heating Capacity {W}
+    3.2,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    JCI J05XP Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    JCI J05XP Heating CapFFF,!- Total Heating Capacity Function of Flow Fraction Curve Name
+    JCI J05XP Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    JCI J05XP Heating CapFFF,!- Heating Capacity Function of Flow Fraction Curve Name
     JCI J05XP Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     JCI J05XP Heating EIRFFF,!- Energy Input Ratio Function of Flow Fraction Curve Name
     JCI J05XP Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -305,9 +304,9 @@
   Coil:Cooling:DX:SingleSpeed,
     JCI J10XP Cooling,       !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17789.3,                 !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    3.8,                     !- Rated COP {W/W}
+    17789.3,                 !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.8,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -405,14 +404,14 @@
   Coil:Heating:DX:SingleSpeed,
     JCI J10XP Heating,       !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    16857.4,                 !- Rated Total Heating Capacity {W}
-    3.2,                     !- Rated COP {W/W}
+    16857.4,                 !- Gross Rated Heating Capacity {W}
+    3.2,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    JCI J10XP Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    JCI J10XP Heating CapFFF,!- Total Heating Capacity Function of Flow Fraction Curve Name
+    JCI J10XP Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    JCI J10XP Heating CapFFF,!- Heating Capacity Function of Flow Fraction Curve Name
     JCI J10XP Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     JCI J10XP Heating EIRFFF,!- Energy Input Ratio Function of Flow Fraction Curve Name
     JCI J10XP Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -523,9 +522,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier 50TFQ006 Cooling,!- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17789.3,                 !- Rated Total Cooling Capacity {W}
-    0.69,                    !- Rated Sensible Heat Ratio
-    3.34,                    !- Rated COP {W/W}
+    17789.3,                 !- Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Gross Rated Sensible Heat Ratio
+    3.34,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -623,14 +622,14 @@
   Coil:Heating:DX:SingleSpeed,
     Carrier 50TFQ006 Heating,!- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    14888.069,               !- Rated Total Heating Capacity {W}
-    2.92,                    !- Rated COP {W/W}
+    14888.069,               !- Gross Rated Heating Capacity {W}
+    2.92,                    !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Carrier 50TFQ006 Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Carrier 50TFQ006 Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Carrier 50TFQ006 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Carrier 50TFQ006 Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Carrier 50TFQ006 Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Carrier 50TFQ006 Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Carrier 50TFQ006 Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -741,9 +740,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier 50HJQ012 Cooling,!- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    34992.558,               !- Rated Total Cooling Capacity {W}
-    0.75,                    !- Rated Sensible Heat Ratio
-    3.41,                    !- Rated COP {W/W}
+    34992.558,               !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    3.41,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -841,14 +840,14 @@
   Coil:Heating:DX:SingleSpeed,
     Carrier 50HJQ012 Heating,!- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    31476.156,               !- Rated Total Heating Capacity {W}
-    3.54,                    !- Rated COP {W/W}
+    31476.156,               !- Gross Rated Heating Capacity {W}
+    3.54,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Carrier 50HJQ012 Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Carrier 50HJQ012 Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Carrier 50HJQ012 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Carrier 50HJQ012 Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Carrier 50HJQ012 Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Carrier 50HJQ012 Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Carrier 50HJQ012 Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -959,9 +958,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Carrier 50EZ060 Cooling, !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17716.3372,              !- Rated Total Cooling Capacity {W}
-    0.75,                    !- Rated Sensible Heat Ratio
-    4.05,                    !- Rated COP {W/W}
+    17716.3372,              !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    4.05,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -1059,14 +1058,14 @@
   Coil:Heating:DX:SingleSpeed,
     Carrier 50EZ060 Heating, !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    17303.1085,              !- Rated Total Heating Capacity {W}
-    4.5,                     !- Rated COP {W/W}
+    17303.1085,              !- Gross Rated Heating Capacity {W}
+    4.5,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Carrier 50EZ060 Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Carrier 50EZ060 Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Carrier 50EZ060 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Carrier 50EZ060 Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Carrier 50EZ060 Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Carrier 50EZ060 Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Carrier 50EZ060 Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -1194,9 +1193,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox LHA120H Stage 1,  !- Name
-    18434.103,               !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    3.55,                    !- Rated COP {W/W}
+    18434.103,               !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.55,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.49,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox LHA120H Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1209,9 +1208,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox LHA120H Stage 1&2,!- Name
-    36340.68,                !- Rated Total Cooling Capacity {W}
-    0.72,                    !- Rated Sensible Heat Ratio
-    3.8,                     !- Rated COP {W/W}
+    36340.68,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    3.8,                     !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox LHA120H Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1379,14 +1378,14 @@
   Coil:Heating:DX:SingleSpeed,
     Lennox LHA120H Heating,  !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    32559.84,                !- Rated Total Heating Capacity {W}
-    3.69,                    !- Rated COP {W/W}
+    32559.84,                !- Gross Rated Heating Capacity {W}
+    3.69,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox LHA120H Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Lennox LHA120H Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Lennox LHA120H Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Lennox LHA120H Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Lennox LHA120H Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Lennox LHA120H Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Lennox LHA120H Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -1504,9 +1503,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox LHA240H Stage 1,  !- Name
-    32560.077,               !- Rated Total Cooling Capacity {W}
-    0.69,                    !- Rated Sensible Heat Ratio
-    3.16,                    !- Rated COP {W/W}
+    32560.077,               !- Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Gross Rated Sensible Heat Ratio
+    3.16,                    !- Gross Rated Cooling COP {W/W}
     3.54,                    !- Rated Air Flow Rate {m3/s}
     0.515,                   !- Fraction of Air Flow Bypassed Around Coil
     Lennox LHA240H Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1519,9 +1518,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox LHA240H Stage 1&2,!- Name
-    67171.644,               !- Rated Total Cooling Capacity {W}
-    0.76,                    !- Rated Sensible Heat Ratio
-    3.5,                     !- Rated COP {W/W}
+    67171.644,               !- Gross Rated Total Cooling Capacity {W}
+    0.76,                    !- Gross Rated Sensible Heat Ratio
+    3.5,                     !- Gross Rated Cooling COP {W/W}
     3.54,                    !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox LHA240H Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1689,14 +1688,14 @@
   Coil:Heating:DX:SingleSpeed,
     Lennox LHA240H Heating,  !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    61977.83,                !- Rated Total Heating Capacity {W}
-    3.6,                     !- Rated COP {W/W}
+    61977.83,                !- Gross Rated Heating Capacity {W}
+    3.6,                     !- Gross Rated Heating COP {W/W}
     3.54,                    !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox LHA240H Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Lennox LHA240H Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Lennox LHA240H Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Lennox LHA240H Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Lennox LHA240H Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Lennox LHA240H Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Lennox LHA240H Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -1798,9 +1797,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Lennox THA060S2 Cooling, !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18903,                   !- Rated Total Cooling Capacity {W}
-    0.74,                    !- Rated Sensible Heat Ratio
-    4.1,                     !- Rated COP {W/W}
+    18903,                   !- Gross Rated Total Cooling Capacity {W}
+    0.74,                    !- Gross Rated Sensible Heat Ratio
+    4.1,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -1898,14 +1897,14 @@
   Coil:Heating:DX:SingleSpeed,
     Lennox THA060S2 Cooling, !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    16443.2,                 !- Rated Total Heating Capacity {W}
-    4.2,                     !- Rated COP {W/W}
+    16443.2,                 !- Gross Rated Heating Capacity {W}
+    4.2,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox THA060S2 Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Lennox THA060S2 Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Lennox THA060S2 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Lennox THA060S2 Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Lennox THA060S2 Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Lennox THA060S2 Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Lennox THA060S2 Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -2023,9 +2022,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox THA120S Stage 1,  !- Name
-    18434.103,               !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    3.5,                     !- Rated COP {W/W}
+    18434.103,               !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.5,                     !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.49,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox THA120S Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2038,9 +2037,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox THA120S Stage 1&2,!- Name
-    36340.68,                !- Rated Total Cooling Capacity {W}
-    .74,                     !- Rated Sensible Heat Ratio
-    3.7,                     !- Rated COP {W/W}
+    36340.68,                !- Gross Rated Total Cooling Capacity {W}
+    .74,                     !- Gross Rated Sensible Heat Ratio
+    3.7,                     !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox THA120S Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2208,14 +2207,14 @@
   Coil:Heating:DX:SingleSpeed,
     Lennox THA120S Heating,  !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    32559.84,                !- Rated Total Heating Capacity {W}
-    3.53,                    !- Rated COP {W/W}
+    32559.84,                !- Gross Rated Heating Capacity {W}
+    3.53,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox THA120S Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Lennox THA120S Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Lennox THA120S Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Lennox THA120S Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Lennox THA120S Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Lennox THA120S Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Lennox THA120S Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -2317,9 +2316,9 @@
   Coil:Cooling:DX:SingleSpeed,
     Lennox KHA060S4 Cooling, !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18023.8,                 !- Rated Total Cooling Capacity {W}
-    0.76,                    !- Rated Sensible Heat Ratio
-    385,                     !- Rated COP {W/W}
+    18023.8,                 !- Gross Rated Total Cooling Capacity {W}
+    0.76,                    !- Gross Rated Sensible Heat Ratio
+    385,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
@@ -2417,14 +2416,14 @@
   Coil:Heating:DX:SingleSpeed,
     Lennox KHA060S4 Cooling, !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    16684.2,                 !- Rated Total Heating Capacity {W}
-    4.1,                     !- Rated COP {W/W}
+    16684.2,                 !- Gross Rated Heating Capacity {W}
+    4.1,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox KHA060S4 Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Lennox KHA060S4 Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Lennox KHA060S4 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Lennox KHA060S4 Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Lennox KHA060S4 Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Lennox KHA060S4 Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Lennox KHA060S4 Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -2542,9 +2541,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KHA120S4 Stage 1, !- Name
-    17818.7,                 !- Rated Total Cooling Capacity {W}
-    0.73,                    !- Rated Sensible Heat Ratio
-    3.53,                    !- Rated COP {W/W}
+    17818.7,                 !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.53,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.51,                    !- Fraction of Air Flow Bypassed Around Coil
     Lennox KHA120S4 Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2557,9 +2556,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KHA120S4 Stage 1&2,  !- Name
-    36340.68,                !- Rated Total Cooling Capacity {W}
-    .75,                     !- Rated Sensible Heat Ratio
-    3.9,                     !- Rated COP {W/W}
+    36340.68,                !- Gross Rated Total Cooling Capacity {W}
+    .75,                     !- Gross Rated Sensible Heat Ratio
+    3.9,                     !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox KHA120S4 Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2727,14 +2726,14 @@
   Coil:Heating:DX:SingleSpeed,
     Lennox KHA120S4 Heating, !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    32563.43,                !- Rated Total Heating Capacity {W}
-    3.68,                    !- Rated COP {W/W}
+    32563.43,                !- Gross Rated Heating Capacity {W}
+    3.68,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox KHA120S4 Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Lennox KHA120S4 Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Lennox KHA120S4 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Lennox KHA120S4 Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Lennox KHA120S4 Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Lennox KHA120S4 Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Lennox KHA120S4 Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name
@@ -2852,9 +2851,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KHA240S4 Stage 1, !- Name
-    34699.5,                 !- Rated Total Cooling Capacity {W}
-    0.76,                    !- Rated Sensible Heat Ratio
-    3.54,                    !- Rated COP {W/W}
+    34699.5,                 !- Gross Rated Total Cooling Capacity {W}
+    0.76,                    !- Gross Rated Sensible Heat Ratio
+    3.54,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.482,                   !- Fraction of Air Flow Bypassed Around Coil
     Lennox KHA240S4 Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2867,9 +2866,9 @@
 
   CoilPerformance:DX:Cooling,
     Lennox KHA240S4 Stage 1&2,  !- Name
-    66966.5,                 !- Rated Total Cooling Capacity {W}
-    0.78,                    !- Rated Sensible Heat Ratio
-    3.7,                     !- Rated COP {W/W}
+    66966.5,                 !- Gross Rated Total Cooling Capacity {W}
+    0.78,                    !- Gross Rated Sensible Heat Ratio
+    3.7,                     !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     0.0,                     !- Fraction of Air Flow Bypassed Around Coil
     Lennox KHA240S4 Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3037,14 +3036,14 @@
   Coil:Heating:DX:SingleSpeed,
     Lennox KHA240S4 Heating, !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    61025.4,                 !- Rated Total Heating Capacity {W}
-    3.78,                    !- Rated COP {W/W}
+    61025.4,                 !- Gross Rated Heating Capacity {W}
+    3.78,                    !- Gross Rated Heating COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox KHA240S4 Heating CapFTemp,  !- Total Heating Capacity Function of Temperature Curve Name
-    Lennox KHA240S4 Heating CapFFF,  !- Total Heating Capacity Function of Flow Fraction Curve Name
+    Lennox KHA240S4 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
+    Lennox KHA240S4 Heating CapFFF,  !- Heating Capacity Function of Flow Fraction Curve Name
     Lennox KHA240S4 Heating EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
     Lennox KHA240S4 Heating EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     Lennox KHA240S4 Heating PLFFPLR,  !- Part Load Fraction Correlation Curve Name

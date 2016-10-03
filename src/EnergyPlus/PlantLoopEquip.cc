@@ -1069,6 +1069,8 @@ namespace PlantLoopEquip {
 
 			} else if ( EquipTypeNum == TypeOf_Baseboard_Rad_Conv_Water ) {
 
+			} else if ( EquipTypeNum == TypeOf_CoolingPanel_Simple ) {
+
 			} else if ( EquipTypeNum == TypeOf_LowTempRadiant_VarFlow ) {
 
 			} else if ( EquipTypeNum == TypeOf_LowTempRadiant_ConstFlow ) {

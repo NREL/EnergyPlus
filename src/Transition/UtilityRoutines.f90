@@ -895,6 +895,73 @@ SUBROUTINE ShowErrorMessage(ErrorMessage,OutUnit1,OutUnit2)
 
 END SUBROUTINE ShowErrorMessage
 
+
+REAL FUNCTION GetSatVapPressFromDryBulb(Tdb) RESULT(retval)
+
+    ! Function to compute saturation vapor pressure in [kPa]
+    !  ASHRAE Fundamentals handbood (2005) p 6.2, equation 5 and 6
+    !    Valid from -100C to 200 C
+
+  REAL, INTENT(IN) :: Tdb ! Dry bulb temperature [degC]
+  REAL, PARAMETER :: C1 = -5674.5359
+  REAL, PARAMETER :: C2 = 6.3925247
+  REAL, PARAMETER :: C3 = -0.009677843
+  REAL, PARAMETER :: C4 = 0.00000062215701
+  REAL, PARAMETER :: C5 = 2.0747825E-09
+  REAL, PARAMETER :: C6 = -9.484024E-13
+  REAL, PARAMETER :: C7 = 4.1635019
+  REAL, PARAMETER :: C8 = -5800.2206
+  REAL, PARAMETER :: C9 = 1.3914993
+  REAL, PARAMETER :: C10 = -0.048640239
+  REAL, PARAMETER :: C11 = 0.000041764768
+  REAL, PARAMETER :: C12 = -0.000000014452093
+  REAL, PARAMETER :: C13 = 6.5459673
+
+  REAL TK
+  TK = Tdb + 273.15      ! Converts from degC to degK
+
+  IF (TK <= 273.15) THEN
+         retval = EXP(C1/TK + C2 + C3*TK + C4*TK**2 + C5*TK**3 + C6*TK**4 + C7*LOG(TK)) / 1000
+  ELSE
+         retval = EXP(C8/TK + C9 + C10*TK + C11*TK**2 + C12*TK**3 + C13*LOG(TK)) / 1000
+  END IF
+
+END FUNCTION
+
+REAL FUNCTION CalculateMuEMPD(a, b, c, d, d_empd, density_matl) RESULT(mu_EMPD)
+
+	 REAL, INTENT(IN) :: a
+	 REAL, INTENT(IN) :: b
+	 REAL, INTENT(IN) :: c
+	 REAL, INTENT(IN) :: d
+	 REAL, INTENT(IN) :: d_empd
+	 REAL, INTENT(IN) :: density_matl
+
+     ! Used fixed values of T, RH, and P
+     REAL, PARAMETER :: T = 24  ! degC
+     REAL, PARAMETER :: RH = 0.45 ! fraction
+     REAL, PARAMETER :: P_ambient = 101325 ! pascals
+
+     ! Used a fixed time interval of 24 hours
+     REAL, PARAMETER :: t_p = 24 * 60 * 60  ! seconds
+
+	 ! Variables
+	 REAL :: slope_MC
+     REAL :: PV_sat
+     REAL :: diffusivity_EMPD
+     REAL :: diffusivity_air
+
+	 ! Some calculations
+     slope_MC = a * b * RH ** (b - 1) + c * d * RH ** (d - 1)
+     PV_sat = GetSatVapPressFromDryBulb(T) * 1000  ! kPa -> Pa
+     diffusivity_EMPD = d_empd ** 2 * 3.1415926535 * slope_MC * density_matl / (t_p * PV_sat)
+     diffusivity_air = 2.0e-7 * (T + 273.15) ** 0.81 / P_ambient
+
+     ! Calculate final value
+     mu_EMPD = diffusivity_air / diffusivity_EMPD
+
+END FUNCTION
+
 !     NOTICE
 !
 !     Copyright © 1996-2008 The Board of Trustees of the University of Illinois
