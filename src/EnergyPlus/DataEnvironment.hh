@@ -144,7 +144,7 @@ namespace DataEnvironment {
 	extern bool EMSWindSpeedOverrideOn; // EMS flag for outdoor air wind speed
 	extern Real64 EMSWindSpeedOverrideValue; // EMS override value for outdoor air wind speed
 	extern Real64 WaterMainsTemp; // Current water mains temperature
-	extern Real64 AnnualAverageDrybulbTemp; // Annual average drybulb temperature
+	extern Real64 AnnualAverageDrybulbTemp; // Annual average dry bulb temperature
 	extern int Year; // Current calendar year of the simulation
 	extern int YearTomorrow; // Tomorrow's calendar year of the simulation
 	extern Array1D< Real64 > SOLCOS; // Solar direction cosines at current time step

@@ -64,6 +64,7 @@
 #include <libkiva/Ground.hpp>
 
 // EnergyPlus Headers
+#include <DataHeatBalance.hh>
 #include <DataSurfaces.hh>
 
 namespace EnergyPlus {
@@ -76,17 +77,41 @@ public:
 
 };
 
+class KivaInstanceMap {
+public:
+  KivaInstanceMap(Kiva::Foundation& foundation,
+    std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
+    int floorSurface,
+    Array1D< int > wallSurfaces,
+    int zoneNum
+  );
+  std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
+  Kiva::Ground ground;
+  int floorSurface;
+  Array1D< int > wallSurfaces;
+  int zoneNum;
+  void setBoundaryConditions();
+  Kiva::BoundaryConditions bcs;
+};
+
 class KivaManager{
 public:
   KivaManager();
-  void setupKivaInstances(Array1D< DataSurfaces::SurfaceData >& Surfaces);
+  virtual ~KivaManager();
+  void setupKivaInstances(Array1D< DataSurfaces::SurfaceData >& Surfaces, Array1D< DataHeatBalance::ConstructionData >& Constructs, Array1D< DataHeatBalance::MaterialProperties >& Materials);
   void initKivaInstances();
   void calcKivaInstances();
   FoundationKiva defaultFoundation;
   std::vector<FoundationKiva> foundationInputs;
-  std::vector<Kiva::Ground> kivaInstances;
-private:
+  std::vector<KivaInstanceMap> kivaInstances;
   void defineDefaultFoundation();
+  Real64 getTemp(int surfNum );
+  Real64 getConv(int surfNum );
+
+private:
+  Real64 getValue(int surfNum, Kiva::GroundOutput::OutputType oT);
+  std::map<int, std::pair<int, Kiva::Surface::SurfaceType>> surfaceMap;
+  std::vector<Kiva::Foundation> foundationInstances;
 };
 
 } // HeatBalanceKivaManager

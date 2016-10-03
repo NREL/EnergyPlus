@@ -531,10 +531,11 @@ Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [
 !Output:Variable,*,Surface Inside Face Convection Heat Gain Rate per Area,hourly;
 !Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area,hourly;
 Output:Variable,*,Zone Mean Air Temperature,hourly; !- Zone Average [C]
-Output:Variable,Zone Floor,Surface Inside Face Temperature,hourly;
-Output:Variable,Zone Floor,Surface Outside Face Temperature,hourly;
-Output:Variable,Zone Floor,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
-Output:Variable,Zone Floor,Surface Inside Face Convection Heat Gain Rate per Area,hourly;
-Output:Variable,Zone Floor,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area,hourly;
+Output:Variable,*,Surface Inside Face Temperature,hourly;
+Output:Variable,*,Surface Outside Face Temperature,hourly;
+Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
+Output:Variable,*,Surface Inside Face Convection Heat Gain Rate per Area,hourly;
+Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area,hourly;
+Output:Variable,*,Surface Inside Face Solar Radiation Heat Gain Rate per Area,hourly;
 OutputControl:Table:Style, HTML;
 Output:Table:SummaryReports, AllSummary;

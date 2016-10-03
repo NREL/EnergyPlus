@@ -60,45 +60,249 @@
 
 // ObjexxFCL Headers
 
+// Lis Header
+#include "lis.h"
+
 // EnergyPlus Headers
 #include <HeatBalanceKivaManager.hh>
+#include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataHeatBalSurface.hh>
+#include <DataGlobals.hh>
+#include <DataSurfaces.hh>
 #include <DisplayRoutines.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
 
-KivaManager::KivaManager() {
-  defineDefaultFoundation();
+KivaInstanceMap::KivaInstanceMap(Kiva::Foundation& foundation,
+  std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
+  int floorSurface,
+  Array1D< int > wallSurfaces,
+  int zoneNum) :
+  outputMap(oM),
+  ground(foundation, outputMap),
+  floorSurface(floorSurface),
+  wallSurfaces(wallSurfaces),
+  zoneNum(zoneNum)
+{}
+
+void KivaInstanceMap::setBoundaryConditions() {
+  bcs.indoorTemp = DataHeatBalFanSys::MAT(zoneNum) + DataGlobals::KelvinConv;
+  bcs.outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
+  bcs.localWindSpeed = DataEnvironment::WindSpeedAt(ground.foundation.surfaceRoughness);
+  bcs.solarAzimuth = std::atan2( DataEnvironment::SOLCOS( 1 ), DataEnvironment::SOLCOS( 2 ) );
+  bcs.solarAltitude = DataGlobals::PiOvr2 - std::acos( DataEnvironment::SOLCOS( 3 ) );
+  bcs.directNormalFlux = DataEnvironment::BeamSolarRad;
+  bcs.diffuseHorizontalFlux = DataEnvironment::DifSolarRad;
+  bcs.skyEmissivity = pow4(DataEnvironment::SkyTempKelvin)/pow4(bcs.outdoorTemp);
+
+  bcs.slabAbsRadiation =
+    DataHeatBalSurface::NetLWRadToSurf( floorSurface ) +
+    DataHeatBalSurface::QRadSWInAbs( floorSurface ) +
+    DataHeatBalFanSys::QHTRadSysSurf( floorSurface ) +
+    DataHeatBalFanSys::QHWBaseboardSurf( floorSurface ) +
+    DataHeatBalFanSys::QSteamBaseboardSurf( floorSurface ) +
+    DataHeatBalFanSys::QElecBaseboardSurf( floorSurface ) +
+    DataHeatBalance::QRadThermInAbs( floorSurface );
+
 }
 
-void KivaManager::setupKivaInstances(Array1D< DataSurfaces::SurfaceData >& Surfaces) {
+KivaManager::KivaManager() {
+  LIS_INT dummy_argc = 0;
+  char** dummy_argv;
+  lis_initialize(&dummy_argc, &dummy_argv);
+}
+
+KivaManager::~KivaManager() {
+  lis_finalize();
+}
+
+void KivaManager::setupKivaInstances(Array1D< DataSurfaces::SurfaceData >& Surfaces, Array1D< DataHeatBalance::ConstructionData >& Constructs, Array1D< DataHeatBalance::MaterialProperties >& Materials) {
   // Figure out number of instances (number of foundation coupled floors)
+  int inst = 0;
+  int surfNum = 1;
+
   for (auto& surface : Surfaces) {
     if ( surface.ExtBoundCond == DataSurfaces::KivaFoundation && surface.Class == DataSurfaces::SurfaceClass_Floor ) {
-      std::cout << surface.Name << std::endl;
-      // Find other surfaces associated with the same floor
+      // TODO Kiva: Setup
 
-      // put together rest of kiva Foundation object based on geometry
+      // Copy foundation input for this instance
+      Kiva::Foundation fnd = foundationInputs[surface.OSCPtr].foundation;
 
-      // point surface to corresponding ground intance(s)
+      // TODO Kiva: Find other surfaces associated with the same floor
+
+      // Set slab construction
+      for (int i = 0; i < Constructs( surface.Construction ).TotLayers; ++i ) {
+        auto& mat = Constructs( surface.Construction ).LayerPoint[i];
+
+        Kiva::Material tempMat;
+
+        tempMat.conductivity = Materials(mat).Conductivity;
+        tempMat.density = Materials(mat).Density;
+        tempMat.specificHeat = Materials(mat).SpecHeat;
+
+        Kiva::Layer tempLayer;
+
+        tempLayer.material = tempMat;
+        tempLayer.thickness = Materials(mat).Thickness;
+
+        fnd.slab.layers.push_back(tempLayer);
+      }
+
+      fnd.slab.emissivity = 0.0; // Long wave included in rad BC. Materials(Constructs( surface.Construction ).LayerPoint(Constructs( surface.Construction ).TotLayers)).AbsorpThermal;
+
+      // TODO Kiva: expose interior solar absorptivity
+
+      // TODO Kiva: wall layers + emissivity/absorptivity
+
+      // put together the rest of kiva Foundation instance based on E+ geometry
+      Real64 wallHeight = 0.0; // TODO each wall with different height gets its own instance.
+      fnd.foundationDepth = wallHeight;
+
+      fnd.orientation = 0.0; // TODO orientation from Zone...do we need this?
+
+      fnd.hasPerimeterSurface = false; // TODO perimeter surface for zones without exposed perimeter
+      fnd.perimeterSurfaceWidth = 0.0;
+
+      // polygon
+      if (DataSurfaces::CCW) {
+        for (size_t i = 0; i < surface.Vertex.size_; ++i ) {
+          auto& v = surface.Vertex[i];
+          fnd.polygon.outer().push_back(Kiva::Point(v.x,v.y));
+        }
+      } else {
+        for (auto i = surface.Vertex.size_ - 1; i <= 0; --i ) {
+          auto& v = surface.Vertex[i];
+          fnd.polygon.outer().push_back(Kiva::Point(v.x,v.y));
+        }
+      }
+
+      // add new foundation instance to list of all instances
+      foundationInstances.push_back(fnd);
+
+
+      // create output map for ground instance. Calculate average temperature, flux, and convection for each surface
+      std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
+
+      outputMap[Kiva::Surface::ST_SLAB_CORE] = {
+        Kiva::GroundOutput::OT_FLUX,
+        Kiva::GroundOutput::OT_TEMP,
+        Kiva::GroundOutput::OT_CONV
+      };
+
+      if (fnd.hasPerimeterSurface) {
+        outputMap[Kiva::Surface::ST_SLAB_PERIM] = {
+          Kiva::GroundOutput::OT_FLUX,
+          Kiva::GroundOutput::OT_TEMP,
+          Kiva::GroundOutput::OT_CONV
+        };
+      }
+
+      if (fnd.foundationDepth > 0.0) {
+        outputMap[Kiva::Surface::ST_WALL_INT] = {
+          Kiva::GroundOutput::OT_FLUX,
+          Kiva::GroundOutput::OT_TEMP,
+          Kiva::GroundOutput::OT_CONV
+        };
+      }
+
+      // TODO Kiva: create wallSurface list
+      Array1D< int > wallSurfaces;
+
+      // point surface to corresponding ground intance(s)]
+      kivaInstances.push_back(KivaInstanceMap(foundationInstances[inst],
+        outputMap,surfNum,wallSurfaces,surface.Zone));
+
+      surfaceMap[surfNum] = {inst, Kiva::Surface::ST_SLAB_CORE};
+
+      inst++;
 
     }
+
+    surfNum++;
+  }
+
+  for (auto& kv : kivaInstances) {
+    auto& grnd = kv.ground;
+
+    // Adjust for concave features using Boundary Layer Adjustment method
+    grnd.calculateBoundaryLayer();
+    grnd.setNewBoundaryGeometry();
+
+    grnd.buildDomain();
+
+    // TODO Kiva: Move to EIO file
+    /*
+    std::cout << "  X Cells: " << grnd.nX << std::endl;
+    std::cout << "  Y Cells: " << grnd.nY << std::endl;
+    std::cout << "  Z Cells: " << grnd.nZ << std::endl;
+    std::cout << "  Total Cells: " << grnd.nX*grnd.nY*grnd.nZ << std::endl;
+    */
   }
 
 }
 
 void KivaManager::initKivaInstances() {
-  // initialize temperatures at the beginning of run environment
 
+  // initialize temperatures at the beginning of run environment
+  if ( DataGlobals::BeginEnvrnFlag ) {
+    for (auto& kv : kivaInstances) {
+      auto& grnd = kv.ground;
+
+      // Start with steady-state solution
+      // TODO Kiva: Accelerated approach? Kusuda?
+      grnd.foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
+      kv.setBoundaryConditions();
+      grnd.calculate(kv.bcs);
+      grnd.foundation.numericalScheme = Kiva::Foundation::NS_ADI;
+    }
+  }
 }
 
 void KivaManager::calcKivaInstances() {
   // calculate heat transfer through ground
+  for (auto& kv : kivaInstances) {
+    auto& grnd = kv.ground;
+
+    // TODO Kiva: Accelerated approach? Kusuda?
+
+    //std::cout << DataEnvironment::CurMnDyHr << " (" << DataGlobals::TimeStep << ")" << std::endl;
+    kv.setBoundaryConditions();
+    grnd.calculate(kv.bcs,DataGlobals::MinutesPerTimeStep*60.);
+    grnd.calculateSurfaceAverages();
+  }
+}
+
+Real64 KivaManager::getValue(int surfNum,Kiva::GroundOutput::OutputType oT) {
+  auto& kI = kivaInstances[surfaceMap[surfNum].first];
+  auto& st = surfaceMap[surfNum].second;
+
+  return kI.ground.getSurfaceAverageValue({st,oT});
+}
+
+Real64 KivaManager::getTemp(int surfNum) {
+  return getValue(surfNum, Kiva::GroundOutput::OT_TEMP) - DataGlobals::KelvinConv;
+}
+
+Real64 KivaManager::getConv(int surfNum) {
+  return getValue(surfNum, Kiva::GroundOutput::OT_CONV);
 }
 
 void KivaManager::defineDefaultFoundation() {
 
+
   Kiva::Foundation defFnd;
+
+  defFnd.hasWall = true;
+  defFnd.hasWall = true;
+  defFnd.hasInteriorHorizontalInsulation = false;
+  defFnd.hasExteriorHorizontalInsulation = false;
+  defFnd.hasInteriorVerticalInsulation = false;
+  defFnd.hasExteriorVerticalInsulation = false;
+
   defFnd.wall.heightAboveGrade = 0.2; // m
 
   Kiva::Material concrete;
@@ -112,7 +316,12 @@ void KivaManager::defineDefaultFoundation() {
 
   defFnd.wall.layers.push_back(defaultFoundationWall);
 
-  // Footer depth? TODO make relative to foundation depth
+  defFnd.wall.interiorEmissivity = 0.9;
+  defFnd.wall.exteriorEmissivity = 0.9;
+  defFnd.wall.exteriorAbsorptivity = 0.9;
+
+
+  defFnd.wall.height = 0.3; // Footer depth? TODO make relative to foundation depth
 
   Kiva::Material typicalSoil;
   typicalSoil.conductivity = 0.864;  // W/m-K
@@ -125,7 +334,44 @@ void KivaManager::defineDefaultFoundation() {
   defFnd.soilEmissivity = 0.9;
   defFnd.surfaceRoughness = 0.03; // m
 
-  defFnd.farFieldWidth = 40; // m
+  // TODO Kiva: terrain pamarameters
+
+  defFnd.farFieldWidth = 40.; // m
+
+  Real64 waterTableDepth = 0.1022*DataEnvironment::Elevation;
+
+  if (waterTableDepth <= 40.) {
+    defFnd.deepGroundDepth = waterTableDepth;
+    defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
+    defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp;
+  } else {
+    defFnd.deepGroundDepth = 40.;
+    defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
+  }
+
+  defFnd.coordinateSystem = Kiva::Foundation::CS_CARTESIAN;
+  defFnd.reductionStrategy = Kiva::Foundation::RS_BOUNDARY;
+  defFnd.numberOfDimensions = 2;
+  defFnd.useSymmetry = true;
+
+  defFnd.buildingHeight = 0.0; // not used
+
+  // Numeric settings
+  defFnd.numericalScheme = Kiva::Foundation::NS_ADI;
+  defFnd.fADI = 0.00001;
+  defFnd.solver = "bicgstab";
+  defFnd.preconditioner = "ilu";
+  defFnd.maxIterations = 100000;
+  defFnd.tolerance = 1.0e-6;
+
+  defFnd.mesh.minCellDim = 0.02;
+  defFnd.mesh.maxNearGrowthCoeff = 1.5;
+  defFnd.mesh.maxDepthGrowthCoeff = 1.5;
+  defFnd.mesh.maxInteriorGrowthCoeff = 1.5;
+  defFnd.mesh.maxExteriorGrowthCoeff = 1.5;
+
+  defFnd.convectionCalculationMethod = Kiva::Foundation::CCM_AUTO;
+  defFnd.wallTopBoundary = Kiva::Foundation::WTB_ZERO_FLUX;
 
   defaultFoundation.foundation = defFnd;
   defaultFoundation.name = "Default Foundation";

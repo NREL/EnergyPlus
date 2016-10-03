@@ -6194,7 +6194,7 @@ namespace SurfaceGeometry {
 
 		// Setup Kiva intances
 		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
-			kivaManager.setupKivaInstances(Surface);
+			kivaManager.setupKivaInstances(Surface, Construct, Material);
 		}
 
 		// test for missing materials for algorithms selected
@@ -7565,9 +7565,15 @@ namespace SurfaceGeometry {
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 
+		kivaManager.defineDefaultFoundation();
+
 		// TODO Kiva: Read foundation data from input
 		cCurrentModuleObject = "Foundation:Kiva";
 		int TotKivaFnds = GetNumObjectsFound( cCurrentModuleObject );
+
+		// Start with copy of default
+
+		// Add: insulation properties
 
 
 	}

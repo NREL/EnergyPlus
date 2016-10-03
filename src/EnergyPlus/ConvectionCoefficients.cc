@@ -87,6 +87,7 @@
 #include <InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 
@@ -418,6 +419,11 @@ namespace ConvectionCoefficients {
 					if ( ( ZoneNum != ZoneToResimulate ) && ( AdjacentZoneToSurface( SurfNum ) != ZoneToResimulate ) ) {
 						continue; // skip surfaces that are not associated with this zone
 					}
+				}
+
+				if ( Surface( SurfNum ).ExtBoundCond == DataSurfaces::KivaFoundation ) {
+					HConvIn( SurfNum ) = SurfaceGeometry::kivaManager.getConv( SurfNum );
+					continue;
 				}
 
 				{ auto const SELECT_CASE_var( Surface( SurfNum ).IntConvCoeff );

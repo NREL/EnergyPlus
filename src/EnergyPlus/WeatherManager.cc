@@ -4730,7 +4730,6 @@ Label902: ;
 				++HdLine;
 				if ( HdLine == 9 ) StillLooking = false;
 			}
-			// TODO Kiva: SetAnnualDryBulb();
 			SetWeatherStatistics();
 		} else { // Header already processed, just read
 			SkipEPlusWFHeader();

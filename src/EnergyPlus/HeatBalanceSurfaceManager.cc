@@ -693,6 +693,12 @@ namespace HeatBalanceSurfaceManager {
 		ManageInternalHeatGains( false );
 		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Interior Solar Distribution" );
 		InitIntSolarDistribution();
+
+		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
+			SurfaceGeometry::kivaManager.initKivaInstances();
+			SurfaceGeometry::kivaManager.calcKivaInstances();
+		}
+
 		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Interior Convection Coefficients" );
 		InitInteriorConvectionCoeffs( TempSurfInTmp );
 
@@ -5255,9 +5261,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 		}
 	}
 
-	// TODO Somewhere around here, calculate Kiva instances...
-	SurfaceGeometry::kivaManager.calcKivaInstances();
-
 	bool const useCondFDHTalg( any_eq( HeatTransferAlgosUsed, UseCondFD ) );
 	Converged = false;
 	while ( ! Converged ) { // Start of main inside heat balance DO loop...
@@ -5438,8 +5441,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 						} else if ( surface.HeatTransferAlgorithm == HeatTransferModel_Kiva ) {
 							// Read Kiva results for each surface
-							TempSurfInTmp( SurfNum ) = 18.0;
-							TH11 = 0.0;
+							TempSurfInTmp( SurfNum ) = SurfaceGeometry::kivaManager.getTemp( SurfNum );
+
+							TH11 = 0.0; // TODO Kiva: Generate warning if asked for outside temp?
 						}
 
 
