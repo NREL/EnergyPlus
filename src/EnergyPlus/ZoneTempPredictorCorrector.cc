@@ -151,7 +151,6 @@ namespace ZoneTempPredictorCorrector {
 	using namespace DataZoneControls;
 	using namespace FaultsManager;
 	using namespace HybridModel;
-	using namespace ZoneCapacitanceMultiplierResearchSpecial;
 	using ScheduleManager::GetCurrentScheduleValue;
 
 	// Data
@@ -1544,6 +1543,9 @@ namespace ZoneTempPredictorCorrector {
 
 		if ( allocated( TComfortControlTypes ) ) TComfortControlTypes.deallocate();
 
+		// Get the Hybrid Model setting inputs
+		CheckAndReadHybridModelZone(); // Added by Sang Hoon Lee May 2015
+
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
 		NumNums = GetNumObjectsFound( cCurrentModuleObject );
@@ -1565,11 +1567,6 @@ namespace ZoneTempPredictorCorrector {
 
 		} else {
 		// Added by Sang Hoon Lee in Sep. 2016.
-		//	GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-		//	ZoneVolCapMultpSens = rNumericArgs( 1 );
-		//	ZoneVolCapMultpMoist = rNumericArgs( 2 );
-		//	ZoneVolCapMultpCO2 = rNumericArgs( 3 );
-		//	ZoneVolCapMultpGenContam = rNumericArgs( 4 );
 			
 			// Default values
 			ZoneVolCapMultpSens = 1.0;
@@ -4082,96 +4079,111 @@ namespace ZoneTempPredictorCorrector {
 			//Zone(ZoneNum).ZoneVolCapMultpGenContam = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpGenContam;
 			
 			// Hybrid model trigger start
-			if (HybridModelZone(ZoneNum).InternalThermalMassCalc == "YES" || HybridModelZone(ZoneNum).InfiltrationCalc == "YES" && (!WarmupFlag) && (!DoingSizing)) {
+			if (( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc ) && ( !WarmupFlag ) && ( !DoingSizing )) {
 
-				HybridModelStartMonth = HybridModelZone(ZoneNum).ZoneMeasuredTemperatureStartMonth;
-				HybridModelStartDate = HybridModelZone(ZoneNum).ZoneMeasuredTemperatureStartDate;
-				HybridModelEndMonth = HybridModelZone(ZoneNum).ZoneMeasuredTemperatureEndMonth;
-				HybridModelEndDate = HybridModelZone(ZoneNum).ZoneMeasuredTemperatureEndDate;
+				HybridModelStartMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartMonth;
+				HybridModelStartDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartDate;
+				HybridModelEndMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndMonth;
+				HybridModelEndDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndDate;
 				
-				if (HybridModelStartMonth == 1){
+				int HMDayArr[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+				if( HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12 ){
+					HMStartDay = HMDayArr[ HybridModelStartMonth - 1 ];
+				} else {
 					HMStartDay = 0;
 				}
-				else if (HybridModelStartMonth == 2){
-					HMStartDay = 31;
-				}
-				else if (HybridModelStartMonth == 3){
-					HMStartDay = 59;
-				}
-				else if (HybridModelStartMonth == 4){
-					HMStartDay = 90;
-				}
-				else if (HybridModelStartMonth == 5){
-					HMStartDay = 120;
-				}
-				else if (HybridModelStartMonth == 6){
-					HMStartDay = 151;
-				}
-				else if (HybridModelStartMonth == 7){
-					HMStartDay = 181;
-				}
-				else if (HybridModelStartMonth == 8){
-					HMStartDay = 212;
-				}
-				else if (HybridModelStartMonth == 9){
-					HMStartDay = 243;
-				}
-				else if (HybridModelStartMonth == 10){
-					HMStartDay = 273;
-				}
-				else if (HybridModelStartMonth == 11){
-					HMStartDay = 304;
-				}
-				else if (HybridModelStartMonth == 12){
-					HMStartDay = 334;
-				}
 
-				if (HybridModelEndMonth == 1){
+				if( HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12 ){
+					HMEndDay = HMDayArr[ HybridModelEndMonth - 1 ];
+				} else {
 					HMEndDay = 0;
 				}
-				else if (HybridModelEndMonth == 2){
-					HMEndDay = 31;
-				}
-				else if (HybridModelEndMonth == 3){
-					HMEndDay = 59;
-				}
-				else if (HybridModelEndMonth == 4){
-					HMEndDay = 90;
-				}
-				else if (HybridModelEndMonth == 5){
-					HMEndDay = 120;
-				}
-				else if (HybridModelEndMonth == 6){
-					HMEndDay = 151;
-				}
-				else if (HybridModelEndMonth == 7){
-					HMEndDay = 181;
-				}
-				else if (HybridModelEndMonth == 8){
-					HMEndDay = 212;
-				}
-				else if (HybridModelEndMonth == 9){
-					HMEndDay = 243;
-				}
-				else if (HybridModelEndMonth == 10){
-					HMEndDay = 273;
-				}
-				else if (HybridModelEndMonth == 11){
-					HMEndDay = 304;
-				}
-				else if (HybridModelEndMonth == 12){
-					HMEndDay = 334;
-				}
+
+				// @@
+				// if (HybridModelStartMonth == 1){
+				// 	HMStartDay = 0;
+				// }
+				// else if (HybridModelStartMonth == 2){
+				// 	HMStartDay = 31;
+				// }
+				// else if (HybridModelStartMonth == 3){
+				// 	HMStartDay = 59;
+				// }
+				// else if (HybridModelStartMonth == 4){
+				// 	HMStartDay = 90;
+				// }
+				// else if (HybridModelStartMonth == 5){
+				// 	HMStartDay = 120;
+				// }
+				// else if (HybridModelStartMonth == 6){
+				// 	HMStartDay = 151;
+				// }
+				// else if (HybridModelStartMonth == 7){
+				// 	HMStartDay = 181;
+				// }
+				// else if (HybridModelStartMonth == 8){
+				// 	HMStartDay = 212;
+				// }
+				// else if (HybridModelStartMonth == 9){
+				// 	HMStartDay = 243;
+				// }
+				// else if (HybridModelStartMonth == 10){
+				// 	HMStartDay = 273;
+				// }
+				// else if (HybridModelStartMonth == 11){
+				// 	HMStartDay = 304;
+				// }
+				// else if (HybridModelStartMonth == 12){
+				// 	HMStartDay = 334;
+				// }
+				// 
+				// if (HybridModelEndMonth == 1){
+				// 	HMEndDay = 0;
+				// }
+				// else if (HybridModelEndMonth == 2){
+				// 	HMEndDay = 31;
+				// }
+				// else if (HybridModelEndMonth == 3){
+				// 	HMEndDay = 59;
+				// }
+				// else if (HybridModelEndMonth == 4){
+				// 	HMEndDay = 90;
+				// }
+				// else if (HybridModelEndMonth == 5){
+				// 	HMEndDay = 120;
+				// }
+				// else if (HybridModelEndMonth == 6){
+				// 	HMEndDay = 151;
+				// }
+				// else if (HybridModelEndMonth == 7){
+				// 	HMEndDay = 181;
+				// }
+				// else if (HybridModelEndMonth == 8){
+				// 	HMEndDay = 212;
+				// }
+				// else if (HybridModelEndMonth == 9){
+				// 	HMEndDay = 243;
+				// }
+				// else if (HybridModelEndMonth == 10){
+				// 	HMEndDay = 273;
+				// }
+				// else if (HybridModelEndMonth == 11){
+				// 	HMEndDay = 304;
+				// }
+				// else if (HybridModelEndMonth == 12){
+				// 	HMEndDay = 334;
+				// }
 
 				HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
 				HybridEndDayOfYear = HMEndDay + HybridModelEndDate;
-				Zone(ZoneNum).ZoneMeasuredTemperature = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredTemperatureSchedulePtr);
+				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
 
 				// HM calculation only HM calculation period start
 				if (DayOfYear >= HybridStartDayOfYear && DayOfYear <= HybridEndDayOfYear){
 					ZT(ZoneNum) = Zone(ZoneNum).ZoneMeasuredTemperature;
 					// Internal thermal mass calcualtion start
-					if (HybridModelZone(ZoneNum).InternalThermalMassCalc == "YES"){
+					if ( HybridModelZone(ZoneNum).InternalThermalMassCalc ){
 						if (SumSysMCpT == 0 && ZT(ZoneNum) != PreviousMeasuredZT1(ZoneNum) && UseZoneTimeStepHistory){ // HM calculation only when HVAC off
 							 // Calculate air capacity using UseAnalyticalSolution)
 							if (TempDepCoef == 0.0) {
@@ -4219,7 +4231,7 @@ namespace ZoneTempPredictorCorrector {
 					} // Internal thermal mass calcualtion end
 
 					// Infiltration calcualtion start
-					if (HybridModelZone(ZoneNum).InfiltrationCalc == "YES") {
+					if ( HybridModelZone(ZoneNum).InfiltrationCalc ) {
 
 						// Calculate MCPI included in TempIndCoef and TempDepCoef
 						double a = Zone(ZoneNum).OutDryBulbTemp;

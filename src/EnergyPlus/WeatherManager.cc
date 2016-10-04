@@ -6315,37 +6315,37 @@ Label9999: ;
 		int NumAlphas;
 		int IOStat;
 		int NumNumbers;
-		int Loop; //Added by Sang Hoon Lee July 2015
-		int ZoneNum; //Added by Sang Hoon Lee July 2015
+		// int Loop; //Added by Sang Hoon Lee July 2015
+		// int ZoneNum; //Added by Sang Hoon Lee July 2015
 		cCurrentModuleObject = "RunPeriodControl:DaylightSavingTime";
-		for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) { //Added by Sang Hoon Lee July 2015
-			if (HybridModelZone(ZoneNum).InternalThermalMassCalc != "YES" && (!WarmupFlag) && (!DoingSizing)) { //Added by Sang Hoon Lee July 2015
-				NumFound = GetNumObjectsFound( cCurrentModuleObject );
+		// for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) { //Added by Sang Hoon Lee July 2015
+		// 	if ( !HybridModelZone(ZoneNum).InternalThermalMassCalc && (!WarmupFlag) && (!DoingSizing)) { //Added by Sang Hoon Lee July 2015
+		NumFound = GetNumObjectsFound( cCurrentModuleObject );
 
-				if ( NumFound == 1 ) {
-					GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					if ( NumAlphas != 2 ) {
-						ShowSevereError( cCurrentModuleObject + ": Insufficient fields, must have Start AND End Dates" );
-						ErrorsFound = true;
-					} else { // Correct number of arguments
-						ProcessDateString( cAlphaArgs( 1 ), IDFDST.StMon, IDFDST.StDay, IDFDST.StWeekDay, IDFDST.StDateType, ErrorsFound );
-						if ( IDFDST.StDateType == InvalidDate ) {
-							ShowSevereError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
-							ErrorsFound = true;
-						}
-						ProcessDateString( cAlphaArgs( 2 ), IDFDST.EnMon, IDFDST.EnDay, IDFDST.EnWeekDay, IDFDST.EnDateType, ErrorsFound );
-						if ( IDFDST.EnDateType == InvalidDate ) {
-							ShowSevereError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
-							ErrorsFound = true;
-						}
-						IDFDaylightSaving = true;
-					}
-				} else if ( NumFound > 1 ) {
-					ShowSevereError( cCurrentModuleObject + ": Too many objects in Input File, only one allowed." );
+		if ( NumFound == 1 ) {
+			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( NumAlphas != 2 ) {
+				ShowSevereError( cCurrentModuleObject + ": Insufficient fields, must have Start AND End Dates" );
+				ErrorsFound = true;
+			} else { // Correct number of arguments
+				ProcessDateString( cAlphaArgs( 1 ), IDFDST.StMon, IDFDST.StDay, IDFDST.StWeekDay, IDFDST.StDateType, ErrorsFound );
+				if ( IDFDST.StDateType == InvalidDate ) {
+					ShowSevereError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}
+				ProcessDateString( cAlphaArgs( 2 ), IDFDST.EnMon, IDFDST.EnDay, IDFDST.EnWeekDay, IDFDST.EnDateType, ErrorsFound );
+				if ( IDFDST.EnDateType == InvalidDate ) {
+					ShowSevereError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
+					ErrorsFound = true;
+				}
+				IDFDaylightSaving = true;
 			}
+		} else if ( NumFound > 1 ) {
+			ShowSevereError( cCurrentModuleObject + ": Too many objects in Input File, only one allowed." );
+			ErrorsFound = true;
 		}
+			//} //if
+		//} //for loop
 
 	}
 

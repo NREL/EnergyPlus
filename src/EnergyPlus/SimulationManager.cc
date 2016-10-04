@@ -308,7 +308,6 @@ namespace SimulationManager {
 		using Psychrometrics::InitializePsychRoutines;
 		using FaultsManager::CheckAndReadFaults;
 		using namespace HybridModel;
-		using namespace ZoneCapacitanceMultiplierResearchSpecial;
 		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -381,8 +380,6 @@ namespace SimulationManager {
 		CheckIfAnyIdealCondEntSetPoint();
 		createFacilityElectricPowerServiceObject();
 		
-		CheckAndReadHybridModelZone(); // Added by Sang Hoon Lee May 2015
-		// CheckAndReadZoneCapacitanceMultiplierResearchSpecial(); // Added by Sang Hoon Lee October 2015
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;

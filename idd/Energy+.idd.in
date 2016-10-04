@@ -60414,21 +60414,21 @@ HybridModel:Zone,
        \object-list ZoneAndZoneListNames
   A3 , \field Calculate Zone Internal Thermal Mass
        \note Use measured temperature data to calculate zone temperature capacity multiplier
-	   \type choice
+       \type choice
        \key NO
        \key YES
-	   \default NO
+       \default NO
   A4 , \field Calculate Zone Air Infiltration Rate
        \note Use measured temperature data to calculate zone air infiltration air flow rate
-	   \type choice
+       \type choice
        \key NO
        \key YES
-	   \default NO
+       \default NO
   A5 , \field Zone Measured Air Temperature Schedule Name
        \required-field
        \type object-list
        \object-list ScheduleNames
-	   \note from Schedule:File
+       \note from Schedule:File
   N1 , \field Begin Month
        \required-field
        \minimum 1
@@ -60449,8 +60449,7 @@ HybridModel:Zone,
        \minimum 1
        \maximum 31
        \type integer
-	   
-	   
+       
 SolarCollector:FlatPlate:Water,
        \memo Flat plate water solar collector (single glazed, unglazed, or evacuated tube).
        \memo Thermal and optical properties are taken from the referenced

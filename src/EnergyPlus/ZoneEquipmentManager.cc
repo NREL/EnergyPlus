@@ -5234,7 +5234,7 @@ namespace ZoneEquipmentManager {
 			}
 
 			// When Hybrid Modeling Infiltration is YES added November 2015 by Sang Hoon Lee Start
-			if (HybridModelZone(NZ).InfiltrationCalc == "YES"){
+			if ( HybridModelZone(NZ).InfiltrationCalc ){
 
 				if (MCPIHM( NZ ) >= 0.0){
 					//MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
