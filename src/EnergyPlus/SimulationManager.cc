@@ -382,7 +382,7 @@ namespace SimulationManager {
 		createFacilityElectricPowerServiceObject();
 		
 		CheckAndReadHybridModelZone(); // Added by Sang Hoon Lee May 2015
-		CheckAndReadZoneCapacitanceMultiplierResearchSpecial(); // Added by Sang Hoon Lee October 2015
+		// CheckAndReadZoneCapacitanceMultiplierResearchSpecial(); // Added by Sang Hoon Lee October 2015
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;

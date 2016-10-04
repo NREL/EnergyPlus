@@ -102,13 +102,13 @@ namespace ZoneCapacitanceMultiplierResearchSpecial {
 		double ZoneVolCapMultpGenContam;
 
 		// Default Constructor
-		ZoneCapacitanceMultiplierResearchSpecialProperties() :
-
-			ZoneVolCapMultpSens(1),
-			ZoneVolCapMultpMoist(1),
-			ZoneVolCapMultpCO2(1),
-			ZoneVolCapMultpGenContam(1)
-		{}
+		// ZoneCapacitanceMultiplierResearchSpecialProperties() :
+		// 
+		// 	ZoneVolCapMultpSens(1),
+		// 	ZoneVolCapMultpMoist(1),
+		// 	ZoneVolCapMultpCO2(1),
+		// 	ZoneVolCapMultpGenContam(1)
+		// {}
 
 		// Member Constructor
 		ZoneCapacitanceMultiplierResearchSpecialProperties(
@@ -133,8 +133,8 @@ namespace ZoneCapacitanceMultiplierResearchSpecial {
 
 	// Functions
 
-	void
-		CheckAndReadZoneCapacitanceMultiplierResearchSpecial();
+	// void
+	// 	CheckAndReadZoneCapacitanceMultiplierResearchSpecial();
 
 } // ZoneCapacitanceMultiplierResearchSpecial
 

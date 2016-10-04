@@ -719,11 +719,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \format singleLine
        \memo Multiplier altering the relative capacitance of the air compared to an empty zone
        \min-fields 4
- A1 , \field Zone Name
-       \required-field
-       \type object-list
-       \object-list Zone Names
- N1 , \field Temperature Capacity Multiplier
+  N1 , \field Temperature Capacity Multiplier
        \type real
        \default 1.0
        \minimum> 0.0
@@ -738,11 +734,15 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \default 1.0
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air carbon dioxide concentration
-  N4 ; \field Generic Contaminant Capacity Multiplier
+  N4 , \field Generic Contaminant Capacity Multiplier
        \type real
        \default 1.0
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air generic contaminant concentration
+  A1 ; \field Zone Name
+       \required-field
+       \type object-list
+       \object-list Zone Names
 
 Timestep,
        \memo Specifies the "basic" timestep for the simulation. The

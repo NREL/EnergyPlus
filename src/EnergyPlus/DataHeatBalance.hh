@@ -1357,6 +1357,7 @@ namespace DataHeatBalance {
 		//   less out of bounds temperature errors allowed
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
+		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
 		Real64 ZoneMeasuredTemperature; // Added by Sang Hoon Lee May 2015
 		Real64 ZoneVolCapMultpSens; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
 		Real64 ZoneVolCapMultpMoist; // Added by Sang Hoon June 2016
@@ -1441,25 +1442,26 @@ namespace DataHeatBalance {
 			EnforcedReciprocity( false ),
 			ZoneMinCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
-			ZoneMeasuredTemperature(0.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSens(1.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpMoist(1.0), // Added by Sang Hoon June 2016
-			ZoneVolCapMultpCO2(1.0), // Added by Sang Hoon June 2016
-			ZoneVolCapMultpGenContam(1.0), // Added by Sang Hoon June 2016
-			ZoneVolCapMultpSensHM(0.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMSum(0.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMSum1(0.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMCount(0.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMCountSum(0.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMCountSum1(0.0), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMAverage(1.0), // Added by Sang Hoon May 2015
-			InfiltrationVolumeFlowRateHM(0.0), // Added by Sang Hoon Lee February 2016
-			IVFHM(0.0), // Added by Sang Hoon Lee February 2016
-			InfiltrationDesignLevelHM(0.0), // Added by Sang Hoon Lee February 2016
-			MCPIHM(0.0), // Added by Sang Hoon Lee February 2016
-			InfilMdotHM(0.0), // Added by Sang Hoon Lee February 2016
-			InfilVdotOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
-			InfilOAAirChangeRateHM(0.0) // Added by Sang Hoon Lee February 2016
+			FlagCustomizedZoneCap( false ),
+			ZoneMeasuredTemperature( 0.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpSens( 1.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpMoist( 1.0 ), // Added by Sang Hoon June 2016
+			ZoneVolCapMultpCO2( 1.0 ), // Added by Sang Hoon June 2016
+			ZoneVolCapMultpGenContam( 1.0 ), // Added by Sang Hoon June 2016
+			ZoneVolCapMultpSensHM( 0.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpSensHMSum( 0.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpSensHMSum1( 0.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpSensHMCount( 0.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpSensHMCountSum( 0.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpSensHMCountSum1( 0.0 ), // Added by Sang Hoon May 2015
+			ZoneVolCapMultpSensHMAverage( 1.0 ), // Added by Sang Hoon May 2015
+			InfiltrationVolumeFlowRateHM( 0.0 ), // Added by Sang Hoon Lee February 2016
+			IVFHM( 0.0 ), // Added by Sang Hoon Lee February 2016
+			InfiltrationDesignLevelHM( 0.0 ), // Added by Sang Hoon Lee February 2016
+			MCPIHM( 0.0 ), // Added by Sang Hoon Lee February 2016
+			InfilMdotHM( 0.0 ), // Added by Sang Hoon Lee February 2016
+			InfilVdotOADensityHM( 0.0 ), // Added by Sang Hoon Lee February 2016
+			InfilOAAirChangeRateHM( 0.0 ) // Added by Sang Hoon Lee February 2016
 		{}
 
 		// Member Constructor

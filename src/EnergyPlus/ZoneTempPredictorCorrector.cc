@@ -1545,20 +1545,63 @@ namespace ZoneTempPredictorCorrector {
 		if ( allocated( TComfortControlTypes ) ) TComfortControlTypes.deallocate();
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
-		//cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-		//NumNums = GetNumObjectsFound( cCurrentModuleObject );
-		//if ( NumNums == 0 ) {
-		//	ZoneVolCapMultpSens = 1.0;
-		//	ZoneVolCapMultpMoist = 1.0;
-		//	ZoneVolCapMultpCO2 = 1.0;
-		//	ZoneVolCapMultpGenContam = 1.0;
-		//} else {
+		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
+		NumNums = GetNumObjectsFound( cCurrentModuleObject );
+		if ( NumNums == 0 ) {
+
+			// Default values
+			ZoneVolCapMultpSens = 1.0;
+			ZoneVolCapMultpMoist = 1.0;
+			ZoneVolCapMultpCO2 = 1.0;
+			ZoneVolCapMultpGenContam = 1.0;
+
+			// Assign to all zones
+			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
+				Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+				Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
+				Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
+				Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
+			}
+
+		} else {
+		// Added by Sang Hoon Lee in Sep. 2016.
 		//	GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 		//	ZoneVolCapMultpSens = rNumericArgs( 1 );
 		//	ZoneVolCapMultpMoist = rNumericArgs( 2 );
 		//	ZoneVolCapMultpCO2 = rNumericArgs( 3 );
 		//	ZoneVolCapMultpGenContam = rNumericArgs( 4 );
-		//}
+			
+			// Default values
+			ZoneVolCapMultpSens = 1.0;
+			ZoneVolCapMultpMoist = 1.0;
+			ZoneVolCapMultpCO2 = 1.0;
+			ZoneVolCapMultpGenContam = 1.0;
+
+			// Assign the user inputs to the specified zones
+			for ( int ZoneCapNum = 1; ZoneCapNum <= NumNums; ZoneCapNum++ ) {
+				GetObjectItem(cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+				int ZoneNum = FindItemInList( cAlphaArgs(1), Zone );
+				if( ZoneNum > 0 ){
+					Zone( ZoneNum ).FlagCustomizedZoneCap = true;
+					Zone( ZoneNum ).ZoneVolCapMultpSens = rNumericArgs( 1 );
+					Zone( ZoneNum ).ZoneVolCapMultpMoist = rNumericArgs( 2 );
+					Zone( ZoneNum ).ZoneVolCapMultpCO2 = rNumericArgs( 3 );
+					Zone( ZoneNum ).ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+				}
+			}
+			
+			// Assign default values to all the other zones
+			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
+				if( ! Zone( ZoneNum ).FlagCustomizedZoneCap ){
+					Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+					Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
+					Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
+					Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
+				}
+			}
+
+		}
 
 		gio::write( OutputFileInits, Format_700 );
 		gio::write( OutputFileInits, Format_701 ) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
@@ -2775,7 +2818,7 @@ namespace ZoneTempPredictorCorrector {
 						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATsurf
 						- RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHATref
 						+ RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkMCpT + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SysDepZoneLoadsLagged;
-					AirCap = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume * ZoneVolCapMultpSens
+					AirCap = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirVolume * Zone( ZoneNum ).ZoneVolCapMultpSens
 						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RhoAir
 						* RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).CpAir
 						/ ( TimeStepSys*SecInHour );
@@ -3897,7 +3940,7 @@ namespace ZoneTempPredictorCorrector {
 				WZoneTimeMinus3Temp( ZoneNum ) = WZoneTimeMinus3( ZoneNum );
 			}
 
-			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 
 			AirCap = AIRRAT( ZoneNum );
 
@@ -4033,11 +4076,10 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			//Hybrid modeling start: Added by Sang Hoon Lee May 2015 for Hybrid Modeling
-
-			Zone(ZoneNum).ZoneVolCapMultpSens = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpSens;
-			Zone(ZoneNum).ZoneVolCapMultpMoist = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpMoist;
-			Zone(ZoneNum).ZoneVolCapMultpCO2 = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpCO2;
-			Zone(ZoneNum).ZoneVolCapMultpGenContam = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpGenContam;
+			//Zone(ZoneNum).ZoneVolCapMultpSens = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpSens;
+			//Zone(ZoneNum).ZoneVolCapMultpMoist = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpMoist;
+			//Zone(ZoneNum).ZoneVolCapMultpCO2 = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpCO2;
+			//Zone(ZoneNum).ZoneVolCapMultpGenContam = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpGenContam;
 			
 			// Hybrid model trigger start
 			if (HybridModelZone(ZoneNum).InternalThermalMassCalc == "YES" || HybridModelZone(ZoneNum).InfiltrationCalc == "YES" && (!WarmupFlag) && (!DoingSizing)) {
