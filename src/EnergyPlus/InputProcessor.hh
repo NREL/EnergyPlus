@@ -28,18 +28,6 @@ using json = nlohmann::json;
 
 class IdfParser {
 public:
-	void initialize( json const & schema ) {
-		if ( schema.is_null() ) return;
-		const json & loc = schema[ "properties" ];
-		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
-			std::string key = it.key();
-			for ( char & c : key ) c = toupper( c );
-			case_insensitive_keys[ key ] = it.key();
-		}
-	}
-
-	std::unordered_map < std::string, std::string > case_insensitive_keys;
-
 	json decode( std::string const & idf, json const & schema );
 
 	json decode( std::string const & idf, json const & schema, bool & success );
@@ -179,6 +167,7 @@ namespace EnergyPlus {
 		static json schema;
 		static json jdf;
 		static std::ostream * echo_stream;
+		static std::unordered_map < std::string, std::string > case_insensitive_object_map;
 
 		template < class T >
 		struct is_shared_ptr : std::false_type {};

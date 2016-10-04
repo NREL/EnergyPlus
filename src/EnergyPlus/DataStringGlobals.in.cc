@@ -147,8 +147,7 @@ namespace DataStringGlobals {
 	std::string outputTblTabFileName("eplustbl.tab");
 	std::string outputTblTxtFileName("eplustbl.txt");
 	std::string outputTblXmlFileName("eplustbl.xml");
-	std::string inputIdfFileName;
-	std::string inputJdfFileName;
+	std::string inputFileName;
 	std::string inputIddFileName;
 	std::string inputJddFileName;
 	std::string inputWeatherFileName;
@@ -184,8 +183,9 @@ namespace DataStringGlobals {
 	std::string outputMtrCsvFileName("eplusmtr.csv");
 	std::string outputRvauditFileName("eplusout.rvaudit");
 
-	std::string idfFileNameOnly;
-	std::string idfDirPathName;
+	std::string inputFileNameOnly;
+	std::string inputDirPathName;
+	std::string outputDirPathName;
 	std::string exeDirectory;
 
 	std::string ProgramPath; // Path for Program from INI file

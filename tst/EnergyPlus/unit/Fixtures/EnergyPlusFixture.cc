@@ -231,12 +231,18 @@ namespace EnergyPlus {
 			std::cout << "JSON Schema not found" << std::endl;
 			return;
 		}
-		InputProcessor::idf_parser.initialize(InputProcessor::schema);
+
+		const json & loc = InputProcessor::schema[ "properties" ];
+		InputProcessor::case_insensitive_object_map.reserve( loc.size() );
+		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
+			std::string key = it.key();
+			for ( char & c : key ) c = toupper( c );
+			InputProcessor::case_insensitive_object_map.emplace( std::move( key ), it.key() );
+		}
 	}
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
-		InputProcessor::state.initialize(&InputProcessor::schema);
 
 		show_message();
 

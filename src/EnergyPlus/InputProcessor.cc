@@ -18,6 +18,7 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
+#include <FileSystem.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
 #include <iomanip>
@@ -30,6 +31,10 @@ IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
 State EnergyPlus::InputProcessor::state = State();
 char EnergyPlus::InputProcessor::s[] = { 0 };
 std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
+
+std::unordered_map < std::string, std::string >
+		EnergyPlus::InputProcessor::case_insensitive_object_map = std::unordered_map < std::string, std::string >();
+
 std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > >
 		EnergyPlus::InputProcessor::jdd_jdf_cache_map =
 		std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > ();
@@ -129,8 +134,8 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 		} else {
 			std::string obj_name = parse_string( idf, index, success );
 			for ( char & c : obj_name ) c = ( char ) toupper( c );
-			auto tmp_umit = case_insensitive_keys.find( obj_name );
-			if ( tmp_umit != case_insensitive_keys.end() ) {
+			auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( obj_name );
+			if ( tmp_umit != EnergyPlus::InputProcessor::case_insensitive_object_map.end() ) {
 				obj_name = tmp_umit->second;
 			} else {
 				print_out_line_error( idf, false );
@@ -933,40 +938,70 @@ namespace EnergyPlus {
 	InputProcessor::ProcessInput() {
 		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {
-            ShowSevereError( "jdd file path " + inputJddFileName + " not found" );
+            ShowFatalError( "JDD file path " + inputJddFileName + " not found" );
 			return;
 		}
 		InputProcessor::schema = json::parse(jdd_stream);
-		std::ifstream idf_stream( inputIdfFileName , std::ifstream::in | std::ios::ate);
-		if ( !idf_stream.is_open() ) {
-			ShowSevereError( "idf file path " + inputIdfFileName + " not found" );
+
+		const json & loc = InputProcessor::schema[ "properties" ];
+		case_insensitive_object_map.reserve( loc.size() );
+		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
+			std::string key = it.key();
+			for ( char & c : key ) c = toupper( c );
+			case_insensitive_object_map.emplace( std::move( key ), it.key() );
+		}
+
+		std::ifstream input_stream( inputFileName , std::ifstream::in | std::ios::ate);
+		if ( !input_stream.is_open() ) {
+			ShowFatalError( "Input file path " + inputFileName + " not found" );
 			return;
 		}
-		std::ifstream::pos_type size = idf_stream.tellg();
+
+		// TODO: Check which file read approach works properly on windows
+		// std::string lines;
+		// std::string line;
+		// while (std::getline(infile, line))
+		// {
+		// 	lines.append(line + NL);
+		// }
+		std::ifstream::pos_type size = input_stream.tellg();
 		char *memblock = new char[(size_t) size + 1];
-		idf_stream.seekg(0, std::ios::beg);
-		idf_stream.read(memblock, size);
+		input_stream.seekg(0, std::ios::beg);
+		input_stream.read(memblock, size);
 		memblock[size] = '\0';
-		idf_stream.close();
+		input_stream.close();
 		std::string input_file = memblock;
 		delete[] memblock;
-		InputProcessor::idf_parser.initialize(InputProcessor::schema);
-		json const user_input = InputProcessor::idf_parser.decode(input_file, InputProcessor::schema);
-		auto const user_input_dump = user_input.dump();
+
+		if ( ! DataGlobals::isJDF ) {
+			json const input_file_json = InputProcessor::idf_parser.decode( input_file, InputProcessor::schema );
+			if ( DataGlobals::outputJDFConversion ) {
+				input_file = input_file_json.dump( 4 );
+				std::string convertedIDF( outputDirPathName + inputFileNameOnly + ".jdf" );
+				FileSystem::makeNativePath( convertedIDF );
+				std::ofstream convertedFS( convertedIDF, std::ofstream::out );
+				convertedFS << input_file << std::endl;
+			} else {
+				input_file = input_file_json.dump();
+			}
+		}
 
 		InputProcessor::state.initialize( & InputProcessor::schema );
 
-		json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index) -> bool {
-			InputProcessor::state.traverse(event, parsed, line_num, line_index);
+		json::parser_callback_t cb = []( int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
+			InputProcessor::state.traverse( event, parsed, line_num, line_index );
 			return true;
 		};
-		InputProcessor::jdf = json::parse(user_input_dump, cb);
-//		InputProcessor::state.print_errors();
-//		std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
-//		std::ofstream ofs("encoded_json.idf", std::ofstream::out);
-//		ofs << encoded << std::endl;
-//		std::ofstream ofs("json_dump.json", std::ofstream::out);
-//		ofs << InputProcessor::jdf.dump(4) << std::endl;
+
+		InputProcessor::jdf = json::parse( input_file, cb );
+
+		if ( DataGlobals::isJDF && DataGlobals::outputJDFConversion ) {
+			std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
+			std::string convertedJDF( outputDirPathName + inputFileNameOnly + ".idf" );
+			FileSystem::makeNativePath( convertedJDF );
+			std::ofstream convertedFS( convertedJDF, std::ofstream::out );
+			convertedFS << encoded << std::endl;
+		}
 
 		InitializeCacheMap();
 
@@ -1026,8 +1061,8 @@ namespace EnergyPlus {
 		auto const & find_obj = jdf.find( ObjectWord );
 
 		if ( find_obj == jdf.end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end()
 			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
@@ -1037,8 +1072,8 @@ namespace EnergyPlus {
 		}
 
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
 			}
 		}
@@ -1070,8 +1105,8 @@ namespace EnergyPlus {
 
 		auto find_iterators = jdd_jdf_cache_map.find( Object );
 		if ( find_iterators == jdd_jdf_cache_map.end() ) {
-			auto const tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
+			auto const tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( Object ) );
+			if ( tmp_umit == case_insensitive_object_map.end()
 			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
@@ -1342,8 +1377,8 @@ namespace EnergyPlus {
 		json * obj;
 
 		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjType ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
@@ -1381,8 +1416,8 @@ namespace EnergyPlus {
 		json * obj;
 
 		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjType ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
@@ -1942,8 +1977,8 @@ namespace EnergyPlus {
 		NumNumeric = 0;
 		json * object;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
@@ -1956,8 +1991,8 @@ namespace EnergyPlus {
 
 		json * objects;
 		if ( jdf.find( ObjectWord ) == jdf.end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;

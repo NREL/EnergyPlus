@@ -477,8 +477,8 @@ EnergyPlusPgm( std::string const & filepath )
 				}
 			}
 
-			std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
-			std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+			std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
+			std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
 
 			int fileUnitNumber;
 			int iostatus;
