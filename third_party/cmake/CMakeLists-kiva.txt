@@ -2,7 +2,7 @@ include(ExternalProject)
 
 ExternalProject_Add(Kiva
   GIT_REPOSITORY https://github.com/big-ladder/kiva.git
-  GIT_TAG "develop"
+  GIT_TAG "energyplus"
   SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/kiva"
   UPDATE_COMMAND ""
   PATCH_COMMAND ""
