@@ -15895,6 +15895,7 @@ SurfaceProperty:HeatTransferAlgorithm:SurfaceList,
        \memo EMPD (Effective Moisture Penetration Depth with Conduction Transfer Functions).
        \memo Advanced/Research Usage: CondFD (Conduction Finite Difference)
        \memo Advanced/Research Usage: HAMT (Combined Heat And Moisture Finite Element)
+       \min-fields 3
   A1 , \field Name
        \required-field
        \type alpha
@@ -23969,7 +23970,6 @@ AirflowNetwork:Distribution:Component:Coil,
       \required-field
       \type choice
       \key Coil:Cooling:DX:SingleSpeed
-! TODO: double check key below
       \key Coil:Cooling:DX:TwoSpeed
       \key Coil:Heating:Fuel
       \key Coil:Heating:Electric
@@ -40666,8 +40666,7 @@ ZoneHVAC:AirDistributionUnit,
        \key AirTerminal:DualDuct:VAV
        \key AirTerminal:SingleDuct:ConstantVolume:Reheat
        \key AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
-       \key AirTerminal:SingleDuct:InletSideMixer
-       \key AirTerminal:SingleDuct:SupplySideMixer
+       \key AirTerminal:SingleDuct:Mixer
        \key AirTerminal:SingleDuct:VAV:Reheat
        \key AirTerminal:SingleDuct:VAV:NoReheat
        \key AirTerminal:SingleDuct:SeriesPIU:Reheat
@@ -73193,6 +73192,7 @@ SetpointManager:OutdoorAirPretreat,
        \memo produce the reference setpoint condition at the
        \memo mixed air node when mixed with the return air stream
   A1 , \field Name
+       \required-field
   A2 , \field Control Variable
        \type choice
        \key Temperature
