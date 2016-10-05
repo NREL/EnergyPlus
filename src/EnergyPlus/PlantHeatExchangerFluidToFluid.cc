@@ -360,12 +360,10 @@ namespace PlantHeatExchangerFluidToFluid {
 			CheckFluidHXs.dimension( NumberOfPlantFluidHXs, true );
 			for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), FluidHX, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				FluidHX( CompLoop ).Name = cAlphaArgs( 1 );
 

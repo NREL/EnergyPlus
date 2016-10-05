@@ -383,13 +383,10 @@ namespace PurchasedAirManager {
 				PurchAirNumericFields( PurchAirNum ).FieldNames.allocate( NumNums );
 				PurchAirNumericFields( PurchAirNum ).FieldNames = "";
 				PurchAirNumericFields( PurchAirNum ).FieldNames = cNumericFieldNames;
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), PurchAir, PurchAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+					cAlphaArgs( 1 ) = "xxxxx";
 				}
 				PurchAir( PurchAirNum ).Name = cAlphaArgs( 1 );
 				// get optional  availability schedule

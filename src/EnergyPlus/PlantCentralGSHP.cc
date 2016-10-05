@@ -675,17 +675,11 @@ namespace PlantCentralGSHP {
 
 			// intialize nth chiller heater index (including identical units) for current wrapper
 			NumChHtrPerWrapper = 0;
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Wrapper, WrapperNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				continue;
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
-
 			if ( cAlphaArgs( 2 ) == "SMARTMIXING" ) {
 				Wrapper( WrapperNum ).ControlMode = SmartMixing;
 			}
@@ -971,15 +965,11 @@ namespace PlantCentralGSHP {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ChillerHeater( ChillerHeaterNum ).Name = cAlphaArgs( 1 );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ChillerHeater, ChillerHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				CHErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
-
 			ChillerHeater( ChillerHeaterNum ).CondModeCooling = cAlphaArgs( 4 );
 
 			// Performance curves

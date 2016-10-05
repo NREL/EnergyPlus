@@ -284,13 +284,10 @@ namespace PlantComponentTemperatureSources {
 		// fill arrays
 		for ( SourceNum = 1; SourceNum <= NumSources; ++SourceNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterSource, SourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			WaterSource( SourceNum ).Name = cAlphaArgs( 1 );
 

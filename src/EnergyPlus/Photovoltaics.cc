@@ -401,12 +401,10 @@ namespace Photovoltaics {
 		cCurrentModuleObject = cPVGeneratorObjectName;
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PVarray, PVnum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			PVarray( PVnum ).Name = cAlphaArgs( 1 );
 
@@ -531,10 +529,8 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVSimplePerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpSimpleModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) { //repeat or blank name so don't add
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
 					continue;
 				}
@@ -575,11 +571,8 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
 			for ( ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpTNRSYSModuleParams, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) { //repeat or blank name so don't add
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
 					continue;
 				}
@@ -630,15 +623,11 @@ namespace Photovoltaics {
 			for ( ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum ) {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpSNLModuleParams, &SNLModuleParamsStuct::name, ModNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) { //repeat or blank name so don't add
+				if ( cAlphaArgs( 1 ).empty() ) {
+					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
 					continue;
 				}
-
 				tmpSNLModuleParams( ModNum ).name = cAlphaArgs( 1 );
 				tmpSNLModuleParams( ModNum ).Acoll = rNumericArgs( 1 );
 				tmpSNLModuleParams( ModNum ).NcellSer = rNumericArgs( 2 );

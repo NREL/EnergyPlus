@@ -346,12 +346,10 @@ namespace PackagedThermalStorageCoil {
 
 		for ( item = 1; item <= NumTESCoils; ++item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), TESCoil, item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				cAlphaArgs( 1 ) = "xxxxx";
 			}
 			VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {

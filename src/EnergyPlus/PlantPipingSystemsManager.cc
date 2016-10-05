@@ -795,17 +795,11 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemDomains, DomainNum - 1, IsNotOK, IsBlank, ObjName_ug_GeneralDomain + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( ObjName_ug_GeneralDomain + " Name, cannot be blank" );
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Blank name encountered";
 			}
-
 			// Mesh extents, validated by IP
 			PipingSystemDomains( DomainNum ).Extents.Xmax = rNumericArgs( 1 );
 			PipingSystemDomains( DomainNum ).Extents.Ymax = rNumericArgs( 2 );
@@ -1761,13 +1755,9 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemCircuits( PipeCircuitCounter ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits, PipeCircuitCounter - 1, IsNotOK, IsBlank, ObjName_Circuit + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
+
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( ObjName_Circuit + " Name, cannot be blank" );
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Blank name encountered";
 			}
@@ -1885,17 +1875,11 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemSegments( SegmentCtr ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemSegments, SegmentCtr - 1, IsNotOK, IsBlank, ObjName_Segment + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( ObjName_Segment + " Name, cannot be blank" );
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Blank name encountered";
 			}
-
 			// Read in the pipe location, validated as positive by IP
 			// -- note that these values will be altered by the main GetInput routine in two ways:
 			//   1) shift for basement wall if selected
@@ -2050,13 +2034,8 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			HGHX( HorizontalGHXCtr ).ObjName = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), HGHX, &HorizontalTrenchData::ObjName, HorizontalGHXCtr - 1, IsNotOK, IsBlank, ObjName_HorizTrench + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( ObjName_HorizTrench + " Name, cannot be blank" );
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "Blank name encountered";
 			}

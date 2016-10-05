@@ -431,15 +431,11 @@ namespace PlantManager {
 				CurrentModuleObject = "CondenserLoop";
 				InputProcessor::GetObjectItem( CurrentModuleObject, CondLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			}
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alpha( 1 ), PlantLoop, LoopNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+			if (Alpha( 1 ).empty() ) {
+				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
-				if ( IsBlank ) Alpha( 1 ) = "xxxxx";
+				Alpha( 1 ) = "xxxxx";
 			}
-
 			this_loop.Name = Alpha( 1 ); // Load the Plant Loop Name
 
 			if ( InputProcessor::SameString( Alpha( 2 ), "STEAM" ) ) {

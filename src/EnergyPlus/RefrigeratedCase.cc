@@ -995,14 +995,12 @@ namespace RefrigeratedCase {
 				InputProcessor::GetObjectItem( CurrentModuleObject, CaseNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				++NumDisplayCases;
-				IsNotOK = false;
-				IsBlank = false;
+
 				AlphaNum = 1;
-				InputProcessor::VerifyName( Alphas( AlphaNum ), RefrigCase, CaseNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( AlphaNum ) + "\", invalid " + cAlphaFieldNames( AlphaNum ) + "+\"" + Alphas( AlphaNum ) );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				RefrigCase( CaseNum ).Name = Alphas( AlphaNum );
 
@@ -1525,14 +1523,10 @@ namespace RefrigeratedCase {
 			for ( WalkInID = 1; WalkInID <= NumSimulationWalkIns; ++WalkInID ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, WalkInID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), WalkIn, WalkInID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				WalkIn( WalkInID ).Name = Alphas( 1 );
 
@@ -1944,14 +1938,10 @@ namespace RefrigeratedCase {
 				AlphaNum = 1;
 				InputProcessor::GetObjectItem( CurrentModuleObject, CoilID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( AlphaNum ), WarehouseCoil, CoilID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( AlphaNum ) + "\"." );
-					if ( IsBlank ) Alphas( AlphaNum ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				WarehouseCoil( CoilID ).Name = Alphas( AlphaNum );
 
@@ -2464,17 +2454,12 @@ namespace RefrigeratedCase {
 
 			CurrentModuleObject = "ZoneHVAC:RefrigerationChillerSet";
 			for ( SetID = 1; SetID <= NumRefrigChillerSets; ++SetID ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, SetID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
+				InputProcessor::GetObjectItem( CurrentModuleObject, SetID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames )
 				AlphaNum = 1;
-				InputProcessor::VerifyName( Alphas( AlphaNum ), AirChillerSet, SetID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( AlphaNum ) + "\"." );
-					if ( IsBlank ) Alphas( AlphaNum ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				AirChillerSet( SetID ).Name = Alphas( AlphaNum );
 
@@ -2562,12 +2547,10 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:CaseAndWalkInList";
 			for ( ListNum = 1; ListNum <= NumSimulationCaseAndWalkInLists; ++ListNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), CaseAndWalkInList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 
 				CaseAndWalkInList( ListNum ).Name = Alphas( 1 );
@@ -2632,13 +2615,10 @@ namespace RefrigeratedCase {
 			for ( RackNum = 1; RackNum <= NumRefrigeratedRacks; ++RackNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, RackNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), RefrigRack, RackNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				RefrigRack( RackNum ).Name = Alphas( 1 );
 				HeatReclaimRefrigeratedRack( RackNum ).Name = Alphas( 1 );
@@ -3529,14 +3509,11 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:GasCooler:AirCooled";
 				for ( GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, GCNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), GasCooler, GCNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + " = " + Alphas( 1 ) );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+					if (Alphas( 1 ).empty() ) {
+						ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+						Alphas( 1 ) = "xxxxx";
+					}
 					GasCooler( GCNum ).Name = Alphas( 1 );
 
 					GasCooler( GCNum ).CapCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -3674,13 +3651,10 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:SecondarySystem";
 				for ( SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, SecondaryNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), Secondary, SecondaryNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+					if (Alphas( 1 ).empty() ) {
+						ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
+						Alphas( 1 ) = "xxxxx";
 					}
 					Secondary( SecondaryNum ).Name = Alphas( 1 );
 
@@ -4144,14 +4118,10 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:Compressor";
 			for ( CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, CompNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), Compressor, CompNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				Compressor( CompNum ).Name = Alphas( 1 );
 
@@ -4230,14 +4200,10 @@ namespace RefrigeratedCase {
 				NumSimulationMechSubcoolers = 0;
 				for ( SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, SubcoolerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), Subcooler, SubcoolerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+					if (Alphas( 1 ).empty() ) {
+						ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
+						Alphas( 1 ) = "xxxxx";
 					}
 					Subcooler( SubcoolerNum ).Name = Alphas( 1 );
 
@@ -4305,13 +4271,10 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:TransferLoadList";
 				for ( ListNum = 1; ListNum <= NumSimulationTransferLoadLists; ++ListNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), TransferLoadList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+					if (Alphas( 1 ).empty() ) {
+						ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 						ErrorsFound = true;
+						Alphas( 1 ) = "xxxxx";
 					}
 
 					TransferLoadList( ListNum ).Name = Alphas( 1 );
@@ -4360,15 +4323,11 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:CompressorList";
 			for ( ListNum = 1; ListNum <= NumCompressorLists; ++ListNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
 				CompressorLists( ListNum ).NumCompressors = NumAlphas - 1;
-				InputProcessor::VerifyName( Alphas( 1 ), CompressorLists, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				CompressorLists( ListNum ).Name = Alphas( 1 );
 				if ( ! allocated( CompressorLists( ListNum ).CompItemNum ) ) CompressorLists( ListNum ).CompItemNum.allocate( CompressorLists( ListNum ).NumCompressors );
@@ -4392,15 +4351,10 @@ namespace RefrigeratedCase {
 			for ( RefrigSysNum = 1; RefrigSysNum <= NumRefrigSystems; ++RefrigSysNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, RefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-
-				InputProcessor::VerifyName( Alphas( 1 ), System, RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				System( RefrigSysNum ).Name = Alphas( 1 );
 
@@ -5090,13 +5044,10 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:TranscriticalSystem";
 			for ( TransRefrigSysNum = 1; TransRefrigSysNum <= NumTransRefrigSystems; ++TransRefrigSysNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), TransSystem, RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				if (Alphas( 1 ).empty() ) {
+					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
 					ErrorsFound = true;
+					Alphas( 1 ) = "xxxxx";
 				}
 				TransSystem( TransRefrigSysNum ).Name = Alphas( 1 );
 
