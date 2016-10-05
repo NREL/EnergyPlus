@@ -59,6 +59,7 @@
 // C++ Headers
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
 
 // Lis Header
 #include "lis.h"
@@ -110,6 +111,15 @@ void KivaInstanceMap::setBoundaryConditions() {
 
 }
 
+void KivaInstanceMap::reportKivaSurfaces() {
+  // Calculate inside face values
+  Real64 const qFloor = -(bcs.slabAbsRadiation + DataHeatBalance::HConvIn(floorSurface)*(DataHeatBalFanSys::MAT(zoneNum) - DataHeatBalSurface::TempSurfIn(floorSurface)));
+
+  DataHeatBalSurface::OpaqSurfInsFaceConductionFlux( floorSurface ) = qFloor;
+  DataHeatBalSurface::OpaqSurfInsFaceConduction( floorSurface ) = qFloor * DataSurfaces::Surface(floorSurface).Area; // for reporting as in CTF, PT
+  // TODO Kiva: Repeat for walls
+}
+
 KivaManager::KivaManager() {
   LIS_INT dummy_argc = 0;
   char** dummy_argv;
@@ -120,7 +130,12 @@ KivaManager::~KivaManager() {
   lis_finalize();
 }
 
-void KivaManager::setupKivaInstances(Array1D< DataSurfaces::SurfaceData >& Surfaces, Array1D< DataHeatBalance::ConstructionData >& Constructs, Array1D< DataHeatBalance::MaterialProperties >& Materials) {
+void KivaManager::setupKivaInstances() {
+
+  auto& Surfaces = DataSurfaces::Surface;
+  auto& Constructs = DataHeatBalance::Construct;
+  auto& Materials = DataHeatBalance::Material;
+
   // Figure out number of instances (number of foundation coupled floors)
   int inst = 0;
   int surfNum = 1;
@@ -234,13 +249,10 @@ void KivaManager::setupKivaInstances(Array1D< DataSurfaces::SurfaceData >& Surfa
 
     grnd.buildDomain();
 
-    // TODO Kiva: Move to EIO file
-    /*
-    std::cout << "  X Cells: " << grnd.nX << std::endl;
-    std::cout << "  Y Cells: " << grnd.nY << std::endl;
-    std::cout << "  Z Cells: " << grnd.nZ << std::endl;
-    std::cout << "  Total Cells: " << grnd.nX*grnd.nY*grnd.nZ << std::endl;
-    */
+    // TODO Kiva: Add wall surfaces to EIO
+    gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Floor Surface, Wall Surface(s)";
+		gio::write( DataGlobals::OutputFileInits, "(A,',',I5',',I5',',I5',',A)" ) << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd.nX << grnd.nZ << grnd.nX*grnd.nZ << DataSurfaces::Surface(kv.floorSurface).Name;
+
   }
 
 }
@@ -268,11 +280,11 @@ void KivaManager::calcKivaInstances() {
     auto& grnd = kv.ground;
 
     // TODO Kiva: Accelerated approach? Kusuda?
-
-    //std::cout << DataEnvironment::CurMnDyHr << " (" << DataGlobals::TimeStep << ")" << std::endl;
     kv.setBoundaryConditions();
     grnd.calculate(kv.bcs,DataGlobals::MinutesPerTimeStep*60.);
     grnd.calculateSurfaceAverages();
+    kv.reportKivaSurfaces();
+
   }
 }
 

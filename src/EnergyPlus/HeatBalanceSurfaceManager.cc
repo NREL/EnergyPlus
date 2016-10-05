@@ -1441,7 +1441,11 @@ namespace HeatBalanceSurfaceManager {
 		for ( loop = 1; loop <= TotSurfaces; ++loop ) {
 			if ( ! Surface( loop ).HeatTransSurf ) continue;
 			SetupOutputVariable( "Surface Inside Face Temperature [C]", TempSurfInRep( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Outside Face Temperature [C]", TempSurfOut( loop ), "Zone", "State", Surface( loop ).Name );
+
+			if ( Surface( loop ).ExtBoundCond != KivaFoundation ) {
+				SetupOutputVariable( "Surface Outside Face Temperature [C]", TempSurfOut( loop ), "Zone", "State", Surface( loop ).Name );
+			}
+
 			SetupOutputVariable( "Surface Inside Face Adjacent Air Temperature [C]", TempEffBulkAir( loop ), "Zone", "State", Surface( loop ).Name );
 			SetupOutputVariable( "Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]", HConvIn( loop ), "Zone", "State", Surface( loop ).Name );
 			SetupOutputVariable( "Surface Inside Face Convection Heat Gain Rate [W]", QdotConvInRep( loop ), "Zone", "State", Surface( loop ).Name );
@@ -1498,23 +1502,25 @@ namespace HeatBalanceSurfaceManager {
 				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfInsFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Energy [J]", OpaqSurfInsFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-				SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate [W]", OpaqSurfOutsideFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Conduction Heat Gain Rate [W]", OpaqSurfExtFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Conduction Heat Loss Rate [W]", OpaqSurfExtFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfOutsideFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Energy [J]", OpaqSurfOutsideFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+				if ( Surface( loop ).ExtBoundCond != KivaFoundation ) {
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate [W]", OpaqSurfOutsideFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Gain Rate [W]", OpaqSurfExtFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Loss Rate [W]", OpaqSurfExtFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfOutsideFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Energy [J]", OpaqSurfOutsideFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-				SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate [W]", OpaqSurfAvgFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Average Face Conduction Heat Gain Rate [W]", OpaqSurfAvgFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Average Face Conduction Heat Loss Rate [W]", OpaqSurfAvgFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfAvgFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Energy [J]", OpaqSurfAvgFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate [W]", OpaqSurfAvgFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Gain Rate [W]", OpaqSurfAvgFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Loss Rate [W]", OpaqSurfAvgFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfAvgFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Energy [J]", OpaqSurfAvgFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-				SetupOutputVariable( "Surface Heat Storage Rate [W]", OpaqSurfStorageConduction( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Heat Storage Gain Rate [W]", OpaqSurfStorageGainRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Heat Storage Loss Rate [W]", OpaqSurfStorageCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Heat Storage Rate per Area [W/m2]", OpaqSurfStorageConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Heat Storage Energy [J]", OpaqSurfStorageConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Rate [W]", OpaqSurfStorageConduction( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Gain Rate [W]", OpaqSurfStorageGainRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Loss Rate [W]", OpaqSurfStorageCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Rate per Area [W/m2]", OpaqSurfStorageConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Energy [J]", OpaqSurfStorageConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+				}
 
 				//      ENDIF
 				//CurrentModuleObject='Opaque Surfaces'

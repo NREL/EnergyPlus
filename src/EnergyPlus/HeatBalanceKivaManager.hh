@@ -91,6 +91,7 @@ public:
   Array1D< int > wallSurfaces;
   int zoneNum;
   void setBoundaryConditions();
+  void reportKivaSurfaces();
   Kiva::BoundaryConditions bcs;
 };
 
@@ -98,7 +99,7 @@ class KivaManager{
 public:
   KivaManager();
   virtual ~KivaManager();
-  void setupKivaInstances(Array1D< DataSurfaces::SurfaceData >& Surfaces, Array1D< DataHeatBalance::ConstructionData >& Constructs, Array1D< DataHeatBalance::MaterialProperties >& Materials);
+  void setupKivaInstances();
   void initKivaInstances();
   void calcKivaInstances();
   FoundationKiva defaultFoundation;

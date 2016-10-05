@@ -537,5 +537,7 @@ Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourl
 Output:Variable,*,Surface Inside Face Convection Heat Gain Rate per Area,hourly;
 Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area,hourly;
 Output:Variable,*,Surface Inside Face Solar Radiation Heat Gain Rate per Area,hourly;
+Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area,hourly;
+Output:Variable,*,Surface Inside Face Conduction Heat Transfer Rate per Area,hourly;
 OutputControl:Table:Style, HTML;
 Output:Table:SummaryReports, AllSummary;
