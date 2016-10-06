@@ -231,10 +231,11 @@ namespace EnergyPlus {
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
-		FinalZoneSizing.allocate( 2 );
-		TermUnitFinalZoneSizing.allocate( 2 );
-		CalcFinalZoneSizing.allocate( 2 );
-		TermUnitSizing.allocate( 2 );
+		FinalZoneSizing.allocate( 1 );
+		TermUnitFinalZoneSizing.allocate( 1 );
+		CalcFinalZoneSizing.allocate( 1 );
+		TermUnitSizing.allocate( 1 );
+		ZoneEqSizing.allocate( 1 );
 		TotNumLoops = 1;
 		PlantLoop.allocate( TotNumLoops );
 		PlantSizData.allocate( 1 );
@@ -273,13 +274,19 @@ namespace EnergyPlus {
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_SimpleHeating;
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 1 ).WaterInletNodeNum;
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = WaterCoil( 1 ).WaterOutletNodeNum;
+		Sys( 1 ).HWLoopNum = 1;
+		Sys( 1 ).HWLoopSide = 1;
+		Sys( 1 ).HWBranchIndex = 1;
 		PlantSizData( 1 ).DeltaT = 11.0;
 		PlantSizData( 1 ).ExitTemp = 82;
 		PlantSizData( 1 ).PlantLoopName = "HotWaterLoop";
 		PlantSizData( 1 ).LoopType = 1;
 		ZoneSizingRunDone = true;
 		CurZoneEqNum = 1;
+		CurSysNum = 0;
 		Zone( 1 ).FloorArea = 99.16;
+		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
 		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
@@ -318,6 +325,7 @@ namespace EnergyPlus {
 		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.196047, 0.000001 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
 		SizeSys( 1 );
+		SizeWaterCoil( 1 );
 
 		Node.deallocate();
 		ZoneEquipConfig.deallocate();
