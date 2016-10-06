@@ -423,14 +423,8 @@ namespace MicroCHPElectricGenerator {
 			// load in Micro CHPs
 			for ( GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), MicroCHP, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				//GENERATOR:MICRO CHP,
 				MicroCHP( GeneratorNum ).Name = AlphArray( 1 ); //  A1 Generator name
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );

@@ -911,13 +911,7 @@ namespace IceThermalStorage {
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), IceStorage, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -1007,13 +1001,7 @@ namespace IceThermalStorage {
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), DetIceStor, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;

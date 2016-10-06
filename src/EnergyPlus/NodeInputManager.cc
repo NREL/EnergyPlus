@@ -589,13 +589,9 @@ namespace NodeInputManager {
 		NCount = 0;
 		for ( Loop = 1; Loop <= NumOfNodeLists; ++Loop ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphas( 1 ), NodeLists, NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::IsNameEmpty(cAlphas( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) continue;
+
 			++NCount;
 			NodeLists( NCount ).Name = cAlphas( 1 );
 			NodeLists( NCount ).NodeNames.allocate( NumAlphas - 1 );

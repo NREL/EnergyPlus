@@ -349,13 +349,8 @@ namespace HVACCooledBeam {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, CBIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBNum = CBIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), CoolBeam, CBNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			CoolBeam( CBNum ).Name = Alphas( 1 );
 			CoolBeam( CBNum ).UnitType = CurrentModuleObject;
 			CoolBeam( CBNum ).UnitType_Num = 1;

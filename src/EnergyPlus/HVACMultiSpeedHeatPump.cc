@@ -672,13 +672,8 @@ namespace HVACMultiSpeedHeatPump {
 			SuppHeatCoilOutletNode = 0;
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, MSHPNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), MSHeatPump, MSHPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			MSHeatPump( MSHPNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
 				MSHeatPump( MSHPNum ).AvaiSchedPtr = ScheduleAlwaysOn;

@@ -1032,13 +1032,7 @@ namespace MixedAir {
 			// create a reference for convenience
 			auto & thisControllerList( ControllerLists( Item ) );
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), ControllerLists, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 			thisControllerList.Name = AlphArray( 1 );
 			IsNotOK = false;
 			IsBlank = false;
@@ -1496,14 +1490,7 @@ namespace MixedAir {
 				if ( mod( ( NumAlphas + NumNums - 5 ), 3 ) != 0 ) ++NumGroups;
 				VentilationMechanical( VentMechNum ).Name = AlphArray( 1 );
 
-				// Check Controller:MechanicalVentilation object name
-				ErrorInName = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), VentilationMechanical, VentMechNum - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 				VentilationMechanical( VentMechNum ).SchName = AlphArray( 2 );
 				if ( lAlphaBlanks( 2 ) ) {
@@ -2088,13 +2075,8 @@ namespace MixedAir {
 
 			for ( OutAirNum = 1; OutAirNum <= NumOAMixers; ++OutAirNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), OAMixer, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 				OAMixer( OutAirNum ).Name = AlphArray( 1 );
 				OAMixer( OutAirNum ).MixNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 				//  Set connection type to 'Inlet', because this is not necessarily directly from

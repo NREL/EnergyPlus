@@ -391,15 +391,9 @@ namespace HVACHXAssistedCoolingCoil {
 
 		for ( HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
+			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType = AlphArray( 2 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName = AlphArray( 3 );
 
@@ -512,13 +506,8 @@ namespace HVACHXAssistedCoolingCoil {
 		for ( HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType = AlphArray( 2 );

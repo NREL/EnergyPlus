@@ -190,13 +190,8 @@ namespace MatrixDataManager {
 		for ( MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++MatNum;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), MatData, MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			MatData( MatNum ).Name = cAlphaArgs( 1 );
 			NumRows = std::floor( rNumericArgs( 1 ) );
 			NumCols = std::floor( rNumericArgs( 2 ) );

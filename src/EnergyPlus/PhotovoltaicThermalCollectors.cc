@@ -337,11 +337,8 @@ namespace PhotovoltaicThermalCollectors {
 			tmpSimplePVTperf.allocate( NumSimplePVTPerform );
 			for ( Item = 1; Item <= NumSimplePVTPerform; ++Item ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ).empty() ) {
-					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					cAlphaArgs( 1 ) = "xxxxx";
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 				tmpSimplePVTperf( Item ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Fixed" ) ) {
 					tmpSimplePVTperf( Item ).ThermEfficMode = FixedThermEffic;
@@ -374,11 +371,9 @@ namespace PhotovoltaicThermalCollectors {
 
 		for ( Item = 1; Item <= NumPVT; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			if ( cAlphaArgs( 1 ).empty() ) {
-				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) continue;
+
 			PVT( Item ).Name = cAlphaArgs( 1 );
 			PVT( Item ).TypeNum = TypeOf_PVTSolarCollectorFlatPlate; //DSU, assigned in DataPlant
 

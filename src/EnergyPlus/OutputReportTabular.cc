@@ -805,14 +805,9 @@ namespace OutputReportTabular {
 		NumArray.dimension( NumNums, 0.0 );
 		for ( int TabNum = 1, TabNum_end = MonthlyInputCount; TabNum <= TabNum_end; ++TabNum ) { // MonthlyInputCount is modified in the loop
 			InputProcessor::GetObjectItem( CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = false;
+
 			if ( TabNum - 1 > 0 ) {
-				InputProcessor::VerifyName( AlphArray( 1 ), MonthlyInput, &MonthlyInputType::name, TabNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "RTMBLANK";
-				}
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "RTMBLANK", ErrorsFound);
 			}
 			if ( NumAlphas < 2 ) {
 				ShowSevereError( CurrentModuleObject + ": No fields specified." );

@@ -363,13 +363,8 @@ namespace HVACSingleDuctInduc {
 			InputProcessor::GetObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IUNum = IUIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), IndUnit, IUNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			IndUnit( IUNum ).Name = Alphas( 1 );
 			IndUnit( IUNum ).UnitType = CurrentModuleObject;
 			IndUnit( IUNum ).UnitType_Num = SingleDuct_CV_FourPipeInduc;

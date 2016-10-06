@@ -2979,14 +2979,7 @@ namespace HVACUnitarySystem {
 		for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DesignSpecMSHP, DesignSpecNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 			DesignSpecMSHP( DesignSpecNum ).Name = Alphas( 1 );
 
@@ -3131,13 +3124,7 @@ namespace HVACUnitarySystem {
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames = "";
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( iNameAlphaNum ), UnitarySystem, UnitarySysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( iNameAlphaNum ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas(iNameAlphaNum), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 			UnitarySystem( UnitarySysNum ).Name = Alphas( iNameAlphaNum );
 

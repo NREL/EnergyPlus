@@ -3274,17 +3274,10 @@ namespace HeatBalanceManager {
 			for ( Loop = 1; Loop <= TotTCGlazings; ++Loop ) {
 				//Get each TCGlazings from the input processor
 				InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				ErrorInName = false;
 				IsBlank = false;
 
-				// Verify unique names
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), TCGlazings, Loop - 1, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
-					ShowContinueError( "...All Thermochromic Glazing names must be unique regardless of subtype." );
-					ErrorsFound = true;
-					continue;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+				if ( IsBlank ) continue;
 
 				if ( MaterialNumProp + 1 != MaterialNumAlpha ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
@@ -3465,14 +3458,10 @@ namespace HeatBalanceManager {
 			// [wavelength (microns), transmittance, front reflectance, back reflectance] for
 			// wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, SpecDataNames, SpecDataNumAlpha, SpecDataProps, SpecDataNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( SpecDataNames( 1 ), SpectralData, Loop, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) continue;
 
 			//Load the spectral data derived type from the input data.
 			SpectralData( Loop ).Name = SpecDataNames( 1 );
@@ -3965,17 +3954,9 @@ namespace HeatBalanceManager {
 			//Get the object names for each construction from the input processor
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( ConstructAlphas( 0 ), WConstructNames, ConstrNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
-			if ( ErrorInName && ! IsBlank ) {
-				ShowContinueError( "...first instance will be used." );
-				continue;
-			}
-			if ( IsBlank ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::IsNameEmpty(ConstructAlphas( 0 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) continue;
 
 			++ConstrNum;
 			WConstructNames( ConstrNum ) = ConstructAlphas( 0 );
@@ -4156,14 +4137,9 @@ namespace HeatBalanceManager {
 				TMP = index( cAlphaArgs( 1 ), char( 2 ) );
 			}
 
-			//    Make sure Zone Name is unique
-			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Zone, ZoneLoop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) continue;
 
 			++ZoneLoop;
 			ProcessZoneData( cCurrentModuleObject, ZoneLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
@@ -4190,15 +4166,7 @@ namespace HeatBalanceManager {
 
 			for ( ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ListNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				// List name
-				ErrorInName = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), ZoneList, ListNum - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-
-				if ( ErrorInName ) {
-					ErrorsFound = true;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", ErrorsFound);
 
 				ZoneList( ListNum ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::FindItemInList( ZoneList( ListNum ).Name, Zone ) > 0 ) {
@@ -4247,15 +4215,7 @@ namespace HeatBalanceManager {
 
 			for ( GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GroupNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				// Group name
-				ErrorInName = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), ZoneGroup, GroupNum - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-
-				if ( ErrorInName ) {
-					ErrorsFound = true;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", ErrorsFound);
 
 				ZoneGroup( GroupNum ).Name = cAlphaArgs( 1 );
 
@@ -5239,13 +5199,9 @@ namespace HeatBalanceManager {
 			//Call Input Get routine to retrieve frame/divider data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, FrameDividerNames, FrameDividerNumAlpha, FrameDividerProps, FrameDividerNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			ErrorInName = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( FrameDividerNames( 1 ), FrameDivider, FrameDividerNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::IsNameEmpty(FrameDividerNames( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) continue;
 
 			//Load the frame/divider derived type from the input data.
 			++FrameDividerNum;
@@ -6548,14 +6504,10 @@ Label1000: ;
 
 			for ( Loop = 1; Loop <= TotSurfIncSolSSG; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				ErrorInName = false;
+
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), SurfIncSolSSG, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
-					ShowContinueError( "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name" );
-					ErrorsFound = true;
-					continue;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
+				if ( IsBlank ) continue;
 
 				SurfIncSolSSG( Loop ).Name = cAlphaArgs( 1 );
 
@@ -6604,14 +6556,9 @@ Label1000: ;
 
 			for ( Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				ErrorInName = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), FenLayAbsSSG, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-				if ( ErrorInName ) {
-					ShowContinueError( "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other ComplexFenestrationProperty:SolarAbsorbedLayers name" );
-					ErrorsFound = true;
-					continue;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
+				if ( IsBlank ) continue;
 
 				FenLayAbsSSG( Loop ).Name = cAlphaArgs( 1 );
 
@@ -7103,15 +7050,10 @@ Label1000: ;
 		for ( Loop = 1; Loop <= W7SupportPillars; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
 			IsBlank = false;
-
-			// Verify unique names
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SupportPillar, Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
-				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
 			}
 
@@ -7139,15 +7081,10 @@ Label1000: ;
 		for ( Loop = 1; Loop <= W7DeflectionStates; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
 			IsBlank = false;
-
-			// Verify unique names
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), DeflectionState, Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
-				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
 			}
 
@@ -7225,16 +7162,10 @@ Label1000: ;
 
 		for ( Loop = 1; Loop <= TotComplexShades; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
 			IsBlank = false;
-
-			// Verify unique names
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ComplexShade, Loop, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
-				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
 			}
 
@@ -7488,13 +7419,9 @@ Label1000: ;
 
 		for ( Loop = 1; Loop <= TotThermalModels; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), WindowThermalModel, TotThermalModels - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
+			if ( IsBlank ) continue;
 
 			WindowThermalModel( Loop ).Name = cAlphaArgs( 1 );
 

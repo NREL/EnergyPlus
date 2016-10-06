@@ -408,14 +408,8 @@ namespace InternalHeatGains {
 		errFlag = false;
 		for ( Item = 1; Item <= NumPeopleStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), PeopleObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			PeopleObjects( Item ).Name = AlphaName( 1 );
 
 			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
@@ -956,14 +950,8 @@ namespace InternalHeatGains {
 		errFlag = false;
 		for ( Item = 1; Item <= NumLightsStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), LightsObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			LightsObjects( Item ).Name = AlphaName( 1 );
 
 			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
@@ -1223,14 +1211,8 @@ namespace InternalHeatGains {
 		errFlag = false;
 		for ( Item = 1; Item <= NumZoneElectricStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), ZoneElectricObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			ZoneElectricObjects( Item ).Name = AlphaName( 1 );
 
 			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
@@ -1433,14 +1415,8 @@ namespace InternalHeatGains {
 		errFlag = false;
 		for ( Item = 1; Item <= NumZoneGasStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), ZoneGasObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			ZoneGasObjects( Item ).Name = AlphaName( 1 );
 
 			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
@@ -1664,14 +1640,8 @@ namespace InternalHeatGains {
 		errFlag = false;
 		for ( Item = 1; Item <= NumHotWaterEqStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), HotWaterEqObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			HotWaterEqObjects( Item ).Name = AlphaName( 1 );
 
 			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
@@ -1874,14 +1844,8 @@ namespace InternalHeatGains {
 		errFlag = false;
 		for ( Item = 1; Item <= NumSteamEqStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), SteamEqObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			SteamEqObjects( Item ).Name = AlphaName( 1 );
 
 			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
@@ -2084,14 +2048,8 @@ namespace InternalHeatGains {
 		errFlag = false;
 		for ( Item = 1; Item <= NumOtherEqStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), OtherEqObjects, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			OtherEqObjects( Item ).Name = AlphaName( 1 );
 
 			Item1 = InputProcessor::FindItemInList( AlphaName( 3 ), Zone );
@@ -2617,14 +2575,8 @@ namespace InternalHeatGains {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), ZoneBBHeat, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
 			ZoneBBHeat( Loop ).Name = AlphaName( 1 );
 
 			ZoneBBHeat( Loop ).ZonePtr = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
@@ -2721,14 +2673,8 @@ namespace InternalHeatGains {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphaName( 1 ), ZoneCO2Gen, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
 			ZoneCO2Gen( Loop ).Name = AlphaName( 1 );
 
 			ZoneCO2Gen( Loop ).ZonePtr = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );

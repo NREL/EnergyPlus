@@ -661,14 +661,8 @@ namespace HVACControllers {
 		if ( NumSimpleControllers > 0 ) {
 			for ( Num = 1; Num <= NumSimpleControllers; ++Num ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), ControllerProps, &ControllerPropsType::ControllerName, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				ControllerProps( Num ).ControllerName = AlphArray( 1 );
 				ControllerProps( Num ).ControllerType = CurrentModuleObject;
 				{ auto const SELECT_CASE_var( AlphArray( 2 ) );

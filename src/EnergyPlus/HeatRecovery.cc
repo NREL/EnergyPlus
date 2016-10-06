@@ -438,13 +438,8 @@ namespace HeatRecovery {
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = "";
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = cNumericFieldNames;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExchCond, ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			ExchCond( ExchNum ).Name = cAlphaArgs( 1 );
 			ExchCond( ExchNum ).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
 			if ( lAlphaFieldBlanks( 2 ) ) {
@@ -691,13 +686,8 @@ namespace HeatRecovery {
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = "";
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = cNumericFieldNames;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), BalDesDehumPerfData, PerfDataNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			BalDesDehumPerfData( PerfDataNum ).Name = cAlphaArgs( 1 );
 			BalDesDehumPerfData( PerfDataNum ).PerfType = cCurrentModuleObject;
 			BalDesDehumPerfData( PerfDataNum ).NomSupAirVolFlow = rNumericArgs( 1 );

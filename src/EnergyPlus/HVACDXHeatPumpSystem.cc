@@ -383,14 +383,7 @@ namespace HVACDXHeatPumpSystem {
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXHeatPumpSystem, DXHeatSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 			DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpSystemType = CurrentModuleObject; // push Object Name into data array
 			DXHeatPumpSystem( DXHeatSysNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {

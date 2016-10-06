@@ -677,14 +677,8 @@ namespace HeatBalanceAirManager {
 		errFlag = false;
 		for ( Item = 1; Item <= NumInfiltrationStatements; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), InfiltrationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			InfiltrationObjects( Item ).Name = cAlphaArgs( 1 );
 			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
@@ -1028,14 +1022,9 @@ namespace HeatBalanceAirManager {
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
 		for ( Item = 1; Item <= NumVentilationStatements; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), VentilationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			errFlag = ErrorsFound;
+
 			VentilationObjects( Item ).Name = cAlphaArgs( 1 );
 
 			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -1471,14 +1460,9 @@ namespace HeatBalanceAirManager {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
 			VentiCount = TotDesignFlowVentilation + Loop;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Ventilation, VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			Ventilation( VentiCount ).Name = cAlphaArgs( 1 );
 			Ventilation( VentiCount ).ModelType = VentilationWindAndStack;
 
@@ -1728,14 +1712,8 @@ namespace HeatBalanceAirManager {
 		for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Mixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			Mixing( Loop ).Name = cAlphaArgs( 1 );
 
 			Mixing( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -2051,15 +2029,8 @@ namespace HeatBalanceAirManager {
 		for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), CrossMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			CrossMixing( Loop ).Name = cAlphaArgs( 1 );
 
 			CrossMixing( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -2316,14 +2287,8 @@ namespace HeatBalanceAirManager {
 			for ( Loop = 1; Loop <= TotRefDoorMixing; ++Loop ) {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), RefDoorMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				NameThisObject = cAlphaArgs( 1 );
 
 				AlphaNum = 2;

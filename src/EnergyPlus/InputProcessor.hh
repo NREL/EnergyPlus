@@ -805,6 +805,30 @@ namespace EnergyPlus {
 
 		static
 		void
+		IsNameEmpty(
+                std::string  & NameToVerify,
+        std::string const & StringToDisplay,
+        std::string const & NewName,
+        bool & ErrorFound );
+
+        static
+        void
+        IsNameEmpty(
+                std::string & NameToVerify,
+                std::string const & StringToDisplay,
+                bool & IsBlank,
+                bool & ErrorFound
+        );
+
+        static
+        void
+        IsNameEmpty(
+                std::string & NameToVerify,
+                std::string const & StringToDisplay,
+                bool & ErrorFound
+        );
+		static
+		void
 		RangeCheck(
 			bool & ErrorsFound, // Set to true if error detected
 			std::string const & WhatFieldString, // Descriptive field for string

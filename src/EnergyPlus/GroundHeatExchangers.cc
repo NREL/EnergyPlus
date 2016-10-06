@@ -1325,29 +1325,8 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
 
-				isNotOK = false;
-				isBlank = false;
-
-				// Create temporary array of previous names to pass to VerifyName
-				Array1D <std::string> tmpNames;
-				tmpNames.allocate( numVerticalGLHEs - 1 );
-
-				// Populate temporary array with previous entrys
-				for (int i = 1; i < numVerticalGLHEs - 1; ++i ) {
-					tmpNames( i ) = verticalGLHE( i ).Name;
-				}
-
-				//get object name
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
-
-				// Deallocate temporary array when no longer needed
-				tmpNames.deallocate();
-
-				if ( isNotOK ) {
-					errorsFound = true;
-					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num
@@ -1470,29 +1449,8 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
 
-				isNotOK = false;
-				isBlank = false;
-
-				// Create temporary array of previous names to pass to VerifyName
-				Array1D <std::string> tmpNames;
-				tmpNames.allocate( numSlinkyGLHEs - 1 );
-
-				// Populate temporary array with previous entrys
-				for (int i = 1; i < numSlinkyGLHEs - 1; ++i ) {
-					tmpNames( i ) = slinkyGLHE( i ).Name;
-				}
-
-				//get object name
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
-
-				// Deallocate temporary array when no longer needed
-				tmpNames.deallocate();
-
-				if ( isNotOK ) {
-					errorsFound = true;
-					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num

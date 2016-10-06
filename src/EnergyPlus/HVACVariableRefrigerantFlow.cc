@@ -1472,14 +1472,8 @@ namespace HVACVariableRefrigerantFlow {
 		cCurrentModuleObject = "ZoneTerminalUnitList";
 		for ( VRFNum = 1; VRFNum <= NumVRFTULists; ++VRFNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), TerminalUnitList, VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			TerminalUnitList( VRFNum ).Name = cAlphaArgs( 1 );
 			TerminalUnitList( VRFNum ).NumTUInList = NumAlphas - 1;
 			TerminalUnitList( VRFNum ).ZoneTUPtr.allocate( TerminalUnitList( VRFNum ).NumTUInList );
@@ -2980,14 +2974,8 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRFTUNumericFields( VRFTUNum ).FieldNames.allocate(NumNums);
 			VRFTUNumericFields( VRFTUNum ).FieldNames = cNumericFieldNames;
+            InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), VRFTU, VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VRFTU( VRFTUNum ).Name = cAlphaArgs( 1 );
 			ZoneTerminalUnitListNum = 0;
 			for ( NumList = 1; NumList <= NumVRFTULists; ++NumList ) {

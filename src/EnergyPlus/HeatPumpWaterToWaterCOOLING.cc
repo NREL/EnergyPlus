@@ -129,10 +129,10 @@ namespace HeatPumpWaterToWaterCOOLING {
 	Real64 Power( 0.0 ); // power consumption Watts
 	Real64 QLoad( 0.0 ); // heat rejection from Load Side coil Watts
 	Real64 QSource( 0.0 ); // cooling capacity Watts
-	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
+	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
 
 	// Object Data
 	Array1D< GshpSpecs > GSHP; // dimension to number of machines
@@ -307,9 +307,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			InputProcessor::VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), "GHSP Name", "xxxxx", ErrorsFound);
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
