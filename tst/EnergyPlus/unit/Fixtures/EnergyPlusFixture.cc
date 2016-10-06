@@ -215,6 +215,8 @@
 #include <fstream>
 #include <algorithm>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/DemandManager.hh>
+#include <EnergyPlus/DualDuct.hh>
 
 json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth, json::parse_event_t event, json &parsed,
 									   unsigned line_num, unsigned line_index) -> bool {
@@ -333,8 +335,10 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DemandManager::clear_state();
 		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
+		DualDuct::clear_state();
 		DXCoils::clear_state();
 		clearFacilityElectricPowerServiceObject();
 		EconomicLifeCycleCost::clear_state();

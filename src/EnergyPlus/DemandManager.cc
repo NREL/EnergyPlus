@@ -148,6 +148,7 @@ namespace DemandManager {
 	// Object Data
 	Array1D< DemandManagerListData > DemandManagerList;
 	Array1D< DemandManagerData > DemandMgr;
+	std::unordered_map< std::string, std::string > DemandMgr_map;
 
 	// MODULE SUBROUTINES:
 
@@ -166,6 +167,7 @@ namespace DemandManager {
 		GetInput = true;
 		DemandManagerList.deallocate();
 		DemandMgr.deallocate();
+		DemandMgr_map.clear();
 	}
 
 	void
@@ -442,8 +444,6 @@ namespace DemandManager {
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string AlphArray; // Character string data
 		Array1D< Real64 > NumArray; // Numeric data
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string Units; // String for meter units
 		static bool ErrorsFound( false );
 		std::string CurrentModuleObject; // for ease in renaming.
@@ -464,13 +464,7 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), DemandManagerList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				// unique_string_blank_key_check
 				DemandManagerList( ListNum ).Name = AlphArray( 1 );
 
 				DemandManagerList( ListNum ).Meter = GetMeterIndex( AlphArray( 2 ) );
@@ -720,6 +714,7 @@ namespace DemandManager {
 			NumArray.dimension( MaxNums, 0.0 );
 
 			DemandMgr.allocate( NumDemandMgr );
+			DemandMgr_map.reserve( NumDemandMgr );
 
 			// Get input for DemandManager:ExteriorLights
 			StartIndex = 1;
@@ -733,11 +728,8 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+                // unique_string_blank_key
+				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeExtLights;
@@ -838,11 +830,8 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				// unique_string_blank_key
+                InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeLights;
@@ -963,11 +952,8 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				// unique_string_blank_key
+				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeElecEquip;
@@ -1086,13 +1072,8 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				// unique_string_blank_key
+				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeThermostats;
@@ -1217,13 +1198,8 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+                // unique_string_blank_key
+				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeVentilation;
