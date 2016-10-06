@@ -7,5 +7,5 @@ configure_file("${CMAKE_SOURCE_DIR}/third_party/cmake/CMakeLists-kiva.txt" "${CM
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/third_party/cmake)
 execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/third_party/cmake)
 
-add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/kiva/src/libkiva")
 add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/kiva/vendor/lis-1.5.66/")
+add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/kiva/src/libkiva")
