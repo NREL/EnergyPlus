@@ -121,7 +121,6 @@ namespace RoomAirModelManager {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals; // ,                ONLY : MaxNameLength
-
 	using namespace DataRoomAirModel;
 	using General::RoundSigDigits;
 
@@ -329,17 +328,8 @@ namespace RoomAirModelManager {
 		// for the actual patterns, a single structure array holds
 		// different patterns in nested derived types.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
 		using DataGlobals::NumOfZones;
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceClass_IntMass;
@@ -353,17 +343,8 @@ namespace RoomAirModelManager {
 		using DataErrorTracking::TotalRoomAirPatternTooHigh;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUserDefinedPatternData: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // number of alphas
@@ -686,30 +667,10 @@ namespace RoomAirModelManager {
 		// METHODOLOGY EMPLOYED:
 		//     Use input processer to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // States which alpha value to read from a
@@ -917,27 +878,10 @@ namespace RoomAirModelManager {
 		// METHODOLOGY EMPLOYED:
 		//     Use input processer to get input from idf file
 
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -1010,28 +954,11 @@ namespace RoomAirModelManager {
 		// METHODOLOGY EMPLOYED:
 		// Use input processor to get input from idf file
 
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat;
@@ -1103,35 +1030,15 @@ namespace RoomAirModelManager {
 		// METHODOLOGY EMPLOYED:
 		// Use input processor to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
-
 		using DataSurfaces::Surface;
 		using namespace DataAirflowNetwork;
 		using DataHeatBalance::TotPeople;
 		using DataHeatBalance::People;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat;
@@ -1263,28 +1170,10 @@ namespace RoomAirModelManager {
 		// METHODOLOGY EMPLOYED:
 		// Use input processor to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using namespace ScheduleManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat;
@@ -1444,14 +1333,7 @@ namespace RoomAirModelManager {
 		// METHODOLOGY EMPLOYED:
 		// Use input processor to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::ZoneIntGainDeviceTypes;
@@ -1463,17 +1345,6 @@ namespace RoomAirModelManager {
 		using InternalHeatGains::GetInternalGainDeviceIndex;
 		using DataHVACGlobals::NumZoneHVACTerminalTypes;
 		using DataHVACGlobals::ZoneHVACTerminalTypes;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;  // local do loop index
@@ -2679,26 +2550,6 @@ namespace RoomAirModelManager {
 		// number. If incorrect name is given, errorsfound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int I;  // Zone index
 
@@ -2750,17 +2601,7 @@ namespace RoomAirModelManager {
 		// number.If incorrect name is given, errorsfound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using DataRoomAirModel::AirNode;
 		using DataRoomAirModel::TotNumOfAirNodes;
 		using DataLoopNode::NodeID;
@@ -2770,18 +2611,6 @@ namespace RoomAirModelManager {
 
 		// Return value
 		bool EquipFind; // True if an error is found
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;

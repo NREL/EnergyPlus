@@ -279,23 +279,13 @@ namespace SystemReports {
 		// Once all compsets have been established (second iteration) find all components
 		// subcomponents, etc.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using namespace DataGlobalConstants;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const EnergyTransfer( 1 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
 
 		int AirDistUnitNum;
 		int MatchLoop;
@@ -3929,9 +3919,6 @@ namespace SystemReports {
 		// calculate energy contribution of outside air through mixing box and pro-rate to
 		// zones according to zone mass flow rates.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3944,7 +3931,6 @@ namespace SystemReports {
 		using DataHeatBalFanSys::ZoneAirHumRatAvg;
 		using DataEnvironment::StdRhoAir;
 		using DataEnvironment::OutBaroPress;
-
 		using WindowAC::GetWindowACOutAirNode;
 		using WindowAC::GetWindowACMixedAirNode;
 		using WindowAC::GetWindowACZoneInletAirNode;
@@ -3977,18 +3963,8 @@ namespace SystemReports {
 		using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
 		using HVACStandAloneERV::GetStandAloneERVZoneInletAirNode;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallLoad( 0.1 ); // (W)
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CtrlZoneNum; // ZONE counter
@@ -4512,20 +4488,6 @@ namespace SystemReports {
 		// METHODOLOGY EMPLOYED:
 		// Simply cycles through the plant and condenser demand sides until
 		// a component is found that matches the component type and name
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PassBranchNum; // DO loop counter for branches

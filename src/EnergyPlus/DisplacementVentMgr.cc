@@ -289,34 +289,12 @@ namespace DisplacementVentMgr {
 		// initial calculations and averages the final result comparing the position of the surface with
 		// the interface subzone height.
 
-		// METHODOLOGY EMPLOYED:
-		// -
-		// -
-		// -
-		// -
-
-		// REFERENCES:
-		// -
-		// -
-
 		// Using/Aliasing
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-				using ScheduleManager::GetScheduleIndex;
+		using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::BeginEnvrnFlag;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Ctd; // DO loop counter for surfaces
@@ -603,12 +581,6 @@ namespace DisplacementVentMgr {
 		// room air equivalent temperatures and three space temperatures (floor subzone, occupied zone and upper,
 		// mixed subzone temperature)
 
-		// METHODOLOGY EMPLOYED:
-		// -
-		// -
-		// -
-		// -
-
 		// REFERENCES:
 		// Model developed by Paul Linden (UCSD), G. Carrilho da Graca (UCSD) and P. Haves (LBL).
 		// Work funded by the California Energy Comission. More information on the model can found in:
@@ -618,7 +590,7 @@ namespace DisplacementVentMgr {
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-				using ScheduleManager::GetScheduleIndex;
+		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -628,21 +600,9 @@ namespace DisplacementVentMgr {
 		using InternalHeatGains::SumInternalConvectionGainsByTypes;
 		using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 const OneThird( 1.0 / 3.0 );
 		static Real64 const MinFlow_pow_fac( std::pow( 1.0 / 24.55 * 1.0, 1.0 / 0.6 ) );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 HeightFrac; // Fractional height of transition between occupied and mixed subzones

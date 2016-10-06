@@ -322,15 +322,8 @@ namespace HVACControllers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Controller component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSystemVariables;
-
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::FlowLocked;
@@ -346,21 +339,10 @@ namespace HVACControllers {
 		// Only used within the Calc routines
 		// TRUE if speculative warm restart is supported by this controller
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// The Controller that you are currently loading input into
 		int ControlNum;
 		int ControllerType;
-
-		// FLOW:
 
 		// Obtains and Allocates Controller related parameters from input file
 		if ( GetControllerInputFlag ) { //First time subroutine has been entered
@@ -565,11 +547,6 @@ namespace HVACControllers {
 		using DataSystemVariables::TrackAirLoopEnvFlag;
 		using DataSystemVariables::TraceAirLoopEnvFlag;
 		using DataSystemVariables::TraceHVACControllerEnvFlag;
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using DataHVACGlobals::NumPrimaryAirSys;
 		using DataAirSystems::PrimaryAirSystem;
@@ -584,19 +561,8 @@ namespace HVACControllers {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iHumidityRatioMaxSetPoint;
 
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "HVACControllers: GetControllerInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Num; // The Controller that you are currently loading input into
@@ -3400,26 +3366,9 @@ Label100: ;
 		// METHODOLOGY EMPLOYED:
 		// setup data for sensed nodes and compare positions if on the same branch
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataAirSystems::PrimaryAirSystem;
 		using DataHVACGlobals::NumPrimaryAirSys;
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirSysNum;
@@ -3567,26 +3516,6 @@ Label100: ;
 
 		// PURPOSE OF THIS FUNCTION:
 		// This subroutine finds the controllers actuator node number
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlNum;

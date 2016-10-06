@@ -399,25 +399,6 @@ namespace MixedAir {
 		// PURPOSE OF THIS SUBROUTINE
 		// Manage the outside air system
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		if ( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();
 			GetOASysInputFlag = false;
@@ -452,24 +433,6 @@ namespace MixedAir {
 
 		// PURPOSE OF THIS SUBROUTINE
 		// Simulate the controllers and components in the outside air system.
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
@@ -797,23 +760,6 @@ namespace MixedAir {
 		// PURPOSE OF THIS SUBROUTINE
 		// Simulate an Outside Air Mixer component
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OAMixerNum;
 
@@ -859,23 +805,6 @@ namespace MixedAir {
 
 		// PURPOSE OF THIS SUBROUTINE
 		// Simulate an Outside Air Controller component
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OAControllerNum;
@@ -926,23 +855,14 @@ namespace MixedAir {
 		// METHODOLOGY EMPLOYED:
 		// Use the Get routines from the InputProcessor module.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using BranchNodeConnections::TestCompSet;
+		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
 		using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOutsideAirSysInputs: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1270,7 +1190,7 @@ namespace MixedAir {
 		// Use the Get routines from the InputProcessor module.
 
 		// Using/Aliasing
-				using namespace DataDefineEquip;
+		using namespace DataDefineEquip;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using NodeInputManager::GetOnlySingleNode;
@@ -1954,22 +1874,13 @@ namespace MixedAir {
 		// METHODOLOGY EMPLOYED:
 		// Use the Get routines from the InputProcessor module.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using NodeInputManager::GetOnlySingleNode;
+		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOAMixerInputs: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2093,11 +2004,8 @@ namespace MixedAir {
 
 		// METHODOLOGY EMPLOYED:
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using namespace DataDefineEquip;
+		using namespace DataDefineEquip;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using NodeInputManager::GetOnlySingleNode;
@@ -2118,18 +2026,8 @@ namespace MixedAir {
 
 		using SetPointManager::GetMixedAirNumWithCoilFreezingCheck;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOAControllerInputs: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -4412,28 +4310,15 @@ namespace MixedAir {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
-
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
 		using HVACHXAssistedCoolingCoil::GetHXCoilType;
 		using WaterCoils::SetCoilDesFlow;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( CurrentModuleObjects( CMO_OAController ) );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 OAFlowRatio; // Used for error checking
@@ -4821,28 +4706,8 @@ namespace MixedAir {
 		// incorrect OA mixer name is given, ErrorsFound is returned as true
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		Array1D_int OANodeNumbers( 4 ); // return OA mixer nodes
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichOAMixer;
@@ -5339,31 +5204,8 @@ namespace MixedAir {
 		// After making sure get input is done, the OA System number of indicated
 		// OA System is returned.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int OASysNumber; // OA Sys Number
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();
@@ -5390,29 +5232,8 @@ namespace MixedAir {
 		// After making sure get input is done, the matched mixer number is found.
 		// Note -- only the first is looked at for an Outside Air System.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
 		// Return value
 		int OAMixerNumber; // Mixer Number
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int OACompNum;
@@ -5450,31 +5271,8 @@ namespace MixedAir {
 		// After making sure get input is done, the mixer index of indicated
 		// mixer is returned.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int OAMixerIndex; // Mixer Index
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetOAMixerInputFlag ) {
 			GetOAMixerInputs();
@@ -5673,28 +5471,8 @@ namespace MixedAir {
 		// This routine checks the controller list for existance of the
 		// reference coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		bool OnControllerList; // true if found on controller list
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Num;
@@ -5735,30 +5513,13 @@ namespace MixedAir {
 		// This routine checks for a "dangling" controller list (AirLoopHVAC:ControllerList).
 		// It must be either found on a AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CheckControllerLists" );
 		static std::string const CurrentModuleObject( "AirLoopHVAC:ControllerList" );
 		static std::string const AirLoopObject( "AirLoopHVAC" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -5839,29 +5600,6 @@ namespace MixedAir {
 		// When OA Controller data is gotten from other routines, must check to make sure
 		// new name doesn't duplicate.  (Essentially a pass through to call Verify Name)
 		// Currently, this is only called from HVACStandAlongERV::GetStandaloneERV()
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( AllocateOAControllersFlag ) {
 			// Make sure OAControllers are allocated
@@ -6006,31 +5744,8 @@ namespace MixedAir {
 		// After making sure get input is done, the OA System number of indicated
 		// OA System is returned.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int NumOACompList; // OA Comp Number
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();

@@ -114,14 +114,6 @@ namespace BranchInputManager {
 	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataLoopNode;
 	using namespace DataBranchAirLoopPlant;
-
-	// Use statements for access to subroutines in other modules
-
-
-
-
-
-
 	using namespace NodeInputManager;
 	using namespace BranchNodeConnections;
 
@@ -268,30 +260,9 @@ namespace BranchInputManager {
 		// This subroutine "gets" the branch list specified in a Plant or Condenser loop and
 		// returns number and names to the outside calling routine.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found; // Points to correct Branch List/Branch
 		bool ErrFound; // True when error has occured (cannot find Branch List)
 
@@ -351,28 +322,8 @@ namespace BranchInputManager {
 		// This function returns the number of branches in a branch list so that the calling
 		// routine can allocate arrays before calling GetBranchList.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int NumBranchesInBranchList;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Found;

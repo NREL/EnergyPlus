@@ -153,13 +153,6 @@ namespace HeatBalanceManager {
 	using namespace DataHeatBalSurface;
 	using namespace DataRoomAirModel;
 	using namespace DataIPShortCuts;
-	// Use statements for access to subroutines in other modules
-
-
-
-
-
-
 	using ScheduleManager::GetScheduleIndex;
 	using DataSurfaces::TotSurfaces;
 	using DataSurfaces::FrameDivider;
@@ -498,30 +491,13 @@ namespace HeatBalanceManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Counts or details unused constructions.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
-
-
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const NumConstrObjects( 5 );
 		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Unused;
@@ -586,28 +562,9 @@ namespace HeatBalanceManager {
 		// METHODOLOGY EMPLOYED:
 		// Check for specific objects that must be present for such a simulation to be valid.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		bool ValidSimulation; // True is other objects appear to make this a valid simulation.
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 		ValidSimulation = false;
 		if ( InputProcessor::GetNumObjectsFound( "SolarCollector:FlatPlate:Water" ) > 0 ) {
 			ValidSimulation = true;
@@ -1243,16 +1200,8 @@ namespace HeatBalanceManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Reads the input data for the SITE ATMOSPHERIC VARIATION object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// Using/Aliasing
-
-
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumObjects;
@@ -5192,29 +5141,6 @@ namespace HeatBalanceManager {
 		// Gets input data for window frame and/or divider and/or window
 		// inside/outside reveal.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int IOStat; // IO Status when calling get input subroutine
@@ -5358,14 +5284,7 @@ namespace HeatBalanceManager {
 		// If the window on the data file has two glazing systems, a second Construction (and its
 		// associated materials) corresponding to the second glazing system is created.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using namespace DataStringGlobals;
 		using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 		using General::TrimSigDigits;
@@ -5374,17 +5293,8 @@ namespace HeatBalanceManager {
 		using DataSystemVariables::TempFullFileName;
 		using DataSystemVariables::CheckForActualFileName;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const NumName( 5, { "1", "2", "3", "4", "5" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int W5DataFileNum;
@@ -6478,17 +6388,8 @@ Label1000: ;
 		// Loads scheduled surface gains for solar incident on interior side of the surfaces and absorbed solar energy in
 		// window layers
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
 		using General::TrimSigDigits;
 		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::Surface;
@@ -6500,17 +6401,8 @@ Label1000: ;
 		using DataHeatBalance::TotConstructs;
 		using ScheduleManager::GetScheduleIndex;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetScheduledSurfaceGains: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumArgs;
@@ -7425,27 +7317,14 @@ Label1000: ;
 		// METHODOLOGY EMPLOYED:
 		// usual GetInput processing.  Matrix input from MatrixDataManager
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
 		using namespace MatrixDataManager;
 		using namespace DataBSDFWindow;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SetupComlexFenestrationStateInput: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//The following moved to DataBSDFWindow module:

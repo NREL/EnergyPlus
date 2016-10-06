@@ -162,7 +162,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
 
@@ -242,11 +241,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-
-
-
-
-
 		using GlobalNames::VerifyUniqueBaseboardName;
 		using namespace DataIPShortCuts;
 		using General::TrimSigDigits;

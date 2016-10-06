@@ -120,8 +120,6 @@ namespace ScheduleManager {
 	using DataEnvironment::HolidayIndexTomorrow;
 	using DataEnvironment::DSTIndicator;
 
-	// Use statements for access to subroutines in other modules
-
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const MaxDayTypes( 12 );
@@ -212,18 +210,8 @@ namespace ScheduleManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses the standard get routines in the InputProcessor.
 
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
-
-
-
-
-
-
-
-
 		using General::ProcessDateString;
 		using General::JulianDay;
 		using General::RoundSigDigits;
@@ -241,12 +229,6 @@ namespace ScheduleManager {
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ProcessScheduleInput: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2564,28 +2546,8 @@ namespace ScheduleManager {
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the internal pointer to Schedule "ScheduleName".
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int GetScheduleIndex;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int DayCtr;
@@ -2689,31 +2651,8 @@ namespace ScheduleManager {
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the internal pointer to Day Schedule "ScheduleName".
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int GetDayScheduleIndex;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( ! ScheduleInputProcessed ) {
 			ProcessScheduleInput();

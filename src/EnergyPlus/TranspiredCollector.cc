@@ -172,27 +172,11 @@ namespace TranspiredCollector {
 		// METHODOLOGY EMPLOYED:
 		// Setup to avoid string comparisons after first call
 
-		// REFERENCES:
-		//  none
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataHVACGlobals::TempControlTol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -271,14 +255,7 @@ namespace TranspiredCollector {
 		// usual EnergyPlus input
 		// Extensible UTSC object for underlying heat transfer surfaces and for multisystem
 
-		// REFERENCES:
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using DataGlobals::Pi;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -302,19 +279,6 @@ namespace TranspiredCollector {
 		using DataHeatBalance::Smooth;
 		using DataHeatBalance::VerySmooth;
 		using BranchNodeConnections::TestCompSet;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1360,21 +1324,8 @@ namespace TranspiredCollector {
 		// mine Surface derived type for correct index/number of surface
 		// mine UTSC derived type that has the surface.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataSurfaces::Surface;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UTSCNum; // temporary

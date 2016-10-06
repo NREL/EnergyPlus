@@ -702,7 +702,7 @@ namespace DElightManagerF {
 		// USE STATEMENTS:
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-				using DataDaylighting::ZoneDaylight;
+		using DataDaylighting::ZoneDaylight;
 		using DataSurfaces::WorldCoordSystem;
 		using DataSurfaces::AspectTransform;
 
@@ -754,25 +754,6 @@ namespace DElightManagerF {
 
 		// METHODOLOGY EMPLOYED:
 		// Uses the std::replace function from the C++ library
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 

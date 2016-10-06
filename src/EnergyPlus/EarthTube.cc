@@ -111,8 +111,6 @@ namespace EarthTube {
 	using namespace DataHeatBalFanSys;
 	using namespace DataHeatBalance; // This is the heat balance super block data module
 	using namespace DataSurfaces;
-
-	// Use statements for access to subroutines in other modules
 	using namespace Psychrometrics;
 
 	// Data
@@ -214,33 +212,14 @@ namespace EarthTube {
 		// This subroutine obtains input data for EarthTube units and
 		// stores it in the EarthTube data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleValuesForDay;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const EarthTubeTempLimit( 100.0 ); // degrees Celsius
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208    CHARACTER(len=MaxNameLength), DIMENSION(10) :: AlphaName

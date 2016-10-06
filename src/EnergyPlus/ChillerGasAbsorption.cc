@@ -298,9 +298,6 @@ namespace ChillerGasAbsorption {
 		// This routine will get the input
 		// required by the Direct Fired Absorption chiller modelin the object ChillerHeater:Absorption:DirectFired
 
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;

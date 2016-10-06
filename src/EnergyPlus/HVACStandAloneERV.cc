@@ -131,8 +131,6 @@ namespace HVACStandAloneERV {
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
 	using namespace DataHVACGlobals;
-
-	// Use statements for access to subroutines in other modules
 	using ScheduleManager::GetScheduleIndex;
 	using ScheduleManager::GetCurrentScheduleValue;
 
@@ -204,29 +202,13 @@ namespace HVACStandAloneERV {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of a Stand Alone ERV unit. Called from SimZoneEquipment
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// ZoneNum not used at this time, future modifications may require zone information
 		// dehumid = negative
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StandAloneERVNum; // index of Stand Alone ERV unit being simulated
@@ -282,17 +264,7 @@ namespace HVACStandAloneERV {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using MixedAir::OAController;
@@ -316,19 +288,6 @@ namespace HVACStandAloneERV {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StandAloneERVIndex; // loop index
@@ -1242,9 +1201,6 @@ namespace HVACStandAloneERV {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSizing::AutoSize;
 		using DataSizing::CurZoneEqNum;
@@ -1254,7 +1210,6 @@ namespace HVACStandAloneERV {
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
 		using DataZoneEquipment::ZoneEquipConfig;
-
 		using ScheduleManager::GetScheduleMaxValue;
 		using HeatRecovery::SetHeatExchangerData;
 		using Fans::SetFanData;
@@ -1262,18 +1217,6 @@ namespace HVACStandAloneERV {
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
 		using Fans::SimulateFanComponents;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // Index to zone object
@@ -1407,10 +1350,10 @@ namespace HVACStandAloneERV {
 		// (i.e., ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;)
 		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex > 0 ) {
 			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
-		}		
+		}
 		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex > 0 ) {
 			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
-		}			
+		}
 
 		// now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
 		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;
@@ -1756,29 +1699,8 @@ namespace HVACStandAloneERV {
 		// Supply Air Flow rate, if found.  If incorrect name is given, ErrorsFound is returned as true
 		// and supply air flow rate as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
 		// Return value
 		Real64 AirFlowRate; // returned supply air flow rate of the ERV unit
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichERV;
@@ -1826,29 +1748,8 @@ namespace HVACStandAloneERV {
 		// Supply Air Inlet Node Number, if found.  If incorrect name is given, ErrorsFound is returned as true
 		// and Supply Air Inlet Node Number as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
 		// Return value
 		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichERV;
@@ -1896,29 +1797,8 @@ namespace HVACStandAloneERV {
 		// Exhaust Air Inlet Node Number, if found.  If incorrect name is given, ErrorsFound is returned as true
 		// and Exhaust Air Inlet Node Number as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
 		// Return value
 		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichERV;

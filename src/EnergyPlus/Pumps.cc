@@ -224,13 +224,9 @@ namespace Pumps {
 		// the necessary loop and the PumpRunning has been correctly set.
 
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::FlowPumpQuery;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -314,11 +310,6 @@ namespace Pumps {
 		//  Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
 		// Using/Aliasing
-
-
-
-
-
 		using DataIPShortCuts::lAlphaFieldBlanks;
 		using DataIPShortCuts::cAlphaFieldNames;
 		using DataIPShortCuts::cNumericFieldNames;
@@ -347,10 +338,6 @@ namespace Pumps {
 		using DataHeatBalance::IntGainTypeOf_PumpBank_VarSpeed;
 		using DataHeatBalance::IntGainTypeOf_PumpBank_ConSpeed;
 		using DataHeatBalance::Zone;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StartTemp( 100.0 ); // Standard Temperature across code to calculated Steam density

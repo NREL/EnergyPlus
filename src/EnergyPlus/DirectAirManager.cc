@@ -177,24 +177,8 @@ namespace DirectAirManager {
 
 		// METHODOLOGY EMPLOYED:
 
-		// REFERENCES:
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DirectAirNum;
@@ -254,13 +238,7 @@ namespace DirectAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Use the Get routines from the InputProcessor module.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -269,16 +247,6 @@ namespace DirectAirManager {
 		using SplitterComponent::NumSplitters;
 		using namespace DataLoopNode;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:    INTEGER :: BaseboardNum
 		int NumNums; // Number of REAL(r64) numbers returned by GetObjectItem
@@ -550,25 +518,10 @@ namespace DirectAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-				using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MaxAirVolFlowRateDes; // Design maximum air volume flow rate for reporting

@@ -180,13 +180,9 @@ namespace SolarCollectors {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using DataPlant::TypeOf_SolarCollectorFlatPlate;
 		using DataPlant::TypeOf_SolarCollectorICS;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true );
@@ -259,12 +255,6 @@ namespace SolarCollectors {
 
 		// Using/Aliasing
 		using namespace DataHeatBalance;
-
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -2267,23 +2257,10 @@ namespace SolarCollectors {
 		// mine  ExtVentedCavity derived type that has the surface.
 		// Adapated from Photovoltaics module, originally developed by Brent G. (2004)
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataSurfaces::Surface;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CavNum; // temporary
@@ -2336,25 +2313,8 @@ namespace SolarCollectors {
 		// METHODOLOGY EMPLOYED:
 		// access derived type
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataSurfaces::ExtVentedCavity;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		TsColl = ExtVentedCavity( VentModNum ).Tbaffle;

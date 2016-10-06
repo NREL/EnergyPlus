@@ -104,13 +104,6 @@ namespace NodeInputManager {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::OutputFileBNDetails;
 	using DataGlobals::DisplayAdvancedReportVariables;
-
-
-
-
-
-
-
 	using General::TrimSigDigits;
 	using namespace DataLoopNode;
 	using namespace BranchNodeConnections;

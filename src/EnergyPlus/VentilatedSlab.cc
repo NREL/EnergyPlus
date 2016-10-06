@@ -131,15 +131,12 @@ namespace VentilatedSlab {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
-
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataHeatBalFanSys::QRadSysSource;
 	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
@@ -260,25 +257,9 @@ namespace VentilatedSlab {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqVentedSlab;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // index of ventilated slab being simulated
@@ -346,12 +327,6 @@ namespace VentilatedSlab {
 		// Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.cc)
 
 		// Using/Aliasing
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		auto & GetWaterCoilMaxFlowRate( WaterCoils::GetCoilMaxWaterFlowRate );
@@ -372,10 +347,6 @@ namespace VentilatedSlab {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataSizing::ZoneHVACSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const MeanAirTemperature( "MeanAirTemperature" );
 		static std::string const MeanRadiantTemperature( "MeanRadiantTemperature" );
@@ -385,12 +356,6 @@ namespace VentilatedSlab {
 		static std::string const SlabSurfaceTemperature( "SurfaceTemperature" );
 		static std::string const SlabSurfaceDewPointTemperature( "ZoneAirDewPointTemperature" );
 		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -1450,19 +1415,15 @@ namespace VentilatedSlab {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-				using WaterCoils::SetCoilDesFlow;
+		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
 		using HVACHXAssistedCoolingCoil::GetHXCoilType;
-		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
@@ -1477,17 +1438,8 @@ namespace VentilatedSlab {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeVentilatedSlab" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -2948,24 +2900,6 @@ namespace VentilatedSlab {
 		// METHODOLOGY EMPLOYED:
 		// Calculates the sensible and total enthalpy change from the fan outlet node to the slab inlet node.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // total mass flow through the system
 		int FanOutletNode; // system fan outlet node
@@ -3027,9 +2961,6 @@ namespace VentilatedSlab {
 		// that a cooling coil must be present in order to call a cooling coil
 		// simulation.  Other than that, the subroutine is very straightforward.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using General::RoundSigDigits;
@@ -3052,21 +2983,12 @@ namespace VentilatedSlab {
 		using DataSurfaces::Surface;
 		using NodeInputManager::GetOnlySingleNode;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const CondDeltaTemp( 0.001 ); // How close the surface temperatures can get to the dewpoint temperature
 		// of a space before the radiant cooling system shuts off the flow.
 		Real64 const ZeroSystemResp( 0.1 ); // Response below which the system response is really zero
 		Real64 const TempCheckLimit( 0.1 ); // Maximum allowed temperature difference between outlet temperature calculations
 		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ConstrNum; // Index for construction number in Construct derived type

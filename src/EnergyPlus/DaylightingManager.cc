@@ -5117,17 +5117,7 @@ namespace DaylightingManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -10022,7 +10012,7 @@ Label903: ;
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-				using DataDaylighting::ZoneDaylight;
+		using DataDaylighting::ZoneDaylight;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10089,25 +10079,8 @@ Label903: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// The purpose of the routine is to allow the daylighting map data to be written in various formats
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt FmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string fullmapName; // for output to map units as well as SQL

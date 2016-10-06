@@ -449,19 +449,10 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
 		using General::RoundSigDigits;
 		using General::SafeDivide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  CHARACTER(len=MaxNameLength), &
@@ -701,17 +692,8 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine

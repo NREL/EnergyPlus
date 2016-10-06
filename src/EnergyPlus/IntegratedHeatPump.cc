@@ -1434,7 +1434,6 @@ namespace EnergyPlus {
 			// it should be called by an air loop parent object, when FirstHVACIteration == true
 
 			// Using/Aliasing
-
 			using DataHVACGlobals::SmallLoad;
 			using DataEnvironment::OutDryBulbTemp;
 			using WaterThermalTanks::SimWaterThermalTank;
@@ -1480,7 +1479,7 @@ namespace EnergyPlus {
 					IntegratedHeatPumps( DXCoilNum ).WHtankType, IntegratedHeatPumps( DXCoilNum ).WHtankName,
 					IntegratedHeatPumps( DXCoilNum ).WHtankID,
 					false, false,
-					MyLoad, MaxCap, MinCap, OptCap, true, IntegratedHeatPumps( DXCoilNum ).LoopNum, 
+					MyLoad, MaxCap, MinCap, OptCap, true, IntegratedHeatPumps( DXCoilNum ).LoopNum,
 					IntegratedHeatPumps( DXCoilNum ).LoopSideNum );
 			}
 			IntegratedHeatPumps( DXCoilNum ).CheckWHCall = false;//clear checking flag
@@ -1790,8 +1789,6 @@ namespace EnergyPlus {
 			// This function looks up the given coil and returns the outlet node.  If
 			// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 			// as zero.
-
-			// Using/Aliasing
 
 			// Return value
 			int NodeNumber(0); // returned outlet node of matched coil

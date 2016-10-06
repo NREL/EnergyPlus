@@ -304,20 +304,6 @@ namespace ConvectionCoefficients {
 		using DataLoopNode::Node;
 		using DataLoopNode::NumOfNodes;
 
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // DO loop counter for zones
 		int SurfNum; // DO loop counter for surfaces in zone
@@ -1133,10 +1119,6 @@ namespace ConvectionCoefficients {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using CurveManager::GetCurveIndex;
@@ -3131,26 +3113,8 @@ namespace ConvectionCoefficients {
 		// one of the "regular" convection types and becomes a "negative" convection
 		// type to that surface.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SurfNum;
@@ -3832,12 +3796,6 @@ namespace ConvectionCoefficients {
 		// PURPOSE OF THIS FUNCTION:
 		// This subroutine calculates the interior convection coefficient for a surface.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalFanSys::MAT;
 		using DataRoomAirModel::AirModel;
@@ -3850,16 +3808,6 @@ namespace ConvectionCoefficients {
 
 		// Locals
 		Real64 const OneThird( ( 1.0 / 3.0 ) ); // 1/3 in highest precision
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 DeltaTemp; // Temperature difference between the zone air and the surface
@@ -4409,29 +4357,11 @@ namespace ConvectionCoefficients {
 		// as the result of this function.  The surface has already
 		// been verified to have user supplied exterior convection values.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Return value
 		Real64 SetExtConvectionCoeff;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 HExt( 0.0 ); // Will become the returned value
@@ -4481,32 +4411,11 @@ namespace ConvectionCoefficients {
 		// as the result of this function.  The surface has already
 		// been verified to have user supplied interior convection values.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Return value
 		Real64 SetIntConvectionCoeff;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		Real64 HInt( 0.0 ); // Will become the returned value
 

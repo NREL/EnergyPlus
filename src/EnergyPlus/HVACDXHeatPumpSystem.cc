@@ -112,8 +112,6 @@ namespace HVACDXHeatPumpSystem {
 	using namespace DataLoopNode;
 	using namespace DataGlobals;
 	using namespace DataHVACGlobals;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
 	// Data
@@ -179,34 +177,11 @@ namespace HVACDXHeatPumpSystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages DXHeatPumpSystem component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DXCoils::SimDXCoil;
 		using General::TrimSigDigits;
 		using DataAirLoop::AirLoopControlInfo;
-
 		using VariableSpeedCoils::SimVariableSpeedCoils;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DEFINITIONS:
-		// na
-
-		// FLOW:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of CoilSystem:Heating:DX object
@@ -319,7 +294,7 @@ namespace HVACDXHeatPumpSystem {
 		// REFERENCES:
 
 		// Using/Aliasing
-				using NodeInputManager::GetOnlySingleNode;
+		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -329,19 +304,6 @@ namespace HVACDXHeatPumpSystem {
 		using DXCoils::SetCoilSystemHeatingDXFlag;
 		using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
 		using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -605,13 +567,9 @@ namespace HVACDXHeatPumpSystem {
 		// METHODOLOGY EMPLOYED:
 		//  Data is moved from the System data structure to the System outlet nodes.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using namespace ScheduleManager;
 		using DataHVACGlobals::TempControlTol;
-
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::SolveRegulaFalsi;
@@ -621,18 +579,9 @@ namespace HVACDXHeatPumpSystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.e-3 ); // Accuracy of solver result
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of the DX cooling coil

@@ -243,32 +243,13 @@ namespace PackagedTerminalHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of a packaged terminal heat pump. Called from SimZoneEquipment.
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-
 		using namespace DataZoneEnergyDemands;
 		using DataHeatBalFanSys::TempControlType;
 		using DataZoneEquipment::PkgTermHPAirToAir_Num;
 		using DataZoneEquipment::PkgTermHPWaterToAir_Num;
 		using DataZoneEquipment::PkgTermACAirToAir_Num;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PTUnitNum( 0 ); // index of packaged terminal heat pump being simulated
@@ -531,9 +512,6 @@ namespace PackagedTerminalHeatPump {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::GetFanType;
 		using Fans::GetFanIndex;
@@ -568,12 +546,6 @@ namespace PackagedTerminalHeatPump {
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
 		auto & GetWaterCoilOutletNode( WaterCoils::GetCoilOutletNode );
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using FluidProperties::GetSatDensityRefrig;
@@ -600,19 +572,9 @@ namespace PackagedTerminalHeatPump {
 		using SingleDuct::GetATMixer;
 		using DataSizing::ZoneHVACSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPTUnit: " ); // include trailing blank space
 		static std::string const RoutineNameFull( "GetPackagedTerminalHeatPumpInput" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PTUnitIndex; // loop index
@@ -4147,7 +4109,7 @@ namespace PackagedTerminalHeatPump {
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
-		
+
 		DataScalableCapSizingON = false;
 
 	}
@@ -4431,9 +4393,6 @@ namespace PackagedTerminalHeatPump {
 		// METHODOLOGY EMPLOYED:
 		// Simulates the unit components sequentially in the air flow direction.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
@@ -4441,7 +4400,6 @@ namespace PackagedTerminalHeatPump {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
-
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
@@ -4461,12 +4419,6 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNode; // PTHP air outlet node
@@ -6324,11 +6276,6 @@ namespace PackagedTerminalHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will calcultes MSHP performance based on given system load
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using Fans::SimulateFanComponents;
 		using DXCoils::SimDXCoil;
@@ -6336,7 +6283,6 @@ namespace PackagedTerminalHeatPump {
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
-
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
@@ -6350,19 +6296,10 @@ namespace PackagedTerminalHeatPump {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using SingleDuct::SimATMixer;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcVarSpeedHeatPump: " ); // for error messages
 		Real64 const ErrTolerance( 0.001 ); // convergence limit for hotwater coil
 		int const SolveMaxIter( 50 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNode; // PTHP air outlet node

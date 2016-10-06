@@ -336,16 +336,7 @@ namespace PlantManager {
 		// METHODOLOGY EMPLOYED:
 		// calls the Input Processor to retrieve data from input file.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using SetPointManager::IsNodeOnSetPtManager;
@@ -359,18 +350,8 @@ namespace PlantManager {
 		using General::RoundSigDigits;
 		using DataConvergParams::PlantConvergence;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPlant/CondenserLoopData: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopNum; // DO loop counter for loops
@@ -740,25 +721,9 @@ namespace PlantManager {
 		// the routine the module level derived type Loop should be fully allocated
 		// and fully populated.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using namespace NodeInputManager;
+		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumHalfLoops;
@@ -3114,12 +3079,8 @@ namespace PlantManager {
 		// METHODOLOGY EMPLOYED:
 		// Obtains volumetric flow rate data from the PlantSizData array..
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-
 		using General::RoundSigDigits;
 		using PlantLoopEquip::SimPlantEquip;
 		using FluidProperties::GetDensityGlycol;
@@ -3128,16 +3089,8 @@ namespace PlantManager {
 		// Locals
 		bool InitLoopEquip( true );
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizePlantLoop" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
@@ -3353,31 +3306,16 @@ namespace PlantManager {
 		// METHODOLOGY EMPLOYED:
 		// Obtains volumetric flow rate data from the PlantSizData array..
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-
 		using General::RoundSigDigits;
 		using PlantLoopEquip::SimPlantEquip;
 		using FluidProperties::GetDensityGlycol;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataPlant::PlantLoop;
 
-		// Locals
-		// bool InitLoopEquip( true );
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ResizePlantLoop" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
@@ -3807,24 +3745,6 @@ namespace PlantManager {
 		//   - Most component models are active
 		//   - Pipes are passive unless located between splitter/mixers when assumed to be bypass
 		//   - A branch with multiple active components becomes SeriesActive and so do its components
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopCtr;
@@ -4504,26 +4424,9 @@ namespace PlantManager {
 		// METHODOLOGY EMPLOYED:
 		// use input processor ot find number of plant loops
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
 		using DataGlobals::AnyPlantInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int numPlantLoopsCheck;

@@ -264,19 +264,10 @@ namespace SwimmingPool {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using DataHeatBalance::Construct;
 		using General::TrimSigDigits;
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using DataSurfaces::Surface;
@@ -287,10 +278,6 @@ namespace SwimmingPool {
 		using namespace DataLoopNode;
 		using namespace DataSurfaceLists;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSwimmingPool: " ); // include trailing blank space
 		Real64 const MinCoverFactor( 0.0 ); // minimum value for cover factors
@@ -298,12 +285,6 @@ namespace SwimmingPool {
 		Real64 const MinDepth( 0.05 ); // minimum average pool depth (to avoid obvious input errors)
 		Real64 const MaxDepth( 10.0 ); // maximum average pool depth (to avoid obvious input errors)
 		Real64 const MinPowerFactor( 0.0 ); // minimum power factor for miscellaneous equipment
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if something goes wrong
@@ -998,18 +979,18 @@ namespace SwimmingPool {
 		using DataEnvironment::OutBaroPress;
 		using DataConversions::CFA;
 		using DataConversions::CFMF;
-		
+
 		static std::string const RoutineName( "CalcSwimmingPoolEvap" );
 		static Real64 const CFinHg( 0.00029613 ); // Multiple pressure in Pa by this constant to get inches of Hg
 
 		Real64 PSatPool;
 		Real64 PParAir;
-		
+
 		// Evaporation calculation:
 		// Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
 		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
 		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
-		
+
 		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
 		PParAir = PsyPsatFnTemp( MAT, RoutineName ) * PsyRhFnTdbWPb( MAT, HumRat, OutBaroPress );
 		if ( PSatPool < PParAir ) PSatPool = PParAir;
@@ -1018,7 +999,7 @@ namespace SwimmingPool {
 		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
 
 	}
-	
+
 	void
 	UpdateSwimmingPool(
 		int const PoolNum // number of the swimming pool

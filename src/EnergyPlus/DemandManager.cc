@@ -421,18 +421,9 @@ namespace DemandManager {
 
 		// Using/Aliasing
 		using DataGlobals::MinutesPerTimeStep;
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using OutputProcessor::EnergyMeters;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ListNum;
@@ -627,11 +618,6 @@ namespace DemandManager {
 
 		// Using/Aliasing
 		using DataGlobals::MinutesPerTimeStep;
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using DataHeatBalance::Lights;
@@ -643,10 +629,6 @@ namespace DemandManager {
 		using DataZoneControls::TStatObjects;
 		using General::RoundSigDigits;
 		using MixedAir::GetOAController;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumDemandMgrExtLights;

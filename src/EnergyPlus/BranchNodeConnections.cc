@@ -120,27 +120,8 @@ namespace BranchNodeConnections {
 		// This subroutine registers a node connection in the Node Connection data structure.  This
 		// structure is intended to help with HVAC diagramming as well as validation of nodes.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "RegisterNodeConnection: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorsFoundHere;
@@ -247,8 +228,6 @@ namespace BranchNodeConnections {
 		// This subroutine modifies an existing node connection in the Node Connection data structure.  This
 		// structure is intended to help with HVAC diagramming as well as validation of nodes. This function
 		// is a based on RegisterNodeConnection.
-
-		// Using/Aliasing
 
 		static std::string const RoutineName( "ModifyNodeConnectionType: " );
 
@@ -367,24 +346,8 @@ namespace BranchNodeConnections {
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop1;
@@ -876,23 +839,6 @@ namespace BranchNodeConnections {
 		// METHODOLOGY EMPLOYED:
 		// Traverses CompSet structure.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER Loop
 		bool ErrInObject;
@@ -1207,26 +1153,6 @@ namespace BranchNodeConnections {
 		// METHODOLOGY EMPLOYED:
 		// Traverses CompSet structure.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER Loop
 		bool ErrInObject;
@@ -1323,25 +1249,6 @@ namespace BranchNodeConnections {
 
 		// METHODOLOGY EMPLOYED:
 		// Traverses CompSet structure.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string ChildCType;
@@ -1518,27 +1425,6 @@ namespace BranchNodeConnections {
 		// inlet/outlet nodes have been input.  This routine assumes that identical
 		// "CompSets" cannot be used in multiple places and issues a warning if they are.
 		// This subroutine also
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompTypeUC; // Component type in upper case
@@ -1787,26 +1673,6 @@ namespace BranchNodeConnections {
 		//   c)  If not found, call SetUpCompSets (with parent type and name UNDEFINED)
 		//       to add a new item in the CompSets array
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Count;
 		int Found;
@@ -1971,28 +1837,6 @@ namespace BranchNodeConnections {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function provides a connection type with given node number
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int NodeConnectIndex;

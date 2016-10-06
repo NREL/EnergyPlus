@@ -907,9 +907,6 @@ namespace RuntimeLanguageProcessor {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Runs a stack with the interpreter.
 
-		// METHODOLOGY EMPLOYED:
-		// Using/Aliasing
-
 		// Return value
 		ErlValueType ReturnValue;
 
@@ -1809,19 +1806,8 @@ namespace RuntimeLanguageProcessor {
 		// METHODOLOGY EMPLOYED:
 		// Uses recursion to handle tokens with compound expressions
 
-		// Using/Aliasing
-
 		// Return value
 		int ExpressionNum;
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Pos;
@@ -2099,7 +2085,7 @@ namespace RuntimeLanguageProcessor {
 	}
 
 	ErlValueType
-	EvaluateExpression( 
+	EvaluateExpression(
 		int const ExpressionNum,
 		bool & seriousErrorFound
 	)
@@ -2185,7 +2171,7 @@ namespace RuntimeLanguageProcessor {
 							}
 						}
 					}
-					
+
 				}
 			}
 
@@ -2286,7 +2272,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == OperatorRaiseToPower ) {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					TestValue = std::pow( Operand( 1 ).Number, Operand( 2 ).Number );
-					if ( std::isnan( TestValue ) ) { 
+					if ( std::isnan( TestValue ) ) {
 						// throw Error
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
@@ -2659,7 +2645,6 @@ namespace RuntimeLanguageProcessor {
 
 		// Using/Aliasing
 		using DataGlobals::TimeStepZone;
-
 		using General::TrimSigDigits;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
@@ -3058,7 +3043,7 @@ namespace RuntimeLanguageProcessor {
 						// register the trend pointer in ErlVariable.
 						ErlVariable( VariableNum ).Value.TrendVariable = true;
 						ErlVariable( VariableNum ).Value.TrendVarPointer = TrendNum;
-						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this, 
+						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this,
 					}
 
 					NumTrendSteps = std::floor( rNumericArgs( 1 ) );
@@ -3784,15 +3769,8 @@ namespace RuntimeLanguageProcessor {
 
 		// PURPOSE OF THIS FUNCTION:
 
-		// METHODOLOGY EMPLOYED:
-
-		// Using/Aliasing
-
 		// Return value
 		int VariableNum;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool Found;
@@ -3844,19 +3822,6 @@ namespace RuntimeLanguageProcessor {
 
 		// PURPOSE OF THIS FUNCTION:
 		// Creates new variable if it doesn't exist.  If exists, returns existing variable number.
-
-		// METHODOLOGY EMPLOYED:
-
-		// Using/Aliasing
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
 
 		// FLOW:
 		int VariableNum = FindEMSVariable( VariableName, StackNum );

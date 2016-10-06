@@ -148,8 +148,6 @@ namespace ThermalComfort {
 	using DataRoomAirModel::IsZoneUI;
 	using DataRoomAirModel::VComfort_Jet;
 	using DataRoomAirModel::VComfort_Recirculation;
-
-	//Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyRhFnTdbWPb;
 
 	namespace {
@@ -1834,34 +1832,16 @@ namespace ThermalComfort {
 
 		// PURPOSE OF THIS SUBROUTINE:
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataGlobals;
 		using namespace DataHeatBalance;
 		using DataSurfaces::Surface;
-
-
-
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const AngleFacLimit( 0.01 ); // To set the limit of sum of angle factors
 		int const MaxSurfaces( 20 ); // Maximum number of surfaces in each AngleFactor List
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  CHARACTER(len=MaxNameLength),  &

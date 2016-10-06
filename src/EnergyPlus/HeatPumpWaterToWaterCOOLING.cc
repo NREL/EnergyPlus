@@ -162,28 +162,11 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// It gets the input for the models, initializes simulation variables, calls
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using DataPlant::TypeOf_HPWaterEFCooling;
-
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInput( true ); // then TRUE, calls subroutine to read input file.
@@ -252,33 +235,13 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// GSHPs and begin to fill the
 		// arrays associated with the typeGSHP.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPECooling;
 		using DataPlant::ScanPlantLoopsForObject;
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::FindRefrigerant;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GSHPNum; // Gshp counter

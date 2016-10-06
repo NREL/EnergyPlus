@@ -502,32 +502,13 @@ namespace HeatBalanceIntRadExchange {
 		// Initializes the various parameters for Hottel's ScriptF method for
 		// the grey interchange between surfaces in an enclosure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
 		using General::RoundSigDigits;
 		using General::ScanForReports;
 
-		// Locals
-		// SUBROUTINE ARGUMENTS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt AFormat( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumOfZoneSurfaces; // total number of surfaces in the zone.
@@ -811,33 +792,13 @@ namespace HeatBalanceIntRadExchange {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine gets the user view factor info.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
 		using General::TrimSigDigits;
 
 		// Argument array dimensioning
 		F.dim( N, N );
 		SPtr.dim( N );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER   :: NumZonesWithUserF
@@ -894,34 +855,13 @@ namespace HeatBalanceIntRadExchange {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine gets the user view factor info.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
 		using General::TrimSigDigits;
 
 		// Argument array dimensioning
 		F.dim( N, N );
 		SPtr.dim( N );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UserFZoneIndex;

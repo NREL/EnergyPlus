@@ -244,15 +244,8 @@ namespace loc {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::Construct;
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -262,19 +255,6 @@ namespace loc {
 		using DataEnvironment::GroundTemp_SurfaceObjInput;
 		using General::RoundSigDigits;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -440,11 +420,6 @@ namespace loc {
 		// METHODOLOGY EMPLOYED:
 		// Check flags and update data structure
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DataGlobals::BeginEnvrnFlag;
@@ -453,7 +428,6 @@ namespace loc {
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
-
 		using DataPlant::TypeOf_GrndHtExchgSurface;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -463,19 +437,9 @@ namespace loc {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN) :: FlowLock            ! flow initialization/condition flag    !DSU
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DesignVelocity( 0.5 ); // Hypothetical design max pipe velocity [m/s]
 		static std::string const RoutineName( "InitSurfaceGroundHeatExchanger" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

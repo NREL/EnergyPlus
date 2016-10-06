@@ -152,26 +152,8 @@ namespace MicroturbineElectricGenerator {
 
 		// METHODOLOGY EMPLOYED:       Uses empirical models based on manufacturers data
 
-		// REFERENCES:
-		//  na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -232,30 +214,6 @@ namespace MicroturbineElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// INTEGER, INTENT(IN)          :: FlowLock !unused1208 !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		if ( GetMTInput ) {
 			GetMTGeneratorInput();
 			GetMTInput = false;
@@ -296,19 +254,12 @@ namespace MicroturbineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		//  EnergyPlus input processor.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveType;
 		using CurveManager::GetCurveMinMaxValues;
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -317,10 +268,6 @@ namespace MicroturbineElectricGenerator {
 		using General::RoundSigDigits;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// PARAMETERS:
-		//  na
 
 		// LOCAL VARIABLES:
 		int GeneratorNum; // Index to generator
@@ -2030,23 +1977,6 @@ namespace MicroturbineElectricGenerator {
 		// To pass exhaust outlet number from Micro Turbine to Exhaust fired absorption chiller.
 		// METHODOLOGY EMPLOYED:
 		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;

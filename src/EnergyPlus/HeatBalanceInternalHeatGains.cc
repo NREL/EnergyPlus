@@ -100,25 +100,12 @@ SetupZoneInternalGain(
 	// devices are internal gains like people, lights, electric equipment
 	// and HVAC components with skin loss models like thermal tanks, and power conditioning.
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataHeatBalance;
 
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	int const DeviceAllocInc( 100 );
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int IntGainsNum;

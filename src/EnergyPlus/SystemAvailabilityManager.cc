@@ -121,8 +121,6 @@ namespace SystemAvailabilityManager {
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataHVACGlobals;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using DataAirSystems::PrimaryAirSystem;
 	using DataHeatBalance::ZoneList;
@@ -454,17 +452,7 @@ namespace SystemAvailabilityManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses InputProcessor "Get" routines to obtain data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::MarkNode;
 		using DataHeatBalance::Zone;
@@ -474,18 +462,8 @@ namespace SystemAvailabilityManager {
 		using DataZoneEquipment::NumValidSysAvailZoneComponents;
 		using DataZoneEquipment::cValidSysAvailManagerCompTypes;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSysAvailManagerInputs: " ); // include trailing blank
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string cAlphaFieldNames;
@@ -1246,27 +1224,6 @@ namespace SystemAvailabilityManager {
 		// This routine gets the System Availability Manager List object input and stores
 		// it for later retrieval of items from the Plant and Air Loops.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string cAlphaFieldNames;
 		Array1D_string cNumericFieldNames;
@@ -1574,26 +1531,6 @@ namespace SystemAvailabilityManager {
 		// If not allocated, ZoneComp structure will be allocated to "Total num of zone equip types" and
 		// ZoneCompAvailMgrs structure will be allocated to "Total number of components of the indicated type".
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string AvailabilityListName; // name that should be an Availability Manager List Name
 		int Found;
@@ -1797,30 +1734,8 @@ namespace SystemAvailabilityManager {
 		// Loop over all the System Availability Managers and invoke the correct
 		// System Availability Manager algorithm.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//  CHARACTER(len=*), INTENT(IN) :: SysAvailType
-		// then a dummyvariable is passed in to this subroutine.
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		{ auto const SELECT_CASE_var( SysAvailType );
 		if ( SELECT_CASE_var == SysAvailMgr_Scheduled ) { // 'AvailabilityManager:Scheduled'
@@ -3970,28 +3885,8 @@ namespace SystemAvailabilityManager {
 		// This function returns true for a valid System Availability Manager Type
 		// and false if not.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int ValidType; // result of validation
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Found;
@@ -4094,15 +3989,7 @@ namespace SystemAvailabilityManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses InputProcessor "Get" routines to obtain data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::MarkNode;
 		using DataHeatBalance::Zone;
@@ -4119,18 +4006,8 @@ namespace SystemAvailabilityManager {
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveType;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetHybridVentilationInputs: " ); // include trailing blank
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -4533,28 +4410,11 @@ namespace SystemAvailabilityManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::NumValidSysAvailZoneComponents;
-
 		using DataHeatBalance::TotVentilation;
 		using DataHeatBalance::Ventilation;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// NA
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // One time flag

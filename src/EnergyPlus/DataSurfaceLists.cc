@@ -140,37 +140,16 @@ namespace DataSurfaceLists {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Gets the surface lists for the Radiant System Surface Groups input.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSurfaces;
-
-
-
-
-
 		using DataHeatBalance::Zone;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject1( "ZoneHVAC:LowTemperatureRadiant:SurfaceGroup" );
 		static std::string const CurrentModuleObject2( "ZoneHVAC:VentilatedSlab:SlabGroup" );
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
 		Real64 const SurfListMinFlowFrac( 0.001 ); // Minimum allowed flow fraction (to avoid divide by zero)
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string Alphas; // Alpha items for object

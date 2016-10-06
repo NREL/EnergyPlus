@@ -170,8 +170,6 @@ namespace HVACMultiSpeedHeatPump {
 	using DataHVACGlobals::Coil_HeatingElectric_MultiStage;
 	using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 	using namespace Psychrometrics;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
 	// Data
@@ -250,26 +248,8 @@ namespace HVACMultiSpeedHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of multispeed heat pump.
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int MSHeatPumpNum; // index of fan coil unit being simulated
@@ -520,19 +500,7 @@ namespace HVACMultiSpeedHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the multispeed heat pump model
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
-
-
-
-
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
 		using FluidProperties::FindGlycol;
@@ -1561,10 +1529,6 @@ namespace HVACMultiSpeedHeatPump {
 		// determine the bypass fraction. The simulation converges quickly on mass flow rate. If the zone
 		// temperatures float in the deadband, additional iterations are required to converge on mass flow rate.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using Fans::GetFanIndex;
 		using Fans::GetFanVolFlow;
@@ -1576,7 +1540,6 @@ namespace HVACMultiSpeedHeatPump {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
-
 		using DataAirLoop::AirLoopControlInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipList;
@@ -1600,9 +1563,6 @@ namespace HVACMultiSpeedHeatPump {
 		using WaterCoils::SimulateWaterCoilComponents;
 		using DataZoneControls::StageZoneLogic;
 		using DXCoils::GetDXCoilAvailSchPtr;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "InitMSHeatPump" );
@@ -2269,19 +2229,12 @@ namespace HVACMultiSpeedHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for sizing multispeed heat pump airflow rates and flow fraction.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-				using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::ZoneEquipConfig;
 		using General::TrimSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumOfSpeedCooling; // Number of speeds for cooling

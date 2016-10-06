@@ -415,31 +415,9 @@ namespace CurveManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
-		//  USE DataGlobals, ONLY: DisplayExtraWarnings, OutputFileInits
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumBiQuad; // Number of biquadratic curve objects in the input data file
@@ -2733,27 +2711,6 @@ namespace CurveManager {
 		// Setting up of curve output variables caused errors in some files. Thus, separating the setup
 		// from the getinput.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CurveIndex;
 
@@ -3946,28 +3903,8 @@ Label999: ;
 		// Given the curve index and the values of 1 or 2 independent variables,
 		// returns the value of an equipment performance table lookup.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		Real64 TableValue;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -4133,28 +4070,8 @@ Label999: ;
 		// Given the curve index and the values of 1 or 2 independent variables,
 		// returns the value of an equipment performance table lookup.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		Real64 TableValue;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -5076,31 +4993,9 @@ Label999: ;
 		// PURPOSE OF THIS FUNCTION:
 		// Returns true if the input unit type is valid
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		bool IsCurveInputTypeValid;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( len( InInputType ) > 0 ) {
 			if ( InputProcessor::SameString( InInputType, "DIMENSIONLESS" ) ) {
 				IsCurveInputTypeValid = true;
@@ -5140,31 +5035,8 @@ Label999: ;
 		// PURPOSE OF THIS FUNCTION:
 		// Returns true if the output unit type is valid
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		bool IsCurveOutputTypeValid;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( InputProcessor::SameString( InOutputType, "DIMENSIONLESS" ) ) {
 			IsCurveOutputTypeValid = true;
@@ -5335,28 +5207,8 @@ Label999: ;
 		// METHODOLOGY EMPLOYED:
 		// uses InputProcessor::FindItemInList( to search the curve array for the curve name
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int GetCurveIndex;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// First time GetCurveIndex is called, get the input for all the performance curves
 		if ( GetCurvesInputFlag ) {
@@ -5563,29 +5415,11 @@ Label999: ;
 		// METHODOLOGY EMPLOYED:
 		// General EnergyPlus Methodology
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
-		//  USE PlantPressureSystem, ONLY: PlantPressureCurveData, PressureCurve
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurveObjectName( "Curve:Functional:PressureDrop" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumPressure;
@@ -5665,29 +5499,12 @@ Label999: ;
 		//  PressureCurve_Pressure    = pressure curve based on friction/minor loss
 		//  PressureCurve_Generic     = curvemanager held curve which is function of flow rate
 
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
-
-		//  USE CurveManager,   ONLY : GetCurveIndex, GetCurveType
 		using DataBranchAirLoopPlant::PressureCurve_None;
 		using DataBranchAirLoopPlant::PressureCurve_Pressure;
 		using DataBranchAirLoopPlant::PressureCurve_Generic;
 		using DataBranchAirLoopPlant::PressureCurve_Error;
-		//  USE PlantPressureSystem, ONLY: PlantPressureCurveData, PressureCurve
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TempCurveIndex;

@@ -192,7 +192,6 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
-
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetActuatedBranchFlowRate;
@@ -294,10 +293,6 @@ namespace BaseboardRadiator {
 		// na
 
 		// Using/Aliasing
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using namespace DataLoopNode;
@@ -690,7 +685,7 @@ namespace BaseboardRadiator {
 		if ( PltSizHeatNum > 0 ) {
 
 			DataScalableCapSizingON = false;
-			
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {
@@ -1243,7 +1238,6 @@ namespace BaseboardRadiator {
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;
-
 		using General::TrimSigDigits;
 		using DataGlobals::KickOffSimulation;
 

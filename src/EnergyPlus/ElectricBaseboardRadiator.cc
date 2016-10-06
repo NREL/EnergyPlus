@@ -169,27 +169,11 @@ namespace ElectricBaseboardRadiator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine simulates the Electric Baseboard units.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// Water baseboard module
 
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // Index of unit in baseboard array
@@ -262,11 +246,6 @@ namespace ElectricBaseboardRadiator {
 		// Hot water baseboard module
 
 		// Using/Aliasing
-
-
-
-
-
 		using DataSurfaces::Surface;
 		using GlobalNames::VerifyUniqueBaseboardName;
 		using General::RoundSigDigits;
@@ -278,10 +257,6 @@ namespace ElectricBaseboardRadiator {
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
 		Real64 const MaxFraction( 1.0 ); // Maximum limit of fractional values
@@ -292,12 +267,6 @@ namespace ElectricBaseboardRadiator {
 		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to HW baseboard heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to HW baseboard heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); // get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant

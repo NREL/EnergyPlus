@@ -149,15 +149,11 @@ ControlCompOutput(
 	// METHODOLOGY EMPLOYED:
 	// Currently this is using an intervasl halving scheme to a control tolerance
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::WarmupFlag;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-
 	using WaterCoils::SimulateWaterCoilComponents;
 	using FanCoilUnits::Calc4PipeFanCoil;
 	using UnitVentilator::CalcUnitVentilatorComponents;
@@ -172,9 +168,6 @@ ControlCompOutput(
 	using OutdoorAirUnit::CalcOAUnitCoilComps;
 	using PlantUtilities::SetActuatedBranchFlowRate;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	//Iteration maximum for reheat control
 	static int const MaxIter( 25 );
@@ -186,9 +179,6 @@ ControlCompOutput(
 	//  Plus -- order in ListOfComponents array must be in sorted order.
 	int const NumComponents( 11 );
 	static Array1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
 
 	// DERIVED TYPE DEFINITIONS
 	//Interval Half Type used for Controller
@@ -874,23 +864,6 @@ ValidateComponent(
 	// Uses existing routines in InputProcessor.  GetObjectItemNum uses the "standard"
 	// convention of the Name of the item/object being the first Alpha Argument.
 
-	// REFERENCES:
-	// na
-
-	// Using/Aliasing
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
-
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int ItemNum;
 
@@ -938,23 +911,6 @@ ValidateComponent(
 		// METHODOLOGY EMPLOYED:
 		// Uses existing routines in InputProcessor.  GetObjectItemNum uses the "standard"
 		// convention of the Name of the item/object being the first Alpha Argument.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ItemNum;
@@ -1533,12 +1489,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	// This subroutine tests supply air path integrity and displays the loop for each branch.
 	// Also, input and output nodes.
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::OutputFileBNDetails;
@@ -1550,20 +1500,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	using namespace ZonePlenum;
 	using DataAirLoop::AirToZoneNodeInfo;
 	using DataHVACGlobals::NumPrimaryAirSys;
-
-
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Count;
@@ -1832,28 +1768,11 @@ TestReturnAirPathIntegrity(
 	using DataAirLoop::AirToZoneNodeInfo;
 	using namespace ZonePlenum;
 	using DataHVACGlobals::NumPrimaryAirSys;
-
-
-
 	using MixerComponent::MixerCond;
 	using MixerComponent::NumMixers;
 	auto & GetZoneMixerInput( MixerComponent::GetMixerInput );
 	using PoweredInductionUnits::PIUnitHasMixer;
 	using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
-
-	// Argument array dimensioning
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;

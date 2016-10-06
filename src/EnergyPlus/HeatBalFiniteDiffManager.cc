@@ -337,33 +337,12 @@ namespace HeatBalFiniteDiffManager {
 		// This subroutine is the main driver for initializations for the variable property CondFD part of the
 		// MFD algorithm
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
 		using DataHeatBalance::MaxAllowedDelTempCondFD;
 		using DataHeatBalance::CondFDRelaxFactor;
 		using DataHeatBalance::CondFDRelaxFactorInput;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine
@@ -2188,8 +2167,8 @@ namespace HeatBalFiniteDiffManager {
 					if ( construct.SourceSinkPresent && ( Lay == construct.TempAfterLayer ) ) {
 						TempUserLoc( Surf ) = TDT_i; // Transfer node temp to DataHeatBalSurface module
 					}
-					
-					
+
+
 				} // End of R-layer and Regular check
 
 				TDT( i ) = TDT_i;

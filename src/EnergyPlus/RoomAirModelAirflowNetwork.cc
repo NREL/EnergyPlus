@@ -286,12 +286,6 @@ namespace RoomAirModelAirflowNetwork {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Perform one-time checking and term calculations
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -311,7 +305,6 @@ namespace RoomAirModelAirflowNetwork {
 		using DataZoneEquipment::ZoneEquipList;
 		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
-
 		using General::RoundSigDigits;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:

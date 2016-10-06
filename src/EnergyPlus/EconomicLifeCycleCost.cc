@@ -113,7 +113,7 @@ namespace EconomicLifeCycleCost {
 	// Using/Aliasing
 	using namespace DataGlobalConstants;
 	using namespace DataPrecisionGlobals;
-		using namespace DataCostEstimate;
+	using namespace DataCostEstimate;
 	using namespace DataIPShortCuts;
 
 	// Data

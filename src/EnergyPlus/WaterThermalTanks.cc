@@ -420,16 +420,12 @@ namespace WaterThermalTanks {
 
 		// Using/Aliasing
 		using DataGlobals::KickOffSimulation;
-
 		using DataSizing::DataNonZoneNonAirloopValue;
 		using IntegratedHeatPump::IntegratedHeatPumps;
 		using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
 		using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
 		using IntegratedHeatPump::GetCurWorkMode;
 		using IntegratedHeatPump::IHPOperationMode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyOneTimeFlagWH; // first pass log
@@ -813,12 +809,8 @@ namespace WaterThermalTanks {
 		// The necessary control flags and dummy variables are set and passed into SimWaterHeater.
 
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using DataGlobals::DoingSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool LocalRunFlag; // local variables of similar name as others used in Sim modules
@@ -4989,7 +4981,6 @@ namespace WaterThermalTanks {
 		using DataSizing::CurZoneEqNum;
 		using DataSizing::ZoneEqSizing;
 		using DataSizing::DataNonZoneNonAirloopValue;
-
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -5004,9 +4995,6 @@ namespace WaterThermalTanks {
 		using Fans::GetFanVolFlow;
 		using IntegratedHeatPump::SizeIHP;
 		using IntegratedHeatPump::IntegratedHeatPumps;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UseInletNode; // Water heater use inlet node number
@@ -8756,15 +8744,8 @@ namespace WaterThermalTanks {
 		//  Calls CalcWaterThermalTankMixed to get tank temperature at the given part load ratio (source water mass flow rate)
 		//  and calculates the residual as defined above
 
-		// REFERENCES:
-
-		// USE STATEMENTS:
-		// Using/Aliasing
-
 		// Return value
 		Real64 PLRResidualMixedTank;
-
-		// Argument array dimensioning
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8772,15 +8753,6 @@ namespace WaterThermalTanks {
 		// par(3) = water heater num
 		// par(4) = FirstHVACIteration
 		// par(5) = MdotWater
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		//  na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WaterThermalTankNum; // index of water heater
@@ -9503,7 +9475,6 @@ namespace WaterThermalTanks {
 		// BA benchmark report for residential design mode
 
 		// Using/Aliasing
-
 		using DataHeatBalance::Zone;
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -9516,18 +9487,10 @@ namespace WaterThermalTanks {
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeTankForDemandSide" );
 		Real64 const GalTocubicMeters( 0.0037854 );
 		Real64 const kBtuPerHrToWatts( 293.1 );
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tstart; // initial tank temp for sizing.
@@ -10244,33 +10207,20 @@ namespace WaterThermalTanks {
 		// METHODOLOGY EMPLOYED:
 		// same as for plant connected water heaters, only draws are scheduled.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSizing::AutoSize;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using ScheduleManager::GetScheduleMaxValue;
-
 		using DataHeatBalance::Zone;
 		using SolarCollectors::Collector;
 		using SolarCollectors::NumOfCollectors;
 		using DataSurfaces::Surface;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const GalTocubicMeters( 0.0037854 );
 		Real64 const kBtuPerHrToWatts( 293.1 );
 		static std::string const RoutineName( "SizeStandAloneWaterHeater" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 tmpTankVolume; // local temporary for tank volume m3
@@ -10687,7 +10637,6 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::CycFanCycCoil;
 		using namespace OutputReportPredefined;
 		using General::TrimSigDigits;
-
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using VariableSpeedCoils::VSHPWHHeatingCapacity;
@@ -10696,10 +10645,6 @@ namespace WaterThermalTanks {
 
 		// Locals
 		Real64 MdotAir; // air mass flow rate through HP water heater evaporator (kg/s)
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TotalDrawMass; // Total mass of hot water drawn during the test (kg), equivalent to 64.3 gallons

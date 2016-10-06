@@ -190,27 +190,8 @@ namespace PhotovoltaicThermalCollectors {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -281,15 +262,7 @@ namespace PhotovoltaicThermalCollectors {
 		// METHODOLOGY EMPLOYED:
 		// usual E+ methods
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts;
 		using namespace DataHeatBalance;
 		using namespace DataLoopNode;
@@ -302,19 +275,6 @@ namespace PhotovoltaicThermalCollectors {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace DataPlant; // DSU
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -562,7 +522,6 @@ namespace PhotovoltaicThermalCollectors {
 		using DataLoopNode::Node;
 		using DataLoopNode::SensedNodeFlagValue;
 		using FluidProperties::GetDensityGlycol;
-
 		using DataHVACGlobals::DoSetPointTest;
 		using DataHVACGlobals::SetPointErrorFlag;
 		using DataHeatBalance::QRadSWOutIncident;

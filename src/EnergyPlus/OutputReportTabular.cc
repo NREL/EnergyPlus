@@ -154,7 +154,7 @@ namespace OutputReportTabular {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-		using DataGlobals::BigNumber;
+	using DataGlobals::BigNumber;
 	using DataGlobals::ZoneTSReporting;
 	using DataGlobals::HVACTSReporting;
 	using DataGlobals::KindOfSim;
@@ -6264,21 +6264,6 @@ namespace OutputReportTabular {
 		//   routine.  All arrays are strings so numbers need to be
 		//   converted prior to calling WriteTable.
 
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string columnHead;
 		Array1D_int columnWidth;
@@ -6642,19 +6627,6 @@ namespace OutputReportTabular {
 		//   Creates several arrays that are passed to the WriteTable
 		//   routine.  All arrays are strings so numbers need to be
 		//   converted prior to calling WriteTable.
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iInObj;
@@ -10208,24 +10180,6 @@ namespace OutputReportTabular {
 		//   builds up a tableEntry array which holds the data for the
 		//   predefined reports.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
@@ -10441,24 +10395,6 @@ namespace OutputReportTabular {
 		//   is created for each type of component. Columns are created
 		//   for each description within that table. Rows are created
 		//   for each named object.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)

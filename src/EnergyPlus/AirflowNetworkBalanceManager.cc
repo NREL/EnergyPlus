@@ -123,7 +123,6 @@ namespace AirflowNetworkBalanceManager {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-
 	using General::RoundSigDigits;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::OutputFileBNDetails;
@@ -6735,7 +6734,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkLinkReport( i ).VolFLOW2 = 0.0;
 			}
 		}
-		
+
 		if ( !( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {
@@ -7283,12 +7282,6 @@ namespace AirflowNetworkBalanceManager {
 		// This subroutine validates the inputs of distribution system, since node data from a pimary airloop
 		// are nor available in the first call during reading input data of airflownetwrok objects.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataAirLoop::AirToZoneNodeInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -7296,7 +7289,6 @@ namespace AirflowNetworkBalanceManager {
 		using MixedAir::GetOAMixerReliefNodeNumber;
 		using MixedAir::GetOAMixerInletNodeNumber;
 		using SingleDuct::GetHVACSingleDuctSysIndex;
-
 		using BranchNodeConnections::GetNodeConnectionType;
 		using namespace DataLoopNode;
 		using DataBranchNodeConnections::NodeConnections;
@@ -7305,18 +7297,8 @@ namespace AirflowNetworkBalanceManager {
 		using SplitterComponent::GetSplitterNodeNumbers;
 		using SplitterComponent::GetSplitterOutletNumber;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ValidateDistributionSystem: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i;
@@ -7782,29 +7764,12 @@ namespace AirflowNetworkBalanceManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine validate zone exhaust fan and associated surface
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataZoneEquipment::ZoneEquipList;
 		using DataZoneEquipment::ZoneExhaustFan_Num;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ValidateExhaustFanInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i;
@@ -7915,14 +7880,7 @@ namespace AirflowNetworkBalanceManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine performs hybrid ventilation control
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataHVACGlobals::NumHybridVentSysAvailMgrs;
 		using DataHVACGlobals::HybridVentSysAvailAirLoopNum;
 		using DataHVACGlobals::HybridVentSysAvailVentCtrl;
@@ -7932,21 +7890,11 @@ namespace AirflowNetworkBalanceManager {
 		using DataHVACGlobals::HybridVentSysAvailActualZoneNum;
 		using DataZoneEquipment::ZoneEquipConfig;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const HybridVentCtrl_Close( 2 ); // Open windows or doors
 		int const IndividualCtrlType( 0 ); // Individual window or door control
 		int const GlobalCtrlType( 1 ); // Global window or door control
 		static std::string const RoutineName( "HybridVentilationControl: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SysAvailNum; // Hybrid ventilation control number
@@ -8039,33 +7987,13 @@ namespace AirflowNetworkBalanceManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Modify the wind pressure coefficients for single sided ventilation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataEnvironment;
 		using namespace DataIPShortCuts;
 		using namespace DataAirflowNetwork;
 
-
-
-
 		// Locals
 		int WindDirNum;
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AFNZnNum; // counters

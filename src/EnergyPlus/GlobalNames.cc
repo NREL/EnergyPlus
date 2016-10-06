@@ -92,7 +92,6 @@ namespace GlobalNames {
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 
-
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	// na

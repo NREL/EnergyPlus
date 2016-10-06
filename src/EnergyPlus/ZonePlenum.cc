@@ -114,8 +114,6 @@ namespace ZonePlenum {
 	using namespace DataHVACGlobals;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::OutHumRat;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyTdbFnHW;
 	using Psychrometrics::PsyHFnTdbW;
 

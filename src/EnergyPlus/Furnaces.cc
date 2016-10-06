@@ -186,15 +186,12 @@ namespace Furnaces {
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::OutDryBulbTemp;
 	using DataEnvironment::StdRhoAir;
-
 	using namespace DataZoneEquipment;
 	using Psychrometrics::PsyHfgAirFnWTdb;
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using Psychrometrics::PsyHFnTdbW;
 	using Psychrometrics::PsyTdbFnHW;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Fans::SimulateFanComponents;
 	using DXCoils::SimDXCoil;
@@ -325,12 +322,7 @@ namespace Furnaces {
 		// in the Calc routines and returned here through subroutine arguments. The actual simulation of these coils is
 		// performed here (i.e. the supplemental and reheat coil loads are passed as 0 to CalcFurnaceOutput).
 
-		// REFERENCES:
-		// na
-
-
 		// Using/Aliasing
-
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using DataAirLoop::AirLoopControlInfo;
@@ -340,24 +332,6 @@ namespace Furnaces {
 		using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 		using DataHeatBalFanSys::TempControlType;
 		using IntegratedHeatPump::IntegratedHeatPumps;
-
-		//USE WaterCoils,               ONLY: SimulateWaterCoilComponents
-		//USE PlantUtilities,           ONLY: SetComponentFlowRate
-		//USE SteamCoils,               ONLY: SimulateSteamCoilComponents
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FurnaceNum; // Furnace number
@@ -705,15 +679,7 @@ namespace Furnaces {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-
 		// Using/Aliasing
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using DataLoopNode::NodeID;
 		using DataHeatBalance::Zone;
@@ -795,18 +761,9 @@ namespace Furnaces {
 		// Locals
 		std::string CurrentModuleObject; // Object type for getting and error messages
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const getUnitaryHeatOnly( "GetUnitaryHeatOnly" );
 		static std::string const getAirLoopHVACHeatCoolInput( "GetAirLoopHVACHeatCoolInput" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FurnaceNum; // The Furnace that you are currently loading input into
@@ -7027,29 +6984,16 @@ namespace Furnaces {
 		// METHODOLOGY EMPLOYED:
 		// Calculate the part-load ratio required to meet the zone sensible load.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using HeatingCoils::SimulateHeatingCoilComponents;
-
 		using DataHeatBalFanSys::MAT;
 		using DataAirLoop::AirToOANodeInfo;
 		using General::SolveRegulaFalsi;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIter( 600 ); // maximum number of iterations
 		Real64 const MinPLR( 0.0 ); // minimum part load ratio allowed
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 OnOffAirFlowRatio; // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step

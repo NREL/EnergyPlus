@@ -140,30 +140,9 @@ namespace MatrixDataManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// get input for Matrix objects
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumTwoDimMatrix; // count of Matrix:TwoDimension objects
@@ -249,24 +228,8 @@ namespace MatrixDataManager {
 		// inputs name of matrix and returns integer index
 		// currently uses InputProcessor::FindItemInList( which is case sensitive
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int MatrixIndexPtr; // Function result
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -302,31 +265,6 @@ namespace MatrixDataManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// pass matrix to calling routine
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		if ( Idx > 0 ) { // protect hard crash
 			Mat2D = MatData( Idx ).Mat2D;
 		} else {
@@ -353,27 +291,6 @@ namespace MatrixDataManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( Idx > 0 ) {
 			NumRows = MatData( Idx ).Mat2D.isize( 2 );
 			NumCols = MatData( Idx ).Mat2D.isize( 1 );

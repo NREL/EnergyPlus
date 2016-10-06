@@ -382,11 +382,6 @@ namespace WaterUse {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
@@ -397,10 +392,6 @@ namespace WaterUse {
 		using WaterManager::SetupTankDemandComponent;
 		using Psychrometrics::RhoH2O;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine

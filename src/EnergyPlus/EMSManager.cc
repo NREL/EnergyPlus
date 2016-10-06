@@ -163,28 +163,9 @@ namespace EMSManager {
 		// Get number of EMS-related input objects and set
 		// global logical AnyEnergyManagementSystemInModel
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		//  USE DataIPShortCuts
 		// Using/Aliasing
-
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using General::ScanForReports;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -310,7 +291,6 @@ namespace EMSManager {
 		using DataGlobals::emsCallFromExternalInterface;
 		using DataGlobals::emsCallFromBeginNewEvironment;
 		using DataGlobals::emsCallFromUserDefinedComponentModel;
-
 		using RuntimeLanguageProcessor::EvaluateStack;
 		using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
 		using OutputProcessor::MeterType;
@@ -318,18 +298,6 @@ namespace EMSManager {
 		using OutputProcessor::RealVariableType;
 		using OutputProcessor::RVar;
 		using OutputProcessor::RVariableTypes;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -612,24 +580,11 @@ namespace EMSManager {
 		using DataGlobals::emsCallFromComponentGetInput;
 		using DataGlobals::emsCallFromUserDefinedComponentModel;
 		using DataGlobals::emsCallFromUnitarySystemSizing;
-
-
-
-
-
-
-		//  USE OutputProcessor, ONLY: GetReportVarPointerForEMS
-		//  USE DataIPShortCuts
-
 		using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
 		using RuntimeLanguageProcessor::FindEMSVariable;
 		using RuntimeLanguageProcessor::NewEMSVariable;
 		using RuntimeLanguageProcessor::ExternalInterfaceInitializeErlVariable;
 		using RuntimeLanguageProcessor::SetErlValueNumber;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -767,7 +722,7 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						Sensor( SensorNum ).VariableNum = VariableNum;
-						ErlVariable( VariableNum ).Value.initialized = true; 
+						ErlVariable( VariableNum ).Value.initialized = true;
 					}
 				}
 
@@ -1092,27 +1047,9 @@ namespace EMSManager {
 		// but we also want to allow customizing sizing calcs which occur much earlier in the simulation.
 		//  so here we do a final pass and throw the errors that would usually occur during get input.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		//  USE DataIPShortCuts, ONLY: cCurrentModuleObject
 		// Using/Aliasing
-
 		using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SensorNum; // local loop
@@ -1407,23 +1344,8 @@ namespace EMSManager {
 		// mine structure and write to edd file
 		// note this executes after final processing and sizing-related calling points may already execute Erl programs
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1469,24 +1391,8 @@ namespace EMSManager {
 		// METHODOLOGY EMPLOYED:
 		// mine structure and write to eio file
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1670,26 +1576,8 @@ namespace EMSManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Provide method to verify that a specific node is (probably) managed by EMS
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataLoopNode::NodeID;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int Loop( 0 ); // local do loop index
@@ -2136,7 +2024,7 @@ namespace EMSManager {
 	void
 	checkForUnusedActuatorsAtEnd()
 	{
-		// call at end of simulation to check if any of the user's actuators were never initialized.  
+		// call at end of simulation to check if any of the user's actuators were never initialized.
 		// Could be a mistake we want to help users catch // Issue #4404.
 		for ( int actuatorUsedLoop = 1; actuatorUsedLoop <= numActuatorsUsed; ++actuatorUsedLoop ) {
 			if ( ! ErlVariable( EMSActuatorUsed( actuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
@@ -2147,9 +2035,9 @@ namespace EMSManager {
 				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( actuatorUsedLoop ).ControlTypeName );
 			}
 		}
-	
+
 	}
-	
+
 } // EMSManager
 
 //Moved these setup EMS actuator routines out of module to solve circular use problems between
@@ -2181,18 +2069,8 @@ SetupEMSActuator(
 	//  check for duplicates.
 
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	// Object Data
-
-	// FLOW:
 
 	std::string const UpperCaseObjectType( InputProcessor::MakeUPPERCase( cComponentTypeName ) );
 	std::string const UpperCaseObjectName( InputProcessor::MakeUPPERCase( cUniqueIDName ) );
@@ -2251,23 +2129,8 @@ SetupEMSActuator(
 	//  check for duplicates.
 
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	// Object Data
-
-	// FLOW:
-	//  IF (.NOT. ActuatorFileOpen) THEN
-	//    !OPEN(88,file='eplusout.add')
-	//    !WRITE(88, '(A)') 'Object Type,Actuator Name'
-	//    ActuatorFileOpen = .TRUE.
-	//  END IF
 
 	std::string const UpperCaseObjectType( InputProcessor::MakeUPPERCase( cComponentTypeName ) );
 	std::string const UpperCaseObjectName( InputProcessor::MakeUPPERCase( cUniqueIDName ) );
@@ -2326,18 +2189,8 @@ SetupEMSActuator(
 	//  check for duplicates.
 
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	// Object Data
-
-	// FLOW:
 
 	std::string const UpperCaseObjectType( InputProcessor::MakeUPPERCase( cComponentTypeName ) );
 	std::string const UpperCaseObjectName( InputProcessor::MakeUPPERCase( cUniqueIDName ) );
@@ -2388,28 +2241,9 @@ SetupEMSInternalVariable(
 	// PURPOSE OF THIS SUBROUTINE:
 	// Setup internal data source and make available to EMS
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int InternalVarAvailNum; // loop index
@@ -2473,28 +2307,9 @@ SetupEMSInternalVariable(
 	// PURPOSE OF THIS SUBROUTINE:
 	// Setup internal data source and make available to EMS
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
-
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int InternalVarAvailNum; // loop index

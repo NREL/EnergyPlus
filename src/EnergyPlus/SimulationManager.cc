@@ -684,11 +684,8 @@ namespace SimulationManager {
 		// METHODOLOGY EMPLOYED:
 		// Use GetObjectItem from the Input Processor
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using DataStringGlobals::MatchVersion;
+		using DataStringGlobals::MatchVersion;
 		using namespace DataConvergParams;
 		using namespace DataSystemVariables;
 		using DataHVACGlobals::LimitNumSysSteps;
@@ -701,18 +698,8 @@ namespace SimulationManager {
 		using DataEnvironment::IgnoreDiffuseRadiation;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string Alphas( 6 );
@@ -1128,24 +1115,6 @@ namespace SimulationManager {
 		// For now (8/2008), the routine will query several objects in the input.  And try to produce warnings or
 		// fatals as a result.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumZoneSizing;
 		int NumSystemSizing;
@@ -1243,27 +1212,6 @@ namespace SimulationManager {
 		// reports and may get confused when nothing is produced.  This routine will provide a warning when
 		// results should be produced (either sizing periods or weather files are run) but no reports are
 		// requested.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool SimPeriods;
@@ -1574,32 +1522,16 @@ namespace SimulationManager {
 		// Using global flag (kickoff simulation), only a few time steps are executed.
 		// global flag is used in other parts of simulation to terminate quickly.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ExteriorEnergyUse::ManageExteriorEnergyUse;
 		using DataEnvironment::EndMonthFlag;
 		using DataEnvironment::EnvironmentName;
-
 		using CostEstimateManager::SimCostEstimate;
 		using General::TrimSigDigits;
 		using namespace DataTimings;
 		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool Available( false ); // an environment is available to process
@@ -1704,32 +1636,11 @@ namespace SimulationManager {
 		// This subroutine 'reports' the NodeConnection data structure.  It groups the
 		// report/dump by parent, non-parent objects.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		using namespace DataBranchNodeConnections;
 		using DataGlobals::OutputFileBNDetails;
 		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -1851,14 +1762,7 @@ namespace SimulationManager {
 		// return air paths, controlled zones.
 		// This information should be useful in diagnosing node connection input errors.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using namespace DataAirLoop;
 		using namespace DataBranchNodeConnections;
 		using DataLoopNode::NumOfNodes;
@@ -1873,18 +1777,8 @@ namespace SimulationManager {
 		using DualDuct::ReportDualDuctConnections;
 		using DataGlobals::OutputFileBNDetails;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const errstring( "**error**" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string ChrOut;
@@ -2642,13 +2536,9 @@ Resimulate(
 	using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
 	using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
 	using DataContaminantBalance::Contaminant;
-
 	using DataHeatBalance::ZoneAirMassFlow;
 	using namespace ZoneEquipmentManager;
 	//using ZoneEquipmentManager::CalcAirFlowSimple;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	Real64 ZoneTempChange( 0.0 ); // Dummy variable needed for calling ManageZoneAirUpdates

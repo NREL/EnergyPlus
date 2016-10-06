@@ -262,16 +262,13 @@ namespace InternalHeatGains {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-				using namespace ScheduleManager;
+		using namespace ScheduleManager;
 		using General::RoundSigDigits;
 		using General::CheckCreatedZoneItemName;
 		using namespace OutputReportPredefined;
 		using namespace DataLoopNode;
 		using CurveManager::GetCurveIndex;
 		using NodeInputManager::GetOnlySingleNode;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );

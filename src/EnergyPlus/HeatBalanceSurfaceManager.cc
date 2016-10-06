@@ -5075,7 +5075,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalanceEMPD::HeatFluxLatent;
 	using DataMoistureBalanceEMPD::RVSurfaceOld;
 	using DataMoistureBalanceEMPD::RVSurfLayer;
-
 	using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 	using WindowManager::CalcWindowHeatBalance;
 	using HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff;
@@ -5104,9 +5103,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using WindowEquivalentLayer::EQLWindowOutsideEffectiveEmiss;
 	using SwimmingPool::SimSwimmingPool;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const IterDampConst( 5.0 ); // Damping constant for inside surface temperature iterations
@@ -5122,12 +5118,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static std::string const HBSurfManInsideSurf( "HB,SurfMan:InsideSurf" );
 	static std::string const Inside( "Inside" );
 	static std::string const BlankString;
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	Real64 AbsInt; // Solar absorptance of inside movable insulation

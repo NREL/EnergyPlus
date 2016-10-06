@@ -156,8 +156,6 @@ namespace FanCoilUnits {
 	using DataHVACGlobals::ATMixerExists;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
 	// Data
@@ -253,27 +251,8 @@ namespace FanCoilUnits {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages the simulation of a fan coil unit. Called from SimZone Equipment
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanCoilNum; // index of fan coil unit being simulated
@@ -346,15 +325,7 @@ namespace FanCoilUnits {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -378,21 +349,11 @@ namespace FanCoilUnits {
 		using DataGlobals::NumOfZones;
 		using DataGlobals::ScheduleAlwaysOn;
 		using SingleDuct::GetATMixer;
-
 		using DataSizing::ZoneHVACSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		static std::string const RoutineName( "GetFanCoilUnits: " ); // include trailing blank space
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanCoilIndex; // loop index
@@ -1144,9 +1105,6 @@ namespace FanCoilUnits {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using Psychrometrics::PsyCpAirFnWTdb;
@@ -1176,7 +1134,6 @@ namespace FanCoilUnits {
 		using DataHVACGlobals::MinSATempCoolingSizing;
 		using DataHVACGlobals::MaxSATempHeatingSizing;
 		using DataHeatBalance::Zone;
-
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeFanCoilUnit: " ); // include trailing blank space
@@ -3796,15 +3753,11 @@ namespace FanCoilUnits {
 		// maximum or zero.  The water flow rate is set to zero if there is no
 		// load.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
 		using DataHeatBalFanSys::TempControlType;
 		using PlantUtilities::SetComponentFlowRate;
 		using General::TrimSigDigits;
-
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3812,11 +3765,6 @@ namespace FanCoilUnits {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcMultiStage4PipeFanCoil" );
 		int const MaxIterCycl( 100 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 PLR; // Part Load Ratio, fraction of time step fancoil is on
@@ -4433,26 +4381,6 @@ namespace FanCoilUnits {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the index for a given PT Unit
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

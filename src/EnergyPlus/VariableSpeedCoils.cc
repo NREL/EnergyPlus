@@ -432,13 +432,9 @@ namespace VariableSpeedCoils {
 		// This subroutine manages variable-speed Water to Air Heat Pump component simulation.
 
 		// Using/Aliasing
-
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
 		using General::SolveRegulaFalsi;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilNum; // The WatertoAirHP that you are currently loading input into
@@ -522,7 +518,7 @@ namespace VariableSpeedCoils {
 		// Uses "Get" routines to read in data.
 
 		// Using/Aliasing
-				using namespace NodeInputManager;
+		using namespace NodeInputManager;
 		using BranchNodeConnections::TestCompSet;
 		using GlobalNames::VerifyUniqueCoilName;
 		using namespace OutputReportPredefined;
@@ -536,18 +532,8 @@ namespace VariableSpeedCoils {
 		using WaterManager::SetupTankSupplyComponent;
 		using ScheduleManager::GetScheduleIndex;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetVarSpeedCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoilNum; // The Water to Air HP that you are currently loading input into
@@ -5538,7 +5524,6 @@ namespace VariableSpeedCoils {
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
 
-
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
 
@@ -5643,11 +5628,6 @@ namespace VariableSpeedCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// USE STATEMENTS:
-		//  USE FluidProperties, ONLY: FindGlycol
-		// Using/Aliasing
-
-
 		// Return value
 		Real64 CoilAirFlowRate; // returned air volume flow rate of matched coil
 
@@ -5707,8 +5687,6 @@ namespace VariableSpeedCoils {
 		// This function looks up the given coil and returns PLR curve index.  If
 		// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero.
-
-		// Using/Aliasing
 
 		// Return value
 		int PLRNumber; // returned outlet node of matched coil
@@ -5851,8 +5829,6 @@ namespace VariableSpeedCoils {
 		// This function looks up the given coil and returns the condenser inlet node.  If
 		// incorrect coil  name is given, ErrorsFound is returned as true.
 
-		// Using/Aliasing
-
 		// Return value
 		int CondNode; // returned condenser node number of matched coil
 
@@ -5894,8 +5870,6 @@ namespace VariableSpeedCoils {
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given coil and returns min OAT for compressor operation.  If
 		// incorrect coil  name is given, ErrorsFound is returned as true.
-
-		// Using/Aliasing
 
 		// Return value
 		Real64 MinOAT; // returned min OAT for compressor operation
@@ -5939,9 +5913,6 @@ namespace VariableSpeedCoils {
 		// This function looks up the given coil and returns number of speeds.  If
 		// incorrect coil name is given, ErrorsFound is returned as true.
 
-
-		// Using/Aliasing
-
 		// Return value
 		int Speeds; // returned number of speeds
 
@@ -5984,11 +5955,8 @@ namespace VariableSpeedCoils {
 		// This routine was designed to "push" information from a parent object to
 		// this WSHP coil object.
 
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-
-
 		using FluidProperties::FindGlycol;
 
 		// Obtains and Allocates WatertoAirHP related parameters from input file
@@ -6031,12 +5999,10 @@ namespace VariableSpeedCoils {
 		// METHODOLOGY EMPLOYED:
 		// Data is moved from the HP data structure to the HP outlet nodes.
 
-
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
 		using DataContaminantBalance::Contaminant;
-
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirInletNode;

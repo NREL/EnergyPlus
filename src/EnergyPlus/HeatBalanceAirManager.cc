@@ -295,30 +295,11 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Modelled after 'Modual Example' in Guide for Module Developers
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// Formats
 		static gio::Fmt Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -346,32 +327,12 @@ namespace HeatBalanceAirManager {
 			// PURPOSE OF THIS SUBROUTINE :
 			// This subroutine sets the zone mass conservation flag to true.
 
-			// METHODOLOGY EMPLOYED :
-			// na
-
-			// REFERENCES :
-			// na
-
 			// Using/Aliasing
 			using DataHeatBalance::TotMixing;
 			using DataHeatBalance::Mixing;
 			using DataHeatBalance::ZoneAirMassFlow;
 			using DataHeatBalFanSys::MixingMassFlowZone;
 			using DataHeatBalFanSys::ZoneMassBalanceFlag;
-
-
-			// locals
-			// SUBROUTINE ARGUMENT DEFINITIONS :
-			// na
-
-			// SUBROUTINE PARAMETER DEFINITIONS :
-			// na
-
-			// INTERFACE BLOCK SPECIFICATIONS :
-			// na
-
-			// DERIVED TYPE DEFINITIONS :
-			// na
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS :
 			int Loop;
@@ -403,9 +364,6 @@ namespace HeatBalanceAirManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the "simple" air flow model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// IDD Statements
 		// INFILTRATION,A1 [Zone Name],A2 [SCHEDULE Name],N1 [Design level KW],
@@ -419,11 +377,6 @@ namespace HeatBalanceAirManager {
 		//     A3 [Source Zone Name], N2 [Delta Temperature delta C];
 
 		// Using/Aliasing
-
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleValuesForDay;
 		using ScheduleManager::CheckScheduleValueMinMax;
@@ -431,11 +384,8 @@ namespace HeatBalanceAirManager {
 		using ScheduleManager::GetScheduleName;
 		using General::RoundSigDigits;
 		using General::CheckCreatedZoneItemName;
-		//  USE DataIPShortCuts
 		using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 		using DataGlobals::NumOfZones;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
@@ -447,11 +397,6 @@ namespace HeatBalanceAirManager {
 		Real64 const RefDoorNone( 0.0 );
 		Real64 const RefDoorAirCurtain( 0.5 );
 		Real64 const RefDoorStripCurtain( 0.9 );
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array2D< Real64 > SVals1;
@@ -2810,13 +2755,7 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		//     Use input processer to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Zone;
@@ -2836,18 +2775,9 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
 		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
 		static gio::Fmt RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // States which alpha value to read from a
