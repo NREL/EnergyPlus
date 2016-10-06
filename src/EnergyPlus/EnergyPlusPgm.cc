@@ -236,7 +236,6 @@ EnergyPlusPgm( std::string const & filepath )
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
-	using json = nlohmann::json;
 
 	// PROGRAM INFORMATION:
 	//       AUTHOR         Linda K. Lawrie, et al

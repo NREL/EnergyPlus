@@ -33,8 +33,6 @@ using namespace EnergyPlus::WindowManager;
 TEST_F(EnergyPlusFixture, WindowFrameTest )
 {
 
-	bool ErrorsFound( false );
-
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",
 		"Material,",

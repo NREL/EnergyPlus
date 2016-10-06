@@ -216,7 +216,7 @@
 #include <algorithm>
 #include <EnergyPlus/DisplayRoutines.hh>
 
-json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth, json::parse_event_t event, json &parsed,
+json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
 									   unsigned line_num, unsigned line_index) -> bool {
 	EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
 	return true;
@@ -533,7 +533,7 @@ namespace EnergyPlus {
 	}
 
 
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
 		InputProcessor::jdf = InputProcessor::idf_parser.decode(idf_snippet, InputProcessor::schema);
 
 		if (InputProcessor::jdf.find("Building") == InputProcessor::jdf.end()) {
@@ -623,13 +623,13 @@ namespace EnergyPlus {
 	}
 
 	bool EnergyPlusFixture::compare_idf(
-		std::string const & name,
-		int const num_alphas,
-		int const num_numbers,
-		std::vector< std::string > const & alphas,
-		std::vector< bool > const & alphas_blank,
-		std::vector< Real64 > const & numbers,
-		std::vector< bool > const & numbers_blank
+		std::string const & EP_UNUSED( name ),
+		int const EP_UNUSED( num_alphas ),
+		int const EP_UNUSED( num_numbers ),
+		std::vector< std::string > const & EP_UNUSED( alphas ),
+		std::vector< bool > const & EP_UNUSED( alphas_blank ),
+		std::vector< Real64 > const & EP_UNUSED( numbers ),
+		std::vector< bool > const & EP_UNUSED( numbers_blank )
 	)
 	{
 		// using namespace InputProcessor;

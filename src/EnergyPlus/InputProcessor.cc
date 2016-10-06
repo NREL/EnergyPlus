@@ -66,7 +66,7 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 		for ( auto obj_in = obj.value().begin(); obj_in != obj.value().end(); ++obj_in ) {
 			encoded += obj.key();
 			int skipped_fields = 0;
-			for ( int i = 0; i < legacy_idd.size(); i++ ) {
+			for ( size_t i = 0; i < legacy_idd.size(); i++ ) {
 				std::string entry = legacy_idd[ i ];
 				if ( obj_in.value().find( entry ) == obj_in.value().end() ) {
 					if ( entry == "name" ) encoded += end_of_field + obj_in.key();
@@ -91,10 +91,10 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 			}
 
 			auto & extensions = obj_in.value()[ "extensions" ];
-			for ( int extension_i = 0; extension_i < extensions.size(); extension_i++ ) {
+			for ( size_t extension_i = 0; extension_i < extensions.size(); extension_i++ ) {
 				auto & cur_extension_obj = extensions[ extension_i ];
 				auto & extensible = schema[ "properties" ][ obj.key() ][ "legacy_idd" ][ "extensibles" ];
-				for ( int i = 0; i < extensible.size(); i++ ) {
+				for ( size_t i = 0; i < extensible.size(); i++ ) {
 					std::string tmp = extensible[ i ];
 					if ( cur_extension_obj.find( tmp ) == cur_extension_obj.end() ) {
 						skipped_fields++;
@@ -176,7 +176,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	json extensible = json::object();
 	json array_of_extensions = json::array();
 	Token token;
-	int legacy_idd_index = 0, extensible_index = 0;
+	size_t legacy_idd_index = 0, extensible_index = 0;
 	success = true;
 	bool was_value_parsed = false;
 	auto const & legacy_idd_fields_array = legacy_idd[ "fields" ];
@@ -224,7 +224,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			was_value_parsed = false;
 			next_token( idf, index );
 			if ( token == Token::SEMICOLON ) {
-				int min_fields = 0;
+				size_t min_fields = 0;
 				if ( found_min_fields != schema_obj_loc.end() ) {
 					min_fields = found_min_fields.value();
 				}
@@ -708,11 +708,11 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 	}
 }
 
-void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
+void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line_index ) ) {
 	auto const * loc = stack.back();
 
 	if ( loc->find( "enum" ) != loc->end() ) {
-		int i;
+		size_t i;
 		auto const & enum_array = loc->at( "enum" );
 		auto const enum_array_size = enum_array.size();
 		if ( parsed.is_string() ) {
@@ -774,7 +774,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 	} else if ( parsed.is_string() ) {
 		auto const found_anyOf = loc->find( "anyOf" );
 		if ( found_anyOf != loc->end() ) {
-			int i;
+			size_t i;
 			for ( i = 0; i < found_anyOf->size(); i++ ) {
 				auto const & any_of_check = found_anyOf->at( i );
 				auto const found_type = any_of_check.find( "type" );
@@ -988,7 +988,7 @@ namespace EnergyPlus {
 
 		InputProcessor::state.initialize( & InputProcessor::schema );
 
-		json::parser_callback_t cb = []( int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
+		json::parser_callback_t cb = []( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
 			InputProcessor::state.traverse( event, parsed, line_num, line_index );
 			return true;
 		};
@@ -1019,7 +1019,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::GetNumSectionsFound( std::string const & SectionWord ) {
+	EnergyPlus::InputProcessor::GetNumSectionsFound( std::string const & EP_UNUSED( SectionWord ) ) {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This function returns the number of a particular section (in input data file)
 		// found in the current run.  If it can't find the section in list
@@ -1031,12 +1031,6 @@ namespace EnergyPlus {
 		auto const & SectionWord_iter = jdf.find( "SectionWord" );
 		if ( SectionWord_iter == jdf.end() ) return -1;
 		return static_cast <int> ( SectionWord_iter.value().size() );
-
-//		if ( jdf.find( "SectionWord" ) == jdf.end() ) return -1;
-//		int num_sections_found = 0;
-//		json obj = jdf[ "SectionWord" ];
-//		for ( auto it = obj.begin(); it != obj.end(); ++it ) num_sections_found++;
-//		return num_sections_found;
 	}
 
 
@@ -1141,7 +1135,7 @@ namespace EnergyPlus {
 		auto const & obj = jdf_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
-		for ( int i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
+		for ( size_t i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_alphas_fields[ i ];
 			if ( field == "name" && schema_name_field != jdd_it_val.end() ) {
 				auto const & name_iter = schema_name_field.value();
@@ -1207,7 +1201,7 @@ namespace EnergyPlus {
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
 
-				for ( auto i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
+				for ( size_t i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
 					std::string const & field_name = legacy_idd_alphas_extensions[ i ];
 					auto const & jdf_obj_field_iter = jdf_extension_obj.find( field_name );
 
@@ -1259,7 +1253,7 @@ namespace EnergyPlus {
 		}
 
 		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
-		for ( int i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
+		for ( size_t i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_numerics_fields[ i ];
 			auto it = obj.value().find( field );
 			if ( it != obj.value().end() ) {
@@ -1301,7 +1295,7 @@ namespace EnergyPlus {
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
 
-				for ( auto i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
+				for ( size_t i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
 					std::string const & field = legacy_idd_numerics_extensions[ i ];
                     auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
 
@@ -2365,10 +2359,6 @@ namespace EnergyPlus {
 		static std::string const EMSOutputVariable( "EnergyManagementSystem:OutputVariable" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CurrentRecord;
-		int Loop;
-		int Loop1;
-
 		OutputVariablesForSimulation.allocate( 10000 );
 		MaxConsideredOutputVariables = 10000;
 
@@ -2499,8 +2489,8 @@ namespace EnergyPlus {
 				for ( auto const & extensions : fields[ "extensions" ] ) {
 					auto const report_name = MakeUPPERCase( extensions.at( "report_name" ) );
 					if ( report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY" ) {
-						for ( Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1 ) {
-							InputProcessor::AddVariablesForMonthlyReport( MonthlyNamedReports( Loop1 ) );
+						for ( int i = 1; i <= NumMonthlyReports; ++i ) {
+							InputProcessor::AddVariablesForMonthlyReport( MonthlyNamedReports( i ) );
 						}
 					} else {
 						InputProcessor::AddVariablesForMonthlyReport( report_name );
