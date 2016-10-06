@@ -178,7 +178,7 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
 	json root;
 	Token token;
-    auto const & schema_properties = schema[ "properties" ];
+	auto const & schema_properties = schema[ "properties" ];
 
 	while ( true ) {
 		token = look_ahead( idf, index );
@@ -208,7 +208,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			u64toa( root[ obj_name ].size() + 1, s );
 			std::string name = obj_name + " " + s;
 			if ( !obj.is_null() ) {
-                auto const & name_iter = obj.find( "name" );
+				auto const & name_iter = obj.find( "name" );
 				if ( name_iter != obj.end() ) {
 					name = name_iter.value();
 					obj.erase( name_iter );
@@ -229,7 +229,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 }
 
 json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
-                              json const & legacy_idd, json const & schema_obj_loc ) {
+							  json const & legacy_idd, json const & schema_obj_loc ) {
 	json root = json::object();
 	json extensible = json::object();
 	json array_of_extensions = json::array();
@@ -238,20 +238,20 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	success = true;
 	bool was_value_parsed = false;
 	auto const & legacy_idd_fields_array = legacy_idd[ "fields" ];
-    auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
+	auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
 
 	auto const & schema_patternProperties = schema_obj_loc[ "patternProperties" ];
 	auto const & schema_dot_star = schema_patternProperties[ ".*" ];
 	auto const & schema_obj_props = schema_dot_star[ "properties" ];
 
 	json const * schema_obj_extensions = nullptr;
-    if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
+	if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
 		schema_obj_extensions = & schema_obj_props[ "extensions" ][ "items" ][ "properties" ];
 	}
 
 	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
 
-    index += 1;
+	index += 1;
 
 	while ( true ) {
 		token = look_ahead( idf, index );
@@ -265,13 +265,13 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				int ext_size = 0;
 				if ( legacy_idd_index < legacy_idd_fields_array.size() ) {
 					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-                    root[ field_name ] = "";
+					root[ field_name ] = "";
 				} else {
-                    auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
+					auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
 					ext_size = static_cast<int>( legacy_idd_extensibles_array.size() );
 					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
 					extensible_index++;
-                    extensible[ field_name ] = "";
+					extensible[ field_name ] = "";
 				}
 				if ( ext_size && extensible_index % ext_size == 0 ) {
 					array_of_extensions.push_back( extensible );
@@ -286,9 +286,9 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				if ( found_min_fields != schema_obj_loc.end() ) {
 					min_fields = found_min_fields.value();
 				}
-                for (; legacy_idd_index < min_fields; legacy_idd_index++) {
+				for (; legacy_idd_index < min_fields; legacy_idd_index++) {
 					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-                    root[ field_name ] = "";
+					root[ field_name ] = "";
 				}
 				if ( extensible.size() ) {
 					array_of_extensions.push_back( extensible );
@@ -385,7 +385,7 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 	}
 	json val;
 	if ( is_double ) {
-        try {
+		try {
 			auto const double_val = stod(num_str, nullptr );
 			val = double_val;
 		} catch ( std::exception e ) {
@@ -407,7 +407,7 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 
 json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
 	auto const & field_type = field_loc.find("type");
-    if ( field_type != field_loc.end() ) {
+	if ( field_type != field_loc.end() ) {
 		if ( field_type.value() == "number" || field_type.value() == "integer" ) {
 			return parse_number( idf, index, success );
 		} else {
@@ -530,10 +530,10 @@ void IdfParser::print_out_line_error( std::string const & idf, bool obj_found ) 
 	std::string line;
 	if ( obj_found ) EnergyPlus::ShowWarningError( "error: \"extra field(s)\" " );
 	else EnergyPlus::ShowWarningError( "error: \"obj not found in schema\" " );
-    EnergyPlus::ShowWarningError( "at line number " + std::to_string( cur_line_num )
+	EnergyPlus::ShowWarningError( "at line number " + std::to_string( cur_line_num )
 								  + " (index " + std::to_string(index_into_cur_line)  + ")\nLine:\n" );
 	while ( idf[ beginning_of_line_index++ ] != '\n' ) line += idf[ beginning_of_line_index ];
-    EnergyPlus::ShowWarningError( line );
+	EnergyPlus::ShowWarningError( line );
 }
 
 void IdfParser::eat_whitespace( std::string const & idf, size_t & index ) {
@@ -736,13 +736,13 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 			} else { // must be at the very end of an object now
 				const auto * loc = stack.back();
 				if ( loc->find( "minProperties" ) != loc->end() &&
-				     cur_obj_count < loc->at( "minProperties" ).get < unsigned >() ) {
+					 cur_obj_count < loc->at( "minProperties" ).get < unsigned >() ) {
 					u64toa( line_num, s );
 					errors.push_back(
 					"minProperties for object \"" + cur_obj_name + "\" at line " + s + " was not met" );
 				}
 				if ( loc->find( "maxProperties" ) != loc->end() &&
-				     cur_obj_count > loc->at( "maxProperties" ).get < unsigned >() ) {
+					 cur_obj_count > loc->at( "maxProperties" ).get < unsigned >() ) {
 					u64toa( line_num, s );
 					errors.push_back(
 					"maxProperties for object \"" + cur_obj_name + "\" at line " + s + " was exceeded" );
@@ -750,9 +750,9 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				obj_required.clear();
 				extensible_required.clear();
 				need_new_object_name = true;
-                stack.pop_back();
+				stack.pop_back();
 			}
-            stack.pop_back();
+			stack.pop_back();
 			last_seen_event = event;
 			break;
 		}
@@ -782,7 +782,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line
 			if ( i == enum_array_size ) {
 				u64toa( line_num, s );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-				                  + ": \"" + parsed_string + "\" was not found in the enum" );
+								  + ": \"" + parsed_string + "\" was not found in the enum" );
 			}
 		} else {
 			int const parsed_int = parsed.get < int >();
@@ -794,7 +794,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line
 				i64toa( parsed_int, s );
 				u64toa( line_num, s2 );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-				                  + ": \"" + s2 + "\" was not found in the enum" );
+								  + ": \"" + s2 + "\" was not found in the enum" );
 			}
 		}
 	} else if ( parsed.is_number() ) {
@@ -826,8 +826,8 @@ void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line
 			dtoa( val, s );
 			u64toa( line_num, s2 );
 			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-			                    + ", type == " + loc->at( "type" ).get < std::string >()
-			                    + " but parsed value = " + s2 );
+								+ ", type == " + loc->at( "type" ).get < std::string >()
+								+ " but parsed value = " + s2 );
 		}
 	} else if ( parsed.is_string() ) {
 		auto const found_anyOf = loc->find( "anyOf" );
@@ -841,7 +841,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line
 			if ( i == found_anyOf->size() ) {
 				u64toa( line_num, s );
 				warnings.push_back( "type == string was not found in anyOf in object \"" + cur_obj_name
-				                    + "\" at line " + s );
+									+ "\" at line " + s );
 			}
 			return;
 		}
@@ -996,7 +996,7 @@ namespace EnergyPlus {
 	InputProcessor::ProcessInput() {
 		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {
-            ShowFatalError( "JDD file path " + inputJddFileName + " not found" );
+			ShowFatalError( "JDD file path " + inputJddFileName + " not found" );
 			return;
 		}
 		InputProcessor::schema = json::parse(jdd_stream);
@@ -1115,7 +1115,7 @@ namespace EnergyPlus {
 		if ( find_obj == jdf.end() ) {
 			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
 			if ( tmp_umit == case_insensitive_object_map.end()
-			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
+				 || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
 			return static_cast< int >( jdf[ tmp_umit->second ].size() );
@@ -1159,7 +1159,7 @@ namespace EnergyPlus {
 		if ( find_iterators == jdd_jdf_cache_map.end() ) {
 			auto const tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( Object ) );
 			if ( tmp_umit == case_insensitive_object_map.end()
-			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
+				 || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
 			find_iterators = jdd_jdf_cache_map.find( tmp_umit->second );
@@ -1168,7 +1168,7 @@ namespace EnergyPlus {
 		NumAlphas = 0;
 		NumNumbers = 0;
 		Status = -1;
-        auto const & is_AlphaBlank = present(AlphaBlank);
+		auto const & is_AlphaBlank = present(AlphaBlank);
 		auto const & is_AlphaFieldNames = present(AlphaFieldNames);
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
@@ -1177,7 +1177,7 @@ namespace EnergyPlus {
 		auto const & jdd_it = find_iterators->second.first;
 		auto const & jdd_it_val = jdd_it.value();
 
-        // Locations in JSON schema relating to normal fields
+		// Locations in JSON schema relating to normal fields
 		auto const & schema_obj_props = jdd_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
 
 		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
@@ -1197,7 +1197,7 @@ namespace EnergyPlus {
 			std::string const & field = legacy_idd_alphas_fields[ i ];
 			if ( field == "name" && schema_name_field != jdd_it_val.end() ) {
 				auto const & name_iter = schema_name_field.value();
-                if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
+				if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
 				} else {
 					Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
@@ -1214,7 +1214,7 @@ namespace EnergyPlus {
 					auto const & schema_field_obj = schema_obj_props[ field ];
 					auto const & find_default = schema_field_obj.find( "default" );
 					if ( it.value().get < std::string >().empty() &&
-					     find_default != schema_field_obj.end() ) {
+						 find_default != schema_field_obj.end() ) {
 						auto const & default_val = find_default.value();
 						if ( default_val.is_string() ) {
 							val = default_val.get < std::string >();
@@ -1227,13 +1227,13 @@ namespace EnergyPlus {
 						val = it.value().get < std::string >();
 						if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = val.empty();
 					}
-                    if ( schema_field_obj.find("retaincase") != schema_field_obj.end() ) {
-                        Alphas( i + 1 ) = val;
-                    } else {
+					if ( schema_field_obj.find("retaincase") != schema_field_obj.end() ) {
+						Alphas( i + 1 ) = val;
+					} else {
 						Alphas( i + 1 ) = MakeUPPERCase( val );
 					}
 				} else {
-                    if ( it.value().is_number_integer() ) {
+					if ( it.value().is_number_integer() ) {
 						i64toa( it.value().get < int >(), s );
 					} else {
 						dtoa( it.value().get < double >(), s );
@@ -1268,7 +1268,7 @@ namespace EnergyPlus {
 						if ( jdf_field_val.is_string() ) {
 							auto const & schema_field = schema_extension_fields[ field_name ];
 							std::string val = jdf_field_val;
-                            auto const & tmp_find_default_iter = schema_field.find( "default" );
+							auto const & tmp_find_default_iter = schema_field.find( "default" );
 							if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
 								auto const & field_default_val = tmp_find_default_iter.value();
 								if ( field_default_val.is_string() ) {
@@ -1321,7 +1321,7 @@ namespace EnergyPlus {
 				} else {
 					if ( it.value().get < std::string >().empty() ) {
 						auto const & schema_obj = schema_obj_props[ field ];
-                        auto const & schema_default_iter = schema_obj.find( "default" );
+						auto const & schema_default_iter = schema_obj.find( "default" );
 						if ( schema_default_iter != schema_obj.end() ) {
 							auto const & schema_default_val = schema_default_iter.value();
 							if ( schema_default_val.is_string() ) Numbers( i + 1 ) = -99999;
@@ -1355,7 +1355,7 @@ namespace EnergyPlus {
 
 				for ( size_t i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
 					std::string const & field = legacy_idd_numerics_extensions[ i ];
-                    auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
+					auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
 
 					if ( jdf_extension_field_iter != jdf_extension_obj.end() ) {
 						auto const & val = jdf_extension_field_iter.value();
@@ -1734,7 +1734,7 @@ namespace EnergyPlus {
 		for ( std::string::size_type i = 0, e = len( InputString ); i < e; ++i ) {
 			int const curCharVal = int( InputString[ i ] );
 			if ( ( 97 <= curCharVal && curCharVal <= 122 ) ||
-			     ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
+				 ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
 				ResultString[ i ] = char( curCharVal - 32 );
 			}
 		}
@@ -1978,7 +1978,7 @@ namespace EnergyPlus {
 
 			size_t max_size = 0;
 			for ( auto const & obj : object.value() ) {
-                auto const & find_extensions = obj.find( "extensions" );
+				auto const & find_extensions = obj.find( "extensions" );
 				if ( find_extensions != obj.end() ) {
 					auto const size = find_extensions.value().size();
 					if ( size > max_size ) max_size = size;
@@ -2267,8 +2267,8 @@ namespace EnergyPlus {
 			cAlphaArgs( { 1, NumAlphas } ) = BlankString;
 			for ( CountP = 1; CountP <= NumPrePM; ++CountP ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs,
-				                               NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-				                               cAlphaFieldNames, cNumericFieldNames );
+											   NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
+											   cAlphaFieldNames, cNumericFieldNames );
 				if ( cAlphaArgs( 1 ).empty() ) cAlphaArgs( 1 ) = "Unknown";
 				if ( NumAlphas > 3 ) {
 					Multiples = "s";
@@ -2280,10 +2280,10 @@ namespace EnergyPlus {
 					auto const errorType( uppercased( cAlphaArgs( 2 ) ) );
 					if ( errorType == "INFORMATION" ) {
 						ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
-						             "\" has the following Information message" + Multiples + ':' );
+									 "\" has the following Information message" + Multiples + ':' );
 					} else if ( errorType == "WARNING" ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
-						                  "\" has the following Warning condition" + Multiples + ':' );
+										  "\" has the following Warning condition" + Multiples + ':' );
 					} else if ( errorType == "SEVERE" ) {
 						ShowSevereError(
 						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
@@ -2305,7 +2305,7 @@ namespace EnergyPlus {
 				CountM = 3;
 				if ( CountM > NumAlphas ) {
 					ShowContinueError( cCurrentModuleObject + " was blank.  Check " + cAlphaArgs( 1 ) +
-					                   " audit trail or error file for possible reasons." );
+									   " audit trail or error file for possible reasons." );
 				}
 				while ( CountM <= NumAlphas ) {
 					if ( len( cAlphaArgs( CountM ) ) == MaxNameLength ) {
@@ -2428,7 +2428,7 @@ namespace EnergyPlus {
 				json const & fields = obj.value();
 				if ( !fields.at( "key_value" ).empty() ) {
 					InputProcessor::AddRecordToOutputVariableStructure( fields.at( "key_value" ),
-					                                                    fields.at( "variable_name" ) );
+																		fields.at( "variable_name" ) );
 				} else {
 					InputProcessor::AddRecordToOutputVariableStructure( "*", fields.at( "variable_name" ) );
 				}
@@ -2445,8 +2445,8 @@ namespace EnergyPlus {
 				for ( auto const & extensions : fields[ "extensions" ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
-						                                                    extensions.at(
-						                                                    "output_variable_or_meter_name" ) );
+																			extensions.at(
+																			"output_variable_or_meter_name" ) );
 					} else {
 						InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
 						"output_variable_or_meter_name" ) );
@@ -2465,8 +2465,8 @@ namespace EnergyPlus {
 				for ( auto const & extensions : fields[ "extensions" ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
-						                                                    extensions.at(
-						                                                    "output_variable_or_meter_name" ) );
+																			extensions.at(
+																			"output_variable_or_meter_name" ) );
 					} else {
 						InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
 						"output_variable_or_meter_name" ) );
@@ -2522,7 +2522,7 @@ namespace EnergyPlus {
 				//TODO: Might be incorrect
 				for ( auto const & extensions : fields[ "extensions" ] ) {
 					InputProcessor::AddRecordToOutputVariableStructure( "*",
-					                                                    extensions.at( "variable_or_meter_name" ) );
+																		extensions.at( "variable_or_meter_name" ) );
 				}
 			}
 		}
@@ -2636,12 +2636,12 @@ namespace EnergyPlus {
 
 		} else if ( reportName == "COMFORTREPORTSIMPLE55MONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MEAN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
 
 		} else if ( reportName == "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY" );
@@ -2716,26 +2716,26 @@ namespace EnergyPlus {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
 
 		} else if ( reportName == "WINDOWENERGYZONESUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 
 		} else if ( reportName == "AVERAGEOUTDOORCONDITIONSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
@@ -2832,15 +2832,15 @@ namespace EnergyPlus {
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 
 		} else if ( reportName == "COILREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "HEATING COIL HEATING ENERGY" );
@@ -2914,12 +2914,12 @@ namespace EnergyPlus {
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
+												"ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" );
+												"ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR" );
 
