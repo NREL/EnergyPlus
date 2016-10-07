@@ -455,13 +455,7 @@ namespace FanCoilUnits {
 			FanCoilNumericFields( FanCoilNum ).FieldNames = "";
 			FanCoilNumericFields( FanCoilNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), FanCoil, FanCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+            // unique_string_blank_key
 			FanCoil( FanCoilNum ).Name = Alphas( 1 );
 			FanCoil( FanCoilNum ).UnitType = CurrentModuleObject;
 			FanCoil( FanCoilNum ).UnitType_Num = FanCoilUnit_4Pipe;

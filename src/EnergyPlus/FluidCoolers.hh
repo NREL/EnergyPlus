@@ -379,6 +379,9 @@ namespace FluidCoolers {
 		int const FluidCoolerNum
 	);
 
+	void
+	clear_state();
+
 } // FluidCoolers
 
 } // EnergyPlus
