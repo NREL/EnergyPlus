@@ -81,8 +81,7 @@
 #include <milo/itoa.hpp>
 #include <iomanip>
 
-using json = nlohmann::json;
-
+// initialization of class static variables
 json EnergyPlus::InputProcessor::jdf = json();
 json EnergyPlus::InputProcessor::schema = json();
 IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
@@ -96,6 +95,19 @@ std::unordered_map < std::string, std::string >
 std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > >
 		EnergyPlus::InputProcessor::jdd_jdf_cache_map =
 		std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > ();
+
+bool icompare( std::string const & s1, std::string const & s2 ) {
+	if ( s1.length() == s2.length() ) {
+		return std::equal(
+			s2.begin(),
+			s2.end(),
+			s1.begin(),
+			[ ]( unsigned char c1, unsigned char c2 ) { return ::tolower( c1 ) == ::tolower( c2 );}
+		);
+	}
+	return false;
+}
+
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
@@ -191,10 +203,10 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			eat_comment( idf, index );
 		} else {
 			std::string obj_name = parse_string( idf, index, success );
-			for ( char & c : obj_name ) c = ( char ) toupper( c );
-			auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( obj_name );
-			if ( tmp_umit != EnergyPlus::InputProcessor::case_insensitive_object_map.end() ) {
-				obj_name = tmp_umit->second;
+
+			auto const converted = EnergyPlus::InputProcessor::ConvertInsensitiveObjectType( obj_name );
+			if ( converted.first ) {
+				obj_name = converted.second;
 			} else {
 				print_out_line_error( idf, false );
 				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
@@ -213,10 +225,10 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 					name = name_iter.value();
 					obj.erase( name_iter );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
+						// hacky but needed to warn if there are duplicate names in parsed IDF
 						if ( obj_name != "RunPeriod" ) {
-							EnergyPlus::ShowWarningMessage("Duplicate names!! name: " + name);
+							EnergyPlus::ShowWarningMessage("Duplicate name found. name: \"" + name + "\"");
 						}
-						// name = name + " " + s;
 					}
 				}
 			}
@@ -616,6 +628,36 @@ void State::initialize( json const * parsed_schema ) {
 	for ( auto & s : loc ) root_required.emplace( s.get < std::string >(), false );
 }
 
+void State::add_error( ErrorType err, double val, unsigned line_num, unsigned line_index ) {
+	std::string str = "Value \"" + std::to_string( val ) + "\" parsed at line " + std::to_string( line_num )
+					  + " (index " + std::to_string( line_index ) + ")";
+	if ( err == ErrorType::Maximum ) {
+		errors.push_back( str + " exceeds maximum" );
+	} else if ( err == ErrorType::ExclusiveMaximum ) {
+		errors.push_back( str + " exceeds or equals exclusive maximum" );
+	} else if ( err == ErrorType::Minimum ) {
+		errors.push_back( str + " is less than the minimum" );
+	} else if ( err == ErrorType::ExclusiveMinimum ) {
+		errors.push_back( str + " is less than or equal to the exclusive minimum" );
+	}
+}
+
+int State::print_errors() {
+	if ( warnings.size() ) EnergyPlus::ShowWarningError("Number of validation warnings: " + std::to_string(errors.size()));
+	for ( auto const & s: warnings ) EnergyPlus::ShowContinueError( s );
+	if ( errors.size() ) EnergyPlus::ShowSevereError("Number of validation errors: " + std::to_string(errors.size()));
+	for ( auto const & s : errors ) EnergyPlus::ShowContinueError( s );
+	return static_cast<int> ( errors.size() + warnings.size() );
+}
+
+std::vector < std::string > const & State::validation_errors() {
+	return errors;
+}
+
+std::vector < std::string > const & State::validation_warnings() {
+	return warnings;
+}
+
 void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index ) {
 	switch ( event ) {
 		case json::parse_event_t::object_start: {
@@ -807,18 +849,18 @@ void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line
 		if ( found_min != loc->end() ) {
 			double const min_val = found_min->get < double >();
 			if ( loc->find( "exclusiveMinimum" ) != loc->end() && val <= min_val ) {
-				add_error( "exmin", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::ExclusiveMinimum, val, line_num, prev_line_index + prev_key_len );
 			} else if ( val < min_val ) {
-				add_error( "min", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::Minimum, val, line_num, prev_line_index + prev_key_len );
 			}
 		}
 		auto const found_max = loc->find( "maximum" );
 		if ( found_max != loc->end() ) {
 			double const max_val = found_max->get < double >();
 			if ( loc->find( "exclusiveMaximum" ) != loc->end() && val >= max_val ) {
-				add_error( "exmax", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::ExclusiveMaximum, val, line_num, prev_line_index + prev_key_len );
 			} else if ( val > max_val ) {
-				add_error( "max", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::Maximum, val, line_num, prev_line_index + prev_key_len );
 			}
 		}
 		auto const found_type = loc->find( "type" );
@@ -912,12 +954,29 @@ namespace EnergyPlus {
 // Needed for unit tests, should not be normally called.
 	void
 	InputProcessor::clear_state() {
-		state.errors.clear();
-		state.warnings.clear();
+		state = State();
+		idf_parser = IdfParser();
 		jdf.clear();
 		jdd_jdf_cache_map.clear();
 		EchoInputFile = 0;
 		echo_stream = nullptr;
+	}
+
+	std::vector < std::string > const & InputProcessor::validation_errors() {
+		return state.validation_errors();
+	}
+
+	std::vector < std::string > const & InputProcessor::validation_warnings() {
+		return state.validation_warnings();
+	}
+
+	std::pair< bool, std::string >
+	InputProcessor::ConvertInsensitiveObjectType( std::string const & objectType ) {
+		auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( MakeUPPERCase( objectType ) );
+		if ( tmp_umit != EnergyPlus::InputProcessor::case_insensitive_object_map.end() ) {
+			return std::make_pair( true, tmp_umit->second );
+		}
+		return std::make_pair( false, "" );
 	}
 
 	void
@@ -1077,7 +1136,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::GetNumSectionsFound( std::string const & EP_UNUSED( SectionWord ) ) {
+	InputProcessor::GetNumSectionsFound( std::string const & EP_UNUSED( SectionWord ) ) {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This function returns the number of a particular section (in input data file)
 		// found in the current run.  If it can't find the section in list
@@ -1093,7 +1152,7 @@ namespace EnergyPlus {
 
 
 	int
-	EnergyPlus::InputProcessor::GetNumObjectsFound( std::string const & ObjectWord ) {
+	InputProcessor::GetNumObjectsFound( std::string const & ObjectWord ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -1133,7 +1192,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::GetObjectItem(
+	InputProcessor::GetObjectItem(
 		std::string const & Object,
 		int const Number,
 		Array1S_string Alphas,
@@ -1419,7 +1478,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::GetObjectItemNum(
+	InputProcessor::GetObjectItemNum(
 	std::string const & ObjType, // Object Type (ref: IDD Objects)
 	std::string const & ObjName // Name of the object type
 	) {
@@ -1457,7 +1516,7 @@ namespace EnergyPlus {
 
 
 	int
-	EnergyPlus::InputProcessor::GetObjectItemNum(
+	InputProcessor::GetObjectItemNum(
 			std::string const & ObjType, // Object Type (ref: IDD Objects)
 			std::string const & NameTypeVal, // Object "name" field type ( used as search key )
 			std::string const & ObjName // Name of the object type
@@ -1500,7 +1559,7 @@ namespace EnergyPlus {
 	}
 
 	Real64
-	EnergyPlus::InputProcessor::ProcessNumber(
+	InputProcessor::ProcessNumber(
 		std::string const & String,
 		bool & ErrorFlag
 	) {
@@ -1558,7 +1617,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItemInList(
+	InputProcessor::FindItemInList(
 		std::string const & String,
 		Array1_string const & ListOfItems,
 		int const NumItems
@@ -1586,7 +1645,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItemInList(
+	InputProcessor::FindItemInList(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
@@ -1614,7 +1673,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItemInSortedList(
+	InputProcessor::FindItemInSortedList(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
@@ -1654,7 +1713,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItem(
+	InputProcessor::FindItem(
 		std::string const & String,
 		Array1D_string const & ListOfItems,
 		int const NumItems
@@ -1683,7 +1742,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItem(
+	InputProcessor::FindItem(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
@@ -1712,7 +1771,7 @@ namespace EnergyPlus {
 	}
 
 	std::string
-	EnergyPlus::InputProcessor::MakeUPPERCase( std::string const & InputString ) {
+	InputProcessor::MakeUPPERCase( std::string const & InputString ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -1744,7 +1803,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::VerifyName(
+	InputProcessor::VerifyName(
 		std::string const & NameToVerify,
 		Array1D_string const & NamesList,
 		int const NumOfNames,
@@ -1787,7 +1846,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::VerifyName(
+	InputProcessor::VerifyName(
 		std::string const & NameToVerify,
 		Array1S_string const NamesList,
 		int const NumOfNames,
@@ -1830,7 +1889,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::RangeCheck(
+	InputProcessor::RangeCheck(
 		bool & ErrorsFound, // Set to true if error detected
 		std::string const & WhatFieldString, // Descriptive field for string
 		std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
@@ -1909,7 +1968,7 @@ namespace EnergyPlus {
 	}
 
 //void
-//EnergyPlus::InputProcessor::TurnOnReportRangeCheckErrors()
+//InputProcessor::TurnOnReportRangeCheckErrors()
 //{
 //
 //	// SUBROUTINE INFORMATION:
@@ -1926,7 +1985,7 @@ namespace EnergyPlus {
 //}
 
 //void
-//EnergyPlus::InputProcessor::TurnOffReportRangeCheckErrors()
+//InputProcessor::TurnOffReportRangeCheckErrors()
 //{
 //
 //	// SUBROUTINE INFORMATION:
@@ -1944,7 +2003,7 @@ namespace EnergyPlus {
 //}
 
 	int
-	EnergyPlus::InputProcessor::GetNumRangeCheckErrorsFound() {
+	InputProcessor::GetNumRangeCheckErrorsFound() {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -2013,7 +2072,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::GetObjectDefMaxArgs(
+	InputProcessor::GetObjectDefMaxArgs(
 		std::string const & ObjectWord, // Object for definition
 		int & NumArgs, // How many arguments (max) this Object can have
 		int & NumAlpha, // How many Alpha arguments (max) this Object can have
@@ -2084,7 +2143,7 @@ namespace EnergyPlus {
 	}
 
 // void
-// EnergyPlus::InputProcessor::ReportOrphanRecordObjects()
+// InputProcessor::ReportOrphanRecordObjects()
 // {
 
 // 	// SUBROUTINE INFORMATION:
@@ -2210,7 +2269,7 @@ namespace EnergyPlus {
 // }
 
 	void
-	EnergyPlus::InputProcessor::PreProcessorCheck( bool & PreP_Fatal ) // True if a preprocessor flags a fatal error
+	InputProcessor::PreProcessorCheck( bool & PreP_Fatal ) // True if a preprocessor flags a fatal error
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2322,7 +2381,7 @@ namespace EnergyPlus {
 	}
 
 	// void
-	// EnergyPlus::InputProcessor::CompactObjectsCheck()
+	// InputProcessor::CompactObjectsCheck()
 	// {
 
 	// // SUBROUTINE INFORMATION:
@@ -2354,7 +2413,7 @@ namespace EnergyPlus {
 	// }
 
 	// void
-	// EnergyPlus::InputProcessor::ParametricObjectsCheck()
+	// InputProcessor::ParametricObjectsCheck()
 	// {
 
 	// // SUBROUTINE INFORMATION:

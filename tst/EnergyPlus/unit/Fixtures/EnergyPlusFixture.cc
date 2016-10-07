@@ -116,6 +116,7 @@
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
@@ -214,7 +215,6 @@
 
 #include <fstream>
 #include <algorithm>
-#include <EnergyPlus/DisplayRoutines.hh>
 
 json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
 									   unsigned line_num, unsigned line_index) -> bool {
@@ -265,6 +265,8 @@ namespace EnergyPlus {
 		UtilityRoutines::outputErrorHeader = false;
 
 		Psychrometrics::InitializePsychRoutines();
+
+		InputProcessor::state.initialize( & InputProcessor::schema );
 	}
 
 	void EnergyPlusFixture::TearDown() {

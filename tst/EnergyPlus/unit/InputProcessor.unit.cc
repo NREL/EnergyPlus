@@ -118,7 +118,7 @@ namespace EnergyPlus {
 											""
 										  });
 		ASSERT_TRUE(process_idf(idf));
-		std::string encoded = InputProcessor::idf_parser.encode(InputProcessor::jdf, InputProcessor::schema);
+		std::string encoded = encodeIDF();
 		EXPECT_EQ(idf, encoded);
 	}
 
@@ -178,7 +178,7 @@ namespace EnergyPlus {
 											 }));
 
 		ASSERT_TRUE(process_idf(idf));
-		std::string encoded = InputProcessor::idf_parser.encode(InputProcessor::jdf, InputProcessor::schema);
+		std::string encoded = encodeIDF();
 		EXPECT_EQ(expected, encoded);
 	}
 
@@ -216,13 +216,14 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf(idf) );
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
@@ -302,19 +303,20 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE(process_idf(idf));
-
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
 		}
-		EXPECT_EQ(InputProcessor::state.errors.size(), 0ul);
+		auto const & errors = validation_errors();
+		EXPECT_EQ(errors.size(), 0ul);
 	}
 
 
@@ -355,28 +357,29 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions", {
-														{
-															{"vertex_x_coordinate", ""},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", ""},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", ""},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", ""}
-														}
-												}
+									{"extensions",
+										{
+											{
+												{"vertex_x_coordinate", ""},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", ""},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", ""},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", ""}
+											}
+										}
 									}
 								}
 							}
@@ -417,19 +420,20 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -477,28 +481,29 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions", {
-														{
-															{"vertex_x_coordinate", 10},
-															{"vertex_y_coordinate", 0.0},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", 0.0},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 10},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														}
-												}
+									{"extensions",
+										{
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											}
+										}
 									}
 								}
 							}
@@ -507,19 +512,20 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -527,8 +533,10 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		json::parse(InputProcessor::jdf.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 0ul);
+		json::parse(jdf.dump(2), EnergyPlusFixture::call_back);
+		auto const & errors = validation_errors();
+		auto const & warnings = validation_warnings();
+		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
 		EXPECT_TRUE(success);
 	}
 
@@ -585,28 +593,29 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions", {
-														{
-															{"vertex_x_coordinate", 10},
-															{"vertex_y_coordinate", 0.0},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", 0.0},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 10},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														}
-												}
+									{"extensions",
+										{
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											}
+										}
 									}
 								}
 							},
@@ -621,28 +630,29 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions", {
-														{
-															{"vertex_x_coordinate", 10},
-															{"vertex_y_coordinate", 0.0},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", 0.0},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 0.0},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														},
-														{
-															{"vertex_x_coordinate", 10},
-															{"vertex_y_coordinate", 10},
-															{"vertex_z_coordinate", 0}
-														}
-												}
+									{"extensions",
+									{
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											}
+										}
 									}
 								}
 							}
@@ -683,19 +693,20 @@ namespace EnergyPlus {
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -704,8 +715,10 @@ namespace EnergyPlus {
 			}
 		}
 
-		json::parse(InputProcessor::jdf.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 0ul);
+		json::parse(jdf.dump(2), EnergyPlusFixture::call_back);
+		auto const & errors = validation_errors();
+		auto const & warnings = validation_warnings();
+		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
 	}
 
 
@@ -756,7 +769,9 @@ namespace EnergyPlus {
 				}));
 
 		ASSERT_TRUE( process_idf( idf ) );
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 0ul);
+		auto const & errors = validation_errors();
+		auto const & warnings = validation_warnings();
+		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
 	}
 
 
@@ -798,14 +813,14 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
-
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
@@ -869,14 +884,14 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
-
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 				}
 			}
@@ -919,28 +934,29 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions", {
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 0.0},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 0.0},
-													{"vertex_y_coordinate", 0.0},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 0.0},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												}
-										}
+							{"extensions",
+							{
+								{
+									{"vertex_x_coordinate", 10},
+									{"vertex_y_coordinate", 0.0},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 0.0},
+									{"vertex_y_coordinate", 0.0},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 0.0},
+									{"vertex_y_coordinate", 10},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 10},
+									{"vertex_y_coordinate", 10},
+									{"vertex_z_coordinate", 0}
+								}
+								}
 							}
 						}
 					}
@@ -949,19 +965,20 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -1023,28 +1040,29 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions", {
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 0.0},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 0.0},
-													{"vertex_y_coordinate", 0.0},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 0.0},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												}
-										}
+							{"extensions",
+								{
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
 							}
 						}
 					},
@@ -1059,28 +1077,29 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions", {
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 0.0},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 0.0},
-													{"vertex_y_coordinate", 0.0},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 0.0},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												}
-										}
+							{"extensions",
+								{
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
 							}
 						}
 					}
@@ -1089,19 +1108,20 @@ namespace EnergyPlus {
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
+		json & jdf = getJDF();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
-			ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()]);
+			ASSERT_NO_THROW(tmp = jdf[it.key()]);
 			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
-				ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()]);
+				ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()]);
 				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
-					ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()]);
+					ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()]);
 					if (!tmp.is_array()) {
 						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
 					} else {
 						for (size_t i = 0; i < it_in_in.value().size(); i++) {
 							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
-								ASSERT_NO_THROW(tmp = InputProcessor::jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								ASSERT_NO_THROW(tmp = jdf[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
 								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
 							}
 						}
@@ -1134,11 +1154,14 @@ namespace EnergyPlus {
 					";                        !- Constant Cooling Setpoint {C}"
 				}));
 		ASSERT_TRUE( process_idf( idf ) );
-		json::parse(InputProcessor::jdf.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size() + InputProcessor::state.warnings.size(), 2ul);
-		if (InputProcessor::state.errors.size() >= 2) {
-			EXPECT_NE(InputProcessor::state.errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("You must run Parametric Preprocessor for \"Parametric:Logic\" at line"), std::string::npos);
+		json & jdf = getJDF();
+		json::parse(jdf.dump(2), EnergyPlusFixture::call_back);
+		auto const & errors = validation_errors();
+		auto const & warnings = validation_warnings();
+		EXPECT_EQ(errors.size() + warnings.size(), 2ul);
+		if (errors.size() >= 2) {
+			EXPECT_NE(errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("You must run Parametric Preprocessor for \"Parametric:Logic\" at line"), std::string::npos);
 		}
 	}
 
@@ -1159,13 +1182,14 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"non_existent_field_2", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions", {
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												}
-										}
+							{"extensions",
+								{
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
 							}
 						}
 					}
@@ -1207,13 +1231,15 @@ namespace EnergyPlus {
 		};
 
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size(), 2ul);
-		EXPECT_EQ(InputProcessor::state.warnings.size(), 0ul);
-		if (InputProcessor::state.errors.size() >= 2) {
-			EXPECT_NE(InputProcessor::state.errors[0].find("Key \"non_existent_field_1\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("Key \"non_existent_field_2\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
-//            EXPECT_NE(InputProcessor::state.errors[2].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
-//            EXPECT_NE(InputProcessor::state.errors[3].find("Required object \"Building\" was not provided"), std::string::npos);
+		auto const & errors = validation_errors();
+		auto const & warnings = validation_warnings();
+		EXPECT_EQ(errors.size(), 2ul);
+		EXPECT_EQ(warnings.size(), 0ul);
+		if (errors.size() >= 2) {
+			EXPECT_NE(errors[0].find("Key \"non_existent_field_1\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("Key \"non_existent_field_2\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+//            EXPECT_NE(errors[2].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
+//            EXPECT_NE(errors[3].find("Required object \"Building\" was not provided"), std::string::npos);
 		}
 	}
 
@@ -1233,16 +1259,17 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions", {
-												{
-													{"vertex_z_coordinate", 0}
-												},
-												{
-													{"vertex_x_coordinate", 10},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												}
-										}
+							{"extensions",
+								{
+									{
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
 							}
 						}
 					}
@@ -1283,16 +1310,18 @@ namespace EnergyPlus {
 		};
 
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size(), 4ul);
-		EXPECT_EQ(InputProcessor::state.warnings.size(), 0ul);
-		if (InputProcessor::state.errors.size() >= 4) {
-			EXPECT_NE(InputProcessor::state.errors[0].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[2].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[2].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[3].find("Required field \"construction_name\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
-//            EXPECT_NE(InputProcessor::state.errors[4].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
-//            EXPECT_NE(InputProcessor::state.errors[5].find("Required object \"Building\" was not provided"), std::string::npos);
+		auto const & errors = validation_errors();
+		auto const & warnings = validation_warnings();
+		EXPECT_EQ(errors.size(), 4ul);
+		EXPECT_EQ(warnings.size(), 0ul);
+		if (errors.size() >= 4) {
+			EXPECT_NE(errors[0].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
+			EXPECT_NE(errors[3].find("Required field \"construction_name\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+//            EXPECT_NE(errors[4].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
+//            EXPECT_NE(errors[5].find("Required object \"Building\" was not provided"), std::string::npos);
 		}
 	}
 
@@ -1313,13 +1342,14 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", -987.654321},
 							{"number_of_vertices", -98765.4321},
-							{"extensions", {
-												{
-													{"vertex_x_coordinate", "definitely not a number"},
-													{"vertex_y_coordinate", 10},
-													{"vertex_z_coordinate", 0}
-												}
-										}
+							{"extensions",
+								{
+									{
+										{"vertex_x_coordinate", "definitely not a number"},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
 							}
 						}
 					}
@@ -1358,50 +1388,52 @@ namespace EnergyPlus {
 			},
 		};
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
-		EXPECT_EQ(InputProcessor::state.errors.size(), 5ul);
-		EXPECT_EQ(InputProcessor::state.warnings.size(), 0ul);
-		if (InputProcessor::state.errors.size() >= 5) {
-			EXPECT_NE(InputProcessor::state.errors[0].find("Value \"0.000000\" parsed at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[0].find("is less than or equal to the exclusive minimum"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("Value \"0.000000\" parsed at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[1].find("is less than or equal to the exclusive minimum"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[2].find("In object \"BuildingSurface:Detailed\", at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[2].find("type needs to be string"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[3].find("Value \"-98765.432100\" parsed at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[3].find("less than the minimum"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[4].find("Value \"-987.654321\" parsed at line"), std::string::npos);
-			EXPECT_NE(InputProcessor::state.errors[4].find("less than the minimum"), std::string::npos);
-//			EXPECT_NE(InputProcessor::state.errors[5].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
+		auto const & errors = validation_errors();
+		auto const & warnings = validation_warnings();
+		EXPECT_EQ(errors.size(), 5ul);
+		EXPECT_EQ(warnings.size(), 0ul);
+		if (errors.size() >= 5) {
+			EXPECT_NE(errors[0].find("Value \"0.000000\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[0].find("is less than or equal to the exclusive minimum"), std::string::npos);
+			EXPECT_NE(errors[1].find("Value \"0.000000\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("is less than or equal to the exclusive minimum"), std::string::npos);
+			EXPECT_NE(errors[2].find("In object \"BuildingSurface:Detailed\", at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("type needs to be string"), std::string::npos);
+			EXPECT_NE(errors[3].find("Value \"-98765.432100\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[3].find("less than the minimum"), std::string::npos);
+			EXPECT_NE(errors[4].find("Value \"-987.654321\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[4].find("less than the minimum"), std::string::npos);
+//			EXPECT_NE(errors[5].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
 		}
 	}
 
 
 	TEST_F( InputProcessorFixture, eat_whitespace ) {
 		size_t index = 0;
-		InputProcessor::idf_parser.eat_whitespace( "    test", index );
+		eat_whitespace( "    test", index );
 		EXPECT_EQ( 4ul, index );
 
 		index = 0;
-		InputProcessor::idf_parser.eat_whitespace( "t   test", index );
+		eat_whitespace( "t   test", index );
 		EXPECT_EQ( 0ul, index );
 	}
 
 
 	TEST_F( InputProcessorFixture, eat_comment ) {
 		size_t index = 0;
-		InputProcessor::idf_parser.eat_comment( "!- North Axis {deg}\n", index );
+		eat_comment( "!- North Axis {deg}\n", index );
 		EXPECT_EQ( 20ul, index );
 
 		index = 0;
-		InputProcessor::idf_parser.eat_comment( "                    !- Terrain\n", index );
+		eat_comment( "                    !- Terrain\n", index );
 		EXPECT_EQ( 31ul, index );
 
 		index = 0;
-		InputProcessor::idf_parser.eat_comment( "  !- Name\n    0.0000", index );
+		eat_comment( "  !- Name\n    0.0000", index );
 		EXPECT_EQ( 10ul, index );
 
 		index = 0;
-		InputProcessor::idf_parser.eat_comment( "  !- Name\n\r    0.0000", index );
+		eat_comment( "  !- Name\n\r    0.0000", index );
 		EXPECT_EQ( 10ul, index );
 	}
 
@@ -1411,35 +1443,35 @@ namespace EnergyPlus {
 		bool success = true;
 		std::string output_string;
 
-		output_string = InputProcessor::idf_parser.parse_string( "test_string", index, success );
+		output_string = parse_string( "test_string", index, success );
 		EXPECT_EQ( "test_string", output_string );
 		EXPECT_EQ( 11ul, index );
 		EXPECT_TRUE( success );
 
 		index = 0;
 		success = true;
-		output_string = InputProcessor::idf_parser.parse_string( "-1234.1234", index, success );
+		output_string = parse_string( "-1234.1234", index, success );
 		EXPECT_EQ( "-1234.1234", output_string );
 		EXPECT_EQ( 10ul, index );
 		EXPECT_TRUE( success );
 
 		index = 0;
 		success = true;
-		output_string = InputProcessor::idf_parser.parse_string( R"(\b\t/\\\";)", index, success );
+		output_string = parse_string( R"(\b\t/\\\";)", index, success );
 		EXPECT_EQ( "\b\t/\\\"", output_string );
 		EXPECT_EQ( 9ul, index );
 		EXPECT_TRUE( success );
 
 		index = 0;
 		success = true;
-		output_string = InputProcessor::idf_parser.parse_string( R"(test \n string)", index, success );
+		output_string = parse_string( R"(test \n string)", index, success );
 		EXPECT_EQ( "", output_string );
 		EXPECT_EQ( 7ul, index );
 		EXPECT_FALSE( success );
 
 		index = 0;
 		success = true;
-		output_string = InputProcessor::idf_parser.parse_string( R"(! this is a comment \n)", index, success );
+		output_string = parse_string( R"(! this is a comment \n)", index, success );
 		EXPECT_EQ( "", output_string );
 		EXPECT_EQ( 0ul, index );
 		EXPECT_TRUE( success );
@@ -1450,22 +1482,22 @@ namespace EnergyPlus {
 		bool success = true;
 		json rv;
 
-		rv = InputProcessor::idf_parser.parse_value("11th of April,", index, success, InputProcessor::schema["properties"]);
+		rv = parse_value("11th of April,", index, success);
 		EXPECT_EQ(13ul, index);
 		EXPECT_EQ("11th of April", rv.get<std::string>());
 
 		index = 0;
-		rv = InputProcessor::idf_parser.parse_value("11.201,", index, success, InputProcessor::schema["properties"]);
+		rv = parse_value("11.201,", index, success);
 		EXPECT_EQ(6ul, index);
 		EXPECT_EQ(11.201, rv.get<double>());
 
 		index = 0;
-		rv = InputProcessor::idf_parser.parse_value("11.201 of April,", index, success, InputProcessor::schema["properties"]);
+		rv = parse_value("11.201 of April,", index, success);
 		EXPECT_EQ(15ul, index);
 		EXPECT_EQ("11.201 of April", rv.get<std::string>());
 
 		index = 0;
-		EXPECT_NO_THROW(rv = InputProcessor::idf_parser.parse_value("4Ee5,", index, success, InputProcessor::schema["properties"]));
+		EXPECT_NO_THROW(rv = parse_value("4Ee5,", index, success));
 		EXPECT_EQ(4ul, index);
 		EXPECT_EQ("4Ee5", rv.get<std::string>());
 	}
@@ -1476,50 +1508,50 @@ namespace EnergyPlus {
 		bool success = true;
 		json output;
 
-		output = InputProcessor::idf_parser.parse_number("4.5,", index, success);
+		output = parse_number("4.5,", index, success);
 		EXPECT_EQ(4.5, output.get<double>());
 		EXPECT_EQ(3ul, index);
 		EXPECT_TRUE(success);
 
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("0.53;", index, success);
+		output = parse_number("0.53;", index, success);
 		EXPECT_EQ(0.53, output.get<double>());
 		EXPECT_EQ(4ul, index);
 		EXPECT_TRUE(success);
 
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("1.53  ;", index, success);
+		output = parse_number("1.53  ;", index, success);
 		EXPECT_EQ(1.53, output.get<double>());
 		EXPECT_EQ(4ul, index);
 		EXPECT_TRUE(success);
 
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number(" 1.53  ;", index, success);
+		output = parse_number(" 1.53  ;", index, success);
 		EXPECT_EQ(1.53, output.get<double>());
 		EXPECT_EQ(5ul, index);
 		EXPECT_TRUE(success);
 
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("2.510035e5;", index, success);
+		output = parse_number("2.510035e5;", index, success);
 		EXPECT_EQ(251003.5, output.get<double>());
 		EXPECT_EQ(10ul, index);
 		EXPECT_TRUE(success);
 
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("2.510035e-05;", index, success);
+		output = parse_number("2.510035e-05;", index, success);
 		EXPECT_EQ(0.00002510035, output.get<double>());
 		EXPECT_EQ(12ul, index);
 		EXPECT_TRUE(success);
 
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("1.0E-05;", index, success);
+		output = parse_number("1.0E-05;", index, success);
 		EXPECT_EQ(0.000010, output.get<double>());
 		EXPECT_EQ(7ul, index);
 		EXPECT_TRUE(success);
 
 		// handling weird scientific notation
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("5E-5;", index, success);
+		output = parse_number("5E-5;", index, success);
 		EXPECT_EQ(0.00005, output.get<double>());
 		EXPECT_EQ(4ul, index);
 		EXPECT_TRUE(success);
@@ -1527,80 +1559,80 @@ namespace EnergyPlus {
 
 		// handling weird scientific notation
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("5E-05;", index, success);
+		output = parse_number("5E-05;", index, success);
 		EXPECT_EQ(0.00005, output.get<double>());
 		EXPECT_EQ(5ul, index);
 		EXPECT_TRUE(success);
 
 		// handling weird scientific notation
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("5.E-05;", index, success);
+		output = parse_number("5.E-05;", index, success);
 		EXPECT_EQ(0.00005, output.get<double>());
 		EXPECT_EQ(6ul, index);
 		EXPECT_TRUE(success);
 
 		index = 0;
-		output = InputProcessor::idf_parser.parse_number("11th of April,", index, success);
+		output = parse_number("11th of April,", index, success);
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("-+4,", index, success));
+		EXPECT_NO_THROW(output = parse_number("-+4,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("4..0,", index, success));
+		EXPECT_NO_THROW(output = parse_number("4..0,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("++4,", index, success));
+		EXPECT_NO_THROW(output = parse_number("++4,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("--4,", index, success));
+		EXPECT_NO_THROW(output = parse_number("--4,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("4++,", index, success));
+		EXPECT_NO_THROW(output = parse_number("4++,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("4--,", index, success));
+		EXPECT_NO_THROW(output = parse_number("4--,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("4ee5,", index, success));
+		EXPECT_NO_THROW(output = parse_number("4ee5,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("4EE5,", index, success));
+		EXPECT_NO_THROW(output = parse_number("4EE5,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("4eE5,", index, success));
+		EXPECT_NO_THROW(output = parse_number("4eE5,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
 
 		index = 0;
-		EXPECT_NO_THROW(output = InputProcessor::idf_parser.parse_number("4Ee5,", index, success));
+		EXPECT_NO_THROW(output = parse_number("4Ee5,", index, success));
 		EXPECT_TRUE(output.is_null());
 		EXPECT_EQ(0ul, index);
 		EXPECT_FALSE(success);
@@ -1610,31 +1642,31 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, look_ahead ) {
 		std::string const test_input( "B , ! t ; `" );
 		size_t index = 0;
-		IdfParser::Token token = InputProcessor::idf_parser.look_ahead( test_input, index );
+		IdfParser::Token token = look_ahead( test_input, index );
 		EXPECT_EQ( 0ul, index );
 		EXPECT_EQ( IdfParser::Token::STRING, token );
 		index = 2;
-		token = InputProcessor::idf_parser.look_ahead( test_input, index );
+		token = look_ahead( test_input, index );
 		EXPECT_EQ( 2ul, index );
 		EXPECT_EQ( IdfParser::Token::COMMA, token );
 		index = 3;
-		token = InputProcessor::idf_parser.look_ahead( test_input, index );
+		token = look_ahead( test_input, index );
 		EXPECT_EQ( 3ul, index );
 		EXPECT_EQ( IdfParser::Token::EXCLAMATION, token );
 		index = 5;
-		token = InputProcessor::idf_parser.look_ahead( test_input, index );
+		token = look_ahead( test_input, index );
 		EXPECT_EQ( 5ul, index );
 		EXPECT_EQ( IdfParser::Token::STRING, token );
 		index = 7;
-		token = InputProcessor::idf_parser.look_ahead( test_input, index );
+		token = look_ahead( test_input, index );
 		EXPECT_EQ( 7ul, index );
 		EXPECT_EQ( IdfParser::Token::SEMICOLON, token );
 		index = 9;
-		token = InputProcessor::idf_parser.look_ahead( test_input, index );
+		token = look_ahead( test_input, index );
 		EXPECT_EQ( 9ul, index );
 		EXPECT_EQ( IdfParser::Token::NONE, token );
 		index = test_input.size();
-		token = InputProcessor::idf_parser.look_ahead( test_input, index );
+		token = look_ahead( test_input, index );
 		EXPECT_EQ( test_input.size(), index );
 		EXPECT_EQ( IdfParser::Token::END, token );
 	}
@@ -1643,26 +1675,26 @@ namespace EnergyPlus {
 		size_t index = 0;
 
 		std::string const test_input( "B , ! t ; `" );
-		IdfParser::Token token = InputProcessor::idf_parser.next_token( test_input, index );
+		IdfParser::Token token = next_token( test_input, index );
 		EXPECT_EQ( 1ul, index );
 		EXPECT_EQ( IdfParser::Token::STRING, token );
-		token = InputProcessor::idf_parser.next_token( test_input, index );
+		token = next_token( test_input, index );
 		EXPECT_EQ( 3ul, index );
 		EXPECT_EQ( IdfParser::Token::COMMA, token );
-		token = InputProcessor::idf_parser.next_token( test_input, index );
+		token = next_token( test_input, index );
 		EXPECT_EQ( 5ul, index );
 		EXPECT_EQ( IdfParser::Token::EXCLAMATION, token );
-		token = InputProcessor::idf_parser.next_token( test_input, index );
+		token = next_token( test_input, index );
 		EXPECT_EQ( 7ul, index );
 		EXPECT_EQ( IdfParser::Token::STRING, token );
-		token = InputProcessor::idf_parser.next_token( test_input, index );
+		token = next_token( test_input, index );
 		EXPECT_EQ( 9ul, index );
 		EXPECT_EQ( IdfParser::Token::SEMICOLON, token );
-		token = InputProcessor::idf_parser.next_token( test_input, index );
+		token = next_token( test_input, index );
 		EXPECT_EQ( 10ul, index );
 		EXPECT_EQ( IdfParser::Token::NONE, token );
 		index = test_input.size();
-		token = InputProcessor::idf_parser.next_token( test_input, index );
+		token = next_token( test_input, index );
 		EXPECT_EQ( test_input.size() , index );
 		EXPECT_EQ( IdfParser::Token::END, token );
 	}

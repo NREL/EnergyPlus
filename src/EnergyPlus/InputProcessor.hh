@@ -99,7 +99,7 @@ public:
 	json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
 
 	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
-	                   json const & obj_loc );
+								json const & obj_loc );
 
 	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
 
@@ -121,16 +121,6 @@ public:
 
 	Token next_token( std::string const & idf, size_t & index );
 
-	bool icompare( std::string const & s1, std::string const & s2 ) {
-		if ( s1.length() == s2.length() ) {
-			return std::equal( s2.begin(),
-			                   s2.end(),
-			                   s1.begin(),
-			                   [ ]( unsigned char c1, unsigned char c2 ) { return tolower( c1 ) == tolower( c2 ); } );
-		}
-		return false;
-	}
-
 	inline std::string rtrim( std::string & s ) {
 		if ( s.size() == 0 ) return std::string();
 		for ( size_t i = s.size() - 1; i > 0; i-- ) {
@@ -140,15 +130,9 @@ public:
 		return s;
 	}
 
-//	std::string read_from_file( std::string const & input_file_name ) {
-//		std::ifstream in( input_file_name, std::ios::in | std::ios::binary );
-//		if ( in ) {
-//			return ( std::string( ( std::istreambuf_iterator < char >( in ) ), std::istreambuf_iterator < char >() ) );
-//		}
-//		throw ( errno );
-//	}
-
 private:
+	friend class InputProcessorFixture;
+
 	size_t cur_line_num = 1;
 	size_t index_into_cur_line = 0;
 	size_t beginning_of_line_index = 0;
@@ -156,76 +140,82 @@ private:
 };
 
 class State {
-	json const * schema;
-	std::vector < json const * > stack;
-	std::unordered_map < std::string, bool > obj_required, extensible_required, root_required;
-	// this design decision was made because
-	// the choice was between sorting a vector for binary searching or log time object lookup in a map
-	std::string cur_obj_name = "";
-
-	unsigned prev_line_index = 0, prev_key_len = 0;
-	unsigned cur_obj_count = 0;
-	bool is_in_extensibles = false, does_key_exist = true, need_new_object_name = true;
-	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
-	char s[ 129 ];
-	char s2[ 129 ];
-
 public:
+	enum class ErrorType {
+		Maximum,
+		ExclusiveMaximum,
+		Minimum,
+		ExclusiveMinimum
+	};
+
 	void initialize( json const * parsed_schema );
 
 	void traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index );
 
 	void validate( json & parsed, unsigned line_num, unsigned line_index );
 
-	std::vector < std::string > errors, warnings;
+	void add_error( ErrorType err, double val, unsigned line_num, unsigned line_index );
 
-	int print_errors() {
-		if ( warnings.size() ) EnergyPlus::ShowContinueError("Warnings: " + std::to_string(errors.size()));
-		for ( auto const & s: warnings ) EnergyPlus::ShowContinueError( s );
-		if ( errors.size() ) EnergyPlus::ShowWarningError("Errors: " + std::to_string(errors.size()));
-		for ( auto const & s : errors ) EnergyPlus::ShowWarningError( s );
-		return static_cast<int> ( errors.size() + warnings.size() );
-	}
+	int print_errors();
 
-	bool icompare( std::string const & s1, std::string const & s2 ) {
-		if ( s1.length() == s2.length() ) {
-			return std::equal( s2.begin(),
-			                   s2.end(),
-			                   s1.begin(),
-			                   [ ]( unsigned char c1, unsigned char c2 ) { return tolower( c1 ) == tolower( c2 ); } );
-		}
-		return false;
-	}
+	std::vector < std::string > const & validation_errors();
 
-	void add_error( std::string err, double val, unsigned line_num, unsigned line_index ) {
-		std::string str = "Value \"" + std::to_string( val ) + "\" parsed at line " + std::to_string( line_num )
-		                  + " (index " + std::to_string( line_index ) + ")";
-		if ( err == "max" ) {
-			errors.push_back( str + " exceeds maximum" );
-		} else if ( err == "exmax" ) {
-			errors.push_back( str + " exceeds or equals exclusive maximum" );
-		} else if ( err == "min" ) {
-			errors.push_back( str + " is less than the minimum" );
-		} else if ( err == "exmin" ) {
-			errors.push_back( str + " is less than or equal to the exclusive minimum" );
-		}
-	}
+	std::vector < std::string > const & validation_warnings();
+
+private:
+	json const * schema;
+	std::vector < json const * > stack;
+	std::unordered_map < std::string, bool > obj_required;
+	std::unordered_map < std::string, bool > extensible_required;
+	std::unordered_map < std::string, bool > root_required;
+	// this design decision was made because
+	// the choice was between sorting a vector for binary searching or log time object lookup in a map
+	std::string cur_obj_name = "";
+
+	unsigned prev_line_index = 0;
+	unsigned prev_key_len = 0;
+	unsigned cur_obj_count = 0;
+	bool is_in_extensibles = false;
+	bool does_key_exist = true;
+	bool need_new_object_name = true;
+	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
+	char s[ 129 ];
+	char s2[ 129 ];
+
+	std::vector < std::string > errors;
+	std::vector < std::string > warnings;
 };
 
 namespace EnergyPlus {
 
 	class InputProcessor {
 	private:
+		friend class EnergyPlusFixture;
+		friend class InputProcessorFixture;
+
+		static
+		std::vector < std::string > const &
+		validation_errors();
+
+		static
+		std::vector < std::string > const &
+		validation_warnings();
+
 		static char s[ 129 ];
 		static std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > jdd_jdf_cache_map;
 
-	public:
 		static IdfParser idf_parser;
 		static State state;
 		static json schema;
 		static json jdf;
 		static std::ostream * echo_stream;
 		static std::unordered_map < std::string, std::string > case_insensitive_object_map;
+
+	public:
+
+		static
+		std::pair< bool, std::string >
+		ConvertInsensitiveObjectType( std::string const & objectType );
 
 		template < class T >
 		struct is_shared_ptr : std::false_type {};
@@ -234,7 +224,8 @@ namespace EnergyPlus {
 
 		// Clears the global data in InputProcessor.
 		// Needed for unit tests, should not be normally called.
-		static void
+		static
+		void
 		clear_state();
 
 		static
@@ -491,7 +482,7 @@ namespace EnergyPlus {
 			if ( it != last ) return it - first + 1; // 1-based return index
 
 			auto const it2 = std::find_if( first, last,
-			                               [ &str ]( const valueType & s ) { return equali( s.name, str ); } );
+										   [ &str ]( const valueType & s ) { return equali( s.name, str ); } );
 			if ( it2 != last ) return it2 - first + 1; // 1-based return index
 
 			return 0; // Not found
@@ -514,7 +505,7 @@ namespace EnergyPlus {
 			if ( it != last ) return it - first + 1; // 1-based return index
 
 			auto const it2 = std::find_if( first, last,
-			                               [ &str ]( const valueType & s ) { return equali( s->name, str ); } );
+										   [ &str ]( const valueType & s ) { return equali( s->name, str ); } );
 			if ( it2 != last ) return it2 - first + 1; // 1-based return index
 
 			return 0; // Not found
@@ -530,7 +521,7 @@ namespace EnergyPlus {
 			std::string const & str
 		) {
 			return FindItem( first, last, str,
-			                 is_shared_ptr < typename std::iterator_traits < InputIterator >::value_type >{ } );
+							 is_shared_ptr < typename std::iterator_traits < InputIterator >::value_type >{ } );
 		}
 
 		static
@@ -765,7 +756,7 @@ namespace EnergyPlus {
 			ErrorFound = false;
 			if ( NumOfNames > 0 ) {
 				int const Found = FindItem( NameToVerify, NamesList,
-				                            NumOfNames ); // Calls FindItem overload that accepts member arrays
+											NumOfNames ); // Calls FindItem overload that accepts member arrays
 				if ( Found != 0 ) {
 					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
 					ErrorFound = true;
@@ -797,7 +788,7 @@ namespace EnergyPlus {
 			ErrorFound = false;
 			if ( NumOfNames > 0 ) {
 				int const Found = FindItem( NameToVerify, NamesList,
-				                            NumOfNames ); // Calls FindItem overload that accepts member arrays
+											NumOfNames ); // Calls FindItem overload that accepts member arrays
 				if ( Found != 0 ) {
 					ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
 					ErrorFound = true;
