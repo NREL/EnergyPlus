@@ -118,6 +118,7 @@ namespace ExteriorEnergyUse {
 	int const DistrictHeatUse( 12 ); // Purchased Heating
 	int const OtherFuel1Use( 13 ); // OtherFuel1
 	int const OtherFuel2Use( 14 ); // OtherFuel2
+	bool GetInputFlag( true ); // First time, input is "gotten"
 
 	int const ScheduleOnly( 1 ); // exterior lights only on schedule
 	int const AstroClockOverride( 2 ); // exterior lights controlled to turn off during day.
@@ -137,6 +138,7 @@ namespace ExteriorEnergyUse {
 	// Object Data
 	Array1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
 	Array1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
+	std::unordered_map< std::string, std::string > ExteriorEquipment_map;
 
 	// Functions
 
@@ -149,6 +151,8 @@ namespace ExteriorEnergyUse {
 		NumExteriorEqs = 0;
 		ExteriorLights.deallocate();
 		ExteriorEquipment.deallocate();
+		ExteriorEquipment_map.clear();
+        GetInputFlag = true;
 	}
 
 	void
@@ -163,31 +167,6 @@ namespace ExteriorEnergyUse {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine provides the usual call for the Simulation Manager.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 
 		if ( GetInputFlag ) {
 			GetExteriorEnergyUseInput();
@@ -267,7 +246,9 @@ namespace ExteriorEnergyUse {
 		NumFuelEq = InputProcessor::GetNumObjectsFound( "Exterior:FuelEquipment" );
 		NumWtrEq = InputProcessor::GetNumObjectsFound( "Exterior:WaterEquipment" );
 		ExteriorEquipment.allocate( NumFuelEq + NumWtrEq );
+		ExteriorEquipment_map.reserve( NumFuelEq + NumWtrEq );
 
+		GetInputFlag = false;
 		NumExteriorEqs = 0;
 
 		// =================================  Get Exterior Lights
@@ -275,13 +256,7 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:Lights";
 		for ( Item = 1; Item <= NumExteriorLights; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExteriorLights, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+            // unique_string_blank_key continue error here
 			ExteriorLights( Item ).Name = cAlphaArgs( 1 );
 			ExteriorLights( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( ExteriorLights( Item ).SchedPtr == 0 ) {
@@ -351,13 +326,8 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::VerifyUniqueInterObjectName( ExteriorEquipment_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+            // unique_string_blank_key continue error
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 
@@ -421,13 +391,8 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::VerifyUniqueInterObjectName( ExteriorEquipment_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			// unique_string_blank_key  continue error
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 			ExteriorEquipment( NumExteriorEqs ).FuelType = WaterUse;

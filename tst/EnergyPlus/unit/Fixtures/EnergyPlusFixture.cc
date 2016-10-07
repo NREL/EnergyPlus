@@ -217,6 +217,8 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DualDuct.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
 
 json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth, json::parse_event_t event, json &parsed,
 									   unsigned line_num, unsigned line_index) -> bool {
@@ -344,6 +346,8 @@ namespace EnergyPlus {
 		EconomicLifeCycleCost::clear_state();
 		EconomicTariff::clear_state();
 		EMSManager::clear_state();
+        EvaporativeCoolers::clear_state();
+        EvaporativeFluidCoolers::clear_state();
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();
