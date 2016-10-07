@@ -79,22 +79,22 @@
 #include <FileSystem.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
-#include <iomanip>
 
-// initialization of class static variables
-json EnergyPlus::InputProcessor::jdf = json();
-json EnergyPlus::InputProcessor::schema = json();
-IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
-State EnergyPlus::InputProcessor::state = State();
-char EnergyPlus::InputProcessor::s[] = { 0 };
-std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
+typedef std::unordered_map < std::string, std::string > UnorderedObjectTypeMap;
+typedef std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > UnorderedObjectCacheMap;
 
-std::unordered_map < std::string, std::string >
-		EnergyPlus::InputProcessor::case_insensitive_object_map = std::unordered_map < std::string, std::string >();
+namespace EnergyPlus {
+	// initialization of class static variables
+	json InputProcessor::jdf = json();
+	json InputProcessor::schema = json();
+	IdfParser InputProcessor::idf_parser = IdfParser();
+	State InputProcessor::state = State();
+	char InputProcessor::s[] = { 0 };
+	std::ostream * InputProcessor::echo_stream = nullptr;
 
-std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > >
-		EnergyPlus::InputProcessor::jdd_jdf_cache_map =
-		std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > ();
+	UnorderedObjectTypeMap InputProcessor::case_insensitive_object_map = UnorderedObjectTypeMap();
+	UnorderedObjectCacheMap InputProcessor::jdd_jdf_cache_map = UnorderedObjectCacheMap();
+}
 
 bool icompare( std::string const & s1, std::string const & s2 ) {
 	if ( s1.length() == s2.length() ) {
@@ -143,7 +143,7 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 					else skipped_fields++;
 					continue;
 				}
-				for ( int j = 0; j < skipped_fields; j++ ) encoded += ",\n  ";
+				for ( int j = 0; j < skipped_fields; j++ ) encoded += "," + EnergyPlus::DataStringGlobals::NL + "  ";
 				skipped_fields = 0;
 				encoded += end_of_field;
 				auto const & val = obj_in.value()[ entry ];
@@ -160,10 +160,10 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 				continue;
 			}
 
-			auto & extensions = obj_in.value()[ "extensions" ];
+			auto const & extensions = obj_in.value()[ "extensions" ];
 			for ( size_t extension_i = 0; extension_i < extensions.size(); extension_i++ ) {
-				auto & cur_extension_obj = extensions[ extension_i ];
-				auto & extensible = schema[ "properties" ][ obj.key() ][ "legacy_idd" ][ "extensibles" ];
+				auto const & cur_extension_obj = extensions[ extension_i ];
+				auto const & extensible = schema[ "properties" ][ obj.key() ][ "legacy_idd" ][ "extensibles" ];
 				for ( size_t i = 0; i < extensible.size(); i++ ) {
 					std::string tmp = extensible[ i ];
 					if ( cur_extension_obj.find( tmp ) == cur_extension_obj.end() ) {
@@ -629,8 +629,8 @@ void State::initialize( json const * parsed_schema ) {
 }
 
 void State::add_error( ErrorType err, double val, unsigned line_num, unsigned line_index ) {
-	std::string str = "Value \"" + std::to_string( val ) + "\" parsed at line " + std::to_string( line_num )
-					  + " (index " + std::to_string( line_index ) + ")";
+	std::string str = "Out of Range: Value \"" + std::to_string( val ) + "\" parsed at line " +
+					  std::to_string( line_num ) + " (index " + std::to_string( line_index ) + ")";
 	if ( err == ErrorType::Maximum ) {
 		errors.push_back( str + " exceeds maximum" );
 	} else if ( err == ErrorType::ExclusiveMaximum ) {
@@ -643,11 +643,11 @@ void State::add_error( ErrorType err, double val, unsigned line_num, unsigned li
 }
 
 int State::print_errors() {
-	if ( warnings.size() ) EnergyPlus::ShowWarningError("Number of validation warnings: " + std::to_string(errors.size()));
-	for ( auto const & s: warnings ) EnergyPlus::ShowContinueError( s );
+	if ( warnings.size() ) EnergyPlus::ShowWarningError("Number of validation warnings: " + std::to_string(warnings.size()));
+	for ( auto const & s : warnings ) EnergyPlus::ShowContinueError( s );
 	if ( errors.size() ) EnergyPlus::ShowSevereError("Number of validation errors: " + std::to_string(errors.size()));
 	for ( auto const & s : errors ) EnergyPlus::ShowContinueError( s );
-	return static_cast<int> ( errors.size() + warnings.size() );
+	return static_cast<int> ( errors.size() );
 }
 
 std::vector < std::string > const & State::validation_errors() {
@@ -1120,6 +1120,11 @@ namespace EnergyPlus {
 			convertedFS << encoded << std::endl;
 		}
 
+		auto const num_errors = InputProcessor::state.print_errors();
+		if ( num_errors ) {
+			ShowFatalError( "IP: Errors occurred on processing input file. Preceding condition(s) cause termination." );
+		}
+
 		InitializeCacheMap();
 
 		int MaxArgs = 0;
@@ -1136,7 +1141,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	InputProcessor::GetNumSectionsFound( std::string const & EP_UNUSED( SectionWord ) ) {
+	InputProcessor::GetNumSectionsFound( std::string const & SectionWord ) {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This function returns the number of a particular section (in input data file)
 		// found in the current run.  If it can't find the section in list
@@ -1145,7 +1150,7 @@ namespace EnergyPlus {
 		// METHODOLOGY EMPLOYED:
 		// Look up section in list of sections.  If there, return the
 		// number of sections of that kind found in the current input.  If not, return -1.
-		auto const & SectionWord_iter = jdf.find( "SectionWord" );
+		auto const & SectionWord_iter = jdf.find( SectionWord );
 		if ( SectionWord_iter == jdf.end() ) return -1;
 		return static_cast <int> ( SectionWord_iter.value().size() );
 	}
@@ -1486,21 +1491,22 @@ namespace EnergyPlus {
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
 		json * obj;
-
-		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end() ) {
+		auto obj_iter = jdf.find( ObjType );
+		if ( obj_iter == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
 			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
 			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
 		} else {
-			obj = &jdf[ ObjType ];
+			obj = &( obj_iter.value() );
 		}
 
 		int object_item_num = 1;
 		bool found = false;
+		auto const upperObjName = MakeUPPERCase( ObjName );
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
-			if ( MakeUPPERCase( it.key() ) == MakeUPPERCase( ObjName ) ) {
+			if ( MakeUPPERCase( it.key() ) == upperObjName ) {
 				found = true;
 				break;
 			}
@@ -1525,25 +1531,24 @@ namespace EnergyPlus {
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
 		json * obj;
-
-		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end() ) {
+		auto obj_iter = jdf.find( ObjType );
+		if ( jdf.find( ObjType ) == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
 			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
 			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
 		} else {
-			obj = &jdf[ ObjType ];
+			obj = &( obj_iter.value() );
 		}
 
 		int object_item_num = 1;
 		bool found = false;
-
-
+		auto const upperObjName = MakeUPPERCase( ObjName );
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
 			auto it2 = it.value().find(NameTypeVal);
 
-			if ( (it2 != it.value().end()) && (MakeUPPERCase( it2.value() ) == MakeUPPERCase( ObjName )) ) {
+			if ( ( it2 != it.value().end() ) && ( MakeUPPERCase( it2.value() ) == upperObjName ) ) {
 				found = true;
 				break;
 			}
@@ -1967,58 +1972,6 @@ namespace EnergyPlus {
 		}
 	}
 
-//void
-//InputProcessor::TurnOnReportRangeCheckErrors()
-//{
-//
-//	// SUBROUTINE INFORMATION:
-//	//       AUTHOR         Linda Lawrie
-//	//       DATE WRITTEN   July 2000
-//	//       MODIFIED       na
-//	//       RE-ENGINEERED  na
-//
-//	// PURPOSE OF THIS SUBROUTINE:
-//	// This subroutine turns on the logical to report range check errors
-//	// directly out of the InputProcessor.
-//	ReportRangeCheckErrors = true;
-//
-//}
-
-//void
-//InputProcessor::TurnOffReportRangeCheckErrors()
-//{
-//
-//	// SUBROUTINE INFORMATION:
-//	//       AUTHOR         Linda Lawrie
-//	//       DATE WRITTEN   July 20000
-//	//       MODIFIED       na
-//	//       RE-ENGINEERED  na
-//
-//	// PURPOSE OF THIS SUBROUTINE:
-//	// This subroutine turns off the logical to report range check errors
-//	// directly out of the InputProcessor.
-//
-//	ReportRangeCheckErrors = false;
-//
-//}
-
-	int
-	InputProcessor::GetNumRangeCheckErrorsFound() {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function returns the number of OutOfRange errors found during
-		// input processing.
-//		return NumOutOfRangeErrorsFound;
-		// TODO: Fix this
-		return 0;
-	}
-
 	void
 	InputProcessor::GetMaxSchemaArgs(
 		int & NumArgs,
@@ -2380,61 +2333,6 @@ namespace EnergyPlus {
 
 	}
 
-	// void
-	// InputProcessor::CompactObjectsCheck()
-	// {
-
-	// // SUBROUTINE INFORMATION:
-	// //       AUTHOR         Linda Lawrie
-	// //       DATE WRITTEN   December 2005
-	// //       MODIFIED       na
-	// //       RE-ENGINEERED  na
-
-	// // PURPOSE OF THIS SUBROUTINE:
-	// // Check to see if Compact Objects (i.e. CompactHVAC and its ilk) exist in the
-	// // input file.  If so, expandobjects was not run and there's a possible problem.
-	// 	bool CompactObjectsFound;
-
-	// 	CompactObjectsFound = false;
-
-	// 	for ( int i = IDFRecords.l(), e = IDFRecords.u(); i <= e; ++i ) {
-	// 		auto const & Name( IDFRecords( i ).Name );
-	// 		if ( ( has_prefix( Name, "HVACTEMPLATE:" ) ) || ( has_prefix( Name, "HVACTemplate:" ) ) ) {
-	// 			ShowSevereError( "HVACTemplate objects are found in the IDF File." );
-	// 			CompactObjectsFound = true;
-	// 			break;
-	// 		}
-	// 	}
-
-	// 	if ( CompactObjectsFound ) {
-	// 		ShowFatalError( "Program Terminates: The ExpandObjects program has not been run or is not in your EnergyPlus.exe folder." );
-	// 	}
-
-	// }
-
-	// void
-	// InputProcessor::ParametricObjectsCheck()
-	// {
-
-	// // SUBROUTINE INFORMATION:
-	// //       AUTHOR         Jason Glazer (based on CompactObjectsCheck by Linda Lawrie)
-	// //       DATE WRITTEN   September 2009
-	// //       MODIFIED
-	// //       RE-ENGINEERED  na
-
-	// // PURPOSE OF THIS SUBROUTINE:
-	// // Check to see if Parametric Objects exist in the input file.
-
-	// 	for ( int i = IDFRecords.l(), e = IDFRecords.u(); i <= e; ++i ) {
-	// 		auto const & Name( IDFRecords( i ).Name );
-	// 		if ( has_prefixi( Name, "Parametric:" ) ) {
-	// 			ShowSevereError( "Parametric objects are found in the IDF File." );
-	// 			ShowFatalError( "Program Terminates: The ParametricPreprocessor program has not been run." );
-	// 			break;
-	// 		}
-	// 	}
-	// }
-
 	void
 	InputProcessor::PreScanReportingVariables() {
 		// SUBROUTINE INFORMATION:
@@ -2499,8 +2397,6 @@ namespace EnergyPlus {
 			auto const & jdf_object = jdf_objects.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-
-				//TODO: Might be incorrect
 				for ( auto const & extensions : fields[ "extensions" ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
@@ -2519,8 +2415,6 @@ namespace EnergyPlus {
 			auto const & jdf_object = jdf_objects.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-
-				//TODO: Might be incorrect
 				for ( auto const & extensions : fields[ "extensions" ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
@@ -2554,7 +2448,6 @@ namespace EnergyPlus {
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
-				// TODO: Might be wrong...
 				InputProcessor::AddRecordToOutputVariableStructure( "*", obj.key() );
 			}
 		}
@@ -2577,8 +2470,6 @@ namespace EnergyPlus {
 			auto const & jdf_object = jdf_objects.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-
-				//TODO: Might be incorrect
 				for ( auto const & extensions : fields[ "extensions" ] ) {
 					InputProcessor::AddRecordToOutputVariableStructure( "*",
 																		extensions.at( "variable_or_meter_name" ) );

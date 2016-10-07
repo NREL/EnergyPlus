@@ -201,18 +201,16 @@ namespace EnergyPlus {
 		std::vector < std::string > const &
 		validation_warnings();
 
-		static char s[ 129 ];
-		static std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > jdd_jdf_cache_map;
-
 		static IdfParser idf_parser;
 		static State state;
 		static json schema;
 		static json jdf;
-		static std::ostream * echo_stream;
 		static std::unordered_map < std::string, std::string > case_insensitive_object_map;
+		static std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > jdd_jdf_cache_map;
+		static std::ostream * echo_stream;
+		static char s[ 129 ];
 
 	public:
-
 		static
 		std::pair< bool, std::string >
 		ConvertInsensitiveObjectType( std::string const & objectType );
@@ -275,9 +273,9 @@ namespace EnergyPlus {
 		static
 		int
 		GetObjectItemNum(
-				std::string const & ObjType, // Object Type (ref: IDD Objects)
-				std::string const & NameTypeVal, // Object "name" field type ( used as search key )
-				std::string const & ObjName // Name of the object type
+			std::string const & ObjType, // Object Type (ref: IDD Objects)
+			std::string const & NameTypeVal, // Object "name" field type ( used as search key )
+			std::string const & ObjName // Name of the object type
 		);
 
 		static
@@ -851,16 +849,6 @@ namespace EnergyPlus {
 			Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
 		);
 
-//	void
-//	TurnOnReportRangeCheckErrors();
-
-//	void
-//	TurnOffReportRangeCheckErrors();
-
-		static
-		int
-		GetNumRangeCheckErrorsFound();
-
 		static
 		void
 		GetMaxSchemaArgs(
@@ -878,17 +866,9 @@ namespace EnergyPlus {
 			int & NumNumeric // How many Numeric arguments (max) this Object can have
 		);
 
-//	void
-//	ReportOrphanRecordObjects();
-
+		static
 		void
 		PreProcessorCheck( bool & PreP_Fatal ); // True if a preprocessor flags a fatal error
-
-//	void
-//	CompactObjectsCheck();
-
-//	void
-//	ParametricObjectsCheck();
 
 		static
 		void
@@ -909,17 +889,17 @@ namespace EnergyPlus {
 		void
 		ReAllocateAndPreserveOutputVariablesForSimulation();
 
-//	void
-//	ShowAuditErrorMessage(
-//		std::string const & Severity, // if blank, does not add to sum
-//		std::string const & ErrorMessage
-//	);
+		// void
+		// ReportOrphanRecordObjects();
+
+		// void
+		// ShowAuditErrorMessage(
+		// 	std::string const & Severity, // if blank, does not add to sum
+		// 	std::string const & ErrorMessage
+		// );
 
 		std::string
 		IPTrimSigDigits( int const IntegerValue );
-
-//		void
-//		ReportOrphanRecordObjects();
 
 	}; // InputProcessor
 }

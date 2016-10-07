@@ -568,10 +568,6 @@ namespace EnergyPlus {
 					}
 			};
 		}
-		InputProcessor::InitializeCacheMap();
-		InputProcessor::InitFiles();
-		SimulationManager::PostIPProcessing();
-		InputProcessor::state.print_errors();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -584,6 +580,11 @@ namespace EnergyPlus {
 		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
+
+		InputProcessor::InitializeCacheMap();
+		InputProcessor::InitFiles();
+		SimulationManager::PostIPProcessing();
+		InputProcessor::state.print_errors();
 
 		return true;
 	}

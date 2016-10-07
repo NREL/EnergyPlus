@@ -415,13 +415,6 @@ namespace SizingManager {
 
 								ManageHeatBalance();
 
-								//  After the first iteration of HeatBalance, all the "input" has been gotten
-								if ( BeginSimFlag ) {
-									if ( InputProcessor::GetNumRangeCheckErrorsFound() > 0 ) {
-										ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
-									}
-								}
-
 								BeginHourFlag = false;
 								BeginDayFlag = false;
 								BeginEnvrnFlag = false;
@@ -506,9 +499,6 @@ namespace SizingManager {
 
 			ManageZoneEquipment( true, SimZoneEquip, SimAir );
 			ManageAirLoops( true, SimAir, SimZoneEquip );
-			if ( InputProcessor::GetNumRangeCheckErrorsFound() > 0 ) {
-				ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
-			}
 
 			ResetEnvironmentCounter();
 			CurEnvirNumSimDay = 0;

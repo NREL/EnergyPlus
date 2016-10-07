@@ -580,13 +580,6 @@ namespace SimulationManager {
 
 						ManageHeatBalance();
 
-						//  After the first iteration of HeatBalance, all the 'input' has been gotten
-						if ( BeginFullSimFlag ) {
-							if ( InputProcessor::GetNumRangeCheckErrorsFound() > 0 ) {
-								ShowFatalError( "Out of \"range\" values found in input" );
-							}
-						}
-
 						BeginHourFlag = false;
 						BeginDayFlag = false;
 						BeginEnvrnFlag = false;
@@ -1576,13 +1569,6 @@ namespace SimulationManager {
 
 			ManageHeatBalance();
 
-			//  After the first iteration of HeatBalance, all the 'input' has been gotten
-			if ( BeginFullSimFlag ) {
-				if ( InputProcessor::GetNumRangeCheckErrorsFound() > 0 ) {
-					ShowFatalError( "Out of \"range\" values found in input" );
-				}
-			}
-
 			BeginHourFlag = false;
 			BeginDayFlag = false;
 			BeginEnvrnFlag = false;
@@ -2332,54 +2318,10 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		// PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
-
-//		CheckCachedIPErrors(); // eplusout.iperr is unused in the json input processor, it has been replaced by
-							   // state.errors and state.warnings in the InputProcessor namespace
+		InputProcessor::PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
 		if ( PreP_Fatal ) {
 			ShowFatalError( "Preprocessor condition(s) cause termination." );
-		}
-
-		// if ( OverallErrorFlag ) {
-			// ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );
-		// }
-
-		// CompactObjectsCheck(); // Check to see if Compact Objects (CompactHVAC, etc) are in input file.
-		// If so, ExpandObjects didn't get called...
-		// ParametricObjectsCheck(); // check to see if any parametric objects are in the input file
-		// parametric preprocessor was not run
-
-		// if ( NumOutOfRangeErrorsFound + NumBlankReqFieldFound + NumMiscErrorsFound > 0 ) {
-			// ShowSevereError( "IP: Out of \"range\" values and/or blank required fields found in input" );
-			// ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );
-		// }
-
-		if ( InputProcessor::GetNumSectionsFound( "DISPLAYALLWARNINGS" ) > 0 ) {
-			DisplayAllWarnings = true;
-			DisplayExtraWarnings = true;
-			DisplayUnusedSchedules = true;
-			DisplayUnusedObjects = true;
-		}
-
-		if ( InputProcessor::GetNumSectionsFound( "DISPLAYEXTRAWARNINGS" ) > 0 ) {
-			DisplayExtraWarnings = true;
-		}
-
-		if ( InputProcessor::GetNumSectionsFound( "DISPLAYUNUSEDOBJECTS" ) > 0 ) {
-			DisplayUnusedObjects = true;
-		}
-
-		if ( InputProcessor::GetNumSectionsFound( "DISPLAYUNUSEDSCHEDULES" ) > 0 ) {
-			DisplayUnusedSchedules = true;
-		}
-
-		if ( InputProcessor::GetNumSectionsFound( "DisplayZoneAirHeatBalanceOffBalance" ) > 0 ) {
-			DisplayZoneAirHeatBalanceOffBalance = true;
-		}
-
-		if ( InputProcessor::GetNumSectionsFound( "DISPLAYADVANCEDREPORTVARIABLES" ) > 0 ) {
-			DisplayAdvancedReportVariables = true;
 		}
 
 		//Set up more globals - process fluid input.
@@ -2390,70 +2332,6 @@ namespace SimulationManager {
 		InputProcessor::PreScanReportingVariables();
 
 	}
-
-//	void
-//	CheckCachedIPErrors()
-//	{
-//
-//		// SUBROUTINE INFORMATION:
-//		//       AUTHOR         Linda Lawrie
-//		//       DATE WRITTEN   August 2010
-//		//       MODIFIED       na
-//		//       RE-ENGINEERED  na
-//
-//		// PURPOSE OF THIS SUBROUTINE:
-//		// This routine displays the cached error messages after the preprocessor
-//		// errors have been checked and produced.
-//
-//		// METHODOLOGY EMPLOYED:
-//		// na
-//
-//		// REFERENCES:
-//		// na
-//
-//		// Using/Aliasing
-//
-//		// Locals
-//		// SUBROUTINE ARGUMENT DEFINITIONS:
-//		// na
-//
-//		// SUBROUTINE PARAMETER DEFINITIONS:
-//
-//		// INTERFACE BLOCK SPECIFICATIONS:
-//		// na
-//
-//		// DERIVED TYPE DEFINITIONS:
-//		// na
-//
-//		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-//		int iostatus;
-//		std::string ErrorMessage;
-//
-//		gio::close( CacheIPErrorFile );
-//		gio::open( CacheIPErrorFile, DataStringGlobals::outputIperrFileName );
-//		iostatus = 0;
-//		while ( iostatus == 0 ) {
-//			{ IOFlags flags; gio::read( CacheIPErrorFile, fmtA, flags ) >> ErrorMessage; iostatus = flags.ios(); }
-//			if ( iostatus != 0 ) break;
-//			if ( is_blank( ErrorMessage ) ) continue;
-//			ShowErrorMessage( ErrorMessage );
-//			if ( sqlite ) {
-//				// Following code relies on specific formatting of Severes, Warnings, and continues
-//				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
-//				// automatic sending of error messages to SQLite are turned on.
-//				if ( ErrorMessage[ 4 ] == 'S' ) {
-//					sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
-//				} else if ( ErrorMessage[ 4 ] == 'W' ) {
-//					sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
-//				} else if ( ErrorMessage[ 6 ] == '~' ) {
-//					sqlite->updateSQLiteErrorRecord( ErrorMessage );
-//				}
-//			}
-//		}
-//
-//		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
-//
-//	}
 
 } // SimulationManager
 
