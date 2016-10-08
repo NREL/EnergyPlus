@@ -740,9 +740,9 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air generic contaminant concentration
   A1 ; \field Zone Name
-       \required-field
        \type object-list
        \object-list Zone Names
+       \note If this field is left blank, default multiplier values are used for all the zones not specified
 
 Timestep,
        \memo Specifies the "basic" timestep for the simulation. The

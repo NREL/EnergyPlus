@@ -3850,10 +3850,10 @@ namespace ZoneTempPredictorCorrector {
 		static Real64 SNLoad( 0.0 ); // Sensible load calculated for zone in watts and then loaded in report variables
 		static int ZoneNum( 0 );
 		static int ZoneNodeNum( 0 ); // System node number for air flow through zone either by system or as a plenum
-		static Real64 ResearchSpecialZoneVolCapMultpSens(1.0); // Added by Sang Hoon Lee October 2015
-		static Real64 ResearchSpecialZoneVolCapMultpMoist(1.0); // Added by Sang Hoon Lee October 2015
-		static Real64 ResearchSpecialZoneVolCapMultpCO2(1.0); // Added by Sang Hoon Lee October 2015
-		static Real64 ResearchSpecialZoneVolCapMultpGenContam(1.0); // Added by Sang Hoon Lee October 2015
+		// static Real64 ResearchSpecialZoneVolCapMultpSens(1.0); // Added by Sang Hoon Lee October 2015
+		// static Real64 ResearchSpecialZoneVolCapMultpMoist(1.0); // Added by Sang Hoon Lee October 2015
+		// static Real64 ResearchSpecialZoneVolCapMultpCO2(1.0); // Added by Sang Hoon Lee October 2015
+		// static Real64 ResearchSpecialZoneVolCapMultpGenContam(1.0); // Added by Sang Hoon Lee October 2015
 		
 		static int HMStartDay( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
 		static int HMEndDay( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
@@ -3863,8 +3863,8 @@ namespace ZoneTempPredictorCorrector {
 		static int HybridModelEndDate( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
 		static int HybridStartDayOfYear( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
 		static int HybridEndDayOfYear( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		int HMCount; // Added by Sang Hoon Lee August 2015
-		Real64 HMMultiplierSum; // Added by Sang Hoon Lee August 2015
+		// int HMCount; // Added by Sang Hoon Lee August 2015
+		// Real64 HMMultiplierSum; // Added by Sang Hoon Lee August 2015
 		Real64 HMMultiplierAverage;
 		static Real64 MultpHM(10.0);
 		static int MultpHMCount (0);

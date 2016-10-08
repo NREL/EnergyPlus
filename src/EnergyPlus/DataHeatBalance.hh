@@ -2894,21 +2894,20 @@ namespace DataHeatBalance {
 			InfilTotalLoss( 0.0 ),
 			InfilVolumeCurDensity( 0.0 ),
 			InfilVolumeCurDensityHM( 0.0 ), // InfilVolumeCurDensity inversely calculated for Hyrbrid Modeling:Infiltration, added by Sang Hoon Lee February 2016
-			InfilVdotCurDensityHM ( 0.0 ), // InfilVdotCurDensity inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			InfilMassHM( 0.0 ), // InfilMass inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			InfilMdotHM( 0.0 ), // InfilMdot inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
 			InfilVolumeStdDensity( 0.0 ),
 			InfilVdotCurDensity( 0.0 ),
 			InfilVdotStdDensity( 0.0 ),
 			InfilMass( 0.0 ),
 			InfilMdot( 0.0 ),
 			InfilAirChangeRate( 0.0 ),
-			
+			InfilAirChangeRateHM( 0.0 ), // InfilAirChangeRate inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
+			InfilVdotCurDensityHM ( 0.0 ), // InfilVdotCurDensity inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
+			InfilMassHM( 0.0 ), // InfilMass inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
+			InfilMdotHM( 0.0 ), // InfilMdot inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
 			InfilVdotOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
 			InfilVolumeOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
 			InfilOAAirChangeRateHM(0.0), // Added by Sang Hoon Lee February 2016
 			InfilOAAirChangeRate(0.0), // Added by Sang Hoon Lee February 2016
-
 			MCPIHM(0.0), // for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
 			MCPIHMCalculated(0.0), // for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
 			MCPI(0.0), // for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
