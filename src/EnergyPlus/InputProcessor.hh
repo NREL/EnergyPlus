@@ -66,6 +66,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <fstream>
 
 // ObjexxFCL Headers
@@ -152,7 +153,7 @@ public:
 
 	void traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index );
 
-	void validate( json & parsed, unsigned line_num, unsigned line_index );
+	void validate( json const * loc, json & parsed, unsigned line_num, unsigned line_index );
 
 	void add_error( ErrorType err, double val, unsigned line_num, unsigned line_index );
 
@@ -207,6 +208,7 @@ namespace EnergyPlus {
 		static json jdf;
 		static std::unordered_map < std::string, std::string > case_insensitive_object_map;
 		static std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > jdd_jdf_cache_map;
+		static std::map < const json::object_t * const, std::pair < std::string, std::string > > unused_inputs;
 		static std::ostream * echo_stream;
 		static char s[ 129 ];
 
@@ -232,7 +234,7 @@ namespace EnergyPlus {
 
 		static
 		void
-		InitializeCacheMap();
+		InitializeMaps();
 
 		static
 		void
@@ -889,8 +891,9 @@ namespace EnergyPlus {
 		void
 		ReAllocateAndPreserveOutputVariablesForSimulation();
 
-		// void
-		// ReportOrphanRecordObjects();
+		static
+		void
+		ReportOrphanRecordObjects();
 
 		// void
 		// ShowAuditErrorMessage(

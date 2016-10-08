@@ -581,7 +581,7 @@ namespace EnergyPlus {
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
-		InputProcessor::InitializeCacheMap();
+		InputProcessor::InitializeMaps();
 		InputProcessor::InitFiles();
 		SimulationManager::PostIPProcessing();
 		InputProcessor::state.print_errors();

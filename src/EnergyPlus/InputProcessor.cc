@@ -60,6 +60,7 @@
 #include <algorithm>
 #include <istream>
 #include <iostream>
+#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
@@ -82,6 +83,7 @@
 
 typedef std::unordered_map < std::string, std::string > UnorderedObjectTypeMap;
 typedef std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > UnorderedObjectCacheMap;
+typedef std::map < const json::object_t * const, std::pair < std::string, std::string > > UnorderedUnusedObjectMap;
 
 namespace EnergyPlus {
 	// initialization of class static variables
@@ -94,18 +96,17 @@ namespace EnergyPlus {
 
 	UnorderedObjectTypeMap InputProcessor::case_insensitive_object_map = UnorderedObjectTypeMap();
 	UnorderedObjectCacheMap InputProcessor::jdd_jdf_cache_map = UnorderedObjectCacheMap();
+	UnorderedUnusedObjectMap InputProcessor::unused_inputs = UnorderedUnusedObjectMap();
 }
 
 bool icompare( std::string const & s1, std::string const & s2 ) {
-	if ( s1.length() == s2.length() ) {
-		return std::equal(
-			s2.begin(),
-			s2.end(),
+	return s1.length() == s2.length() &&
+		std::equal(
 			s1.begin(),
+			s1.end(),
+			s2.begin(),
 			[ ]( unsigned char c1, unsigned char c2 ) { return ::tolower( c1 ) == ::tolower( c2 );}
 		);
-	}
-	return false;
 }
 
 
@@ -423,7 +424,16 @@ json IdfParser::parse_value( std::string const & idf, size_t & index, bool & suc
 		if ( field_type.value() == "number" || field_type.value() == "integer" ) {
 			return parse_number( idf, index, success );
 		} else {
-			return parse_string( idf, index, success );
+			auto const parsed_string = parse_string( idf, index, success );
+			auto const & enum_it = field_loc.find( "enum" );
+			if ( enum_it == field_loc.end() ) return parsed_string;
+			for ( auto const & s : enum_it.value() ) {
+				auto const & str = s.get < std::string >();
+				if ( icompare( str, parsed_string ) ) {
+					return str;
+				}
+			}
+			return parsed_string;
 		}
 	} else {
 		switch (look_ahead(idf, index)) {
@@ -432,12 +442,20 @@ json IdfParser::parse_value( std::string const & idf, size_t & index, bool & suc
 				auto const & enum_it = field_loc.find( "enum" );
 				if (enum_it != field_loc.end()) {
 					for ( auto const & s : enum_it.value() ) {
-						if ( icompare( s, parsed_string ) ) {
-							return s;
+						auto const & str = s.get < std::string >();
+						if ( icompare( str, parsed_string ) ) {
+							return str;
 						}
 					}
 				} else if ( icompare( parsed_string, "Autosize" ) || icompare( parsed_string, "Autocalculate" ) ) {
-					return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
+					auto const & default_it = field_loc.find( "default" );
+					// The following is hacky because it abuses knowing the consistent generated structure
+					// in the future this might not hold true for the array indexes.
+					if ( default_it != field_loc.end() ) {
+						return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 1 ];
+					} else {
+						return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
+					}
 				}
 				return parsed_string;
 			}
@@ -1034,7 +1052,8 @@ namespace EnergyPlus {
 	}
 
 	void
-	InputProcessor::InitializeCacheMap() {
+	InputProcessor::InitializeMaps() {
+		unused_inputs.clear();
 		jdd_jdf_cache_map.clear();
 		jdd_jdf_cache_map.reserve( jdf.size() );
 		auto const & schema_properties = schema.at( "properties" );
@@ -1045,6 +1064,8 @@ namespace EnergyPlus {
 			jdf_obj_iterators_vec.reserve( objects.size() );
 			for ( auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); ++jdf_obj_iter ) {
 				jdf_obj_iterators_vec.emplace_back( jdf_obj_iter );
+				auto const * const obj_ptr = jdf_obj_iter.value().get_ptr< const json::object_t * const >();
+				unused_inputs.emplace( obj_ptr, std::make_pair( jdf_iter.key(), jdf_obj_iter.key() ) );
 			}
 			auto const & schema_iter = schema_properties.find( jdf_iter.key() );
 			jdd_jdf_cache_map.emplace( schema_iter.key(), std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) ) );
@@ -1099,7 +1120,7 @@ namespace EnergyPlus {
 				std::ofstream convertedFS( convertedIDF, std::ofstream::out );
 				convertedFS << input_file << std::endl;
 			} else {
-				input_file = input_file_json.dump();
+				input_file = input_file_json.dump( 4 );
 			}
 		}
 
@@ -1122,10 +1143,10 @@ namespace EnergyPlus {
 
 		auto const num_errors = InputProcessor::state.print_errors();
 		if ( num_errors ) {
-			ShowFatalError( "IP: Errors occurred on processing input file. Preceding condition(s) cause termination." );
+			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
 		}
 
-		InitializeCacheMap();
+		InitializeMaps();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -1241,6 +1262,12 @@ namespace EnergyPlus {
 		auto const & jdd_it = find_iterators->second.first;
 		auto const & jdd_it_val = jdd_it.value();
 
+		auto const * const obj_ptr = jdf_it.value().get_ptr< const json::object_t * const >();
+		auto const find_unused = unused_inputs.find( obj_ptr );
+		if ( find_unused != unused_inputs.end() ) {
+			unused_inputs.erase( find_unused );
+		}
+
 		// Locations in JSON schema relating to normal fields
 		auto const & schema_obj_props = jdd_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
 
@@ -1249,7 +1276,6 @@ namespace EnergyPlus {
 		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
 		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
 		auto const & schema_name_field = jdd_it_val.find( "name" );
-
 
 		Alphas = "";
 		Numbers = 0;
@@ -2095,131 +2121,81 @@ namespace EnergyPlus {
 		NumArgs = NumAlpha + NumNumeric;
 	}
 
-// void
-// InputProcessor::ReportOrphanRecordObjects()
-// {
+	void
+	InputProcessor::ReportOrphanRecordObjects()
+	{
 
-// 	// SUBROUTINE INFORMATION:
-// 	//       AUTHOR         Linda Lawrie
-// 	//       DATE WRITTEN   August 2002
-// 	//       MODIFIED       na
-// 	//       RE-ENGINEERED  na
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   August 2002
+		//       MODIFIED       na
+		//       RE-ENGINEERED  Mark Adams, Oct 2016
 
-// 	// PURPOSE OF THIS SUBROUTINE:
-// 	// This subroutine reports "orphan" objects that are in the IDF but were
-// 	// not "gotten" during the simulation.
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine reports "orphan" objects that are in the input but were
+		// not "gotten" during the simulation.
 
-// 	// METHODOLOGY EMPLOYED:
-// 	// Uses internal (to InputProcessor) IDFRecordsGotten array, cross-matched with Object
-// 	// names -- puts those into array to be printed (not adding dups).
-// 	int Count;
-// 	int Found;
-// 	int ObjFound;
-// 	int NumOrphObjNames;
-// 	bool potentialOrphanedSpecialObjects( false );
+		std::unordered_set< std::string > unused_object_types;
+		unused_object_types.reserve( unused_inputs.size() );
 
-// 	Array1D_string OrphanObjectNames( NumIDFRecords );
-// 	Array1D_string OrphanNames( NumIDFRecords );
-// 	NumOrphObjNames = 0;
+		if ( unused_inputs.size() && DisplayUnusedObjects ) {
+			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the input" );
+			ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
+			if ( ! DisplayAllWarnings ) {
+				ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all." );
+			} else {
+				ShowContinueError( " Each unused object is shown." );
+			}
+			ShowContinueError( " See InputOutputReference document for more details." );
+		}
 
-// 	for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
-// 		if ( IDFRecordsGotten( Count ) ) continue;
-// 		//  This one not gotten
-// 		Found = FindItemInList( IDFRecords( Count ).Name, OrphanObjectNames, NumOrphObjNames );
-// 		if ( Found == 0 ) {
-// 			if ( SortedIDD ) {
-// 				ObjFound = FindItemInSortedList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 				if ( ObjFound != 0 ) ObjFound = iListOfObjects( ObjFound );
-// 			} else {
-// 				ObjFound = FindItemInList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 			}
-// 			if ( ObjFound > 0 ) {
-// 				if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
-// 				++NumOrphObjNames;
-// 				OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
-// 				// To avoid looking up potential things later when they *definitely* aren't there, we'll trap for specific flags here first
-// 				//  and set the potential flag.  If the potential flag is false, nothing else is looked up later to save time
-// 				if ( ( ! potentialOrphanedSpecialObjects ) && ( ! OrphanObjectNames( NumOrphObjNames ).empty() )  && ( OrphanObjectNames( NumOrphObjNames )[ 0 ] == 'Z' ) ) {
-// 					potentialOrphanedSpecialObjects = true;
-// 				}
-// 				if ( ObjectDef( ObjFound ).NameAlpha1 ) {
-// 					OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
-// 				}
-// 			} else {
-// 				ShowWarningError( "object not found=" + IDFRecords( Count ).Name );
-// 			}
-// 		} else if ( DisplayAllWarnings ) {
-// 			if ( SortedIDD ) {
-// 				ObjFound = FindItemInSortedList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 				if ( ObjFound != 0 ) ObjFound = iListOfObjects( ObjFound );
-// 			} else {
-// 				ObjFound = FindItemInList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 			}
-// 			if ( ObjFound > 0 ) {
-// 				if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
-// 				++NumOrphObjNames;
-// 				OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
-// 				if ( ObjectDef( ObjFound ).NameAlpha1 ) {
-// 					OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
-// 				}
-// 			} else {
-// 				ShowWarningError( "ReportOrphanRecordObjects: object not found=" + IDFRecords( Count ).Name );
-// 			}
-// 		}
-// 	}
+		bool first_iteration = true;
+		for ( auto it = unused_inputs.begin(); it != unused_inputs.end(); ++it ) {
+			auto const & object_type = it->second.first;
+			auto const & name = it->second.second;
 
-// 	// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
-// 	// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if
-// 	// for now, the list includes:
-// 	//  - objects that start with "ZONEHVAC:"
-// 	if ( potentialOrphanedSpecialObjects ) {
-// 		for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-// 			if ( has_prefix( OrphanObjectNames( Count ), "ZONEHVAC:" ) ) {
-// 				ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the idf, and was not used." );
-// 				ShowContinueError( " -- Object type: " + OrphanObjectNames( Count ) );
-// 				ShowContinueError( " -- Object name: " + OrphanNames( Count ) );
-// 			}
-// 		}
-// 	}
+			// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
+			if ( has_prefix( object_type, "ZoneHVAC:" ) ) {
+				ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used." );
+				ShowContinueError( " -- Object type: " + object_type );
+				ShowContinueError( " -- Object name: " + name );
+			}
 
-// 	if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
-// 		gio::write( EchoInputFile, fmtLD ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
-// 		for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-// 			if ( ! OrphanNames( Count ).empty() ) {
-// 				gio::write( EchoInputFile, fmtA ) << ' ' + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
-// 			} else {
-// 				gio::write( EchoInputFile, fmtLD ) << OrphanObjectNames( Count );
-// 			}
-// 		}
-// 		ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the idf" );
-// 		ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
-// 		if ( ! DisplayAllWarnings ) {
-// 			ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings to see all." );
-// 		} else {
-// 			ShowContinueError( " Each unused object is shown." );
-// 		}
-// 		ShowContinueError( " See InputOutputReference document for more details." );
-// 		if ( ! OrphanNames( 1 ).empty() ) {
-// 			ShowMessage( "Object=" + OrphanObjectNames( 1 ) + '=' + OrphanNames( 1 ) );
-// 		} else {
-// 			ShowMessage( "Object=" + OrphanObjectNames( 1 ) );
-// 		}
-// 		for ( Count = 2; Count <= NumOrphObjNames; ++Count ) {
-// 			if ( ! OrphanNames( Count ).empty() ) {
-// 				ShowContinueError( "Object=" + OrphanObjectNames( Count ) + '=' + OrphanNames( Count ) );
-// 			} else {
-// 				ShowContinueError( "Object=" + OrphanObjectNames( Count ) );
-// 			}
-// 		}
-// 	} else if ( NumOrphObjNames > 0 ) {
-// 		ShowMessage( "There are " + IPTrimSigDigits( NumOrphObjNames ) + " unused objects in input." );
-// 		ShowMessage( "Use Output:Diagnostics,DisplayUnusedObjects; to see them." );
-// 	}
+			if ( ! DisplayUnusedObjects ) continue;
 
-// 	OrphanObjectNames.deallocate();
-// 	OrphanNames.deallocate();
+			if ( ! DisplayAllWarnings ) {
+				auto found_type = unused_object_types.find( object_type );
+				if ( found_type != unused_object_types.end() ) {
+					// only show first unused named object of an object class
+					continue;
+				} else {
+					unused_object_types.emplace( object_type );
+				}
+			}
 
-// }
+			if ( first_iteration ) {
+				if ( ! name.empty() ) {
+					ShowMessage( "Object=" + object_type + '=' + name );
+				} else {
+					ShowMessage( "Object=" + object_type );
+				}
+				first_iteration = false;
+			} else {
+				if ( ! name.empty() ) {
+					ShowContinueError( "Object=" + object_type + '=' + name );
+				} else {
+					ShowContinueError( "Object=" + object_type );
+				}
+			}
+		}
+
+		if ( unused_inputs.size() && ! DisplayUnusedObjects ) {
+			u64toa( unused_inputs.size(), s );
+			ShowMessage( "There are " + std::string( s ) + " unused objects in input." );
+			ShowMessage( "Use Output:Diagnostics,DisplayUnusedObjects; to see them." );
+		}
+
+	}
 
 	void
 	InputProcessor::PreProcessorCheck( bool & PreP_Fatal ) // True if a preprocessor flags a fatal error

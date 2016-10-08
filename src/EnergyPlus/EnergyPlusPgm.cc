@@ -459,7 +459,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 		ShowPsychrometricSummary();
 
-		// ReportOrphanRecordObjects();
+		InputProcessor::ReportOrphanRecordObjects();
 		ReportOrphanFluids();
 		ReportOrphanSchedules();
 
