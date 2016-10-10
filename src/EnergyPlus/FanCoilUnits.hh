@@ -419,6 +419,19 @@ namespace FanCoilUnits {
 	);
 
 	void
+	TightenAirAndWaterFlowLimits(
+		int const FanCoilNum, // Unit index in fan coil array
+		bool const CoolingLoad, // true if zone requires cooling
+		bool const HeatingLoad, // true if zone requires heating
+		int const WaterControlNode, // water control node, either cold or hot water
+		int const ControlledZoneNum, // controlling zone index
+		bool const FirstHVACIteration, //  TRUE if 1st HVAC simulation of system timestep
+		Real64 const QZnReq, // zone load [W]
+		Real64 & PLRMin, // minimum part-load ratio
+		Real64 & PLRMax // maximum part-load ratio
+	);
+
+	void
 	Calc4PipeFanCoil(
 		int const FanCoilNum, // Unit index in fan coil array
 		int const ControlledZoneNum, // ZoneEquipConfig index
@@ -477,6 +490,12 @@ namespace FanCoilUnits {
 	);
 
 	Real64
+	CalcFanCoilPLRResidual(
+		Real64 const PLR, // part-load ratio of air and water mass flow rate
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
 	CalcFanCoilHWLoadResidual(
 		Real64 const HWFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
@@ -498,12 +517,6 @@ namespace FanCoilUnits {
 		Array1< Real64 > const & Par // Function parameters
 	);
 	
-	Real64
-	CalcFanCoilAirFlowResidual(
-		Real64 const WaterFlow, // water mass flow rate [kg/s]
-		Array1< Real64 > const & Par // Function parameters
-	);
-
 	Real64
 	CalcFanCoilAirAndWaterFlowResidual(
 		Real64 const WaterFlow, // water mass flow rate [kg/s]

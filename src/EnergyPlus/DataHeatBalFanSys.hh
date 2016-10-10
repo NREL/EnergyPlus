@@ -96,6 +96,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > QHWBaseboardToPerson; // Sum of radiant gains to people from hot water baseboard heaters
 	extern Array1D< Real64 > QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
 	extern Array1D< Real64 > QElecBaseboardToPerson; // Sum of radiant gains to people from electric baseboard heaters
+	extern Array1D< Real64 > QCoolingPanelToPerson; // Sum of radiant losses to people from cooling panels
 	//Zone air drybulb conditions variables
 	extern Array1D< Real64 > ZTAV; // Zone Air Temperature Averaged over the Zone Time step
 	extern Array1D< Real64 > MAT; // MEAN AIR TEMPARATURE (C)
@@ -182,6 +183,8 @@ namespace DataHeatBalFanSys {
 
 	extern Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
 	// temperature at source
+	extern Array1D< Real64 > CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
+	// temperature at the user specified location
 	extern Array1D< Real64 > QHTRadSysSurf; // Current radiant heat flux at a surface due to the presence
 	// of high temperature radiant heaters
 	extern Array1D< Real64 > QHWBaseboardSurf; // Current radiant heat flux at a surface due to the presence
@@ -190,6 +193,8 @@ namespace DataHeatBalFanSys {
 	// of steam baseboard heaters
 	extern Array1D< Real64 > QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
 	// of electric baseboard heaters
+	extern Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
+	// of simple cooling panels
 	extern Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	extern Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	extern Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
@@ -203,14 +208,13 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > SumHmAW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
 	extern Array1D< Real64 > SumHmARa; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 	extern Array1D< Real64 > SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
+	extern Array1D< Real64 > SumHmARaZ;
 
 	extern Array1D< Real64 > TempZoneThermostatSetPoint;
 	extern Array1D< Real64 > ZoneThermostatSetPointHi;
 	extern Array1D< Real64 > ZoneThermostatSetPointLo;
 
 	extern Array1D< Real64 > LoadCorrectionFactor; // PH 3/3/04
-
-	extern Array1D_bool CrossMixingFlag; // TRUE when a zone is mixing
 
 	extern Array1D< Real64 > AIRRAT; // "air power capacity"  PH 3/5/04
 	extern Array1D< Real64 > ZTM1; // zone air temperature at previous timestep

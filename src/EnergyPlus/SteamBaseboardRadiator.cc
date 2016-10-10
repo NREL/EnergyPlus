@@ -608,6 +608,14 @@ namespace SteamBaseboardRadiator {
 
 			SteamBaseboard( BaseboardNum ).FluidIndex = SteamIndex;
 
+			// search zone equipment list structure for zone index
+			for ( int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone ) {
+				for ( int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList( ctrlZone ).NumOfEquipTypes; ++zoneEquipTypeNum ) {
+					if ( DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipType_Num( zoneEquipTypeNum ) == DataZoneEquipment::BBElectric_Num && DataZoneEquipment::ZoneEquipList( ctrlZone ).EquipName( zoneEquipTypeNum ) == SteamBaseboard( BaseboardNum ).EquipID ) {
+						SteamBaseboard( BaseboardNum ).ZonePtr = ctrlZone;
+					}
+				}
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -870,6 +878,8 @@ namespace SteamBaseboardRadiator {
 
 		if ( PltSizSteamNum > 0 ) {
 
+			DataScalableCapSizingON = false;
+			
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax == AutoSize ) {
@@ -918,6 +928,7 @@ namespace SteamBaseboardRadiator {
 						}
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 					}

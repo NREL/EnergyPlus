@@ -8,7 +8,6 @@
 ! Schedules are listed alphabetically, with general schedules first,
 ! followed by the ten 90.1 building type schedules.
 ! ScheduleType objects for the schedule defined below
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   ScheduleTypeLimits,

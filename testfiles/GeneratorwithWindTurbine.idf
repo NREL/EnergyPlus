@@ -611,8 +611,8 @@
     WT List,                 !- Name
     WT List,                 !- Generator List Name
     Baseload,                !- Generator Operation Scheme Type
-    ,                        !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    Always On;               !- Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    Always On;               !- Generator Track Schedule Name Scheme Schedule Name
 
   Output:Variable,*,Generator Produced Electric Energy,Hourly;
 

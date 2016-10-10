@@ -18,7 +18,6 @@
 !    www.solar-rating.org
 !
 ! All collectors are glazed flat-plate collectors, unless otherwise indicated
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   SolarCollectorPerformance:FlatPlate,

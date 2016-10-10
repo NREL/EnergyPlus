@@ -99,7 +99,7 @@ for pr_num in pr_numbers:
     title = j['title']
     labels = j['labels']
     if len(labels) == 0:
-        print("No labels on PR #" + pr_num)
+        print("WARNING: No labels on PR #" + pr_num, file=sys.stderr)
     for label in labels:
         key = 'Unknown'
         label_name = label['name']
