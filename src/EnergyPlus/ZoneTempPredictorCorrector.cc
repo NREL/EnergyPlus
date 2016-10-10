@@ -1545,19 +1545,18 @@ namespace ZoneTempPredictorCorrector {
 
 		// Get the Hybrid Model setting inputs
 		CheckAndReadHybridModelZone(); // Added by Sang Hoon Lee May 2015
+		
+		// Default multiplier values
+		ZoneVolCapMultpSens = 1.0;
+		ZoneVolCapMultpMoist = 1.0;
+		ZoneVolCapMultpCO2 = 1.0;
+		ZoneVolCapMultpGenContam = 1.0;
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
 		NumNums = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumNums == 0 ) {
-
-			// Default values
-			ZoneVolCapMultpSens = 1.0;
-			ZoneVolCapMultpMoist = 1.0;
-			ZoneVolCapMultpCO2 = 1.0;
-			ZoneVolCapMultpGenContam = 1.0;
-
-			// Assign to all zones
+			// Assign default multiplier values to all zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
 				Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
 				Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
@@ -1567,18 +1566,12 @@ namespace ZoneTempPredictorCorrector {
 
 		} else {
 		// Added by Sang Hoon Lee in Sep. 2016.
-			
-			// Default values
-			ZoneVolCapMultpSens = 1.0;
-			ZoneVolCapMultpMoist = 1.0;
-			ZoneVolCapMultpCO2 = 1.0;
-			ZoneVolCapMultpGenContam = 1.0;
 
-			// Assign the user inputs to the specified zones
+			// Assign the user inputted multipliers to specified zones
 			for ( int ZoneCapNum = 1; ZoneCapNum <= NumNums; ZoneCapNum++ ) {
-				GetObjectItem(cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+				GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				int ZoneNum = FindItemInList( cAlphaArgs(1), Zone );
+				int ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone );
 				if( ZoneNum > 0 ){
 					Zone( ZoneNum ).FlagCustomizedZoneCap = true;
 					Zone( ZoneNum ).ZoneVolCapMultpSens = rNumericArgs( 1 );
@@ -1588,13 +1581,36 @@ namespace ZoneTempPredictorCorrector {
 				}
 			}
 			
-			// Assign default values to all the other zones
+			// Assign default multiplier values to all the other zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
 				if( ! Zone( ZoneNum ).FlagCustomizedZoneCap ){
 					Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
 					Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
 					Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
 					Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
+				}
+			}
+
+			// Calculate the average multiplier value from all zones
+			{
+				
+				Real64 ZoneVolCapMultpSens_temp = 0.0;
+				Real64 ZoneVolCapMultpMoist_temp = 0.0;
+				Real64 ZoneVolCapMultpCO2_temp = 0.0;
+				Real64 ZoneVolCapMultpGenContam_temp = 0.0;
+
+				for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
+					ZoneVolCapMultpSens_temp += Zone( ZoneNum ).ZoneVolCapMultpSens;
+					ZoneVolCapMultpMoist_temp += Zone( ZoneNum ).ZoneVolCapMultpMoist;
+					ZoneVolCapMultpCO2_temp += Zone( ZoneNum ).ZoneVolCapMultpCO2;
+					ZoneVolCapMultpGenContam_temp += Zone( ZoneNum ).ZoneVolCapMultpGenContam;
+				}
+
+				if( NumOfZones > 0 ){
+					ZoneVolCapMultpSens = ZoneVolCapMultpSens_temp / NumOfZones;
+					ZoneVolCapMultpMoist = ZoneVolCapMultpMoist_temp / NumOfZones;
+					ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2_temp / NumOfZones;
+					ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam_temp / NumOfZones;
 				}
 			}
 

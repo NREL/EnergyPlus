@@ -1464,13 +1464,6 @@ namespace DataHeatBalance {
 			InfilOAAirChangeRateHM( 0.0 ) // Added by Sang Hoon Lee February 2016
 		{}
 
-		// Member Constructor
-		//ZoneData(
-		//	std::string const & Name
-		//	) :
-		//	Name(Name)
-		//{}
-
 		void
 		SetOutBulbTempAt();
 

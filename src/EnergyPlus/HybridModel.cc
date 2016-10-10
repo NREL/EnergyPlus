@@ -38,7 +38,8 @@ namespace HybridModel {
 	using namespace InputProcessor;
 	using DataGlobals::ScheduleAlwaysOn;
 	using General::CheckCreatedZoneItemName;
-
+	
+	bool FlagHybridModel( false ); // True if hybrid model is activated
 	int NumOfHybridModelZones( 0 ); // Number of hybrid model zones in the model
 	std::string CurrentModuleObject; // to assist in getting input
 
@@ -77,12 +78,15 @@ namespace HybridModel {
 		HybridModelZone.allocate( NumOfZones );
 
 		if (NumOfHybridModelZones > 0) {
+
+			FlagHybridModel = true;
+			RunMeOnceFlag = true;
 		
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
 				GetObjectItem(CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
-				ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+				ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone ); //@@ Zone list
 				HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "YES" );
 				HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "YES" );
 				HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ));
@@ -91,8 +95,6 @@ namespace HybridModel {
 				HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth = rNumericArgs( 3 );
 				HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndDate = rNumericArgs( 4 );
 			}
-
-			RunMeOnceFlag = true;
 
 			if (ErrorsFound) {
 				ShowFatalError( "Errors getting Hybrid Model input data. Preceding condition(s) cause termination." );

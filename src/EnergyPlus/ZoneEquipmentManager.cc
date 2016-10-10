@@ -5233,16 +5233,16 @@ namespace ZoneEquipmentManager {
 				MCPTI( NZ ) += MCpI_temp * TempExt;
 			}
 
-			// When Hybrid Modeling Infiltration is YES added November 2015 by Sang Hoon Lee Start
-			if ( HybridModelZone(NZ).InfiltrationCalc ){
+			// When Hybrid Modeling Infiltration is YES_added by Sang Hoon Lee, November 2015 
+			if ( FlagHybridModel && HybridModelZone( NZ ).InfiltrationCalc ){
 
 				if (MCPIHM( NZ ) >= 0.0){
 					//MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-					Zone(NZ).InfiltrationVolumeFlowRateHM = Zone(NZ).MCPIHM / AirDensity / CpAir; // in m3/second, Infiltration design air flow rate considering coefficients and schedule
+					Zone( NZ ).InfiltrationVolumeFlowRateHM = Zone( NZ ).MCPIHM / AirDensity / CpAir; // in m3/second, Infiltration design air flow rate considering coefficients and schedule
 					// MCpI_temp = IVF * AirDensity * CpAir * ( Infiltration( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ ) ) * Infiltration( j ).TemperatureTermCoef + WindExt * ( Infiltration( j ).VelocityTermCoef + WindExt * Infiltration( j ).VelocitySQTermCoef ) );
-					Zone(NZ).IVFHM = Zone(NZ).MCPIHM / (AirDensity * CpAir * (Infiltration(j).ConstantTermCoef + std::abs(TempExt - ZMAT(NZ)) * Infiltration(j).TemperatureTermCoef + WindExt * (Infiltration(j).VelocityTermCoef + WindExt * Infiltration(j).VelocitySQTermCoef))); // in m3/second, Infiltration design air flow rate considering schedule
+					Zone( NZ ).IVFHM = Zone( NZ ).MCPIHM / (AirDensity * CpAir * (Infiltration( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ )) * Infiltration( j ).TemperatureTermCoef + WindExt * ( Infiltration( j ).VelocityTermCoef + WindExt * Infiltration( j ).VelocitySQTermCoef ))); // in m3/second, Infiltration design air flow rate considering schedule
 					//IVF = Infiltration(j).DesignLevel * GetCurrentScheduleValue(Infiltration(j).SchedPtr);
-					Zone(NZ).InfiltrationDesignLevelHM = Zone(NZ).InfiltrationVolumeFlowRateHM * 3600 / Zone(NZ).Volume; // ACH
+					Zone( NZ ).InfiltrationDesignLevelHM = Zone( NZ ).InfiltrationVolumeFlowRateHM * 3600 / Zone( NZ ).Volume; // ACH
 
 				}
 				else {
@@ -5251,7 +5251,7 @@ namespace ZoneEquipmentManager {
 					Zone( NZ ).InfiltrationDesignLevelHM = 0.0;
 				}
 				
-			} // When Hybrid Modeling Infiltration is YES added November 2015 by Sang Hoon Lee End
+			} // When Hybrid Modeling Infiltration is YES_added by Sang Hoon Lee, November 2015. End
 	
 		}
 
