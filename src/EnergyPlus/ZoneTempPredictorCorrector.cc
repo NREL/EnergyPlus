@@ -4204,22 +4204,25 @@ namespace ZoneTempPredictorCorrector {
 							 // Calculate air capacity using UseAnalyticalSolution)
 							if (TempDepCoef == 0.0) {
 								AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); // Inverse equation
-							}
-							else {
-								AirCapHM = TempDepCoef / std::log((TempIndCoef - TempDepCoef * PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * ZT(ZoneNum))); // Inverse equation
+							} else {
+								Real64 AirCapHM_temp = (TempIndCoef - TempDepCoef * PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * ZT(ZoneNum));
+								if( AirCapHM_temp > 0 ){ // Avoide IND
+									AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
+								} else {
+									AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); //@@
+								}
 							}
 							// Calculate multiplier
 							if (abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.1){
+								
 								MultpHM = AirCapHM / (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) * (TimeStepSys * SecInHour); // Inverse equation
-								if (MultpHM < 1.0){ // HM multiplier must be greater than 1
-									MultpHM = 0.0;
+								
+								if (( MultpHM < 1.0 ) || ( MultpHM > 30.0 )){ // HM multiplier must be greater than 1 and less than 30
+									MultpHM = 1.0; // @@ 1.0 is the default value_zrp
 								}
-								if (MultpHM > 30.0){ // HM multiplier no greater than 30
-									MultpHM = 0.0;
-								}
-							}
-							else {
-								MultpHM = 0.0;
+
+							} else {
+								MultpHM = 1.0;
 							}
 						}
 
