@@ -1437,7 +1437,7 @@ For a variable flow chiller this is the maximum water flow rate and for a consta
 
 \paragraph{Field: Reference Condenser Fluid Flow Rate}\label{field-reference-condenser-fluid-flow-rate}
 
-This numeric field contains the chiller's operating condenser water flow rate in cubic meters per second. This field can be autosized. This field is also used to enter the air flow rate if Condenser Type = AirCooled or EvaporativelyCooled and Heat Recovery is specified..
+This numeric field contains the chiller's operating condenser fluid flow rate in cubic meters per second. This field can be autosized. This field is also used to enter the air flow rate if Condenser Type = AirCooled or EvaporativelyCooled and Heat Recovery is specified. If AirCooled or EvaporativelyCooled and this field is autosized, the air flow rate is set to 0.000114 m3/s/W (850 cfm/ton) multiplied by the chiller Reference Capacity. For air- and evaporatively-cooled condensers, this flow rate is used to set condenser outlet air node conditions and used for evaporatively-cooled condensers to calculate water use rate.
 
 \paragraph{Field: Cooling Capacity Function of Temperature Curve Name}\label{field-cooling-capacity-function-of-temperature-curve-name}
 
@@ -1706,6 +1706,10 @@ Evap-cooled:
   HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
 \item
   HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
+\item
+  HVAC,Sum,Chiller Evaporative Condenser Water Volume {[}m3{]}
+\item
+  HVAC,Sum,Chiller Evaporative Condenser Mains Supply Water Volume {[}m3{]}
 \end{itemize}
 
 Water-cooled:
@@ -1746,23 +1750,23 @@ Most of these chiller output variables are defined above under ``Generic Chiller
 
 These outputs are for the electric power consumption of the chiller condenser fan and are applicable to air- or evaporatively-cooled chillers. These reports are available only for the Chiller:Electric:EIR and only when the Condenser Fan Power Ratio input field is greater than 0. This output is also added to a meter object with Resource Type = Electricity, End Use Key = Chillers, Group Key = Plant (Ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Chiller Capacity Temperature Modifier Multiplier {[]}}{Chiller Capacity Temperature Modifier Multiplier }}\label{chiller-capacity-temperature-modifier-multiplier}
+\paragraph{Chiller Capacity Temperature Modifier Multiplier {[]}}\label{chiller-capacity-temperature-modifier-multiplier}
 
 This is the output of the curve object Cooling Capacity Function of Temperature Curve.
 
-\paragraph{\texorpdfstring{Chiller EIR Temperature Modifier Multiplier {[]}}{Chiller EIR Temperature Modifier Multiplier }}\label{chiller-eir-temperature-modifier-multiplier}
+\paragraph{Chiller EIR Temperature Modifier Multiplier {[]}}\label{chiller-eir-temperature-modifier-multiplier}
 
 This is the output of the curve object Electric Input to Cooling Output Ratio Function of Temperature Curve.
 
-\paragraph{\texorpdfstring{Chiller EIR Part Load Modifier Multiplier {[]}}{Chiller EIR Part Load Modifier Multiplier }}\label{chiller-eir-part-load-modifier-multiplier}
+\paragraph{Chiller EIR Part Load Modifier Multiplier {[]}}\label{chiller-eir-part-load-modifier-multiplier}
 
 This is the output of the curve object Electric Input to Cooling Output Ratio Function of Part Load Curve.
 
-\paragraph{\texorpdfstring{Chiller Part Load Ratio {[]}}{Chiller Part Load Ratio }}\label{chiller-part-load-ratio-1}
+\paragraph{Chiller Part Load Ratio {[]}}\label{chiller-part-load-ratio-1}
 
 This output is the ratio of the evaporator heat transfer rate plus the false load heat transfer rate (if applicable) to the available chiller capacity. This value is used to determine Chiller EIR Part Load Modifier Multiplier.
 
-\paragraph{\texorpdfstring{Chiller Cycling Ratio {[]}}{Chiller Cycling Ratio }}\label{chiller-cycling-ratio-1}
+\paragraph{Chiller Cycling Ratio {[]}}\label{chiller-cycling-ratio-1}
 
 The cycling ratio is the amount of time the chiller operates during each simulation timestep. If the chiller part-load ratio falls below the minimum part-load ratio, the chiller cycles on and off to meet the cooling load.
 
@@ -1771,6 +1775,12 @@ The cycling ratio is the amount of time the chiller operates during each simulat
 \paragraph{Chiller False Load Heat Transfer Energy {[}J{]}}\label{chiller-false-load-heat-transfer-energy-j}
 
 These outputs are the heat transfer rate and total heat transfer due to false loading of the chiller. When the chiller part-load ratio is below the minimum unloading ratio, the chiller false loads (e.g.~hot-gas bypass) to further reduce capacity. The false load heat transfer output variable is not metered.
+
+\paragraph{Chiller Evaporative Condenser Water Volume {[}m3{]}}\label{chiller-evaporative-condenser-water-volume-m3}
+
+\paragraph{Chiller Evaporative Condenser Mains Supply Water Volume {[}m3{]}}\label{chiller-evaporative-condenser-mains-supply-water-volume-m3}
+
+These outputs are the water use for evaporatively-cooled condensers. When the chiller operates, the water consumed by the evaporatively-cooled condenser is proportional to the chiller condenser heat transfer. The evaporative condenser is assumed to be 100\% effective where the condenser inlet air dry-bulb temperature is equal to the outdoor wet-bulb temperature.
 
 \subsection{Chiller:Electric:ReformulatedEIR}\label{chillerelectricreformulatedeir}
 
@@ -3082,7 +3092,7 @@ The CoolCapfT curve represents the fraction of the cooling capacity of the chill
 
 \paragraph{Field: Fuel Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-fuel-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
-The CFIRfT curve represents the fraction of the fuel input to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
+The CFIRfT curve represents the fraction of the fuel input to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and either the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature.
 
 \paragraph{Field: Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-fuel-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name}
 
@@ -3097,7 +3107,7 @@ The CFIRfPLR curve represents the fraction of the fuel input to the chiller as t
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-2}
 
-The ElecCoolFT curve represents the fraction of the electricity to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
+The ElecCoolFT curve represents the fraction of the electricity to the chiller at full load as it varies by temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature.
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name-2}
 
@@ -3139,10 +3149,6 @@ The chilled water supply temperature in degrees C below which the chiller will s
 
 The fuel higher heating value in kJ/kg. \emph{This field is not currently used}.
 
-\paragraph{Field: Chiller Flow Mode}\label{field-chiller-flow-mode-7}
-
-This field is deprecated and is not used.
-
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2-000}
 
 This alpha field determines the type of fuel that the chiller uses. The default is \textbf{NaturalGas}. Valid values are \textbf{NaturalGas}, \textbf{PropaneGas}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOil\#1}, \textbf{FuelOil\#2, OtherFuel1, OtherFuel2}.
@@ -3181,14 +3187,13 @@ ChillerHeater:Absorption:DirectFired,
       GasAbsFlatBiQuad,        !- Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
       GasAbsLinearQuad,        !- Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
       GasAbsFlatBiQuad,        !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-      GasAbsFlatQuad,      !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+      GasAbsFlatQuad,          !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
       GasAbsInvLinearQuad,     !- Heating Capacity Function of Cooling Capacity Curve Name
       GasAbsLinearQuad,        !- Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
       EnteringCondenser,       !- Temperature Curve Input Variable
       WaterCooled,             !- Condenser Type
       2,                       !- Chilled Water Temperature Lower Limit {C}
       0,                       !- Fuel Higher Heating Value {kJ/kg}
-      VariableFlow,            !- Chiller Flow Mode
       NaturalGas,              !- Fuel Type
       1.0;                     !- Sizing Factor
 \end{lstlisting}
@@ -3321,7 +3326,7 @@ These outputs are the electric power input to the chiller when operating in cool
 
 These outputs are the fuel input to the chiller when operating in cooling mode, heating mode, or both depending on the fuel type entered. This value is not metered, but the separate cooling and heating fuel consumption are metered (see below).
 
-\paragraph{\texorpdfstring{Chiller Heater Runtime Fraction {[]}}{Chiller Heater Runtime Fraction }}\label{chiller-heater-runtime-fraction}
+\paragraph{Chiller Heater Runtime Fraction {[]}}\label{chiller-heater-runtime-fraction}
 
 This is the average fraction of the time period during which the direct fired absorption chiller-heater was operating in either cooling mode, heating mode, or both.
 
@@ -3486,7 +3491,7 @@ The CoolCapfT curve represents the fraction of the cooling capacity of the chill
 
 \paragraph{Field: Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-thermal-energy-input-to-cooling-output-ratio-function-of-temperature-curve-name}
 
-The TeFIRfT curve represents the fraction of the Thermal Energy Input to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
+The TeFIRfT curve represents the fraction of the Thermal Energy Input to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the value of the curve should be 1.0. The curve is usually a biquadratic or bilinear curve with the input variables being the leaving chilled water temperature and the entering condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature.
 
 \paragraph{Field: Thermal Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-thermal-energy-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name}
 
@@ -3500,7 +3505,7 @@ CoolElectricPower = NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT\left( {{T_{
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-3}
 
-The CEIRfT curve represents the fraction of the electricity to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature. 
+The CEIRfT curve represents the fraction of the electricity to the chiller at full load as it varies with temperature. The curve is normalized so that at design conditions the of the curve should be 1.0. The curve is usually a biquadratic or bilinear~ curve with the input variables being the leaving chilled water temperature and either~ the entering or leaving condenser water temperature (see \emph{Temperature Curve Input Variable} below). If the chiller is AirCooled, the temperature of the condenser inlet node (outdoor air node) is used for the condenser temperature.
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-name-3}
 
@@ -3701,7 +3706,7 @@ The ``Chiller'' output variables are defined above under ``Generic Chiller Outpu
 
 These outputs are the electric power input to the chiller when operating in cooling mode, heating mode, or both. This value is not metered, but the separate cooling and heating electric consumption are metered (see below).
 
-\paragraph{\texorpdfstring{Chiller Heater Runtime Fraction {[]}}{Chiller Heater Runtime Fraction }}\label{chiller-heater-runtime-fraction-1}
+\paragraph{Chiller Heater Runtime Fraction {[]}}\label{chiller-heater-runtime-fraction-1}
 
 This is the average fraction of the time period during which the Exhaust Fired absorption chiller-heater was operating in either cooling mode, heating mode, or both.
 
@@ -3711,7 +3716,7 @@ These outputs are the electricity input to the Exhaust Fired absorption chiller 
 
 This is the average available cooling capacity for the reported time period.
 
-\paragraph{\texorpdfstring{Chiller Heater Cooling Part Load Ratio {[]}}{Chiller Heater Cooling Part Load Ratio }}\label{chiller-heater-cooling-part-load-ratio-1}
+\paragraph{Chiller Heater Cooling Part Load Ratio {[]}}\label{chiller-heater-cooling-part-load-ratio-1}
 
 This is the average cooling load (Chiller Heater Evaporator Cooling Rate {[}W{]}) divided by the average available cooling capacity (Chiller Heater Maximum Cooling Rate {[}W{]}) for the reported time period.
 
@@ -3733,7 +3738,7 @@ These outputs are the electric power input to the Exhaust Fired absorption chill
 
 This is the average available heating capacity for the reported time period.
 
-\paragraph{\texorpdfstring{Chiller Heater Heating Part Load Ratio {[]}}{Chiller Heater Heating Part Load Ratio }}\label{chiller-heater-heating-part-load-ratio-1}
+\paragraph{Chiller Heater Heating Part Load Ratio {[]}}\label{chiller-heater-heating-part-load-ratio-1}
 
 This is the average heating load (Chiller Heater Heating Rate {[}W{]}) divided by the average available heating capacity (Chiller Heater Maximum Heating Rate {[}W{]}) for the reported time period.
 
@@ -4106,7 +4111,7 @@ These outputs are the heating output (load) of the boiler. Energy is metered on 
 
 These outputs are the hot water inlet and outlet temperatures and flow rate for the boiler.
 
-\paragraph{\texorpdfstring{Boiler Part Load Ratio {[]}}{Boiler Part Load Ratio }}\label{boiler-part-load-ratio}
+\paragraph{Boiler Part Load Ratio {[]}}\label{boiler-part-load-ratio}
 
 This output is the operating part-load ratio of the boiler. The part-load ratio is calculated as the boiler load divided by the boiler nominal capacity. The part-load ratio is limited by the minimum and maximum part-load ratio inputs specified by the user.
 
@@ -4888,28 +4893,26 @@ For the heating mode:
 
 \begin{lstlisting}
 
-BRANCH, Heating GshpHeating Branch,
-    ,
+BRANCH,
+	Heating GshpHeating Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Heating,
     GshpHeating,
     GshpHeating LoadSide Inlet Node,
-    GshpHeating LoadSide Outlet Node,
-    ACTIVE;
+    GshpHeating LoadSide Outlet Node;
 \end{lstlisting}
 
 \textbf{!in condenser loop}
 
 \begin{lstlisting}
 
-BRANCH, GshpHeating SourceSide Branch,
-    ,
+BRANCH,
+	GshpHeating SourceSide Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Heating,
     GshpHeating,
     GshpHeating SourceSide Inlet Node,
-    GshpHeating SourceSide Outlet Node,
-    ACTIVE;
+    GshpHeating SourceSide Outlet Node;
 \end{lstlisting}
 
 Example of Heat Pump Links
@@ -4937,8 +4940,7 @@ BRANCH,GshpCLG1 Chiller Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
     GshpCLG LoadSide Inlet Node1,
-    GshpCLG LoadSide Outlet Node1,
-    Active;
+    GshpCLG LoadSide Outlet Node1;
 \end{lstlisting}
 
 \textbf{!in condenser loop}
@@ -4950,8 +4952,7 @@ BRANCH, GshpCLG1 Condenser Branch,
     ,
     HeatPump:WatertoWater:ParameterEstimatinon:Cooling, GshpCLG1,
     GshpCLG SourceSide Inlet Node1,
-    GshpCLG SourceSide Outlet Node1,
-    ACTIVE;
+    GshpCLG SourceSide Outlet Node1;
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-13-003}
@@ -5769,7 +5770,7 @@ ChillerHeaterPerformance:Electric:EIR,
 
 Note that much of these output variables are adapted from the definitions above under ``Generic Chiller Outputs'' and ``Electric EIR Chiller Outputs.'' The following outputs are repeated up to the maximum of individual chiller-heater module objects. The maximum number may be different from the number of object defined in this object when users define two or more identical chiller-heater modules for a single chiller heater object in the central heat pump system.
 
-\subsubsection{\texorpdfstring{Chiller Heater Operation Mode Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{~}}{Chiller Heater Operation Mode Unit \textless{}x\textgreater{} ~}}\label{chiller-heater-operation-mode-unit-x}
+\subsubsection{Chiller Heater Operation Mode Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{~}}\label{chiller-heater-operation-mode-unit-x}
 
 This output represents the operating mode of the chiller-heater module. Two single mode outputs and three simultaneous cooling-heating mode outputs are possible:
 
@@ -5794,11 +5795,11 @@ The first mode 0 is reported when the chiller-heater is turned off. The next two
 
 Note that the decision to operate individual chiller-heater modules is solely dependent on the chiller-heater schedule and loads. A fraction may appear in case the chiller-heater mode varies within a zone time step. In this particular case, users may define a detailed reporting frequency for this output variable.
 
-\subsubsection{\texorpdfstring{Chiller Heater Part Load Ratio Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{~}}{Chiller Heater Part Load Ratio Unit \textless{}x\textgreater{} ~}}\label{chiller-heater-part-load-ratio-unit-x}
+\subsubsection{Chiller Heater Part Load Ratio Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{~}}\label{chiller-heater-part-load-ratio-unit-x}
 
 This output is the ratio of the evaporator heat transfer rate plus the false load heat transfer rate (if applicable) to the available chiller-heater capacity. This value is used to determine ChillerEIRFPLR.
 
-\subsubsection{\texorpdfstring{Chiller Heater Cycling Ratio Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{~}}{Chiller Heater Cycling Ratio Unit \textless{}x\textgreater{} ~}}\label{chiller-heater-cycling-ratio-unit-x}
+\subsubsection{Chiller Heater Cycling Ratio Unit \textless{}x\textgreater{} \protect\hyperlink{section-1}{~}}\label{chiller-heater-cycling-ratio-unit-x}
 
 The cycling ratio is the amount of time the chiller-heater operates during each simulation time step. If the chiller-heater part-load ratio falls below the minimum part-load ratio, the chiller-heater cycles on and off to meet the loads.
 
@@ -5864,9 +5865,9 @@ This is the output of the curve object Electric Input to Cooling Output Ratio Fu
 
 This is the output of the curve object Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve.
 
-\subsection{Thermal Storage Objects}\label{thermal-storage-objects}
+\subsection{Cold Thermal Storage Objects}\label{thermal-storage-objects}
 
-There are four types of cold thermal storage objects:
+There are four types of cold thermal storage objects that can be added to plant loops. (To model cold thermal storage integrated with packaged air-conditioning units, see the thermal storage cooling coil in section \ref{coilcoolingdxsinglespeedthermalstorage}.  The four cold thermal storage objects for plant loops are:
 
 \begin{itemize}
 \item
@@ -5882,12 +5883,12 @@ There are four types of cold thermal storage objects:
 These objects are typically placed on the supply side of a primary chilled water loop in series or in parallel with one or more chillers.~ Using the the component set point (PlantEquipmentOperation:ComponentSetpoint) plant operation scheme type, the chiller and storage tank setpoints are used to control operation. Using a SetpointManager:Scheduled object (or other appropriate type of set point manager), the setpoints on the chiller outlet node and the ice storage outlet node can be used to control how the cooling load is shared and when charging of storage occurs.~ Example setpoints to use for various modes of operation are shown in the table below:
 
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
-\toprule 
+\toprule
 Mode & Chiller Setpoint & Storage Setpoint \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Mode & Chiller Setpoint & Storage Setpoint \tabularnewline
 \midrule
 \endhead
@@ -5901,9 +5902,9 @@ Cooling with chiller and storage (chiller carries portion of load, valid if chil
 
 Example files have been developed for three common storage configurations:
 
-1.~Series -- Chiller Upstream:~ In this configuration, a chiller is placed first on the same branch as the storage unit and both use the \textbf{SeriesActive} branch control type.
+1.~Series -- Chiller Upstream:~ In this configuration, a chiller is placed first on the same branch as the storage unit.
 
-2.~Series -- Chiller Downstream:~ In this configuration, a chiller is placed second on the same branch as the storage unit and both use the \textbf{SeriesActive} branch control type.
+2.~Series -- Chiller Downstream:~ In this configuration, a chiller is placed second on the same branch as the storage unit.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -5991,7 +5992,7 @@ The following outputs are available for simple Ice Storage model:
 
 The load requested by the plant control scheme. A positive value indicates a cooling load or a request to discharge (melt) the tank. A negative value indicates a request to charge (freeze) the tank.
 
-\paragraph{\texorpdfstring{Ice Thermal Storage End Fraction {[]}}{Ice Thermal Storage End Fraction }}\label{ice-thermal-storage-end-fraction}
+\paragraph{Ice Thermal Storage End Fraction {[]}}\label{ice-thermal-storage-end-fraction}
 
 The fraction of full ice storage which is present at the end of the current HVAC timestep. When reported at a frequency less than detailed, this value is averaged over the reporting period.
 
@@ -6153,15 +6154,15 @@ Current detailed ice storage output variables are:
 
 The actual load (absolute value) provided by the ice storage system during the current timestep
 
-\paragraph{\texorpdfstring{Ice Thermal Storage Change Fraction {[]}}{Ice Thermal Storage Change Fraction }}\label{ice-thermal-storage-change-fraction}
+\paragraph{Ice Thermal Storage Change Fraction {[]}}\label{ice-thermal-storage-change-fraction}
 
 The change in the ice tank's charge fraction charged during the current timestep (positive for charging, negative for discharging).
 
-\paragraph{\texorpdfstring{Ice Thermal Storage End Fraction {[]}}{Ice Thermal Storage End Fraction }}\label{ice-thermal-storage-end-fraction-1}
+\paragraph{Ice Thermal Storage End Fraction {[]}}\label{ice-thermal-storage-end-fraction-1}
 
 The fraction charge of the ice storage system at the end of the timestep
 
-\paragraph{\texorpdfstring{Ice Thermal Storage On Coil Fraction {[]}}{Ice Thermal Storage On Coil Fraction }}\label{ice-thermal-storage-on-coil-fraction}
+\paragraph{Ice Thermal Storage On Coil Fraction {[]}}\label{ice-thermal-storage-on-coil-fraction}
 
 The fraction of ice that is actually on the freezing surface at the end of the timestep.~ This can be different for an ``inside melt'' system than the end fraction (see previous output parameter).
 

@@ -14,9 +14,11 @@ set( test_src
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
+  ChilledCeilingPanelSimple.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
@@ -30,13 +32,17 @@ set( test_src
   Datasets.unit.cc
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
+  DaylightingManager.unit.cc
+  DElightManager.unit.cc
   DemandResponse.unit.cc
   DesiccantDehumidifiers.unit.cc
   DisplacementVentMgr.unit.cc
   DOASEffectOnZoneSizing.unit.cc
+  DualDuct.unit.cc
   DXCoils.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
+  ElectricBaseboardRadiator.unit.cc
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
@@ -51,13 +57,19 @@ set( test_src
   General.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatBalanceMovableInsulation.unit.cc
+  HeatBalanceIntRadExchange.unit.cc
   HeatBalanceSurfaceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
+  HeatingCoils.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
+  HighTempRadiantSystem.unit.cc
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
+  HVACManager.unit.cc
+  HVACInterfaceManager.unit.cc
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
@@ -67,23 +79,27 @@ set( test_src
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
+  IntegratedHeatPump.unit.cc
+  InternalHeatGains.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
+  MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
-  PlantHeatExchangerFluidToFluid.unit.cc
-  PlantPipingSystemsManager.unit.cc
-  PlantUtilities.unit.cc
-  Pumps.unit.cc
-  PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  PlantHeatExchangerFluidToFluid.unit.cc
+  PlantPipingSystemsManager.unit.cc
+  PlantUtilities.unit.cc
+  Pumps.unit.cc
+  PurchasedAirManager.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -91,6 +107,7 @@ set( test_src
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
+  SimulationManager.unit.cc
   SingleDuct.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
@@ -106,9 +123,11 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   Tables.unit.cc
+  SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
+  VAVDefMinMaxFlow.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   VentilatedSlab.unit.cc

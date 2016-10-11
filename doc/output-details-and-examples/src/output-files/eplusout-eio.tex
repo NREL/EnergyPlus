@@ -82,10 +82,6 @@ Environment:Site Atmospheric Variation,0.330,460.000,6.500000E-003
 
 ~SurfaceGeometry,UpperLeftCorner,CounterClockwise,RelativeCoordinateSystem
 
-! \textless{}Program Control Information:Threads/Parallel Sims\textgreater{}, Threading Supported,Maximum Number of Threads, Env Set Threads (OMP\_NUM\_THREADS), EP Env Set Threads (EP\_OMP\_NUM\_THREADS). IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), Number NominalSurface, Number Parallel Sims
-
-Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, Not Set, 2, 60, N/A
-
 The simulation parameters output is the simplest form of reporting in the \textbf{eplusout.eio} file. Each of the ``header'' records (lines starting with an ``!'') are followed immediately by the one and only data line. By and large, these data lines are all merely echoes of the entries in the IDF (or defaulted for blank fields). For most of these descriptions, you can look at the object fields (of same name) in the \href{file:///E:/Docs4PDFs/InputOutputReference.pdf}{Input Output Reference} document.
 
 \subsection{Version}\label{version}
@@ -265,44 +261,6 @@ If daylighting is used, this describes the coordinate system for entering daylig
 \subsubsection{Field: Rectangular (Simple) Surface Coordinate System}\label{field-rectangular-simple-surface-coordinate-system}
 
 For simple surfaces (Wall, Window, Door, and so forth) the coordinate system that is used to describe their starting point.
-
-\subsection{Program Control}\label{program-control}
-
-! \textless{}Program Control Information:Threads/Parallel Sims\textgreater{}, Threading Supported,Maximum Number of Threads, Env Set Threads (OMP\_NUM\_THREADS), EP Env Set Threads (EP\_OMP\_NUM\_THREADS). IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number Parallel Sims
-
-Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, Not Set, 2, 60, N/A
-
-More examples:
-
-Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, Not Set, 1, 6, N/A
-
-Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, 1, 1, 46, N/A
-
-This describes the threading that may be active for the simulation. The ProgramControl object is used for this output. As described in that object, only the Interior Radiant Exchange calculation has been exposed to use threading, goal being to speed up calculations but may not always be the most beneficial.
-
-\subsubsection{Field: Threading Supported}\label{field-threading-supported}
-
-The compile of the program has to support threading (OpenMP for now). If it is compiled thus, this field will be \textbf{Yes}.~ Otherwise it will be \textbf{No}.
-
-\subsubsection{Field: Maximum Number of Threads}\label{field-maximum-number-of-threads}
-
-Regardless of whether the compile has supported threading, the system is queried for the number of threads possible -- that number is entered in this field.
-
-\subsubsection{Field: Env Set Threads (OMP\_NUM\_THREADS)}\label{field-env-set-threads-ompux5fnumux5fthreads}
-
-The Environment Variable OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.~ If not set, \textbf{Not Set} will be shown. This is a system variable, but suggest that you use the following environment variable if you want to manually control the number of threads.
-
-\subsubsection{Field: EP Env Set Threads (EP\_OMP\_NUM\_THREADS)}\label{field-ep-env-set-threads-epux5fompux5fnumux5fthreads}
-
-The Environment Variable EP\_OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.~ If not set, \textbf{Not Set} will be shown.
-
-\subsubsection{Field: IDF Set Threads}\label{field-idf-set-threads}
-
-If you use the ProgramControl object in your IDF, you can again manually control the number of threads to be used. This would be reported here if set.~ If not set, \textbf{Not Set} will be shown.
-
-\subsubsection{Field: Number of Threads Used (Interior Radiant Exchange)}\label{field-number-of-threads-used-interior-radiant-exchange}
-
-This is the number of threads that was actually used in the Interior Radiant Exchange routines (which calculates the interior surface temperatures).
 
 \subsubsection{Field: Number Nominal Surfaces}\label{field-number-nominal-surfaces}
 
@@ -2410,7 +2368,7 @@ Part 2 of the Window Construction Report encompasses several ``lines''.
 
 \textbf{Line 6:} ! \textless{}WindowMaterial:Blind\textgreater{},Material Name,SlatWidth \{m\},SlatSeparation \{m\},SlatThickness \{m\},SlatAngle \{deg\},SlatBeamSolarTransmittance,SlatBeamSolarFrontReflectance,BlindToGlassDistance \{m\}
 
-\subsection{\texorpdfstring{Material\textbf{:}WindowGlass}{Material:WindowGlass}}\label{materialwindowglass}
+\subsection{Material\textbf{:}WindowGlass}\label{materialwindowglass}
 
 \subsubsection{Field:~ \textless{}Material:WindowGlass\textgreater{}}\label{field-materialwindowglass}
 
@@ -3168,7 +3126,7 @@ This field contains the nominal sensible heat ratio (SHR) capacity of the coil i
 
 This field contains the nominal cooling coil UA value in Watts per deg C.
 
-\subsubsection{\texorpdfstring{Field: Nominal Surface Area \{m\(^{2}\)\}}{Field: Nominal Surface Area \{m\^{}\{2\}\}}}\label{field-nominal-surface-area-m2}
+\subsubsection{Field: Nominal Surface Area \{m\(^{2}\)\}}\label{field-nominal-surface-area-m2}
 
 This field contains the nominal cooling coil surface area in square meter.
 
@@ -4319,18 +4277,18 @@ Outputs are provided for lookup tables in two forms. The first being the outputs
 ! <CREATING NEW CURVE OBJECT>
 CREATING NEW CURVE OBJECT
 ! Input as Table:OneIndependentVariable "HPACCOOLCAPFFF"
-! RSquared       = 1.0000000000
+! RSquared       = 1.0000000000
 ! Standard Error = 0.0000000000
-! Sample Size    = 3
+! Sample Size    = 3
 Curve:Quadratic,
-FromTable_HPACCOOLCAPFFF,  !- Name
-  0.8000000000,  !- Coefficient1 Constant
-  0.2000000000,  !- Coefficient2 x
-  -3.1086244690E-015,  !- Coefficient3 x**2
-  0.0000000000,  !- Minimum Value of x
-  1.5000000000,  !- Maximum Value of x
-  0.8000000000,  !- Minimum Curve Output
-  1.5000000000;  !- Maximum Curve Output
+FromTable_HPACCOOLCAPFFF,  !- Name
+  0.8000000000,  !- Coefficient1 Constant
+  0.2000000000,  !- Coefficient2 x
+  -3.1086244690E-015,  !- Coefficient3 x**2
+  0.0000000000,  !- Minimum Value of x
+  1.5000000000,  !- Maximum Value of x
+  0.8000000000,  !- Minimum Curve Output
+  1.5000000000;  !- Maximum Curve Output
 END CREATING NEW CURVE OBJECT
 ``
 \end{lstlisting}
@@ -4352,7 +4310,7 @@ As described elsewhere, EnergyPlus simulates the first day of each simulation pe
 
 \begin{lstlisting}
 ! <Environment:WarmupDays>, NumberofWarmupDays
-Environment:WarmupDays,  6
+Environment:WarmupDays,  6
 \end{lstlisting}
 
 \subsubsection{Field: <Environment:WarmupDays>}
@@ -4365,7 +4323,7 @@ This field will show the number of days required to reach the convergence state 
 
 \subsection{Warmup Convergence Outputs}
 
-Warmup is performed for each environment being simulated. When a file passes convergence, no warnings are shown.  However, when it doesn’t a warning appears in the eplusout.err file, for example:
+Warmup is performed for each environment being simulated. When a file passes convergence, no warnings are shown.  However, when it doesn’t a warning appears in the eplusout.err file, for example:
 
 \begin{lstlisting}
 CheckWarmupConvergence: Loads Initialization, Zone = "BACKROOM" did not converge after 25 warmup days.
@@ -4398,15 +4356,15 @@ Summary (warmup convergance information is not reported during sizing and only a
 
 Warmup Convergence Information,PLENUM-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1459548118,7.6866834879E-002,Pass,Pass,6.4148162842E-002,0.1344412193,Pass,Pass
 
- Warmup Convergence Information,SPACE1-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1205887641,0.2962564087,Pass,Pass,0.6840608138,3.7598304674,Pass,Pass
+ Warmup Convergence Information,SPACE1-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1205887641,0.2962564087,Pass,Pass,0.6840608138,3.7598304674,Pass,Pass
 
- Warmup Convergence Information,SPACE2-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1494584750,0.4540146507,Pass,Pass,0.7552649309,3.0925096445,Pass,Pass
+ Warmup Convergence Information,SPACE2-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1494584750,0.4540146507,Pass,Pass,0.7552649309,3.0925096445,Pass,Pass
 
- Warmup Convergence Information,SPACE3-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1150550710,0.2873890950,Pass,Pass,7.0443709912,61.6558566585,Pass,Pass
+ Warmup Convergence Information,SPACE3-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1150550710,0.2873890950,Pass,Pass,7.0443709912,61.6558566585,Pass,Pass
 
- Warmup Convergence Information,SPACE4-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1153798692,0.4838241280,Pass,Pass,2.4744275587,18.1154149427,Pass,Pass
+ Warmup Convergence Information,SPACE4-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1153798692,0.4838241280,Pass,Pass,2.4744275587,18.1154149427,Pass,Pass
 
- Warmup Convergence Information,SPACE5-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1208173250,0.2114200039,Pass,Pass,0.4984428726,2.8997025264,Pass,Pass
+ Warmup Convergence Information,SPACE5-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO# = 725300,0.1208173250,0.2114200039,Pass,Pass,0.4984428726,2.8997025264,Pass,Pass
 \end{lstlisting}
 
 \subsubsection{Field: Zone Name}
@@ -4456,17 +4414,17 @@ Detailed warmup convergence information is reported if you add an Output:Diagnos
 \begin{lstlisting}
 ! <Warmup Convergence Information>, Zone Name,Time Step,Hour of Day, Warmup Temperature Difference {deltaC}, Warmup Load Difference {W}
 
- Warmup Convergence Information, PLENUM-1,1,1,7.2649997289E-005,0.3830511891
+ Warmup Convergence Information, PLENUM-1,1,1,7.2649997289E-005,0.3830511891
 
- Warmup Convergence Information, SPACE1-1,1,1,1.9871863274E-004,1.6099213169E-002
+ Warmup Convergence Information, SPACE1-1,1,1,1.9871863274E-004,1.6099213169E-002
 
- Warmup Convergence Information, SPACE2-1,1,1,4.2767539998E-003,3.1481614518
+ Warmup Convergence Information, SPACE2-1,1,1,4.2767539998E-003,3.1481614518
 
- Warmup Convergence Information, SPACE3-1,1,1,1.2388614949E-003,5.9934952313
+ Warmup Convergence Information, SPACE3-1,1,1,1.2388614949E-003,5.9934952313
 
- Warmup Convergence Information, SPACE4-1,1,1,2.7512443391E-003,3.9192729035
+ Warmup Convergence Information, SPACE4-1,1,1,2.7512443391E-003,3.9192729035
 
- Warmup Convergence Information, SPACE5-1,1,1,1.7415692658E-003,5.3879887714
+ Warmup Convergence Information, SPACE5-1,1,1,1.7415692658E-003,5.3879887714
 \end{lstlisting}
 
 \subsubsection{Field: Zone Name}
@@ -4483,7 +4441,7 @@ This field will show the value of hour of the day.
 
 \subsubsection{Field: Warmup Temperature Difference}
 
-This field will provide a mean air temperature comparison between the second to last and the last warmup day for the simulation.  In other words, it will provide a DT between, for example, 9:10AM on the second to last warmup day and 9:10AM on the last warmup day. The value will be on a zone-by-zone basis for each time step in the simulation.
+This field will provide a mean air temperature comparison between the second to last and the last warmup day for the simulation.  In other words, it will provide a DT between, for example, 9:10AM on the second to last warmup day and 9:10AM on the last warmup day. The value will be on a zone-by-zone basis for each time step in the simulation.
 
 \subsubsection{Field: Warmup Load Difference}
 

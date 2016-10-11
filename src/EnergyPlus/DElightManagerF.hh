@@ -79,14 +79,16 @@ namespace DElightManagerF {
 	);
 
 	void
+	GetInputDElightComplexFenestration(
+		bool & ErrorsFound
+	);
+
+	void
 	CheckForGeometricTransform(
 		bool & doTransform,
 		Real64 & OldAspectRatio,
 		Real64 & NewAspectRatio
 	);
-
-	void
-	SetupDElightOutput4EPlus();
 
 	std::string
 	ReplaceBlanksWithUnderscores(

@@ -2266,9 +2266,9 @@ The parallel powered induction unit is an air system terminal unit that mixes va
 \caption{Parallel PIU Terminal Unit \protect \label{fig:parallel-piu-terminal-unit-001}}
 \end{figure}
 
-\subsubsection{Inputs}\label{inputs-10-008}
+\subsubsection{Inputs}\label{inputs-2016-06-16-1620}
 
-\paragraph{Field: Zone Name}\label{field-zone-name-9-000}
+\paragraph{Field: Zone Name}\label{field-zone-name-2016-06-16-1620}
 
 Enter the name of the zone. The name must match a building zone name used in the ZONE object.
 
@@ -3218,11 +3218,11 @@ HVACTemplate:System:VRF,
   autosize,     !- Evaporative Condenser Pump Rated Power Consumption {W}
   ,                     !- Supply Water Storage Tank Name
   200,                  !- Basin Heater Capacity {W/K}
-  ,                     !- Basin Heater Set Point Temperature (C)
+  ,                     !- Basin Heater Set Point Temperature {C}
   ,                     !- Basin Heater Operating Schedule Name
   ,                     !- Fuel Type
-  ,    !- Minimum Outdoor Temperature in Heat Recovery Mode (C)
-  ;    !- Maximum Outdoor Temperature in Heat Recovery Mode (C)
+  ,    !- Minimum Outdoor Temperature in Heat Recovery Mode {C}
+  ;    !- Maximum Outdoor Temperature in Heat Recovery Mode {C}
 \end{lstlisting}
 
 \subsection{HVACTemplate:System:Unitary}\label{hvactemplatesystemunitary}
@@ -3481,10 +3481,6 @@ The \emph{CollReheatDesuperheater} option cools beyond the dry-bulb setpoint as 
 
 The default is \emph{None} which meets the sensible cooling load only. The humidistat is located in the same zone that is specified above as the Control Zone or Thermostat Location Name.
 
-\paragraph{Field: Dehumidification Control Zone Name}\label{field-dehumidification-control-zone-name}
-
-This field is deprecated and will be removed. The humidistat is located in the same zone that is specified above as the Control Zone or Thermostat Location Name.
-
 \paragraph{Field: Dehumidification Setpoint}\label{field-dehumidification-setpoint-1}
 
 This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100). The default is 60\%.
@@ -3578,7 +3574,6 @@ HVACTemplate:System:Unitary,
   ,                        !- Sensible Heat Recovery Effectiveness
   ,                        !- Latent Heat Recovery Effectiveness
   None,                    !- Dehumidification Control Type
-  ,                        !- Dehumidification Control Zone Name
   60,                      !- Dehumidification Setpoint {percent}
   ElectricSteam,           !- Humidifier Type
   ,                        !- Humidifier Availability Schedule
@@ -3990,7 +3985,7 @@ HVACTemplate:System:UnitaryHeatPump:AirToAir,
 
 This object simulates a unitary system with option cooling coil (air-cooled DX, water-cooled DX, and chilled water), options heating coil (gas, electric, hot water, air-to-air heat pump, and water-to-air heat pump) with cycling or continous fan controls. Often a single HVACTemplate:Zone:Unitary object will be used with a single HVACTemplate:System:UnitarySystem object to simulate single zone system. In addition, multiple HVACTemplate:Zone:Unitary objects may reference the same HVACTemplate:System:UnitarySystem object in a multiple zone version. For a multiple zone system, only one zone is specified as the control zone. The model can simulate chilled water or heat pump systems seen in commercial buildings and split systems commonly seen in residential buildings. HVACTemplate:System:UnitarySystem is similar to HVACTemplate:System:Unitary and HVACTemplate:System:UnitaryHeatPump:AirToAir, but it offers more flexilbility by using the more general AirLoopHVAC:UnitarySystem object instead of the more specific unitary furnace and heat pump objects.
 
-\subsubsection{Inputs}\label{inputs-17-003}
+\subsubsection{Inputs}\label{inputs-2016-06-16-1621}
 
 \paragraph{Field: Name}\label{field-name-4-013}
 
@@ -4152,7 +4147,7 @@ The default value is Gas.
 
 \paragraph{Field: Number of Speeds or Stages for Heating}\label{field-number-of-speeds-or-stages-for-heating}
 
-This field defines the number of heating speeds or stages if a multi-speed heatpump or multi-stage heating coil is specifiedl. The default is 1. For heating coil type MultiSpeedDXHeatPumpAirSource, the maximum number of speeds allowed is 10. For heating coil types MultiStageElectric and MultiStageGas, the maximum number of stages allowed is 4. For other heating coil types, this field is ignored.
+This field defines the number of heating speeds or stages if a multi-speed heatpump or multi-stage heating coil is specified. The default is 1. For heating coil type MultiSpeedDXHeatPumpAirSource, the maximum number of speeds allowed is 10. For heating coil types MultiStageElectric and MultiStageGas, the maximum number of stages allowed is 4. For other heating coil types, this field is ignored.
 
 \paragraph{Field: Heating Coil Availability Schedule Name}\label{field-heating-coil-availability-schedule-name-3}
 
@@ -4395,10 +4390,6 @@ The \emph{CoolReheat} option cools beyond the dry-bulb setpoint as required to m
 
 The default is \emph{None} which meets the sensible cooling load only. The humidistat is located in the same zone that is specified above as the Control Zone or Thermostat Location Name.
 
-\paragraph{Field: Dehumidification Control Zone Name}\label{field-dehumidification-control-zone-name-1}
-
-This field specifies the zone name where the humidistat is located for controlling dehumidification.
-
 \paragraph{Field: Dehumidification Relative Humidity Setpoint}\label{field-dehumidification-relative-humidity-setpoint}
 
 This field specifies the zone humidistat setpoint for dehumidification in percent (0 to 100). The default is 60\%. This field is ignored if a Dehumidification Relative Humidity Setpoint Schedule Name is specified.
@@ -4529,7 +4520,6 @@ HVACTemplate:System:UnitarySystem,
   ,                        !- Heat Recovery Heat Exchanger Type
   ,                        !- Heat Recovery Frost Control Type
   None,                    !- Dehumidification Control Type
-  ,                        !- Dehumidification Control Zone Name
   60.0,       !- Dehumidification Relative Humidity Setpoint {percent}
   ,           !- Dehumidification Relative Humidity Setpoint Schedule Name
   None,                    !- Humidifier Type
@@ -6934,11 +6924,11 @@ Enter the type of air-to-air heat recovery which is available between the relief
 
 The default is None\emph{.}
 
-\paragraph{\texorpdfstring{Field: Heat Recovery Sensible Effectiveness {[]}}{Field: Heat Recovery Sensible Effectiveness }}\label{field-heat-recovery-sensible-effectiveness}
+\paragraph{Field: Heat Recovery Sensible Effectiveness {[]}}\label{field-heat-recovery-sensible-effectiveness}
 
 Enter the sensible heat recovery effectiveness. This is applied as a constant effectiveness at all conditions. The valid range is from 0.0 to 1.0, and the default is 0.70.
 
-\paragraph{\texorpdfstring{Field: Heat Recovery Latent Effectiveness {[]}}{Field: Heat Recovery Latent Effectiveness }}\label{field-heat-recovery-latent-effectiveness}
+\paragraph{Field: Heat Recovery Latent Effectiveness {[]}}\label{field-heat-recovery-latent-effectiveness}
 
 Enter the latent heat recovery effectiveness if Heat Recovery Type is \emph{Enthalpy}. This is applied as a constant effectiveness at all conditions. The valid range is from 0.0 to 1.0, and the default is 0.65.
 
@@ -7079,7 +7069,7 @@ The piping systems that connect the chilled water coils in the HVAC template obj
 
 \subsubsection{Inputs}\label{inputs-23-001}
 
-\paragraph{Field: Name}\label{field-name-10-007}
+\paragraph{Field: Name}\label{field-name-2016-06-16-1622}
 
 The name used to designate the HVACTemplate:Plant:ChilledWaterLoop.
 

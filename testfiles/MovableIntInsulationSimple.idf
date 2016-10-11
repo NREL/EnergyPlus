@@ -12,7 +12,7 @@
 ! Plant:    None
 ! SolDis=FullInteriorAndExterior, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.5;
+  Version,8.6;
 
   Timestep,6;
 
@@ -526,3 +526,4 @@
     Through: 12/31,          !- Field 9
     For: Alldays,            !- Field 10
     Until: 24:00,1.00;       !- Field 11
+

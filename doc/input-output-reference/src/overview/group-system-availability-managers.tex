@@ -82,7 +82,7 @@ The scheduled on availability manager has one output variable.
   HVAC,Average,Availability Manager Scheduled On Control Status
 \end{itemize}
 
-\paragraph{\texorpdfstring{Availability Manager Scheduled On Control Status {[]}}{Availability Manager Scheduled On Control Status }}\label{availability-manager-scheduled-on-control-status}
+\paragraph{Availability Manager Scheduled On Control Status {[]}}\label{availability-manager-scheduled-on-control-status}
 
 A value of 0 indicates the manager is signaling \emph{NoAction}. A value of 2 means the manager is signaling \emph{CycleOn}.
 
@@ -119,7 +119,7 @@ The scheduled off availability manager has one output variable.
   HVAC,Average,Availability Manager Scheduled Off Control Status
 \end{itemize}
 
-\paragraph{\texorpdfstring{Availability Manager Scheduled Off Control Status {[]}}{Availability Manager Scheduled Off Control Status }}\label{availability-manager-scheduled-off-control-status}
+\paragraph{Availability Manager Scheduled Off Control Status {[]}}\label{availability-manager-scheduled-off-control-status}
 
 A value of 0 indicates the manager is signaling \emph{NoAction}. A value of 1 means the manager is signaling \emph{ForceOff}.
 
@@ -128,6 +128,8 @@ A value of 0 indicates the manager is signaling \emph{NoAction}. A value of 1 me
 This manager is used for cycling on an air system when one or more zones become too hot or too cold. The usual situation is that the central air handler is turned off at night. However if the building gets too cold there might be condensation on the walls and other damage. Thus the control system is usually programmed to turn the system on if 1 control thermostat or any thermostat shows a zone temperature of less than a night time set point. Similarly there might be a concern about a building getting too hot. Again the control system is programmed to turn the air handler back on if one or any zone temperature exceeds a night time cooling set point.
 
 This object gives the user considerable flexibility in determining how the night time on/off decision will be made. The manager can look at the temperature in 1 zone or it can sample all the zones connected to the air handler. The user can specify a temperature tolerance and a run time for the system once it switches on. There is also an applicability schedule the user can schedule whether or not this availability manager itself is being applied.
+
+\subsubsection{Inputs}\label{inputs-3-037}
 
 \textbf{\emph{Field: Name}}
 
@@ -143,7 +145,19 @@ The name of the central fan on/off schedule for the air system that this availab
 
 \textbf{\emph{Field: Control Type}}
 
-The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly}. \emph{StayOff} means the availability manager will have no effect air handler on/off will be determined by the fan schedule. \emph{CycleOnAny} means that if any zone served by a system whose AvailabilityManagerAssignmentList references this system availability manager has an air temperature outside the cooling or heating set points the central fan will turn on even though the fan schedule indicates the fan is off. \emph{CycleOnControlZone} means the same thing except the availability manager looks at the temperature in only one zone. \emph{CycleOnAnyZoneFansOnly} is the same as \emph{CycleOnAny} except that only the zone fans are cycled on and the central air handler fan is left off. The default is \emph{StayOff}.
+The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZone}, \emph{CycleOnAnyZoneFansOnly}, \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyCoolingZone}, \emph{CycleOnAnyHeatingZone}, or \emph{CycleOnAnyHeatingZoneFansOnly}. The default is \emph{StayOff}.
+
+\begin{itemize}
+\tightlist
+\item  \emph{StayOff} means the availability manager will have no effect air handler on/off will be determined by the fan schedule. 
+\item  \emph{CycleOnAny} means that if any zone served by a system whose AvailabilityManagerAssignmentList references this system availability manager has an air temperature outside the cooling or heating set points the central fan will turn on even though the fan schedule indicates the fan is off. 
+\item  \emph{CycleOnControlZone} means the same thing except the availability manager looks at the temperature in any one or more zones specified in the Control Zone or Zone List Name field. 
+\item  \emph{CycleOnAnyZoneFansOnly} is the same as \emph{CycleOnAny} except that only the zone fans are cycled on and the central air handler fan is left off. 
+\item  \emph{CycleOnAnyCoolingOrHeatingZone} means that the central fan will turn on if any zone listed in the Cooling Control Zone or Zone List Name is outside the cooling setpoint or any zone listed in the Heating Control Zone or Zone List Name is outside the heating setpoint. If the central fan is activated, then the zone fans are enabled.  If the central fan is not activated, but any zone in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint, then the zone fans only will be enabled.
+\item  \emph{CycleOnAnyCoolingZone} means that the central fan will turn on if any zone listed in the Cooling Control Zone or Zone List Name is outside the cooling setpoint. If the central fan is activated, then the zone fans are enabled.  
+\item  \emph{CycleOnAnyHeatingZone} means that the central fan will turn on if any zone listed in the Heating Control Zone or Zone List Name is outside the heating setpoint. If the central fan is activated, then the zone fans are enabled.   If the central fan is not activated, but any zone in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint, then the zone fans only will be enabled. 
+\item  \emph{CycleOnAnyHeatingZoneFansOnly} means that the zone fans will be enabled if any zone listed in the Heating Zone Fans Only Zone or Zone List Name is outside the heating setpoint. The central fan is never activated with this control type.
+\end{itemize}
 
 \textbf{\emph{Field: Thermostat Tolerance}}
 
@@ -153,24 +167,38 @@ The Thermostat Tolerance defines the amount by which the zone temperature must f
 
 The time in seconds for which the system will run after it has cycled on. The default is 3600 seconds (1 hour).
 
-\textbf{\emph{Field: Control Zone Name}}
+\textbf{\emph{Field: Control Zone or Zone List Name}}
 
-For the option \emph{CycleOnControlZone} this is the name of the control zone.
+For the option \emph{CycleOnControlZone} this is the name of the control zone or zone list. These zones will activate the central fan for heating or cooling.
+
+\textbf{\emph{Field: Cooling Control Zone or Zone List Name}}
+
+For the options \emph{CycleOnAnyCoolingOrHeatingZone} and  \emph{CycleOnAnyCoolingZone}  this is the name of the cooling control zone or zone list. These zones will activate the central fan for cooling.
+
+\textbf{\emph{Field: Heating Control Zone or Zone List Name}}
+
+For the options \emph{CycleOnAnyCoolingOrHeatingZone} and  \emph{CycleOnAnyHeatingZone}  this is the name of the heating control zone or zone list. These zones will activate the central fan for heating.
+
+\textbf{\emph{Field: Heating Zone Fans Only Zone or Zone List Name}}
+
+For the options \emph{CycleOnAnyCoolingOrHeatingZone}, \emph{CycleOnAnyHeatingZone}, and \emph{CycleOnAnyHeatingZoneFansOnly},  this is the name of the heating zone fans control zone or zone list. These zones will activate the zone fans for heating.
 
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
 
 AvailabilityManager:NightCycle,
-  VAV Sys 1 Avail,         ! Name
-  SysAvailApplicSch,     !Applicability Schedule Name
-  FanAvailSched,             ! Fan Schedule Name
-  CycleOnAny,                   ! Control Type
-  4.0,                                 ! Temperature Tolerance {delta C}
-  7200.;                             ! Cycle Run Time {s}
+  VAV Sys 1 Avail,       !- Name
+  SysAvailApplicSch,     !- Applicability Schedule Name
+  FanAvailSched,         !- Fan Schedule Name
+  CycleOnAny,            !- Control Type
+  4.0,                   !- Temperature Tolerance {delta C}
+  7200.;                 !- Cycle Run Time {s}
+  ,                      !- Control Zone or Zone List Name
+  ,                      !- Cooling Zone or Zone List Name
+  ,                      !- Heating Control Zone or Zone List Name
+  ;                      !- Heating Zone Fans Only Zone or Zone List Name
 \end{lstlisting}
-
-\subsubsection{Inputs}\label{inputs-3-037}
 
 \subsubsection{Outputs}\label{outputs-2-022}
 
@@ -278,7 +306,7 @@ The high temperature turn off availability manager has one output variable.
   HVAC,Average,Availability Manager High Temperature Turn Off Control Status
 \end{itemize}
 
-\paragraph{\texorpdfstring{Availability Manager High Temperature Turn Off Control Status {[]}}{Availability Manager High Temperature Turn Off Control Status }}\label{availability-manager-high-temperature-turn-off-control-status}
+\paragraph{Availability Manager High Temperature Turn Off Control Status {[]}}\label{availability-manager-high-temperature-turn-off-control-status}
 
 A value of 0 indicates the manager is signaling \emph{NoAction}. A value of 1 means the manager is signaling \emph{ForceOff.}
 
@@ -320,7 +348,7 @@ The high temperature turn on availability manager has one output variable.
   HVAC,Average,Availability Manager High Temperature Turn On Control Status
 \end{itemize}
 
-\paragraph{\texorpdfstring{Availability Manager High Temperature Turn On Control Status {[]}}{Availability Manager High Temperature Turn On Control Status }}\label{availability-manager-high-temperature-turn-on-control-status}
+\paragraph{Availability Manager High Temperature Turn On Control Status {[]}}\label{availability-manager-high-temperature-turn-on-control-status}
 
 A value of 0 indicates the manager is signaling \emph{NoAction}. A value of 2 means the manager is signaling \emph{CycleOn.}
 
@@ -409,7 +437,7 @@ The low temperature turn on availability manager has one output variable.
   HVAC,Average,Availability Manager Low Temperature Turn On Control Status {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Availability Manager Low Temperature Turn On Control Status {[]}}{Availability Manager Low Temperature Turn On Control Status }}\label{availability-manager-low-temperature-turn-on-control-status}
+\paragraph{Availability Manager Low Temperature Turn On Control Status {[]}}\label{availability-manager-low-temperature-turn-on-control-status}
 
 A value of 0 indicates the manager is signaling NoAction. A value of 2 means the manager is signaling CycleOn.
 
@@ -480,7 +508,7 @@ The night ventilation availability manager has one output variable.
   HVAC,Average,Availability Manager Night Ventilation Control Status {[]}
 \end{itemize}
 
-\paragraph{\texorpdfstring{Availability Manager Night Ventilation Control Status {[]}}{Availability Manager Night Ventilation Control Status }}\label{availability-manager-night-ventilation-control-status}
+\paragraph{Availability Manager Night Ventilation Control Status {[]}}\label{availability-manager-night-ventilation-control-status}
 
 A value of 0 indicates the manager is signaling NoAction. A value of 2 means the manager is signaling CycleOn.
 
@@ -504,7 +532,7 @@ A unique, user-assigned name for an instance of a hybrid ventilation availabilit
 
 The name of the air loop (AirLoopHVAC object) to be controlled by this system availability manager. If this field is left blank, hybrid ventilation manager will be applied to the controlled zone specified in the field below.
 
-\paragraph{Field: Controlled Zone Name}\label{field-controlled-zone-name}
+\paragraph{Field: Control Zone Name}\label{field-controlled-zone-name}
 
 The name of a controlled zone served by the air loop defined in the previous field. The air conditions in this zone are used to determine if natural ventilation should be provided.
 
@@ -572,6 +600,26 @@ The name of a ZoneVentilation:* object whose zone name is the controlled zone na
 
 \textbf{Note:} A \textbf{ZoneInfiltration:*} object indicates any one of \textbf{ZoneInfiltration:DesignFlowRate}, \textbf{ZoneInfiltration:EffectiveLeakageArea},and \textbf{ZoneInfiltration:FlowCoefficient} objects.A object of\textbf{ZoneVentilation:*} indicates any one of \textbf{ZoneVentilation:DesignFlowRate} and \textbf{ZoneVentilation:WindandStackOpenArea} objects.
 
+An example of this object in an input file:
+
+\begin{lstlisting}
+
+AvailabilityManager:HybridVentilation,
+  Hybrid ventilation controller 1,  !- Name
+  Typical Terminal Reheat 1,  !- HVAC Air Loop Name
+  NORTH ZONE,              !- Control Zone Name
+  Hybrid Control Mode Schedule,  !- Ventilation Control Mode Schedule Name
+  Yes,                     !- Use Weather File Rain Indicators
+  40.0,                    !- Maximum Wind Speed {m/s}
+  15.0,                    !- Minimum Outdoor Temperature {C}
+  35.0,                    !- Maximum Outdoor Temperature {C}
+  20000.0,                 !- Minimum Outdoor Enthalpy {J/kg}
+  30000.0,                 !- Maximum Outdoor Enthalpy {J/kg}
+  15.0,                    !- Minimum Outdoor Dewpoint {C}
+  30.0,                    !- Maximum Outdoor Dewpoint {C}
+  Outdoor air Schedule;    !- Minimum Outdoor Ventilation Air Schedule Name
+\end{lstlisting}
+
 \subsubsection{Outputs}\label{outputs-9-008}
 
 The hybrid ventilation availability manager has two output variables.
@@ -580,11 +628,11 @@ HVAC,Average,Availability Manager Hybrid Ventilation Control Mode {[]}
 
 HVAC,Average,Availability Manager Hybrid Ventilation Control Status {[]}
 
-\paragraph{\texorpdfstring{Availability Manager Hybrid Ventilation Control Mode {[]}}{Availability Manager Hybrid Ventilation Control Mode }}\label{availability-manager-hybrid-ventilation-control-mode}
+\paragraph{Availability Manager Hybrid Ventilation Control Mode {[]}}\label{availability-manager-hybrid-ventilation-control-mode}
 
 This is the hybrid ventilation control mode given in the Ventilation Control Mode Schedule.
 
-\paragraph{\texorpdfstring{Availability Manager Hybrid Ventilation Control Status {[]}}{Availability Manager Hybrid Ventilation Control Status }}\label{availability-manager-hybrid-ventilation-control-status}
+\paragraph{Availability Manager Hybrid Ventilation Control Status {[]}}\label{availability-manager-hybrid-ventilation-control-status}
 
 This is the hybrid ventilation control status, which can have three integer values: 0, 1, and 2. A zero value indicates no hybrid ventilation control, corresponding to zero value defined in the previous output variable. A value of one indicates that natural ventilation is allowed. A value of two denotes that the natural ventilation is not allowed, so all window/door openings are closed.
 

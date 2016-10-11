@@ -123,7 +123,7 @@ namespace DataHVACGlobals {
 	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
 	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
 	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil
-
+	extern int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing; // identifies desiccant performance data face velocity autosisizing input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
@@ -196,7 +196,7 @@ namespace DataHVACGlobals {
 	extern int const CoilDX_MultiSpeedCooling;
 	extern int const CoilDX_MultiSpeedHeating;
 
-	extern int const Coil_HeatingGas;
+	extern int const Coil_HeatingGasOrOtherFuel;
 	extern int const Coil_HeatingGas_MultiStage;
 	extern int const Coil_HeatingElectric;
 	extern int const Coil_HeatingElectric_MultiStage;
@@ -339,6 +339,7 @@ namespace DataHVACGlobals {
 	extern Real64 BalancedExhMassFlow; // balanced zone exhaust (declared as so by user)  [kg/s]
 	extern Real64 PlenumInducedMassFlow; // secondary air mass flow rate induced from a return plenum [kg/s]
 	extern bool TurnFansOn; // If true overrides fan schedule and cycles fans on
+	extern bool TurnZoneFansOnlyOn; // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
 	extern bool TurnFansOff; // If True overides fan schedule and TurnFansOn and forces fans off
 	extern bool ZoneCompTurnFansOn; // If true overrides fan schedule and cycles fans on
 	extern bool ZoneCompTurnFansOff; // If True overides fan schedule and TurnFansOn and forces fans off

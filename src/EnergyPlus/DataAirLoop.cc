@@ -114,7 +114,6 @@ namespace DataAirLoop {
 	Array1D< AirLooptoZoneData > AirLoopZoneInfo;
 	Array1D< AirLoopControlData > AirLoopControlInfo;
 	Array1D< AirLoopFlowData > AirLoopFlow;
-	Array1D< OAControllerData > OAControllerInfo;
 	Array1D< OutsideAirSysProps > OutsideAirSys;
 
 	// Clears the global data in DataAirLoop.
@@ -138,7 +137,6 @@ namespace DataAirLoop {
 		AirLoopZoneInfo.deallocate();
 		AirLoopControlInfo.deallocate();
 		AirLoopFlow.deallocate();
-		OAControllerInfo.deallocate();
 		OutsideAirSys.deallocate();
 	}
 

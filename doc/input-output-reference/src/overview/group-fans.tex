@@ -97,7 +97,7 @@ This output field contains the electricity consumption of the fan in Joules for 
 
 \subsection{Fan:OnOff}\label{fanonoff}
 
-This object models a constant air volume fan that is intended to cycle on and off in tandem with a cooling or heating system (i.e., AUTO fan control mode). The fan can also operate continuously like Fan:ConstantVolume. If modeling continuous operation and this object is used as part of a system that utilizes Coil:Heating:Gas, Coil:Cooling:DX:SingleSpeed or Coil:Heating:DX:SingleSpeed, the user should confirm proper air flow rates (coil and fan max flows are equal) and that the coil part-load fraction correlation(s) are appropriate (e.g., part-load fraction is less than or equal to 1 for all values of coil part-load ratio). If modeling multi-speed fan operation, this object must be used as part of a compound object that allows multiple fan speeds (e.g., AirLoopHVAC:Unitary:Furnace:HeatCool, ZoneHVAC:PackagedTerminalAirConditioner, etc.). In this case, the ratio of the compound object air flow rate to the fan s maximum air flow rate is used to determine the power at alternate fan speeds. The optional input for Fan Power Ratio Function of Speed Ratio Curve Name must be entered to model multi-speed fan operation. An optional fan total efficiency ratio curve is also available to model efficiency differences at alternate fan speeds.
+This object models a constant air volume fan that is intended to cycle on and off in tandem with a cooling or heating system (i.e., AUTO fan control mode). The fan can also operate continuously like Fan:ConstantVolume. If modeling continuous operation and this object is used as part of a system that utilizes Coil:Heating:Fuel, Coil:Cooling:DX:SingleSpeed or Coil:Heating:DX:SingleSpeed, the user should confirm proper air flow rates (coil and fan max flows are equal) and that the coil part-load fraction correlation(s) are appropriate (e.g., part-load fraction is less than or equal to 1 for all values of coil part-load ratio). If modeling multi-speed fan operation, this object must be used as part of a compound object that allows multiple fan speeds (e.g., AirLoopHVAC:Unitary:Furnace:HeatCool, ZoneHVAC:PackagedTerminalAirConditioner, etc.). In this case, the ratio of the compound object air flow rate to the fan s maximum air flow rate is used to determine the power at alternate fan speeds. The optional input for Fan Power Ratio Function of Speed Ratio Curve Name must be entered to model multi-speed fan operation. An optional fan total efficiency ratio curve is also available to model efficiency differences at alternate fan speeds.
 
 \subsubsection{Inputs}\label{inputs-1-017}
 
@@ -190,7 +190,7 @@ This output field contains the average rise in air temperature across the fan (o
 
 This output field contains the electricity consumption of the fan in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Fans, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{\texorpdfstring{Fan Runtime Fraction {[]}}{Fan Runtime Fraction }}\label{fan-runtime-fraction}
+\paragraph{Fan Runtime Fraction {[]}}\label{fan-runtime-fraction}
 
 This output field contains the fraction of time that this fan operated for the timestep being reported.
 

@@ -193,7 +193,9 @@ namespace HighTempRadiantSystem {
 	extern Array1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
-
+	void
+	clear_state();
+	
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
@@ -203,8 +205,8 @@ namespace HighTempRadiantSystem {
 	);
 
 	void
-	GetHighTempRadiantSystem();
-
+	GetHighTempRadiantSystem( bool & ErrorsFound ); // Error flag if problems encountered on reading user input
+	
 	void
 	InitHighTempRadiantSystem(
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
