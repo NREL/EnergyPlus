@@ -5531,7 +5531,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							// Read Kiva results for each surface
 							TempSurfInTmp( SurfNum ) = SurfaceGeometry::kivaManager.getTemp( SurfNum );
 
-							TH11 = 0.0; // TODO Kiva: Generate warning if asked for outside temp?
+							TH11 = 0.0;
 						}
 
 

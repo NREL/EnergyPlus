@@ -74,6 +74,7 @@ class FoundationKiva {
 public:
   Kiva::Foundation foundation;
   std::string name;
+  std::vector< int > surfaces;
 
 };
 
@@ -82,16 +83,17 @@ public:
   KivaInstanceMap(Kiva::Foundation& foundation,
     std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
     int floorSurface,
-    Array1D< int > wallSurfaces,
+    std::vector< int > wallSurfaces,
     int zoneNum
   );
   std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> outputMap;
   Kiva::Ground ground;
   int floorSurface;
-  Array1D< int > wallSurfaces;
+  std::vector< int > wallSurfaces;
   int zoneNum;
   void setBoundaryConditions();
   void reportKivaSurfaces();
+  void plotDomain();
   Kiva::BoundaryConditions bcs;
 };
 
@@ -106,6 +108,9 @@ public:
   std::vector<FoundationKiva> foundationInputs;
   std::vector<KivaInstanceMap> kivaInstances;
   void defineDefaultFoundation();
+  bool defaultSet;
+  int findFoundation(std::string name);
+  int defaultIndex;
   Real64 getTemp(int surfNum );
   Real64 getConv(int surfNum );
 

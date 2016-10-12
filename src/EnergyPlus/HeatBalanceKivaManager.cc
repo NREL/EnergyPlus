@@ -64,6 +64,10 @@
 // Lis Header
 #include "lis.h"
 
+#ifdef GROUND_PLOT
+#include "libgroundplot/GroundPlot.hpp"
+#endif
+
 // EnergyPlus Headers
 #include <HeatBalanceKivaManager.hh>
 #include <DataEnvironment.hh>
@@ -72,6 +76,7 @@
 #include <DataHeatBalSurface.hh>
 #include <DataGlobals.hh>
 #include <DataSurfaces.hh>
+#include <DataStringGlobals.hh>
 #include <DisplayRoutines.hh>
 #include <UtilityRoutines.hh>
 
@@ -81,7 +86,7 @@ namespace HeatBalanceKivaManager {
 KivaInstanceMap::KivaInstanceMap(Kiva::Foundation& foundation,
   std::map<Kiva::Surface::SurfaceType, std::vector<Kiva::GroundOutput::OutputType>> oM,
   int floorSurface,
-  Array1D< int > wallSurfaces,
+  std::vector< int > wallSurfaces,
   int zoneNum) :
   outputMap(oM),
   ground(foundation, outputMap),
@@ -109,6 +114,28 @@ void KivaInstanceMap::setBoundaryConditions() {
     DataHeatBalFanSys::QElecBaseboardSurf( floorSurface ) +
     DataHeatBalance::QRadThermInAbs( floorSurface );
 
+  // Calculate area weighted average for walls
+  Real64 QAtotal = 0.0;
+  Real64 Atotal = 0.0;
+  for (auto& wl : wallSurfaces) {
+    Real64 Q =
+      DataHeatBalSurface::NetLWRadToSurf( wl ) +
+      DataHeatBalSurface::QRadSWInAbs( wl ) +
+      DataHeatBalFanSys::QHTRadSysSurf( wl ) +
+      DataHeatBalFanSys::QHWBaseboardSurf( wl ) +
+      DataHeatBalFanSys::QSteamBaseboardSurf( wl ) +
+      DataHeatBalFanSys::QElecBaseboardSurf( wl ) +
+      DataHeatBalance::QRadThermInAbs( wl );
+
+    Real64& A = DataSurfaces::Surface( wl ).Area;
+
+    QAtotal += Q*A;
+    Atotal += A;
+
+  }
+
+  bcs.wallAbsRadiation = QAtotal/Atotal;
+
 }
 
 void KivaInstanceMap::reportKivaSurfaces() {
@@ -116,14 +143,33 @@ void KivaInstanceMap::reportKivaSurfaces() {
   Real64 const qFloor = -(bcs.slabAbsRadiation + DataHeatBalance::HConvIn(floorSurface)*(DataHeatBalFanSys::MAT(zoneNum) - DataHeatBalSurface::TempSurfIn(floorSurface)));
 
   DataHeatBalSurface::OpaqSurfInsFaceConductionFlux( floorSurface ) = qFloor;
-  DataHeatBalSurface::OpaqSurfInsFaceConduction( floorSurface ) = qFloor * DataSurfaces::Surface(floorSurface).Area; // for reporting as in CTF, PT
-  // TODO Kiva: Repeat for walls
+  DataHeatBalSurface::OpaqSurfInsFaceConduction( floorSurface ) = qFloor * DataSurfaces::Surface(floorSurface).Area;
+
+  for (auto& wl : wallSurfaces) {
+    Real64 Qrad =
+      DataHeatBalSurface::NetLWRadToSurf( wl ) +
+      DataHeatBalSurface::QRadSWInAbs( wl ) +
+      DataHeatBalFanSys::QHTRadSysSurf( wl ) +
+      DataHeatBalFanSys::QHWBaseboardSurf( wl ) +
+      DataHeatBalFanSys::QSteamBaseboardSurf( wl ) +
+      DataHeatBalFanSys::QElecBaseboardSurf( wl ) +
+      DataHeatBalance::QRadThermInAbs( wl );
+
+    Real64 const qWall = -(Qrad + DataHeatBalance::HConvIn(wl)*(DataHeatBalFanSys::MAT(zoneNum) - DataHeatBalSurface::TempSurfIn(wl)));
+
+    DataHeatBalSurface::OpaqSurfInsFaceConductionFlux( wl ) = qWall;
+    DataHeatBalSurface::OpaqSurfInsFaceConduction( wl ) = qWall * DataSurfaces::Surface(wl).Area;
+
+  }
+
 }
 
 KivaManager::KivaManager() {
   LIS_INT dummy_argc = 0;
   char** dummy_argv;
   lis_initialize(&dummy_argc, &dummy_argv);
+  defaultSet = false;
+  defaultIndex = 0.0;
 }
 
 KivaManager::~KivaManager() {
@@ -142,12 +188,39 @@ void KivaManager::setupKivaInstances() {
 
   for (auto& surface : Surfaces) {
     if ( surface.ExtBoundCond == DataSurfaces::KivaFoundation && surface.Class == DataSurfaces::SurfaceClass_Floor ) {
-      // TODO Kiva: Setup
 
       // Copy foundation input for this instance
       Kiva::Foundation fnd = foundationInputs[surface.OSCPtr].foundation;
 
-      // TODO Kiva: Find other surfaces associated with the same floor
+      // Find other surfaces associated with the same floor
+      std::vector< int > wallSurfaces;
+
+      for (auto& wl : foundationInputs[surface.OSCPtr].surfaces) {
+        if ( Surfaces(wl).Zone == surface.Zone && wl != surfNum ) {
+          if ( Surfaces(wl).Class != DataSurfaces::SurfaceClass_Wall ) {
+            if ( Surfaces(wl).Class == DataSurfaces::SurfaceClass_Floor ) {
+              // TODO Kiva: only one floundation floor per zone
+              ShowSevereError( "only one foundation floor per zone" );
+            } else {
+              // TODO Kiva: only floor and wall surfaces allowed
+              ShowSevereError( "only floor and wall surfaces allowed" );
+            }
+          } else {
+            wallSurfaces.push_back(wl);
+          }
+        }
+      }
+
+      // All wall surfaces must have the same construction
+      if (wallSurfaces.size() != 0) {
+        int constructionNum = Surfaces(wallSurfaces[0]).Construction;
+        for (auto& wl : wallSurfaces) {
+          if (Surfaces(wl).Construction != constructionNum) {
+            // TODO Kiva: all walls must have the same construction
+            ShowSevereError( "all walls must have the same construction" );
+          }
+        }
+      }
 
       // Set slab construction
       for (int i = 0; i < Constructs( surface.Construction ).TotLayers; ++i ) {
@@ -169,17 +242,23 @@ void KivaManager::setupKivaInstances() {
 
       fnd.slab.emissivity = 0.0; // Long wave included in rad BC. Materials(Constructs( surface.Construction ).LayerPoint(Constructs( surface.Construction ).TotLayers)).AbsorpThermal;
 
-      // TODO Kiva: expose interior solar absorptivity
-
-      // TODO Kiva: wall layers + emissivity/absorptivity
+      // Set wall construction
 
       // put together the rest of kiva Foundation instance based on E+ geometry
-      Real64 wallHeight = 0.0; // TODO each wall with different height gets its own instance.
+      Real64 wallHeight = 0.0;
+      if (wallSurfaces.size() != 0) {
+        wallHeight = Surfaces(wallSurfaces[0]).Height; // TODO Kiva: each wall with different height gets its own instance.
+        for (auto& wl : wallSurfaces) {
+          if (Surfaces(wl).Height != wallHeight) {
+            // TODO Kiva: all walls must be the same height
+            ShowSevereError( "all walls must be the same height" );
+          }
+        }
+      }
+
       fnd.foundationDepth = wallHeight;
 
-      fnd.orientation = 0.0; // TODO orientation from Zone...do we need this?
-
-      fnd.hasPerimeterSurface = false; // TODO perimeter surface for zones without exposed perimeter
+      fnd.hasPerimeterSurface = false; // TODO Kiva: perimeter surface for zones without exposed perimeter
       fnd.perimeterSurfaceWidth = 0.0;
 
       // polygon
@@ -224,14 +303,16 @@ void KivaManager::setupKivaInstances() {
         };
       }
 
-      // TODO Kiva: create wallSurface list
-      Array1D< int > wallSurfaces;
-
       // point surface to corresponding ground intance(s)]
       kivaInstances.push_back(KivaInstanceMap(foundationInstances[inst],
         outputMap,surfNum,wallSurfaces,surface.Zone));
 
+      // TODO Kiva: Change for walk-out basements (each floor can point to multiple instances)
       surfaceMap[surfNum] = {inst, Kiva::Surface::ST_SLAB_CORE};
+
+      for (auto& wl : wallSurfaces) {
+        surfaceMap[wl] = {inst, Kiva::Surface::ST_WALL_INT};
+      }
 
       inst++;
 
@@ -279,13 +360,76 @@ void KivaManager::calcKivaInstances() {
   for (auto& kv : kivaInstances) {
     auto& grnd = kv.ground;
 
-    // TODO Kiva: Accelerated approach? Kusuda?
     kv.setBoundaryConditions();
     grnd.calculate(kv.bcs,DataGlobals::MinutesPerTimeStep*60.);
     grnd.calculateSurfaceAverages();
     kv.reportKivaSurfaces();
+    kv.plotDomain();
 
   }
+}
+
+void KivaInstanceMap::plotDomain() {
+
+  #ifdef GROUND_PLOT
+
+  if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 2 && DataGlobals::HourOfDay == 2 && DataGlobals::TimeStep == 1) {
+    Kiva::SnapshotSettings ss;
+    ss.dir = DataStringGlobals::outDirPathName + "/snapshot";
+    double& l = ground.foundation.reductionLength2;
+    const double width = 6.0;
+    const double depth = ground.foundation.foundationDepth + width/2.0;
+    const double range = max(width, depth);
+    ss.xRange = {l - range/2.0, l + range/2.0};
+    ss.yRange = {0.5,0.5};
+    ss.zRange = {-range, ground.foundation.wall.heightAboveGrade};
+
+    Kiva::GroundPlot gp(ss,ground.domain,ground.foundation.blocks);
+
+    std::size_t nI =  gp.iMax - gp.iMin + 1;
+    std::size_t nJ = gp.jMax - gp.jMin + 1;
+
+    for(size_t k = gp.kMin; k <= gp.kMax; k++)
+    {
+      for(size_t j = gp.jMin; j <= gp.jMax; j++)
+      {
+        for(size_t i = gp.iMin; i <= gp.iMax; i++)
+        {
+          std::size_t index = (i-gp.iMin)+nI*(j-gp.jMin)+nI*nJ*(k-gp.kMin);
+          if (ss.plotType == Kiva::SnapshotSettings::P_TEMP)
+          {
+            if (ss.outputUnits == Kiva::SnapshotSettings::IP)
+              gp.TDat.a[index] = (ground.TNew[i][j][k] - 273.15)*9/5 + 32.0;
+            else
+              gp.TDat.a[index] = ground.TNew[i][j][k] - 273.15;
+          }
+          else
+          {
+            double du = gp.distanceUnitConversion;
+            std::vector<double> Qflux = ground.calculateHeatFlux(i,j,k);
+            double Qx = Qflux[0];
+            double Qy = Qflux[1];
+            double Qz = Qflux[2];
+            double Qmag = sqrt(Qx*Qx + Qy*Qy + Qz*Qz);
+
+            if (ss.fluxDir == Kiva::SnapshotSettings::D_M)
+              gp.TDat.a[index] = Qmag/(du*du);
+            else if (ss.fluxDir == Kiva::SnapshotSettings::D_X)
+              gp.TDat.a[index] = Qx/(du*du);
+            else if (ss.fluxDir == Kiva::SnapshotSettings::D_Y)
+              gp.TDat.a[index] = Qy/(du*du);
+            else if (ss.fluxDir == Kiva::SnapshotSettings::D_Z)
+              gp.TDat.a[index] = Qz/(du*du);
+          }
+        }
+      }
+    }
+
+    gp.createFrame();
+  }
+
+  #endif
+
 }
 
 Real64 KivaManager::getValue(int surfNum,Kiva::GroundOutput::OutputType oT) {
@@ -333,7 +477,7 @@ void KivaManager::defineDefaultFoundation() {
   defFnd.wall.exteriorAbsorptivity = 0.9;
 
 
-  defFnd.wall.height = 0.3; // Footer depth? TODO make relative to foundation depth
+  defFnd.wall.footerDepth = 0.3;
 
   Kiva::Material typicalSoil;
   typicalSoil.conductivity = 0.864;  // W/m-K
@@ -346,8 +490,6 @@ void KivaManager::defineDefaultFoundation() {
   defFnd.soilEmissivity = 0.9;
   defFnd.surfaceRoughness = 0.03; // m
 
-  // TODO Kiva: terrain pamarameters
-
   defFnd.farFieldWidth = 40.; // m
 
   Real64 waterTableDepth = 0.1022*DataEnvironment::Elevation;
@@ -355,7 +497,7 @@ void KivaManager::defineDefaultFoundation() {
   if (waterTableDepth <= 40.) {
     defFnd.deepGroundDepth = waterTableDepth;
     defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
-    defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp;
+    defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp + DataGlobals::KelvinConv;
   } else {
     defFnd.deepGroundDepth = 40.;
     defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
@@ -386,9 +528,26 @@ void KivaManager::defineDefaultFoundation() {
   defFnd.wallTopBoundary = Kiva::Foundation::WTB_ZERO_FLUX;
 
   defaultFoundation.foundation = defFnd;
-  defaultFoundation.name = "Default Foundation";
+  defaultFoundation.name = "<Default Foundation>";
 
   foundationInputs.push_back(defaultFoundation);
+
+  defaultIndex = foundationInputs.size() - 1;
+
+  defaultSet = true;
+
+}
+
+int KivaManager::findFoundation(std::string name) {
+  int fndNum = 0;
+  for (auto& fnd : foundationInputs) {
+    // Check if foundation exists
+    if ( fnd.name == name) {
+      return fndNum;
+    }
+    fndNum++;
+  }
+  return (int)foundationInputs.size();
 
 }
 

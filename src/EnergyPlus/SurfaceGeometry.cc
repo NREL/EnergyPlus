@@ -2922,18 +2922,24 @@ namespace SurfaceGeometry {
 					}
 
 				} else if ( SameString( cAlphaArgs( ArgPointer ), "Foundation" ) ) {
-					// TODO Kiva: Find foundation object, if not found use default
+					// Find foundation object, if blank use default
 					if ( lAlphaFieldBlanks(ArgPointer + 1) ) {
 
 						// Apply default foundation
-						SurfaceTmp( SurfNum ).OSCPtr = 0; // Reuse OSC pointer...shouldn't be used for non OSC cases anyway.
-
+						if (!kivaManager.defaultSet) {
+							// define default foundation if no other foundation object specified
+							kivaManager.defineDefaultFoundation();
+						}
+						SurfaceTmp( SurfNum ).OSCPtr = kivaManager.defaultIndex; // Reuse OSC pointer...shouldn't be used for non OSC surfaces anyway.
+						kivaManager.foundationInputs[kivaManager.defaultIndex].surfaces.push_back(SurfNum);
 					} else {
-						for (auto& fnd : kivaManager.foundationInputs) {
-							// Check if foundation exists
-							if ( fnd.name == SurfaceTmp( SurfNum ).ExtBoundCondName) {
-								// assign index
-							}
+						Found = kivaManager.findFoundation(SurfaceTmp( SurfNum ).ExtBoundCondName);
+						if (Found != (int)kivaManager.foundationInputs.size()) {
+							SurfaceTmp( SurfNum ).OSCPtr = Found;
+							kivaManager.foundationInputs[Found].surfaces.push_back( SurfNum );
+						} else {
+							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1) + "\"." );
+							ErrorsFound = true;
 						}
 					}
 					SurfaceTmp( SurfNum ).ExtBoundCond = KivaFoundation;
@@ -2941,7 +2947,7 @@ namespace SurfaceGeometry {
 				} else if ( SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
 					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM, TotOSCM );
 					if ( Found == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1 ) + "\"." );
 						ErrorsFound = true;
 					}
 					SurfaceTmp( SurfNum ).OSCMPtr = Found;
@@ -7563,11 +7569,11 @@ namespace SurfaceGeometry {
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 
-		kivaManager.defineDefaultFoundation();
-
 		// TODO Kiva: Read foundation data from input
 		cCurrentModuleObject = "Foundation:Kiva";
 		int TotKivaFnds = GetNumObjectsFound( cCurrentModuleObject );
+
+
 
 		// TODO Kiva: Error if construction has internal source
 

@@ -527,9 +527,6 @@ Output:VariableDictionary,IDF;
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
-!Output:Variable,*,Surface Inside Face Temperature,hourly;
-!Output:Variable,*,Surface Inside Face Convection Heat Gain Rate per Area,hourly;
-!Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area,hourly;
 Output:Variable,*,Zone Mean Air Temperature,hourly; !- Zone Average [C]
 Output:Variable,*,Surface Inside Face Temperature,hourly;
 Output:Variable,*,Surface Outside Face Temperature,hourly;

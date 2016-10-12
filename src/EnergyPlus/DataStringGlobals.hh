@@ -127,6 +127,7 @@ namespace DataStringGlobals {
 
 	extern std::string weatherFileNameOnly;
 	extern std::string idfDirPathName;
+	extern std::string outDirPathName;
 	extern std::string idfFileNameOnly;
 	extern std::string exeDirectory;
 
