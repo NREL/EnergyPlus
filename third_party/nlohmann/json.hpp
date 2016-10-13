@@ -1009,7 +1009,7 @@ class basic_json
     @since version 1.0.0
     */
     using parser_callback_t = std::function<bool(int depth, parse_event_t event, basic_json& parsed,
-                                                 unsigned line_num, unsigned line_index)>;
+                                                 size_t line_num, size_t line_index)>;
 
 
     //////////////////
@@ -7581,10 +7581,8 @@ class basic_json
     class lexer
     {
       public:
-        unsigned get_line_num() { return line_num; }
-        unsigned get_line_index() { return line_index; }
-        void set_line_index(unsigned num) { line_index = num; }
-        void set_line_num(unsigned num) { line_num = num; }
+        size_t get_line_num() { return line_num; }
+        size_t get_line_index() { return m_start - m_line_start; }
 
         /// token types for the parser
         enum class token_type
@@ -7962,7 +7960,11 @@ basic_json_parser_5:
                         break;
                     }
 basic_json_parser_6:
-                    line_index++;
+                    if (yych == '\n')
+                    {
+                      ++line_num;
+                      m_line_start = m_cursor;
+                    }
                     ++m_cursor;
                     if (m_limit <= m_cursor)
                     {
@@ -8973,7 +8975,8 @@ basic_json_parser_63:
         }
 
       private:
-        unsigned line_num = 1, line_index = 0;
+        size_t line_num = 1;
+        size_t line_index = 0;
         /// optional input stream
         std::istream* m_stream = nullptr;
         /// line buffer buffer for m_stream
@@ -8988,6 +8991,8 @@ basic_json_parser_63:
         const lexer_char_t* m_cursor = nullptr;
         /// pointer to the end of the buffer
         const lexer_char_t* m_limit = nullptr;
+        /// pointer to the start of the line
+        const lexer_char_t* m_line_start = nullptr;
         /// the last token type
         token_type last_token_type = token_type::end_of_input;
     };
@@ -9006,10 +9011,8 @@ basic_json_parser_63:
               m_lexer(reinterpret_cast<const typename lexer::lexer_char_t*>(buff), strlen(buff))
         {}
 
-        unsigned get_line_num() { return m_lexer.get_line_num(); }
-        unsigned get_line_index() { return m_lexer.get_line_index(); }
-        void set_line_index(unsigned num) { m_lexer.set_line_index(num); }
-        void set_line_num(unsigned num) { m_lexer.set_line_num(num); }
+        size_t get_line_num() { return m_lexer.get_line_num(); }
+        size_t get_line_index() { return m_lexer.get_line_index(); }
 
         /// a parser reading from an input stream
         parser(std::istream& is, const parser_callback_t cb = nullptr)
@@ -9063,7 +9066,6 @@ basic_json_parser_63:
 
                     // read next token
                     get_token();
-                    set_line_num(get_line_num() + 1);
 
                     // closing } -> we are done
                     if (last_token == lexer::token_type::end_object)
@@ -9073,7 +9075,6 @@ basic_json_parser_63:
                         {
                             result = basic_json(value_t::discarded);
                         }
-                        set_line_num(get_line_num() + 1);
                         return result;
                     }
 
@@ -9118,7 +9119,6 @@ basic_json_parser_63:
                         {
                             result[key] = std::move(value);
                         }
-                        set_line_num(get_line_num() + 1);
                     }
                     while (last_token == lexer::token_type::value_separator);
 
@@ -9145,7 +9145,6 @@ basic_json_parser_63:
 
                     // read next token
                     get_token();
-                    set_line_num(get_line_num() + 1);
 
                     // closing ] -> we are done
                     if (last_token == lexer::token_type::end_array)
@@ -9176,7 +9175,6 @@ basic_json_parser_63:
                         {
                             result.push_back(std::move(value));
                         }
-                        set_line_num(get_line_num() + 1);
                     }
                     while (last_token == lexer::token_type::value_separator);
 
@@ -9187,7 +9185,6 @@ basic_json_parser_63:
                     {
                         result = basic_json(value_t::discarded);
                     }
-                    set_line_num(get_line_num() + 1);
                     return result;
                 }
 
