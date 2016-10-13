@@ -405,13 +405,8 @@ namespace PlantLoadProfile {
 
 			for ( ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-				// PlantProfile name
-				if ( cAlphaArgs( 1 ).empty() ) {
-					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					cAlphaArgs( 1 ) = "xxxxx";
-				}
 				PlantProfile( ProfileNum ).Name = cAlphaArgs( 1 );
 				PlantProfile( ProfileNum ).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
 

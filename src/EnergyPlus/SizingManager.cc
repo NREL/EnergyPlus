@@ -835,12 +835,8 @@ namespace SizingManager {
 			for ( OAIndex = 1; OAIndex <= NumOARequirements; ++OAIndex ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-				if ( Alphas(1).empty() ) {
-					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					Alphas( 1 ) = "xxxxx";
-				}
 				OARequirements( OAIndex ).Name = Alphas( 1 );
 
 				ProcessInputOARequirements( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
@@ -1078,12 +1074,7 @@ namespace SizingManager {
 			for ( ZADIndex = 1; ZADIndex <= NumZoneAirDistribution; ++ZADIndex ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, ZADIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				if ( Alphas(1).empty() ) {
-					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					Alphas( 1 ) = "xxxxx";
-				}
+				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 				ZoneAirDistribution( ZADIndex ).Name = Alphas( 1 );
 
@@ -1364,11 +1355,8 @@ namespace SizingManager {
 		errFlag = false;
 		for ( Item = 1; Item <= NumSizingZoneStatements; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			if ( cAlphaArgs( 1 ).empty() ) {
-				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			SizingZoneObjects( Item ).Name = cAlphaArgs( 1 );
 
 			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 1 ), ZoneNames, NumZones );
@@ -1429,11 +1417,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).ZoneName = "Invalid Zone Name";
 						}
 					}
-					if (ZoneSizingInput( ZoneSizIndex ).ZoneName.empty()) {
-						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-						ErrorsFound = true;
-						cAlphaArgs( 1 ) = "xxxxx";
-					}
+
+					InputProcessor::IsNameEmpty(ZoneSizingInput( ZoneSizIndex ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 					if ( IsNotOK && ! SizingZoneObjects( Item ).ZoneListActive ) {
 						ShowContinueError( "Zone may have been entered in a ZoneList assignment." );
 					}
@@ -2070,11 +2055,7 @@ namespace SizingManager {
 
 		for ( SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SysSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			if (cAlphaArgs( iNameAlphaNum ).empty()) {
-				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-				ErrorsFound = true;
-				cAlphaArgs( iNameAlphaNum ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( iNameAlphaNum ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 			SysSizInput( SysSizIndex ).AirPriLoopName = cAlphaArgs( iNameAlphaNum );
 			{ auto const loadSizeType( cAlphaArgs( iLoadTypeSizeAlphaNum ) );
@@ -2533,11 +2514,8 @@ namespace SizingManager {
 
 		for ( PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PltSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			if ( cAlphaArgs( 1 ).empty() ) {
-				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+
 			PlantSizData( PltSizIndex ).PlantLoopName = cAlphaArgs( 1 );
 			PlantSizData( PltSizIndex ).ExitTemp = rNumericArgs( 1 );
 			PlantSizData( PltSizIndex ).DeltaT = rNumericArgs( 2 );
@@ -2994,12 +2972,7 @@ namespace SizingManager {
 				lNumericBlanks = true;
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, zSIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				if ( Alphas( 1 ).empty() ) {
-					ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					Alphas( 1 ) = "xxxxx";
-				}
+				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 				ZoneHVACSizing( zSIndex ).Name = Alphas( 1 );
 

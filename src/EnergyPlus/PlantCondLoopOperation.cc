@@ -443,50 +443,28 @@ namespace PlantCondLoopOperation {
 		CurrentModuleObject = "PlantEquipmentOperationSchemes";
 		NumPlantOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
-		if ( NumPlantOpSchemes > 0 ) {
-			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
-			OpSchemeNames.allocate( NumPlantOpSchemes );
-			Num = 0;
+
+
 			for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				IsNotOK = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), OpSchemeNames, Num, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					continue;
-				}
-				++Num;
-				OpSchemeNames( Num ) = cAlphaArgs( 1 );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+				if ( IsBlank ) continue;
 			}
 
-			OpSchemeNames.deallocate();
 
-		}
 
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
 		NumCondOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
-		if ( NumCondOpSchemes > 0 ) {
-			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
-			OpSchemeNames.allocate( NumCondOpSchemes );
-			Num = 0;
+
 			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				IsNotOK = false;
+				InputProcessor::GetObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
+											  IOStat);
 				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), OpSchemeNames, Num, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					continue;
-				}
-				++Num;
-				OpSchemeNames( Num ) = cAlphaArgs( 1 );
+				InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
+				if (IsBlank) continue;
 			}
-
-			OpSchemeNames.deallocate();
-
-		}
 
 		//Load the Plant data structure
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
