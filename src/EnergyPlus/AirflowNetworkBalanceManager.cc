@@ -305,6 +305,7 @@ namespace AirflowNetworkBalanceManager {
 
 	// Object Data
 	Array1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
+	std::unordered_map< std::string, std::string > UniqueAirflowNetworkSurfaceName;
 
 	Array1D< OccupantVentilationControlProp > OccupantVentilationControl;
 	// Functions
@@ -363,6 +364,7 @@ namespace AirflowNetworkBalanceManager {
 		IntraZoneNumOfZones = 0;
 		AirflowNetworkZnRpt.deallocate();
 		OccupantVentilationControl.deallocate();
+		UniqueAirflowNetworkSurfaceName.clear();
 	}
 
 	void
@@ -677,6 +679,7 @@ namespace AirflowNetworkBalanceManager {
 
 		ErrorsFound = false;
 		AirflowNetworkInitFlag = false;
+		AirflowNetworkGetInputFlag = false;
 
 		// Read AirflowNetwork OccupantVentilationControl before reading other AirflowNetwork objects, so that this object can be called by other simple ventilation objects
 		CurrentModuleObject = "AirflowNetwork:OccupantVentilationControl";
@@ -686,6 +689,7 @@ namespace AirflowNetworkBalanceManager {
 			for ( i = 1; i <= AirflowNetworkNumOfOccuVentCtrls; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				OccupantVentilationControl( i ).Name = Alphas( 1 ); // Name of object
+				// unique_string_blank_key
 				OccupantVentilationControl( i ).MinOpeningTime = Numbers( 1 );
 				if ( OccupantVentilationControl( i ).MinOpeningTime < 0.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cNumericFields( 1 ) + " < 0.0" );
@@ -1006,6 +1010,7 @@ namespace AirflowNetworkBalanceManager {
 			AirflowNetworkZoneFlag.dimension( NumOfZones, false ); // AirflowNetwork zone flag
 			for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneZoneData( i ).ZoneName = Alphas( 1 ); // Name of Associated EnergyPlus Thermal Zone
 				if ( ! lAlphaBlanks( 2 ) ) MultizoneZoneData( i ).VentControl = Alphas( 2 ); // Ventilation Control Mode: "Temperature", "Enthalpy",
 				// "ASHRAE55ADAPTIVE", "CEN15251AdaptiveComfort,
@@ -1187,6 +1192,7 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtNode );
 				for ( i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					// unique_string_blank_key
 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ); // Name of external node
 					MultizoneExternalNodeData( i ).Height = Numbers( 1 ); // Nodal height
 					if ( InputProcessor::SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
@@ -1209,6 +1215,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneSurfaceData.allocate( AirflowNetworkNumOfSurfaces );
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneSurfaceData( i ).SurfName = Alphas( 1 ); // Name of Associated EnergyPlus surface
 				MultizoneSurfaceData( i ).OpeningName = Alphas( 2 ); // Name of crack or opening component,
 				// either simple or detailed large opening, or crack
@@ -1458,6 +1465,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneCompDetOpeningData.allocate( AirflowNetworkNumOfDetOpenings );
 			for ( i = 1; i <= AirflowNetworkNumOfDetOpenings; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneCompDetOpeningData( i ).Name = Alphas( 1 ); // Name of large detailed opening component
 				MultizoneCompDetOpeningData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient When Window or Door Is Closed
 				MultizoneCompDetOpeningData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent When Window or Door Is Closed
@@ -1690,6 +1698,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneCompSimpleOpeningData.allocate( AirflowNetworkNumOfSimOpenings );
 			for ( i = 1; i <= AirflowNetworkNumOfSimOpenings; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneCompSimpleOpeningData( i ).Name = Alphas( 1 ); // Name of large simple opening component
 				MultizoneCompSimpleOpeningData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient When Window or Door Is Closed
 				MultizoneCompSimpleOpeningData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent When Window or Door Is Closed
@@ -1705,6 +1714,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneCompHorOpeningData.allocate( AirflowNetworkNumOfHorOpenings );
 			for ( i = 1; i <= AirflowNetworkNumOfHorOpenings; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneCompHorOpeningData( i ).Name = Alphas( 1 ); // Name of large simple opening component
 				MultizoneCompHorOpeningData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient When Window or Door Is Closed
 				if ( Numbers( 1 ) <= 0.0 ) {
@@ -1867,6 +1877,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneSurfaceStdConditionsCrackData.allocate( {0,AirflowNetworkNumOfStdCndns} );
 			for ( i = 1; i <= AirflowNetworkNumOfStdCndns; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneSurfaceStdConditionsCrackData( i ).Name = Alphas( 1 );
 				MultizoneSurfaceStdConditionsCrackData( i ).StandardT = Numbers( 1 ); // Reference temperature for crack data
 				MultizoneSurfaceStdConditionsCrackData( i ).StandardP = Numbers( 2 ); // Reference barometric pressure for crack data
@@ -1896,6 +1907,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneSurfaceCrackData.allocate( AirflowNetworkNumOfSurCracks );
 			for ( i = 1; i <= AirflowNetworkNumOfSurCracks; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneSurfaceCrackData( i ).Name = Alphas( 1 ); // Name of surface crack component
 				MultizoneSurfaceCrackData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient
 				MultizoneSurfaceCrackData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent
@@ -1930,6 +1942,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneSurfaceELAData.allocate( AirflowNetworkNumOfSurELA );
 			for ( i = 1; i <= AirflowNetworkNumOfSurELA; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneSurfaceELAData( i ).Name = Alphas( 1 ); // Name of surface effective leakage area component
 				MultizoneSurfaceELAData( i ).ELA = Numbers( 1 ); // Effective leakage area
 				MultizoneSurfaceELAData( i ).DischCoeff = Numbers( 2 ); // Discharge coefficient
@@ -1948,6 +1961,7 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneCompExhaustFanData.allocate( AirflowNetworkNumOfExhFan );
 			for ( i = 1; i <= AirflowNetworkNumOfExhFan; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				MultizoneCompExhaustFanData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
 				MultizoneCompExhaustFanData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
 				MultizoneCompExhaustFanData( i ).FlowExpo = Numbers( 2 ); // Flow exponent
@@ -2048,6 +2062,7 @@ namespace AirflowNetworkBalanceManager {
 
 				for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					// unique_string_blank_key
 					MultizoneCPValueData( i ).Name = Alphas( 1 ); // Name of CP value
 					MultizoneCPValueData( i ).CPArrayName = Alphas( 2 ); // CP array Name
 					// Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
@@ -2295,6 +2310,7 @@ namespace AirflowNetworkBalanceManager {
 			IntraZoneNodeData.allocate( IntraZoneNumOfNodes );
 			for ( i = 1; i <= IntraZoneNumOfNodes; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				IntraZoneNodeData( i ).Name = Alphas( 1 );       // Name of node
 				IntraZoneNodeData( i ).RAFNNodeName = Alphas( 2 ); // Name of RoomAir node
 				IntraZoneNodeData( i ).Height = Numbers( 1 ); // Nodal height
@@ -2341,10 +2357,10 @@ namespace AirflowNetworkBalanceManager {
 		IntraZoneNumOfLinks = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( IntraZoneNumOfLinks > 0 ) {
 			IntraZoneLinkageData.allocate( IntraZoneNumOfLinks );
-			UniqueAirflowNetworkSurfaceName.clear();
             UniqueAirflowNetworkSurfaceName.reserve( IntraZoneNumOfLinks );
 			for ( i = 1; i <= IntraZoneNumOfLinks; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				IntraZoneLinkageData( i ).Name = Alphas( 1 ); // Name of linkage
 				IntraZoneLinkageData( i ).NodeNames( 1 ) = Alphas( 2 );
 				IntraZoneLinkageData( i ).NodeHeights( 1 ) = 0.0;
@@ -2360,10 +2376,8 @@ namespace AirflowNetworkBalanceManager {
 						ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid " + cAlphaFields( 5 ) + " given = " + Alphas( 5 ) + " in AirflowNetwork:MultiZone:Surface objects" );
 						ErrorsFound = true;
 					}
-					if ( UniqueAirflowNetworkSurfaceName.find( IntraZoneLinkageData( i ).SurfaceName ) == UniqueAirflowNetworkSurfaceName.end() ) {
-						UniqueAirflowNetworkSurfaceName.insert( IntraZoneLinkageData( i ).SurfaceName );
-					} else {
-						ErrorsFound = true;
+					InputProcessor::VerifyUniqueInterObjectName( UniqueAirflowNetworkSurfaceName, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
+					if ( ErrorsFound ) {
 						if (IsBlank) Alphas(5) = "xxxxx";
 					}
 				}
@@ -2524,6 +2538,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysNodeData.allocate( DisSysNumOfNodes );
 			for ( i = 1; i <= DisSysNumOfNodes; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysNodeData( i ).Name = Alphas( 1 ); // Name of node
 				DisSysNodeData( i ).EPlusName = Alphas( 2 ); // Name of associated EnergyPlus node
 				DisSysNodeData( i ).EPlusType = Alphas( 3 ); // Name of associated EnergyPlus type
@@ -2552,6 +2567,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompLeakData.allocate( DisSysNumOfLeaks );
 			for ( i = 1; i <= DisSysNumOfLeaks; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompLeakData( i ).Name = Alphas( 1 ); // Name of duct leak component
 				DisSysCompLeakData( i ).FlowCoef = Numbers( 1 ); // Air Mass Flow Coefficient
 				DisSysCompLeakData( i ).FlowExpo = Numbers( 2 ); // Air Mass Flow exponent
@@ -2568,6 +2584,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompELRData.allocate( DisSysNumOfELRs );
 			for ( i = 1; i <= DisSysNumOfELRs; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompELRData( i ).Name = Alphas( 1 ); // Name of duct effective leakage ratio component
 				DisSysCompELRData( i ).ELR = Numbers( 1 ); // Value of effective leakage ratio
 				DisSysCompELRData( i ).FlowRate = Numbers( 2 ); // Maximum airflow rate
@@ -2587,6 +2604,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompDuctData.allocate( DisSysNumOfDucts );
 			for ( i = 1; i <= DisSysNumOfDucts; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompDuctData( i ).Name = Alphas( 1 ); // Name of duct effective leakage ratio component
 				DisSysCompDuctData( i ).L = Numbers( 1 ); // Duct length [m]
 				DisSysCompDuctData( i ).D = Numbers( 2 ); // Hydrolic diameter [m]
@@ -2702,6 +2720,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompCoilData.allocate( DisSysNumOfCoils );
 			for ( i = 1; i <= DisSysNumOfCoils; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompCoilData( i ).Name = Alphas( 1 ); // Name of associated EPlus coil component
 				DisSysCompCoilData( i ).EPlusType = Alphas( 2 ); // coil type
 				DisSysCompCoilData( i ).L = Numbers( 1 ); // Air path length
@@ -2720,6 +2739,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompHXData.allocate( DisSysNumOfHXs );
 			for ( i = 1; i <= DisSysNumOfHXs; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompHXData( i ).Name = Alphas( 1 ); // Name of associated EPlus heat exchange component
 				DisSysCompHXData( i ).EPlusType = Alphas( 2 ); // coil type
 				DisSysCompHXData( i ).L = Numbers( 1 ); // Air path length
@@ -2735,6 +2755,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompTermUnitData.allocate( DisSysNumOfTermUnits );
 			for ( i = 1; i <= DisSysNumOfTermUnits; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompTermUnitData( i ).Name = Alphas( 1 ); // Name of associated EPlus coil component
 				DisSysCompTermUnitData( i ).EPlusType = Alphas( 2 ); // Terminal unit type
 				DisSysCompTermUnitData( i ).L = Numbers( 1 ); // Air path length
@@ -2751,6 +2772,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompCPDData.allocate( DisSysNumOfCPDs );
 			for ( i = 1; i <= DisSysNumOfCPDs; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompCPDData( i ).Name = Alphas( 1 ); // Name of constant pressure drop component
 				DisSysCompCPDData( i ).A = 1.0; // cross section area
 				DisSysCompCPDData( i ).DP = Numbers( 1 ); // Pressure difference across the component
@@ -2772,6 +2794,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompOutdoorAirData.allocate( NumOfOAFans );
 			for ( i = 1; i <= NumOfOAFans; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompOutdoorAirData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
 				DisSysCompOutdoorAirData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
 				DisSysCompOutdoorAirData( i ).FlowExpo = Numbers( 2 ); // Flow exponent
@@ -2851,6 +2874,7 @@ namespace AirflowNetworkBalanceManager {
 			PressureControllerData.allocate( NumOfPressureControllers );
 			for ( i = 1; i <= NumOfPressureControllers; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name
 				PressureControllerData( i ).ZoneName = Alphas( 2 ); // Zone name
 				PressureControllerData( i ).ZoneNum = InputProcessor::FindItemInList( Alphas( 2 ), Zone );
@@ -3448,6 +3472,7 @@ namespace AirflowNetworkBalanceManager {
 			for ( count = AirflowNetworkNumOfSurfaces + 1; count <= AirflowNetworkNumOfLinks; ++count ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, count - AirflowNetworkNumOfSurfaces, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				AirflowNetworkLinkageData( count ).Name = Alphas( 1 );
 				AirflowNetworkLinkageData( count ).NodeNames( 1 ) = Alphas( 2 );
 				AirflowNetworkLinkageData( count ).NodeHeights( 1 ) = 0.0;

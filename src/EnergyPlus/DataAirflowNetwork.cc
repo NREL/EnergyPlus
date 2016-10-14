@@ -226,7 +226,6 @@ namespace DataAirflowNetwork {
 	Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
 	Array1D< IntraZoneNodeProp > IntraZoneNodeData;
 	Array1D< IntraZoneLinkageProp > IntraZoneLinkageData;
-	std::unordered_set< std::string > UniqueAirflowNetworkSurfaceName; // AirflowNetwork:IntraZone:Linkage A5 field (AirflowNetwork:MultiZone:Surface Name) set
 	Array1D< DisSysNodeProp > DisSysNodeData;
 	Array1D< DisSysCompLeakProp > DisSysCompLeakData;
 	Array1D< DisSysCompELRProp > DisSysCompELRData;
@@ -301,7 +300,6 @@ namespace DataAirflowNetwork {
 		MultizoneCompExhaustFanData.deallocate();
 		IntraZoneNodeData.deallocate();
 		IntraZoneLinkageData.deallocate();
-		UniqueAirflowNetworkSurfaceName.clear();
 		DisSysNodeData.deallocate();
 		DisSysCompLeakData.deallocate();
 		DisSysCompELRData.deallocate();
