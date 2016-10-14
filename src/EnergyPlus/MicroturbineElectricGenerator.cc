@@ -369,7 +369,7 @@ namespace MicroturbineElectricGenerator {
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-            InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 			MTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			MTGenerator( GeneratorNum ).RefElecPowerOutput = NumArray( 1 );
