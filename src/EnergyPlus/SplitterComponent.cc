@@ -312,12 +312,8 @@ namespace SplitterComponent {
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
-			if ( AlphArray(1).empty()) {
-				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
-				ErrorsFound = true;
-				AlphArray( 1 ) = "xxxxx";
-			}
 			SplitterCond( SplitterNum ).SplitterName = AlphArray( 1 );
 			SplitterCond( SplitterNum ).InletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			SplitterCond( SplitterNum ).NumOutletNodes = NumAlphas - 2;

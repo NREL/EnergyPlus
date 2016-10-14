@@ -343,12 +343,7 @@ namespace ZoneDehumidifier {
 		for ( ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			if ( Alphas( 1 ).empty() ) {
-				ShowSevereError( CurrentModuleObject + " Name, cannot be blank" );
-				ErrorsFound = true;
-				Alphas( 1 ) = "xxxxx";
-			}
+            InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 			// A1,  \field Name
 			ZoneDehumid( ZoneDehumidIndex ).Name = Alphas( 1 );

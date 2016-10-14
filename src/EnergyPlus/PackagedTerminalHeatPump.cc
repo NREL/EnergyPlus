@@ -720,6 +720,7 @@ namespace PackagedTerminalHeatPump {
 			CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
 			InputProcessor::GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
+			PTUnitNum = PTUnitIndex;
 
 			PTUnitUNumericFields( PTUnitNum ).FieldNames.allocate( NumNumbers );
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";

@@ -1213,12 +1213,7 @@ namespace WaterThermalTanks {
 				for ( DesuperheaterNum = 1; DesuperheaterNum <= NumWaterHeaterDesuperheater; ++DesuperheaterNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, DesuperheaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-					if ( cAlphaArgs(1).empty() ) {
-						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-						ErrorsFound = true;
-						cAlphaArgs( 1 ) = "xxxxx";
-					}
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 					VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 					if ( errFlag ) {
 						ErrorsFound = true;
@@ -1523,12 +1518,7 @@ namespace WaterThermalTanks {
 					for ( int i = NumAlphas + 1; i <= nNumPossibleAlphaArgs; ++i ) {
 						hpwhAlphaBlank[ i ] = true;
 					}
-
-					if ( hpwhAlpha[ 1 ].empty() ) {
-						ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-						ErrorsFound = true;
-						hpwhAlpha[ 1 ] = "xxxxx";
-					}
+					InputProcessor::IsNameEmpty(hpwhAlpha[1], cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 					// Name and type
 					HPWH.Name = hpwhAlpha[ 1 ];

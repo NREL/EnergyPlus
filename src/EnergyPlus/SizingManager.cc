@@ -1418,7 +1418,7 @@ namespace SizingManager {
 						}
 					}
 
-					InputProcessor::IsNameEmpty(ZoneSizingInput( ZoneSizIndex ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+					InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 					if ( IsNotOK && ! SizingZoneObjects( Item ).ZoneListActive ) {
 						ShowContinueError( "Zone may have been entered in a ZoneList assignment." );
 					}
