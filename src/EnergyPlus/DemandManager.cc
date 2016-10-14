@@ -728,7 +728,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-                // unique_string_blank_key
+				// unique_string_blank_key
 				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
@@ -831,7 +831,7 @@ namespace DemandManager {
 				IsNotOK = false;
 				IsBlank = false;
 				// unique_string_blank_key
-                InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeLights;
@@ -1198,7 +1198,7 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-                // unique_string_blank_key
+				// unique_string_blank_key
 				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 

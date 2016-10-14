@@ -2834,6 +2834,7 @@ namespace AirflowNetworkBalanceManager {
 			DisSysCompReliefAirData.allocate( NumOfReliefFans );
 			for ( i = 1; i <= NumOfReliefFans; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 				DisSysCompReliefAirData( i ).Name = Alphas( 1 ); // Name of zone exhaust fan component
 				DisSysCompReliefAirData( i ).FlowCoef = Numbers( 1 ); // flow coefficient
 				DisSysCompReliefAirData( i ).FlowExpo = Numbers( 2 ); // Flow exponent

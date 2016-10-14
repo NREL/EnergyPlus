@@ -460,7 +460,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-            InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			// unique_string_blank_key
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
@@ -763,7 +763,7 @@ namespace Fans {
 		// input the night ventilation performance objects
 		for ( NVPerfNum = 1; NVPerfNum <= NumNightVentPerf; ++NVPerfNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-            // unique_string_blank_key
+			// unique_string_blank_key
 			NightVentPerf( NVPerfNum ).FanName = cAlphaArgs( 1 );
 			NightVentPerf( NVPerfNum ).FanEff = rNumericArgs( 1 );
 			NightVentPerf( NVPerfNum ).DeltaPress = rNumericArgs( 2 );

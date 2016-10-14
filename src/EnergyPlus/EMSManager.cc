@@ -744,7 +744,7 @@ namespace EMSManager {
 			for ( SensorNum = 1; SensorNum <= NumSensors; ++SensorNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-                // unique_string_blank_key
+				// unique_string_blank_key
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					Sensor( SensorNum ).Name = cAlphaArgs( 1 );
@@ -832,7 +832,7 @@ namespace EMSManager {
 						cAlphaFieldNames, cNumericFieldNames );
 				}
 
-                // unique_string_blank_key
+				// unique_string_blank_key
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSActuatorUsed( ActuatorNum ).Name = cAlphaArgs( 1 );
@@ -893,7 +893,7 @@ namespace EMSManager {
 			for ( InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-                // unique_string_blank_key
+				// unique_string_blank_key
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSInternalVarsUsed( InternVarNum ).Name = cAlphaArgs( 1 );
@@ -942,7 +942,7 @@ namespace EMSManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-                // unique_string_blank_key
+				// unique_string_blank_key
 				EMSProgramCallManager( CallManagerNum ).Name = cAlphaArgs( 1 );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );

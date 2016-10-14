@@ -436,7 +436,7 @@ namespace EvaporativeFluidCoolers {
 			EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::VerifyUniqueInterObjectName( SimpleEvapFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
-            // unique_string_blank_key
+			// unique_string_blank_key
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num = EvapFluidCooler_SingleSpeed;

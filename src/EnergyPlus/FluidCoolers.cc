@@ -398,7 +398,7 @@ namespace FluidCoolers {
 		for ( SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = SingleSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-            InputProcessor::VerifyUniqueInterObjectName( SimpleFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( SimpleFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
 			// unique_string_blank_key
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
@@ -446,7 +446,7 @@ namespace FluidCoolers {
 			FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::VerifyUniqueInterObjectName( SimpleFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
-            // unique_string_blank_key
+			// unique_string_blank_key
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num = FluidCooler_TwoSpeed;
@@ -2207,7 +2207,7 @@ namespace FluidCoolers {
 	void
 	clear_state() {
 		SimpleFluidCooler_map.clear();
-        GetInput = true;
+		GetInput = true;
 	}
 
 } // FluidCoolers

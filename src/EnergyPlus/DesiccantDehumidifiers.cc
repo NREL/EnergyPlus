@@ -454,7 +454,7 @@ namespace DesiccantDehumidifiers {
 
 			DesicDehumNum = DesicDehumIndex;
 			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-            // unique_string_blank_key
+			// unique_string_blank_key
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Solid;
@@ -740,8 +740,8 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Generic;
 			InputProcessor::GetObjectItem( DesicDehum( DesicDehumNum ).DehumType, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-            InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, ErrorsFoundGeneric );
-            // unique_string_blank_key
+			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, ErrorsFoundGeneric );
+			// unique_string_blank_key
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 
 			ErrorsFound2 = false;

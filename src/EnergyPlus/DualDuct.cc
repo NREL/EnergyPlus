@@ -367,7 +367,7 @@ namespace DualDuct {
 
 				DamperNum = DamperIndex;
 				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
-                // unique_string_blank_key
+				// unique_string_blank_key
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_ConstantVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -429,7 +429,7 @@ namespace DualDuct {
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
 				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
-                // unique_string_blank_key
+				// unique_string_blank_key
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_VariableVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );

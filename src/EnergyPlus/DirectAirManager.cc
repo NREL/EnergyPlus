@@ -307,7 +307,7 @@ namespace DirectAirManager {
 			for ( DirectAirNum = 1; DirectAirNum <= NumDirectAir; ++DirectAirNum ) {
 				DirectAir( DirectAirNum ).cObjectName = cCurrentModuleObject; // push Object Name into data array
 				InputProcessor::GetObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-                // unique_string_blank_key
+				// unique_string_blank_key
 				DirectAir( DirectAirNum ).EquipID = cAlphaArgs( 1 );
 				DirectAir( DirectAirNum ).Schedule = cAlphaArgs( 2 );
 				if ( lAlphaFieldBlanks( 2 ) ) {

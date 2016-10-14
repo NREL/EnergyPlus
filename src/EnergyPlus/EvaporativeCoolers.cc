@@ -3462,7 +3462,7 @@ namespace EvaporativeCoolers {
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = cNumericFields;
 
 				InputProcessor::VerifyUniqueInterObjectName( EvapCond_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-                // unique_string_blank_key
+				// unique_string_blank_key
 				ZoneEvapUnit( UnitLoop ).Name = Alphas( 1 );
 				if ( lAlphaBlanks( 2 ) ) {
 					ZoneEvapUnit( UnitLoop ).AvailSchedIndex = ScheduleAlwaysOn;
@@ -4586,11 +4586,11 @@ namespace EvaporativeCoolers {
 	//        End of Reporting subroutines for the EvaporativeCoolers Module
 	// *****************************************************************************
 
-    void
+	void
 	clear_state() {
 		GetInputZoneEvapUnit = true;
 		EvapCond_map.clear();
-    }
+	}
 
 } // EvaporativeCoolers
 
