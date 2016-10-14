@@ -347,8 +347,8 @@ namespace EnergyPlus {
 		EconomicLifeCycleCost::clear_state();
 		EconomicTariff::clear_state();
 		EMSManager::clear_state();
-        EvaporativeCoolers::clear_state();
-        EvaporativeFluidCoolers::clear_state();
+		EvaporativeCoolers::clear_state();
+		EvaporativeFluidCoolers::clear_state();
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();

@@ -152,7 +152,7 @@ namespace ExteriorEnergyUse {
 		ExteriorLights.deallocate();
 		ExteriorEquipment.deallocate();
 		ExteriorEquipment_map.clear();
-        GetInputFlag = true;
+		GetInputFlag = true;
 	}
 
 	void

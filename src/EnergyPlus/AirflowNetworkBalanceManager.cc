@@ -2357,7 +2357,7 @@ namespace AirflowNetworkBalanceManager {
 		IntraZoneNumOfLinks = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( IntraZoneNumOfLinks > 0 ) {
 			IntraZoneLinkageData.allocate( IntraZoneNumOfLinks );
-            UniqueAirflowNetworkSurfaceName.reserve( IntraZoneNumOfLinks );
+			UniqueAirflowNetworkSurfaceName.reserve( IntraZoneNumOfLinks );
 			for ( i = 1; i <= IntraZoneNumOfLinks; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				// unique_string_blank_key

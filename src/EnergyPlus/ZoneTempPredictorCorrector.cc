@@ -501,11 +501,11 @@ namespace ZoneTempPredictorCorrector {
 		for ( Item = 1; Item <= NumTStatStatements; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-            if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-                ErrorsFound = true;
-                cAlphaArgs( 1 ) = "xxxxx";
-            }
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ErrorsFound = true;
+				cAlphaArgs( 1 ) = "xxxxx";
+			}
 
 			TStatObjects( Item ).Name = cAlphaArgs( 1 );
 			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -625,7 +625,7 @@ namespace ZoneTempPredictorCorrector {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleTempHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
 				ErrorsFound = true;
 				cAlphaArgs( 1 ) = "xxxxx";
 			}
@@ -648,11 +648,11 @@ namespace ZoneTempPredictorCorrector {
 		for ( SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= NumSingleTempCoolingControls; ++SingleTempCoolingControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleTempCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-            if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-                ErrorsFound = true;
-                cAlphaArgs( 1 ) = "xxxxx";
-            }
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ErrorsFound = true;
+				cAlphaArgs( 1 ) = "xxxxx";
+			}
 
 			SetPointSingleCooling( SingleTempCoolingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleCooling( SingleTempCoolingControlNum ).TempSchedName = cAlphaArgs( 2 );
@@ -689,11 +689,11 @@ namespace ZoneTempPredictorCorrector {
 		for ( DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, DualTempHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-            if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-                ErrorsFound = true;
-                cAlphaArgs( 1 ) = "xxxxx";
-            }
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ErrorsFound = true;
+				cAlphaArgs( 1 ) = "xxxxx";
+			}
 
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointDualHeatCool( DualTempHeatCoolControlNum ).HeatTempSetptSchedName = cAlphaArgs( 2 );
@@ -913,7 +913,7 @@ namespace ZoneTempPredictorCorrector {
 			IsNotOK = false;
 			IsBlank = false;
 
-            //TODO: re-think search for Name and Zone Name duplicates in HumidityContolZone
+			//TODO: re-think search for Name and Zone Name duplicates in HumidityContolZone
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), HumidityControlZone, &ZoneHumidityControls::ControlName, HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -965,11 +965,11 @@ namespace ZoneTempPredictorCorrector {
 		errFlag = false;
 		for ( Item = 1; Item <= NumComfortTStatStatements; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-            if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-                ErrorsFound = true;
-                cAlphaArgs( 1 ) = "xxxxx";
-            }
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ErrorsFound = true;
+				cAlphaArgs( 1 ) = "xxxxx";
+			}
 
 			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
@@ -1213,11 +1213,11 @@ namespace ZoneTempPredictorCorrector {
 		for ( SingleFangerHeatingControlNum = 1; SingleFangerHeatingControlNum <= NumSingleFangerHeatingControls; ++SingleFangerHeatingControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerHeatingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-            if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-                ErrorsFound = true;
-                cAlphaArgs( 1 ) = "xxxxx";
-            }
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ErrorsFound = true;
+				cAlphaArgs( 1 ) = "xxxxx";
+			}
 
             SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatingFanger( SingleFangerHeatingControlNum ).PMVSchedName = cAlphaArgs( 2 );
@@ -1244,7 +1244,7 @@ namespace ZoneTempPredictorCorrector {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-            //TODO: re-think checking for singleCooling and SingleCoolingorHeating fangers in SetPointSingleCoolingFanger
+			//TODO: re-think checking for singleCooling and SingleCoolingorHeating fangers in SetPointSingleCoolingFanger
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1276,7 +1276,7 @@ namespace ZoneTempPredictorCorrector {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-            //TODO: re-think checking for singleCooling and SingleCoolingorHeating fangers in SetPointSingleCoolingFanger
+			//TODO: re-think checking for singleCooling and SingleCoolingorHeating fangers in SetPointSingleCoolingFanger
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1307,12 +1307,12 @@ namespace ZoneTempPredictorCorrector {
 
 		for ( DualFangerHeatCoolControlNum = 1; DualFangerHeatCoolControlNum <= NumDualFangerHeatCoolControls; ++DualFangerHeatCoolControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, DualFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-            if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-                ErrorsFound = true;
-                cAlphaArgs( 1 ) = "xxxxx";
-            }
-            SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ErrorsFound = true;
+				cAlphaArgs( 1 ) = "xxxxx";
+			}
+			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSetptSchedName = cAlphaArgs( 2 );
 			SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( SetPointDualHeatCoolFanger( DualFangerHeatCoolControlNum ).HeatPMVSchedIndex == 0 ) {
@@ -1818,12 +1818,12 @@ namespace ZoneTempPredictorCorrector {
 		NumStageCtrZone = 0;
 		for ( Item = 1; Item <= NumStageControlledZones; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-            if ( cAlphaArgs( 1 ).empty() ) {
-                ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-                ErrorsFound = true;
-                cAlphaArgs( 1 ) = "xxxxx";
-            }
-            StagedTStatObjects( Item ).Name = cAlphaArgs( 1 );
+			if ( cAlphaArgs( 1 ).empty() ) {
+				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
+				ErrorsFound = true;
+				cAlphaArgs( 1 ) = "xxxxx";
+			}
+			StagedTStatObjects( Item ).Name = cAlphaArgs( 1 );
 			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
 			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( cAlphaArgs( 2 ), ZoneList );

@@ -516,7 +516,7 @@ namespace CondenserLoopTowers {
 
 		// Allocate data structures to hold tower input data, report data and tower inlet conditions
 		SimpleTower.allocate( NumSimpleTowers );
-        SimpleTower_map.reserve( NumSimpleTowers );
+		SimpleTower_map.reserve( NumSimpleTowers );
 		SimpleTowerReport.allocate( NumSimpleTowers );
 		SimpleTowerInlet.allocate( NumSimpleTowers );
 		CheckEquipName.dimension( NumSimpleTowers, true );
