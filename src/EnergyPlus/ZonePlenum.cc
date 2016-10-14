@@ -396,7 +396,7 @@ namespace ZonePlenum {
 			CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-            InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 			ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another return plenum
@@ -520,7 +520,7 @@ namespace ZonePlenum {
 			CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-            InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 			ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another plenum

@@ -1325,7 +1325,7 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-                InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
 
 				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
@@ -1449,7 +1449,7 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-                InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
 
 				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 

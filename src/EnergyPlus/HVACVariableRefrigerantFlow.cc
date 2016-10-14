@@ -2974,7 +2974,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRFTUNumericFields( VRFTUNum ).FieldNames.allocate(NumNums);
 			VRFTUNumericFields( VRFTUNum ).FieldNames = cNumericFieldNames;
-            InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 			VRFTU( VRFTUNum ).Name = cAlphaArgs( 1 );
 			ZoneTerminalUnitListNum = 0;

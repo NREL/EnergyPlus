@@ -460,7 +460,7 @@ namespace PlantCondLoopOperation {
 
 			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
 				InputProcessor::GetObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
-											  IOStat);
+				                              IOStat);
 				IsBlank = false;
 				InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
 				if (IsBlank) continue;
