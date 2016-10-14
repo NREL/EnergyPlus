@@ -1753,31 +1753,31 @@ namespace EnergyPlus {
 		}
 	}
 
-    void
-    EnergyPlus::InputProcessor::IsNameEmpty(
-            std::string & NameToVerify,
-            std::string const & StringToDisplay,
-            bool & IsBlank,
-            bool & ErrorFound
-    ){
-        if ( NameToVerify.empty() ) {
-            ShowSevereError( StringToDisplay + ", cannot be blank" );
-            ErrorFound = true;
-            IsBlank = true;
-        }
-    }
+	void
+	EnergyPlus::InputProcessor::IsNameEmpty(
+			std::string & NameToVerify,
+			std::string const & StringToDisplay,
+			bool & IsBlank,
+			bool & ErrorFound
+	){
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		}
+	}
 
-    void
-    EnergyPlus::InputProcessor::IsNameEmpty(
-            std::string & NameToVerify,
-            std::string const & StringToDisplay,
-            bool & ErrorFound
-    ){
-        if ( NameToVerify.empty() ) {
-            ShowSevereError( StringToDisplay + ", cannot be blank" );
-            ErrorFound = true;
-        }
-    }
+	void
+	EnergyPlus::InputProcessor::IsNameEmpty(
+			std::string & NameToVerify,
+			std::string const & StringToDisplay,
+			bool & ErrorFound
+	){
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+		}
+	}
 
 	void
 	EnergyPlus::InputProcessor::RangeCheck(
