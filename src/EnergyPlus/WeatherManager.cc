@@ -5861,7 +5861,7 @@ Label9999: ;
 
 			IsNotOK = false;
 			IsBlank = false;
-			//TODO: rethink algorithm for duplicates
+
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
