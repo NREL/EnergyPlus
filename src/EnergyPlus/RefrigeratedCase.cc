@@ -3486,7 +3486,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:GasCooler:AirCooled";
 				for ( GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, GCNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-                    InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+					InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 					GasCooler( GCNum ).Name = Alphas( 1 );
 
 					GasCooler( GCNum ).CapCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -3624,7 +3624,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:SecondarySystem";
 				for ( SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, SecondaryNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-                    InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+					InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 					Secondary( SecondaryNum ).Name = Alphas( 1 );
 
@@ -4088,7 +4088,7 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:Compressor";
 			for ( CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, CompNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-                InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 				Compressor( CompNum ).Name = Alphas( 1 );
 
@@ -4167,7 +4167,7 @@ namespace RefrigeratedCase {
 				NumSimulationMechSubcoolers = 0;
 				for ( SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, SubcoolerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-                    InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+					InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 					Subcooler( SubcoolerNum ).Name = Alphas( 1 );
 
@@ -4998,7 +4998,7 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:TranscriticalSystem";
 			for ( TransRefrigSysNum = 1; TransRefrigSysNum <= NumTransRefrigSystems; ++TransRefrigSysNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-                InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
 
 				TransSystem( TransRefrigSysNum ).Name = Alphas( 1 );
 
