@@ -804,113 +804,113 @@ namespace EnergyPlus {
 		}
 
 		static
-			void
-			IsNameEmpty(
-					std::string  & NameToVerify,
-					std::string const & StringToDisplay,
-					std::string const & NewName,
-					bool & ErrorFound );
+		void
+		IsNameEmpty(
+                std::string  & NameToVerify,
+        std::string const & StringToDisplay,
+        std::string const & NewName,
+        bool & ErrorFound );
 
-		static
-			void
-			IsNameEmpty(
-					std::string & NameToVerify,
-					std::string const & StringToDisplay,
-					bool & IsBlank,
-					bool & ErrorFound
-				   );
+        static
+        void
+        IsNameEmpty(
+                std::string & NameToVerify,
+                std::string const & StringToDisplay,
+                bool & IsBlank,
+                bool & ErrorFound
+        );
 
+        static
+        void
+        IsNameEmpty(
+                std::string & NameToVerify,
+                std::string const & StringToDisplay,
+                bool & ErrorFound
+        );
 		static
-			void
-			IsNameEmpty(
-					std::string & NameToVerify,
-					std::string const & StringToDisplay,
-					bool & ErrorFound
-				   );
-		static
-			void
-			RangeCheck(
-					bool & ErrorsFound, // Set to true if error detected
-					std::string const & WhatFieldString, // Descriptive field for string
-					std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
-					std::string const & ErrorLevel, // 'Warning','Severe','Fatal')
+		void
+		RangeCheck(
+			bool & ErrorsFound, // Set to true if error detected
+			std::string const & WhatFieldString, // Descriptive field for string
+			std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
+			std::string const & ErrorLevel, // 'Warning','Severe','Fatal')
 			Optional_string_const LowerBoundString = _, // String for error message, if applicable
 			Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
 			Optional_string_const UpperBoundString = _, // String for error message, if applicable
 			Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
 			Optional_string_const ValueString = _, // Value with digits if to be displayed with error
 			Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
-				);
+		);
 
-		//	void
-		//	TurnOnReportRangeCheckErrors();
+//	void
+//	TurnOnReportRangeCheckErrors();
 
-		//	void
-		//	TurnOffReportRangeCheckErrors();
-
-		static
-			int
-			GetNumRangeCheckErrorsFound();
+//	void
+//	TurnOffReportRangeCheckErrors();
 
 		static
-			void
-			GetMaxSchemaArgs(
-					int & NumArgs,
-					int & NumAlpha,
-					int & NumNumeric
-					);
+		int
+		GetNumRangeCheckErrorsFound();
 
 		static
-			void
-			GetObjectDefMaxArgs(
-					std::string const & ObjectWord, // Object for definition
-					int & NumArgs, // How many arguments (max) this Object can have
-					int & NumAlpha, // How many Alpha arguments (max) this Object can have
-					int & NumNumeric // How many Numeric arguments (max) this Object can have
-					);
+		void
+		GetMaxSchemaArgs(
+			int & NumArgs,
+			int & NumAlpha,
+			int & NumNumeric
+		);
 
-		//	void
-		//	ReportOrphanRecordObjects();
+		static
+		void
+		GetObjectDefMaxArgs(
+			std::string const & ObjectWord, // Object for definition
+			int & NumArgs, // How many arguments (max) this Object can have
+			int & NumAlpha, // How many Alpha arguments (max) this Object can have
+			int & NumNumeric // How many Numeric arguments (max) this Object can have
+		);
+
+//	void
+//	ReportOrphanRecordObjects();
 
 		void
-			PreProcessorCheck( bool & PreP_Fatal ); // True if a preprocessor flags a fatal error
+		PreProcessorCheck( bool & PreP_Fatal ); // True if a preprocessor flags a fatal error
 
-		//	void
-		//	CompactObjectsCheck();
+//	void
+//	CompactObjectsCheck();
 
-		//	void
-		//	ParametricObjectsCheck();
-
-		static
-			void
-			PreScanReportingVariables();
+//	void
+//	ParametricObjectsCheck();
 
 		static
-			void
-			AddVariablesForMonthlyReport( std::string const & reportName );
+		void
+		PreScanReportingVariables();
 
 		static
-			void
-			AddRecordToOutputVariableStructure(
-					std::string const & KeyValue,
-					std::string const & VariableName
-					);
+		void
+		AddVariablesForMonthlyReport( std::string const & reportName );
 
 		static
-			void
-			ReAllocateAndPreserveOutputVariablesForSimulation();
+		void
+		AddRecordToOutputVariableStructure(
+		std::string const & KeyValue,
+		std::string const & VariableName
+		);
 
-		//	void
-		//	ShowAuditErrorMessage(
-		//		std::string const & Severity, // if blank, does not add to sum
-		//		std::string const & ErrorMessage
-		//	);
+		static
+		void
+		ReAllocateAndPreserveOutputVariablesForSimulation();
+
+//	void
+//	ShowAuditErrorMessage(
+//		std::string const & Severity, // if blank, does not add to sum
+//		std::string const & ErrorMessage
+//	);
 
 		std::string
-			IPTrimSigDigits( int const IntegerValue );
+		IPTrimSigDigits( int const IntegerValue );
 
-		//		void
-		//		ReportOrphanRecordObjects();
+//		void
+//		ReportOrphanRecordObjects();
 
 	}; // InputProcessor
 }
