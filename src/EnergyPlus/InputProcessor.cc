@@ -1656,8 +1656,8 @@ namespace EnergyPlus {
     void
     InputProcessor::VerifyUniqueInterObjectName(
             std::unordered_map< std::string, std::string > & names,
-			std::string & object_name,
-            std::string & object_type,
+			std::string const & object_name,
+            std::string const & object_type,
 			bool & ErrorsFound
     ) {
 		auto const & names_iter = names.find( object_name );
