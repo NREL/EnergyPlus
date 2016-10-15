@@ -1653,6 +1653,22 @@ namespace EnergyPlus {
 
 	}
 
+    void
+    InputProcessor::VerifyUniqueInterObjectName(
+            std::unordered_map< std::string, std::string > & names,
+			std::string & object_name,
+            std::string & object_type,
+			bool & ErrorsFound
+    ) {
+		auto const & names_iter = names.find( object_name );
+        if ( names_iter == names.end() ) {
+			names.emplace( object_name, object_type );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+		}
+    }
+
 	void
 	EnergyPlus::InputProcessor::VerifyName(
 		std::string const & NameToVerify,

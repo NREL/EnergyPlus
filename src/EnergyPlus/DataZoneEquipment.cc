@@ -517,14 +517,7 @@ namespace DataZoneEquipment {
 				InputProcessor::GetObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
 				IsNotOK = false;
 				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), ZoneEquipList, ControlledZoneNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowContinueError( "Bad Zone Equipment name in " + CurrentModuleObject + "=\"" + ZoneEquipConfig( ControlledZoneNum ).EquipListName + "\"" );
-					ShowContinueError( "For Zone=\"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\"." );
-					GetZoneEquipmentDataErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
+				// unique_string_blank_key_check
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
 				maxEquipCount = 0;
@@ -830,11 +823,7 @@ namespace DataZoneEquipment {
 			InputProcessor::GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
 			IsNotOK = false;
 			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SupplyAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key_check
 			SupplyAirPath( PathNum ).Name = AlphArray( 1 );
 			SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 
@@ -883,14 +872,7 @@ namespace DataZoneEquipment {
 		for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key_check
 			ReturnAirPath( PathNum ).Name = AlphArray( 1 );
 			ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 

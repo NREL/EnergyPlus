@@ -155,6 +155,7 @@ namespace EvaporativeFluidCoolers {
 	int const EvapFluidCooler_TwoSpeed( 2 );
 
 	static std::string const BlankString;
+	bool GetInput( true );
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumSimpleEvapFluidCoolers( 0 ); // Number of similar evaporative fluid coolers
@@ -193,6 +194,7 @@ namespace EvaporativeFluidCoolers {
 
 	// Object Data
 	Array1D< EvapFluidCoolerspecs > SimpleEvapFluidCooler; // dimension to number of machines
+	std::unordered_map< std::string, std::string > SimpleEvapFluidCooler_map;
 	Array1D< EvapFluidCoolerInletConds > SimpleEvapFluidCoolerInlet; // inlet conditions
 	Array1D< ReportVars > SimpleEvapFluidCoolerReport; // report variables
 
@@ -252,7 +254,6 @@ namespace EvaporativeFluidCoolers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
 		int EvapFluidCoolerNum; // Pointer to EvapFluidCooler
 
 		//GET INPUT
@@ -405,8 +406,6 @@ namespace EvaporativeFluidCoolers {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
 		Array1D< Real64 > NumArray( 25 ); // Numeric input data array
 		Array1D_string AlphArray( 13 ); // Character string input data array
@@ -421,10 +420,12 @@ namespace EvaporativeFluidCoolers {
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleEvapFluidCooler ) ) return;
+		GetInput = false;
 
 		// Allocate data structures to hold evaporative fluid cooler input data,
 		// report data and evaporative fluid cooler inlet conditions
 		SimpleEvapFluidCooler.allocate( NumSimpleEvapFluidCoolers );
+		SimpleEvapFluidCooler_map.reserve( static_cast< unsigned > (NumSimpleEvapFluidCoolers) );
 		SimpleEvapFluidCoolerReport.allocate( NumSimpleEvapFluidCoolers );
 		SimpleEvapFluidCoolerInlet.allocate( NumSimpleEvapFluidCoolers );
 		CheckEquipName.dimension( NumSimpleEvapFluidCoolers, true );
@@ -434,13 +435,8 @@ namespace EvaporativeFluidCoolers {
 		for ( SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers; ++SingleSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SimpleEvapFluidCooler, EvapFluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( SimpleEvapFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			// unique_string_blank_key
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num = EvapFluidCooler_SingleSpeed;
@@ -652,13 +648,8 @@ namespace EvaporativeFluidCoolers {
 			EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SimpleEvapFluidCooler, EvapFluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( SimpleEvapFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			// unique_string_blank_key
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num = EvapFluidCooler_TwoSpeed;
@@ -2783,6 +2774,12 @@ namespace EvaporativeFluidCoolers {
 
 		// set
 
+	}
+
+	void
+	clear_state() {
+		SimpleEvapFluidCooler_map.clear();
+		GetInput = true;
 	}
 
 } // EvaporativeFluidCoolers

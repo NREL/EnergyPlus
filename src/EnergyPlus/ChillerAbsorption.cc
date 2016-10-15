@@ -374,6 +374,7 @@ namespace ChillerAbsorption {
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			// unique_string_blank_key
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;

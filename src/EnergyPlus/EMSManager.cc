@@ -744,14 +744,7 @@ namespace EMSManager {
 			for ( SensorNum = 1; SensorNum <= NumSensors; ++SensorNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Sensor, SensorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-
+				// unique_string_blank_key
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					Sensor( SensorNum ).Name = cAlphaArgs( 1 );
@@ -839,14 +832,7 @@ namespace EMSManager {
 						cAlphaFieldNames, cNumericFieldNames );
 				}
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), EMSActuatorUsed, ActuatorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-
+				// unique_string_blank_key
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSActuatorUsed( ActuatorNum ).Name = cAlphaArgs( 1 );
@@ -907,14 +893,7 @@ namespace EMSManager {
 			for ( InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), EMSInternalVarsUsed, InternVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-
+				// unique_string_blank_key
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSInternalVarsUsed( InternVarNum ).Name = cAlphaArgs( 1 );
@@ -963,13 +942,7 @@ namespace EMSManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), EMSProgramCallManager, CallManagerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				// unique_string_blank_key
 				EMSProgramCallManager( CallManagerNum ).Name = cAlphaArgs( 1 );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );

@@ -204,6 +204,7 @@ namespace DesiccantDehumidifiers {
 
 	// Object Data
 	Array1D< DesiccantDehumidifierData > DesicDehum;
+	std::unordered_map< std::string, std::string > DesicDehum_map;
 
 	// Functions
 
@@ -427,6 +428,8 @@ namespace DesiccantDehumidifiers {
 		NumDesicDehums = NumSolidDesicDehums + NumGenericDesicDehums;
 		// allocate the data array
 		DesicDehum.allocate( NumDesicDehums );
+		DesicDehum_map.reserve( NumDesicDehums );
+		GetInputDesiccantDehumidifier = false;
 
 		InputProcessor::GetObjectDefMaxArgs( dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
@@ -450,13 +453,8 @@ namespace DesiccantDehumidifiers {
 			InputProcessor::GetObjectItem( CurrentModuleObject, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			DesicDehumNum = DesicDehumIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DesicDehum, DesicDehumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
+			// unique_string_blank_key
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Solid;
@@ -742,14 +740,8 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Generic;
 			InputProcessor::GetObjectItem( DesicDehum( DesicDehumNum ).DehumType, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DesicDehum, DesicDehumNum - 1, IsNotOK, IsBlank, DesicDehum( DesicDehumNum ).DehumType + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFoundGeneric = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, ErrorsFoundGeneric );
+			// unique_string_blank_key
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 
 			ErrorsFound2 = false;
@@ -2891,6 +2883,7 @@ namespace DesiccantDehumidifiers {
 		GetInputDesiccantDehumidifier = true;
 		InitDesiccantDehumidifierOneTimeFlag = true;
 		DesicDehum.deallocate();
+		DesicDehum_map.clear();
 	}
 
 	//        End of Reporting subroutines for the SimAir Module

@@ -115,10 +115,10 @@ namespace GlobalNames {
 
 	// Object Data
 	std::unordered_map < std::string, std::string > ChillerNames;
-    std::unordered_map < std::string, std::string > BoilerNames;
-    std::unordered_map < std::string, std::string > BaseboardNames;
-    std::unordered_map < std::string, std::string > CoilNames;
-    std::unordered_map < std::string, std::string > aDUNames;
+	std::unordered_map < std::string, std::string > BoilerNames;
+	std::unordered_map < std::string, std::string > BaseboardNames;
+	std::unordered_map < std::string, std::string > CoilNames;
+	std::unordered_map < std::string, std::string > aDUNames;
 
 	// Functions
 

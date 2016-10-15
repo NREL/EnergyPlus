@@ -354,6 +354,7 @@ namespace BaseboardRadiator {
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
+				// unique_string_blank_key
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;

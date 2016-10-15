@@ -959,8 +959,6 @@ namespace DXCoils {
 		int NumAlphas2; // Number of alphas in input for performance object
 		int NumNumbers2; // Number of numeric items in input for performance object
 		int IOStatus; // Input status returned from GetObjectItem
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int DXHPWaterHeaterCoilNum; // Loop index for 1,NumDXHeatPumpWaterHeaterCoils
 		int CapacityStageNum; // Loop index for 1,Number of capacity stages
@@ -1113,13 +1111,7 @@ namespace DXCoils {
 			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -1523,13 +1515,7 @@ namespace DXCoils {
 			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			++DXCoilNum;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -1999,13 +1985,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -2384,13 +2364,7 @@ namespace DXCoils {
 			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -2888,13 +2862,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -3367,13 +3335,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -3728,13 +3690,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -4237,13 +4193,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -4739,13 +4689,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -4848,13 +4792,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -4955,13 +4893,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -5045,13 +4977,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( MaxNumbers );
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoil, DXCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			// unique_string_blank_key
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;

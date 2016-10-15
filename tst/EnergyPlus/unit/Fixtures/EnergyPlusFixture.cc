@@ -113,19 +113,25 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
@@ -214,7 +220,6 @@
 
 #include <fstream>
 #include <algorithm>
-#include <EnergyPlus/DisplayRoutines.hh>
 
 json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth, json::parse_event_t event, json &parsed,
 									   unsigned line_num, unsigned line_index) -> bool {
@@ -333,16 +338,21 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DemandManager::clear_state();
 		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
+		DualDuct::clear_state();
 		DXCoils::clear_state();
 		clearFacilityElectricPowerServiceObject();
 		EconomicLifeCycleCost::clear_state();
 		EconomicTariff::clear_state();
 		EMSManager::clear_state();
+		EvaporativeCoolers::clear_state();
+		EvaporativeFluidCoolers::clear_state();
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();
+		FluidCoolers::clear_state();
 		FluidProperties::clear_state();
 		Furnaces::clear_state();
 		GlobalNames::clear_state();

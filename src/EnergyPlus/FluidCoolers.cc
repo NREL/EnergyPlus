@@ -140,6 +140,7 @@ namespace FluidCoolers {
 	std::string const cFluidCooler_SingleSpeed( "FluidCooler:SingleSpeed" );
 	std::string const cFluidCooler_TwoSpeed( "FluidCooler:TwoSpeed" );
 
+	bool GetInput( true );
 	int const PIM_NominalCapacity( 1 );
 	int const PIM_UFactor( 2 );
 
@@ -182,6 +183,7 @@ namespace FluidCoolers {
 
 	// Object Data
 	Array1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
+	std::unordered_map< std::string, std::string > SimpleFluidCooler_map;
 	Array1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
 	Array1D< ReportVars > SimpleFluidCoolerReport; // report variables
 
@@ -238,7 +240,6 @@ namespace FluidCoolers {
 		// na
 
 		// LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
 		int FluidCoolerNum;
 
 		// GET INPUT
@@ -333,10 +334,6 @@ namespace FluidCoolers {
 		// Based on GetTowerInput subroutine from Don Shirey, Jan 2001 and Sept/Oct 2002;
 
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -387,9 +384,11 @@ namespace FluidCoolers {
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleFluidCooler ) ) return;
+		GetInput = false;
 
 		// Allocate data structures to hold fluid cooler input data, report data and fluid cooler inlet conditions
 		SimpleFluidCooler.allocate( NumSimpleFluidCoolers );
+		SimpleFluidCooler_map.reserve( NumSimpleFluidCoolers );
 		SimpleFluidCoolerReport.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerInlet.allocate( NumSimpleFluidCoolers );
 		CheckEquipName.dimension( NumSimpleFluidCoolers, true );
@@ -399,13 +398,8 @@ namespace FluidCoolers {
 		for ( SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = SingleSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SimpleFluidCooler, FluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( SimpleFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			// unique_string_blank_key
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num = FluidCooler_SingleSpeed;
@@ -451,13 +445,8 @@ namespace FluidCoolers {
 		for ( TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SimpleFluidCooler, FluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( SimpleFluidCooler_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			// unique_string_blank_key
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num = FluidCooler_TwoSpeed;
@@ -2213,6 +2202,12 @@ namespace FluidCoolers {
 
 		}
 
+	}
+
+	void
+	clear_state() {
+		SimpleFluidCooler_map.clear();
+		GetInput = true;
 	}
 
 } // FluidCoolers

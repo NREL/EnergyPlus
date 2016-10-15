@@ -154,6 +154,7 @@ namespace DualDuct {
 
 	// Object Data
 	Array1D< DamperDesignParams > Damper;
+	std::unordered_map< std::string, std::string > Damper_map;
 	Array1D< DamperFlowConditions > DamperInlet;
 	Array1D< DamperFlowConditions > DamperHotAirInlet;
 	Array1D< DamperFlowConditions > DamperColdAirInlet;
@@ -346,6 +347,7 @@ namespace DualDuct {
 		NumDualDuctVarVolOA = InputProcessor::GetNumObjectsFound( cCMO_DDVarVolOA );
 		NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
 		Damper.allocate( NumDampers );
+		Damper_map.reserve( NumDampers );
 		CheckEquipName.dimension( NumDampers, true );
 
 		DamperInlet.allocate( NumDampers );
@@ -364,13 +366,8 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex;
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
+				// unique_string_blank_key
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_ConstantVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -431,13 +428,8 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
+				// unique_string_blank_key
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_VariableVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -505,13 +497,8 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
+				// unique_string_blank_key
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_OutdoorAir;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -2211,6 +2198,11 @@ namespace DualDuct {
 
 	//        End of Reporting subroutines for the Damper Module
 	// *****************************************************************************
+
+	void
+	clear_state() {
+		Damper_map.clear();
+	}
 
 } // DualDuct
 

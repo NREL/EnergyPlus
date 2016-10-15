@@ -276,6 +276,7 @@ namespace CoolTower {
 		for ( CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, CoolTowerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			// unique_string_blank_key
 			CoolTowerSys( CoolTowerNum ).Name = cAlphaArgs( 1 ); // Name of cooltower
 			CoolTowerSys( CoolTowerNum ).Schedule = cAlphaArgs( 2 ); // Get schedule
 			if ( lAlphaBlanks( 2 ) ) {

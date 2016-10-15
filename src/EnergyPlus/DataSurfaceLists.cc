@@ -218,6 +218,7 @@ namespace DataSurfaceLists {
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 
 				SurfList( Item ).Name = Alphas( 1 );
 				SurfList( Item ).NumOfSurfaces = NumAlphas - 1;
@@ -295,6 +296,7 @@ namespace DataSurfaceLists {
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				// unique_string_blank_key
 
 				SlabList( Item ).Name = Alphas( 1 );
 				SlabList( Item ).NumOfSurfaces = ( ( NumAlphas - 1 ) / 4 );

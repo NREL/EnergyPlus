@@ -338,6 +338,7 @@ namespace ChillerGasAbsorption {
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			// unique_string_blank_key
 
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
