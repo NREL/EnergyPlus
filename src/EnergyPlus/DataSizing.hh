@@ -1220,7 +1220,6 @@ namespace DataSizing {
 		Real64 OAFlowPerZone; // - OA requirement per zone
 		Real64 OAFlowACH; // - OA requirement per zone per hour
 		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
-		Real64 MaxOAFractionSchValue; // - Maximum value from OAFlow fraction schedule (used for sizing)
 
 		// Default Constructor
 		OARequirementsData() :
@@ -1229,8 +1228,7 @@ namespace DataSizing {
 			OAFlowPerArea( 0.0 ),
 			OAFlowPerZone( 0.0 ),
 			OAFlowACH( 0.0 ),
-			OAFlowFracSchPtr( 0 ),
-			MaxOAFractionSchValue( 0.0 )
+			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn )
 		{}
 
 	};

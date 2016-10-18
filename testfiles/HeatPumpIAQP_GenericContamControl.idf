@@ -1247,7 +1247,7 @@
     Zn001:Wall001,           !- Surface Name
     1.0E-2,                  !- Mass Transfer Coefficient {m/s}
     GC Source Schedule,      !- Schedule Name
-    2.0;                     !- Henry adsorption constant or partition coefficient {dimensionless}
+    2.0;                     !- Henry Adsorption Constant or Partition Coefficient {dimensionless}
 
   SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
     EAST ZONE GC DVS,        !- Name
@@ -1573,9 +1573,9 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    1.7,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    1.7,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-    1.7,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    1.7,                     !- Cooling Supply Air Flow Rate {m3/s}
+    1.7,                     !- Heating Supply Air Flow Rate {m3/s}
+    1.7,                     !- No Load Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Air Fan Object Type
     Supply Fan 1,            !- Supply Air Fan Name
@@ -1583,7 +1583,7 @@
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
-    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}

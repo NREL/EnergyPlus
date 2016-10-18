@@ -3220,17 +3220,17 @@
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -3276,7 +3276,7 @@
     DX Cooling Coil System ZN1,  !- Component 2 Name
     Mixed Air Node ZN1,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN1,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN1,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN1,  !- Component 3 Outlet Node Name
@@ -3509,17 +3509,17 @@
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -3565,7 +3565,7 @@
     DX Cooling Coil System ZN2,  !- Component 2 Name
     Mixed Air Node ZN2,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN2,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN2,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN2,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN2,  !- Component 3 Outlet Node Name
@@ -3798,17 +3798,17 @@
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -3854,7 +3854,7 @@
     DX Cooling Coil System ZN3,  !- Component 2 Name
     Mixed Air Node ZN3,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN3,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN3,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN3,  !- Component 3 Outlet Node Name
@@ -4087,17 +4087,17 @@
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -4143,7 +4143,7 @@
     DX Cooling Coil System ZN4,  !- Component 2 Name
     Mixed Air Node ZN4,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN4,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN4,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN4,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN4,  !- Component 3 Outlet Node Name
@@ -4376,17 +4376,17 @@
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,                        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    ,                        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -4432,7 +4432,7 @@
     DX Cooling Coil System ZN5,  !- Component 2 Name
     Mixed Air Node ZN5,      !- Component 2 Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil ZN5,   !- Component 3 Name
     Cooling Coil Air Outlet Node ZN5,  !- Component 3 Inlet Node Name
     Heating Coil Air Outlet Node ZN5,  !- Component 3 Outlet Node Name
@@ -4649,7 +4649,7 @@
     OA Sys ZN11,             !- Component 1 Name
     Air Loop Inlet Node ZN11,!- Component 1 Inlet Node Name
     Mixed Air Node ZN11,     !- Component 1 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 2 Object Type
+    Coil:Heating:Fuel,       !- Component 2 Object Type
     Main Heating Coil ZN11,  !- Component 2 Name
     Mixed Air Node ZN11,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN11,  !- Component 2 Outlet Node Name
@@ -4849,7 +4849,7 @@
     OA Sys ZN12,             !- Component 1 Name
     Air Loop Inlet Node ZN12,!- Component 1 Inlet Node Name
     Mixed Air Node ZN12,     !- Component 1 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 2 Object Type
+    Coil:Heating:Fuel,       !- Component 2 Object Type
     Main Heating Coil ZN12,  !- Component 2 Name
     Mixed Air Node ZN12,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN12,  !- Component 2 Outlet Node Name
@@ -5235,7 +5235,7 @@
     OA Sys ZN14,             !- Component 1 Name
     Air Loop Inlet Node ZN14,!- Component 1 Inlet Node Name
     Mixed Air Node ZN14,     !- Component 1 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 2 Object Type
+    Coil:Heating:Fuel,       !- Component 2 Object Type
     Main Heating Coil ZN14,  !- Component 2 Name
     Mixed Air Node ZN14,     !- Component 2 Inlet Node Name
     Heating Coil Air Outlet Node ZN14,  !- Component 2 Outlet Node Name
@@ -5412,11 +5412,11 @@
     Simple Electric Load Center,  !- Name
     PV List,                 !- Generator List Name
     BASELOAD,                !- Generator Operation Scheme Type
-    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     DirectCurrentWithInverter,  !- Electrical Buss Type
-    Curve Inverter;          !- Inverter Object Name
+    Curve Inverter;          !- Inverter Name
 
   ElectricLoadCenter:Inverter:FunctionOfPower,
     Curve Inverter,          !- Name

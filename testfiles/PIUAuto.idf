@@ -125,8 +125,8 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    1,                      !- End Month
-    7,                      !- End Day of Month
+    1,                       !- End Month
+    7,                       !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -138,8 +138,8 @@
     ,                        !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
-    4,                      !- End Month
-    7,                      !- End Day of Month
+    4,                       !- End Month
+    7,                       !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -151,8 +151,8 @@
     ,                        !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
-    7,                      !- End Month
-    7,                      !- End Day of Month
+    7,                       !- End Month
+    7,                       !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -526,21 +526,21 @@
   Schedule:Compact,
     FANANDCOILAVAILSCHED,    !- Name
     FRACTION,                !- Schedule Type Limits Name
-    Through: 12/31,           !- Field 1
-    For: Weekdays,           !- Field 6
-    Until: 7:00,0.00,        !- Field 7
-    Until: 17:00,1.00,       !- Field 9
-    Until: 24:00,0.00,       !- Field 11
-    For: Weekends Holidays,  !- Field 13
-    Until: 24:00,0.00,       !- Field 14
-    For: SummerDesignDay,    !- Field 16
-    Until: 24:00,1.00,       !- Field 17
-    For: WinterDesignDay,    !- Field 19
-    Until: 24:00,1.00,       !- Field 20
-    For: CustomDay1,         !- Field 22
-    Until: 24:00,0.00,       !- Field 23
-    For: CustomDay2,         !- Field 25
-    Until: 24:00,0.00;       !- Field 26
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 7:00,0.00,        !- Field 3
+    Until: 17:00,1.00,       !- Field 5
+    Until: 24:00,0.00,       !- Field 7
+    For: Weekends Holidays,  !- Field 9
+    Until: 24:00,0.00,       !- Field 10
+    For: SummerDesignDay,    !- Field 12
+    Until: 24:00,1.00,       !- Field 13
+    For: WinterDesignDay,    !- Field 15
+    Until: 24:00,1.00,       !- Field 16
+    For: CustomDay1,         !- Field 18
+    Until: 24:00,0.00,       !- Field 19
+    For: CustomDay2,         !- Field 21
+    Until: 24:00,0.00;       !- Field 22
 
   Schedule:Compact,
     COOLINGPUMPAVAILSCHED,   !- Name
@@ -761,12 +761,12 @@
 
   ZoneInfiltration:DesignFlowRate,
     East Zone Infiltration,  !- Name
-    East Zone,          !- Zone or ZoneList Name
-    ON,    !- Schedule Name
+    East Zone,               !- Zone or ZoneList Name
+    ON,                      !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
-    0.0001,                !- Flow per Exterior Surface Area {m3/s-m2}
+    0.0001,                  !- Flow per Exterior Surface Area {m3/s-m2}
     ,                        !- Air Changes per Hour {1/hr}
     1.0000,                  !- Constant Term Coefficient
     0.0000,                  !- Temperature Term Coefficient
@@ -775,8 +775,8 @@
 
   ZoneInfiltration:DesignFlowRate,
     West Zone Infiltration,  !- Name
-    West Zone,          !- Zone or ZoneList Name
-    ON,    !- Schedule Name
+    West Zone,               !- Zone or ZoneList Name
+    ON,                      !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
@@ -788,9 +788,9 @@
     0.0000;                  !- Velocity Squared Term Coefficient
 
   ZoneInfiltration:DesignFlowRate,
-    North Zone Infiltration,  !- Name
-    North Zone,          !- Zone or ZoneList Name
-    ON,    !- Schedule Name
+    North Zone Infiltration, !- Name
+    North Zone,              !- Zone or ZoneList Name
+    ON,                      !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
@@ -800,6 +800,7 @@
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
+
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
@@ -1255,17 +1256,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1336,18 +1337,18 @@
 
   AvailabilityManager:NightCycle,
     Reheat System 1 Avail,   !- Name
-    ON,                      !- Schedule Name
+    ON,                      !- Applicability Schedule Name
     FanAndCoilAvailSched,    !- Fan Schedule Name
     CycleOnAnyCoolingOrHeatingZone,  !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     1800,                    !- Cycling Run Time {s}
     ,                        !- Control Zone or Zone List Name
-    Reheat System 1 Cooling Zones,  !- Cooling Zone or Zone List Name
-    East Zone,  !- Heating Control Zone or Zone List Name
+    Reheat System 1 Cooling Zones,  !- Cooling Control Zone or Zone List Name
+    East Zone,               !- Heating Control Zone or Zone List Name
     Reheat System 1 PIU Zones;  !- Heating Zone Fans Only Zone or Zone List Name
 
   ZoneList,
-    Reheat System 1 Cooling Zones, !- Name
+    Reheat System 1 Cooling Zones,  !- Name
     West Zone,               !- Zone 1 Name
     East Zone,               !- Zone 2 Name
     North Zone;              !- Zone 3 Name
@@ -1585,16 +1586,16 @@
     Circ Pump,               !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -1808,16 +1809,16 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -2036,16 +2037,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictHeating,
@@ -2429,7 +2430,7 @@
   Output:Variable,Zone 3 PIU Air Outlet Node,System Node Temperature,detailed;
 
   Output:Variable,*,Availability Manager Night Cycle Control Status,detailed;
-  
+
   Output:VariableDictionary,Regular;
 
   Output:Surfaces:Drawing,dxf;

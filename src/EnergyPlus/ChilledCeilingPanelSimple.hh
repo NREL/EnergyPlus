@@ -104,6 +104,9 @@ namespace CoolingPanelSimple {
 	extern Array1D_bool CheckEquipName;
 	extern Array1D_bool SetLoopIndexFlag; // get loop number flag
 
+	// Autosizing variables
+	extern Array1D_bool MySizeFlagCoolPanel;
+	
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Simple Chilled Ceiling Panel
 
 	// Types
@@ -131,7 +134,6 @@ namespace CoolingPanelSimple {
 		int CondErrIndex;
 		Real64 ColdThrottlRange;
 		Real64 RatedWaterTemp;
-		Real64 RatedCapacity;
 		int CoolingCapMethod;
 		Real64 ScaledCoolingCapacity;
 		Real64 UA;
@@ -184,7 +186,6 @@ namespace CoolingPanelSimple {
 			CondErrIndex( 0 ),
 			ColdThrottlRange( 0.0 ),
 			RatedWaterTemp( 0.0 ),
-			RatedCapacity( 0.0 ),
 			CoolingCapMethod( 0 ),
 			ScaledCoolingCapacity( 0.0 ),
 			UA( 0.0 ),
@@ -222,8 +223,20 @@ namespace CoolingPanelSimple {
 
 	};
 
+	struct CoolingPanelSysNumericFieldData
+	{
+		// Members
+		Array1D_string FieldNames;
+		
+		// Default Constructor
+		CoolingPanelSysNumericFieldData()
+		{}
+		
+	};
+		
 	// Object Data
 	extern Array1D< CoolingPanelParams > CoolingPanel;
+	extern Array1D< CoolingPanelSysNumericFieldData > CoolingPanelSysNumericFields;
 
 	// Functions
 
@@ -250,6 +263,10 @@ namespace CoolingPanelSimple {
 		bool const FirstHVACIteration
 	);
 
+	void SizeCoolingPanel(
+		int const CoolingPanelNum
+	);
+	
 	void
 	CalcCoolingPanel(
 		int & CoolingPanelNum
