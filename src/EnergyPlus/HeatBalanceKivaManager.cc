@@ -164,10 +164,32 @@ void KivaInstanceMap::reportKivaSurfaces() {
 
 }
 
-KivaManager::KivaManager() {
+KivaManager::Settings::Settings() :
+  soilK(0.864),
+  soilRho(1510),
+  soilCp(1260),
+  groundSolarAbs(0.9),
+  groundThermalAbs(0.9),
+  groundRoughness(0.9),
+  farFieldWidth(40.0),
+  deepGroundBoundary(AUTO),
+  deepGroundDepth(40.0),
+  minCellDim(0.02),
+  maxGrowthCoeff(1.5),
+  timestepType(HOURLY)
+{}
+
+KivaManager::KivaManager() :
+  defaultSet(false),
+  defaultIndex(0)
+{
+
+  // lis overhead
   LIS_INT dummy_argc = 0;
   char** dummy_argv;
   lis_initialize(&dummy_argc, &dummy_argv);
+
+  // default
   defaultSet = false;
   defaultIndex = 0.0;
 }
@@ -199,7 +221,7 @@ void KivaManager::setupKivaInstances() {
         if ( Surfaces(wl).Zone == surface.Zone && wl != surfNum ) {
           if ( Surfaces(wl).Class != DataSurfaces::SurfaceClass_Wall ) {
             if ( Surfaces(wl).Class == DataSurfaces::SurfaceClass_Floor ) {
-              // TODO Kiva: only one floundation floor per zone
+              // TODO Kiva: only one foundation floor per zone
               ShowSevereError( "only one foundation floor per zone" );
             } else {
               // TODO Kiva: only floor and wall surfaces allowed
@@ -211,50 +233,72 @@ void KivaManager::setupKivaInstances() {
         }
       }
 
-      // All wall surfaces must have the same construction
+      // Set wall construction
+
+      Real64 wallHeight = 0.0;
       if (wallSurfaces.size() != 0) {
+        Real64 minZ, maxZ = Surfaces(wallSurfaces[0]).Vertex[0].z;
+        for (size_t i = 1; i < Surfaces(wallSurfaces[0]).Vertex.size(); ++i ) {
+          if (Surfaces(wallSurfaces[0]).Vertex[i].z < minZ) {minZ = Surfaces(wallSurfaces[0]).Vertex[i].z;}
+          if (Surfaces(wallSurfaces[0]).Vertex[i].z > maxZ) {maxZ = Surfaces(wallSurfaces[0]).Vertex[i].z;}
+        }
+        wallHeight = maxZ - minZ; // TODO Kiva: each wall with different height gets its own instance.
         int constructionNum = Surfaces(wallSurfaces[0]).Construction;
         for (auto& wl : wallSurfaces) {
+          Real64 minZ, maxZ = Surfaces(wl).Vertex[0].z;
+          for (size_t i = 1; i < Surfaces(wl).Vertex.size(); ++i ) {
+            if (Surfaces(wl).Vertex[i].z < minZ) {minZ = Surfaces(wl).Vertex[i].z;}
+            if (Surfaces(wl).Vertex[i].z > maxZ) {maxZ = Surfaces(wl).Vertex[i].z;}
+          }
+          Real64 surfHeight = maxZ - minZ;
+          if (std::abs(surfHeight - wallHeight) > 0.00001) {
+            // TODO Kiva: all walls must be the same height
+            ShowSevereError( "all walls must be the same height" );
+          }
           if (Surfaces(wl).Construction != constructionNum) {
             // TODO Kiva: all walls must have the same construction
             ShowSevereError( "all walls must have the same construction" );
           }
         }
+        if (constructionNum != foundationInputs[surface.OSCPtr].wallConstructionIndex && foundationInputs[surface.OSCPtr].wallConstructionIndex != 0) {
+          // TODO Kiva: foundation wall must have the same construction as walls (or be left blank)
+          ShowSevereError( "foundation wall must have the same construction as walls (or be left blank)" );
+        }
+        foundationInputs[surface.OSCPtr].wallConstructionIndex = constructionNum;
+      }
+
+      if (foundationInputs[surface.OSCPtr].wallConstructionIndex > 0) {
+        auto& c = Constructs(foundationInputs[surface.OSCPtr].wallConstructionIndex);
+
+        // Clear layers
+        fnd.wall.layers.clear();
+
+        // Push back construction's layers
+        for (int layer = 1; layer <= c.TotLayers; layer++ ) {
+          auto& mat = Materials(c.LayerPoint(layer));
+
+          Kiva::Layer tempLayer;
+
+          tempLayer.material = Kiva::Material(mat.Conductivity, mat.Density, mat.SpecHeat);
+          tempLayer.thickness = mat.Thickness;
+
+          fnd.wall.layers.push_back(tempLayer);
+        }
       }
 
       // Set slab construction
       for (int i = 0; i < Constructs( surface.Construction ).TotLayers; ++i ) {
-        auto& mat = Constructs( surface.Construction ).LayerPoint[i];
-
-        Kiva::Material tempMat;
-
-        tempMat.conductivity = Materials(mat).Conductivity;
-        tempMat.density = Materials(mat).Density;
-        tempMat.specificHeat = Materials(mat).SpecHeat;
+        auto& mat = Materials(Constructs( surface.Construction ).LayerPoint[i]);
 
         Kiva::Layer tempLayer;
 
-        tempLayer.material = tempMat;
-        tempLayer.thickness = Materials(mat).Thickness;
+        tempLayer.material = Kiva::Material(mat.Conductivity, mat.Density, mat.SpecHeat);
+        tempLayer.thickness = mat.Thickness;
 
         fnd.slab.layers.push_back(tempLayer);
       }
 
       fnd.slab.emissivity = 0.0; // Long wave included in rad BC. Materials(Constructs( surface.Construction ).LayerPoint(Constructs( surface.Construction ).TotLayers)).AbsorpThermal;
-
-      // Set wall construction
-
-      // put together the rest of kiva Foundation instance based on E+ geometry
-      Real64 wallHeight = 0.0;
-      if (wallSurfaces.size() != 0) {
-        wallHeight = Surfaces(wallSurfaces[0]).Height; // TODO Kiva: each wall with different height gets its own instance.
-        for (auto& wl : wallSurfaces) {
-          if (Surfaces(wl).Height != wallHeight) {
-            // TODO Kiva: all walls must be the same height
-            ShowSevereError( "all walls must be the same height" );
-          }
-        }
-      }
 
       fnd.foundationDepth = wallHeight;
 
@@ -263,12 +307,12 @@ void KivaManager::setupKivaInstances() {
 
       // polygon
       if (DataSurfaces::CCW) {
-        for (size_t i = 0; i < surface.Vertex.size_; ++i ) {
+        for (size_t i = 0; i < surface.Vertex.size(); ++i ) {
           auto& v = surface.Vertex[i];
           fnd.polygon.outer().push_back(Kiva::Point(v.x,v.y));
         }
       } else {
-        for (auto i = surface.Vertex.size_ - 1; i <= 0; --i ) {
+        for (auto i = surface.Vertex.size() - 1; i <= 0; --i ) {
           auto& v = surface.Vertex[i];
           fnd.polygon.outer().push_back(Kiva::Point(v.x,v.y));
         }
@@ -304,8 +348,8 @@ void KivaManager::setupKivaInstances() {
       }
 
       // point surface to corresponding ground intance(s)]
-      kivaInstances.push_back(KivaInstanceMap(foundationInstances[inst],
-        outputMap,surfNum,wallSurfaces,surface.Zone));
+      kivaInstances.emplace_back(foundationInstances[inst],
+        outputMap,surfNum,wallSurfaces,surface.Zone);
 
       // TODO Kiva: Change for walk-out basements (each floor can point to multiple instances)
       surfaceMap[surfNum] = {inst, Kiva::Surface::ST_SLAB_CORE};
@@ -332,7 +376,7 @@ void KivaManager::setupKivaInstances() {
 
     // TODO Kiva: Add wall surfaces to EIO
     gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Floor Surface, Wall Surface(s)";
-		gio::write( DataGlobals::OutputFileInits, "(A,',',I5',',I5',',I5',',A)" ) << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd.nX << grnd.nZ << grnd.nX*grnd.nZ << DataSurfaces::Surface(kv.floorSurface).Name;
+    gio::write( DataGlobals::OutputFileInits, "(A,',',I5',',I5',',I5',',A)" ) << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd.nX << grnd.nZ << grnd.nX*grnd.nZ << DataSurfaces::Surface(kv.floorSurface).Name;
 
   }
 
@@ -364,8 +408,9 @@ void KivaManager::calcKivaInstances() {
     grnd.calculate(kv.bcs,DataGlobals::MinutesPerTimeStep*60.);
     grnd.calculateSurfaceAverages();
     kv.reportKivaSurfaces();
-    kv.plotDomain();
-
+    if (DataEnvironment::Month == 7 && DataEnvironment::DayOfMonth == 24 && DataGlobals::HourOfDay == 16 && DataGlobals::TimeStep == 1) {
+      kv.plotDomain();
+    }
   }
 }
 
@@ -373,60 +418,58 @@ void KivaInstanceMap::plotDomain() {
 
   #ifdef GROUND_PLOT
 
-  if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 2 && DataGlobals::HourOfDay == 2 && DataGlobals::TimeStep == 1) {
-    Kiva::SnapshotSettings ss;
-    ss.dir = DataStringGlobals::outDirPathName + "/snapshot";
-    double& l = ground.foundation.reductionLength2;
-    const double width = 6.0;
-    const double depth = ground.foundation.foundationDepth + width/2.0;
-    const double range = max(width, depth);
-    ss.xRange = {l - range/2.0, l + range/2.0};
-    ss.yRange = {0.5,0.5};
-    ss.zRange = {-range, ground.foundation.wall.heightAboveGrade};
+  Kiva::SnapshotSettings ss;
+  ss.dir = DataStringGlobals::outDirPathName + "/snapshot";
+  double& l = ground.foundation.reductionLength2;
+  const double width = 6.0;
+  const double depth = ground.foundation.foundationDepth + width/2.0;
+  const double range = max(width, depth);
+  ss.xRange = {l - range/2.0, l + range/2.0};
+  ss.yRange = {0.5,0.5};
+  ss.zRange = {-range, ground.foundation.wall.heightAboveGrade};
 
-    Kiva::GroundPlot gp(ss,ground.domain,ground.foundation.blocks);
+  Kiva::GroundPlot gp(ss,ground.domain,ground.foundation.blocks);
 
-    std::size_t nI =  gp.iMax - gp.iMin + 1;
-    std::size_t nJ = gp.jMax - gp.jMin + 1;
+  std::size_t nI =  gp.iMax - gp.iMin + 1;
+  std::size_t nJ = gp.jMax - gp.jMin + 1;
 
-    for(size_t k = gp.kMin; k <= gp.kMax; k++)
+  for(size_t k = gp.kMin; k <= gp.kMax; k++)
+  {
+    for(size_t j = gp.jMin; j <= gp.jMax; j++)
     {
-      for(size_t j = gp.jMin; j <= gp.jMax; j++)
+      for(size_t i = gp.iMin; i <= gp.iMax; i++)
       {
-        for(size_t i = gp.iMin; i <= gp.iMax; i++)
+        std::size_t index = (i-gp.iMin)+nI*(j-gp.jMin)+nI*nJ*(k-gp.kMin);
+        if (ss.plotType == Kiva::SnapshotSettings::P_TEMP)
         {
-          std::size_t index = (i-gp.iMin)+nI*(j-gp.jMin)+nI*nJ*(k-gp.kMin);
-          if (ss.plotType == Kiva::SnapshotSettings::P_TEMP)
-          {
-            if (ss.outputUnits == Kiva::SnapshotSettings::IP)
-              gp.TDat.a[index] = (ground.TNew[i][j][k] - 273.15)*9/5 + 32.0;
-            else
-              gp.TDat.a[index] = ground.TNew[i][j][k] - 273.15;
-          }
+          if (ss.outputUnits == Kiva::SnapshotSettings::IP)
+            gp.TDat.a[index] = (ground.TNew[i][j][k] - 273.15)*9/5 + 32.0;
           else
-          {
-            double du = gp.distanceUnitConversion;
-            std::vector<double> Qflux = ground.calculateHeatFlux(i,j,k);
-            double Qx = Qflux[0];
-            double Qy = Qflux[1];
-            double Qz = Qflux[2];
-            double Qmag = sqrt(Qx*Qx + Qy*Qy + Qz*Qz);
+            gp.TDat.a[index] = ground.TNew[i][j][k] - 273.15;
+        }
+        else
+        {
+          double du = gp.distanceUnitConversion;
+          std::vector<double> Qflux = ground.calculateHeatFlux(i,j,k);
+          double Qx = Qflux[0];
+          double Qy = Qflux[1];
+          double Qz = Qflux[2];
+          double Qmag = sqrt(Qx*Qx + Qy*Qy + Qz*Qz);
 
-            if (ss.fluxDir == Kiva::SnapshotSettings::D_M)
-              gp.TDat.a[index] = Qmag/(du*du);
-            else if (ss.fluxDir == Kiva::SnapshotSettings::D_X)
-              gp.TDat.a[index] = Qx/(du*du);
-            else if (ss.fluxDir == Kiva::SnapshotSettings::D_Y)
-              gp.TDat.a[index] = Qy/(du*du);
-            else if (ss.fluxDir == Kiva::SnapshotSettings::D_Z)
-              gp.TDat.a[index] = Qz/(du*du);
-          }
+          if (ss.fluxDir == Kiva::SnapshotSettings::D_M)
+            gp.TDat.a[index] = Qmag/(du*du);
+          else if (ss.fluxDir == Kiva::SnapshotSettings::D_X)
+            gp.TDat.a[index] = Qx/(du*du);
+          else if (ss.fluxDir == Kiva::SnapshotSettings::D_Y)
+            gp.TDat.a[index] = Qy/(du*du);
+          else if (ss.fluxDir == Kiva::SnapshotSettings::D_Z)
+            gp.TDat.a[index] = Qz/(du*du);
         }
       }
     }
-
-    gp.createFrame();
   }
+
+  gp.createFrame(std::to_string(DataEnvironment::Month) + "/" + std::to_string(DataEnvironment::DayOfMonth) + " " + std::to_string(DataGlobals::HourOfDay) + ":00");
 
   #endif
 
@@ -444,20 +487,42 @@ Real64 KivaManager::getTemp(int surfNum) {
 }
 
 Real64 KivaManager::getConv(int surfNum) {
-  return getValue(surfNum, Kiva::GroundOutput::OT_CONV);
+  auto conv = getValue(surfNum, Kiva::GroundOutput::OT_CONV);
+  assert(conv > 0.0);
+  return conv;
+
 }
 
 void KivaManager::defineDefaultFoundation() {
 
-
   Kiva::Foundation defFnd;
 
-  defFnd.hasWall = true;
-  defFnd.hasWall = true;
-  defFnd.hasInteriorHorizontalInsulation = false;
-  defFnd.hasExteriorHorizontalInsulation = false;
-  defFnd.hasInteriorVerticalInsulation = false;
-  defFnd.hasExteriorVerticalInsulation = false;
+  // From settings
+  defFnd.soil = Kiva::Material(settings.soilK, settings.soilRho, settings.soilCp);
+  defFnd.soilAbsorptivity = settings.groundSolarAbs;
+  defFnd.soilEmissivity = settings.groundThermalAbs;
+  defFnd.surfaceRoughness = settings.groundRoughness;
+  defFnd.farFieldWidth = settings.farFieldWidth;
+
+  Real64 waterTableDepth = 0.1022*DataEnvironment::Elevation;
+
+  if (settings.deepGroundBoundary == Settings::AUTO) {
+    if (waterTableDepth <= 40.) {
+      defFnd.deepGroundDepth = waterTableDepth;
+      defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
+      defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp + DataGlobals::KelvinConv;
+    } else {
+      defFnd.deepGroundDepth = 40.;
+      defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
+    }
+  } else if (settings.deepGroundBoundary == Settings::ZERO_FLUX) {
+    defFnd.deepGroundDepth = settings.deepGroundDepth;
+    defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
+  } else /* if (settings.deepGroundBoundary == Settings::GROUNDWATER) */ {
+    defFnd.deepGroundDepth = settings.deepGroundDepth;
+    defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
+    defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp + DataGlobals::KelvinConv;
+  }
 
   defFnd.wall.heightAboveGrade = 0.2; // m
 
@@ -476,64 +541,25 @@ void KivaManager::defineDefaultFoundation() {
   defFnd.wall.exteriorEmissivity = 0.9;
   defFnd.wall.exteriorAbsorptivity = 0.9;
 
-
   defFnd.wall.footerDepth = 0.3;
 
-  Kiva::Material typicalSoil;
-  typicalSoil.conductivity = 0.864;  // W/m-K
-  typicalSoil.density = 1510;  // kg/m3
-  typicalSoil.specificHeat = 1260;  // J/kg-K
+  defFnd.mesh.minCellDim = settings.minCellDim;
+  defFnd.mesh.maxNearGrowthCoeff = settings.maxGrowthCoeff;
+  defFnd.mesh.maxDepthGrowthCoeff = settings.maxGrowthCoeff;
+  defFnd.mesh.maxInteriorGrowthCoeff = settings.maxGrowthCoeff;
+  defFnd.mesh.maxExteriorGrowthCoeff = settings.maxGrowthCoeff;
 
-  defFnd.soil = typicalSoil;
-
-  defFnd.soilAbsorptivity = 0.9;
-  defFnd.soilEmissivity = 0.9;
-  defFnd.surfaceRoughness = 0.03; // m
-
-  defFnd.farFieldWidth = 40.; // m
-
-  Real64 waterTableDepth = 0.1022*DataEnvironment::Elevation;
-
-  if (waterTableDepth <= 40.) {
-    defFnd.deepGroundDepth = waterTableDepth;
-    defFnd.deepGroundBoundary = Kiva::Foundation::DGB_CONSTANT_TEMPERATURE;
-    defFnd.deepGroundTemperature = DataEnvironment::AnnualAverageDrybulbTemp + DataGlobals::KelvinConv;
-  } else {
-    defFnd.deepGroundDepth = 40.;
-    defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
-  }
-
-  defFnd.coordinateSystem = Kiva::Foundation::CS_CARTESIAN;
-  defFnd.reductionStrategy = Kiva::Foundation::RS_BOUNDARY;
-  defFnd.numberOfDimensions = 2;
-  defFnd.useSymmetry = true;
-
-  defFnd.buildingHeight = 0.0; // not used
-
-  // Numeric settings
-  defFnd.numericalScheme = Kiva::Foundation::NS_ADI;
-  defFnd.fADI = 0.00001;
-  defFnd.solver = "bicgstab";
-  defFnd.preconditioner = "ilu";
-  defFnd.maxIterations = 100000;
-  defFnd.tolerance = 1.0e-6;
-
-  defFnd.mesh.minCellDim = 0.02;
-  defFnd.mesh.maxNearGrowthCoeff = 1.5;
-  defFnd.mesh.maxDepthGrowthCoeff = 1.5;
-  defFnd.mesh.maxInteriorGrowthCoeff = 1.5;
-  defFnd.mesh.maxExteriorGrowthCoeff = 1.5;
-
-  defFnd.convectionCalculationMethod = Kiva::Foundation::CCM_AUTO;
-  defFnd.wallTopBoundary = Kiva::Foundation::WTB_ZERO_FLUX;
 
   defaultFoundation.foundation = defFnd;
   defaultFoundation.name = "<Default Foundation>";
 
+
+}
+
+void KivaManager::addDefaultFoundation() {
+
   foundationInputs.push_back(defaultFoundation);
-
   defaultIndex = foundationInputs.size() - 1;
-
   defaultSet = true;
 
 }

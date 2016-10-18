@@ -423,6 +423,7 @@ namespace ConvectionCoefficients {
 
 				if ( Surface( SurfNum ).ExtBoundCond == DataSurfaces::KivaFoundation ) {
 					HConvIn( SurfNum ) = SurfaceGeometry::kivaManager.getConv( SurfNum );
+					Surface( SurfNum ).TAirRef = ZoneMeanAirTemp;					
 					continue;
 				}
 

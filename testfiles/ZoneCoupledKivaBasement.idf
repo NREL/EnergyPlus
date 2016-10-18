@@ -90,8 +90,7 @@ Building,
 
 !- =========== ALL OBJECTS IN CLASS: TIMESTEP ===========
 
-Timestep,
-    4; !- Number of Timesteps per Hour
+  Timestep,4;
 
 
 !- =========== ALL OBJECTS IN CLASS: SITE:LOCATION ===========
@@ -99,12 +98,13 @@ Timestep,
 !***********************************************************
 !****** LOCATION SPECIFIC OBJECTS **************************
 !***********************************************************
- Site:Location,
-  Denver Centennial  Golden   N_CO_USA Design_Conditions,     !- Location Name
-      39.74,     !- Latitude {N+ S-}
-    -105.18,     !- Longitude {W- E+}
-      -7.00,     !- Time Zone Relative to GMT {GMT+/-}
-    1829.00;     !- Elevation {m}
+
+  Site:Location,
+    Denver Centennial  Golden   N_CO_USA Design_Conditions,  !- Name
+    39.74,                   !- Latitude {deg}
+    -105.18,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1829.00;                 !- Elevation {m}
 
 
 !- =========== ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
@@ -112,82 +112,81 @@ Timestep,
  ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
  ! Coldest Month=DEC
  ! Denver Centennial  Golden   N_CO_USA Annual Heating 99.6%, MaxDB=-18.8°C
- SizingPeriod:DesignDay,
-  Denver Centennial  Golden   N Ann Htg 99.6% Condns DB,     !- Name
-         12,      !- Month
-         21,      !- Day of Month
-  WinterDesignDay,!- Day Type
-      -18.8,      !- Maximum Dry-Bulb Temperature {C}
-        0.0,      !- Daily Dry-Bulb Temperature Range {C}
- DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-    Wetbulb,      !- Humidity Condition Type
-      -18.8,      !- Wetbulb at Maximum Dry-Bulb {C}
-           ,      !- Humidity Indicating Day Schedule Name
-           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-     81198.,      !- Barometric Pressure {Pa}
-          3,      !- Wind Speed {m/s} design conditions vs. traditional 6.71 m/s (15 mph)
-        340,      !- Wind Direction {Degrees; N=0, S=180}
-         No,      !- Rain {Yes/No}
-         No,      !- Snow on ground {Yes/No}
-         No,      !- Daylight Savings Time Indicator
-  ASHRAEClearSky, !- Solar Model Indicator
-           ,      !- Beam Solar Day Schedule Name
-           ,      !- Diffuse Solar Day Schedule Name
-           ,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-           ,      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
-       0.00;      !- Clearness {0.0 to 1.1}
+
+  SizingPeriod:DesignDay,
+    Denver Centennial  Golden   N Ann Htg 99.6% Condns DB,  !- Name
+    12,                      !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -18.8,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -18.8,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81198.,                  !- Barometric Pressure {Pa}
+    3,                       !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
 
 
  ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=JUL
  ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33°C MWB=15.7°C
- SizingPeriod:DesignDay,
-  Denver Centennial  Golden   N Ann Clg .4% Condns DB=>MWB,     !- Name
-          7,      !- Month
-         21,      !- Day of Month
-  SummerDesignDay,!- Day Type
-         33,      !- Maximum Dry-Bulb Temperature {C}
-       15.2,      !- Daily Dry-Bulb Temperature Range {C}
- DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-    Wetbulb,      !- Humidity Condition Type
-       15.7,      !- Wetbulb at Maximum Dry-Bulb {C}
-           ,      !- Humidity Indicating Day Schedule Name
-           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-     81198.,      !- Barometric Pressure {Pa}
-        4.9,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
-          0,      !- Wind Direction {Degrees; N=0, S=180}
-         No,      !- Rain {Yes/No}
-         No,      !- Snow on ground {Yes/No}
-         No,      !- Daylight Savings Time Indicator
-       ASHRAETau, !- Solar Model Indicator
-           ,      !- Beam Solar Day Schedule Name
-           ,      !- Diffuse Solar Day Schedule Name
-      0.424,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-      2.025;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
 
+  SizingPeriod:DesignDay,
+    Denver Centennial  Golden   N Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    33,                      !- Maximum Dry-Bulb Temperature {C}
+    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    15.7,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81198.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    0,                       !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.424,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    2.025;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
 !- =========== ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
-RunPeriod,
-    Annual Run, !- Name
-    1, !- Begin Month
-    1, !- Begin Day of Month
-    12, !- End Month
-    31, !- End Day of Month
-    Tuesday, !- Day of Week for Start Day
-    Yes, !- Use Weather File Holidays and Special Days
-    Yes, !- Use Weather File Daylight Saving Period
-    No, !- Apply Weekend Holiday Rule
-    Yes, !- Use Weather File Rain Indicators
-    Yes; !- Use Weather File Snow Indicators
-
-
+  RunPeriod,
+    Annual Run,              !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 !***********************************************************
 !****** BASEMENT ZONE SPECIFICATION ************************
@@ -214,7 +213,7 @@ RunPeriod,
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
     Foundation,              !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
+    Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -230,7 +229,7 @@ RunPeriod,
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
     Foundation,              !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
+    Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -246,7 +245,7 @@ RunPeriod,
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
     Foundation,              !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
+    Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -262,7 +261,7 @@ RunPeriod,
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
     Foundation,              !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
+    Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -278,7 +277,7 @@ RunPeriod,
     Basement Floor Construction,  !- Construction Name
     Basement,                !- Zone Name
     Foundation,              !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
+    Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -459,7 +458,7 @@ Zone,
   Material,
     Basement Floor Material,  !- Name
     MediumRough,             !- Roughness
-    0.1,                  !- Thickness {m}
+    0.3,                  !- Thickness {m}
     1.805,                   !- Conductivity {W/m-K}
     2243,                    !- Density {kg/m3}
     837,                     !- Specific Heat {J/kg-K}
@@ -470,7 +469,7 @@ Zone,
 Material,
     Basement Wall Material,  !- Name
     MediumRough,             !- Roughness
-    0.1,                     !- Thickness {m}
+    0.3,                     !- Thickness {m}
     1.802,                   !- Conductivity {W/m-K}
     2243,                    !- Density {kg/m3}
     837,                     !- Specific Heat {J/kg-K}
@@ -539,6 +538,37 @@ Material,
     CounterClockWise, !- Vertex Entry Direction
     Relative; !- Coordinate System
 
+!***********************************************************
+!********************* FOUNDATION **************************
+!***********************************************************
+
+Foundation:Kiva,
+  Basement Foundation,  !- Name
+  Basement Insulation,  !- Interior Horizonatl Insulation Material Name
+  3.3,                  !- Interior Horizontal Insulation Depth
+  1,                    !- Interior Horizontal Insulation Width
+  ,                     !- Interior Vertical Insulation Material Name
+  ,                     !- Interior Vertical Insulation Depth
+  ,                     !- Exterior Horizontal Insulation Material Name
+  ,                     !- Exterior Horizontal Insulation Depth
+  ,                     !- Exterior Horizontal Insulation Width
+  Basement Insulation,  !- Exterior Vertical Insulation Material Name
+  2.9,                  !- Exterior Vertical Insulation Depth
+  0.2,                  !- Wall Height Above Grade
+  ,                     !- Footer Wall Construction
+  0.3;                  !- Footer Depth
+
+Foundation:Kiva:Settings,
+  1.8,            !- Soil Conductivity
+  3200,           !- Soil Density
+  836,            !- Soil Specific Heat
+  0.9,            !- Ground Solar Absorptivity
+  0.9,            !- Ground Thermal Absorptivity
+  0.03,           !- Ground Surface Roughness
+  40,             !- Far-Field Width
+  Autocalculate;  !- Deep-Ground Boundary Condition
+
+
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
 Output:VariableDictionary,IDF;
@@ -557,47 +587,40 @@ OutputControl:Table:Style,
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
+ZoneAirHeatBalanceAlgorithm, AnalyticalSolution; !- Algorithm
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
 Output:Variable,*,Zone Mean Air Temperature,hourly; !- Zone Average [C]
 Output:Variable,*,Surface Inside Face Temperature,hourly;
-Output:Variable,*,Surface Outside Face Temperature,hourly;
 Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
-Output:Variable,*,Surface Inside Face Convection Heat Gain Rate per Area,hourly;
-Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area,hourly;
-Output:Variable,*,Surface Inside Face Solar Radiation Heat Gain Rate per Area,hourly;
-Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area,hourly;
-Output:Variable,*,Surface Inside Face Conduction Heat Transfer Rate per Area,hourly;
 
 ScheduleTypeLimits,
   HVACTemplate Any Number; !- Name
 
-Schedule:Compact,
-  HVACTemplate-Always 21, !- Name
-  HVACTemplate Any Number, !- Schedule Type Limits Name
-  Through: 12/31, !- Field 1
-  For: AllDays, !- Field 2
-  Until: 24:00, !- Field 3
-  21; !- Field 4
+  Schedule:Compact,
+    HVACTemplate-Always 21,  !- Name
+    HVACTemplate Any Number, !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,21;         !- Field 3
 
 ThermostatSetpoint:DualSetpoint,
   Always21 Dual SP Control, !- Name
   HVACTemplate-Always 21, !- Heating Setpoint Temperature Schedule Name
   HVACTemplate-Always 21; !- Cooling Setpoint Temperature Schedule Name
 
-Schedule:Compact,
-  HVACTemplate-Always 4, !- Name
-  HVACTemplate Any Number, !- Schedule Type Limits Name
-  Through: 12/31, !- Field 1
-  For: AllDays, !- Field 2
-  Until: 24:00, !- Field 3
-  4; !- Field 4
+  Schedule:Compact,
+    HVACTemplate-Always 4,   !- Name
+    HVACTemplate Any Number, !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
 
-ZoneControl:Thermostat,
-  Main Floor Thermostat, !- Name
-  Main Floor, !- Zone or ZoneList Name
-  HVACTemplate-Always 4, !- Control Type Schedule Name
-  ThermostatSetpoint:DualSetpoint, !- Control Object Type
-  Always21 Dual SP Control; !- Control Name
+  ZoneControl:Thermostat,
+    Main Floor Thermostat,   !- Name
+    Main Floor,              !- Zone or ZoneList Name
+    HVACTemplate-Always 4,   !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    Always21 Dual SP Control;!- Control 1 Name
 
 ZoneHVAC:EquipmentConnections,
   Main Floor, !- Zone Name
@@ -607,37 +630,37 @@ ZoneHVAC:EquipmentConnections,
   Main Floor Zone Air Node, !- Zone Air Node Name
   Main Floor Return Outlet; !- Zone Return Air Node Name
 
-ZoneHVAC:EquipmentList,
-  Main Floor Equipment, !- Name
-  ZoneHVAC:IdealLoadsAirSystem, !- Zone Equipment Object Type
-  Main Floor Ideal Loads Air System, !- Zone Equipment Name
-  1, !- Zone Equipment Cooling Sequence
-  1; !- Zone Equipment Heating or No-Load Sequence
+  ZoneHVAC:EquipmentList,
+    Main Floor Equipment,    !- Name
+    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
+    Main Floor Ideal Loads Air System,  !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
-ZoneHVAC:IdealLoadsAirSystem,
-  Main Floor Ideal Loads Air System, !- Name
-  , !- Availability Schedule Name
-  Main Floor Ideal Loads Supply Inlet, !- Zone Supply Air Node Name
-  , !- Zone Exhaust Air Node Name
-  50, !- Maximum Heating Supply Air Temperature [C
-  13, !- Minimum Cooling Supply Air Temperature [C]
-  0.0156, !- Maximum Heating Supply Air Humidity Ratio [kg-H20/kg-air]
-  0.0077, !- Minimum Cooling Supply Air Humidity Ratio [kg-H20/kg-air]
-  NoLimit, !- Heating Limit
-  , !- Maximum Heating Air Flow Rate {m3/s}
-  , !- Maximum Sensible Heating Capacity {m3/s}
-  NoLimit, !- Cooling Limit
-  , !- Maximum Cooling Air Flow Rate {m3/s}
-  , !- Maximum Total Cooling Capacity {m3/s}
-  , !- Heating Availability Schedule Name
-  , !- Cooling Availability Schedule Name
-  ConstantSensibleHeatRatio, !- Dehumidification Control Type
-  0.7, !- Cooling Sensible Heat Ratio
-  None, !- Humidification Control Type
-  , !- Design Specification Outdoor Air Object Name
-  , !- Outdoor Air Inlet Node Name
-  None, !- Demand Controlled Ventilation Type
-  NoEconomizer, !- Outdoor Air Economizer Type
-  None, !- Heat Recovery Type
-  0.7, !- Sensible Heat Recovery Effectiveness
-  0.65; !- Latent Heat Recovery Effectiveness
+  ZoneHVAC:IdealLoadsAirSystem,
+    Main Floor Ideal Loads Air System,  !- Name
+    ,                        !- Availability Schedule Name
+    Main Floor Ideal Loads Supply Inlet,  !- Zone Supply Air Node Name
+    ,                        !- Zone Exhaust Air Node Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    13,                      !- Minimum Cooling Supply Air Temperature {C}
+    0.0156,                  !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0077,                  !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    NoLimit,                 !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSensibleHeatRatio,  !- Dehumidification Control Type
+    0.7,                     !- Cooling Sensible Heat Ratio {dimensionless}
+    None,                    !- Humidification Control Type
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Outdoor Air Inlet Node Name
+    None,                    !- Demand Controlled Ventilation Type
+    NoEconomizer,            !- Outdoor Air Economizer Type
+    None,                    !- Heat Recovery Type
+    0.7,                     !- Sensible Heat Recovery Effectiveness {dimensionless}
+    0.65;                    !- Latent Heat Recovery Effectiveness {dimensionless}

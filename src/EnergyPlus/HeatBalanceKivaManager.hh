@@ -75,6 +75,7 @@ public:
   Kiva::Foundation foundation;
   std::string name;
   std::vector< int > surfaces;
+  int wallConstructionIndex;
 
 };
 
@@ -104,15 +105,51 @@ public:
   void setupKivaInstances();
   void initKivaInstances();
   void calcKivaInstances();
+  void defineDefaultFoundation();
+  void addDefaultFoundation();
+  int findFoundation(std::string name);
+  Real64 getTemp(int surfNum );
+  Real64 getConv(int surfNum );
+
   FoundationKiva defaultFoundation;
   std::vector<FoundationKiva> foundationInputs;
   std::vector<KivaInstanceMap> kivaInstances;
-  void defineDefaultFoundation();
+
+
+
+  struct Settings{
+    Settings();
+
+    Real64 soilK;
+    Real64 soilRho;
+    Real64 soilCp;
+    Real64 groundSolarAbs;
+    Real64 groundThermalAbs;
+    Real64 groundRoughness;
+    Real64 farFieldWidth;
+
+    enum DGType {
+      ZERO_FLUX,
+      GROUNDWATER,
+      AUTO
+    };
+
+    DGType deepGroundBoundary;
+    Real64 deepGroundDepth;
+    Real64 minCellDim;
+    Real64 maxGrowthCoeff;
+
+    enum TSType {
+      HOURLY,
+      TIMESTEP
+    };
+
+    TSType timestepType;
+  };
+
+  Settings settings;
   bool defaultSet;
-  int findFoundation(std::string name);
   int defaultIndex;
-  Real64 getTemp(int surfNum );
-  Real64 getConv(int surfNum );
 
 private:
   Real64 getValue(int surfNum, Kiva::GroundOutput::OutputType oT);

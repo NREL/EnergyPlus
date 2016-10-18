@@ -1990,6 +1990,10 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "FCGround"; }
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-FCGround"; }
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
+				} else if ( Surface( surf ).ExtBoundCond == KivaFoundation ) {
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "Foundation"; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-Foundation"; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << IntConvCoeffCalc; }
 				} else if ( Surface( surf ).ExtBoundCond == OtherSideCoefNoCalcExt || Surface( surf ).ExtBoundCond == OtherSideCoefCalcExt ) {
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << OSC( Surface( surf ).OSCPtr ).Name; }
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_705, flags ) << "N/A-OSC"; }

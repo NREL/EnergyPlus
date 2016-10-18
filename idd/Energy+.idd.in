@@ -16052,10 +16052,78 @@ SurfaceProperty:OtherSideConditionsModel,
       \default GapConvectionRadiation
 
 Foundation:Kiva,
-  \memo
-  A1; \field Name
-      \required-field
-      \reference OutFaceEnvNames
+       \memo Refined definition of the foundation surface construction used to
+       \memo infrom two-diemensional heat transfer calculated using the Kiva
+       \memo ground heat transfer methodology.
+  A1,  \field Name
+       \required-field
+       \type alpha
+       \reference OutFaceEnvNames
+  A2,  \field Interior Horizontal Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N1,  \field Interior Horizontal Insulation Depth
+       \note Distance from the wall top to the top of interior horizontal
+       \note insulation
+       \units m
+       \type real
+       \minimum 0.0
+  N2,  \field Interior Horizontal Insulation Width
+       \note Extent of insulation as measured from the wall interior
+       \units m
+       \type real
+       \minimum> 0.0
+  A3,  \field Interior Vertical Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N3,  \field Interior Vertical Insulation Depth
+       \note Extent of insulation as measured from the wall top to the bottom
+       \note edge of the interior vertical insulation
+       \units m
+       \type real
+       \minimum> 0.0
+  A4,  \field Exterior Horizontal Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N4,  \field Exterior Horizontal Insulation Depth
+       \note Distance from the wall top to the top of exterior horizontal
+       \note insulation
+       \units m
+       \type real
+       \minimum 0.0
+  N5,  \field Exterior Horizontal Insulation Width
+       \note Extent of insulation as measured from the wall exterior
+       \units m
+       \type real
+       \minimum> 0.0
+  A5,  \field Exterior Vertical Insulation Material Name
+       \type object-list
+       \object-list MaterialName
+  N6,  \field Exterior Vertical Insulation Depth
+       \note Extent of insulation as measured from the wall top to the bottom
+       \note edge of the exterior vertical insulation
+       \units m
+       \type real
+       \minimum> 0.0
+  N7,  \field Wall Height Above Grade
+       \note Distance from the exterior grade to the wall top
+       \units m
+       \type real
+       \minimum 0.0
+       \default 0.2
+  A6,  \field Footer Wall Construction
+       \note defines the below-grade surface construction for slabs. Required
+       \note if foundation wall is not exposed to the zone.
+       \type object-list
+       \object-list ConstructionNames
+  N8;  \field Footer Depth
+       \note Distance from the slab bottom to the bottom of the foundation
+       \note footer
+       \units m
+       \type real
+       \minimum 0.0
+       \default 0.3
+
 
 SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
        \unique-object

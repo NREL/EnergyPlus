@@ -418,7 +418,7 @@ BuildingSurface:Detailed,
     Floor Construction, !- Construction Name
     Main Floor, !- Zone Name
     Foundation,!- Outside Boundary Condition
-    , !- Outside Boundary Condition Object
+    Slab Foundation, !- Outside Boundary Condition Object
     NoSun, !- Sun Exposure
     NoWind, !- Wind Exposure
     autocalculate, !- View Factor to Ground
@@ -435,6 +435,36 @@ BuildingSurface:Detailed,
     0.0, !- Vertex 4 X-coordinate {m}
     10.0, !- Vertex 4 Y-coordinate {m}
     0.0; !- Vertex 4 Z-coordinate {m}
+
+!***********************************************************
+!********************* FOUNDATION **************************
+!***********************************************************
+
+Foundation:Kiva,
+  Slab Foundation,      !- Name
+  ,                     !- Interior Horizonatl Insulation Material Name
+  ,                     !- Interior Horizontal Insulation Depth
+  ,                     !- Interior Horizontal Insulation Width
+  ,                     !- Interior Vertical Insulation Material Name
+  ,                     !- Interior Vertical Insulation Depth
+  ,                     !- Exterior Horizontal Insulation Material Name
+  ,                     !- Exterior Horizontal Insulation Depth
+  ,                     !- Exterior Horizontal Insulation Width
+  Insulation,           !- Exterior Vertical Insulation Material Name
+  1.5,                  !- Exterior Vertical Insulation Depth
+  0.2,                  !- Wall Height Above Grade
+  ,                     !- Footer Wall Construction
+  1.6;                  !- Footer Depth
+
+Foundation:Kiva:Settings,
+  1.8,            !- Soil Conductivity
+  3200,           !- Soil Density
+  836,            !- Soil Specific Heat
+  0.9,            !- Ground Solar Absorptivity
+  0.9,            !- Ground Thermal Absorptivity
+  0.03,           !- Ground Surface Roughness
+  40,             !- Far-Field Width
+  Autocalculate;  !- Deep-Ground Boundary Condition
 
 !***********************************************************
 !****** IDEAL AIR SYSTEM************************************
@@ -526,15 +556,11 @@ Output:VariableDictionary,IDF;
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
+ZoneAirHeatBalanceAlgorithm, AnalyticalSolution; !- Algorithm
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
 Output:Variable,*,Zone Mean Air Temperature,hourly; !- Zone Average [C]
 Output:Variable,*,Surface Inside Face Temperature,hourly;
-Output:Variable,*,Surface Outside Face Temperature,hourly;
 Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
-Output:Variable,*,Surface Inside Face Convection Heat Gain Rate per Area,hourly;
-Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area,hourly;
-Output:Variable,*,Surface Inside Face Solar Radiation Heat Gain Rate per Area,hourly;
-Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area,hourly;
 Output:Variable,*,Surface Inside Face Conduction Heat Transfer Rate per Area,hourly;
 OutputControl:Table:Style, HTML;
 Output:Table:SummaryReports, AllSummary;

@@ -695,7 +695,11 @@ namespace HeatBalanceSurfaceManager {
 
 		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
 			SurfaceGeometry::kivaManager.initKivaInstances();
-			SurfaceGeometry::kivaManager.calcKivaInstances();
+			if ( (SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
+				SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP )
+			{
+					SurfaceGeometry::kivaManager.calcKivaInstances();
+			}
 		}
 
 		if ( InitSurfaceHeatBalancefirstTime ) DisplayString( "Initializing Interior Convection Coefficients" );
@@ -912,7 +916,7 @@ namespace HeatBalanceSurfaceManager {
 		for ( iSurf = 1; iSurf <= TotSurfaces; ++iSurf ) {
 			zonePt = Surface( iSurf ).Zone;
 			//only exterior surfaces including underground
-			if ( ( Surface( iSurf ).ExtBoundCond == ExternalEnvironment ) || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) ) {
+			if ( ( Surface( iSurf ).ExtBoundCond == ExternalEnvironment ) || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) || ( Surface( iSurf ).ExtBoundCond == KivaFoundation )) {
 				isExterior = true;
 				{ auto const SELECT_CASE_var( Surface( iSurf ).Class );
 				if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Floor ) || ( SELECT_CASE_var == SurfaceClass_Roof ) ) {
