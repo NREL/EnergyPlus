@@ -134,7 +134,9 @@ void KivaInstanceMap::setBoundaryConditions() {
 
   }
 
-  bcs.wallAbsRadiation = QAtotal/Atotal;
+  if (Atotal > 0.0) {
+    bcs.wallAbsRadiation = QAtotal/Atotal;
+  }
 
 }
 
