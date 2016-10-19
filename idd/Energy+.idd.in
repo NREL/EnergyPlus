@@ -16063,11 +16063,12 @@ Foundation:Kiva,
        \type object-list
        \object-list MaterialName
   N1,  \field Interior Horizontal Insulation Depth
-       \note Distance from the wall top to the top of interior horizontal
+       \note Distance from the slab bottom to the top of interior horizontal
        \note insulation
        \units m
        \type real
        \minimum 0.0
+       \default 0.0
   N2,  \field Interior Horizontal Insulation Width
        \note Extent of insulation as measured from the wall interior
        \units m
@@ -16086,7 +16087,7 @@ Foundation:Kiva,
        \type object-list
        \object-list MaterialName
   N4,  \field Exterior Horizontal Insulation Depth
-       \note Distance from the wall top to the top of exterior horizontal
+       \note Distance from the exterior grade to the top of exterior horizontal
        \note insulation
        \units m
        \type real
@@ -16095,7 +16096,8 @@ Foundation:Kiva,
        \note Extent of insulation as measured from the wall exterior
        \units m
        \type real
-       \minimum> 0.0
+       \minimum 0.0
+       \default 0.0
   A5,  \field Exterior Vertical Insulation Material Name
        \type object-list
        \object-list MaterialName

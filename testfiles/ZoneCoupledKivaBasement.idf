@@ -545,7 +545,7 @@ Material,
 Foundation:Kiva,
   Basement Foundation,  !- Name
   Basement Insulation,  !- Interior Horizonatl Insulation Material Name
-  3.3,                  !- Interior Horizontal Insulation Depth
+  ,                     !- Interior Horizontal Insulation Depth
   1,                    !- Interior Horizontal Insulation Width
   ,                     !- Interior Vertical Insulation Material Name
   ,                     !- Interior Vertical Insulation Depth

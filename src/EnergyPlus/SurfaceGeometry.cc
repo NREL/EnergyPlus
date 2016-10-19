@@ -7698,9 +7698,7 @@ namespace SurfaceGeometry {
 
 				if ( fnd.hasInteriorHorizontalInsulation ) {
 					if ( lNumericFieldBlanks( numF ) ) {
-						ErrorsFound = true;
-						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
-						continue;
+						fnd.interiorHorizontalInsulation.depth = 0.0;
 					} else {
 						fnd.interiorHorizontalInsulation.depth = rNumericArgs( numF );
 					} numF++;
@@ -7779,9 +7777,7 @@ namespace SurfaceGeometry {
 
 				if ( fnd.hasExteriorHorizontalInsulation ) {
 					if ( lNumericFieldBlanks( numF ) ) {
-						ErrorsFound = true;
-						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
-						continue;
+						fnd.exteriorHorizontalInsulation.depth = 0.0;
 					} else {
 						fnd.exteriorHorizontalInsulation.depth = rNumericArgs( numF );
 					} numF++;
