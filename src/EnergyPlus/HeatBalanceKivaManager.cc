@@ -239,7 +239,8 @@ void KivaManager::setupKivaInstances() {
 
       Real64 wallHeight = 0.0;
       if (wallSurfaces.size() != 0) {
-        Real64 minZ, maxZ = Surfaces(wallSurfaces[0]).Vertex[0].z;
+        Real64 minZ = Surfaces(wallSurfaces[0]).Vertex[0].z; 
+        Real64 maxZ = minZ;
         for (size_t i = 1; i < Surfaces(wallSurfaces[0]).Vertex.size(); ++i ) {
           if (Surfaces(wallSurfaces[0]).Vertex[i].z < minZ) {minZ = Surfaces(wallSurfaces[0]).Vertex[i].z;}
           if (Surfaces(wallSurfaces[0]).Vertex[i].z > maxZ) {maxZ = Surfaces(wallSurfaces[0]).Vertex[i].z;}
@@ -247,7 +248,6 @@ void KivaManager::setupKivaInstances() {
         wallHeight = maxZ - minZ; // TODO Kiva: each wall with different height gets its own instance.
         int constructionNum = Surfaces(wallSurfaces[0]).Construction;
         for (auto& wl : wallSurfaces) {
-          Real64 minZ, maxZ = Surfaces(wl).Vertex[0].z;
           for (size_t i = 1; i < Surfaces(wl).Vertex.size(); ++i ) {
             if (Surfaces(wl).Vertex[i].z < minZ) {minZ = Surfaces(wl).Vertex[i].z;}
             if (Surfaces(wl).Vertex[i].z > maxZ) {maxZ = Surfaces(wl).Vertex[i].z;}
