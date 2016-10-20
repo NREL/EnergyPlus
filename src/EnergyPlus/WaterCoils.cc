@@ -1033,58 +1033,6 @@ namespace WaterCoils {
 				Node( WaterInletNode ).Quality = 0.0;
 				Node( WaterInletNode ).Press = 0.0;
 				Node( WaterInletNode ).HumRat = 0.0;
-
-				//FB if ( ( WaterCoil( CoilNum ).DesTotWaterCoilLoad != AutoSize ) && MyUAAndFlowCalcFlag( CoilNum ) ) {
-				//FB 	// calculate design water flow rate
-				//FB 	if ( ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) || ( WaterCoil( CoilNum ).CoilPerfInpMeth == UAandFlow 
-				//FB 		&& WaterCoil( CoilNum ).MaxWaterVolFlowRate == AutoSize ) ) {
-				//FB 		// check for very small heating capacity
-				//FB 		if ( WaterCoil( CoilNum ).DesTotWaterCoilLoad > SmallLoad ) {
-				//FB 			WaterCoil( CoilNum ).MaxWaterVolFlowRate = WaterCoil( CoilNum ).DesTotWaterCoilLoad 
-				//FB 				/ ( Cp * rho * ( WaterCoil( CoilNum ).DesInletWaterTemp - WaterCoil( CoilNum ).DesOutletWaterTemp ) );
-				//FB 			// save the design water volumetric flow rate for use by the water loop sizing algorithms
-				//FB 			RegisterPlantCompDesignFlow( WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
-				//FB 		} else {
-				//FB 			WaterCoil( CoilNum ).MaxWaterVolFlowRate = 0.0;
-				//FB 		}
-				//FB 	}
-				//FB 	// calculate the coil UA
-				//FB 	if ( ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap ) || ( WaterCoil( CoilNum ).CoilPerfInpMeth == UAandFlow && WaterCoil( CoilNum ).UACoil == AutoSize ) ) {
-				//FB 		// check for very small heating capacity
-				//FB 		if ( WaterCoil( CoilNum ).DesTotWaterCoilLoad > SmallLoad ) {
-				//FB 			RhoAirStd = StdRhoAir;
-				//FB 			CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
-				//FB 			Par( 1 ) = WaterCoil( CoilNum ).DesTotWaterCoilLoad;
-				//FB 			Par( 2 ) = double( CoilNum );
-				//FB 			Par( 3 ) = double( ContFanCycCoil ); //fan operating mode
-				//FB 			Par( 4 ) = 1.0; // part-load ratio
-				//FB 			WaterCoil( CoilNum ).InletAirTemp = WaterCoil( CoilNum ).DesInletAirTemp;
-				//FB 			WaterCoil( CoilNum ).InletAirHumRat = 0.008;
-				//FB 			WaterCoil( CoilNum ).InletWaterTemp = WaterCoil( CoilNum ).DesInletWaterTemp;
-				//FB 			WaterCoil( CoilNum ).InletWaterMassFlowRate = rho * WaterCoil( CoilNum ).MaxWaterVolFlowRate;
-				//FB 			WaterCoil( CoilNum ).InletAirMassFlowRate = WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( CpAirStd * ( WaterCoil( CoilNum ).DesOutletAirTemp - WaterCoil( CoilNum ).DesInletAirTemp ) );
-				//FB 			WaterCoil( CoilNum ).DesAirVolFlowRate = WaterCoil( CoilNum ).InletAirMassFlowRate / RhoAirStd;
-				//FB 			// set the lower and upper limits on the UA
-				//FB 			UA0 = 0.001 * WaterCoil( CoilNum ).DesTotWaterCoilLoad;
-				//FB 			UA1 = WaterCoil( CoilNum ).DesTotWaterCoilLoad;
-				//FB 			// Invert the simple heating coil model: given the design inlet conditions and the design load, fins the design UA
-				//FB 			SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
-				//FB 			// if the numerical inversion failed, issue error messages.
-				//FB 			if ( SolFla == -1 ) {
-				//FB 				ShowSevereError( "Calculation of heating coil UA failed for coil " + WaterCoil( CoilNum ).Name );
-				//FB 				ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
-				//FB 				ShowFatalError( "Preceding error causes program termination" );
-				//FB 			} else if ( SolFla == -2 ) {
-				//FB 				ShowSevereError( "Calculation of heating coil UA failed for coil " + WaterCoil( CoilNum ).Name );
-				//FB 				ShowContinueError( "  Bad starting values for UA" );
-				//FB 				ShowFatalError( "Preceding error causes program termination" );
-				//FB 			}
-				//FB 			WaterCoil( CoilNum ).UACoil = UA;
-				//FB 		} else {
-				//FB 			WaterCoil( CoilNum ).UACoil = 1.0;
-				//FB 		}
-				//FB 	}
-				//FB }
 				MyUAAndFlowCalcFlag( CoilNum ) = false;
 				//fill values for variable UA
 				CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );

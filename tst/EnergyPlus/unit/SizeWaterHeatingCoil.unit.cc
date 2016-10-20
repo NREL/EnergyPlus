@@ -63,6 +63,8 @@
 #include <General.hh>
 #include <ObjexxFCL/gio.hh>
 #include <DataEnvironment.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -104,11 +106,13 @@ using namespace EnergyPlus::SingleDuct;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::WaterCoils;
 using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
+using namespace EnergyPlus::DataAirSystems;
+using namespace EnergyPlus::DataAirLoop;
 
 namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1 ) {
 
-		// test whether sizing of zone reheat coil sizing works for performance input method = NominalCaoacity
+		// test whether sizing of zone reheat coil sizing works for performance input method = NominalCapacity
 		// with all inputs set by user. The UA for the coil needs to be calculated.
 
 		bool ErrorsFound( false );
@@ -314,11 +318,6 @@ namespace EnergyPlus {
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
 		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
-		// EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.2 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2, .07351776, 0.000001 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin, .07351776, 0.000001 );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -326,10 +325,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow, 0.1415762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac, 0.3 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea, .002032 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.196047, 0.000001 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
 		SizeSys( 1 );
 		SizeWaterCoil( 1 );
@@ -559,11 +554,6 @@ namespace EnergyPlus {
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
 		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
-		// EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.2 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2, .07351776, 0.000001 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin, .07351776, 0.000001 );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -571,10 +561,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow, 0.1415762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac, 0.3 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea, .002032 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.196047, 0.000001 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
 		SizeSys( 1 );
 		SizeWaterCoil( 1 );
@@ -804,11 +790,6 @@ namespace EnergyPlus {
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
 		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
-		// EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.2 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2, .07351776, 0.000001 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin, .07351776, 0.000001 );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -816,10 +797,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow, 0.1415762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac, 0.3 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea, .002032 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.196047, 0.000001 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
 		SizeSys( 1 );
 		SizeWaterCoil( 1 );
@@ -845,7 +822,7 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4 ) {
 
 		// test whether autosizing of zone reheat coil works for performance input method = UFactorTimesAreaAndDesignWaterFlowRate,
-		// all inputs autosized
+		// UA is user input.
 
 		bool ErrorsFound( false );
 
@@ -1050,11 +1027,6 @@ namespace EnergyPlus {
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
 		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
-		// EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.2 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2, .07351776, 0.000001 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin, .07351776, 0.000001 );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -1062,10 +1034,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow, 0.1415762 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac, 0.3 );
-		// EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea, .002032 );
-		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.196047, 0.000001 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
 		SizeSys( 1 );
 		SizeWaterCoil( 1 );
@@ -1085,6 +1053,176 @@ namespace EnergyPlus {
 		PlantSizData.deallocate();
 		WaterCoils::MySizeFlag.deallocate();
 		WaterCoils::MyUAAndFlowCalcFlag.deallocate();
+
+	}
+
+	TEST_F( EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5 ) {
+
+		// test whether autosizing of system heating coil works when capacity is entered in system sizing array
+
+
+		bool ErrorsFound( false );
+
+		InitializePsychRoutines();
+		DataEnvironment::StdRhoAir = 1.20;
+
+		std::string const idf_objects = delimited_string( {
+			"	Version,8.4;",
+			"	Zone,",
+			"	SPACE1-1, !- Name",
+			"	0, !- Direction of Relative North { deg }",
+			"	0, !- X Origin { m }",
+			"	0, !- Y Origin { m }",
+			"	0, !- Z Origin { m }",
+			"	1, !- Type",
+			"	1, !- Multiplier",
+			"	2.438400269, !- Ceiling Height {m}",
+			"	239.247360229; !- Volume {m3}",
+			"	Sizing:System,",
+			"	VAV Sys 1, !- AirLoop Name",
+			"	sensible, !- Type of Load to Size On",
+			"	autosize, !- Design Outdoor Air Flow Rate { m3/s }",
+			"	0.3, !- Central Heating Maximum System Air Flow Ratio",
+			"	7.0, !- Preheat Design Temperature { C }",
+			"	0.008, !- Preheat Design Humidity Ratio { kgWater/kgDryAir }",
+			"	11.0, !- Precool Design Temperature { C }",
+			"	0.008, !- Precool Design Humidity Ratio { kgWater/kgDryAir }",
+			"	12.8, !- Central Cooling Design Supply Air Temperature { C }",
+			"	16.7, !- Central Heating Design Supply Air Temperature { C }",
+			"	noncoincident, !- Type of Zone Sum to Use",
+			"	no, !- 100% Outdoor Air in Cooling",
+			"	no, !- 100% Outdoor Air in Heating",
+			"	0.008, !- Central Cooling Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+			"	0.008, !- Central Heating Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+			"	DesignDay, !- Cooling Design Air Flow Method",
+			"	0, !- Cooling Design Air Flow Rate { m3/s }",
+			"	, !- Supply Air Flow Rate Per Floor Area During Cooling Operation { m3/s-m2 }",
+			"	, !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+			"	, !- Design Supply Air Flow Rate Per Unit Cooling Capacity { m3/s-W }",
+			"	FlowPerHeatingCapacity, !- Heating Design Air Flow Method",
+			"	0, !- Heating Design Air Flow Rate { m3/s }",
+			"	, !- Supply Air Flow Rate Per Floor Area During Heating Operation { m3/s-m2 }",
+			"	, !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+			"	, !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+			"	0.000174194, !- Design Supply Air Flow Rate Per Unit Heating Capacity { m3/s-W }",
+			"	, !- System Outdoor Air Method",
+			"	1.0, !- Zone Maximum Outdoor Air Fraction { dimensionless }",
+			"	CoolingDesignCapacity, !- Cooling Design Capacity Method",
+			"	autosize, !- Cooling Design Capacity { W }",
+			"	, !- Cooling Design Capacity Per Floor Area { W/m2 }",
+			"	, !- Fraction of Autosized Cooling Design Capacity",
+			"	HeatingDesignCapacity, !- Heating Design Capacity Method",
+			"	12000, !- Heating Design Capacity { W }",
+			"	, !- Heating Design Capacity Per Floor Area { W/m2 }",
+			"	, !- Fraction of Autosized Heating Design Capacity",
+			"	VAV;                     !- Central Cooling Capacity Control Method",
+			"	ScheduleTypeLimits,",
+			"	Fraction, !- Name",
+			"	0.0, !- Lower Limit Value",
+			"	1.0, !- Upper Limit Value",
+			"	CONTINUOUS; !- Numeric Type",
+			"	Schedule:Compact,",
+			"	ReheatCoilAvailSched, !- Name",
+			"	Fraction, !- Schedule Type Limits Name",
+			"	Through: 12/31, !- Field 1",
+			"	For: AllDays, !- Field 2",
+			"	Until: 24:00,1.0; !- Field 3",
+			"	Coil:Heating:Water,",
+			"	Gronk1 Zone Coil, !- Name",
+			"	ReheatCoilAvailSched, !- Availability Schedule Name",
+			"	, !- U-Factor Times Area Value { W/K }",
+			"	, !- Maximum Water Flow Rate { m3/s }",
+			"	SPACE1-1 Zone Coil Water In Node, !- Water Inlet Node Name",
+			"	SPACE1-1 Zone Coil Water Out Node, !- Water Outlet Node Name",
+			"	SPACE1-1 Zone Coil Air In Node, !- Air Inlet Node Name",
+			"	SPACE1-1 In Node, !- Air Outlet Node Name",
+			"	NominalCapacity, !- Performance Input Method",
+			"	, !- Rated Capacity { W }",
+			"	82.2, !- Rated Inlet Water Temperature { C }",
+			"	16.6, !- Rated Inlet Air Temperature { C }",
+			"	71.1, !- Rated Outlet Water Temperature { C }",
+			"	32.2, !- Rated Outlet Air Temperature { C }",
+			"	; !- Rated Ratio for Air and Water Convection",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		FinalSysSizing.allocate( 1 );
+		UnitarySysEqSizing.allocate( 1 );
+		PrimaryAirSystem.allocate( 1 );
+		AirLoopControlInfo.allocate( 1 );
+		TotNumLoops = 1;
+		PlantLoop.allocate( TotNumLoops );
+		PlantSizData.allocate( 1 );
+		WaterCoils::MySizeFlag.allocate( 1 );
+		WaterCoils::MyUAAndFlowCalcFlag.allocate( 1 );
+		NumPltSizInput = 1;
+		for ( int l = 1; l <= TotNumLoops; ++l ) {
+			auto & loop( PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+			auto & loopside( PlantLoop( l ).LoopSide( 1 ) );
+			loopside.TotalBranches = 1;
+			loopside.Branch.allocate( 1 );
+			auto & loopsidebranch( PlantLoop( l ).LoopSide( 1 ).Branch( 1 ) );
+			loopsidebranch.TotalComponents = 1;
+			loopsidebranch.Comp.allocate( 1 );
+		}
+		GetZoneData( ErrorsFound );
+		EXPECT_EQ( "SPACE1-1", Zone( 1 ).Name );
+		ProcessScheduleInput();
+		ScheduleInputProcessed = true;
+		GetWaterCoilInput();
+		WaterCoils::GetWaterCoilsInputFlag = false;
+		WaterCoils::MySizeFlag( 1 ) = true;
+		WaterCoils::MyUAAndFlowCalcFlag( 1 ) = false;
+		DataSizing::TermUnitSingDuct = true;
+		WaterCoil( 1 ).WaterLoopNum = 1;
+		WaterCoil( 1 ).WaterLoopSide = 1;
+		WaterCoil( 1 ).WaterLoopBranchNum = 1;
+		WaterCoil( 1 ).WaterLoopCompNum = 1;
+		PlantLoop( 1 ).Name = "HotWaterLoop";
+		PlantLoop( 1 ).FluidName = "HotWater";
+		PlantLoop( 1 ).FluidIndex = 1;
+		PlantLoop( 1 ).FluidName = "WATER";
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = WaterCoil( 1 ).Name;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = WaterCoil_SimpleHeating;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = WaterCoil( 1 ).WaterInletNodeNum;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = WaterCoil( 1 ).WaterOutletNodeNum;
+		PlantSizData( 1 ).DeltaT = 11.0;
+		PlantSizData( 1 ).ExitTemp = 82;
+		PlantSizData( 1 ).PlantLoopName = "HotWaterLoop";
+		PlantSizData( 1 ).LoopType = 1;
+		ZoneSizingRunDone = true;
+		SysSizingRunDone = true;
+		CurZoneEqNum = 0;
+		CurSysNum = 1;
+		CurDuctType = 1;
+		Zone( 1 ).FloorArea = 99.16;
+		FinalSysSizing( CurSysNum ).HeatingCapMethod = 9;
+		FinalSysSizing( CurSysNum ).HeatingTotalCapacity = 12000.;
+		FinalSysSizing( CurSysNum ).SysAirMinFlowRat = 0.3;
+		FinalSysSizing( CurSysNum ).DesMainVolFlow = 3.4;
+		FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.49;
+		FinalSysSizing( CurSysNum ).HeatOutTemp = -17.3;
+		FinalSysSizing( CurSysNum ).HeatRetTemp = 21.3;
+		FinalSysSizing( CurSysNum ).HeatSupTemp = 16.7;
+		UnitarySysEqSizing( CurSysNum ).CoolingCapacity = false;
+		UnitarySysEqSizing( CurSysNum ).HeatingCapacity = false;
+		SizeWaterCoil( 1 );
+		EXPECT_NEAR( WaterCoil( 1 ).MaxWaterMassFlowRate, .258323, 0.00001 );
+		EXPECT_NEAR( WaterCoil( 1 ).UACoil, 239.835, 0.01 );
+
+		Node.deallocate();
+		Zone.deallocate();
+		PlantLoop.deallocate();
+		PlantSizData.deallocate();
+		WaterCoils::MySizeFlag.deallocate();
+		WaterCoils::MyUAAndFlowCalcFlag.deallocate();
+		FinalSysSizing.deallocate();
+		UnitarySysEqSizing.deallocate();
+		PrimaryAirSystem.deallocate();
+		AirLoopControlInfo.deallocate();
 
 	}
 
