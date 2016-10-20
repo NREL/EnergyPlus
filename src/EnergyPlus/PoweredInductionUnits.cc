@@ -1611,9 +1611,14 @@ namespace PoweredInductionUnits {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
 				// PIU fan off if FanOnFlowFrac is 0.0 and there is no heating load, also reset fan flag if fan should be off
-				if ( ( QZnReq <= SmallLoad ) && ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) ) {
-					SecAirMassFlow = 0.0;
-					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+				if ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) {
+					if ( QZnReq <= SmallLoad ) {
+						SecAirMassFlow = 0.0;
+						DataHVACGlobals::TurnFansOn = false;
+					} else {
+						SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+						DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+					}
 				} else {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
 				}
@@ -1623,9 +1628,10 @@ namespace PoweredInductionUnits {
 				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
 				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
 				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
 					SecAirMassFlow = 0.0;
-					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+					DataHVACGlobals::TurnFansOn = false;
 				} else {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
 				}
@@ -1649,10 +1655,11 @@ namespace PoweredInductionUnits {
 				// check for fan on or off
 				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && ( PIU( PIUNum ).FanOnFlowFrac > 0.0 ) ) {
 					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+					DataHVACGlobals::TurnFansOn = false;
 				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
 					// if FanOnFlowFrac is 0, then fan does not run for cooling load unless reheat is required, also reset fan flag if fan should be off
 					SecAirMassFlow = 0.0; // Fan is off; no secondary air
-					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+					DataHVACGlobals::TurnFansOn = false;
 				} else {
 					// fan is on; recalc primary air flow
 					// CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) +
