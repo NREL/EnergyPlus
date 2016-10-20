@@ -1,6 +1,12 @@
-# Phase Change Project
+Phase Change Enhancements
+=========================
 
-This project is based on making enhancements to the phase change material simulation model in EnergyPlus.
+Edwin Lee, NREL
+Jeremiah Crossett, NRGSim
+
+# Overview
+
+This project is based on making enhancements to the building envelope phase change material simulation model in EnergyPlus.  While the code for this simulation model is not overly large (~1500 sloc), it does indeed make me want to vomit, and is ripe for refactoring along the way.
 
 ## Purpose/Background
 
@@ -56,6 +62,39 @@ The header file lists the relevant variables, structs, and functions:
  - `CheckFDSurfaceTempLimits` is a simple worker for checking if any temperatures are out of bounds, only minor clean up likely.
 
 ### Improved Design Possibilities
+
+There are going to be many possible improvements to the codebase as this projects goes along.  The following table is the current list with status and notes, as well as the expected level of effort and risk of causing diffs in regression tests.
+
+| Refactoring Possibility                   | Status | Expected Effort | Diffs Risk | Notes                                                                                            |
+|-------------------------------------------|--------|-----------------|------------|--------------------------------------------------------------------------------------------------|
+| Eliminate `using` where sensible          |        | Low             | Low        |                                                                                                  |
+| Arrays and structs re-do                  |        | Low             | Low        |                                                                                                  |
+| Create class with member worker functions |        | Medium          | Moderate   | The diffs could come from having to refactor all-at-once init functions into instance-only inits |
+| Expose manager as single class instance   |        | Medium          | Low        |                                                                                                  |
+| Performance gains                         |        | ?               | Moderate   |                                                                                                  |
+
+#### Eliminate `using` where sensible
+
+Code can be difficult to read with an abundance of `using` statements, especially for developers new to the codebase.  In C++ there are methods available for making the code smaller, so that `using` statements are less necessary than they were with FORTRAN.
+Eliminating them is a small step toward further improved readability with very low risk of diffs or issues.
+
+#### Arrays and structs re-do
+
+The structs in this module contain a whole lot of arrays that are then allocated individually.  For example, [these array member variables](https://github.com/NREL/EnergyPlus/blob/5e3508db490490a804132e81e1e309f042cc4b51/src/EnergyPlus/HeatBalFiniteDiffManager.hh#L104-L106) in the `ConstructionDataFD` struct, which are then allocated individually, but [all to the same size](https://github.com/NREL/EnergyPlus/blob/5e3508db490490a804132e81e1e309f042cc4b51/src/EnergyPlus/HeatBalFiniteDiffManager.cc#L810-L812).
+This results in then having to maintain array indeces much more than if the entire list of variables was one single struct, allocated once, and retrieved once.  I also believe there is the possiblity of performance gains here, because in the calculation code, the object could be retrieved once and used by reference much easier than in the current code, allowing better compiler optimization.  This hasn't been tested, but just an observation.  At a minimum, this will improve code readability.
+
+#### Create class with member worker functions
+
+This step will involve the current steps:
+
+- A class will be created for this manager
+- The worker functions will be encapsulated into the class, which changes the calling signature to remove the "surfnum" type of arguments, and transition the all-at-once operations into instance-only operations
+- The manager of the class will still retain the same "global" state and calling signature to allow it to be used directly from the existing caller(s)
+- Inside the global manager function, the particular instance of the class will be retrieved, and all operations will become member function calls instead of global function calls
+
+#### Expose manager as single class instance
+
+This step would complete the object orientation of the class by changing the manager to a class member function itself, providing a meaningful constructor, and modifying the caller(s) to operate on a class instance instead of just calling global functions.
 
 ## Phase 2: Preparing Modified FORTRAN Codebase
 
