@@ -460,7 +460,7 @@ namespace DataZoneEquipment {
 
 			IsNotOK = false;
 			IsBlank = false;
-			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, ZoneEquipList_set, IsNotOK );
+			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), ZoneEquipList_set, IsNotOK );
 			if ( IsNotOK ) {
 				ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
 				GetZoneEquipmentDataErrorsFound = true;

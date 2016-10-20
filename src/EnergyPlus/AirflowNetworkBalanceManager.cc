@@ -2376,10 +2376,7 @@ namespace AirflowNetworkBalanceManager {
 						ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid " + cAlphaFields( 5 ) + " given = " + Alphas( 5 ) + " in AirflowNetwork:MultiZone:Surface objects" );
 						ErrorsFound = true;
 					}
-					InputProcessor::VerifyUniqueInterObjectName( UniqueAirflowNetworkSurfaceName, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-					if ( ErrorsFound ) {
-						if (IsBlank) Alphas(5) = "xxxxx";
-					}
+					InputProcessor::VerifyUniqueInterObjectName( UniqueAirflowNetworkSurfaceName, Alphas( 5 ), CurrentModuleObject, cAlphaFields( 5 ), ErrorsFound );
 				}
 				if ( InputProcessor::SameString( Alphas( 2 ), Alphas( 3 ) ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "='" + Alphas( 1 ) + "': Invalid inputs of both node name with " + Alphas( 2 ) + " = " + Alphas( 3 ) );

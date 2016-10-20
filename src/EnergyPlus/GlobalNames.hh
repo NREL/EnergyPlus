@@ -122,8 +122,9 @@ namespace GlobalNames {
 
 	void
 	IntraObjUniquenessCheck(
-			std::string const & NameToVerify,
+			std::string & NameToVerify,
 			std::string const & CurrentModuleObject,
+			std::string const & FieldName,
 			std::unordered_set < std::string > UniqueStrings,
 			bool & ErrorsFound
 	);

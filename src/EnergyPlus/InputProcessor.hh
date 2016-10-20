@@ -663,8 +663,9 @@ namespace EnergyPlus {
 		void
 		VerifyUniqueInterObjectName(
 				std::unordered_map< std::string, std::string > & names,
-                std::string const & object_name,
+                std::string & object_name,
 				std::string const & object_type,
+				std::string const & field_name,
 				bool & ErrorsFound
 		);
 

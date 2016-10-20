@@ -365,8 +365,7 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex;
-				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
-				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_ConstantVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -427,8 +426,7 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
-				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
-				// unique_string_blank_key
+				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_VariableVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -496,8 +494,7 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
-				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
-				// unique_string_blank_key
+				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_OutdoorAir;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );

@@ -124,12 +124,20 @@ namespace GlobalNames {
 
 	void
 	IntraObjUniquenessCheck(
-			std::string const & NameToVerify,
+			std::string & NameToVerify,
 			std::string const & CurrentModuleObject,
+			std::string const & FieldName,
 			std::unordered_set < std::string > UniqueStrings,
 			bool & ErrorsFound
 	)
 	{
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( "E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field" );
+			ErrorsFound = true;
+			NameToVerify = "xxxxx";
+			return;
+		}
+
 		auto const & find_string = UniqueStrings.find( NameToVerify );
 		if ( find_string == UniqueStrings.end() ) {
 			UniqueStrings.emplace( NameToVerify );

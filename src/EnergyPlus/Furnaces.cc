@@ -970,8 +970,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -1483,8 +1482,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -2622,8 +2620,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
@@ -3523,8 +3520,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).FurnaceType_Num = UnitarySys_HeatPump_WaterToAir;
 			Furnace( FurnaceNum ).Name = Alphas( 1 );

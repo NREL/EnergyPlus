@@ -460,8 +460,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -509,8 +508,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -577,8 +575,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -692,8 +689,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -797,8 +793,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 ); // Fan name
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 

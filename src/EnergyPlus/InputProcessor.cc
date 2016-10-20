@@ -1656,10 +1656,17 @@ namespace EnergyPlus {
     void
     InputProcessor::VerifyUniqueInterObjectName(
             std::unordered_map< std::string, std::string > & names,
-			std::string const & object_name,
+			std::string & object_name,
             std::string const & object_type,
+            std::string const & field_name,
 			bool & ErrorsFound
     ) {
+	    if ( object_name.empty() ) {
+		    ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
+		    ErrorsFound = true;
+		    object_name = "xxxxx";
+		    return;
+	    }
 		auto const & names_iter = names.find( object_name );
         if ( names_iter == names.end() ) {
 			names.emplace( object_name, object_type );

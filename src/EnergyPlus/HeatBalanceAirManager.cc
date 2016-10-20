@@ -595,7 +595,7 @@ namespace HeatBalanceAirManager {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
-			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 2 ), cCurrentModuleObject, UniqueZoneNames, IsNotOK );
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 2 ), cCurrentModuleObject, cAlphaFieldNames( 2 ), UniqueZoneNames, IsNotOK );
 			if ( IsNotOK ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", a duplicated object " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" is found." );
 				ShowContinueError( "A zone can only have one " + cCurrentModuleObject + " object." );
@@ -874,8 +874,7 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -925,7 +924,7 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );

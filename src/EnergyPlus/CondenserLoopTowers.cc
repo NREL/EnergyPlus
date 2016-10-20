@@ -533,8 +533,7 @@ namespace CondenserLoopTowers {
 		for ( SingleSpeedTowerNumber = 1; SingleSpeedTowerNumber <= NumSingleSpeedTowers; ++SingleSpeedTowerNumber ) {
 			TowerNum = SingleSpeedTowerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_SingleSpeed;
@@ -812,8 +811,7 @@ namespace CondenserLoopTowers {
 		for ( TwoSpeedTowerNumber = 1; TwoSpeedTowerNumber <= NumTwoSpeedTowers; ++TwoSpeedTowerNumber ) {
 			TowerNum = NumSingleSpeedTowers + TwoSpeedTowerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
@@ -1120,8 +1118,7 @@ namespace CondenserLoopTowers {
 		for ( VariableSpeedTowerNumber = 1; VariableSpeedTowerNumber <= NumVariableSpeedTowers; ++VariableSpeedTowerNumber ) {
 			TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + VariableSpeedTowerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, VariableSpeedTowerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleTower( TowerNum ).VSTower = VariableSpeedTowerNumber;
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
@@ -1718,8 +1715,7 @@ namespace CondenserLoopTowers {
 		for ( MerkelVSTowerNum = 1; MerkelVSTowerNum <= NumVSMerkelTowers; ++MerkelVSTowerNum ) {
 			TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + MerkelVSTowerNum;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, MerkelVSTowerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
-			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( SimpleTower_map, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			SimpleTower( TowerNum ).Name = AlphArray( 1 );
 			SimpleTower( TowerNum ).TowerType = cCurrentModuleObject;
 			SimpleTower( TowerNum ).TowerType_Num = CoolingTower_VariableSpeedMerkel;
