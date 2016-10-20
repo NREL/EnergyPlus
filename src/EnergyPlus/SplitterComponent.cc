@@ -312,7 +312,7 @@ namespace SplitterComponent {
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 			SplitterCond( SplitterNum ).SplitterName = AlphArray( 1 );
 			SplitterCond( SplitterNum ).InletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );

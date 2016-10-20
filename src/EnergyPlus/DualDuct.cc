@@ -335,7 +335,6 @@ namespace DualDuct {
 		std::string CurrentModuleObject; // for ease in getting objects
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CtrlZone; // controlled zone do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		int ADUNum; // loop control to search Air Distribution Units
@@ -367,7 +366,7 @@ namespace DualDuct {
 
 				DamperNum = DamperIndex;
 				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
-				// unique_string_blank_key
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_ConstantVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );

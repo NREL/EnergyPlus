@@ -440,7 +440,7 @@ namespace HVACDXSystem {
 		for ( DXCoolSysNum = 1; DXCoolSysNum <= NumDXSystem; ++DXCoolSysNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoolSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			DXCoolingSystem( DXCoolSysNum ).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array
 			DXCoolingSystem( DXCoolSysNum ).Name = Alphas( 1 );

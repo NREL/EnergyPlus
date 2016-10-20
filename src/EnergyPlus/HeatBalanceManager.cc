@@ -3276,8 +3276,7 @@ namespace HeatBalanceManager {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsBlank = false;
 
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-				if ( IsBlank ) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 				if ( MaterialNumProp + 1 != MaterialNumAlpha ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
@@ -3460,8 +3459,7 @@ namespace HeatBalanceManager {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, SpecDataNames, SpecDataNumAlpha, SpecDataProps, SpecDataNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsBlank = false;
 
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) continue;
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			//Load the spectral data derived type from the input data.
 			SpectralData( Loop ).Name = SpecDataNames( 1 );
@@ -3955,8 +3953,7 @@ namespace HeatBalanceManager {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsBlank = false;
-			InputProcessor::IsNameEmpty(ConstructAlphas( 0 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) continue;
+			if ( InputProcessor::IsNameEmpty(ConstructAlphas( 0 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			++ConstrNum;
 			WConstructNames( ConstrNum ) = ConstructAlphas( 0 );
@@ -4138,8 +4135,7 @@ namespace HeatBalanceManager {
 			}
 
 			IsBlank = false;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) continue;
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			++ZoneLoop;
 			ProcessZoneData( cCurrentModuleObject, ZoneLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
@@ -4166,7 +4162,7 @@ namespace HeatBalanceManager {
 
 			for ( ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ListNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", ErrorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				ZoneList( ListNum ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::FindItemInList( ZoneList( ListNum ).Name, Zone ) > 0 ) {
@@ -4215,7 +4211,7 @@ namespace HeatBalanceManager {
 
 			for ( GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GroupNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", ErrorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				ZoneGroup( GroupNum ).Name = cAlphaArgs( 1 );
 
@@ -5200,8 +5196,7 @@ namespace HeatBalanceManager {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, FrameDividerNames, FrameDividerNumAlpha, FrameDividerProps, FrameDividerNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsBlank = false;
-			InputProcessor::IsNameEmpty(FrameDividerNames( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) continue;
+			if ( InputProcessor::IsNameEmpty(FrameDividerNames( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			//Load the frame/divider derived type from the input data.
 			++FrameDividerNum;
@@ -6506,8 +6501,7 @@ Label1000: ;
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				IsBlank = false;
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
-				if ( IsBlank ) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 				SurfIncSolSSG( Loop ).Name = cAlphaArgs( 1 );
 
@@ -6557,8 +6551,7 @@ Label1000: ;
 			for ( Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsBlank = false;
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
-				if ( IsBlank ) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 				FenLayAbsSSG( Loop ).Name = cAlphaArgs( 1 );
 
@@ -7049,10 +7042,8 @@ Label1000: ;
 		SupportPillar.allocate( W7SupportPillars );
 		for ( Loop = 1; Loop <= W7SupportPillars; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
 			IsBlank = false;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) {
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				continue;
 			}
@@ -7082,8 +7073,7 @@ Label1000: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsBlank = false;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) {
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				continue;
 			}
@@ -7163,8 +7153,7 @@ Label1000: ;
 		for ( Loop = 1; Loop <= TotComplexShades; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsBlank = false;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) {
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				continue;
 			}
@@ -7420,8 +7409,7 @@ Label1000: ;
 		for ( Loop = 1; Loop <= TotThermalModels; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			IsBlank = false;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
-			if ( IsBlank ) continue;
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 			WindowThermalModel( Loop ).Name = cAlphaArgs( 1 );
 

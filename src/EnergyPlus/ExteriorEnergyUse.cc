@@ -234,8 +234,6 @@ namespace ExteriorEnergyUse {
 		std::string TypeString; // Fuel Type string (returned from Validation)
 		std::string ConUnits; // String for Fuel Consumption units (allow Water)
 		std::string EndUseSubcategoryName;
-		bool ErrorInName;
-		bool IsBlank;
 		Real64 SchMax; // Max value of schedule for item
 		Real64 SchMin; // Min value of schedule for item
 		static Real64 sumDesignLevel( 0.0 ); // for predefined report of design level total
@@ -256,7 +254,8 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:Lights";
 		for ( Item = 1; Item <= NumExteriorLights; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			// unique_string_blank_key continue error here
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+
 			ExteriorLights( Item ).Name = cAlphaArgs( 1 );
 			ExteriorLights( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( ExteriorLights( Item ).SchedPtr == 0 ) {
@@ -327,7 +326,8 @@ namespace ExteriorEnergyUse {
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::VerifyUniqueInterObjectName( ExteriorEquipment_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			// unique_string_blank_key continue error
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 
@@ -392,7 +392,8 @@ namespace ExteriorEnergyUse {
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::VerifyUniqueInterObjectName( ExteriorEquipment_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			// unique_string_blank_key  continue error
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 			ExteriorEquipment( NumExteriorEqs ).FuelType = WaterUse;

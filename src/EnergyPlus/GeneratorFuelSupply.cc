@@ -210,7 +210,7 @@ namespace GeneratorFuelSupply {
 
 			for ( FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				FuelSupply( FuelSupNum ).Name = AlphArray( 1 );
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );

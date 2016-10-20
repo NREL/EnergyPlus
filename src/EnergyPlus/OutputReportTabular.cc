@@ -807,7 +807,7 @@ namespace OutputReportTabular {
 			InputProcessor::GetObjectItem( CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 
 			if ( TabNum - 1 > 0 ) {
-				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "RTMBLANK", ErrorsFound);
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			}
 			if ( NumAlphas < 2 ) {
 				ShowSevereError( CurrentModuleObject + ": No fields specified." );

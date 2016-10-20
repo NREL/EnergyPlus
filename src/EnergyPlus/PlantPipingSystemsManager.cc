@@ -795,7 +795,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "Blank name encountered", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			// Mesh extents, validated by IP
 			PipingSystemDomains( DomainNum ).Extents.Xmax = rNumericArgs( 1 );
 			PipingSystemDomains( DomainNum ).Extents.Ymax = rNumericArgs( 2 );
@@ -1751,7 +1751,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemCircuits( PipeCircuitCounter ).Name = cAlphaArgs( 1 );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "Blank name encountered", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			// Read pipe thermal properties, validated by IP
 			PipingSystemCircuits( PipeCircuitCounter ).PipeProperties.Conductivity = rNumericArgs( 1 );
@@ -1866,7 +1866,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemSegments( SegmentCtr ).Name = cAlphaArgs( 1 );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "Blank name encountered", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			// Read in the pipe location, validated as positive by IP
 			// -- note that these values will be altered by the main GetInput routine in two ways:
 			//   1) shift for basement wall if selected
@@ -2021,7 +2021,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			HGHX( HorizontalGHXCtr ).ObjName = cAlphaArgs( 1 );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "Blank name encountered", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			// Read in the rest of the inputs into the local type for clarity during transition
 			HGHX( HorizontalGHXCtr ).InletNodeName = cAlphaArgs( 2 );

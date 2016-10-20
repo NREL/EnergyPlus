@@ -6137,7 +6137,7 @@ Label9999: ;
 		for ( Loop = 1; Loop <= NumSpecDays; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, AlphArray, NumAlphas, Duration, NumNumbers, IOStat );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 			SpecialDays( Count ).Name = AlphArray( 1 );
 
 			ProcessDateString( AlphArray( 2 ), PMonth, PDay, PWeekDay, DateType, ErrorsFound );
@@ -6483,7 +6483,7 @@ Label9999: ;
 			MaxDryBulbEntered = false;
 			PressureEntered = false;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, DDLoop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			DesDayInput( EnvrnNum ).Title = cAlphaArgs( 1 ); // Environment name
 			Environment( EnvrnNum ).Title = DesDayInput( EnvrnNum ).Title;
 
@@ -7238,7 +7238,7 @@ Label9999: ;
 			}}
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WPSkyTemperature( Item ).Name = cAlphaArgs( 1 ); // Name
 			} else {
 				WPSkyTemperature( Item ).Name = "All RunPeriods";

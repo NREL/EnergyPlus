@@ -383,7 +383,7 @@ namespace ICEngineElectricGenerator {
 		//LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ICEngineGenerator( GeneratorNum ).Name = AlphArray( 1 );
 

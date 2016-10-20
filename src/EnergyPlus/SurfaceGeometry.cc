@@ -6581,8 +6581,7 @@ namespace EnergyPlus {
 							NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks,
 							cAlphaFieldNames, cNumericFieldNames);
 					IsBlank = false;
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
-					if ( IsBlank ) continue;
+					if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 					ExtVentedCavity(Item).Name = cAlphaArgs(1);
 
 					ExtVentedCavity(Item).OSCMName = cAlphaArgs(2);
@@ -7954,8 +7953,7 @@ namespace EnergyPlus {
 							ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
 							cAlphaFieldNames, cNumericFieldNames);
 					IsBlank = false;
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
-					if ( IsBlank ) continue;
+					if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 					++ControlNum;
 					WindowShadingControl(ControlNum).Name = cAlphaArgs(1); // Set the Control Name in the Derived Type
@@ -8937,8 +8935,7 @@ namespace EnergyPlus {
 							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames,
 							cNumericFieldNames);
 					IsBlank = false;
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
-					if ( IsBlank ) continue;
+					if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 					++OSCNum;
 					OSC(OSCNum).Name = cAlphaArgs(1);
@@ -9121,8 +9118,7 @@ namespace EnergyPlus {
 					InputProcessor::GetObjectItem(cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps,
 							IOStat);
 					IsBlank = false;
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", IsBlank, ErrorsFound);
-					if ( IsBlank ) continue;
+					if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 					++OSCMNum;
 					OSCM(OSCMNum).Name = cAlphaArgs(1);

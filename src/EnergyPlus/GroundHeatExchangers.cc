@@ -150,7 +150,7 @@ namespace GroundHeatExchangers {
 	int locDayOfSim( 0 );
 	namespace {
 		bool GetInput( true );
-		bool errorsFound( false );
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    		bool errorsFound( false );
 	}
 
 	Array1D< Real64 > prevTimeSteps; // This is used to store only the Last Few time step's time
@@ -1325,7 +1325,7 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
 				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
@@ -1449,7 +1449,7 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", errorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
 				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 

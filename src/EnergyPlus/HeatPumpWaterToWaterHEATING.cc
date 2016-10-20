@@ -307,7 +307,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), "GHSP Name" , "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 

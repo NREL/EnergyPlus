@@ -404,7 +404,6 @@ namespace FanCoilUnits {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool errFlag( false ); // Local error flag for GetOAMixerNodeNums
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		Array1D_string Alphas; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -455,7 +454,7 @@ namespace FanCoilUnits {
 			FanCoilNumericFields( FanCoilNum ).FieldNames = "";
 			FanCoilNumericFields( FanCoilNum ).FieldNames = cNumericFields;
 
-			// unique_string_blank_key
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			FanCoil( FanCoilNum ).Name = Alphas( 1 );
 			FanCoil( FanCoilNum ).UnitType = CurrentModuleObject;
 			FanCoil( FanCoilNum ).UnitType_Num = FanCoilUnit_4Pipe;

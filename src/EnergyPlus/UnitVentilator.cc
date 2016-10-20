@@ -415,7 +415,7 @@ namespace UnitVentilator {
 			UnitVentNumericFields( UnitVentNum ).FieldNames.allocate (NumNumbers );
 			UnitVentNumericFields( UnitVentNum ).FieldNames = "";
 			UnitVentNumericFields( UnitVentNum ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitVent( UnitVentNum ).Name = Alphas( 1 );
 			UnitVent( UnitVentNum ).SchedName = Alphas( 2 );

@@ -327,12 +327,9 @@ namespace ElectricBaseboardRadiator {
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames.allocate(NumNumbers);
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound, cCurrentModuleObject + " Name" );
 
-			// unique_string_blank_key
-			VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
 
 			ElecBaseboard( BaseboardNum ).EquipName = cAlphaArgs( 1 ); // name of this baseboard
 			ElecBaseboard( BaseboardNum ).EquipType = BaseboardRadiator_Electric;

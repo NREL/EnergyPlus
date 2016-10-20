@@ -359,7 +359,7 @@ namespace ZoneContaminantPredictorCorrector {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericConstant( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericConstant( Loop ).ZoneName = AlphaName( 2 );
@@ -445,7 +445,7 @@ namespace ZoneContaminantPredictorCorrector {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericPDriven( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericPDriven( Loop ).SurfName = AlphaName( 2 );
@@ -529,7 +529,7 @@ namespace ZoneContaminantPredictorCorrector {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericCutoff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericCutoff( Loop ).ZoneName = AlphaName( 2 );
@@ -598,7 +598,7 @@ namespace ZoneContaminantPredictorCorrector {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDecay( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDecay( Loop ).ZoneName = AlphaName( 2 );
@@ -668,7 +668,7 @@ namespace ZoneContaminantPredictorCorrector {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericBLDiff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericBLDiff( Loop ).SurfName = AlphaName( 2 );
@@ -737,7 +737,7 @@ namespace ZoneContaminantPredictorCorrector {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDVS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDVS( Loop ).SurfName = AlphaName( 2 );
@@ -799,7 +799,7 @@ namespace ZoneContaminantPredictorCorrector {
 			AlphaName = "";
 			IHGNumbers = 0.0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDRS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDRS( Loop ).ZoneName = AlphaName( 2 );
@@ -953,7 +953,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 		for ( ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ContaminantControlledZone( ContControlledZoneNum ).Name = cAlphaArgs( 1 );
 			ContaminantControlledZone( ContControlledZoneNum ).ZoneName = cAlphaArgs( 2 );

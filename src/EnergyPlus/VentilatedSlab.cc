@@ -443,7 +443,7 @@ namespace VentilatedSlab {
 
 			VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			VentSlabNumericFields( Item ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound);
 
 			VentSlab( Item ).Name = cAlphaArgs( 1 );
 			VentSlab( Item ).SchedName = cAlphaArgs( 2 );

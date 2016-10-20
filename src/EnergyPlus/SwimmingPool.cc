@@ -360,7 +360,7 @@ namespace SwimmingPool {
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			Pool( Item ).Name = Alphas( 1 );
 
 			Pool( Item ).SurfaceName = Alphas( 2 );

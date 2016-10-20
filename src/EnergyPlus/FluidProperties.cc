@@ -521,7 +521,7 @@ namespace FluidProperties {
 		FluidNum = 0;
 		for ( Loop = 1; Loop <= NumOfOptionalInput; ++Loop ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			// unique_string_blank_key continue error
+			if ( InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 			++FluidNum;
 			FluidNames( FluidNum ).Name = Alphas( 1 );
 			if ( InputProcessor::SameString( Alphas( 2 ), Refrig ) ) {
@@ -1738,8 +1738,7 @@ namespace FluidProperties {
 
 		for ( Loop = 1; Loop <= NumOfOptionalInput; ++Loop ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			// Check to see if glycol name is one of the defaults or is listed in the Fluid Name list
-			// unique_string_blank_key
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			GlycolFound = false;
 			if ( InputProcessor::SameString( Alphas( 2 ), EthyleneGlycol ) ) {
 				GlycolFound = true;

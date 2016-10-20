@@ -460,7 +460,7 @@ namespace HeatingCoils {
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", InputErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -519,7 +519,7 @@ namespace HeatingCoils {
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", InputErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -588,7 +588,7 @@ namespace HeatingCoils {
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", InputErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -668,7 +668,7 @@ namespace HeatingCoils {
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", InputErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;
@@ -753,7 +753,7 @@ namespace HeatingCoils {
 			HeatingCoilNumericFields( CoilNum ).FieldNames = "";
 			HeatingCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
 
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", InputErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, InputErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				InputErrorsFound = true;

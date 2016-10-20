@@ -387,7 +387,7 @@ namespace HWBaseboardRadiator {
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames.allocate( NumNumbers );
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueBaseboardName( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), errFlag, cCMO_BBRadiator_Water + " Name" );
 			if ( errFlag ) {

@@ -376,7 +376,7 @@ namespace HighTempRadiantSystem {
 			HighTempRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HighTempRadSysNumericFields( Item ).FieldNames = "";
 			HighTempRadSysNumericFields( Item ).FieldNames = cNumericFieldNames;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			// General user input data
 			HighTempRadSys( Item ).Name = cAlphaArgs( 1 );
 

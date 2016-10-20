@@ -376,7 +376,7 @@ namespace WaterManager {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " = " + cAlphaArgs( 1 );
 
 					WaterStorage( Item ).QualitySubCategoryName = cAlphaArgs( 2 );
@@ -528,7 +528,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 
 					RainCollector( Item ).StorageTankName = cAlphaArgs( 2 );
@@ -626,7 +626,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 					GroundwaterWell( Item ).StorageTankName = cAlphaArgs( 2 );
 

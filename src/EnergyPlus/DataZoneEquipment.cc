@@ -515,9 +515,7 @@ namespace DataZoneEquipment {
 			if ( ZoneEquipListNum > 0 ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-				IsNotOK = false;
-				IsBlank = false;
-				// unique_string_blank_key_check
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
 				maxEquipCount = 0;
@@ -821,9 +819,7 @@ namespace DataZoneEquipment {
 		for ( PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-			IsNotOK = false;
-			IsBlank = false;
-			// unique_string_blank_key_check
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			SupplyAirPath( PathNum ).Name = AlphArray( 1 );
 			SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 
@@ -872,7 +868,7 @@ namespace DataZoneEquipment {
 		for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-			// unique_string_blank_key_check
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			ReturnAirPath( PathNum ).Name = AlphArray( 1 );
 			ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 

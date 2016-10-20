@@ -363,7 +363,7 @@ namespace HVACSingleDuctInduc {
 			InputProcessor::GetObjectItem( CurrentModuleObject, IUIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IUNum = IUIndex;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			IndUnit( IUNum ).Name = Alphas( 1 );
 			IndUnit( IUNum ).UnitType = CurrentModuleObject;

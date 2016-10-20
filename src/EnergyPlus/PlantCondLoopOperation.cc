@@ -448,8 +448,7 @@ namespace PlantCondLoopOperation {
 			for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 				IsBlank = false;
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-				if ( IsBlank ) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 			}
 
 
@@ -462,8 +461,7 @@ namespace PlantCondLoopOperation {
 				InputProcessor::GetObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
 				                              IOStat);
 				IsBlank = false;
-				InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject + " Name", IsBlank, ErrorsFound);
-				if (IsBlank) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound) ) continue;
 			}
 
 		//Load the Plant data structure

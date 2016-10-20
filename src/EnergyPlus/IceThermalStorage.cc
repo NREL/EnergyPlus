@@ -911,7 +911,7 @@ namespace IceThermalStorage {
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -1001,7 +1001,7 @@ namespace IceThermalStorage {
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;

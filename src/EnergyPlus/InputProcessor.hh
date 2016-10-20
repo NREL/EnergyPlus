@@ -813,23 +813,7 @@ namespace EnergyPlus {
 		}
 
 		static
-		void
-		IsNameEmpty(
-				std::string  & NameToVerify,
-				std::string const & StringToDisplay,
-				std::string const & NewName,
-				bool & ErrorFound );
-		static
-		void
-		IsNameEmpty(
-				std::string & NameToVerify,
-				std::string const & StringToDisplay,
-				bool & IsBlank,
-				bool & ErrorFound
-		);
-
-		static
-		void
+		bool
 		IsNameEmpty(
 				std::string & NameToVerify,
 				std::string const & StringToDisplay,

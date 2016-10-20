@@ -390,7 +390,6 @@ namespace DesiccantDehumidifiers {
 		static bool ErrorsFound2( false ); // Set to true if errors in input, fatal at end of routine
 		static bool ErrorsFoundGeneric( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool OANodeError; // Flag for check on outside air node
 		std::string RegenFanInlet; // Desiccant system regeneration air fan inlet node
 		std::string RegenFanOutlet; // Desiccant system regeneration air fan outlet node
@@ -451,10 +450,10 @@ namespace DesiccantDehumidifiers {
 			RegenCoilAirInletNode = 0;
 			RegenCoilAirOutletNode = 0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
 			DesicDehumNum = DesicDehumIndex;
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			
 			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, ErrorsFound );
-			// unique_string_blank_key
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Solid;
@@ -739,9 +738,8 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Generic;
 			InputProcessor::GetObjectItem( DesicDehum( DesicDehumNum ).DehumType, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, ErrorsFoundGeneric );
-			// unique_string_blank_key
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 
 			ErrorsFound2 = false;

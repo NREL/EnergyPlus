@@ -646,7 +646,6 @@ namespace EMSManager {
 		//  CHARACTER(len=MaxNameLength), DIMENSION(99) :: AlphArray  ! Character string data  ! 99 should really be some kind of constant
 		//  REAL(r64), DIMENSION(1)          :: NumArray  ! Numeric data
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		//  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
 		Array1D_string cAlphaFieldNames;
@@ -743,8 +742,7 @@ namespace EMSManager {
 
 			for ( SensorNum = 1; SensorNum <= NumSensors; ++SensorNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				// unique_string_blank_key
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					Sensor( SensorNum ).Name = cAlphaArgs( 1 );
@@ -832,7 +830,7 @@ namespace EMSManager {
 						cAlphaFieldNames, cNumericFieldNames );
 				}
 
-				// unique_string_blank_key
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSActuatorUsed( ActuatorNum ).Name = cAlphaArgs( 1 );
@@ -893,7 +891,7 @@ namespace EMSManager {
 			for ( InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				// unique_string_blank_key
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSInternalVarsUsed( InternVarNum ).Name = cAlphaArgs( 1 );
@@ -942,7 +940,7 @@ namespace EMSManager {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				// unique_string_blank_key
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				EMSProgramCallManager( CallManagerNum ).Name = cAlphaArgs( 1 );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );

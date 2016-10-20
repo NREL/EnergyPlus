@@ -310,7 +310,7 @@ namespace BaseboardElectric {
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = "";
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = cNumericFieldNames;
 
-				InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound );
+				InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;

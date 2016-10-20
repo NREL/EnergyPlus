@@ -419,7 +419,7 @@ namespace WindowAC {
 			WindACNumericFields( WindACNum ).FieldNames.allocate( NumNumbers );
 			WindACNumericFields( WindACNum ).FieldNames = "";
 			WindACNumericFields( WindACNum ).FieldNames = cNumericFields;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			WindAC( WindACNum ).Name = Alphas( 1 );
 			WindAC( WindACNum ).UnitType = WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'

@@ -431,7 +431,7 @@ namespace PlantManager {
 				CurrentModuleObject = "CondenserLoop";
 				InputProcessor::GetObjectItem( CurrentModuleObject, CondLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			}
-			InputProcessor::IsNameEmpty(Alpha( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(Alpha( 1 ), CurrentModuleObject, ErrorsFound);
 			this_loop.Name = Alpha( 1 ); // Load the Plant Loop Name
 
 			if ( InputProcessor::SameString( Alpha( 2 ), "STEAM" ) ) {

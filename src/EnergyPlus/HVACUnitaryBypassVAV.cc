@@ -588,7 +588,7 @@ namespace HVACUnitaryBypassVAV {
 			HeatCoilOutletNodeNum = 0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, CBVAVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			CBVAVNum = CBVAVIndex;
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			CBVAV( CBVAVNum ).Name = Alphas( 1 );
 			CBVAV( CBVAVNum ).UnitType = CurrentModuleObject;

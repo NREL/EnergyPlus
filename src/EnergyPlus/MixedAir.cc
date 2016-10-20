@@ -1032,7 +1032,7 @@ namespace MixedAir {
 			// create a reference for convenience
 			auto & thisControllerList( ControllerLists( Item ) );
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			thisControllerList.Name = AlphArray( 1 );
 			IsNotOK = false;
 			IsBlank = false;
@@ -1490,7 +1490,7 @@ namespace MixedAir {
 				if ( mod( ( NumAlphas + NumNums - 5 ), 3 ) != 0 ) ++NumGroups;
 				VentilationMechanical( VentMechNum ).Name = AlphArray( 1 );
 
-				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 				VentilationMechanical( VentMechNum ).SchName = AlphArray( 2 );
 				if ( lAlphaBlanks( 2 ) ) {
@@ -2075,7 +2075,7 @@ namespace MixedAir {
 
 			for ( OutAirNum = 1; OutAirNum <= NumOAMixers; ++OutAirNum ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 				OAMixer( OutAirNum ).Name = AlphArray( 1 );
 				OAMixer( OutAirNum ).MixNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );

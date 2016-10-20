@@ -316,7 +316,7 @@ namespace MixerComponent {
 
 		for ( MixerNum = 1; MixerNum <= NumMixers; ++MixerNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 			MixerCond( MixerNum ).MixerName = AlphArray( 1 );
 

@@ -327,7 +327,7 @@ namespace CTElectricGenerator {
 		//LOAD ARRAYS WITH CT CURVE FIT Generator DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound );
+			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
 
 			CTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 

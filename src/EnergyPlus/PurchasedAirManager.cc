@@ -383,7 +383,7 @@ namespace PurchasedAirManager {
 				PurchAirNumericFields( PurchAirNum ).FieldNames.allocate( NumNums );
 				PurchAirNumericFields( PurchAirNum ).FieldNames = "";
 				PurchAirNumericFields( PurchAirNum ).FieldNames = cNumericFieldNames;
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject + " Name", "xxxxx", ErrorsFound);
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				PurchAir( PurchAirNum ).Name = cAlphaArgs( 1 );
 				// get optional  availability schedule

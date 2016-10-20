@@ -1446,9 +1446,7 @@ namespace BranchInputManager {
 				BCount = 0;
 				for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-					bool is_blank = false;
-					InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject + " Name", is_blank, ErrFound );
-					if (is_blank) continue;
+					if ( InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrFound ) ) continue;
 					++BCount;
 					GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
 				}
@@ -1684,9 +1682,7 @@ namespace BranchInputManager {
 		for ( Count = 1; Count <= NumOfBranchLists; ++Count ) {
 			CurrentModuleObject = "BranchList";
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			bool is_blank = false;
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject + " Name", is_blank, ErrFound );
-			if (is_blank) continue;
+			if ( InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrFound ) ) continue;
 
 			++BCount;
 			BranchList( BCount ).Name = Alphas( 1 );

@@ -307,12 +307,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), "GHSP Name", "xxxxx", ErrorsFound);
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterPECooling;
