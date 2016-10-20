@@ -661,8 +661,6 @@ namespace DemandManager {
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string AlphArray; // Character string data
 		Array1D< Real64 > NumArray; // Numeric data
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		std::string CurrentModuleObject; // for ease in renaming.
 		int Item;
@@ -827,10 +825,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				// unique_string_blank_key
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
@@ -949,10 +944,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				// unique_string_blank_key
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 

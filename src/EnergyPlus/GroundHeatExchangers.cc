@@ -1292,8 +1292,6 @@ namespace GroundHeatExchangers {
 		int numAlphas; // Number of elements in the alpha array
 		int numNums; // Number of elements in the numeric array. "numNums" :)
 		int IOStat; // IO Status when calling get input subroutine
-		bool isNotOK; // Flag to verify name
-		bool isBlank; // Flag for blank name
 		int indexNum;
 		int pairNum;
 		bool allocated;

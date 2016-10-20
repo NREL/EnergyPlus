@@ -331,8 +331,6 @@ namespace FluidProperties {
 		Real64 pTemp;
 		int iTemp;
 		int j;
-		bool ErrorInName;
-		bool IsBlank;
 		int FluidNum;
 
 		// SUBROUTINE LOCAL DATA:

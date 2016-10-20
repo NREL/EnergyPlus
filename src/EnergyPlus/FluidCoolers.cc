@@ -367,8 +367,6 @@ namespace FluidCoolers {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
 		Array1D< Real64 > NumArray( 16 ); // Numeric input data array
 		Array1D_string AlphArray( 5 ); // Character string input data array
