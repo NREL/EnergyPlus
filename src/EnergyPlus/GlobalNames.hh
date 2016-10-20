@@ -66,6 +66,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace EnergyPlus {
 
@@ -118,6 +119,14 @@ namespace GlobalNames {
 	// for unit tests
 	void
 	clear_state();
+
+	void
+	IntraObjUniquenessCheck(
+			std::string const & NameToVerify,
+			std::string const & CurrentModuleObject,
+			std::unordered_set < std::string > UniqueStrings,
+			bool & ErrorsFound
+	);
 
 	void
 	VerifyUniqueChillerName(

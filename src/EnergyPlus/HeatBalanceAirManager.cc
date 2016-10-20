@@ -130,6 +130,8 @@ namespace HeatBalanceAirManager {
 	using Psychrometrics::PsyTdbFnHW;
 
 	// Data
+	std::unordered_set< std::string > UniqueZoneNames;
+	std::unordered_map< std::string, std::string > Infiltration_map;
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
@@ -160,6 +162,8 @@ namespace HeatBalanceAirManager {
 	clear_state()
 	{
 		ManageAirHeatBalanceGetInputFlag =  true;
+		UniqueZoneNames.clear();
+		Infiltration_map.clear();
 	}
 
 
@@ -583,12 +587,7 @@ namespace HeatBalanceAirManager {
 		for ( Loop = 1; Loop <= TotZoneAirBalance; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ZoneAirBalance, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			ZoneAirBalance( Loop ).Name = cAlphaArgs( 1 );
 			ZoneAirBalance( Loop ).ZoneName = cAlphaArgs( 2 );
 			ZoneAirBalance( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -596,7 +595,7 @@ namespace HeatBalanceAirManager {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
-			InputProcessor::VerifyName( cAlphaArgs( 2 ), ZoneAirBalance, &ZoneAirBalanceData::ZoneName, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 2 ), cCurrentModuleObject, UniqueZoneNames, IsNotOK );
 			if ( IsNotOK ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", a duplicated object " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" is found." );
 				ShowContinueError( "A zone can only have one " + cCurrentModuleObject + " object." );
@@ -611,7 +610,7 @@ namespace HeatBalanceAirManager {
 			} else {
 				ZoneAirBalance( Loop ).BalanceMethod = AirBalanceNone;
 				ShowWarningError( RoutineName + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + " not valid choice for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "The dafualt choice \"NONE\" is assigned" );
+				ShowContinueError( "The default choice \"NONE\" is assigned" );
 			}}
 
 			ZoneAirBalance( Loop ).InducedAirRate = rNumericArgs( 1 );
@@ -711,6 +710,7 @@ namespace HeatBalanceAirManager {
 		TotInfiltration = TotDesignFlowInfiltration + TotShermGrimsInfiltration + TotAIM2Infiltration;
 
 		Infiltration.allocate( TotInfiltration );
+		Infiltration_map.reserve( static_cast< unsigned > ( TotInfiltration ) );
 
 		if ( TotDesignFlowInfiltration > 0 ) {
 			Loop = 0;
@@ -874,11 +874,8 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -928,11 +925,7 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );

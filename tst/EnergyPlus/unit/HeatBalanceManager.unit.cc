@@ -95,6 +95,43 @@ using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
 
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir) {
+		std::string const idf_objects = delimited_string(
+				{
+						"ZoneAirBalance:OutdoorAir,\n",
+						"    LIVING ZONE Balance 1,   !- Name\n",
+						"    LIVING ZONE,             !- Zone Name\n",
+						"    Quadrature,              !- Air Balance Method\n",
+						"    0.01,                    !- Induced Outdoor Air Due to Unbalanced Duct Leakage {m3/s}\n",
+						"    INF-SCHED;               !- Induced Outdoor Air Schedule Name",
+						"ZoneAirBalance:OutdoorAir,\n",
+						"    LIVING ZONE Balance 2,   !- Name\n",
+						"    LIVING ZONE,             !- Zone Name\n",
+						"    Quadrature,              !- Air Balance Method\n",
+						"    0.01,                    !- Induced Outdoor Air Due to Unbalanced Duct Leakage {m3/s}\n",
+						"    INF-SCHED2;              !- Induced Outdoor Air Schedule Name",
+						"Zone,",
+						"LIVING ZONE,             !- Name",
+						"0,                       !- Direction of Relative North {deg}",
+						"0,                       !- X Origin {m}",
+						"0,                       !- Y Origin {m}",
+						"0,                       !- Z Origin {m}",
+						"1,                       !- Type",
+						"1,                       !- Multiplier",
+						"autocalculate,           !- Ceiling Height {m}",
+						"autocalculate;           !- Volume {m3}",
+
+				}
+		);
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		bool ErrorsFound = false;
+		auto numZones = InputProcessor::GetNumObjectsFound( "Zone" );
+		ZoneReOrder.allocate( numZones );
+		GetZoneData( ErrorsFound );
+		GetAirFlowFlag( ErrorsFound );
+		EXPECT_TRUE( ErrorsFound );
+	}
+
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names )
 	{
 		std::string const idf_objects = delimited_string( {

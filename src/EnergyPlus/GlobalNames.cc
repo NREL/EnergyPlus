@@ -123,11 +123,28 @@ namespace GlobalNames {
 	// Functions
 
 	void
+	IntraObjUniquenessCheck(
+			std::string const & NameToVerify,
+			std::string const & CurrentModuleObject,
+			std::unordered_set < std::string > UniqueStrings,
+			bool & ErrorsFound
+	)
+	{
+		auto const & find_string = UniqueStrings.find( NameToVerify );
+		if ( find_string == UniqueStrings.end() ) {
+			UniqueStrings.emplace( NameToVerify );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( CurrentModuleObject + " has a duplicate field " + NameToVerify );
+		}
+	}
+
+	void
 	VerifyUniqueChillerName(
-		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
-		bool & ErrorFound,
-		std::string const & StringToDisplay
+			std::string const & TypeToVerify,
+			std::string const & NameToVerify,
+			bool & ErrorFound,
+			std::string const & StringToDisplay
 	)
 	{
 
