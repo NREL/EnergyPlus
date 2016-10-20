@@ -723,9 +723,6 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
 				// unique_string_blank_key
 				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );

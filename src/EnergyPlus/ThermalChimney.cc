@@ -268,6 +268,7 @@ namespace ThermalChimney {
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			// First Alpha is Thermal Chimney Name
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );

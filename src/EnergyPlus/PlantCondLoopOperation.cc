@@ -442,17 +442,11 @@ namespace PlantCondLoopOperation {
 		// get number of operation schemes
 		CurrentModuleObject = "PlantEquipmentOperationSchemes";
 		NumPlantOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-
-
-
-			for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-				IsBlank = false;
-				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
-			}
-
-
-
+		for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
+			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			IsBlank = false;
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
+		}
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
 		NumCondOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 

@@ -401,11 +401,7 @@ namespace Photovoltaics {
 		cCurrentModuleObject = cPVGeneratorObjectName;
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PVnum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			if ( cAlphaArgs( 1 ).empty() ) {
-				ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			PVarray( PVnum ).Name = cAlphaArgs( 1 );
 
 			PVarray( PVnum ).SurfaceName = cAlphaArgs( 2 );
@@ -529,11 +525,7 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVSimplePerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ).empty() ) {
-					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					continue;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				tmpSimpleModuleParams( ModNum ).Name = cAlphaArgs( 1 );
 				tmpSimpleModuleParams( ModNum ).ActiveFraction = rNumericArgs( 1 );
 
@@ -571,11 +563,7 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
 			for ( ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ).empty() ) {
-					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					continue;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				tmpTNRSYSModuleParams( ModNum ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "CrystallineSilicon" ) ) {
 					tmpTNRSYSModuleParams( ModNum ).CellType = CrystallineSiPVCells;
@@ -623,11 +611,8 @@ namespace Photovoltaics {
 			for ( ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum ) {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ).empty() ) {
-					ShowSevereError( cCurrentModuleObject + " Name, cannot be blank" );
-					ErrorsFound = true;
-					continue;
-				}
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 				tmpSNLModuleParams( ModNum ).name = cAlphaArgs( 1 );
 				tmpSNLModuleParams( ModNum ).Acoll = rNumericArgs( 1 );
 				tmpSNLModuleParams( ModNum ).NcellSer = rNumericArgs( 2 );

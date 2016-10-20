@@ -197,7 +197,6 @@ namespace SimAirServingZones {
 	int const Fan_ComponentModel( 25 ); // cpw22Aug2010 (new)
 	int const DXHeatPumpSystem( 26 );
 	int const CoilUserDefined( 27 );
-	bool IsNotOK;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -484,6 +483,7 @@ namespace SimAirServingZones {
 		static bool SplitterExists( false ); // TRUE if there is a slitter in a primary air system
 		static bool MixerExists( false ); // TRUE if there is a mixer in a primary air system
 		bool errFlag;
+		bool IsNotOK;
 		/////////// hoisted into namespace
 		//static int TestUniqueNodesNum( 0 );
 		///////////////////////////
