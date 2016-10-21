@@ -5,7 +5,7 @@ Hybrid Model: Zone Capacitance and Infiltration
  **Lawrence Berkeley National Laboratory**
 
  - Original: May 18, 2015
- - Updated: August 25, 2016
+ - Updated: August 25, 2016; October 20, 2016
  
 ## Justification for New Feature ##
 
@@ -210,7 +210,9 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
       \format singleLine
       \memo Multiplier altering the relative capacitance of the air compared to an empty zone
       \min-fields 4
- A1,  \field Zone or ZoneList Name
+ A1,  \field Name
+      \required-field
+ A2,  \field Zone or ZoneList Name
       \required-field
       \type object-list
       \object-list ZoneAndZoneListNames
@@ -338,7 +340,63 @@ In addition, moisture modifier is more important than temperature modifier, beca
 Internal mass objects are participating in the zone air heat balance and the long wave radiant exchange.  However, they don’t directly interact with the solar heat because internal mass objects don’t have a specific location in space.  So the inclination is to just use regular ‘surfaces’ placed in the space so that they absorb solar.  However, imagine putting a “table” in a space with a window.  Because the solar cannot see the floor, the zone is no longer convex by the strictest definition, so solar calculations will be wrong, and the solar will actually hit both the table and the floor underneath.  Which unrealistically makes the zone cooling load higher than possible.  So, the key is a better solar model that properly clips for internal surfaces, or at least a better solar distribution model that puts some solar directly on internal mass objects in the space.
 
 - Reply:
-	From this feature development, the internal mass is represented in the zone temperature capacitance multiplier, which only corrects the zone air heat capacity reflecting heat stored in the internal mass. Assumptions are not different from the approach used in InternalMass object, which ignores the geometrical construction of the internal mass, and do not contribute to the heat transfer across surfaces and the solar heat gain through windows.  
+	From this feature development, the internal mass is represented in the zone temperature capacitance multiplier, which only corrects the zone air heat capacity reflecting heat stored in the internal mass. Assumptions are not different from the approach used in InternalMass object, which ignores the geometrical construction of the internal mass, and do not contribute to the heat transfer across surfaces and the solar heat gain through windows.
+	
+**Lixing Gu, Sep 29, 2016**
+
+I need some clarifications from Simulation Process:
+ 
+When the “Calculate Zone Air Infiltration Rate” flag and the “Calculate Zone Internal Thermal Mass” flag are both set to YES:
+
+1. Hybrid model simulation for infiltration using the default IM multiplier of 8
+2. Hybrid model simulation for IM multiplier using the calculated infiltration output
+3. Normal energy simulation with the calculated IM multiplier and infiltration
+ 
+Do you have any iteration to recalculate infiltration after getting IM multiplier in Step 2, if Step 2 gets IM Multiplier much beyond 8?
+
+- Reply:
+
+It does not require the iteration process to recalulate infiltration. The sensitivity study from the validation report shows that infiltration is not sensitive to multipliers between 1 and 20. The base IM multiplier 8 is selected as it reflects a typical office internal mass environment. Although the calculated multiplier might differ from 8 at Step 2, the result from Step 2 is the IM multiplier to be used for energy simulation.    
+
+When Step 3 is performed, which algorithm in ZoneAirHeatBalanceAlgorithm should be selected? Since you use both 3rdOrderBackwardDifference and AnalyticalSolution in Step 1 and 2, do you allow users to select EulerMethod?
+
+- Reply: 
+
+After all hybrid simulations are done, the energy simulation does not limit the type of ZoneAirHeatBalanceAlgorithm method.
+
+**Mike Witte, Oct 06, 2016**
+
+1.  I should be careful what I ask for.  You took my suggestion to add a Zone or ZoneList Name field to ZoneCapacitanceMultiplier:ResearchSpecial, and it is proposed as a required field.  To follow the pattern of other objects that apply to a zone or zonelist, there should also be a name field (e.g. People, or ZoneControl:Thermostat).  So, this would become:
+ZoneCapacitanceMultiplier:ResearchSpecial,
+      \format singleLine
+      \memo Multiplier altering the relative capacitance of the air compared to an empty zone
+      \min-fields 4
+ A1,  \field Name
+      \required-field
+  A2, \field Zone or ZoneList Name
+      \required-field
+      \type object-list
+      \object-list ZoneAndZoneListNames
+ N1,  \field Temperature Capacity Multiplier
+      \type real
+      \default 1.0
+      \minimum> 0.0
+
+- Reply:
+
+We agree there should be a new field Name in the object of ZoneCapacitanceMultiplier:ResearchSpecial, to be consistent with other similar objects that apply to a zone or zonelist.
+  
+2.  If ZoneAirMassFlowConservation is used in the same simulations as HybridModel:Zone, then they cannot both actively adjust infiltration.  This will need an error check to see what the infiltration setting is for both of these objects.
+
+- Reply:
+
+The ZoneAirMassFlowConservation should not be activated during the Hybrid Modeling simulations. We will describe this clearly in the Engineering Reference. If the IDF file includes both ZoneAirMassFlowConservation and HybridModeling, we would deactivate the ZoneAirMassFlowConservation and provide a warning message to the user.
+
+3.  If you have not done so, be sure to check the RoomAirModelType for any hybrid zones and throw and error if it is set to anything other than "Mixing".
+
+- Reply:
+
+The model will check the RoomAirModelType for each zone and enforce it to be "Mixing" if Hybrid Modeling is performed for that zone. A warning message will be provided if the RoomAirModelType is changed during the process.
 
 ## Conference Call Conclusions ##
 
