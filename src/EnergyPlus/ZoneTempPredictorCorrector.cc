@@ -223,6 +223,9 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	int NumStageCtrZone( 0 );
 
+	// Number of zone capacitance multiplier objects
+	int NumZoneCapaMultiplier( 0 );
+
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
@@ -1555,8 +1558,8 @@ namespace ZoneTempPredictorCorrector {
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-		NumNums = GetNumObjectsFound( cCurrentModuleObject );
-		if ( NumNums == 0 ) {
+		NumZoneCapaMultiplier = GetNumObjectsFound( cCurrentModuleObject );
+		if ( NumZoneCapaMultiplier == 0 ) {
 		// Assign default multiplier values to all zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
 				Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
@@ -1569,19 +1572,19 @@ namespace ZoneTempPredictorCorrector {
 		// Allow user to specify ZoneCapacitanceMultiplier:ResearchSpecial at zone level
 		// Added by S. Lee and R. Zhang in Oct. 2016.
 
-			ZoneCapMultiplierResearchSpecial.allocate( NumNums );
+			ZoneCapMultiplierResearchSpecial.allocate( NumZoneCapaMultiplier );
 
 			// Assign the user inputted multipliers to specified zones
-			for ( int ZoneCapNum = 1; ZoneCapNum <= NumNums; ZoneCapNum++ ) {
+			for ( int ZoneCapNum = 1; ZoneCapNum <= NumZoneCapaMultiplier; ZoneCapNum++ ) {
 				GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-
-				VerifyName( cAlphaArgs( 1 ), ZoneCapMultiplierResearchSpecial, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				// IsNotOK = false;
+				// IsBlank = false;
+				// 
+				// VerifyName( cAlphaArgs( 1 ), ZoneCapMultiplierResearchSpecial, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				// if ( IsNotOK ) {
+				// 	ErrorsFound = true;
+				// 	if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				// }
 				ZoneCapMultiplierResearchSpecial( Item ).Name = cAlphaArgs( 1 );
 				
 				if( lAlphaFieldBlanks( 2 )){
@@ -3869,10 +3872,7 @@ namespace ZoneTempPredictorCorrector {
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using RoomAirModelManager::ManageAirModel;
 		using General::TrimSigDigits;
-		using DataEnvironment::DayOfYear_Schedule;
 		using DataEnvironment::DayOfYear;
-		using DataEnvironment::Month;
-		using DataEnvironment::DayOfMonth;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
