@@ -490,6 +490,7 @@ namespace ZoneTempPredictorCorrector {
 		// Object Data
 		Array1D< NeededControlTypes > TStatControlTypes;
 		Array1D< NeededComfortControlTypes > TComfortControlTypes;
+		Array1D< ZoneCapMultiplierData > ZoneCapMultiplierResearchSpecial;
 
 		// Formats
 		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
@@ -1556,7 +1557,7 @@ namespace ZoneTempPredictorCorrector {
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
 		NumNums = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumNums == 0 ) {
-			// Assign default multiplier values to all zones
+		// Assign default multiplier values to all zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
 				Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
 				Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
@@ -1565,19 +1566,57 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		} else {
-		// Added by Sang Hoon Lee in Sep. 2016.
+		// Allow user to specify ZoneCapacitanceMultiplier:ResearchSpecial at zone level
+		// Added by S. Lee and R. Zhang in Oct. 2016.
+
+			ZoneCapMultiplierResearchSpecial.allocate( NumNums );
 
 			// Assign the user inputted multipliers to specified zones
 			for ( int ZoneCapNum = 1; ZoneCapNum <= NumNums; ZoneCapNum++ ) {
 				GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				IsNotOK = false;
+				IsBlank = false;
 
-				int ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone );
-				if( ZoneNum > 0 ){
-					Zone( ZoneNum ).FlagCustomizedZoneCap = true;
-					Zone( ZoneNum ).ZoneVolCapMultpSens = rNumericArgs( 1 );
-					Zone( ZoneNum ).ZoneVolCapMultpMoist = rNumericArgs( 2 );
-					Zone( ZoneNum ).ZoneVolCapMultpCO2 = rNumericArgs( 3 );
-					Zone( ZoneNum ).ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+				VerifyName( cAlphaArgs( 1 ), ZoneCapMultiplierResearchSpecial, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				}
+				ZoneCapMultiplierResearchSpecial( Item ).Name = cAlphaArgs( 1 );
+				
+				if( lAlphaFieldBlanks( 2 )){
+				// default multiplier values for all the zones not specified
+					ZoneVolCapMultpSens = rNumericArgs( 1 );
+					ZoneVolCapMultpMoist = rNumericArgs( 2 );
+					ZoneVolCapMultpCO2 = rNumericArgs( 3 );
+					ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+				} else {
+				// multiplier values for the specified zone 
+					int ZoneNum = 0;
+					ZLItem = 0;
+					Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+					if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+					if ( Item1 > 0 ) {
+						ZoneNum = Item1;
+						Zone( ZoneNum ).FlagCustomizedZoneCap = true;
+						Zone( ZoneNum ).ZoneVolCapMultpSens = rNumericArgs( 1 );
+						Zone( ZoneNum ).ZoneVolCapMultpMoist = rNumericArgs( 2 );
+						Zone( ZoneNum ).ZoneVolCapMultpCO2 = rNumericArgs( 3 );
+						Zone( ZoneNum ).ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+					} else if ( ZLItem > 0 ) {
+						for( int ZonePtrNum = 1; ZonePtrNum < ZoneList( ZLItem ).NumOfZones; ZonePtrNum++ ){
+							ZoneNum = ZoneList( ZLItem ).Zone( ZonePtrNum );
+							Zone( ZoneNum ).FlagCustomizedZoneCap = true;
+							Zone( ZoneNum ).ZoneVolCapMultpSens = rNumericArgs( 1 );
+							Zone( ZoneNum ).ZoneVolCapMultpMoist = rNumericArgs( 2 );
+							Zone( ZoneNum ).ZoneVolCapMultpCO2 = rNumericArgs( 3 );
+							Zone( ZoneNum ).ZoneVolCapMultpGenContam = rNumericArgs( 4 );
+						}
+
+					} else {
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
+						ErrorsFound = true;
+					}
 				}
 			}
 			
@@ -1592,8 +1631,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			// Calculate the average multiplier value from all zones
-			{
-				
+			{				
 				Real64 ZoneVolCapMultpSens_temp = 0.0;
 				Real64 ZoneVolCapMultpMoist_temp = 0.0;
 				Real64 ZoneVolCapMultpCO2_temp = 0.0;
@@ -4095,162 +4133,42 @@ namespace ZoneTempPredictorCorrector {
 			//Zone(ZoneNum).ZoneVolCapMultpGenContam = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpGenContam;
 			
 			// Hybrid model trigger start
-			if (( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc ) && ( !WarmupFlag ) && ( !DoingSizing )) {
-
-				HybridModelStartMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartMonth;
-				HybridModelStartDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartDate;
-				HybridModelEndMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndMonth;
-				HybridModelEndDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndDate;
+			if ( FlagHybridModel && ( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc ) && ( !WarmupFlag ) && ( !DoingSizing )) {
 				
-				int HMDayArr[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-
-				if( HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12 ){
-					HMStartDay = HMDayArr[ HybridModelStartMonth - 1 ];
-				} else {
-					HMStartDay = 0;
-				}
-
-				if( HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12 ){
-					HMEndDay = HMDayArr[ HybridModelEndMonth - 1 ];
-				} else {
-					HMEndDay = 0;
-				}
-
-				// @@
-				// if (HybridModelStartMonth == 1){
-				// 	HMStartDay = 0;
-				// }
-				// else if (HybridModelStartMonth == 2){
-				// 	HMStartDay = 31;
-				// }
-				// else if (HybridModelStartMonth == 3){
-				// 	HMStartDay = 59;
-				// }
-				// else if (HybridModelStartMonth == 4){
-				// 	HMStartDay = 90;
-				// }
-				// else if (HybridModelStartMonth == 5){
-				// 	HMStartDay = 120;
-				// }
-				// else if (HybridModelStartMonth == 6){
-				// 	HMStartDay = 151;
-				// }
-				// else if (HybridModelStartMonth == 7){
-				// 	HMStartDay = 181;
-				// }
-				// else if (HybridModelStartMonth == 8){
-				// 	HMStartDay = 212;
-				// }
-				// else if (HybridModelStartMonth == 9){
-				// 	HMStartDay = 243;
-				// }
-				// else if (HybridModelStartMonth == 10){
-				// 	HMStartDay = 273;
-				// }
-				// else if (HybridModelStartMonth == 11){
-				// 	HMStartDay = 304;
-				// }
-				// else if (HybridModelStartMonth == 12){
-				// 	HMStartDay = 334;
-				// }
-				// 
-				// if (HybridModelEndMonth == 1){
-				// 	HMEndDay = 0;
-				// }
-				// else if (HybridModelEndMonth == 2){
-				// 	HMEndDay = 31;
-				// }
-				// else if (HybridModelEndMonth == 3){
-				// 	HMEndDay = 59;
-				// }
-				// else if (HybridModelEndMonth == 4){
-				// 	HMEndDay = 90;
-				// }
-				// else if (HybridModelEndMonth == 5){
-				// 	HMEndDay = 120;
-				// }
-				// else if (HybridModelEndMonth == 6){
-				// 	HMEndDay = 151;
-				// }
-				// else if (HybridModelEndMonth == 7){
-				// 	HMEndDay = 181;
-				// }
-				// else if (HybridModelEndMonth == 8){
-				// 	HMEndDay = 212;
-				// }
-				// else if (HybridModelEndMonth == 9){
-				// 	HMEndDay = 243;
-				// }
-				// else if (HybridModelEndMonth == 10){
-				// 	HMEndDay = 273;
-				// }
-				// else if (HybridModelEndMonth == 11){
-				// 	HMEndDay = 304;
-				// }
-				// else if (HybridModelEndMonth == 12){
-				// 	HMEndDay = 334;
-				// }
-
-				HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
-				HybridEndDayOfYear = HMEndDay + HybridModelEndDate;
 				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
 
+				// prepare start and end date for Hybrid Modeling
+				{
+					int HMDayArr[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+					HybridModelStartMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartMonth;
+					HybridModelStartDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartDate;
+					HybridModelEndMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndMonth;
+					HybridModelEndDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndDate;
+
+					if( HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12 ){
+						HMStartDay = HMDayArr[ HybridModelStartMonth - 1 ];
+					} else {
+						HMStartDay = 0;
+					}
+
+					if( HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12 ){
+						HMEndDay = HMDayArr[ HybridModelEndMonth - 1 ];
+					} else {
+						HMEndDay = 0;
+					}
+
+					HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
+					HybridEndDayOfYear = HMEndDay + HybridModelEndDate;
+				}
+
 				// HM calculation only HM calculation period start
-				if (DayOfYear >= HybridStartDayOfYear && DayOfYear <= HybridEndDayOfYear){
+				if ( DayOfYear >= HybridStartDayOfYear && DayOfYear <= HybridEndDayOfYear ){
+
 					ZT(ZoneNum) = Zone(ZoneNum).ZoneMeasuredTemperature;
-					// Internal thermal mass calcualtion start
-					if ( HybridModelZone(ZoneNum).InternalThermalMassCalc ){
-						if (SumSysMCpT == 0 && ZT(ZoneNum) != PreviousMeasuredZT1(ZoneNum) && UseZoneTimeStepHistory){ // HM calculation only when HVAC off
-							 // Calculate air capacity using UseAnalyticalSolution)
-							if (TempDepCoef == 0.0) {
-								AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); // Inverse equation
-							} else {
-								Real64 AirCapHM_temp = (TempIndCoef - TempDepCoef * PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * ZT(ZoneNum));
-								if( AirCapHM_temp > 0 ){ // Avoide IND
-									AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
-								} else {
-									AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); //@@
-								}
-							}
-							// Calculate multiplier
-							if (abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.1){
-								
-								MultpHM = AirCapHM / (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) * (TimeStepSys * SecInHour); // Inverse equation
-								
-								if (( MultpHM < 1.0 ) || ( MultpHM > 30.0 )){ // HM multiplier must be greater than 1 and less than 30
-									MultpHM = 1.0; // @@ 1.0 is the default value_zrp
-								}
-
-							} else {
-								MultpHM = 1.0;
-							}
-						}
-
-						// Count HM number of calculations
-						if (MultpHM != 0.0){
-							MultpHMCount = 1;
-						}
-						else{
-							MultpHMCount = 0;
-						}
-
-						Zone(ZoneNum).ZoneVolCapMultpSensHM = MultpHM;
-						Zone(ZoneNum).ZoneVolCapMultpSensHMCount = MultpHMCount;
-
-						// Get the sum of HM multiplers and total count during only for the HM calculation period.
-						Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum += Zone(ZoneNum).ZoneVolCapMultpSensHMCount;
-						Zone(ZoneNum).ZoneVolCapMultpSensHMSum += Zone(ZoneNum).ZoneVolCapMultpSensHM;
-						HMMultiplierAverage = Zone(ZoneNum).ZoneVolCapMultpSensHMSum / Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum;
-
-						// Store the last timestep value for hybrid model calculation period
-						if (DayOfYear == HybridEndDayOfYear && EndDayFlag){
-							Zone(ZoneNum).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
-						}
-
-					} // Internal thermal mass calcualtion end
-
-					// Infiltration calcualtion start
-					if ( HybridModelZone(ZoneNum).InfiltrationCalc ) {
+					
+					// * Hybrid Modeling-Infiltration calcualtion start
+					if ( HybridModelZone(ZoneNum).InfiltrationCalc ){
 
 						// Calculate MCPI included in TempIndCoef and TempDepCoef
 						double a = Zone(ZoneNum).OutDryBulbTemp;
@@ -4273,14 +4191,8 @@ namespace ZoneTempPredictorCorrector {
 						
 						if (abs(Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp) > 5.0 && abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) < 0.1) {// Filter
 							InfilOAACHHM = InfilVolumeOADensityHM / (TimeStepZone * Zone(ZoneNum).Volume);
-							if (InfilOAACHHM > 10.0){ // ACH max 10
-								InfilOAACHHM = 10.0;
-							}
-							if (InfilOAACHHM < 0.0){ // ACH min 0.0
-								InfilOAACHHM = 0.0;
-							}
-						}
-						else {
+							InfilOAACHHM = max( 0.0, min( 10.0, InfilOAACHHM ));  // ACH max 10, min 0
+						} else {
 							InfilOAACHHM = 0.0;
 						}
 
@@ -4290,7 +4202,60 @@ namespace ZoneTempPredictorCorrector {
 						Zone(ZoneNum).InfilVdotOADensityHM = Zone(ZoneNum).MCPIHM / CpAir / AirDensity;
 
 					} // Infiltration calcualtion end
+
+					// * Hybrid Modeling-Internal thermal mass calcualtion start
+					if ( HybridModelZone(ZoneNum).InternalThermalMassCalc ){
+
+						if ( SumSysMCpT == 0 && ZT(ZoneNum) != PreviousMeasuredZT1(ZoneNum) && UseZoneTimeStepHistory ){ // HM calculation only when HVAC off
+							// Calculate air capacity using UseAnalyticalSolution)
+							if (TempDepCoef == 0.0) {
+								AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); // Inverse equation
+							} else {
+								Real64 AirCapHM_temp = (TempIndCoef - TempDepCoef * PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * ZT(ZoneNum));
+								if(( AirCapHM_temp > 0 ) && ( AirCapHM_temp != 1 )){ // Avoide IND
+									AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
+								} else {
+									AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); //@@
+								}
+							}
+							// Calculate multiplier
+							if (abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.1){
+								MultpHM = AirCapHM / (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) * (TimeStepSys * SecInHour); // Inverse equation
+								
+								if (( MultpHM < 1.0 ) || ( MultpHM > 30.0 )){ // HM multiplier must be greater than 1 and less than 30
+									MultpHM = 1.0; // @@ 1.0 is the default value_zrp
+								}
+							} else {
+								MultpHM = 1.0;
+							}
+						}
+
+						// Calculate the average multiplier of the zone for the running period
+						{
+							// Count HM number of calculations
+							if( MultpHM != 0.0 ){
+								MultpHMCount = 1;
+							} else {
+								MultpHMCount = 0;
+							}
+
+							Zone(ZoneNum).ZoneVolCapMultpSensHM = MultpHM;
+							Zone(ZoneNum).ZoneVolCapMultpSensHMCount = MultpHMCount;
+
+							// Get the sum of HM multiplers and total count during only for the HM calculation period.
+							Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum += Zone(ZoneNum).ZoneVolCapMultpSensHMCount;
+							Zone(ZoneNum).ZoneVolCapMultpSensHMSum += Zone(ZoneNum).ZoneVolCapMultpSensHM;
+							HMMultiplierAverage = Zone(ZoneNum).ZoneVolCapMultpSensHMSum / Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum;
+
+							// Store the last timestep value for hybrid model calculation period
+							if (DayOfYear == HybridEndDayOfYear && EndDayFlag){
+								Zone(ZoneNum).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
+							}
+						}
+					} // Internal thermal mass calcualtion end
 				}
+
+				// Update zone temperatures in the previous steps
 				PreviousMeasuredZT3(ZoneNum) = PreviousMeasuredZT2(ZoneNum);
 				PreviousMeasuredZT2(ZoneNum) = PreviousMeasuredZT1(ZoneNum);
 				PreviousMeasuredZT1(ZoneNum) = ZT(ZoneNum);

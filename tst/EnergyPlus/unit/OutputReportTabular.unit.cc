@@ -5878,6 +5878,7 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	Zone( 1 ).ExtGrossWallArea = 500.;
 	Zone( 1 ).ExteriorTotalGroundSurfArea = 0;
 	Zone( 1 ).ExtWindowArea = Surface( 3 ).GrossArea + Surface( 4 ).GrossArea;
+	Zone( 1 ).ZoneVolCapMultpSensHMAverage = 1.2; // Hybrid Modeling, Sang Hoon, Sep. 2016
 
 	WriteVeriSumTable();
 
@@ -5888,7 +5889,7 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
 	sqlite_test->sqliteCommit();
 
-	EXPECT_EQ( 123ul, tabularData.size() );
+	EXPECT_EQ( 128ul, tabularData.size() );
 	// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value
 	EXPECT_EQ( "       12.30", tabularData[3][10] );
 	EXPECT_EQ( "       45.60", tabularData[4][10] );
@@ -5914,5 +5915,6 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	EXPECT_EQ( "      500.00", tabularData[88][10] ); // above ground gross floor area
 	EXPECT_EQ( "      100.00", tabularData[98][10] ); // window glass area
 	EXPECT_EQ( "      114.72", tabularData[103][10] ); // window opening area
+	EXPECT_EQ( "        1.20", tabularData[123][10] ); //Capacitance Multiplier, Hybrid Modeling, Sang Hoon, Sep. 2016
 
 }

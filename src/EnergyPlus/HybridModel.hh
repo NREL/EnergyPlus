@@ -28,6 +28,7 @@ namespace HybridModel {
 	struct HybridModelProperties
 	{
 		// Members
+		std::string Name;
 		int ZonePtr;
 		int ZoneMeasuredTemperatureSchedulePtr;
 		bool InternalThermalMassCalc;

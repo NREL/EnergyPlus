@@ -1280,6 +1280,25 @@ namespace DataHeatBalance {
 		{}
 
 	};
+	
+	struct ZoneCapMultiplierData
+	{
+		// Members
+		std::string Name;
+		Real64 ZoneVolCapMultpSens; //Temperature capacity multiplier
+		Real64 ZoneVolCapMultpMoist; //Moist capacity multiplier
+		Real64 ZoneVolCapMultpCO2; //CO2 capacity multiplier
+		Real64 ZoneVolCapMultpGenContam; //Contam capacity multiplier
+
+		// Default Constructor
+		ZoneCapMultiplierData() :
+			ZoneVolCapMultpSens( 1.0 ), 
+			ZoneVolCapMultpMoist( 0.0 ), 
+			ZoneVolCapMultpCO2( 1.0 ), 
+			ZoneVolCapMultpGenContam( 1.0 ) 
+		{}
+
+	};
 
 	struct ZoneData
 	{
@@ -1442,7 +1461,7 @@ namespace DataHeatBalance {
 			FlagCustomizedZoneCap( false ),
 			ZoneMeasuredTemperature( 0.0 ), // Added by Sang Hoon May 2015
 			ZoneVolCapMultpSens( 1.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpMoist( 1.0 ), // Added by Sang Hoon June 2016
+			ZoneVolCapMultpMoist( 0.0 ), // Added by Sang Hoon June 2016
 			ZoneVolCapMultpCO2( 1.0 ), // Added by Sang Hoon June 2016
 			ZoneVolCapMultpGenContam( 1.0 ), // Added by Sang Hoon June 2016
 			ZoneVolCapMultpSensHM( 0.0 ), // Added by Sang Hoon May 2015
@@ -2895,9 +2914,9 @@ namespace DataHeatBalance {
 			InfilAirChangeRate( 0.0 ),
 			InfilAirChangeRateHM( 0.0 ), // InfilAirChangeRate inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
 			InfilVdotCurDensityHM ( 0.0 ), // InfilVdotCurDensity inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
+			InfilVdotOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
 			InfilMassHM( 0.0 ), // InfilMass inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
 			InfilMdotHM( 0.0 ), // InfilMdot inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			InfilVdotOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
 			InfilVolumeOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
 			InfilOAAirChangeRateHM(0.0), // Added by Sang Hoon Lee February 2016
 			InfilOAAirChangeRate(0.0), // Added by Sang Hoon Lee February 2016

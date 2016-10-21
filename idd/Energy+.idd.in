@@ -742,10 +742,12 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \default 1.0
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air generic contaminant concentration
-  A1 ; \field Zone Name
+  A1 , \field Name
+       \required-field
+  A2 ; \field Zone or ZoneList Name
        \type object-list
-       \object-list Zone Names
-       \note If this field is left blank, default multiplier values are used for all the zones not specified
+       \object-list ZoneAndZoneListNames
+       \note If this field is left blank, the multipliers are applied to all the zones not specified
 
 Timestep,
        \memo Specifies the "basic" timestep for the simulation. The
@@ -61275,12 +61277,14 @@ HybridModel:Zone,
        \object-list ZoneAndZoneListNames
   A3 , \field Calculate Zone Internal Thermal Mass
        \note Use measured temperature data to calculate zone temperature capacity multiplier
+       \note Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
        \type choice
        \key NO
        \key YES
        \default NO
   A4 , \field Calculate Zone Air Infiltration Rate
        \note Use measured temperature data to calculate zone air infiltration air flow rate
+       \note Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
        \type choice
        \key NO
        \key YES
