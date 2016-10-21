@@ -743,7 +743,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air generic contaminant concentration
   A1 , \field Name
-       \required-field
+       \note Name of the ZoneCapacitanceMultiplier:ResearchSpecial
   A2 ; \field Zone or ZoneList Name
        \type object-list
        \object-list ZoneAndZoneListNames
