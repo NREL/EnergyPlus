@@ -5,7 +5,7 @@ Thermostat Based-on Adaptive Thermal Comfort Models
  **Lawrence Berkeley National Laboratory**
 
  - Original Date: July 20, 2016
- - Revised Date: July 29, 2016
+ - Revised Date: July 29, 2016; October 21, 2016
 
 ## Justification for New Feature ##
 
@@ -33,12 +33,17 @@ N/A
 
 ## Overview ##
 
-The adaptive comfort model has been adopted in EnergyPlus as one of the thermal comfort models of the People object, as well as one control strategy to operate windows in the Airflow Network model. The existing code will be reused as much as possible. We propose to enhance the existing ZoneControl:Thermostat:OperativeTemperature object to indicate the applicability of the adaptive comfort model with three choices: 
+The adaptive comfort model has been adopted in EnergyPlus as one of the thermal comfort models of the People object, as well as one control strategy to operate windows in the Airflow Network model. The existing code will be reused as much as possible. We propose to enhance the existing ZoneControl:Thermostat:OperativeTemperature object to indicate the applicability of the adaptive comfort model with seven choices: 
 - **None**. The adaptive comfort model is not applicable; 
-- **AdaptiveASH55**. The central line of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint; and 
-- **AdaptiveCEN15251**. The central line of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint. 
+- **AdaptiveASH55_CentralLine**. The central line of the acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint; 
+- **AdaptiveASH55_80PercentUpperLine**. The upper line of the 80% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint;
+- **AdaptiveASH55_90PercentUpperLine**. The upper line of the 90% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used as the zone operative temperature setpoint; 
+- **AdaptiveCEN15251_CentralLine**. The central line of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint;
+- **AdaptiveCEN15251_CategoryIUpperLine**. The upper line of the Category I of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint; 
+- **AdaptiveCEN15251_CategoryIIUpperLine**. The upper line of the Category II of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint; and 
+- **AdaptiveCEN15251_CategoryIIIUpperLine**. The upper line of the Category III of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used as the zone operative temperature setpoint;
 
-When the adaptive comfort model is selected, the thermostat setpoint temperature schedule for space cooling will be overwritten with the calculated operative temperature based on the central line of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007. Such calculations have been implemented in EnergyPlus already. The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. 
+When the adaptive comfort model is selected, the thermostat setpoint temperature schedule for space cooling will be overwritten with the calculated operative temperature based on the selected acceptability limits of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007. Such calculations have been implemented in EnergyPlus already. The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. 
 
 
 ## IDD Object (New) ##
@@ -76,8 +81,13 @@ ZoneControl:Thermostat:OperativeTemperature,
   <b>A4</b> ; \field Adaptive Comfort Model Type
        \type choice
        \key None
-       \key AdaptiveASH55
-       \key AdaptiveCEN15251
+       \key AdaptiveASH55_CentralLine
+       \key AdaptiveASH55_80PercentUpperLine
+       \key AdaptiveASH55_90PercentUpperLine
+       \key AdaptiveCEN15251_CentralLine
+       \key AdaptiveCEN15251_CategoryIUpperLine
+       \key AdaptiveCEN15251_CategoryIIUpperLine
+       \key AdaptiveCEN15251_CategoryIIIUpperLine
        \default None
        \note the cooling setpoint temperature schedule of the referenced thermostat will be adjusted based on the selected adaptive comfort model type
     
