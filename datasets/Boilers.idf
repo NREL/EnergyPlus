@@ -15,7 +15,6 @@
 ! One with 40C supply, 30C return and one with 75C supply, 60C return
 ! Use curve below for a condensing boiler having a nominal thermal efficiency of 0.89.
 !
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Curve:Biquadratic,

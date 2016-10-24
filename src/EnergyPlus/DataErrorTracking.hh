@@ -166,6 +166,11 @@ namespace DataErrorTracking {
 	// Object Data
 	extern Array1D< RecurringErrorData > RecurringErrors;
 
+	// Clears the global data in DataErrorTracking
+	// Needed for unit tests, should not normally be called.
+	void
+	clear_state();
+
 } // DataErrorTracking
 
 } // EnergyPlus

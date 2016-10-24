@@ -218,6 +218,7 @@ namespace LowTempRadiantSystem {
 	int OperatingMode( 0 ); // Used to keep track of whether system is in heating or cooling mode
 	int MaxCloNumOfSurfaces( 0 ); // Used to set allocate size in CalcClo routine
 	bool VarOffCond( false ); // Set to true when in cooling for constant flow system + variable off condensation predicted
+	bool FirstTimeInit( true ); // Set to true for first pass through init routine then set to false
 	Real64 LoopReqTemp( 0.0 ); // Temperature required at the inlet of the pump (from the loop) to meet control logic
 	Array1D< Real64 > QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
 	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -256,6 +257,7 @@ namespace LowTempRadiantSystem {
 		OperatingMode = 0;
 		MaxCloNumOfSurfaces = 0;
 		VarOffCond = false;
+		FirstTimeInit = true;
 		LoopReqTemp = 0.0;
 		QRadSysSrcAvg.deallocate();
 		ZeroSourceSumHATsurf.deallocate();
@@ -318,6 +320,7 @@ namespace LowTempRadiantSystem {
 		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int RadSysNum; // Radiant system number/index in local derived types
 		int SystemType; // Type of radiant system: hydronic, constant flow, or electric
+		bool InitErrorFound( false );
 
 		// FLOW:
 		if ( GetInputFlag ) {
@@ -373,7 +376,10 @@ namespace LowTempRadiantSystem {
 			}
 		}
 
-		InitLowTempRadiantSystem( FirstHVACIteration, RadSysTypes( RadSysNum ).CompIndex, SystemType );
+		InitLowTempRadiantSystem( FirstHVACIteration, RadSysTypes( RadSysNum ).CompIndex, SystemType, InitErrorFound );
+		if ( InitErrorFound ) {
+			ShowFatalError( "InitLowTempRadiantSystem: Preceding error is not allowed to proceed with the simulation.  Correct this input problem." );
+		}
 
 		{ auto const SELECT_CASE_var( SystemType );
 		if ( SELECT_CASE_var == HydronicSystem ) {
@@ -1508,7 +1514,8 @@ namespace LowTempRadiantSystem {
 	InitLowTempRadiantSystem(
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
-		int const SystemType // Type of radiant system: hydronic, constant flow, or electric
+		int const SystemType, // Type of radiant system: hydronic, constant flow, or electric
+		bool & InitErrorsFound
 	)
 	{
 
@@ -1539,6 +1546,8 @@ namespace LowTempRadiantSystem {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using FluidProperties::GetDensityGlycol;
+		using General::RoundSigDigits;
+		using DataSizing::AutoSize;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ZeroTol( 0.0000001 ); // Smallest non-zero value allowed
@@ -1547,9 +1556,7 @@ namespace LowTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
-		static bool ErrorsFound( false ); // In one-time initializations
 		std::string Errout; // Message for errors
-		static bool firstTime( true ); // For one-time initializations
 		int RadNum; // Number of the radiant system (DO loop counter)
 		int RadSurfNum; // Number of the radiant system surface (DO loop counter)
 		int SurfNum; // Intermediate variable for keeping track of the surface number
@@ -1569,6 +1576,8 @@ namespace LowTempRadiantSystem {
 		bool errFlag;
 		// FLOW:
 
+		InitErrorsFound = false;
+		
 		if ( MyOneTimeFlag ) {
 			MyEnvrnFlagHydr.allocate( NumOfHydrLowTempRadSys );
 			MyEnvrnFlagCFlo.allocate( NumOfCFloLowTempRadSys );
@@ -1583,7 +1592,7 @@ namespace LowTempRadiantSystem {
 			MyOneTimeFlag = false;
 		}
 
-		if ( firstTime ) {
+		if ( FirstTimeInit ) {
 
 			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
 			QRadSysSrcAvg.dimension( TotSurfaces, 0.0 );
@@ -1621,27 +1630,29 @@ namespace LowTempRadiantSystem {
 			for ( RadNum = 1; RadNum <= NumOfCFloLowTempRadSys; ++RadNum ) {
 				// Calculate the efficiency for each pump: The calculation
 				// is based on the PMPSIM code in the ASHRAE Secondary Toolkit
-				if ( ( CFloRadSys( RadNum ).NomPowerUse > ZeroTol ) && ( CFloRadSys( RadNum ).MotorEffic > ZeroTol ) ) {
+				if ( ( CFloRadSys( RadNum ).NomPowerUse > ZeroTol ) && ( CFloRadSys( RadNum ).MotorEffic > ZeroTol ) && ( CFloRadSys( RadNum ).WaterVolFlowMax != AutoSize ) ) {
 					TotalEffic = CFloRadSys( RadNum ).WaterVolFlowMax * CFloRadSys( RadNum ).NomPumpHead / CFloRadSys( RadNum ).NomPowerUse;
 					CFloRadSys( RadNum ).PumpEffic = TotalEffic / CFloRadSys( RadNum ).MotorEffic;
 					if ( CFloRadSys( RadNum ).PumpEffic < 0.50 ) {
 						gio::write( Errout, fmtF102 ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
-						ShowWarningError( "Check input. Calc Pump Efficiency=" + stripped( Errout ) + "% which is less than 50%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
+						ShowWarningError( "Check input.  Calc Pump Efficiency=" + RoundSigDigits( CFloRadSys( RadNum ).PumpEffic, 5 ) + "% which is less than 50%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 					} else if ( ( CFloRadSys( RadNum ).PumpEffic > 0.95 ) && ( CFloRadSys( RadNum ).PumpEffic <= 1.0 ) ) {
 						gio::write( Errout, fmtF102 ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
-						ShowWarningError( "Check input.  Calc Pump Efficiency=" + stripped( Errout ) + "% is approaching 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
+						ShowWarningError( "Check input.  Calc Pump Efficiency=" + RoundSigDigits( CFloRadSys( RadNum ).PumpEffic, 5 ) + "% is approaching 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 					} else if ( CFloRadSys( RadNum ).PumpEffic > 1.0 ) {
 						gio::write( Errout, fmtF102 ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
-						ShowSevereError( "Check input.  Calc Pump Efficiency=" + stripped( Errout ) + "% which is bigger than 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
-						ErrorsFound = true;
+						ShowSevereError( "Check input.  Calc Pump Efficiency=" + RoundSigDigits( CFloRadSys( RadNum ).PumpEffic, 5 ) + "% which is bigger than 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
+						InitErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( "Check input.  Pump nominal power and motor efficiency cannot be 0, for pump=" + CFloRadSys( RadNum ).Name );
-					ErrorsFound = true;
+					if ( CFloRadSys( RadNum ).WaterVolFlowMax != AutoSize ) { // Autosize is not an error but it does not need to check pump efficiency here
+						ShowSevereError( "Check input.  Pump nominal power and motor efficiency cannot be 0, for pump=" + CFloRadSys( RadNum ).Name );
+						InitErrorsFound = true;
+					}
 				}
 			}
 
-			firstTime = false;
+			FirstTimeInit = false;
 
 		}
 

@@ -1,66 +1,5 @@
 include(CMakeParseArguments)
 
-# Install files from a remote url
-# TYPE can be either "FILES" or "PROGRAMS"
-# Use the appropriate TYPE to get the proper permissions on the installed file
-# SOURCE should be a url where the function will attempt to download from
-# DESTINATION is the absolute or relative destination which will be passed to 
-# the built in install command after the SOURCE is downloaded to a temporary location
-# If a fourth argument is provided it will be used for the file's install name.
-# If a fifth argument is provided and "TRUE" the file will be saved to the temporary
-# location at ${CMAKE_BINARY_DIR}/install_temp.
-function( install_remote TYPE SOURCE DESTINATION )
-  if( NOT ENABLE_INSTALL_REMOTE )
-    return()
-  endif()
-  if( DEFINED ARGV3 )
-    set(FILENAME "${ARGV3}")
-  else()
-    get_filename_component(FILENAME ${SOURCE} NAME)
-  endif()
-  set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/install_temp")
-  install(CODE "
-  file(DOWNLOAD ${SOURCE} \"${OUTPUT_DIR}/${FILENAME}\" STATUS status_var TIMEOUT 120 INACTIVITY_TIMEOUT 120)
-  list(GET status_var 0 status)
-  list(GET status_var 1 status_msg)
-  if( NOT (status EQUAL 0) )
-    message(\"install_remote failed, trying again: ${SOURCE} error ${status_msg}\")
-    file(DOWNLOAD ${SOURCE} \"${OUTPUT_DIR}/${FILENAME}\" STATUS status_var LOG log_var TIMEOUT 240 INACTIVITY_TIMEOUT 240)
-    list(GET status_var 0 status)
-    list(GET status_var 1 status_msg)
-    if( NOT (status EQUAL 0) )
-      message(SEND_ERROR \"install_remote failed after 2 attempts: ${SOURCE} error ${status_msg}\")
-    endif() 
-  endif()
-  ")
-  install(${TYPE} "${OUTPUT_DIR}/${FILENAME}" DESTINATION ${DESTINATION})
-  if(NOT ARGV4)
-    install(CODE "
-      file(REMOVE \"${OUTPUT_DIR}/${FILENAME}\")
-    ")
-  endif()
-endfunction()
-
-# Similar to install_remote but explicitly for MacOSX plist files.
-# This function will configure a unique bundle id based on build number
-# so that packages will not try to relocate the .app to an older version location.
-function( install_remote_plist SOURCE DESTINATION APP_NAME )
-  if( NOT ENABLE_INSTALL_REMOTE )
-    return()
-  endif()
-  install(CODE "
-    file(DOWNLOAD \"${SOURCE}\" 
-      \"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" 
-    )
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER \"gov.nrel.energyplus.${CMAKE_VERSION_BUILD}.${APP_NAME}\")
-    configure_file(\"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" \"${CMAKE_BINARY_DIR}/install_temp/Info.plist\")
-  ")
-  install(FILES "${CMAKE_BINARY_DIR}/install_temp/Info.plist" DESTINATION "${DESTINATION}")
-  install(CODE "
-    file(REMOVE_RECURSE \"${CMAKE_BINARY_DIR}/install_temp/Info.plist\")
-  ")
-endfunction()
-
 # Add google tests macro
 macro(ADD_GOOGLE_TESTS executable)
   foreach ( source ${ARGN} )
@@ -278,10 +217,12 @@ function(install_and_fixup_exe_target TARGET_NAME INSTALL_PATH)
   install( TARGETS ${TARGET_NAME} DESTINATION ${INSTALL_PATH} )
   #Warning this is only ok because we are counting on static linked executables on windows.
   if(NOT WIN32)
-    install(CODE "
-      include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
-      fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
-    ")
+    if(NOT EXISTS "/etc/redhat-release")
+      install(CODE "
+        include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
+        fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
+      ")
+    endif()
   endif()
 endfunction()
 

@@ -206,7 +206,7 @@ namespace DataHVACGlobals {
 	int const CoilDX_MultiSpeedCooling( 8 );
 	int const CoilDX_MultiSpeedHeating( 9 );
 
-	int const Coil_HeatingGas( 10 );
+	int const Coil_HeatingGasOrOtherFuel( 10 );
 	int const Coil_HeatingGas_MultiStage( 11 );
 	int const Coil_HeatingElectric( 12 );
 	int const Coil_HeatingElectric_MultiStage( 13 );
@@ -237,7 +237,7 @@ namespace DataHVACGlobals {
 	int const CoilVRF_FluidTCtrl_Cooling( 33 );
 	int const CoilVRF_FluidTCtrl_Heating( 34 );
 
-	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl", "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" } );
+	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Fuel", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl", "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" } );
 
 
 	// Water to air HP coil types
@@ -350,6 +350,7 @@ namespace DataHVACGlobals {
 	Real64 BalancedExhMassFlow( 0.0 ); // balanced zone exhaust (declared as so by user)  [kg/s]
 	Real64 PlenumInducedMassFlow( 0.0 ); // secondary air mass flow rate induced from a return plenum [kg/s]
 	bool TurnFansOn( false ); // If true overrides fan schedule and cycles fans on
+	bool TurnZoneFansOnlyOn(false); // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
 	bool TurnFansOff( false ); // If True overides fan schedule and TurnFansOn and forces fans off
 	bool ZoneCompTurnFansOn( false ); // If true overrides fan schedule and cycles fans on
 	bool ZoneCompTurnFansOff( false ); // If True overides fan schedule and TurnFansOn and forces fans off
@@ -547,6 +548,7 @@ namespace DataHVACGlobals {
 		BalancedExhMassFlow = 0.0;
 		PlenumInducedMassFlow = 0.0;
 		TurnFansOn = false;
+		TurnZoneFansOnlyOn = false;
 		TurnFansOff = false;
 		ZoneCompTurnFansOn = false;
 		ZoneCompTurnFansOff = false;
@@ -580,8 +582,12 @@ namespace DataHVACGlobals {
 		SimNonZoneEquipmentFlag = true;
 		ZoneMassBalanceHVACReSim = true;
 		ZoneComp.deallocate();
-		OptStartData = OptStartDataType();
 		CompSetPtEquip.deallocate();
+		OptStartData = OptStartDataType();
+		// unit test ZoneTempPredictorCorrector_ReportingTest fails without this next line. Next 2 lines are just to be thorough.
+		OptStartData.OptStartFlag.deallocate();
+		OptStartData.ActualZoneNum.deallocate();
+		OptStartData.OccStartTime.deallocate();
 	}
 
 } // DataHVACGlobals
