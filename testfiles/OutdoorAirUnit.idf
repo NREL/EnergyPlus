@@ -708,7 +708,7 @@
     1,                       !- Nominal Process Air Flow Rate {m3/s}
     2.5,                     !- Nominal Process Air Velocity {m/s}
     10,                      !- Rotor Power {W}
-    Coil:Heating:Fuel,        !- Regeneration Coil Object Type
+    Coil:Heating:Fuel,       !- Regeneration Coil Object Type
     Desiccant Regen Coil,    !- Regeneration Coil Name
     Fan:VariableVolume,      !- Regeneration Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Fan Name
@@ -851,7 +851,7 @@
     5;                       !- Loop Design Temperature Difference {deltaC}
 
   Sizing:Plant,
-    Hot Water Loop,      !- Plant or Condenser Loop Name
+    Hot Water Loop,          !- Plant or Condenser Loop Name
     Heating,                 !- Loop Type
     82,                      !- Design Loop Exit Temperature {C}
     5;                       !- Loop Design Temperature Difference {deltaC}
@@ -1434,16 +1434,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    0.002,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    900,                     !- Rated Power Consumption {W}
+    0.002,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    900,                     !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictHeating,
@@ -1664,7 +1664,7 @@
     Zone2OAUHX,              !- Component 1 Name
     coil:cooling:water,      !- Component 2 Object Type
     Zone2OAUWCcoil,          !- Component 2 Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Zone2OAUHeatingCoil,     !- Component 3 Name
     Coil:Cooling:Water,      !- Component 4 Object Type
     Zone2OAUWCcoil2;         !- Component 4 Name
@@ -1774,16 +1774,16 @@
     ChW Circ Pump,           !- Name
     ChW Supply Inlet Node,   !- Inlet Node Name
     ChW Pump Outlet Node,    !- Outlet Node Name
-    0.004,                   !- Rated Flow Rate {m3/s}
-    300000,                  !- Rated Pump Head {Pa}
-    1800,                    !- Rated Power Consumption {W}
+    0.004,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1800,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictCooling,

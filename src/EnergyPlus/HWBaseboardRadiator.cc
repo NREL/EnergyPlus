@@ -960,6 +960,7 @@ namespace HWBaseboardRadiator {
 					HWBaseboard( BaseboardNum ).RatedCapacity = TempSize;
 				}
 				RatedCapacityDes = TempSize;
+				DataScalableCapSizingON = false;
 			}
 		}
 

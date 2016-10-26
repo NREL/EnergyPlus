@@ -8,7 +8,8 @@
 ! Capacity Curve for Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 !
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC016_R-22_Low_qcurv,  !- Name
     2.350e+004,              !- Coefficient1 Constant
     816.7,                   !- Coefficient2 x
@@ -27,7 +28,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC016,   !nominal kW = 3.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC016_R-22_Low_pwrcurv,!- Name
     4018.,                   !- Coefficient1 Constant
     95.00,                   !- Coefficient2 x
@@ -45,7 +47,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC016,!- Name
     06CC016_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC016_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -55,7 +58,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC018,   !nominal MBtu/h = 23212.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC018_R-22_Low_qcurv,  !- Name
     1.454e+004,              !- Coefficient1 Constant
     166.5,                   !- Coefficient2 x
@@ -74,7 +78,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC018,   !nominal kW = 3.8
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC018_R-22_Low_pwrcurv,!- Name
     -1771.,                  !- Coefficient1 Constant
     -295.1,                  !- Coefficient2 x
@@ -92,7 +97,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC018,   !nominal MBtu/h = 23212.0, !nominal kW = 3.8
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC018,!- Name
     06CC018_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC018_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -102,7 +108,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC124,   !nominal MBtu/h = 24922.8
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC124_R-22_Low_qcurv,  !- Name
     2.812e+004,              !- Coefficient1 Constant
     988.2,                   !- Coefficient2 x
@@ -121,7 +128,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC124,   !nominal kW = 4.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC124_R-22_Low_pwrcurv,!- Name
     4839.,                   !- Coefficient1 Constant
     115.9,                   !- Coefficient2 x
@@ -139,7 +147,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC124,   !nominal MBtu/h = 24922.8, !nominal kW = 4.0
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC124,!- Name
     06CC124_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC124_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -149,7 +158,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC228,   !nominal MBtu/h = 29783.6
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC228_R-22_Low_qcurv,  !- Name
     3.342e+004,              !- Coefficient1 Constant
     1164.,                   !- Coefficient2 x
@@ -168,7 +178,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC228,   !nominal kW = 4.6
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC228_R-22_Low_pwrcurv,!- Name
     5521.,                   !- Coefficient1 Constant
     116.0,                   !- Coefficient2 x
@@ -186,7 +197,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC228,   !nominal MBtu/h = 29783.6, !nominal kW = 4.6
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC228,!- Name
     06CC228_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC228_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -196,7 +208,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC337,   !nominal MBtu/h = 40337.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC337_R-22_Low_qcurv,  !- Name
     4.408e+004,              !- Coefficient1 Constant
     1536.,                   !- Coefficient2 x
@@ -215,7 +228,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC337,   !nominal kW = 6.6
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC337_R-22_Low_pwrcurv,!- Name
     830.8,                   !- Coefficient1 Constant
     -160.2,                  !- Coefficient2 x
@@ -233,7 +247,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC337,   !nominal MBtu/h = 40337.0, !nominal kW = 6.6
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC337,!- Name
     06CC337_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC337_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -243,7 +258,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC550,   !nominal MBtu/h = 58905.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC550_R-22_Low_qcurv,  !- Name
     9.272e+004,              !- Coefficient1 Constant
     3496.,                   !- Coefficient2 x
@@ -262,7 +278,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC550,   !nominal kW = 9.4
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC550_R-22_Low_pwrcurv,!- Name
     2.563e+004,              !- Coefficient1 Constant
     797.3,                   !- Coefficient2 x
@@ -280,7 +297,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC550,   !nominal MBtu/h = 58905.1, !nominal kW = 9.4
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC550,!- Name
     06CC550_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC550_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -290,7 +308,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC665,   !nominal MBtu/h = 71847.7
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC665_R-22_Low_qcurv,  !- Name
     7.353e+004,              !- Coefficient1 Constant
     2513.,                   !- Coefficient2 x
@@ -309,7 +328,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC665,   !nominal kW = 11.7
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC665_R-22_Low_pwrcurv,!- Name
     5546.,                   !- Coefficient1 Constant
     -61.38,                  !- Coefficient2 x
@@ -327,7 +347,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC665,   !nominal MBtu/h = 71847.7, !nominal kW = 11.7
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC665,!- Name
     06CC665_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC665_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -337,7 +358,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC675,   !nominal MBtu/h = 81443.2
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC675_R-22_Low_qcurv,  !- Name
     9.186e+004,              !- Coefficient1 Constant
     3214.,                   !- Coefficient2 x
@@ -356,7 +378,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC675,   !nominal kW = 13.4
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC675_R-22_Low_pwrcurv,!- Name
     2.545e+004,              !- Coefficient1 Constant
     957.4,                   !- Coefficient2 x
@@ -374,7 +397,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC675,   !nominal MBtu/h = 81443.2, !nominal kW = 13.4
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC675,!- Name
     06CC675_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC675_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -384,7 +408,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-22_Low_06CC899,   !nominal MBtu/h = 104505.5
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC899_R-22_Low_qcurv,  !- Name
     1.176e+005,              !- Coefficient1 Constant
     4106.,                   !- Coefficient2 x
@@ -403,7 +428,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-22_Low_06CC899,   !nominal kW = 18.7
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC899_R-22_Low_pwrcurv,!- Name
     3.300e+004,              !- Coefficient1 Constant
     1169.,                   !- Coefficient2 x
@@ -421,7 +447,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-22_Low_06CC899,   !nominal MBtu/h = 104505.5, !nominal kW = 18.7
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-22_Low_06CC899,!- Name
     06CC899_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
     06CC899_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
@@ -431,7 +458,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC016,   !nominal MBtu/h = 22772.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC016_R-507_Low_qcurv, !- Name
     4.567e+004,              !- Coefficient1 Constant
     1992.,                   !- Coefficient2 x
@@ -450,7 +478,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC016,   !nominal kW = 3.8
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC016_R-507_Low_pwrcurv,  !- Name
     506.5,                   !- Coefficient1 Constant
     -343.1,                  !- Coefficient2 x
@@ -468,7 +497,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC016,   !nominal MBtu/h = 22772.0, !nominal kW = 3.8
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC016,  !- Name
     06CC016_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC016_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -478,7 +508,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC018,   !nominal MBtu/h = 25602.6
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC018_R-507_Low_qcurv, !- Name
     3.216e+004,              !- Coefficient1 Constant
     1091.,                   !- Coefficient2 x
@@ -497,7 +528,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC018,   !nominal kW = 4.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC018_R-507_Low_pwrcurv,  !- Name
     3127.,                   !- Coefficient1 Constant
     -31.68,                  !- Coefficient2 x
@@ -515,7 +547,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC018,   !nominal MBtu/h = 25602.6, !nominal kW = 4.1
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC018,  !- Name
     06CC018_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC018_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -525,7 +558,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC124,   !nominal MBtu/h = 32760.8
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC124_R-507_Low_qcurv, !- Name
     3.266e+004,              !- Coefficient1 Constant
     962.6,                   !- Coefficient2 x
@@ -544,7 +578,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC124,   !nominal kW = 5.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC124_R-507_Low_pwrcurv,  !- Name
     7137.,                   !- Coefficient1 Constant
     293.8,                   !- Coefficient2 x
@@ -562,7 +597,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC124,   !nominal MBtu/h = 32760.8, !nominal kW = 5.1
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC124,  !- Name
     06CC124_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC124_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -572,7 +608,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC228,   !nominal MBtu/h = 37842.9
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC228_R-507_Low_qcurv, !- Name
     3.845e+004,              !- Coefficient1 Constant
     1143.,                   !- Coefficient2 x
@@ -591,7 +628,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC228,   !nominal kW = 5.6
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC228_R-507_Low_pwrcurv,  !- Name
     2670.,                   !- Coefficient1 Constant
     141.3,                   !- Coefficient2 x
@@ -609,7 +647,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC228,   !nominal MBtu/h = 37842.9, !nominal kW = 5.6
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC228,  !- Name
     06CC228_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC228_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -619,7 +658,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC337,   !nominal MBtu/h = 52362.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC337_R-507_Low_qcurv, !- Name
     4.002e+004,              !- Coefficient1 Constant
     698.1,                   !- Coefficient2 x
@@ -638,7 +678,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC337,   !nominal kW = 7.9
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC337_R-507_Low_pwrcurv,  !- Name
     1.318e+004,              !- Coefficient1 Constant
     264.7,                   !- Coefficient2 x
@@ -656,7 +697,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC337,   !nominal MBtu/h = 52362.1, !nominal kW = 7.9
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC337,  !- Name
     06CC337_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC337_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -666,7 +708,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC550,   !nominal MBtu/h = 67622.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC550_R-507_Low_qcurv, !- Name
     1.008e+005,              !- Coefficient1 Constant
     3601.,                   !- Coefficient2 x
@@ -685,7 +728,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC550,   !nominal kW = 10.8
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC550_R-507_Low_pwrcurv,  !- Name
     3038.,                   !- Coefficient1 Constant
     -543.2,                  !- Coefficient2 x
@@ -703,7 +747,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC550,   !nominal MBtu/h = 67622.1, !nominal kW = 10.8
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC550,  !- Name
     06CC550_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC550_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -713,7 +758,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC665,   !nominal MBtu/h = 92217.1
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC665_R-507_Low_qcurv, !- Name
     9.422e+004,              !- Coefficient1 Constant
     2820.,                   !- Coefficient2 x
@@ -732,7 +778,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC665,   !nominal kW = 14.5
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC665_R-507_Low_pwrcurv,  !- Name
     1.054e+004,              !- Coefficient1 Constant
     78.36,                   !- Coefficient2 x
@@ -750,7 +797,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC665,   !nominal MBtu/h = 92217.1, !nominal kW = 14.5
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC665,  !- Name
     06CC665_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC665_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -760,7 +808,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC675,   !nominal MBtu/h = 102876.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC675_R-507_Low_qcurv, !- Name
     9.973e+004,              !- Coefficient1 Constant
     2930.,                   !- Coefficient2 x
@@ -779,7 +828,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC675,   !nominal kW = 16.4
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC675_R-507_Low_pwrcurv,  !- Name
     8449.,                   !- Coefficient1 Constant
     -46.98,                  !- Coefficient2 x
@@ -797,7 +847,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC675,   !nominal MBtu/h = 102876.0, !nominal kW = 16.4
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC675,  !- Name
     06CC675_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC675_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name
@@ -807,7 +858,8 @@ Refrigeration:Compressor,
 
 ! Capacity Curve for Carlyle_R-507_Low_06CC899,   !nominal MBtu/h = 137020.2
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC899_R-507_Low_qcurv, !- Name
     1.322e+005,              !- Coefficient1 Constant
     3751.,                   !- Coefficient2 x
@@ -826,7 +878,8 @@ Curve:Bicubic,
 
 ! Power Curve for Carlyle_R-507_Low_06CC899,   !nominal kW = 23.0
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-Curve:Bicubic,
+
+  Curve:Bicubic,
     06CC899_R-507_Low_pwrcurv,  !- Name
     2.768e+004,              !- Coefficient1 Constant
     877.6,                   !- Coefficient2 x
@@ -844,7 +897,8 @@ Curve:Bicubic,
     48.9;                    !- Maximum Value of y
 
 !Detailed Compressor: Carlyle_R-507_Low_06CC899,   !nominal MBtu/h = 137020.2, !nominal kW = 23.0
-Refrigeration:Compressor,
+
+  Refrigeration:Compressor,
     Carlyle_R-507_Low_06CC899,  !- Name
     06CC899_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06CC899_R-507_Low_qcurv, !- Refrigeration Compressor Capacity Curve Name

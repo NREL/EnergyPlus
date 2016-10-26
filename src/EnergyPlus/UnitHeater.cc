@@ -1057,6 +1057,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								SizingString = "";
 								PrintFlag = false;
@@ -1154,6 +1155,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							}

@@ -215,9 +215,9 @@
     Pump,                    !- Name
     Supply Inlet Node,       !- Inlet Node Name
     Supply Pump-Heating Node,!- Outlet Node Name
-    0.01,                    !- Rated Flow Rate {m3/s}
-    55400.0,                 !- Rated Pump Head {Pa}
-    800.0,                   !- Rated Power Consumption {W}
+    0.01,                    !- Design Flow Rate {m3/s}
+    55400.0,                 !- Design Pump Head {Pa}
+    800.0,                   !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent,            !- Pump Control Type

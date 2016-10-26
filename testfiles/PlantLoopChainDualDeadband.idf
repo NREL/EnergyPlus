@@ -202,16 +202,16 @@
     USE Heat Pump,           !- Name
     USE Heat Supply Inlet Node,  !- Inlet Node Name
     USE Heat Supply Pump-Heating Node,  !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    1,                       !- Rated Pump Head {Pa}
-    0.01,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    1,                       !- Design Pump Head {Pa}
+    0.01,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
@@ -400,16 +400,16 @@
     USE Cool Pump,           !- Name
     USE Cool Supply Inlet Node,  !- Inlet Node Name
     USE Cool Supply Pump-Heating Node,  !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    1,                       !- Rated Pump Head {Pa}
-    0.01,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    1,                       !- Design Pump Head {Pa}
+    0.01,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
@@ -605,16 +605,16 @@
     TRANSFER Pump,           !- Name
     TRANSFER Supply Inlet Node,  !- Inlet Node Name
     TRANSFER Supply Pump-Heating Node,  !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    1,                       !- Rated Pump Head {Pa}
-    0.01,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    1,                       !- Design Pump Head {Pa}
+    0.01,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
@@ -824,16 +824,16 @@
     SOURCE Pump,             !- Name
     SOURCE Supply Inlet Node,!- Inlet Node Name
     SOURCE Supply Pump-district Node,  !- Outlet Node Name
-    0.005,                   !- Rated Flow Rate {m3/s}
-    1,                       !- Rated Pump Head {Pa}
-    0.01,                    !- Rated Power Consumption {W}
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    1,                       !- Design Pump Head {Pa}
+    0.01,                    !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,

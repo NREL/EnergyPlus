@@ -131,6 +131,7 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
   PATTERN _* EXCLUDE
   PATTERN *.ddy EXCLUDE
   PATTERN CMakeLists.txt EXCLUDE
+  PATTERN performance EXCLUDE
 )
 
 # TODO Remove version from file name or generate
@@ -233,7 +234,7 @@ endif()
 
 if( APPLE )
   set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
-  install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch Lite.app" DESTINATION "./")
+  install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EP-Launch-Lite/EP-Launch-Lite.app" DESTINATION "PreProcess")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Mac/IDFVersionUpdater.app" DESTINATION "PreProcess/IDFVersionUpdater")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Mac/Uninstall EnergyPlus.app" DESTINATION "./")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EP-Compare/Run-Mac/EP-Compare.app" DESTINATION "PostProcess/EP-Compare")
