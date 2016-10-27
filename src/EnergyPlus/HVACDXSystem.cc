@@ -404,7 +404,6 @@ namespace HVACDXSystem {
 		static bool ErrorsFound( false ); // If errors detected in input
 		static bool ErrFound( false ); // used for mining functions
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int DXCoolSysNum;
 		bool FanErrorsFound; // flag returned on fan operating mode check
 		bool DXErrorsFound; // flag returned on DX coil name check

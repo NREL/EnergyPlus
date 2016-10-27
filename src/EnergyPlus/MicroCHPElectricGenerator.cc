@@ -289,8 +289,6 @@ namespace MicroCHPElectricGenerator {
 		Array1D_string AlphArray( 25 ); // character string data
 		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		//  INTEGER       :: thisMicroCHP  !temporary index
 		//  INTEGER       :: otherMicroCHP !loop counter and temporary indexer
 		//  INTEGER       :: I   ! loop counter

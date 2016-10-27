@@ -788,8 +788,6 @@ namespace OutputReportTabular {
 		Array1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		MonthlyInputCount = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		if ( MonthlyInputCount > 0 ) {

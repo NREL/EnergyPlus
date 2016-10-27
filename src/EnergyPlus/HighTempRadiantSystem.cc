@@ -353,8 +353,6 @@ namespace HighTempRadiantSystem {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int SurfNum; // Surface number DO loop counter
 		Real64 TotalFracToSurfs; // Sum of fractions of radiation to surfaces
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		// FLOW:
 		// Initializations and allocations

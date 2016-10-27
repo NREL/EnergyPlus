@@ -569,8 +569,6 @@ namespace NodeInputManager {
 		int NumNumbers; // Number of numerics in IDF item
 		int IOStatus; // IOStatus for IDF item (not checked)
 		int NCount; // Actual number of node lists
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool flagError; // true when error node list name should be output
 		Array1D_string cAlphas;
 		Array1D< Real64 > rNumbers;

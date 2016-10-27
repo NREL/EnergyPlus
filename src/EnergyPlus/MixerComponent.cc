@@ -286,8 +286,6 @@ namespace MixerComponent {
 		int NodeNum;
 		int IOStat;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumParams;
 		int InNodeNum1;
 		int InNodeNum2;

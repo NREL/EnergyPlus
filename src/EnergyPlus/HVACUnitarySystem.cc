@@ -3197,11 +3197,7 @@ namespace HVACUnitarySystem {
 			FanName = Alphas( iFanNameAlphaNum );
 
 			if ( ! lAlphaBlanks( iFanTypeAlphaNum ) ) {
-				IsNotOK = false;
-				GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, IsNotOK, CurrentModuleObject, Alphas( iNameAlphaNum ) );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-				}
+				GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, ErrorsFound, CurrentModuleObject, Alphas( iNameAlphaNum ) );
 				UnitarySystem( UnitarySysNum ).FanExists = true;
 			}
 

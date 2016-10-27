@@ -252,8 +252,6 @@ namespace HVACDuct {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		cCurrentModuleObject = "Duct";
 		NumDucts = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );

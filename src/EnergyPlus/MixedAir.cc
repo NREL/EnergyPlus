@@ -1034,8 +1034,6 @@ namespace MixedAir {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			thisControllerList.Name = AlphArray( 1 );
-			IsNotOK = false;
-			IsBlank = false;
 			thisControllerList.NumControllers = ( NumAlphas - 1 ) / 2;
 			thisControllerList.ControllerType.allocate( thisControllerList.NumControllers );
 			thisControllerList.ControllerName.allocate( thisControllerList.NumControllers );

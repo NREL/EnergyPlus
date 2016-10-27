@@ -479,7 +479,7 @@ namespace HeatBalanceAirManager {
 		int Loop1;
 		Array1D_bool RepVarSet;
 		bool IsNotOK;
-		bool IsBlank;
+
 		int ZoneNum;
 		std::string StringOut;
 		std::string NameThisObject;
@@ -870,9 +870,6 @@ namespace HeatBalanceAirManager {
 		InfiltCount = TotDesignFlowInfiltration;
 		for ( Loop = 1; Loop <= TotShermGrimsInfiltration; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
 			++InfiltCount;
 			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );

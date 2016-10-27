@@ -312,8 +312,6 @@ namespace HeatPumpWaterToWaterSimple {
 		Array1D< Real64 > NumArray( 15 ); // numeric data
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		NumCoolCoil = InputProcessor::GetNumObjectsFound( HPEqFitCoolingUC );

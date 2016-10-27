@@ -328,8 +328,6 @@ namespace PackagedThermalStorageCoil {
 		int NumAlphas; // Number of alphas in input
 		int NumNumbers; // Number of numeric items in input
 		int IOStatus; // Input status returned from GetObjectItem
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool errFlag;
 		Real64 TminRho;
