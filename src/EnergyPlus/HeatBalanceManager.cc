@@ -1362,8 +1362,6 @@ namespace HeatBalanceManager {
 		int GasType; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
 		int Loop;
 		int ICoeff; // Gas property coefficient index
-		bool ErrorInName;
-		bool IsBlank;
 		std::string TypeOfGas; // Type of window gas fill (Air, Argon, Krypton, &
 		// Xenon, or Custom
 		Real64 MinSlatAngGeom; // Minimum and maximum slat angle allowed by slat geometry (deg)
@@ -3127,7 +3125,6 @@ namespace HeatBalanceManager {
 			for ( Loop = 1; Loop <= TotTCGlazings; ++Loop ) {
 				//Get each TCGlazings from the input processor
 				InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsBlank = false;
 
 				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
@@ -3282,8 +3279,6 @@ namespace HeatBalanceManager {
 		int SpecDataNumProp; // Number of spectral data properties being passed
 		Array1D< Real64 > SpecDataProps; // Temporary array to transfer spectal data properties
 		int Loop;
-		bool ErrorInName;
-		bool IsBlank;
 		int LamNum; // Wavelength number
 		int TotLam; // Total wavelengths
 		Real64 Lam; // Wavelength (microns)
@@ -3303,7 +3298,6 @@ namespace HeatBalanceManager {
 			// [wavelength (microns), transmittance, front reflectance, back reflectance] for
 			// wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, SpecDataNames, SpecDataNumAlpha, SpecDataProps, SpecDataNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsBlank = false;
 
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
@@ -3485,8 +3479,6 @@ namespace HeatBalanceManager {
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string ConstructAlphas( {0,MaxLayersInConstruct} ); // Construction Alpha names defined
 		Array1D< Real64 > DummyProps( 4 ); // Temporary array to transfer construction properties
-		bool ErrorInName;
-		bool IsBlank;
 		int Loop;
 		int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
 
@@ -3769,8 +3761,6 @@ namespace HeatBalanceManager {
 
 			//Get the object names for each construction from the input processor
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(ConstructAlphas( 0 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			++ConstrNum;
@@ -3925,8 +3915,6 @@ namespace HeatBalanceManager {
 		int ZoneNum;
 		std::string ZoneName;
 		int GroupNum;
-		bool ErrorInName;
-		bool IsBlank;
 
 		cCurrentModuleObject = "Zone";
 		NumOfZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
@@ -3952,7 +3940,6 @@ namespace HeatBalanceManager {
 				TMP = index( cAlphaArgs( 1 ), char( 2 ) );
 			}
 
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			++ZoneLoop;
@@ -4998,8 +4985,6 @@ namespace HeatBalanceManager {
 		int FrameDividerNumProp; // Number of frame/divider properties being passed
 		Array1D< Real64 > FrameDividerProps( 23 ); // Temporary array to transfer frame/divider properties
 		int Loop;
-		bool ErrorInName;
-		bool IsBlank;
 
 		CurrentModuleObject = "WindowProperty:FrameAndDivider";
 		TotFrameDivider = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
@@ -5012,8 +4997,6 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve frame/divider data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, FrameDividerNames, FrameDividerNumAlpha, FrameDividerProps, FrameDividerNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(FrameDividerNames( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			//Load the frame/divider derived type from the input data.
@@ -6046,8 +6029,6 @@ Label1000: ;
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string ConstructAlphas( 1 ); // Construction Alpha names defined
 		Array1D< Real64 > DummyProps( 4 ); // Temporary array to transfer construction properties
-		bool ErrorInName;
-		bool IsBlank;
 		int Loop;
 
 		int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
@@ -6274,8 +6255,6 @@ Label1000: ;
 		int NumAlpha;
 		int NumNumeric;
 		int Loop;
-		bool ErrorInName;
-		bool IsBlank;
 		int IOStat;
 		int SurfNum;
 		int ConstrNum;
@@ -6305,8 +6284,6 @@ Label1000: ;
 
 			for ( Loop = 1; Loop <= TotSurfIncSolSSG; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsBlank = false;
 				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 				SurfIncSolSSG( Loop ).Name = cAlphaArgs( 1 );
@@ -6356,7 +6333,6 @@ Label1000: ;
 
 			for ( Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsBlank = false;
 				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 				FenLayAbsSSG( Loop ).Name = cAlphaArgs( 1 );
@@ -6840,7 +6816,7 @@ Label1000: ;
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
+
 
 		//Reading WindowGap:SupportPillar
 		cCurrentModuleObject = "WindowGap:SupportPillar";
@@ -6848,7 +6824,6 @@ Label1000: ;
 		SupportPillar.allocate( W7SupportPillars );
 		for ( Loop = 1; Loop <= W7SupportPillars; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				continue;
@@ -6877,8 +6852,6 @@ Label1000: ;
 		DeflectionState.allocate( W7DeflectionStates );
 		for ( Loop = 1; Loop <= W7DeflectionStates; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				continue;
@@ -6947,7 +6920,6 @@ Label1000: ;
 
 		for ( Loop = 1; Loop <= TotComplexShades; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
 				continue;
@@ -7171,8 +7143,6 @@ Label1000: ;
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int TotalArgs; // Number of fields for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int iMatGlass; // number of glass layers
 		int NumRows; // temporary size of matrix
 		int NumCols; // temporary size of matrix
@@ -7203,7 +7173,6 @@ Label1000: ;
 
 		for ( Loop = 1; Loop <= TotThermalModels; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 			WindowThermalModel( Loop ).Name = cAlphaArgs( 1 );
