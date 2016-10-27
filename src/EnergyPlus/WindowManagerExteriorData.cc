@@ -70,6 +70,7 @@
 #include "BSDFLayer.hpp"
 #include "Series.hpp"
 #include "EquivalentBSDFLayer.hpp"
+#include "MultiBSDFLayer.hpp"
 #include "FenestrationCommon.hpp"
 #include "MeasuredSampleData.hpp"
 #include "BSDFDirections.hpp"
@@ -84,10 +85,10 @@ namespace EnergyPlus {
   using namespace DataGlobals;
   using namespace WindowComplexManager;
 
-  using namespace LayerOptics;
+  using namespace SingleLayerOptics;
   using namespace FenestrationCommon;
   using namespace SpectralAveraging;
-  using namespace MultiPane;
+  using namespace MultiLayerOptics;
 
   namespace WindowManager {
 
@@ -198,13 +199,13 @@ namespace EnergyPlus {
       double Tsol = t_MaterialProperties.Trans;
       double Rfsol = t_MaterialProperties.ReflectSolBeamFront;
       double Rbsol = t_MaterialProperties.ReflectSolBeamBack;
-      shared_ptr< CMaterialBand > aSolMat = 
+      shared_ptr< CMaterial > aSolMat = 
         make_shared< CMaterialSingleBand >( Tsol, Tsol, Rfsol, Rbsol, 0.3, 2.5 );
 
       double Tvis = t_MaterialProperties.TransVis;
       double Rfvis = t_MaterialProperties.ReflectVisBeamFront;
       double Rbvis = t_MaterialProperties.ReflectVisBeamBack;
-      shared_ptr< CMaterialBand > aVisMat =
+      shared_ptr< CMaterial > aVisMat =
         make_shared< CMaterialSingleBand >( Tvis, Tvis, Rfvis, Rbvis, 0.38, 0.78 );
 
       CMaterialDualBand aMat = CMaterialDualBand( aVisMat, aSolMat, 0.49 );
@@ -269,7 +270,7 @@ namespace EnergyPlus {
       iguLayers->push_back( t_Layer );
     }
 
-    shared_ptr< CEquivalentBSDFLayer > CWindowConstructionsBSDF::getEquivalentLayer(
+    shared_ptr< CMultiBSDFLayer > CWindowConstructionsBSDF::getEquivalentLayer(
       const WavelengthRange t_Range, const int t_ConstrNum ) {
       auto it = m_Equivalent.find( make_pair( t_Range, t_ConstrNum ) );
       if( it == m_Equivalent.end() ) {
@@ -278,12 +279,13 @@ namespace EnergyPlus {
         shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
         IGU_Layers iguLayers = *getLayers( t_Range, t_ConstrNum );
         size_t i = iguLayers.size();
-        shared_ptr< CEquivalentBSDFLayer > aEqLayer = 
-          make_shared< CEquivalentBSDFLayer >( commonWl, aSolarSpectrum, iguLayers[ 0 ] );
+        shared_ptr< CEquivalentBSDFLayer > aEqLayer = make_shared< CEquivalentBSDFLayer >( commonWl, iguLayers[ 0 ] );        
         for( auto i = 1; i < iguLayers.size(); ++i ) {
           aEqLayer->addLayer( iguLayers[ i ] );
         }
-        m_Equivalent[ make_pair( t_Range, t_ConstrNum ) ] = aEqLayer;
+        shared_ptr< CMultiBSDFLayer > aMultiLayer =
+          make_shared< CMultiBSDFLayer >( aEqLayer, aSolarSpectrum );
+        m_Equivalent[ make_pair( t_Range, t_ConstrNum ) ] = aMultiLayer;
       }
     
       return m_Equivalent.at( make_pair( t_Range, t_ConstrNum ) );

@@ -74,7 +74,7 @@
 #include "WindowManagerExteriorOptical.hh"
 #include "WindowManagerExteriorData.hh"
 #include "SpectralSample.hpp"
-#include "SpecularLayer.hpp"
+#include "SurfaceCoating.hpp"
 #include "MeasuredSampleData.hpp"
 #include "FenestrationCommon.hpp"
 #include "Series.hpp"
@@ -91,7 +91,7 @@
 #include "BSDFDirections.hpp"
 #include "BSDFLayerMaker.hpp"
 #include "BSDFLayer.hpp"
-#include "BSDFResults.hpp"
+#include "BSDFIntegrator.hpp"
 #include "OpticalLayer.hpp"
 #include "OpticalSurface.hpp"
 
@@ -100,7 +100,7 @@ namespace EnergyPlus {
   using namespace std;
   using namespace FenestrationCommon;
   using namespace SpectralAveraging;
-  using namespace LayerOptics;
+  using namespace SingleLayerOptics;
 
   using namespace DataEnvironment;
   using namespace DataSurfaces;
@@ -179,7 +179,7 @@ namespace EnergyPlus {
 
     }
 
-    shared_ptr< CMaterialBand > CWCEMaterialFactory::getMaterial() {
+    shared_ptr< CMaterial > CWCEMaterialFactory::getMaterial() {
       if( !m_Initialized ) {
         init();
         m_Initialized = true;
@@ -206,7 +206,7 @@ namespace EnergyPlus {
       
       shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aSampleData, aSolarSpectrum );
 
-      SpecularMaterialType aType = SpecularMaterialType::Monolithic;
+      MaterialType aType = MaterialType::Monolithic;
       CWavelengthRange aRange = CWavelengthRange( m_Range );
       double lowLambda = aRange.minLambda();
       double highLambda = aRange.maxLambda();
@@ -363,9 +363,9 @@ namespace EnergyPlus {
 
     void CWCEBSDFLayerFactory::init() {
       createMaterialFactory();
-      shared_ptr< CMaterialBand > aMaterial = m_MaterialFactory->getMaterial();;
+      shared_ptr< CMaterial > aMaterial = m_MaterialFactory->getMaterial();;
       assert( aMaterial != nullptr );
-      shared_ptr< CCellDescription > aCellDescription = getCellDescription( );
+      shared_ptr< ICellDescription > aCellDescription = getCellDescription( );
       assert( aCellDescription != nullptr );
       shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Small );
 
@@ -393,7 +393,7 @@ namespace EnergyPlus {
       m_MaterialFactory = make_shared< CWCESpecularMaterialsFactory >( m_Material, m_Range );
     }
 
-    shared_ptr< CCellDescription > CWCESpecularLayerFactory::getCellDescription() {
+    shared_ptr< ICellDescription > CWCESpecularLayerFactory::getCellDescription() {
       return make_shared< CSpecularCellDescription >();
     }
 
@@ -410,7 +410,7 @@ namespace EnergyPlus {
       m_MaterialFactory = make_shared< CWCEVenetianBlindMaterialsFactory >( m_Material, m_Range );
     }
 
-    shared_ptr< CCellDescription > CWCEVenetianBlindLayerFactory::getCellDescription() {
+    shared_ptr< ICellDescription > CWCEVenetianBlindLayerFactory::getCellDescription() {
       int blindDataPtr = m_Material->BlindDataPtr;
       auto& blind( Blind( blindDataPtr ) );
       assert( blindDataPtr > 0 );
@@ -437,7 +437,7 @@ namespace EnergyPlus {
       m_MaterialFactory = make_shared< CWCEScreenMaterialsFactory >( m_Material, m_Range );
     }
 
-    shared_ptr< CCellDescription > CWCEScreenLayerFactory::getCellDescription() {
+    shared_ptr< ICellDescription > CWCEScreenLayerFactory::getCellDescription() {
       double diameter = m_Material->Thickness; // Thickness in this case is diameter
       // ratio is not saved withing material but rather calculated from transmittance
       double ratio = 1.0 - std::sqrt( m_Material->Trans );
@@ -458,7 +458,7 @@ namespace EnergyPlus {
       m_MaterialFactory = make_shared< CWCEDiffuseShadeMaterialsFactory >( m_Material, m_Range );
     }
 
-    shared_ptr< CCellDescription > CWCEDiffuseShadeLayerFactory::getCellDescription() {
+    shared_ptr< ICellDescription > CWCEDiffuseShadeLayerFactory::getCellDescription() {
       return make_shared< CPerfectDiffuseCellDescription >();
     }
 

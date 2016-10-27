@@ -85,16 +85,16 @@ namespace SpectralAveraging {
 
 }
 
-namespace LayerOptics {
+namespace SingleLayerOptics {
 
   class CBSDFLayer;
   enum class BSDFHemisphere;
 
 }
 
-namespace MultiPane {
+namespace MultiLayerOptics {
 
-  class CEquivalentBSDFLayer;
+  class CMultiBSDFLayer;
 
 }
 
@@ -102,7 +102,7 @@ namespace EnergyPlus {
 
   namespace WindowManager {
 
-    typedef std::vector< std::shared_ptr< LayerOptics::CBSDFLayer > > IGU_Layers;
+    typedef std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > > IGU_Layers;
     // Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers 
     // in between. So we will just use map to store layers so that we get optimized search.
     typedef std::map< int, std::shared_ptr< IGU_Layers > > Layers_Map;
@@ -113,11 +113,11 @@ namespace EnergyPlus {
     // Converts world coordinates (E+) into local surface coordinates that suites better for 
     // BSDF operations. Return values are angles Theta and Phi that are used to define BSDF direction
     std::pair< double, double > getBSDFCoordinates( const int t_SurfNum, 
-      const EnergyPlus::DataVectorTypes::Vector& t_Ray, const LayerOptics::BSDFHemisphere t_Direction );
+      const EnergyPlus::DataVectorTypes::Vector& t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction );
 
     // Returns Theta and Phi coordinates of surface BSDF for current Sun position
     std::pair< double, double > getSunBSDFCoordinates( const int t_SurfNum,
-      const LayerOptics::BSDFHemisphere t_Direction );
+      const SingleLayerOptics::BSDFHemisphere t_Direction );
 
 	  ///////////////////////////////////////////////////////////////////////////////
 	  //   CWCESpecturmProperties
@@ -140,9 +140,9 @@ namespace EnergyPlus {
       static CWindowConstructionsBSDF& instance();
       
       void pushBSDFLayer( const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum,
-        const std::shared_ptr< LayerOptics::CBSDFLayer >& t_Layer );
+        const std::shared_ptr< SingleLayerOptics::CBSDFLayer >& t_Layer );
 
-      std::shared_ptr< MultiPane::CEquivalentBSDFLayer > getEquivalentLayer( 
+      std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > getEquivalentLayer( 
         const FenestrationCommon::WavelengthRange t_Range, const int t_ConstrNum );
 
     private:
@@ -154,7 +154,7 @@ namespace EnergyPlus {
 
       // Need separate layer properties for Solar and Visible range
       std::map< FenestrationCommon::WavelengthRange, std::shared_ptr< Layers_Map > > m_Layers;
-      std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiPane::CEquivalentBSDFLayer > > m_Equivalent;
+      std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > > m_Equivalent;
       
     };
 

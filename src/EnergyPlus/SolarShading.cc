@@ -107,6 +107,7 @@
 #include <WindowManager.hh>
 #include <WindowManagerExteriorData.hh>
 #include <EquivalentBSDFLayer.hpp>
+#include <MultiBSDFLayer.hpp>
 #include <FenestrationCommon.hpp>
 #include <WindowComplexManager.hh>
 #include <BSDFDirections.hpp>
@@ -166,7 +167,7 @@ namespace SolarShading {
 	using namespace DataTimings;
   using namespace WindowManager;
   using namespace FenestrationCommon;
-  using namespace LayerOptics;
+  using namespace SingleLayerOptics;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -5676,7 +5677,7 @@ namespace SolarShading {
 						TBmBmEQL = max( 0.0, ( TBmBmEQL - TBmDiffEQL ) );
           } else if( inExtWindowModel->isExternalLibraryModel() ) {
             int nLayers = Construct( ConstrNum ).TotSolidLayers;
-            std::shared_ptr< MultiPane::CEquivalentBSDFLayer > aEqLayer =
+            std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
               CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
             std::pair< double, double > Angles = getSunBSDFCoordinates( SurfNum, BSDFHemisphere::Incoming );
@@ -5890,14 +5891,14 @@ namespace SolarShading {
 					DSZone( ZoneNum ) += DSZoneWin;
 					DGZone( ZoneNum ) += DGZoneWin;
         } else if( inExtWindowModel->isExternalLibraryModel() ) {
-          std::shared_ptr< MultiPane::CEquivalentBSDFLayer > aEqLayer =
+          std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
             CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
           CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
           double minLambda = aRange.minLambda();
           double maxLambda = aRange.maxLambda();
 
-          DiffTrans = aEqLayer->TauDiffDiff( minLambda, maxLambda, Side::Front );
+          DiffTrans = aEqLayer->DiffDiff( minLambda, maxLambda, Side::Front, PropertySimple::T );
           DSZoneWin = SkySolarInc * DiffTrans * Surface( SurfNum ).Area / ( DifSolarRad + 1.e-8 );
           DGZoneWin = GndSolarInc * DiffTrans * Surface( SurfNum ).Area / ( GndSolarRad + 1.e-8 );
 
@@ -5937,7 +5938,7 @@ namespace SolarShading {
 						TBmBm = TBmBmEQL;
 						TBmDif = TBmDiffEQL;
           } else if ( inExtWindowModel->isExternalLibraryModel() ) {
-            std::shared_ptr< MultiPane::CEquivalentBSDFLayer > aEqLayer =
+            std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
               CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
             std::pair< double, double > Angles = getSunBSDFCoordinates( SurfNum, BSDFHemisphere::Incoming );
@@ -5945,9 +5946,11 @@ namespace SolarShading {
             CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
             double minLambda = aRange.minLambda();
             double maxLambda = aRange.maxLambda();
-
-            TBmBm = aEqLayer->TauDirDir( minLambda, maxLambda, Side::Front, Angles.first, Angles.second );
-            TBmDif = aEqLayer->TauDirHem( minLambda, maxLambda, Side::Front, Angles.first, Angles.second ) - TBmBm;
+            
+            TBmBm = aEqLayer->DirDir( minLambda, maxLambda, Side::Front, PropertySimple::T, 
+              Angles.first, Angles.second );
+            TBmDif = aEqLayer->DirHem( minLambda, maxLambda, Side::Front, PropertySimple::T, 
+              Angles.first, Angles.second ) - TBmBm;
           }
 				}
 
@@ -5965,13 +5968,14 @@ namespace SolarShading {
             //Note: this is not quite the same as the effective transmittance for total of sky and ground radiation
             TDifBare = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDiffTrans;
           } else if( inExtWindowModel->isExternalLibraryModel() ) {
-            std::shared_ptr< MultiPane::CEquivalentBSDFLayer > aEqLayer =
+            std::shared_ptr< MultiLayerOptics::CMultiBSDFLayer > aEqLayer =
               CWindowConstructionsBSDF::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
             CWavelengthRange aRange = CWavelengthRange( WavelengthRange::Solar );
             double minLambda = aRange.minLambda();
             double maxLambda = aRange.maxLambda();
-            TDifBare = aEqLayer->TauDiffDiff( minLambda, maxLambda, Side::Front );
+            // TDifBare = aEqLayer->TauDiffDiff( minLambda, maxLambda, Side::Front );
+            TDifBare = aEqLayer->DiffDiff( minLambda, maxLambda, Side::Front, PropertySimple::T );
 					} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowEQLModel ) {
 						//get ASHWAT fenestration model diffuse-diffuse properties includes shade if present
 						TDifBare = Construct( ConstrNum ).TransDiff;
