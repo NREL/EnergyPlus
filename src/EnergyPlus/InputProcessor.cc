@@ -1677,6 +1677,28 @@ namespace EnergyPlus {
     }
 
 	void
+	InputProcessor::VerifyUniqueInterObjectName(
+			std::unordered_map< std::string, std::string > & names,
+			std::string & object_name,
+			std::string const & object_type,
+			bool & ErrorsFound
+	) {
+		if ( object_name.empty() ) {
+			ShowSevereError("E+ object type " + object_name + " has a blank field");
+			ErrorsFound = true;
+			object_name = "xxxxx";
+			return;
+		}
+		auto const & names_iter = names.find( object_name );
+		if ( names_iter == names.end() ) {
+			names.emplace( object_name, object_type );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+		}
+	}
+
+	void
 	EnergyPlus::InputProcessor::VerifyName(
 		std::string const & NameToVerify,
 		Array1D_string const & NamesList,

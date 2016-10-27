@@ -198,6 +198,7 @@ namespace HeatRecovery {
 
 	// Object Data
 	Array1D< HeatExchCond > ExchCond;
+	std::unordered_map< std::string, std::string > HeatExchangerUniqueNames;
 	Array1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
 	Array1D< HeatExchCondNumericFieldData > HeatExchCondNumericFields;
 	Array1D< HeatExchCondNumericFieldData > BalDesDehumPerfNumericFields;
@@ -220,6 +221,7 @@ namespace HeatRecovery {
 		MyOneTimeAllocate = true;
 		HeatExchCondNumericFields.deallocate();
 		BalDesDehumPerfNumericFields.deallocate();
+		HeatExchangerUniqueNames.clear();
 	}
 
 	void
@@ -407,8 +409,6 @@ namespace HeatRecovery {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static std::string HeatExchPerfType; // Desiccant balanced heat exchanger performance data type
 		static std::string const RoutineName( "GetHeatRecoveryInput: " ); // include trailing blank space
 
@@ -420,6 +420,7 @@ namespace HeatRecovery {
 
 		// allocate the data array
 		ExchCond.allocate( NumHeatExchangers );
+		HeatExchangerUniqueNames.reserve( NumHeatExchangers );
 		CheckEquipName.dimension( NumHeatExchangers, true );
 		HeatExchCondNumericFields.allocate( NumHeatExchangers );
 
@@ -500,14 +501,8 @@ namespace HeatRecovery {
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = "";
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = cNumericFieldNames;
+			InputProcessor::VerifyUniqueInterObjectName( HeatExchangerUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExchCond, ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			ExchCond( ExchNum ).Name = cAlphaArgs( 1 );
 			ExchCond( ExchNum ).ExchTypeNum = HX_AIRTOAIR_GENERIC;
 			if ( lAlphaFieldBlanks( 2 ) ) {
@@ -616,14 +611,8 @@ namespace HeatRecovery {
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = "";
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = cNumericFieldNames;
+			InputProcessor::VerifyUniqueInterObjectName( HeatExchangerUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ExchCond, ExchNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			ExchCond( ExchNum ).Name = cAlphaArgs( 1 );
 			ExchCond( ExchNum ).ExchTypeNum = HX_DESICCANT_BALANCED;
 			if ( lAlphaFieldBlanks( 2 ) ) {
