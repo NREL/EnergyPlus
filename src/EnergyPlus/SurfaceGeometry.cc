@@ -1852,8 +1852,8 @@ namespace SurfaceGeometry {
 			// Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
 			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond > 0 ) continue;
 			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == Ground ) continue;
-			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == KivaFoundation ) {
-				kivaManager.foundationInputs[Surface( SurfNum ).OSCPtr].surfaces.push_back( SurfNum );
+			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == KivaFoundation) {
+				if (!ErrorsFound) kivaManager.foundationInputs[Surface( SurfNum ).OSCPtr].surfaces.push_back( SurfNum );
 				continue;
 			}
 			if ( Surface( SurfNum ).HeatTransSurf && Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt ) continue;
@@ -6213,7 +6213,7 @@ namespace SurfaceGeometry {
 
 		// Setup Kiva intances
 		if ( any_eq( HeatTransferAlgosUsed, HeatTransferModel_Kiva ) ) {
-			kivaManager.setupKivaInstances();
+			if (!ErrorsFound) kivaManager.setupKivaInstances();
 		}
 
 		// test for missing materials for algorithms selected
@@ -7691,23 +7691,23 @@ namespace SurfaceGeometry {
 						ShowContinueError( "Must be of type \"Material\"" );
 						continue;
 					}
-					fnd.hasInteriorHorizontalInsulation = true;
-					fnd.interiorHorizontalInsulation.layer.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
-					fnd.interiorHorizontalInsulation.layer.thickness = m.Thickness;
+					fndInput.intHIns.x = 0.0;
+					fndInput.intHIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.intHIns.depth = m.Thickness;
 				} alpF++;
 
-				if ( fnd.hasInteriorHorizontalInsulation ) {
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
 					if ( lNumericFieldBlanks( numF ) ) {
-						fnd.interiorHorizontalInsulation.depth = 0.0;
+						fndInput.intHIns.z = 0.0;
 					} else {
-						fnd.interiorHorizontalInsulation.depth = rNumericArgs( numF );
+						fndInput.intHIns.z = rNumericArgs( numF );
 					} numF++;
 					if ( lNumericFieldBlanks( numF ) ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
 						continue;
 					} else {
-						fnd.interiorHorizontalInsulation.width = rNumericArgs( numF );
+						fndInput.intHIns.width = -rNumericArgs( numF );
 					} numF++;
 				} else {
 					if ( !lNumericFieldBlanks( numF ) ) {
@@ -7735,18 +7735,19 @@ namespace SurfaceGeometry {
 						ShowContinueError( "Must be of type \"Material\"" );
 						continue;
 					}
-					fnd.hasInteriorVerticalInsulation = true;
-					fnd.interiorVerticalInsulation.layer.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
-					fnd.interiorVerticalInsulation.layer.thickness = m.Thickness;
+					fndInput.intVIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.intVIns.width = -m.Thickness;
+					fndInput.intVIns.x = 0.0;
+					fndInput.intVIns.z = 0.0;
 				} alpF++;
 
-				if ( fnd.hasInteriorVerticalInsulation ) {
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
 					if ( lNumericFieldBlanks( numF ) ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
 						continue;
 					} else {
-						fnd.interiorVerticalInsulation.depth = rNumericArgs( numF );
+						fndInput.intVIns.depth = rNumericArgs( numF );
 					} numF++;
 				} else {
 					if ( !lNumericFieldBlanks( numF ) ) {
@@ -7770,23 +7771,23 @@ namespace SurfaceGeometry {
 						ShowContinueError( "Must be of type \"Material\"" );
 						continue;
 					}
-					fnd.hasExteriorHorizontalInsulation = true;
-					fnd.exteriorHorizontalInsulation.layer.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
-					fnd.exteriorHorizontalInsulation.layer.thickness = m.Thickness;
+					fndInput.extHIns.x = 0.0;
+					fndInput.extHIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.extHIns.depth = m.Thickness;
 				} alpF++;
 
-				if ( fnd.hasExteriorHorizontalInsulation ) {
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
 					if ( lNumericFieldBlanks( numF ) ) {
-						fnd.exteriorHorizontalInsulation.depth = 0.0;
+						fndInput.extHIns.z = 0.0;
 					} else {
-						fnd.exteriorHorizontalInsulation.depth = rNumericArgs( numF );
+						fndInput.extHIns.z = rNumericArgs( numF );
 					} numF++;
 					if ( lNumericFieldBlanks( numF ) ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
 						continue;
 					} else {
-						fnd.exteriorHorizontalInsulation.width = rNumericArgs( numF );
+						fndInput.extHIns.width = rNumericArgs( numF );
 					} numF++;
 				} else {
 					if ( !lNumericFieldBlanks( numF ) ) {
@@ -7814,18 +7815,19 @@ namespace SurfaceGeometry {
 						ShowContinueError( "Must be of type \"Material\"" );
 						continue;
 					}
-					fnd.hasExteriorVerticalInsulation = true;
-					fnd.exteriorVerticalInsulation.layer.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
-					fnd.exteriorVerticalInsulation.layer.thickness = m.Thickness;
+					fndInput.extVIns.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.extVIns.width = m.Thickness;
+					fndInput.extVIns.x = 0.0;
+					fndInput.extVIns.z = 0.0;
 				} alpF++;
 
-				if ( fnd.hasExteriorVerticalInsulation ) {
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
 					if ( lNumericFieldBlanks( numF ) ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
 						continue;
 					} else {
-						fnd.exteriorVerticalInsulation.depth = rNumericArgs( numF );
+						fndInput.extVIns.depth = rNumericArgs( numF );
 					} numF++;
 				} else {
 					if ( !lNumericFieldBlanks( numF ) ) {
@@ -7837,6 +7839,8 @@ namespace SurfaceGeometry {
 				// Foundation wall
 				if ( !lNumericFieldBlanks( numF ) ) {fnd.wall.heightAboveGrade = rNumericArgs( numF );} numF++;
 
+				if ( !lNumericFieldBlanks( numF ) ) {fnd.wall.depthBelowSlab = rNumericArgs( numF );} numF++;
+
 				if ( !lAlphaFieldBlanks( alpF ) ) {
 					fndInput.wallConstructionIndex = FindItemInList( cAlphaArgs( alpF ), Construct );
 					if ( fndInput.wallConstructionIndex == 0 ) {
@@ -7845,6 +7849,7 @@ namespace SurfaceGeometry {
 						continue;
 					}
 					auto& c = Construct( fndInput.wallConstructionIndex );
+					c.IsUsed = true;
 					if ( c.TypeIsWindow ) {
 						ErrorsFound = true;
 						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
@@ -7855,7 +7860,100 @@ namespace SurfaceGeometry {
 					fndInput.wallConstructionIndex = 0; // Use default wall construction
 				} alpF++;
 
-				if ( !lNumericFieldBlanks( numF ) ) {fnd.wall.footerDepth = rNumericArgs( numF );} numF++;
+				// Footing
+				if ( !lAlphaFieldBlanks( alpF ) ) {
+					int index = FindItemInList( cAlphaArgs( alpF ), Material );
+					if ( index == 0 ) {
+						ErrorsFound = true;
+						ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+						continue;
+					}
+					auto& m = Material( index );
+					if ( m.Group != RegularMaterial) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+						ShowContinueError( "Must be of type \"Material\"" );
+						continue;
+					}
+					fndInput.footing.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+					fndInput.footing.width = m.Thickness;
+					fndInput.footing.x = 0.0;
+					fndInput.footing.z = 0.0;
+				} alpF++;
+
+				if ( !lAlphaFieldBlanks( alpF - 1) ) {
+					if ( lNumericFieldBlanks( numF ) ) {
+						ErrorsFound = true;
+						ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+						continue;
+					} else {
+						fndInput.footing.depth = rNumericArgs( numF );
+					} numF++;
+				} else {
+					if ( !lNumericFieldBlanks( numF ) ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", no " + cAlphaFieldNames( alpF - 1 ) + " defined" );
+						ShowContinueError( cNumericFieldNames( numF ) + " will not be used." );
+					} numF++;
+				}
+
+				// General Blocks
+				int numRemainingFields = NumAlphas - (alpF - 1) + NumProps - (numF -1);
+				if (numRemainingFields > 0) {
+					int numBlocks = numRemainingFields/4;
+					if ( mod( numRemainingFields, 4 ) != 0 ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + fndInput.name + "\", number of Block fields not even multiple of 4. Will read in " + General::TrimSigDigits( numBlocks ) );
+					}
+					for (int blockNum = 0; blockNum < numBlocks; blockNum++) {
+						Kiva::InputBlock block;
+						if ( !lAlphaFieldBlanks( alpF ) ) {
+							int index = FindItemInList( cAlphaArgs( alpF ), Material );
+							if ( index == 0 ) {
+								ErrorsFound = true;
+								ShowSevereError( "Did not find matching material for " + cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + ", missing material = " + cAlphaArgs( alpF ) );
+								continue;
+							}
+							auto& m = Material( index );
+							if ( m.Group != RegularMaterial) {
+								ErrorsFound = true;
+								ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + cAlphaFieldNames( alpF ) + "=\"" + cAlphaArgs( alpF ) );
+								ShowContinueError( "Must be of type \"Material\"" );
+								continue;
+							}
+							block.material = Kiva::Material(m.Conductivity, m.Density, m.SpecHeat );
+							block.width = m.Thickness;
+						} else {
+							ErrorsFound = true;
+							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF ) + " is required and not given." );
+							continue;
+						} alpF++;
+
+						if ( lNumericFieldBlanks( numF ) ) {
+							ErrorsFound = true;
+							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+							continue;
+						} else {
+							block.depth = rNumericArgs( numF );
+						} numF++;
+
+						if ( lNumericFieldBlanks( numF ) ) {
+							ErrorsFound = true;
+							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+							continue;
+						} else {
+							block.x = rNumericArgs( numF );
+						} numF++;
+
+						if ( lNumericFieldBlanks( numF ) ) {
+							ErrorsFound = true;
+							ShowSevereError( cCurrentModuleObject + "=\"" + fndInput.name + "\", " + cAlphaFieldNames( alpF - 1 ) + " defined, but no " + cNumericFieldNames( numF ) + "provided");
+							continue;
+						} else {
+							block.z = rNumericArgs( numF );
+						} numF++;
+
+						fnd.inputBlocks.push_back(block);
+					}
+				}
 
 				kivaManager.foundationInputs.push_back(fndInput);
 			}

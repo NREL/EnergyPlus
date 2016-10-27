@@ -73,6 +73,11 @@ namespace HeatBalanceKivaManager {
 class FoundationKiva {
 public:
   Kiva::Foundation foundation;
+  Kiva::InputBlock intHIns;
+  Kiva::InputBlock intVIns;
+  Kiva::InputBlock extHIns;
+  Kiva::InputBlock extVIns;
+  Kiva::InputBlock footing;
   std::string name;
   std::vector< int > surfaces;
   int wallConstructionIndex;

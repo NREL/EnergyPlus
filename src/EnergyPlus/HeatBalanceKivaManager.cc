@@ -225,9 +225,11 @@ void KivaManager::setupKivaInstances() {
             if ( Surfaces(wl).Class == DataSurfaces::SurfaceClass_Floor ) {
               // TODO Kiva: only one foundation floor per zone
               ShowSevereError( "only one foundation floor per zone" );
+              ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
             } else {
               // TODO Kiva: only floor and wall surfaces allowed
               ShowSevereError( "only floor and wall surfaces allowed" );
+              ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
             }
           } else {
             wallSurfaces.push_back(wl);
@@ -256,15 +258,18 @@ void KivaManager::setupKivaInstances() {
           if (std::abs(surfHeight - wallHeight) > 0.00001) {
             // TODO Kiva: all walls must be the same height
             ShowSevereError( "all walls must be the same height" );
+            ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
           }
           if (Surfaces(wl).Construction != constructionNum) {
             // TODO Kiva: all walls must have the same construction
             ShowSevereError( "all walls must have the same construction" );
+            ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
           }
         }
         if (constructionNum != foundationInputs[surface.OSCPtr].wallConstructionIndex && foundationInputs[surface.OSCPtr].wallConstructionIndex != 0) {
           // TODO Kiva: foundation wall must have the same construction as walls (or be left blank)
           ShowSevereError( "foundation wall must have the same construction as walls (or be left blank)" );
+          ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
         }
         foundationInputs[surface.OSCPtr].wallConstructionIndex = constructionNum;
       }
@@ -307,18 +312,52 @@ void KivaManager::setupKivaInstances() {
       fnd.hasPerimeterSurface = false; // TODO Kiva: perimeter surface for zones without exposed perimeter
       fnd.perimeterSurfaceWidth = 0.0;
 
+      // Add blocks
+      auto intHIns = foundationInputs[surface.OSCPtr].intHIns;
+      auto intVIns = foundationInputs[surface.OSCPtr].intVIns;
+      auto extHIns = foundationInputs[surface.OSCPtr].extHIns;
+      auto extVIns = foundationInputs[surface.OSCPtr].extVIns;
+      auto footing = foundationInputs[surface.OSCPtr].footing;
+
+      if (intHIns.width > 0.0) {
+        intHIns.z += fnd.foundationDepth + fnd.slab.totalWidth();
+        fnd.inputBlocks.push_back(intHIns);
+      }
+      if (intVIns.width > 0.0) {
+        fnd.inputBlocks.push_back(intVIns);
+      }
+      if (extHIns.width > 0.0) {
+        extHIns.z += fnd.wall.heightAboveGrade;
+        extHIns.x = fnd.wall.totalWidth();
+        fnd.inputBlocks.push_back(extHIns);
+      }
+      if (extVIns.width > 0.0) {
+        extVIns.x = fnd.wall.totalWidth();
+        fnd.inputBlocks.push_back(extVIns);
+      }
+      if (footing.width > 0.0) {
+        footing.z = fnd.foundationDepth + fnd.slab.totalWidth() + fnd.wall.depthBelowSlab;
+        footing.x = fnd.wall.totalWidth()/2.0 - footing.width/2.0;
+        fnd.inputBlocks.push_back(footing);
+      }
+
       // polygon
+      Kiva::Polygon floorPolygon;
       if (DataSurfaces::CCW) {
         for (size_t i = 0; i < surface.Vertex.size(); ++i ) {
           auto& v = surface.Vertex[i];
-          fnd.polygon.outer().push_back(Kiva::Point(v.x,v.y));
+          floorPolygon.outer().push_back(Kiva::Point(v.x,v.y));
+          fnd.isExposedPerimeter.push_back(true);
         }
       } else {
         for (auto i = surface.Vertex.size() - 1; i <= 0; --i ) {
           auto& v = surface.Vertex[i];
-          fnd.polygon.outer().push_back(Kiva::Point(v.x,v.y));
+          floorPolygon.outer().push_back(Kiva::Point(v.x,v.y));
+          fnd.isExposedPerimeter.push_back(true);
         }
       }
+
+      fnd.polygon = floorPolygon;
 
       // add new foundation instance to list of all instances
       foundationInstances.push_back(fnd);
@@ -430,7 +469,7 @@ void KivaInstanceMap::plotDomain() {
   ss.yRange = {0.5,0.5};
   ss.zRange = {-range, ground.foundation.wall.heightAboveGrade};
 
-  Kiva::GroundPlot gp(ss,ground.domain,ground.foundation.blocks);
+  Kiva::GroundPlot gp(ss,ground.domain,ground.foundation);
 
   std::size_t nI =  gp.iMax - gp.iMin + 1;
   std::size_t nJ = gp.jMax - gp.jMin + 1;
@@ -543,7 +582,7 @@ void KivaManager::defineDefaultFoundation() {
   defFnd.wall.exteriorEmissivity = 0.9;
   defFnd.wall.exteriorAbsorptivity = 0.9;
 
-  defFnd.wall.footerDepth = 0.3;
+  defFnd.wall.depthBelowSlab = 0.0;
 
   defFnd.mesh.minCellDim = settings.minCellDim;
   defFnd.mesh.maxNearGrowthCoeff = settings.maxGrowthCoeff;

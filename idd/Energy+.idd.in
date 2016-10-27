@@ -16055,6 +16055,7 @@ Foundation:Kiva,
        \memo Refined definition of the foundation surface construction used to
        \memo infrom two-diemensional heat transfer calculated using the Kiva
        \memo ground heat transfer methodology.
+       \extensible:4
   A1,  \field Name
        \required-field
        \type alpha
@@ -16113,19 +16114,163 @@ Foundation:Kiva,
        \type real
        \minimum 0.0
        \default 0.2
-  A6,  \field Footer Wall Construction
-       \note defines the below-grade surface construction for slabs. Required
-       \note if foundation wall is not exposed to the zone.
-       \type object-list
-       \object-list ConstructionNames
-  N8;  \field Footer Depth
-       \note Distance from the slab bottom to the bottom of the foundation
-       \note footer
+  N8,  \field Wall Depth Below Slab
+       \note Distance from the slab bottom to the bottom of the foundation wall
        \units m
        \type real
        \minimum 0.0
+       \default 0.0
+  A6,  \field Footing Wall Construction Name
+       \note Defines the below-grade surface construction for slabs. Required
+       \note if foundation wall is not exposed to the zone.
+       \type object-list
+       \object-list ConstructionNames
+  A7,  \field Footing Material Name
+       \type object-list
+       \object-list MaterialName
+  N9,  \field Footing Depth
+       \note Top-to-bottom dimension of the footing (not to be confused with its
+       \note depth in the ground). The width of the footing is defined by the
+       \note material's thickness.
+       \units m
+       \type real
+       \minimum> 0.0
        \default 0.3
-
+  A8,  \field Block 1 Material Name
+       \begin-extensible
+       \type object-list
+       \object-list MaterialName
+  N10, \field Block 1 Depth
+       \note Top-to-bottom dimension of the block downward.
+       \units m
+       \type real
+       \minimum> 0.0
+  N11, \field Block 1 X Position
+       \note Position outward (+) or inward (-) relative to the foundation wall
+       \note interior
+       \units m
+       \type real
+  N12, \field Block 1 Z Position
+       \note Position downward (+) relative to the foundation wall top
+       \units m
+       \type real
+  A9,  \field Block 2 Material Name
+       \type object-list
+       \object-list MaterialName
+  N13, \field Block 2 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N14, \field Block 2 X Position
+       \units m
+       \type real
+  N15, \field Block 2 Z Position
+       \units m
+       \type real
+  A10, \field Block 3 Material Name
+       \type object-list
+       \object-list MaterialName
+  N16, \field Block 3 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N17, \field Block 3 X Position
+       \units m
+       \type real
+  N18, \field Block 3 Z Position
+       \units m
+       \type real
+  A11, \field Block 4 Material Name
+       \type object-list
+       \object-list MaterialName
+  N19, \field Block 4 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N20, \field Block 4 X Position
+       \units m
+       \type real
+  N21, \field Block 4 Z Position
+       \units m
+       \type real
+  A12, \field Block 5 Material Name
+       \type object-list
+       \object-list MaterialName
+  N22, \field Block 5 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N23, \field Block 5 X Position
+       \units m
+       \type real
+  N24, \field Block 5 Z Position
+       \units m
+       \type real
+  A13, \field Block 6 Material Name
+       \type object-list
+       \object-list MaterialName
+  N25, \field Block 6 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N26, \field Block 6 X Position
+       \units m
+       \type real
+  N27, \field Block 6 Z Position
+       \units m
+       \type real
+  A14, \field Block 7 Material Name
+       \type object-list
+       \object-list MaterialName
+  N16, \field Block 7 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N29, \field Block 7 X Position
+       \units m
+       \type real
+  N30, \field Block 7 Z Position
+       \units m
+       \type real
+  A15, \field Block 8 Material Name
+       \type object-list
+       \object-list MaterialName
+  N31, \field Block 8 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N32, \field Block 8 X Position
+       \units m
+       \type real
+  N33, \field Block 8 Z Position
+       \units m
+       \type real
+  A16, \field Block 9 Material Name
+       \type object-list
+       \object-list MaterialName
+  N34, \field Block 9 Depth
+       \units m
+       \type real
+       \minimum> 0.0
+  N35, \field Block 9 X Position
+       \units m
+       \type real
+  N36, \field Block 9 Z Position
+       \units m
+       \type real
+  A17, \field Block 10 Material Name
+       \type object-list
+       \object-list MaterialName
+  N37, \field Block 10 Depth
+       \units m
+       \type real
+  N38, \field Block 10 X Position
+       \units m
+       \type real
+       \minimum> 0.0
+  N39; \field Block 10 Z Position
+       \units m
+       \type real
 
 SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
        \unique-object
@@ -17371,6 +17516,76 @@ SurfaceProperty:SolarIncidentInside,
        \type object-list
        \object-list ScheduleNames
 
+SurfaceProperty:ExposedFoundationPerimeter,
+       \memo Defines the perimeter of a foundation floor that is exposed to the
+       \memo exterior environment through the floor. User may either define the
+       \memo total exposed perimeter or individually define which segments of
+       \memo the floor surface perimeter are exposed. This object is optional.
+       \memo by default it is assumed that the entire perimeter of each
+       \memo foundation is exposed.
+       \extensible:1
+  A1 , \field Surface Name
+       \required-field
+       \type object-list
+       \object-list FloorSurfaceNames
+  N1 , \field Total Exposed Perimeter
+       \type real
+       \units m
+       \minimum> 0.0
+  A2 , \field Surface Segment 1 Exposed
+       \note Surface Segment N is the perimeter between the Nth and (N+1)th
+       \note vertices
+       \begin-extensible
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A3 , \field Surface Segment 2 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A4 , \field Surface Segment 3 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A5 , \field Surface Segment 4 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A6 , \field Surface Segment 5 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A7 , \field Surface Segment 6 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A8 , \field Surface Segment 7 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A9 , \field Surface Segment 8 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A10, \field Surface Segment 9 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+  A11; \field Surface Segment 10 Exposed
+       \type choice
+       \default Yes
+       \key Yes
+       \key No
+
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
        \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
@@ -17469,7 +17684,7 @@ Foundation:Kiva:Settings,
        \default 1.5
        \units dimensionless
        \minimum 1.0
-  N11; \field Simulation Timestep
+  A2;  \field Simulation Timestep
        \type choice
        \key Hourly
        \key Timestep

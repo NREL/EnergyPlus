@@ -555,8 +555,8 @@ Foundation:Kiva,
   Basement Insulation,  !- Exterior Vertical Insulation Material Name
   2.9,                  !- Exterior Vertical Insulation Depth
   0.2,                  !- Wall Height Above Grade
-  ,                     !- Footer Wall Construction
-  0.3;                  !- Footer Depth
+  0.3,                  !- Wall Depth Below Slab
+  ;                     !- Footer Wall Construction
 
 Foundation:Kiva:Settings,
   1.8,            !- Soil Conductivity
