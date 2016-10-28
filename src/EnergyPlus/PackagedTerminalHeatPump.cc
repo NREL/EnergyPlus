@@ -212,6 +212,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	Array1D< PTUnitData > PTUnit;
+	std::unordered_map< std::string, std::string > PTUnitUniqueNames;
 	Array1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
@@ -219,6 +220,7 @@ namespace PackagedTerminalHeatPump {
 	clear_state()
 	{
 		MyOneTimeFlag = true;
+		PTUnitUniqueNames.clear();
 	}
 
 
@@ -697,6 +699,7 @@ namespace PackagedTerminalHeatPump {
 		// allocate the data structures
 		if ( NumPTUs > 0 ) {
 			PTUnit.allocate( NumPTUs );
+			PTUnitUniqueNames.reserve( static_cast< unsigned >( NumPTUs ) );
 			CheckEquipName.allocate( NumPTUs );
 			PTUnitUNumericFields.allocate( NumPTUs );
 		}
@@ -726,14 +729,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTHPUnit;
@@ -1403,14 +1399,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTACUnit;
@@ -2021,14 +2010,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTWSHPUnit;

@@ -215,6 +215,9 @@ namespace PoweredInductionUnits {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimPIU(
 		std::string const & CompName, // name of the PIU
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step

@@ -171,6 +171,7 @@ namespace PipeHeatTransfer {
 
 	// Object Data
 	Array1D< PipeHTData > PipeHT;
+	std::unordered_map< std::string, std::string > PipeHTUniqueNames;
 
 	//==============================================================================
 
@@ -192,6 +193,11 @@ namespace PipeHeatTransfer {
 		ShowFatalError( "PipeHTFactory: Error getting inputs for pipe named: " + objectName );
 		// Shut up the compiler
 		return nullptr;
+	}
+
+	void
+	PipeHTData::clear_state() {
+		PipeHTUniqueNames.clear();
 	}
 
 	void PipeHTData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
@@ -288,8 +294,6 @@ namespace PipeHeatTransfer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input,
-		static bool IsNotOK( false );
-		static bool IsBlank( false );
 
 		// fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
@@ -315,6 +319,7 @@ namespace PipeHeatTransfer {
 		if ( allocated( PipeHT ) ) PipeHT.deallocate();
 
 		PipeHT.allocate( nsvNumOfPipeHT );
+		PipeHTUniqueNames.reserve( static_cast< unsigned >( nsvNumOfPipeHT ) );
 		Item = 0;
 
 		cCurrentModuleObject = "Pipe:Indoor";
@@ -323,13 +328,7 @@ namespace PipeHeatTransfer {
 			// get the object name
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeInterior;
 
@@ -434,13 +433,7 @@ namespace PipeHeatTransfer {
 			// get the object name
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeExterior;
 
@@ -524,13 +517,7 @@ namespace PipeHeatTransfer {
 			// get the object name
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeUnderground;
 
