@@ -242,20 +242,23 @@ namespace ZoneTempPredictorCorrector {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
+	std::unordered_map<std::string, std::string> HumidityControlZoneUniqueNames;
 	Array1D< ZoneTempControlType > SetPointSingleHeating;
 	Array1D< ZoneTempControlType > SetPointSingleCooling;
 	Array1D< ZoneTempControlType > SetPointSingleHeatCool;
 	Array1D< ZoneTempControlType > SetPointDualHeatCool;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
+	std::unordered_map <std::string, std::string> SetPointSingleCoolingFangerUniqueNames;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+
 
 	// Functions
 	void
 	clear_state()
 	{
-
+		HumidityControlZoneUniqueNames.clear();
 		NumSingleTempHeatingControls = 0;
 		NumSingleTempCoolingControls = 0;
 		NumSingleTempHeatCoolControls = 0;
@@ -280,6 +283,7 @@ namespace ZoneTempPredictorCorrector {
 		SetPointDualHeatCool.deallocate();
 		SetPointSingleHeatingFanger.deallocate();
 		SetPointSingleCoolingFanger.deallocate();
+		SetPointSingleCoolingFangerUniqueNames.clear();
 		SetPointSingleHeatCoolFanger.deallocate();
 		SetPointDualHeatCoolFanger.deallocate();
 	}
@@ -886,27 +890,17 @@ namespace ZoneTempPredictorCorrector {
 		cCurrentModuleObject = cZControlTypes( iZC_HStat );
 		NumHumidityControlZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
-		if ( NumHumidityControlZones > 0 ) HumidityControlZone.allocate( NumHumidityControlZones );
+		if ( NumHumidityControlZones > 0 ) {
+			HumidityControlZone.allocate( NumHumidityControlZones );
+			HumidityControlZoneUniqueNames.reserve(static_cast< unsigned >(NumHumidityControlZones));
+		}
 
 		for ( HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, HumidControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
+			InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), HumidityControlZone, &ZoneHumidityControls::ControlName, HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			HumidityControlZone( HumidControlledZoneNum ).ControlName = cAlphaArgs( 1 );
-			// Ensure unique zone name
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 2 ), HumidityControlZone, &ZoneHumidityControls::ZoneName, HumidControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Zone Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 2 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( HumidityControlZoneUniqueNames, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), ErrorsFound);
 
 			HumidityControlZone( HumidControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 			HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum = InputProcessor::FindItem( cAlphaArgs( 2 ), Zone );
@@ -1208,17 +1202,15 @@ namespace ZoneTempPredictorCorrector {
 		cCurrentModuleObject = ValidComfortControlTypes( SglCoolSetPointFanger );
 		NumSingleFangerCoolingControls = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
-		if ( NumSingleFangerCoolingControls > 0 ) SetPointSingleCoolingFanger.allocate( NumSingleFangerCoolingControls );
+		if ( NumSingleFangerCoolingControls > 0 ) {
+			SetPointSingleCoolingFanger.allocate(NumSingleFangerCoolingControls);
+			SetPointSingleCoolingFangerUniqueNames.reserve(static_cast< unsigned >(NumSingleFangerCoolingControls));
+		}
 
 		for ( SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedName = cAlphaArgs( 2 );
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedIndex = GetScheduleIndex( cAlphaArgs( 2 ) );
@@ -1243,14 +1235,7 @@ namespace ZoneTempPredictorCorrector {
 
 		for ( SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= NumSingleFangerHeatCoolControls; ++SingleFangerHeatCoolControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SetPointSingleCoolingFanger, SingleFangerCoolingControlNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedName = cAlphaArgs( 2 );

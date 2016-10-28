@@ -341,7 +341,9 @@ namespace WeatherManager {
 	Array1D< DesignDayData > DesDayInput; // Design day Input Data
 	Array1D< EnvironmentData > Environment; // Environment data
 	Array1D< RunPeriodData > RunPeriodInput;
+	std::unordered_map <std::string, std::string> RunPeriodInputUniqueNames;
 	Array1D< RunPeriodData > RunPeriodDesignInput;
+	std::unordered_map <std::string, std::string> RunPeriodDesignInputUniqueNames;
 	Array1D< TypicalExtremeData > TypicalExtremePeriods;
 	DaylightSavingPeriodData EPWDST; // Daylight Saving Period Data from EPW file
 	DaylightSavingPeriodData IDFDST; // Daylight Saving Period Data from IDF file
@@ -497,7 +499,9 @@ namespace WeatherManager {
 		DesDayInput.deallocate(); // Design day Input Data
 		Environment.deallocate(); // Environment data
 		RunPeriodInput.deallocate();
+		RunPeriodInputUniqueNames.clear();
 		RunPeriodDesignInput.deallocate();
+		RunPeriodDesignInputUniqueNames.clear();
 		TypicalExtremePeriods.deallocate();
 
 		EPWDST.StDateType = 0 ;
@@ -5426,6 +5430,7 @@ Label9999: ;
 
 		//Call Input Get routine to retrieve annual run data
 		RunPeriodInput.allocate( TotRunPers );
+		RunPeriodInputUniqueNames.reserve(static_cast< unsigned >(TotRunPers));
 
 		cCurrentModuleObject = "RunPeriod";
 		Count = 0;
@@ -5438,14 +5443,7 @@ Label9999: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				IsNotOK = false;
-				IsBlank = false;
-
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			}
 
 			++Count;
@@ -5619,15 +5617,8 @@ Label9999: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Ptr, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			}
-
 			++Count;
 			Loop = RP + Ptr;
 			RunPeriodInput( Loop ).Title = cAlphaArgs( 1 );
@@ -5853,20 +5844,13 @@ Label9999: ;
 		TotRunDesPers = RPD1 + RPD2;
 
 		RunPeriodDesignInput.allocate( RPD1 + RPD2 );
+		RunPeriodDesignInputUniqueNames.reserve(static_cast< unsigned >(RPD1 + RPD2));
 
 		Count = 0;
 		cCurrentModuleObject = "SizingPeriod:WeatherFileDays";
 		for ( Loop = 1; Loop <= RPD1; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			++Count;
 			RunPeriodDesignInput( Count ).Title = cAlphaArgs( 1 );
 			RunPeriodDesignInput( Count ).PeriodType = "User Selected WeatherFile RunPeriod (Design)";
@@ -5946,15 +5930,7 @@ Label9999: ;
 		cCurrentModuleObject = "SizingPeriod:WeatherFileConditionType";
 		for ( Loop = 1; Loop <= RPD2; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Title" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			++Count;
 			RunPeriodDesignInput( Count ).Title = cAlphaArgs( 1 );
 			RunPeriodDesignInput( Count ).PeriodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs( 2 );
