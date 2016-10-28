@@ -645,7 +645,6 @@ namespace EMSManager {
 		int IOStat; // IO Status when calling get input subroutine
 		//  CHARACTER(len=MaxNameLength), DIMENSION(99) :: AlphArray  ! Character string data  ! 99 should really be some kind of constant
 		//  REAL(r64), DIMENSION(1)          :: NumArray  ! Numeric data
-		bool IsNotOK; // Flag to verify name
 		static bool ErrorsFound( false );
 		//  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
 		Array1D_string cAlphaFieldNames;

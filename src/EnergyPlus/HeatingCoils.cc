@@ -404,7 +404,6 @@ namespace HeatingCoils {
 		int NumNums;
 		int IOStat;
 		int StageNum;
-		bool IsNotOK; // Flag to verify name
 		bool DXCoilErrFlag; // Used in GetDXCoil mining functions
 		bool errFlag;
 		// Flow

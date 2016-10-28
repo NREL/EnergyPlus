@@ -502,7 +502,6 @@ namespace SystemAvailabilityManager {
 		int numArgs; // maximum number of arguments for this set of objects
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
 		int SysAvailNum; // DO loop index for all System Availability Managers
 		int CyclingTimeSteps;
 		int ZoneEquipType;
