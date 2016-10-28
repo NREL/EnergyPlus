@@ -16136,139 +16136,139 @@ Foundation:Kiva,
        \type real
        \minimum> 0.0
        \default 0.3
-  A8,  \field Block 1 Material Name
+  A8,  \field Custom Block 1 Material Name
        \begin-extensible
        \type object-list
        \object-list MaterialName
-  N10, \field Block 1 Depth
+  N10, \field Custom Block 1 Depth
        \note Top-to-bottom dimension of the block downward.
        \units m
        \type real
        \minimum> 0.0
-  N11, \field Block 1 X Position
+  N11, \field Custom Block 1 X Position
        \note Position outward (+) or inward (-) relative to the foundation wall
        \note interior
        \units m
        \type real
-  N12, \field Block 1 Z Position
+  N12, \field Custom Block 1 Z Position
        \note Position downward (+) relative to the foundation wall top
        \units m
        \type real
-  A9,  \field Block 2 Material Name
+  A9,  \field Custom Block 2 Material Name
        \type object-list
        \object-list MaterialName
-  N13, \field Block 2 Depth
+  N13, \field Custom Block 2 Depth
        \units m
        \type real
        \minimum> 0.0
-  N14, \field Block 2 X Position
+  N14, \field Custom Block 2 X Position
        \units m
        \type real
-  N15, \field Block 2 Z Position
+  N15, \field Custom Block 2 Z Position
        \units m
        \type real
-  A10, \field Block 3 Material Name
+  A10, \field Custom Block 3 Material Name
        \type object-list
        \object-list MaterialName
-  N16, \field Block 3 Depth
+  N16, \field Custom Block 3 Depth
        \units m
        \type real
        \minimum> 0.0
-  N17, \field Block 3 X Position
+  N17, \field Custom Block 3 X Position
        \units m
        \type real
-  N18, \field Block 3 Z Position
+  N18, \field Custom Block 3 Z Position
        \units m
        \type real
-  A11, \field Block 4 Material Name
+  A11, \field Custom Block 4 Material Name
        \type object-list
        \object-list MaterialName
-  N19, \field Block 4 Depth
+  N19, \field Custom Block 4 Depth
        \units m
        \type real
        \minimum> 0.0
-  N20, \field Block 4 X Position
+  N20, \field Custom Block 4 X Position
        \units m
        \type real
-  N21, \field Block 4 Z Position
+  N21, \field Custom Block 4 Z Position
        \units m
        \type real
-  A12, \field Block 5 Material Name
+  A12, \field Custom Block 5 Material Name
        \type object-list
        \object-list MaterialName
-  N22, \field Block 5 Depth
+  N22, \field Custom Block 5 Depth
        \units m
        \type real
        \minimum> 0.0
-  N23, \field Block 5 X Position
+  N23, \field Custom Block 5 X Position
        \units m
        \type real
-  N24, \field Block 5 Z Position
+  N24, \field Custom Block 5 Z Position
        \units m
        \type real
-  A13, \field Block 6 Material Name
+  A13, \field Custom Block 6 Material Name
        \type object-list
        \object-list MaterialName
-  N25, \field Block 6 Depth
+  N25, \field Custom Block 6 Depth
        \units m
        \type real
        \minimum> 0.0
-  N26, \field Block 6 X Position
+  N26, \field Custom Block 6 X Position
        \units m
        \type real
-  N27, \field Block 6 Z Position
+  N27, \field Custom Block 6 Z Position
        \units m
        \type real
-  A14, \field Block 7 Material Name
+  A14, \field Custom Block 7 Material Name
        \type object-list
        \object-list MaterialName
-  N16, \field Block 7 Depth
+  N16, \field Custom Block 7 Depth
        \units m
        \type real
        \minimum> 0.0
-  N29, \field Block 7 X Position
+  N29, \field Custom Block 7 X Position
        \units m
        \type real
-  N30, \field Block 7 Z Position
+  N30, \field Custom Block 7 Z Position
        \units m
        \type real
-  A15, \field Block 8 Material Name
+  A15, \field Custom Block 8 Material Name
        \type object-list
        \object-list MaterialName
-  N31, \field Block 8 Depth
+  N31, \field Custom Block 8 Depth
        \units m
        \type real
        \minimum> 0.0
-  N32, \field Block 8 X Position
+  N32, \field Custom Block 8 X Position
        \units m
        \type real
-  N33, \field Block 8 Z Position
+  N33, \field Custom Block 8 Z Position
        \units m
        \type real
-  A16, \field Block 9 Material Name
+  A16, \field Custom Block 9 Material Name
        \type object-list
        \object-list MaterialName
-  N34, \field Block 9 Depth
+  N34, \field Custom Block 9 Depth
        \units m
        \type real
        \minimum> 0.0
-  N35, \field Block 9 X Position
+  N35, \field Custom Block 9 X Position
        \units m
        \type real
-  N36, \field Block 9 Z Position
+  N36, \field Custom Block 9 Z Position
        \units m
        \type real
-  A17, \field Block 10 Material Name
+  A17, \field Custom Block 10 Material Name
        \type object-list
        \object-list MaterialName
-  N37, \field Block 10 Depth
+  N37, \field Custom Block 10 Depth
        \units m
        \type real
-  N38, \field Block 10 X Position
+  N38, \field Custom Block 10 X Position
        \units m
        \type real
        \minimum> 0.0
-  N39; \field Block 10 Z Position
+  N39; \field Custom Block 10 Z Position
        \units m
        \type real
 
@@ -17528,10 +17528,12 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \required-field
        \type object-list
        \object-list FloorSurfaceNames
-  N1 , \field Total Exposed Perimeter
+  N1 , \field Exposed Perimeter Fraction
        \type real
        \units m
-       \minimum> 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
   A2 , \field Surface Segment 1 Exposed
        \note Surface Segment N is the perimeter between the Nth and (N+1)th
        \note vertices
