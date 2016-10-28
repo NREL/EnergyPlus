@@ -10626,7 +10626,7 @@ namespace SurfaceGeometry {
 		Real64 WidthEff; // Effective width of the surface
 		Real64 WidthMax; // X difference between the vertex on the most left and the one on the most right
 		Real64 HeightEff; // Effective height of the surface
-		Real64 HeightMax; // Y difference between the vertex on the most left and the one on the most right
+		Real64 HeightMax; // Y difference between the lowest and toppest vertices
 		Real64 Xp;
 		Real64 Yp;
 		Real64 Zp;
