@@ -193,6 +193,7 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
@@ -419,6 +420,7 @@ namespace EnergyPlus {
 		SimulationManager::clear_state();
 		SingleDuct::clear_state();
 		SizingManager::clear_state();
+		SolarCollectors::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
 		SurfaceGeometry::clear_state();
