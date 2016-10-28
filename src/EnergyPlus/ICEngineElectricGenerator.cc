@@ -361,8 +361,6 @@ namespace ICEngineElectricGenerator {
 		Array1D_string AlphArray( 10 ); // character string data
 		Array1D< Real64 > NumArray( 11 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 xValue; // test curve limits
 
 		//FLOW

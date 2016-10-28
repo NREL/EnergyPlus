@@ -4701,8 +4701,6 @@ namespace SingleDuct {
 		int IOStat;
 		static std::string const RoutineName( "GetATMixers: " ); // include trailing blank space
 		static bool ErrorsFound( false ); // Error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NodeNum; // Index to node number
 		int CtrlZone; // Index to control zone
 		bool ZoneNodeNotFound; // Flag for error checking

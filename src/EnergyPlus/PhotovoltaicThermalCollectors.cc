@@ -324,8 +324,6 @@ namespace PhotovoltaicThermalCollectors {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int SurfNum; // local use only
 		int ThisParamObj;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		// Object Data
 		Array1D< SimplePVTModelStruct > tmpSimplePVTperf;

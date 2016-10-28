@@ -314,8 +314,6 @@ namespace WaterManager {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		static bool IsNotOK( false );
-		static bool IsBlank( false );
 		static int alphaOffset( 0 );
 		static int SurfNum( 0 );
 		static std::string objNameMsg;

@@ -306,8 +306,6 @@ namespace ZoneContaminantPredictorCorrector {
 		int Loop;
 		int ZonePtr;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		//  LOGICAL :: ValidScheduleType
 		Array1D_bool RepVarSet;
 		std::string CurrentModuleObject;
@@ -911,8 +909,6 @@ namespace ZoneContaminantPredictorCorrector {
 		//unused1208  REAL(r64), DIMENSION(2) :: NumArray
 		//unused1208  CHARACTER(len=MaxNameLength), DIMENSION(29) :: AlphArray
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool ValidScheduleType;
 
 		struct NeededControlTypes

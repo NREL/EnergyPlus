@@ -338,8 +338,6 @@ namespace HVACHXAssistedCoolingCoil {
 		int NumNums; // Number of number inputs
 		int IOStat; // Return status from GetObjectItem call
 		static bool ErrorsFound( false ); // set TRUE if errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumHXAssistedDXCoils; // Number of HXAssistedCoolingCoil objects using a DX coil
 		int NumHXAssistedWaterCoils; // Number of HXAssistedCoolingCoil objects using a chilled water coil
 		//    LOGICAL :: FanErrFlag              ! Error flag for fan operating mode mining call

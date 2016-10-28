@@ -889,8 +889,6 @@ namespace IceThermalStorage {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		bool ErrorsFound;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		// FLOW:
 
 		ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems

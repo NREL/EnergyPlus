@@ -362,7 +362,6 @@ namespace UnitVentilator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
 		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumFields; // Total number of fields in object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call

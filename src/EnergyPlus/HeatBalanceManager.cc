@@ -6815,7 +6815,6 @@ Label1000: ;
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
-		bool IsNotOK; // Flag to verify name
 
 
 		//Reading WindowGap:SupportPillar

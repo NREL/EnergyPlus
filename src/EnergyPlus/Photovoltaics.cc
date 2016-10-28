@@ -374,8 +374,6 @@ namespace Photovoltaics {
 		int NumNums; // Number of PV Array numeric parameters are being passed
 		int IOStat;
 		static bool ErrorsFound( false ); // if errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int ThisParamObj;
 		int dupPtr;
 
@@ -493,7 +491,6 @@ namespace Photovoltaics {
 
 		// search for duplicate PV arrays on integrated heat transfer surfaces, accumulating source terms across arrays is not supported
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
-			IsNotOK = false;
 			{ auto const SELECT_CASE_var( PVarray( PVnum ).CellIntegrationMode );
 
 			if ( ( SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration ) || ( SELECT_CASE_var == iTranspiredCollectorCellIntegration ) || ( SELECT_CASE_var == iExteriorVentedCavityCellIntegration ) ) {

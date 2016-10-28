@@ -537,8 +537,6 @@ namespace HVACUnitaryBypassVAV {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool DXErrorsFound( false ); // Set to true if errors in get coil input
 		//unused0509  LOGICAL                        :: FanErrorsFound=.FALSE. ! Set to true if errors in get fan input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		static bool FanErrFlag( false ); // Error flag returned during CALL to GetFanType
 		static bool errFlag( false ); // Error flag returned during CALL to mining functions

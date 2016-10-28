@@ -287,7 +287,6 @@ namespace DirectAirManager {
 		int IOStat;
 		static std::string const RoutineName( "GetDirectAirInput: " ); // include trailing blank space
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
 		int Loop; // Do Loop Index
 		int CtrlZone; // controlled zome do loop index
 		int SupAirIn; // controlled zone supply air inlet index

@@ -289,8 +289,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 		Array1D< Real64 > NumArray( 23 ); // numeric data
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		NumGSHPs = InputProcessor::GetNumObjectsFound( ModuleCompNameUC );

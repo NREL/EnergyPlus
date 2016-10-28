@@ -553,7 +553,6 @@ namespace AirflowNetworkBalanceManager {
 		bool NodeFound1;
 		bool NodeFound2;
 		int NumAPL;
-		bool IsBlank;
 		Array1D_string CompName( 2 );
 		std::string SimAirNetworkKey;
 		bool SimObjectError;

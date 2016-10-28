@@ -502,8 +502,6 @@ namespace SystemAvailabilityManager {
 		int numArgs; // maximum number of arguments for this set of objects
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int SysAvailNum; // DO loop index for all System Availability Managers
 		int CyclingTimeSteps;
 		int ZoneEquipType;
@@ -1203,8 +1201,6 @@ namespace SystemAvailabilityManager {
 		int numArgs;
 		int Item;
 		int IOStatus;
-		bool IsNotOK;
-		bool IsBlank;
 		bool ErrorsFound;
 		int list;
 		int itemnum;
@@ -4053,8 +4049,6 @@ namespace SystemAvailabilityManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int SysAvailNum; // DO loop index for all System Availability Managers
 		Real64 SchedMin; // Minimum value specified in a schedule
 		Real64 SchedMax; // Maximum value specified in a schedule

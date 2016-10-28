@@ -319,8 +319,6 @@ namespace SteamCoils {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string AlphArray; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names

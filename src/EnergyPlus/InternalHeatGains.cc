@@ -280,10 +280,8 @@ namespace InternalHeatGains {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string AlphaName;
-		bool IsNotOK; // Flag to verify name
 		Array1D< Real64 > IHGNumbers;
 		int IOStat;
-		bool IsBlank;
 		int Loop;
 		bool MustInpSch;
 		int NumAlpha;

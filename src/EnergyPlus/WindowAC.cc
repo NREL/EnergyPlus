@@ -372,8 +372,6 @@ namespace WindowAC {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool errFlag( false ); // Local error flag for GetOAMixerNodeNums
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool FanErrFlag( false ); // Error flag used in GetFanIndex call
 		Real64 FanVolFlow; // Fan volumetric flow rate
 		bool CoilNodeErrFlag; // Used in error messages for mining coil outlet node number

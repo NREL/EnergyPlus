@@ -330,8 +330,7 @@ namespace DataZoneEquipment {
 		// static bool ErrorsFound( false ); // If errors detected in input // GetZoneEquipmentDataErrorsFound
 		// static int found( 0 );
 		////////////////////////////////////////////////////////////////////////////////////
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
+		bool IsNotOK; // Flag to verify nam
 		bool NodeListError;
 		bool UniqueNodeError;
 		int NumOfControlledZones; // The number of Controlled Zone Equip Configuration objects
@@ -459,12 +458,10 @@ namespace DataZoneEquipment {
 			ZoneEquipConfig( ControlledZoneNum ).ZoneName = AlphArray( 1 ); // for x-referencing with the geometry data
 
 			IsNotOK = false;
-			IsBlank = false;
 			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), ZoneEquipList_set, IsNotOK );
 			if ( IsNotOK ) {
 				ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
 				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 2 ) = "xxxxx";
 			}
 			ZoneEquipConfig( ControlledZoneNum ).EquipListName = AlphArray( 2 ); // the name of the list containing all the zone eq.
 			InletNodeListName = AlphArray( 3 );

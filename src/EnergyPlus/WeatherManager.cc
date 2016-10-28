@@ -6121,8 +6121,6 @@ Label9999: ;
 		int DateType;
 		int IOStat;
 		int DayType;
-		static bool IsNotOK( false ); // Flag to verify name
-		static bool IsBlank( false ); // Flag for blank name
 
 		cCurrentModuleObject = "RunPeriodControl:SpecialDays";
 		NumSpecDays = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
@@ -6424,8 +6422,6 @@ Label9999: ;
 		int NumAlpha; // Number of material alpha names being passed
 		int NumNumerics; // Number of material properties being passed
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int HrLoop;
 		int TSLoop;
 		Real64 LastHrValue;
@@ -7176,8 +7172,6 @@ Label9999: ;
 		int IOStat;
 		int NumAlpha;
 		int NumNumerics;
-		bool IsNotOK;
-		bool IsBlank;
 		int Found;
 		int envFound;
 		int Count;

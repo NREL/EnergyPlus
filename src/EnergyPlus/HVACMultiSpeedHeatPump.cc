@@ -597,7 +597,6 @@ namespace HVACMultiSpeedHeatPump {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // True when input errors found
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool AllocatedFlag( false ); // True when arrays are allocated
 		bool AirNodeFound; // True when an air node is found
 		bool AirLoopFound; // True when an air loop is found

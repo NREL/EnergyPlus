@@ -3415,7 +3415,6 @@ namespace EvaporativeCoolers {
 		int NumFields; // Total number of fields in object
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
 		bool errFlag;
 		Real64 FanVolFlow;
 		int UnitLoop;

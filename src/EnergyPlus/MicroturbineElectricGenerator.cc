@@ -328,8 +328,6 @@ namespace MicroturbineElectricGenerator {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // Error flag... trips fatal error message at end of get input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 ElectOutFTempElevOutput; // Output of Electrical Power Output Modifier Curve (function of temp and elev)
 		Real64 ElecEfficFTempOutput; // Output of Electrical Efficiency Modifier Curve (function of temp)
 		Real64 ElecEfficFPLROutput; // Output of Electrical Efficiency Modifier Curve (function of PLR)

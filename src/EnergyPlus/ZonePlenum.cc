@@ -353,8 +353,6 @@ namespace ZonePlenum {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool NodeListError; // Flag for node list error
 		bool UniqueNodeError;
 		static std::string const RoutineName( "GetZonePlenumInput: " ); // include trailing blank space

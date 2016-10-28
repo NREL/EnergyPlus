@@ -366,8 +366,6 @@ namespace HWBaseboardRadiator {
 		int SurfNum; // Surface number Do loop counter
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		NumHWBaseboards = InputProcessor::GetNumObjectsFound( cCMO_BBRadiator_Water );

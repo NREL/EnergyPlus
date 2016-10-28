@@ -614,8 +614,6 @@ namespace HVACControllers {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		int iNodeType; // for checking actuator node type
 		bool NodeNotFound; // flag true if the sensor node is on the coil air outlet node

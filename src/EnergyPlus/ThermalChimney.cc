@@ -246,8 +246,6 @@ namespace ThermalChimney {
 		int IOStat;
 		int Loop;
 		int Loop1;
-		bool IsNotOK;
-		bool IsBlank;
 
 		//  ALLOCATE(MCPTThermChim(NumOfZones))
 		//  MCPTThermChim=0.0
