@@ -202,6 +202,8 @@ namespace OutdoorAirUnit {
 
 	// Object Data
 	Array1D< OAUnitData > OutAirUnit;
+	std::unordered_map< std::string, std::string > SupplyFanUniqueNames;
+	std::unordered_map< std::string, std::string > ExhaustFanUniqueNames;
 
 	namespace {
 		bool MyOneTimeFlag( true );
@@ -220,6 +222,8 @@ namespace OutdoorAirUnit {
 		CheckEquipName.deallocate();
 		MyOneTimeErrorFlag.deallocate();
 		OutAirUnit.deallocate();
+		SupplyFanUniqueNames.clear();
+		ExhaustFanUniqueNames.clear();
 		MyOneTimeFlag = true;
 		ZoneEquipmentListChecked = false;
 	}
@@ -440,19 +444,14 @@ namespace OutdoorAirUnit {
 		NumOfOAUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
+		SupplyFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
+		ExhaustFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
 		MyOneTimeErrorFlag.dimension( NumOfOAUnits, true );
 		CheckEquipName.dimension( NumOfOAUnits, true );
 
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), OutAirUnit, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			//A1
 			OutAirUnit( OAUnitNum ).Name = cAlphaArgs( 1 );
 			IsNotOK = false;
@@ -497,11 +496,7 @@ namespace OutdoorAirUnit {
 
 			//A5
 			OutAirUnit( OAUnitNum ).SFanName = cAlphaArgs( 5 );
-			InputProcessor::VerifyName( cAlphaArgs( 5 ), OutAirUnit, &OAUnitData::SFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Supply Fan Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 5 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( SupplyFanUniqueNames, cAlphaArgs( 5 ), CurrentModuleObject, cAlphaFields( 5 ), ErrorsFound );
 			errFlag = false;
 			GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 			OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
@@ -527,11 +522,7 @@ namespace OutdoorAirUnit {
 				OutAirUnit( OAUnitNum ).ExtFan = false;
 			} else if ( ! lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFanName = cAlphaArgs( 7 );
-				InputProcessor::VerifyName( cAlphaArgs( 7 ), OutAirUnit, &OAUnitData::ExtFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 7 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName( ExhaustFanUniqueNames, cAlphaArgs( 7 ), CurrentModuleObject, cAlphaFields( 7 ), ErrorsFound );
 				errFlag = false;
 				GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
 				OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
@@ -559,7 +550,6 @@ namespace OutdoorAirUnit {
 			}
 
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
-
 				SetUpCompSets( CurrentModuleObject, OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 7 ), "UNDEFINED", "UNDEFINED" );
 			}
 
@@ -630,6 +620,7 @@ namespace OutdoorAirUnit {
 			}
 
 			//A16 : component list
+
 			InputProcessor::VerifyName( cAlphaArgs( 16 ), OutAirUnit, &OAUnitData::ComponentListName, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObjects( CO_OAEqList ) + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;

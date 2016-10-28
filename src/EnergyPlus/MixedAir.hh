@@ -728,15 +728,6 @@ namespace MixedAir {
 	void
 	CheckControllerLists( bool & ErrFound );
 
-	void
-	CheckOAControllerName(
-		std::string const & OAControllerName, // proposed name
-		int const NumCurrentOAControllers, // Count on number of controllers
-		bool & IsNotOK, // Pass through to VerifyName
-		bool & IsBlank, // Pass through to VerifyName
-		std::string const & SourceID // Pass through to VerifyName
-	);
-
 	int
 	GetNumOASystems();
 

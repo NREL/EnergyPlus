@@ -321,6 +321,8 @@ namespace MixedAir {
 	Array1D< OAControllerProps > OAController;
 	Array1D< OAMixerProps > OAMixer;
 	Array1D< VentilationMechanicalProps > VentilationMechanical;
+	std::unordered_set< std::string > ControllerListUniqueNames;
+	std::unordered_map< std::string, std::string > OutsideAirSysUniqueNames;
 
 	// Functions
 
@@ -406,6 +408,8 @@ namespace MixedAir {
 		VentMechZoneSecondaryRecirculation.deallocate();
 		DesignSpecZoneADObjName.deallocate();
 		DesignSpecZoneADObjIndex.deallocate();
+		ControllerListUniqueNames.clear();
+		OutsideAirSysUniqueNames.clear();
 	}
 
 	void
@@ -991,8 +995,6 @@ namespace MixedAir {
 		int ListNum;
 		int NumSimpControllers; // number of Controller:Simple objects in an OA System
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and messages
 		Array1D_string cAlphaFields; // Alpha field names
 		Array1D_string cNumericFields; // Numeric field names
@@ -1034,8 +1036,6 @@ namespace MixedAir {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			thisControllerList.Name = AlphArray( 1 );
-			IsNotOK = false;
-			IsBlank = false;
 			thisControllerList.NumControllers = ( NumAlphas - 1 ) / 2;
 			thisControllerList.ControllerType.allocate( thisControllerList.NumControllers );
 			thisControllerList.ControllerName.allocate( thisControllerList.NumControllers );
@@ -1073,28 +1073,17 @@ namespace MixedAir {
 
 		OutsideAirSys.allocate( NumOASystems );
 		OASysEqSizing.allocate( NumOASystems );
+		ControllerListUniqueNames.reserve( static_cast< unsigned >( NumOASystems ) );
+		OutsideAirSysUniqueNames.reserve( static_cast< unsigned >( NumOASystems ) );
 		MyOneTimeErrorFlag.dimension( NumOASystems, true );
 		MyOneTimeCheckUnitarySysFlag.dimension( NumOASystems,true );
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), OutsideAirSys, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( OutsideAirSysUniqueNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			OutsideAirSys( OASysNum ).Name = AlphArray( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 2 ), OutsideAirSys, &OutsideAirSysProps::ControllerListName, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + ' ' + cAlphaFields( 2 ) + " Name" );
-			if ( IsNotOK && AlphArray( 1 ) != "xxxxx" ) {
-				ShowContinueError( "Occurs in " + CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\"." );
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 2 ) = "xxxxx";
-			}
+			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), ControllerListUniqueNames, ErrorsFound );
 			ControllerListName = AlphArray( 2 );
 			OutsideAirSys( OASysNum ).ControllerListName = AlphArray( 2 );
 			ComponentListName = AlphArray( 3 );
@@ -1337,8 +1326,6 @@ namespace MixedAir {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false ); // Flag identifying errors found during get input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int ZoneListNum; // Index to Zone List
 		int ScanZoneListNum; // Index used to loop through zone list
 		int MechVentZoneCount; // Index counter for zones with mechanical ventilation
@@ -1399,13 +1386,7 @@ namespace MixedAir {
 			for ( OutAirNum = NumERVControllers+1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
 				++currentOAControllerNum;
 				InputProcessor::GetObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), OAController, OutAirNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName( OutsideAirSysUniqueNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 				ProcessOAControllerInputs( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 
@@ -2051,8 +2032,6 @@ namespace MixedAir {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		if ( ! GetOAMixerInputFlag ) return;
 
@@ -5908,59 +5887,6 @@ namespace MixedAir {
 				ErrFound = true;
 			}
 		}
-
-	}
-
-	void
-	CheckOAControllerName(
-		std::string const & OAControllerName, // proposed name
-		int const NumCurrentOAControllers, // Count on number of controllers
-		bool & IsNotOK, // Pass through to VerifyName
-		bool & IsBlank, // Pass through to VerifyName
-		std::string const & SourceID // Pass through to VerifyName
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   October 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// When OA Controller data is gotten from other routines, must check to make sure
-		// new name doesn't duplicate.  (Essentially a pass through to call Verify Name)
-		// Currently, this is only called from HVACStandAlongERV::GetStandaloneERV()
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		if ( AllocateOAControllersFlag ) {
-			// Make sure OAControllers are allocated
-			AllocateOAControllers();
-		}
-
-		InputProcessor::VerifyName( OAControllerName, OAController, NumCurrentOAControllers, IsNotOK, IsBlank, SourceID );
 
 	}
 
