@@ -699,6 +699,7 @@ namespace PlantCondLoopOperation {
 			}
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 			InputProcessor::VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, ErrorsFound, IsBlank, CurrentModuleObject + " Name" );
+			if ( ErrorsFound ) continue;
 			TempVerifyNames( Num ) = cAlphaArgs( 1 );
 		}
 

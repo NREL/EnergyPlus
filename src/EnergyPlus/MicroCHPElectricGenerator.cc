@@ -317,7 +317,8 @@ namespace MicroCHPElectricGenerator {
 
 			for ( CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
+				// Can't validate this name
+				//InputProcessor::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
 
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 

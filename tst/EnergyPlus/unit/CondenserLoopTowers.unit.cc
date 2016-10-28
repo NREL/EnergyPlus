@@ -905,9 +905,9 @@ namespace EnergyPlus {
 		CondenserLoopTowers::ReportTowers( true, 1 );
 
 		// test that tower outlet temperature = set point temperature
-	//  TEST CASE IS NOT VALID BECAUSE OF THE NEW ORDER OF DATA OBJECTS
-	//	EXPECT_GT( DataLoopNode::Node(9).Temp, 30.0); // inlet node temperature
-	//	EXPECT_DOUBLE_EQ( 30, DataLoopNode::Node(10).Temp ); // outlet node temperature
+		// TEST CASE IS NOT VALID BECAUSE OF THE NEW ORDER OF DATA OBJECTS
+		EXPECT_GT( DataLoopNode::Node(9).Temp, 30.0); // inlet node temperature
+		EXPECT_DOUBLE_EQ( 30, DataLoopNode::Node(10).Temp ); // outlet node temperature
 
 		// input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );
