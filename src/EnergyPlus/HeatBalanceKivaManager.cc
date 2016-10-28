@@ -451,13 +451,11 @@ void KivaManager::setupKivaInstances() {
     grnd.buildDomain();
 
     gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed Perimeter, Floor Surface, Wall Surface(s)";
-    std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A)";
+    std::string fmt = "(A,',',I0',',I0',',I0',',A',',A,A)";
 
-    std::string wallSurfaceString = DataSurfaces::Surface(kv.wallSurfaces[0]).Name;
+    std::string wallSurfaceString = "";
     for (auto& wl : kv.wallSurfaces) {
-      if (wl != kv.wallSurfaces[0]) {
-        wallSurfaceString += ", " + DataSurfaces::Surface(wl).Name;
-      }
+      wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
     }
     gio::write( DataGlobals::OutputFileInits, fmt ) << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd.nX << grnd.nZ << grnd.nX*grnd.nZ << General::RoundSigDigits( grnd.foundation.netPerimeter, 2 ) << DataSurfaces::Surface(kv.floorSurface).Name << wallSurfaceString;
 
