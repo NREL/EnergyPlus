@@ -78,6 +78,8 @@
 #include <DataSurfaces.hh>
 #include <DataStringGlobals.hh>
 #include <DisplayRoutines.hh>
+#include <General.hh>
+#include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -241,7 +243,7 @@ void KivaManager::setupKivaInstances() {
 
       Real64 wallHeight = 0.0;
       if (wallSurfaces.size() != 0) {
-        Real64 minZ = Surfaces(wallSurfaces[0]).Vertex[0].z; 
+        Real64 minZ = Surfaces(wallSurfaces[0]).Vertex[0].z;
         Real64 maxZ = minZ;
         for (size_t i = 1; i < Surfaces(wallSurfaces[0]).Vertex.size(); ++i ) {
           if (Surfaces(wallSurfaces[0]).Vertex[i].z < minZ) {minZ = Surfaces(wallSurfaces[0]).Vertex[i].z;}
@@ -341,19 +343,42 @@ void KivaManager::setupKivaInstances() {
         fnd.inputBlocks.push_back(footing);
       }
 
+      // Exposed Perimeter
+      bool userSetExposedPerimeter;
+      auto& expPerimMap = SurfaceGeometry::exposedFoundationPerimeter.surfaceMap;
+      if (expPerimMap.count(surfNum) == 1) {
+        userSetExposedPerimeter = true;
+        fnd.useDetailedExposedPerimeter = expPerimMap[surfNum].useDetailedExposedPerimeter;
+        if ( fnd.useDetailedExposedPerimeter ) {
+          for (auto s : expPerimMap[surfNum].isExposedPerimeter) {
+            fnd.isExposedPerimeter.push_back(s);
+          }
+        } else {
+          fnd.useDetailedExposedPerimeter = expPerimMap[surfNum].useDetailedExposedPerimeter;
+        }
+      } else {
+        userSetExposedPerimeter = false;
+        fnd.useDetailedExposedPerimeter = true;
+      }
+
       // polygon
+
       Kiva::Polygon floorPolygon;
       if (DataSurfaces::CCW) {
         for (size_t i = 0; i < surface.Vertex.size(); ++i ) {
           auto& v = surface.Vertex[i];
           floorPolygon.outer().push_back(Kiva::Point(v.x,v.y));
-          fnd.isExposedPerimeter.push_back(true);
+          if (!userSetExposedPerimeter) {
+            fnd.isExposedPerimeter.push_back(true);
+          }
         }
       } else {
         for (auto i = surface.Vertex.size() - 1; i <= 0; --i ) {
           auto& v = surface.Vertex[i];
           floorPolygon.outer().push_back(Kiva::Point(v.x,v.y));
-          fnd.isExposedPerimeter.push_back(true);
+          if (!userSetExposedPerimeter) {
+            fnd.isExposedPerimeter.push_back(true);
+          }
         }
       }
 
@@ -409,15 +434,32 @@ void KivaManager::setupKivaInstances() {
   for (auto& kv : kivaInstances) {
     auto& grnd = kv.ground;
 
-    // Adjust for concave features using Boundary Layer Adjustment method
-    grnd.calculateBoundaryLayer();
-    grnd.setNewBoundaryGeometry();
+    if (!kv.ground.foundation.useDetailedExposedPerimeter || !Kiva::isConvex(kv.ground.foundation.polygon))
+    {
+      if (kv.ground.foundation.reductionStrategy == Kiva::Foundation::RS_BOUNDARY) {
+        kv.ground.foundation.reductionStrategy = Kiva::Foundation::RS_AP;
+      }
+    }
+
+    if (kv.ground.foundation.reductionStrategy == Kiva::Foundation::RS_BOUNDARY)
+    {
+      // Adjust for concave features using Boundary Layer Adjustment method
+      grnd.calculateBoundaryLayer();
+      grnd.setNewBoundaryGeometry();
+    }
 
     grnd.buildDomain();
 
-    // TODO Kiva: Add wall surfaces to EIO
-    gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Floor Surface, Wall Surface(s)";
-    gio::write( DataGlobals::OutputFileInits, "(A,',',I5',',I5',',I5',',A)" ) << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd.nX << grnd.nZ << grnd.nX*grnd.nZ << DataSurfaces::Surface(kv.floorSurface).Name;
+    gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed Perimeter, Floor Surface, Wall Surface(s)";
+    std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A)";
+
+    std::string wallSurfaceString = DataSurfaces::Surface(kv.wallSurfaces[0]).Name;
+    for (auto& wl : kv.wallSurfaces) {
+      if (wl != kv.wallSurfaces[0]) {
+        wallSurfaceString += ", " + DataSurfaces::Surface(wl).Name;
+      }
+    }
+    gio::write( DataGlobals::OutputFileInits, fmt ) << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd.nX << grnd.nZ << grnd.nX*grnd.nZ << General::RoundSigDigits( grnd.foundation.netPerimeter, 2 ) << DataSurfaces::Surface(kv.floorSurface).Name << wallSurfaceString;
 
   }
 

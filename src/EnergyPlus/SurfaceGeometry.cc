@@ -183,6 +183,7 @@ namespace SurfaceGeometry {
 	// Object Data
 	Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
 	HeatBalanceKivaManager::KivaManager kivaManager;
+	ExposedFoundationPerimeter exposedFoundationPerimeter;
 
 	// Functions
 
@@ -1928,6 +1929,8 @@ namespace SurfaceGeometry {
 		GetHTSurfExtVentedCavityData( ErrorsFound );
 
 		GetSurfaceHeatTransferAlgorithmOverrides( ErrorsFound );
+
+		exposedFoundationPerimeter.getData( ErrorsFound );
 
 		if ( SurfError || ErrorsFound ) {
 			ErrorsFound = true;
@@ -5855,6 +5858,75 @@ namespace SurfaceGeometry {
 
 		}
 
+	}
+
+	void
+	ExposedFoundationPerimeter::getData( bool& ErrorsFound ) {
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
+		using DataSurfaces::Surface;
+		using General::TrimSigDigits;
+
+		int IOStatus; // Used in GetObjectItem
+		int NumAlphas;
+		int NumNumbers;
+
+		std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
+		int numObjects = GetNumObjectsFound( cCurrentModuleObject );
+
+		for ( int obj = 1; obj <= numObjects; ++obj ) {
+			int alpF = 1;
+			int numF = 1;
+			GetObjectItem( cCurrentModuleObject, obj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			int Found = FindItemInList( cAlphaArgs( alpF ), Surface, TotSurfaces );
+			if ( Found == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface" );
+				ErrorsFound = true;
+			} alpF++;
+			if ( Surface(Found).Class != SurfaceClass_Floor ) {
+				ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", surface is not a floor surface" );
+				ShowContinueError( cCurrentModuleObject + " will not be used" );
+				continue;
+			}
+
+
+			Data data;
+			data.useDetailedExposedPerimeter = true;
+			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false;} numF++;
+
+			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
+			if (numRemainingFields > 0) {
+				if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
+					ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
+					ErrorsFound = true;
+				}
+				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
+					if (!lNumericFieldBlanks( numF - 1 ) && !lAlphaFieldBlanks( alpF )) {
+						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", cannot define both \"" + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
+						ErrorsFound = true;
+					}
+					if ( lAlphaFieldBlanks( alpF ) || SameString(cAlphaArgs( alpF ), "YES") ) {
+						data.isExposedPerimeter.push_back(true);
+					} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
+						data.isExposedPerimeter.push_back(false);
+					} else {
+						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
+						ErrorsFound = true;
+					} alpF++;
+				}
+			} else {
+				if (lNumericFieldBlanks( numF - 1 )) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define either \"" + cAlphaFieldNames( alpF ) + "\" or \"" + cNumericFieldNames(numF - 1) +"\"");
+					ErrorsFound = true;
+				}
+			}
+
+			surfaceMap[Found] = data;
+		}
 	}
 
 	void
