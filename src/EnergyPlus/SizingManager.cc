@@ -805,8 +805,6 @@ namespace SizingManager {
 		int IOStatus; // Used in GetObjectItem
 		int OAIndex;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		//  REAL(r64) :: CalcAmt
 
 		std::string CurrentModuleObject; // for ease in getting objects
@@ -1045,8 +1043,6 @@ namespace SizingManager {
 		int IOStatus; // Used in GetObjectItem
 		int ZADIndex;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string Alphas; // Alpha input items for object
@@ -1301,8 +1297,6 @@ namespace SizingManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumDesDays; // Number of design days in input
 		int NumSizingZoneStatements;
 		int Item;
@@ -1418,7 +1412,7 @@ namespace SizingManager {
 						}
 					}
 					InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-					if ( IsNotOK && ! SizingZoneObjects( Item ).ZoneListActive ) {
+					if ( ErrorsFound && ! SizingZoneObjects( Item ).ZoneListActive ) {
 						ShowContinueError( "Zone may have been entered in a ZoneList assignment." );
 					}
 
@@ -2484,8 +2478,6 @@ namespace SizingManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumDesDays; // Number of design days in input
 
 		cCurrentModuleObject = "Sizing:Plant";
@@ -2934,8 +2926,6 @@ namespace SizingManager {
 		int IOStatus; // Used in GetObjectItem
 		int zSIndex;  // index of "DesignSpecification:ZoneHVAC:Sizing" objects
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		//  REAL(r64) :: CalcAmt
 
 		std::string CurrentModuleObject; // for ease in getting objects

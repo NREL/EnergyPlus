@@ -384,8 +384,6 @@ namespace PlantManager {
 		Array1D_string Alpha( 18 ); // dimension to num of alpha fields in input
 		Array1D< Real64 > Num( 30 ); // dimension to num of numeric data fields in input
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string LoadingScheme;
 		bool ErrFound;
 		std::string CurrentModuleObject; // for ease in renaming.

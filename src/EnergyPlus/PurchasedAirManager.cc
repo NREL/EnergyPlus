@@ -359,8 +359,6 @@ namespace PurchasedAirManager {
 		int NodeNum; // node index
 		static std::string const RoutineName( "GetPurchasedAir: " ); // include trailing blank space
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool IsOANodeListed; // Flag for OA node name listed in OutdoorAir:Node or Nodelist
 		bool UniqueNodeError; // Flag for non-unique node error(s)
 

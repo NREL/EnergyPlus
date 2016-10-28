@@ -426,8 +426,6 @@ namespace PlantCondLoopOperation {
 		std::string CurrentModuleObject; // for ease in renaming
 		std::string PlantLoopObject; // for ease in renaming
 		Array1D_string OpSchemeNames; // Used to verify unique op scheme names
-		bool IsNotOK;
-		bool IsBlank;
 		bool ErrorsFound; // Passed in from OpSchemeInput
 
 		ErrorsFound = false;
@@ -444,7 +442,6 @@ namespace PlantCondLoopOperation {
 		NumPlantOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			IsBlank = false;
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 		}
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
@@ -454,7 +451,7 @@ namespace PlantCondLoopOperation {
 			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
 				InputProcessor::GetObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
 				                              IOStat);
-				IsBlank = false;
+
 				if ( InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound) ) continue;
 			}
 
@@ -586,7 +583,6 @@ namespace PlantCondLoopOperation {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool ErrorsFound; // May be set here and passed on
 		int CLRBO; // Number ofCooling Load Range Based Operation Inputs
@@ -682,13 +678,7 @@ namespace PlantCondLoopOperation {
 			}
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, ErrorsFound, IsBlank, CurrentModuleObject + " Name" );
 			TempVerifyNames( Num ) = cAlphaArgs( 1 );
 
 		}
@@ -708,13 +698,7 @@ namespace PlantCondLoopOperation {
 				Count = Num - PELists;
 			}
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, ErrorsFound, IsBlank, CurrentModuleObject + " Name" );
 			TempVerifyNames( Num ) = cAlphaArgs( 1 );
 		}
 

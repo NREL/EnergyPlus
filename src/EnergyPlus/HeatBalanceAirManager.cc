@@ -918,8 +918,6 @@ namespace HeatBalanceAirManager {
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
 		for ( Loop = 1; Loop <= TotAIM2Infiltration; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
 			++InfiltCount;
 			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );

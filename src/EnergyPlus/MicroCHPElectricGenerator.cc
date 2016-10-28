@@ -317,15 +317,7 @@ namespace MicroCHPElectricGenerator {
 
 			for ( CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				//  Can't validate this name.
-				//    IsNotOK=.FALSE.
-				//    IsBlank=.FALSE.
-
-				//    CALL InputProcessor::VerifyName(AlphArray(1),MicroCHP%Name,CHPParamNum-1,IsNotOK,IsBlank,TRIM(cCurrentModuleObject))
-				//    IF (IsNotOK) THEN
-				//      ErrorsFound=.TRUE.
-				//      IF (IsBlank) AlphArray(1)='xxxxx'
-				//    ENDIF
+				InputProcessor::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
 
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
 

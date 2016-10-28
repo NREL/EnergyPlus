@@ -785,8 +785,6 @@ namespace PlantPipingSystemsManager {
 		int NumSurfacesWithThisOSCM;
 		int NumAlphasBeforePipeCircOne;
 		int CurIndex;
-		bool IsBlank;
-		bool IsNotOK;
 
 		for ( DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum ) {
 
@@ -1739,8 +1737,6 @@ namespace PlantPipingSystemsManager {
 		int IOStatus;
 		int PipeCircuitCounter;
 		int ThisCircuitPipeSegmentCounter;
-		bool IsNotOK;
-		bool IsBlank;
 		int CurIndex;
 		int NumAlphasBeforeSegmentOne;
 
@@ -1855,8 +1851,6 @@ namespace PlantPipingSystemsManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		int CurIndex;
-		bool IsNotOK;
-		bool IsBlank;
 
 		// Read in all pipe segments
 		for ( SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr ) {
@@ -1939,12 +1933,10 @@ namespace PlantPipingSystemsManager {
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
-		int CurIndex;
-		bool IsNotOK;
-		bool IsBlank;
 		int DomainCtr;
 		int CircuitCtr;
 		int SegmentCtr;
+		int CurIndex;
 		int NumPipeSegments;
 		int ThisCircuitPipeSegmentCounter;
 

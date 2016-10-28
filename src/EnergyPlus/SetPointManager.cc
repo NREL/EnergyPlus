@@ -633,8 +633,6 @@ namespace SetPointManager {
 		int ZoneNum; // loop index for zone nodes
 		int NumNodes;
 		Array1D_int NodeNums;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool NodeListError( false );
 		bool ErrInList;
 		int Found;

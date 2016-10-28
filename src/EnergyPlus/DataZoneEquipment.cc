@@ -461,7 +461,7 @@ namespace DataZoneEquipment {
 			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), ZoneEquipList_set, IsNotOK );
 			if ( IsNotOK ) {
 				ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
-				GetZoneEquipmentDataErrorsFound = true
+				GetZoneEquipmentDataErrorsFound = true;
 			}
 			ZoneEquipConfig( ControlledZoneNum ).EquipListName = AlphArray( 2 ); // the name of the list containing all the zone eq.
 			InletNodeListName = AlphArray( 3 );
@@ -840,7 +840,7 @@ namespace DataZoneEquipment {
 
 					SupplyAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
 					SupplyAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
-					ValidateComponent( SupplyAirPath( PathNum ).ComponentType( CompNum ), SupplyAirPath( PathNum ).ComponentName( CompNum ), IsnotOk, CurrentModuleObject );
+					ValidateComponent( SupplyAirPath( PathNum ).ComponentType( CompNum ), SupplyAirPath( PathNum ).ComponentName( CompNum ), IsNotOK, CurrentModuleObject );
 					SupplyAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
 					SupplyAirPath( PathNum ).SplitterIndex( CompNum ) = 0;
 					SupplyAirPath( PathNum ).PlenumIndex( CompNum ) = 0;

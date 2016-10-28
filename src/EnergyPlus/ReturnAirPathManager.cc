@@ -206,7 +206,6 @@ namespace ReturnAirPathManager {
 		// static bool ErrorsFound( false );
 		////////////////////////////////////////////////////////////////////////////////////
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		if ( allocated( ReturnAirPath ) ) {
 			return;

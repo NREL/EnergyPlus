@@ -726,8 +726,6 @@ namespace RoomAirModelManager {
 		int NumOfSurfs; // Index number for last surface of zones
 		int ListSurfNum; // Index number of surfaces listed in the air node object
 		bool SurfNeeded;
-		bool IsNotOK;
-		bool IsBlank;
 
 		// FLOW:
 

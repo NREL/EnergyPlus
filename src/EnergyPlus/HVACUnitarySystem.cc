@@ -2835,7 +2835,6 @@ namespace HVACUnitarySystem {
 		Real64 SteamDensity; // steam density
 		Real64 TotalFloorAreaOnAirLoop; // AirloopHVAC total floor area served
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool AirNodeFound; // used in error checking
 		bool AirLoopFound; // used in error checking
 		bool OASysFound; // used in error checking

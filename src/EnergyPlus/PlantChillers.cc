@@ -625,8 +625,6 @@ namespace PlantChillers {
 		//  CHARACTER(len=MaxNameLength),DIMENSION(9)   :: AlphArray !character string data
 		//  REAL(r64),                        DIMENSION(22)  :: NumArray  !numeric data
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 		//  CHARACTER(len=MaxNameLength) :: cCurrentModuleObject  ! for ease in renaming.
@@ -1003,8 +1001,6 @@ namespace PlantChillers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 
@@ -1433,8 +1429,6 @@ namespace PlantChillers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 
@@ -1831,8 +1825,6 @@ namespace PlantChillers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 
