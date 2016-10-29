@@ -159,7 +159,7 @@ public:
 private:
   Real64 getValue(int surfNum, Kiva::GroundOutput::OutputType oT);
   std::map<int, std::pair<int, Kiva::Surface::SurfaceType>> surfaceMap;
-  std::vector<Kiva::Foundation> foundationInstances;
+  std::map<int,Kiva::Foundation> foundationInstances;
 };
 
 } // HeatBalanceKivaManager

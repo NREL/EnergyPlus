@@ -17528,9 +17528,13 @@ SurfaceProperty:ExposedFoundationPerimeter,
        \required-field
        \type object-list
        \object-list FloorSurfaceNames
-  N1 , \field Exposed Perimeter Fraction
+  N1 , \field Total Exposed Perimeter
        \type real
        \units m
+       \minimum> 0.0
+  N2 , \field Exposed Perimeter Fraction
+       \type real
+       \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 1.0

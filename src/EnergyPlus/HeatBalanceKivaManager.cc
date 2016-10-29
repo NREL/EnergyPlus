@@ -249,7 +249,7 @@ void KivaManager::setupKivaInstances() {
           if (Surfaces(wallSurfaces[0]).Vertex[i].z < minZ) {minZ = Surfaces(wallSurfaces[0]).Vertex[i].z;}
           if (Surfaces(wallSurfaces[0]).Vertex[i].z > maxZ) {maxZ = Surfaces(wallSurfaces[0]).Vertex[i].z;}
         }
-        wallHeight = maxZ - minZ; // TODO Kiva: each wall with different height gets its own instance.
+        wallHeight = maxZ - minZ; // TODO Kiva: each wall with different height gets its own instance. Also use average height in case walls are on slope...
         int constructionNum = Surfaces(wallSurfaces[0]).Construction;
         for (auto& wl : wallSurfaces) {
           for (size_t i = 1; i < Surfaces(wl).Vertex.size(); ++i ) {
@@ -321,23 +321,23 @@ void KivaManager::setupKivaInstances() {
       auto extVIns = foundationInputs[surface.OSCPtr].extVIns;
       auto footing = foundationInputs[surface.OSCPtr].footing;
 
-      if (intHIns.width > 0.0) {
+      if (std::abs(intHIns.width) > 0.0) {
         intHIns.z += fnd.foundationDepth + fnd.slab.totalWidth();
         fnd.inputBlocks.push_back(intHIns);
       }
-      if (intVIns.width > 0.0) {
+      if (std::abs(intVIns.width) > 0.0) {
         fnd.inputBlocks.push_back(intVIns);
       }
-      if (extHIns.width > 0.0) {
+      if (std::abs(extHIns.width) > 0.0) {
         extHIns.z += fnd.wall.heightAboveGrade;
         extHIns.x = fnd.wall.totalWidth();
         fnd.inputBlocks.push_back(extHIns);
       }
-      if (extVIns.width > 0.0) {
+      if (std::abs(extVIns.width) > 0.0) {
         extVIns.x = fnd.wall.totalWidth();
         fnd.inputBlocks.push_back(extVIns);
       }
-      if (footing.width > 0.0) {
+      if (std::abs(footing.width) > 0.0) {
         footing.z = fnd.foundationDepth + fnd.slab.totalWidth() + fnd.wall.depthBelowSlab;
         footing.x = fnd.wall.totalWidth()/2.0 - footing.width/2.0;
         fnd.inputBlocks.push_back(footing);
@@ -354,7 +354,7 @@ void KivaManager::setupKivaInstances() {
             fnd.isExposedPerimeter.push_back(s);
           }
         } else {
-          fnd.useDetailedExposedPerimeter = expPerimMap[surfNum].useDetailedExposedPerimeter;
+          fnd.exposedFraction = expPerimMap[surfNum].exposedFraction;
         }
       } else {
         userSetExposedPerimeter = false;
@@ -385,7 +385,7 @@ void KivaManager::setupKivaInstances() {
       fnd.polygon = floorPolygon;
 
       // add new foundation instance to list of all instances
-      foundationInstances.push_back(fnd);
+      foundationInstances[inst] = fnd;
 
 
       // create output map for ground instance. Calculate average temperature, flux, and convection for each surface
@@ -489,7 +489,7 @@ void KivaManager::calcKivaInstances() {
     grnd.calculate(kv.bcs,DataGlobals::MinutesPerTimeStep*60.);
     grnd.calculateSurfaceAverages();
     kv.reportKivaSurfaces();
-    if (DataEnvironment::Month == 7 && DataEnvironment::DayOfMonth == 24 && DataGlobals::HourOfDay == 16 && DataGlobals::TimeStep == 1) {
+    if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 10 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1) {
       kv.plotDomain();
     }
   }
@@ -500,7 +500,7 @@ void KivaInstanceMap::plotDomain() {
   #ifdef GROUND_PLOT
 
   Kiva::SnapshotSettings ss;
-  ss.dir = DataStringGlobals::outDirPathName + "/snapshot";
+  ss.dir = DataStringGlobals::outDirPathName + "/" + DataSurfaces::Surface(floorSurface).Name;
   double& l = ground.foundation.reductionLength2;
   const double width = 6.0;
   const double depth = ground.foundation.foundationDepth + width/2.0;

@@ -5895,20 +5895,19 @@ namespace SurfaceGeometry {
 
 			Data data;
 			data.useDetailedExposedPerimeter = true;
-			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false;} numF++;
+			int optionsUsed = 0;
+			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter; data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
 
 			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
 			if (numRemainingFields > 0) {
+				optionsUsed++;
 				if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
 					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
 					ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
 					ErrorsFound = true;
 				}
 				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-					if (!lNumericFieldBlanks( numF - 1 ) && !lAlphaFieldBlanks( alpF )) {
-						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", cannot define both \"" + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
-						ErrorsFound = true;
-					}
 					if ( lAlphaFieldBlanks( alpF ) || SameString(cAlphaArgs( alpF ), "YES") ) {
 						data.isExposedPerimeter.push_back(true);
 					} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
@@ -5923,6 +5922,11 @@ namespace SurfaceGeometry {
 					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define either \"" + cAlphaFieldNames( alpF ) + "\" or \"" + cNumericFieldNames(numF - 1) +"\"");
 					ErrorsFound = true;
 				}
+			}
+
+			if (optionsUsed > 1) {
+				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", may only define one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
+				ErrorsFound = true;
 			}
 
 			surfaceMap[Found] = data;
