@@ -5869,6 +5869,7 @@ namespace SurfaceGeometry {
 		using InputProcessor::SameString;
 		using DataSurfaces::Surface;
 		using General::TrimSigDigits;
+		using General::RoundSigDigits;
 
 		int IOStatus; // Used in GetObjectItem
 		int NumAlphas;
@@ -5896,7 +5897,18 @@ namespace SurfaceGeometry {
 			Data data;
 			data.useDetailedExposedPerimeter = true;
 			int optionsUsed = 0;
-			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter; data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
+			if ( !lNumericFieldBlanks( numF ) ) {
+				data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
+				if (data.exposedFraction > 1.0) {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", "+ cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
+					ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
+					ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
+					data.exposedFraction = 1.0;
+				}
+
+				data.useDetailedExposedPerimeter = false;
+				optionsUsed++;
+			} numF++;
 			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
 
 			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
@@ -5917,11 +5929,10 @@ namespace SurfaceGeometry {
 						ErrorsFound = true;
 					} alpF++;
 				}
-			} else {
-				if (lNumericFieldBlanks( numF - 1 )) {
-					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define either \"" + cAlphaFieldNames( alpF ) + "\" or \"" + cNumericFieldNames(numF - 1) +"\"");
-					ErrorsFound = true;
-				}
+			}
+			if (optionsUsed == 0) {
+				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define at least one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
+				ErrorsFound = true;
 			}
 
 			if (optionsUsed > 1) {

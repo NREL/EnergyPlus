@@ -257,7 +257,7 @@ void KivaManager::setupKivaInstances() {
             if (Surfaces(wl).Vertex[i].z > maxZ) {maxZ = Surfaces(wl).Vertex[i].z;}
           }
           Real64 surfHeight = maxZ - minZ;
-          if (std::abs(surfHeight - wallHeight) > 0.00001) {
+          if (std::abs(surfHeight - wallHeight) > 0.001) {
             // TODO Kiva: all walls must be the same height
             ShowSevereError( "all walls must be the same height" );
             ShowFatalError( "KivaManager: Program terminates due to preceding conditions." );
