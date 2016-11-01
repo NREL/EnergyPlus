@@ -73,6 +73,7 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
@@ -88,6 +89,7 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -98,6 +100,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
+#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataPlantPipingSystems.hh>
@@ -111,6 +114,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -135,6 +139,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
@@ -142,8 +147,8 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-
 #include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -156,6 +161,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -192,6 +198,7 @@
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
@@ -204,6 +211,7 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -256,6 +264,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileMeters, flags );
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
+			gio::close( DataGlobals::OutputDElightIn, flags );
 
 		}
 	}
@@ -269,6 +278,7 @@ namespace EnergyPlus {
 		Boilers::clear_state();
 		BoilerSteam::clear_state();
 		BranchInputManager::clear_state();
+		CoolingPanelSimple::clear_state();
 		ChillerExhaustAbsorption::clear_state();
 		ChillerGasAbsorption::clear_state();
 		ChillerIndirectAbsorption::clear_state();
@@ -284,6 +294,7 @@ namespace EnergyPlus {
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
+		DataErrorTracking::clear_state();
 		DataGenerators::clear_state();
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
@@ -293,6 +304,7 @@ namespace EnergyPlus {
 		DataIPShortCuts::clear_state();
 		DataLoopNode::clear_state();
 		DataMoistureBalance::clear_state();
+		DataMoistureBalanceEMPD::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
 		DataPlantPipingSystems::clear_state();
@@ -328,6 +340,7 @@ namespace EnergyPlus {
 		HeatPumpWaterToWaterSimple::clear_state();
 		HeatRecovery::clear_state();
 		HeatingCoils::clear_state();
+		HighTempRadiantSystem::clear_state();
 		Humidifiers::clear_state();
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
@@ -337,10 +350,12 @@ namespace EnergyPlus {
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
+		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
+		MoistureBalanceEMPDManager::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
 		OutdoorAirUnit::clear_state();
@@ -349,6 +364,7 @@ namespace EnergyPlus {
 		OutputReportTabular::clear_state();
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
+		PackagedTerminalHeatPump::clear_state();
 		PlantCondLoopOperation::clear_state();
 		PlantChillers::clear_state();
 		PlantLoadProfile::clear_state();
@@ -383,6 +399,7 @@ namespace EnergyPlus {
 		VentilatedSlab::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();
+		WaterToAirHeatPumpSimple::clear_state();
 		WaterUse::clear_state();
 		WeatherManager::clear_state();
 		WindowAC::clear_state();
@@ -518,6 +535,7 @@ namespace EnergyPlus {
 		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
 		return has_output;
 	}
+
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
 		if ( idf_snippet.empty() ) {

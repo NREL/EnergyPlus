@@ -332,6 +332,9 @@ namespace PlantManager {
 	void
 	CheckIfAnyPlant();
 
+	void
+	CheckOngoingPlantWarnings();
+
 } // PlantManager
 
 } // EnergyPlus

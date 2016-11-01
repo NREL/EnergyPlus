@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+   <key>CFBundleExecutable</key>
+   <string>IDFVersionUpdater</string>
+   <key>CFBundleName</key>
+   <string>IDFVersionUpdater</string>
+   <key>CFBundleIdentifier</key>
+   <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+   <key>CFBundleInfoDictionaryVersion</key>
+   <string>6.0</string>
+   <key>CFBundleVersion</key>
+   <string>0.13.0.2.0</string>
+   <key>CFBundleDevelopmentRegion</key>
+   <string>en</string>
+   <key>CFBundlePackageType</key>
+   <string>APPL</string>
+   <key>CFBundleSignature</key>
+   <string></string>
+   <key>CFBundleGetInfoString</key>
+   <string>0.13</string>
+   <key>CFBundleShortVersionString</key>
+   <string>0.13</string>
+   <key>CFBundleIconFile</key>
+   <string>IDFVersionUpdater.icns</string>
+   <key>LSMinimumSystemVersion</key>
+   <string>10.7</string>
+</dict>
+</plist>

@@ -3,7 +3,6 @@
 !
 ! EnergyPlus Reference Data Set for Window Screens.
 ! Names are based on color and material.
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   WindowMaterial:Screen,

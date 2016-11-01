@@ -122,16 +122,11 @@ namespace UnitVentilator {
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
 	// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::BeginEnvrnFlag;
 	using DataGlobals::BeginDayFlag;
-	using DataGlobals::InitConvTemp;
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
@@ -145,9 +140,6 @@ namespace UnitVentilator {
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
 
 	// Currrent Module Unit type
 	std::string const cMO_UnitVentilator( "ZoneHVAC:UnitVentilator" );
@@ -676,7 +668,7 @@ namespace UnitVentilator {
 				//      \type choice
 				//      \key Coil:Heating:Water
 				//      \key Coil:Heating:Electric
-				//      \key Coil:Heating:Gas
+				//      \key Coil:Heating:Fuel
 				//      \key Coil:Heating:Steam
 				// A15, \field Heating Coil Name
 				//      \type object-list
@@ -696,7 +688,7 @@ namespace UnitVentilator {
 						UnitVent( UnitVentNum ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
 					} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 						UnitVent( UnitVentNum ).HCoilType = Heating_ElectricCoilType;
-					} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+					} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 						UnitVent( UnitVentNum ).HCoilType = Heating_GasCoilType;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\", invalid" );
@@ -1118,7 +1110,7 @@ namespace UnitVentilator {
 
 				if ( UnitVent( UnitVentNum ).HCoilType == Heating_WaterCoilType ) {
 
-					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 					UnitVent( UnitVentNum ).MaxHotWaterFlow = rho * UnitVent( UnitVentNum ).MaxVolHotWaterFlow;
 					UnitVent( UnitVentNum ).MinHotWaterFlow = rho * UnitVent( UnitVentNum ).MinVolHotWaterFlow;
@@ -1713,6 +1705,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1721,8 +1714,8 @@ namespace UnitVentilator {
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
 								}
-								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 								MaxVolHotWaterFlowDes = DesHeatingLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 
 							} else {
@@ -1806,6 +1799,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1910,6 +1904,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoolingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -2110,7 +2105,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
 				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
 			}}
@@ -2138,7 +2133,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
 				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
 			}}

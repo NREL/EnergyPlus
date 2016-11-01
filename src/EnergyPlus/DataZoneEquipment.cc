@@ -136,7 +136,8 @@ namespace DataZoneEquipment {
 	int const RefrigerationAirChillerSet_Num( 27 );
 	int const UserDefinedZoneHVACForcedAir_Num( 28 );
 	int const ZoneUnitarySystem_Num( 29 ); // AirloopHVAC:UnitarySystem configured as zone equipment
-	int const TotalNumZoneEquipType( 29 );
+	int const CoolingPanel_Num( 30 );
+	int const TotalNumZoneEquipType( 30 );
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
@@ -612,6 +613,9 @@ namespace DataZoneEquipment {
 					} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC" ) { // Electric Baseboard
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBElectricConvective_Num;
 
+					} else if ( SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" ) { // Simple Cooling Panel
+						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = CoolingPanel_Num;
+					
 					} else if ( SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT" ) { // High Temperature Radiators
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HiTempRadiant_Num;
 

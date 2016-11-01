@@ -114,6 +114,8 @@ namespace DataGlobals {
 	extern Real64 const KelvinConv; // Conversion factor for C to K and K to C
 	extern Real64 const InitConvTemp; // [deg C], standard init vol to mass flow conversion temp
 	extern Real64 const AutoCalculate; // automatically calculate some fields.
+	extern Real64 const CWInitConvTemp; // [deg C], standard init chilled water vol to mass flow conversion temp
+	extern Real64 const HWInitConvTemp; // [deg C], standard init hot water vol to mass flow conversion temp
 
 	extern Real64 const StefanBoltzmann; // Stefan-Boltzmann constant in W/(m2*K4)
 	extern Real64 const UniversalGasConst; // (J/mol*K)
@@ -184,6 +186,8 @@ namespace DataGlobals {
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
+	extern int OutputDElightIn; // Unit number for the DElight In file
+	extern std::ostream * delightin_stream; // Internal stream used for DElight In file
 	extern bool ZoneSizingCalc; // TRUE if zone sizing calculation
 	extern bool SysSizingCalc; // TRUE if system sizing calculation
 	extern bool DoZoneSizing; // User input in SimulationControl object

@@ -958,6 +958,7 @@ namespace WindowAC {
 		DataScalableSizingON = false;
 		ZoneHeatingOnlyFan = false;
 		ZoneCoolingOnlyFan = true;
+		DataScalableCapSizingON = false;
 		CompType = "ZoneHVAC:WindowAirConditioner";
 		CompName = WindAC( WindACNum ).Name;
 		DataZoneNumber = WindAC( WindACNum ).ZonePtr;
@@ -1066,6 +1067,8 @@ namespace WindowAC {
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = WindAC( WindACNum ).MaxAirVolFlow;
 		}
 
+		DataScalableCapSizingON = false;
+		
 	}
 
 	void

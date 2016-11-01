@@ -2,7 +2,6 @@
 ! SurfaceColorSchemes.idf
 !
 ! EnergyPlus Example Surface Color Schemes
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   OutputControl:SurfaceColorScheme,
