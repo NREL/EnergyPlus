@@ -150,7 +150,8 @@ namespace EnergyPlus {
         if( construction.isGlazingConstruction() ) {
           for( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
             auto& material( Material( construction.LayerPoint( LayNum ) ) );
-            if ( material.Group != WindowGas && material.Group != WindowGasMixture && material.Group != ComplexWindowGap ) {
+            if ( material.Group != WindowGas && material.Group != WindowGasMixture && 
+              material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
               shared_ptr< MaterialProperties > aMaterial = make_shared< MaterialProperties >();
               *aMaterial = material;
 
