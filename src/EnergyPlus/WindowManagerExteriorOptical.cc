@@ -148,23 +148,25 @@ namespace EnergyPlus {
       for( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
         auto& construction( Construct( ConstrNum ) );
         if( construction.isGlazingConstruction() ) {
-          for( auto LayNum = 1; LayNum <= construction.TotSolidLayers; ++LayNum ) {
+          for( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
             auto& material( Material( construction.LayerPoint( LayNum ) ) );
-            shared_ptr< MaterialProperties > aMaterial = make_shared< MaterialProperties >();
-            *aMaterial = material;
+            if ( material.Group != WindowGas && material.Group != WindowGasMixture && material.Group != ComplexWindowGap ) {
+              shared_ptr< MaterialProperties > aMaterial = make_shared< MaterialProperties >();
+              *aMaterial = material;
 
-            // This is necessary because rest of EnergyPlus code relies on TransDiff property 
-            // of construction. It will basically trigger Window optical calculations if this
-            // property is >0.
-            construction.TransDiff = material.Trans;
+              // This is necessary because rest of EnergyPlus code relies on TransDiff property 
+              // of construction. It will basically trigger Window optical calculations if this
+              // property is >0.
+              construction.TransDiff = material.Trans;
 
-            auto aRange = WavelengthRange::Solar;
-            shared_ptr< CBSDFLayer > aSolarLayer = getBSDFLayer( aMaterial, aRange );
-            aWinConst.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
+              auto aRange = WavelengthRange::Solar;
+              shared_ptr< CBSDFLayer > aSolarLayer = getBSDFLayer( aMaterial, aRange );
+              aWinConst.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
 
-            aRange = WavelengthRange::Visible;
-            shared_ptr< CBSDFLayer > aVisibleLayer = getBSDFLayer( aMaterial, aRange );
-            aWinConst.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
+              aRange = WavelengthRange::Visible;
+              shared_ptr< CBSDFLayer > aVisibleLayer = getBSDFLayer( aMaterial, aRange );
+              aWinConst.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
+            }
 
           }
         }
