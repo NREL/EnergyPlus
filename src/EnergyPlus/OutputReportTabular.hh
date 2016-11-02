@@ -774,6 +774,12 @@ namespace OutputReportTabular {
 	WriteSurfaceShadowing();
 
 	void
+	WriteEioTables();
+
+	std::vector<std::string>
+	splitCommaString(std::string inputString);
+	
+	void
 	AddTOCZoneLoadComponentTable();
 
 	void

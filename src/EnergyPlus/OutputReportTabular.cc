@@ -5170,6 +5170,7 @@ namespace OutputReportTabular {
 		int EchoInputFile; // found unit number for 'eplusout.audit'
 
 		FillWeatherPredefinedEntries();
+		WriteEioTables();
 		FillRemainingPredefinedEntries();
 
 		if ( WriteTabularFiles ) {
@@ -10783,6 +10784,78 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			}
 		}
+	}
+
+    // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
+	// J. Glazer - October 2, 2016
+	void
+	WriteEioTables() {
+
+		// since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
+		gio::close(OutputFileInits); 		// for testing only
+
+		std::ifstream eioFile;
+		eioFile.open(DataStringGlobals::outputEioFileName);
+		std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
+		std::vector<std::string> bodyLines;    // holds the data records only
+		std::string line;
+		while (std::getline(eioFile, line))
+		{
+			if (line.at(0) == '!')
+			{
+				headerLines.push_back(line);
+			} else {
+				if (line.at(0) == ' ') {
+					bodyLines.push_back(line.erase(0, 1)); // remove leading space
+				} else {
+					bodyLines.push_back(line); 
+				}
+			}
+		}
+		eioFile.close();
+
+		// now go through each header and create a report for each one
+		std::vector<std::string> headerFields;
+		std::string tableNameWithSigns;
+		std::string tableName;
+		for (auto headerLine : headerLines)
+		{
+			headerFields = splitCommaString(headerLine);
+			tableNameWithSigns = headerFields.at(0);
+			tableName = tableNameWithSigns.substr(3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
+			// first count the number of matching lines
+			int countOfMatchingLines = 0;
+			for (auto bodyLine : bodyLines)
+			{ 
+				if (bodyLine.size() > tableName.size()) {
+					if (bodyLine.substr(0, tableName.size()) == tableName) {
+						++countOfMatchingLines;
+					}
+				}
+			}
+			int numRows = countOfMatchingLines;
+
+
+		}
+
+		// reopen the EIO initilization file and position it at the end of the file so that additional writes continue to be added at the end.
+		int write_stat;
+		{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); flags.POSITION("APPEND"); gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags); write_stat = flags.ios(); }
+		// as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
+	}
+
+	// function that returns a vector of strings when given a string with comma delimitters
+	std::vector<std::string>
+	splitCommaString(std::string inputString) 
+	{
+		std::vector<std::string> fields;
+		std::string field;
+		std::stringstream inputSS(inputString);
+		while (std::getline(inputSS, field, ','))
+		{
+			fields.push_back(field);
+		}
+		return fields;
 	}
 
 	void
