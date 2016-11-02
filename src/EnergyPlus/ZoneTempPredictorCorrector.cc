@@ -4219,14 +4219,10 @@ namespace ZoneTempPredictorCorrector {
 								}
 							}
 							// Calculate multiplier
-							if (abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.1){
-								MultpHM = AirCapHM / (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) * (TimeStepSys * SecInHour); // Inverse equation
-								
-								if (( MultpHM < 1.0 ) || ( MultpHM > 30.0 )){ // HM multiplier must be greater than 1 and less than 30
-									MultpHM = 1.0; // @@ 1.0 is the default value_zrp
-								}
-							} else {
-								MultpHM = 1.0;
+							MultpHM = AirCapHM / (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) * (TimeStepSys * SecInHour); // Inverse equation
+
+							if ((MultpHM < 1.0) || (MultpHM > 30.0)){ // HM multiplier must be greater than 1 and less than 30
+								MultpHM = 1.0; // @@ 1.0 is the default value_zrp
 							}
 						}
 
