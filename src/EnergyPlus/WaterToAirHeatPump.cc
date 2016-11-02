@@ -373,19 +373,9 @@ namespace WaterToAirHeatPump {
 			++HPNum;
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-
-			InputProcessor::VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			WatertoAirHP( HPNum ).Name = AlphArray( 1 );
 			WatertoAirHP( HPNum ).WatertoAirHPType = "COOLING";
@@ -480,19 +470,9 @@ namespace WaterToAirHeatPump {
 			++HPNum;
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-
-			InputProcessor::VerifyName( AlphArray( 1 ), WatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			WatertoAirHP( HPNum ).Name = AlphArray( 1 );
 			WatertoAirHP( HPNum ).WatertoAirHPType = "HEATING";

@@ -649,7 +649,6 @@ namespace PackagedTerminalHeatPump {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		static bool errFlag( false ); // Error flag returned during CALL to mining functions
 		Real64 FanVolFlow; // maximum supply air volumetric flow rate of fan

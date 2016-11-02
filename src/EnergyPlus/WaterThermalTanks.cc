@@ -101,6 +101,7 @@
 #include <SolarCollectors.hh>
 #include <IntegratedHeatPump.hh>
 #include <VariableSpeedCoils.hh>
+#include <zlib/deflate.h>
 
 namespace EnergyPlus {
 
@@ -270,6 +271,7 @@ namespace WaterThermalTanks {
 
 	// Object Data
 	Array1D< WaterThermalTankData > WaterThermalTank;
+	std::unordered_map < std::string, std::string > WaterThermalTankUniqueNames;
 	Array1D< HeatPumpWaterHeaterData > HPWaterHeater;
 	Array1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
 
@@ -1186,6 +1188,7 @@ namespace WaterThermalTanks {
 
 			if ( NumWaterThermalTank > 0 ) {
 				WaterThermalTank.allocate( NumWaterThermalTank );
+				WaterThermalTankUniqueNames.reserve(static_cast< unsigned > (NumWaterThermalTank));
 				WHSaveNodeNames.allocate( NumWaterThermalTank );
 				CheckWTTEquipName.dimension( NumWaterThermalTank, true );
 			}
@@ -2369,15 +2372,8 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterHeaterMixed; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					InputProcessor::VerifyUniqueInterObjectName(WaterThermalTankUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-					IsNotOK = false;
-					IsBlank = false;
-
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
 					WaterThermalTank( WaterThermalTankNum ).TypeNum = MixedWaterHeater;
@@ -2808,14 +2804,8 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - NumWaterHeaterMixed, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					InputProcessor::VerifyUniqueInterObjectName(WaterThermalTankUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - NumWaterHeaterMixed - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
 					WaterThermalTank( WaterThermalTankNum ).TypeNum = StratifiedWaterHeater;
@@ -3356,14 +3346,8 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + NumWaterHeaterStratified + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					InputProcessor::VerifyUniqueInterObjectName(WaterThermalTankUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
 					WaterThermalTank( WaterThermalTankNum ).TypeNum = MixedChilledWaterStorage;
@@ -3574,15 +3558,8 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + NumChilledWaterStratified; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+					InputProcessor::VerifyUniqueInterObjectName(WaterThermalTankUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-					IsNotOK = false;
-					IsBlank = false;
-
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterThermalTank, WaterThermalTankNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
 					WaterThermalTank( WaterThermalTankNum ).TypeNum = StratifiedChilledWaterStorage;
@@ -11122,6 +11099,7 @@ namespace WaterThermalTanks {
 		InitWaterThermalTanksOnce = true;
 		CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
 		WaterThermalTank.deallocate();
+		WaterThermalTankUniqueNames.clear();
 		HPWaterHeater.deallocate();
 		WaterHeaterDesuperheater.deallocate();
 	}
