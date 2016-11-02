@@ -348,7 +348,7 @@ namespace Humidifiers {
 
 		// allocate the data array
 		Humidifier.allocate( NumHumidifiers );
-		HumidifierUniqueNames.reserve( NumHumidifiers );
+		HumidifierUniqueNames.reserve( static_cast< unsigned >( NumHumidifiers ) );
 		CheckEquipName.dimension( NumHumidifiers, true );
 
 		Alphas.allocate( MaxAlphas );

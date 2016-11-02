@@ -451,7 +451,6 @@ namespace PlantCondLoopOperation {
 			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
 				InputProcessor::GetObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
 				                              IOStat);
-
 				if ( InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound) ) continue;
 			}
 
@@ -583,7 +582,6 @@ namespace PlantCondLoopOperation {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		bool IsBlank; // Flag for blank name
 		bool ErrorsFound; // May be set here and passed on
 		int CLRBO; // Number ofCooling Load Range Based Operation Inputs
 		int HLRBO; // Number ofHeating Load Range Based Operation Inputs
@@ -605,7 +603,7 @@ namespace PlantCondLoopOperation {
 		int NumSchemeLists;
 		int LoopNum;
 		std::string CurrentModuleObject; // for ease in renaming.
-		Array1D_string TempVerifyNames;
+		std::unordered_map< std::string, std::string > UniqueNames;
 
 		ErrorsFound = false; //DSU CS
 
@@ -629,7 +627,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		// test for blank or duplicates -- this section just determines if there are any duplicate operation scheme names
-		TempVerifyNames.allocate( NumSchemes );
+		UniqueNames.reserve( static_cast< unsigned >( NumSchemes ) );
 
 		//Check for existence of duplicates in keyword names
 		Count = 0;
@@ -678,16 +676,13 @@ namespace PlantCondLoopOperation {
 			}
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, ErrorsFound, IsBlank, CurrentModuleObject + " Name" );
-			TempVerifyNames( Num ) = cAlphaArgs( 1 );
-
+			InputProcessor::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
 		}
 
 		//**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
 		PELists = InputProcessor::GetNumObjectsFound( "PlantEquipmentList" );
 		CELists = InputProcessor::GetNumObjectsFound( "CondenserEquipmentList" );
 		NumSchemeLists = PELists + CELists;
-		TempVerifyNames.allocate( NumSchemeLists );
 		Count = 0;
 		for ( Num = 1; Num <= NumSchemeLists; ++Num ) {
 			if ( Num <= PELists ) {
@@ -698,9 +693,7 @@ namespace PlantCondLoopOperation {
 				Count = Num - PELists;
 			}
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), TempVerifyNames, Num - 1, ErrorsFound, IsBlank, CurrentModuleObject + " Name" );
-			if ( ErrorsFound ) continue;
-			TempVerifyNames( Num ) = cAlphaArgs( 1 );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
 		}
 
 		//**********GET INPUT AND LOAD PLANT DATA STRUCTURE*********

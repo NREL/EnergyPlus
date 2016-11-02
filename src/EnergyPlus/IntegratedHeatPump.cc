@@ -568,22 +568,8 @@ namespace EnergyPlus {
 				++DXCoilNum;
 				AlfaFieldIncre = 1;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat,
-				               lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				IsNotOK = false;
-				IsBlank = false;
-
-				InputProcessor::VerifyName( AlphArray( 1 ), IntegratedHeatPumps, DXCoilNum - 1, IsNotOK, IsBlank,
-				            CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-				VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
-				if ( errFlag ) {
-					ErrorsFound = true;
-				}
+				InputProcessor::GetObjectItem( CurrentModuleObject, CoilCounter, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 				IntegratedHeatPumps( DXCoilNum ).Name = AlphArray( 1 );
 				IntegratedHeatPumps( DXCoilNum ).IHPtype = "AIRSOURCE_IHP";

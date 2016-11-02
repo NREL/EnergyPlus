@@ -168,14 +168,17 @@
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -190,6 +193,7 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
@@ -391,6 +395,8 @@ namespace EnergyPlus {
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PackagedTerminalHeatPump::clear_state();
+		Pipes::clear_state();
+		PipeHeatTransfer::clear_state();
 		PlantCondLoopOperation::clear_state();
 		PlantChillers::clear_state();
 		PlantLoadProfile::clear_state();
@@ -398,8 +404,9 @@ namespace EnergyPlus {
 		PlantManager::clear_state();
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
-		Pipes::clear_state();
+		PlantPipingSystemsManager::clear_state();
 		PollutionModule::clear_state();
+		PoweredInductionUnits::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
@@ -413,6 +420,7 @@ namespace EnergyPlus {
 		SimulationManager::clear_state();
 		SingleDuct::clear_state();
 		SizingManager::clear_state();
+		SolarCollectors::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
 		SurfaceGeometry::clear_state();

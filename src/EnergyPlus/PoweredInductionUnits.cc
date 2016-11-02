@@ -168,6 +168,13 @@ namespace PoweredInductionUnits {
 
 	// Object Data
 	Array1D< PowIndUnitData > PIU;
+	std::unordered_map< std::string, std::string > PiuUniqueNames;
+
+	void
+	clear_state() {
+		PiuUniqueNames.clear();
+		GetPIUInputFlag = true;
+	}
 
 	void
 	SimPIU(
@@ -335,7 +342,6 @@ namespace PoweredInductionUnits {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CtrlZone; // controlled zome do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		bool AirNodeFound;
@@ -351,6 +357,7 @@ namespace PoweredInductionUnits {
 		NumPIUs = NumSeriesPIUs + NumParallelPIUs;
 		// allocate the data structures
 		PIU.allocate( NumPIUs );
+		PiuUniqueNames.reserve( static_cast< unsigned >( NumPIUs ) );
 		CheckEquipName.dimension( NumPIUs, true );
 
 		// loop over Series PIUs; get and load the input data
@@ -361,13 +368,7 @@ namespace PoweredInductionUnits {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PIU( PIUNum ).Name = cAlphaArgs( 1 );
 			PIU( PIUNum ).UnitType = cCurrentModuleObject;
 			PIU( PIUNum ).UnitType_Num = SingleDuct_SeriesPIU_Reheat;
@@ -478,13 +479,7 @@ namespace PoweredInductionUnits {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex + NumSeriesPIUs;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PIU, PIUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PIU( PIUNum ).Name = cAlphaArgs( 1 );
 			PIU( PIUNum ).UnitType = cCurrentModuleObject;
 			PIU( PIUNum ).UnitType_Num = SingleDuct_ParallelPIU_Reheat;

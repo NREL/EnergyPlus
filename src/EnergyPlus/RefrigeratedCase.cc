@@ -484,6 +484,7 @@ namespace RefrigeratedCase {
 	Array1D< RefrigSystemData > System;
 	Array1D< TransRefrigSystemData > TransSystem;
 	Array1D< RefrigCondenserData > Condenser;
+	std::unordered_map< std::string, std::string > UniqueCondenserNames;
 	Array1D< RefrigCompressorData > Compressor;
 	Array1D< RefrigGasCoolerData > GasCooler;
 	Array1D< SubcoolerData > Subcooler;
@@ -499,6 +500,10 @@ namespace RefrigeratedCase {
 
 	// Functions
 
+	void
+	clear_state() {
+		UniqueCondenserNames.clear();
+	}
 	void
 	ManageRefrigeratedCaseRacks()
 	{
@@ -698,8 +703,6 @@ namespace RefrigeratedCase {
 		Array1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
 		static bool CaseLoads( false ); // Flag to help verify load type with loads served by systems cooled by cascade condensers
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		static bool IsNotOK( false ); // Flag to verify name
-		static bool IsBlank( false ); // Flag for blank name
 		static bool StartCycle( false ); // Flag for counting defrost cycles
 
 		static int AlphaListNum( 0 ); // Index of Names in Case, Compressor et al Lists
@@ -922,6 +925,7 @@ namespace RefrigeratedCase {
 		if ( NumRefrigCondensers > 0 ) {
 			HeatReclaimRefrigCondenser.allocate( NumRefrigCondensers );
 			Condenser.allocate( NumRefrigCondensers );
+			UniqueCondenserNames.reserve( static_cast< unsigned >( NumRefrigCondensers ) );
 		}
 		if ( NumSimulationGasCooler > 0 ) {
 			GasCooler.allocate( NumSimulationGasCooler );
@@ -2962,14 +2966,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
 				for ( CondNum = 1; CondNum <= NumSimulationCondAir; ++CondNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + " = " + Alphas( 1 ) );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 					Condenser( CondNum ).CapCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -3072,14 +3069,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3272,14 +3262,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3407,14 +3390,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 

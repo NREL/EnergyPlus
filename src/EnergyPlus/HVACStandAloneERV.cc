@@ -171,6 +171,10 @@ namespace HVACStandAloneERV {
 
 	// Object Data
 	Array1D< StandAloneERVData > StandAloneERV;
+	std::unordered_set< std::string > HeatExchangerUniqueNames;
+	std::unordered_set< std::string > SupplyAirFanUniqueNames;
+	std::unordered_set< std::string > ExhaustAirFanUniqueNames;
+	std::unordered_set< std::string > ControllerUniqueNames;
 
 	// Functions
 
@@ -182,6 +186,10 @@ namespace HVACStandAloneERV {
 		MySizeFlag.deallocate();
 		CheckEquipName.deallocate();
 		StandAloneERV.deallocate();
+		HeatExchangerUniqueNames.clear();
+		SupplyAirFanUniqueNames.clear();
+		ExhaustAirFanUniqueNames.clear();
+		ControllerUniqueNames.clear();
 	}
 
 	void
@@ -286,17 +294,9 @@ namespace HVACStandAloneERV {
 		// na
 
 		// Using/Aliasing
-
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using MixedAir::OAController;
-		using MixedAir::CheckOAControllerName;
 		using DataHeatBalance::Zone;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneControls::HumidityControlZone;
@@ -398,6 +398,10 @@ namespace HVACStandAloneERV {
 
 		// allocate the data structures
 		StandAloneERV.allocate( NumStandAloneERVs );
+		HeatExchangerUniqueNames.reserve( static_cast< unsigned >( NumStandAloneERVs ) );
+		SupplyAirFanUniqueNames.reserve( static_cast< unsigned >( NumStandAloneERVs ) );
+		ExhaustAirFanUniqueNames.reserve( static_cast< unsigned >( NumStandAloneERVs ) );
+		ControllerUniqueNames.reserve( static_cast< unsigned >( NumStandAloneERVs ) );
 		CheckEquipName.dimension( NumStandAloneERVs, true );
 
 		// loop over Stand Alone ERV units; get and load the input data
@@ -405,13 +409,6 @@ namespace HVACStandAloneERV {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, StandAloneERVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			StandAloneERVNum = StandAloneERVIndex; // separate variables in case other objects read by this module at some point later
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), StandAloneERV, StandAloneERVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
 			StandAloneERV( StandAloneERVNum ).Name = Alphas( 1 );
 			StandAloneERV( StandAloneERVNum ).UnitType = CurrentModuleObject;
 
@@ -425,11 +422,7 @@ namespace HVACStandAloneERV {
 				}
 			}
 
-			InputProcessor::VerifyName( Alphas( 3 ), StandAloneERV, &StandAloneERVData::HeatExchangerName, StandAloneERVNum - 1, IsNotOK, IsBlank, "HeatExchanger:AirToAir:SensibleAndLatent" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 3 ) = "xxxxx";
-			}
+			GlobalNames::IntraObjUniquenessCheck( Alphas( 3 ), CurrentModuleObject, cAlphaFields( 3 ), HeatExchangerUniqueNames, ErrorsFound );
 			StandAloneERV( StandAloneERVNum ).HeatExchangerName = Alphas( 3 );
 			errFlag = false;
 			StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum = GetHeatExchangerObjectTypeNum( StandAloneERV( StandAloneERVNum ).HeatExchangerName, errFlag );
@@ -447,11 +440,7 @@ namespace HVACStandAloneERV {
 			StandAloneERV( StandAloneERVNum ).DesignHXVolFlowRate = HXSupAirFlowRate;
 
 			StandAloneERV( StandAloneERVNum ).SupplyAirFanName = Alphas( 4 );
-			InputProcessor::VerifyName( Alphas( 4 ), StandAloneERV, &StandAloneERVData::SupplyAirFanName, StandAloneERVNum - 1, IsNotOK, IsBlank, "Fan:OnOff" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 4 ) = "xxxxx";
-			}
+			GlobalNames::IntraObjUniquenessCheck( Alphas( 4 ), CurrentModuleObject, cAlphaFields( 4 ), SupplyAirFanUniqueNames, ErrorsFound );
 
 			errFlag = false;
 			GetFanType( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, SAFanTypeNum, errFlag, CurrentModuleObject, StandAloneERV( StandAloneERVNum ).Name );
@@ -480,11 +469,7 @@ namespace HVACStandAloneERV {
 			StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = SAFanVolFlowRate;
 
 			StandAloneERV( StandAloneERVNum ).ExhaustAirFanName = Alphas( 5 );
-			InputProcessor::VerifyName( Alphas( 5 ), StandAloneERV, &StandAloneERVData::ExhaustAirFanName, StandAloneERVNum - 1, IsNotOK, IsBlank, "Fan:OnOff Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 5 ) = "xxxxx";
-			}
+			GlobalNames::IntraObjUniquenessCheck( Alphas( 5 ), CurrentModuleObject, cAlphaFields( 5 ), ExhaustAirFanUniqueNames, ErrorsFound );
 			errFlag = false;
 			GetFanType( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, EAFanTypeNum, errFlag, CurrentModuleObject, StandAloneERV( StandAloneERVNum ).Name );
 			if ( ! errFlag ) {
@@ -590,11 +575,9 @@ namespace HVACStandAloneERV {
 				StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 			} else {
 				// Verify controller name in Stand Alone ERV object matches name of valid controller object
-				InputProcessor::VerifyName( Alphas( 6 ), StandAloneERV, &StandAloneERVData::ControllerName, StandAloneERVNum - 1, IsNotOK, IsBlank, "ZoneHVAC:EnergyRecoveryVentilator:Controller Name" );
+				GlobalNames::IntraObjUniquenessCheck( Alphas( 6 ), CurrentModuleObject, cAlphaFields( 6 ), ControllerUniqueNames, ErrorsFound );
 				StandAloneERV( StandAloneERVNum ).ControllerNameDefined = true;
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 6 ) = "xxxxx";
+				if ( ErrorsFound ) {
 					StandAloneERV( StandAloneERVNum ).ControllerNameDefined = false;
 				}
 
@@ -736,15 +719,6 @@ namespace HVACStandAloneERV {
 
 		for ( ERVControllerNum = 1; ERVControllerNum <= NumERVCtrlrs; ++ERVControllerNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, ERVControllerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			CheckOAControllerName( Alphas( 1 ), ERVControllerNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
-
 			++OutAirNum;
 			auto & thisOAController( OAController( OutAirNum ) );
 

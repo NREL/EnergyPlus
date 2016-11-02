@@ -294,6 +294,7 @@ namespace OutputProcessor {
 	Array1D< MeterArrayType > VarMeterArrays;
 	Array1D< MeterType > EnergyMeters;
 	Array1D< EndUseCategoryType > EndUseCategory;
+	std::unordered_map< std::string, std::string > UniqueMeterNames;
 
 	// Routines tagged on the end of this module:
 	//  AddToOutputVariableList
@@ -390,6 +391,7 @@ namespace OutputProcessor {
 		VarMeterArrays.deallocate();
 		EnergyMeters.deallocate();
 		EndUseCategory.deallocate();
+		UniqueMeterNames.clear();
 	}
 
 	void
@@ -1629,8 +1631,6 @@ namespace OutputProcessor {
 		int IOStat;
 		int NumCustomMeters;
 		int NumCustomDecMeters;
-		bool IsNotOK;
-		bool IsBlank;
 		int fldIndex;
 		bool KeyIsStar;
 		Array1D_string NamesOfKeys; // Specific key name
@@ -1669,13 +1669,8 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( ErrorsFound ) continue;
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );
 			VarsOnCustomMeter = 0;
@@ -1821,13 +1816,8 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( ErrorsFound ) continue;
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );
 			VarsOnCustomMeter = 0;
