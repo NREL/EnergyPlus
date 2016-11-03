@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <fstream>
-#include <set>
+
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -24,8 +24,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include <GlobalNames.hh>
 #include <UtilityRoutines.hh>
+#include <GlobalNames.hh>
 
 using json = nlohmann::json;
 

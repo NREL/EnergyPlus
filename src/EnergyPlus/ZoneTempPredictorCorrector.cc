@@ -421,8 +421,6 @@ namespace ZoneTempPredictorCorrector {
 		//unused1208  CHARACTER(len=MaxNameLength), DIMENSION(29) :: AlphArray
 		static bool ErrorsFound( false );
 		bool errFlag;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CTIndex;
 		int HumidControlledZoneNum; // The Humidity Controller that information is being loaded into
 		bool ValidScheduleControlType;

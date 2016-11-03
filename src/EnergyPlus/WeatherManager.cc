@@ -5414,8 +5414,6 @@ Label9999: ;
 		int NumNumeric; // Number of numbers being input
 		int IOStat; // IO Status when calling get input subroutine
 		int Loop;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int Count;
 		int RP; // number of run periods
 		int RPAW; // number of run periods, actual weather
@@ -5829,8 +5827,6 @@ Label9999: ;
 		int NumNumerics; // Number of Numerics being input
 		int IOStat; // IO Status when calling get input subroutine
 		int Loop;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int RPD1;
 		int RPD2;
 		int Count;

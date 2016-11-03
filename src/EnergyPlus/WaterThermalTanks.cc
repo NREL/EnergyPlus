@@ -1098,8 +1098,6 @@ namespace WaterThermalTanks {
 		int CondNum; // Index to refrigration condenser
 		int DXCoilNum; // Index to DX coils
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool IsValid; // Flag for validating PLF curve, OutsideAirNode
 		static std::string FanInletNode; // Used to set up comp set
 		static std::string FanOutletNode; // Used to set up comp set

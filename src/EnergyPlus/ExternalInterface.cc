@@ -1060,8 +1060,6 @@ namespace ExternalInterface {
 		int retValfmiVersion;
 		int retValfmiPathLib;
 		Array1D_string NameListInstances( 5 );
-		bool IsNotOK;
-		bool IsBlank;
 		static bool FirstCallIni( true ); // First time, input has been read
 		bool fileExist;
 		std::string tempFullFileName;
