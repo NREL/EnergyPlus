@@ -148,7 +148,7 @@ namespace DemandManager {
 	// Object Data
 	Array1D< DemandManagerListData > DemandManagerList;
 	Array1D< DemandManagerData > DemandMgr;
-	std::unordered_map< std::string, std::string > DemandMgr_map;
+	std::unordered_map< std::string, std::string > UniqueDemandMgrNames;
 
 	// MODULE SUBROUTINES:
 
@@ -167,7 +167,7 @@ namespace DemandManager {
 		GetInput = true;
 		DemandManagerList.deallocate();
 		DemandMgr.deallocate();
-		DemandMgr_map.clear();
+		UniqueDemandMgrNames.clear();
 	}
 
 	void
@@ -712,7 +712,7 @@ namespace DemandManager {
 			NumArray.dimension( MaxNums, 0.0 );
 
 			DemandMgr.allocate( NumDemandMgr );
-			DemandMgr_map.reserve( NumDemandMgr );
+			UniqueDemandMgrNames.reserve( NumDemandMgr );
 
 			// Get input for DemandManager:ExteriorLights
 			StartIndex = 1;
@@ -723,7 +723,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeExtLights;
@@ -821,7 +821,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeLights;
@@ -939,7 +939,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeElecEquip;
@@ -1058,7 +1058,7 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeThermostats;
@@ -1183,7 +1183,7 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				InputProcessor::VerifyUniqueInterObjectName( DemandMgr_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeVentilation;

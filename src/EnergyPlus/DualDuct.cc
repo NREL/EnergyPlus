@@ -154,7 +154,7 @@ namespace DualDuct {
 
 	// Object Data
 	Array1D< DamperDesignParams > Damper;
-	std::unordered_map< std::string, std::string > Damper_map;
+	std::unordered_map< std::string, std::string > UniqueDamperNames;
 	Array1D< DamperFlowConditions > DamperInlet;
 	Array1D< DamperFlowConditions > DamperHotAirInlet;
 	Array1D< DamperFlowConditions > DamperColdAirInlet;
@@ -345,7 +345,7 @@ namespace DualDuct {
 		NumDualDuctVarVolOA = InputProcessor::GetNumObjectsFound( cCMO_DDVarVolOA );
 		NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
 		Damper.allocate( NumDampers );
-		Damper_map.reserve( NumDampers );
+		UniqueDamperNames.reserve( NumDampers );
 		CheckEquipName.dimension( NumDampers, true );
 
 		DamperInlet.allocate( NumDampers );
@@ -364,7 +364,7 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex;
-				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_ConstantVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -425,7 +425,7 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
-				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_VariableVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -493,7 +493,7 @@ namespace DualDuct {
 				InputProcessor::GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
-				InputProcessor::VerifyUniqueInterObjectName( Damper_map, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_OutdoorAir;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -2196,7 +2196,7 @@ namespace DualDuct {
 
 	void
 	clear_state() {
-		Damper_map.clear();
+		UniqueDamperNames.clear();
 	}
 
 } // DualDuct

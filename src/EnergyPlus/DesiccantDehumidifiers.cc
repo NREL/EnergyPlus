@@ -204,7 +204,7 @@ namespace DesiccantDehumidifiers {
 
 	// Object Data
 	Array1D< DesiccantDehumidifierData > DesicDehum;
-	std::unordered_map< std::string, std::string > DesicDehum_map;
+	std::unordered_map< std::string, std::string > UniqueDesicDehumNames;
 
 	// Functions
 
@@ -427,7 +427,7 @@ namespace DesiccantDehumidifiers {
 		NumDesicDehums = NumSolidDesicDehums + NumGenericDesicDehums;
 		// allocate the data array
 		DesicDehum.allocate( NumDesicDehums );
-		DesicDehum_map.reserve( NumDesicDehums );
+		UniqueDesicDehumNames.reserve( NumDesicDehums );
 		GetInputDesiccantDehumidifier = false;
 
 		InputProcessor::GetObjectDefMaxArgs( dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers );
@@ -452,7 +452,7 @@ namespace DesiccantDehumidifiers {
 			InputProcessor::GetObjectItem( CurrentModuleObject, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			DesicDehumNum = DesicDehumIndex;
 
-			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Solid;
@@ -737,7 +737,7 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Generic;
 			InputProcessor::GetObjectItem( DesicDehum( DesicDehumNum ).DehumType, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::VerifyUniqueInterObjectName( DesicDehum_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFoundGeneric );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFoundGeneric );
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 
 			ErrorsFound2 = false;
@@ -2879,7 +2879,7 @@ namespace DesiccantDehumidifiers {
 		GetInputDesiccantDehumidifier = true;
 		InitDesiccantDehumidifierOneTimeFlag = true;
 		DesicDehum.deallocate();
-		DesicDehum_map.clear();
+		UniqueDesicDehumNames.clear();
 	}
 
 	//        End of Reporting subroutines for the SimAir Module

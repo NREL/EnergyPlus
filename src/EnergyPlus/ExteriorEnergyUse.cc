@@ -118,7 +118,7 @@ namespace ExteriorEnergyUse {
 	int const DistrictHeatUse( 12 ); // Purchased Heating
 	int const OtherFuel1Use( 13 ); // OtherFuel1
 	int const OtherFuel2Use( 14 ); // OtherFuel2
-	bool GetInputFlag( true ); // First time, input is "gotten"
+	bool GetExteriorEnergyInputFlag( true ); // First time, input is "gotten"
 
 	int const ScheduleOnly( 1 ); // exterior lights only on schedule
 	int const AstroClockOverride( 2 ); // exterior lights controlled to turn off during day.
@@ -138,7 +138,7 @@ namespace ExteriorEnergyUse {
 	// Object Data
 	Array1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
 	Array1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
-	std::unordered_map< std::string, std::string > ExteriorEquipment_map;
+	std::unordered_map< std::string, std::string > UniqueExteriorEquipNames;
 
 	// Functions
 
@@ -151,8 +151,8 @@ namespace ExteriorEnergyUse {
 		NumExteriorEqs = 0;
 		ExteriorLights.deallocate();
 		ExteriorEquipment.deallocate();
-		ExteriorEquipment_map.clear();
-		GetInputFlag = true;
+		UniqueExteriorEquipNames.clear();
+		GetExteriorEnergyInputFlag = true;
 	}
 
 	void
@@ -168,9 +168,9 @@ namespace ExteriorEnergyUse {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine provides the usual call for the Simulation Manager.
 
-		if ( GetInputFlag ) {
+		if ( GetExteriorEnergyInputFlag ) {
 			GetExteriorEnergyUseInput();
-			GetInputFlag = false;
+			GetExteriorEnergyInputFlag = false;
 		}
 
 		ReportExteriorEnergyUse();
@@ -244,9 +244,9 @@ namespace ExteriorEnergyUse {
 		NumFuelEq = InputProcessor::GetNumObjectsFound( "Exterior:FuelEquipment" );
 		NumWtrEq = InputProcessor::GetNumObjectsFound( "Exterior:WaterEquipment" );
 		ExteriorEquipment.allocate( NumFuelEq + NumWtrEq );
-		ExteriorEquipment_map.reserve( NumFuelEq + NumWtrEq );
+		UniqueExteriorEquipNames.reserve( NumFuelEq + NumWtrEq );
 
-		GetInputFlag = false;
+		GetExteriorEnergyInputFlag = false;
 		NumExteriorEqs = 0;
 
 		// =================================  Get Exterior Lights
@@ -325,7 +325,7 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( ExteriorEquipment_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 			++NumExteriorEqs;
@@ -391,7 +391,7 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( ExteriorEquipment_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
 
 			++NumExteriorEqs;

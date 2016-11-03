@@ -196,7 +196,7 @@ namespace Fans {
 
 	// Object Data
 	Array1D< FanEquipConditions > Fan;
-	std::unordered_map< std::string, std::string > Fan_map;
+	std::unordered_map< std::string, std::string > UniqueFanNames;
 	Array1D< NightVentPerfData > NightVentPerf;
 	Array1D< FanNumericFieldData > FanNumericFields;
 
@@ -447,7 +447,7 @@ namespace Fans {
 		if ( NumFans > 0 ) {
 			Fan.allocate( NumFans );
 			FanNumericFields.allocate( NumFans );
-			Fan_map.reserve( NumFans );
+			UniqueFanNames.reserve( NumFans );
 		}
 		CheckEquipName.dimension( NumFans, true );
 
@@ -460,7 +460,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -508,7 +508,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -575,7 +575,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -689,7 +689,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -793,7 +793,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( Fan_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 ); // Fan name
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 
@@ -3367,7 +3367,7 @@ namespace Fans {
 		Fan.deallocate();
 		NightVentPerf.deallocate();
 		FanNumericFields.deallocate();
-		Fan_map.clear();
+		UniqueFanNames.clear();
 
 	}
 
