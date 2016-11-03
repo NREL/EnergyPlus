@@ -104,7 +104,6 @@
 #include <HVACStandAloneERV.hh>
 #include <HVACUnitarySystem.hh>
 #include <HVACVariableRefrigerantFlow.hh>
-#include <HybridModel.hh>// Addedy by Sang Hoon Lee November 2015
 #include <HWBaseboardRadiator.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
@@ -4432,7 +4431,6 @@ namespace ZoneEquipmentManager {
 		using DataGlobals::HourOfDay;
 		using DataHVACGlobals::TimeStepSys;
 		using namespace DataLoopNode;
-		using namespace HybridModel; // Added by Sang Hoon Lee November 2015
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4551,8 +4549,6 @@ namespace ZoneEquipmentManager {
 		VentMCP = 0.0;
 		MDotCPOA = 0.0;
 		MDotOA = 0.0;
-		MCPIHM = 0.0; // Added by Sang Hoon Lee February 2016
-
 		MCPThermChim = 0.0;
 		ThermChimAMFL = 0.0;
 		MCPTThermChim = 0.0;
@@ -5256,27 +5252,6 @@ namespace ZoneEquipmentManager {
 				OAMFL( NZ ) += MCpI_temp / CpAir;
 				MCPTI( NZ ) += MCpI_temp * TempExt;
 			}
-
-			// When Hybrid Modeling Infiltration is YES_added by Sang Hoon Lee, November 2015 
-			if ( FlagHybridModel && HybridModelZone( NZ ).InfiltrationCalc ){
-
-				if (MCPIHM( NZ ) >= 0.0){
-					//MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-					Zone( NZ ).InfiltrationVolumeFlowRateHM = Zone( NZ ).MCPIHM / AirDensity / CpAir; // in m3/second, Infiltration design air flow rate considering coefficients and schedule
-					// MCpI_temp = IVF * AirDensity * CpAir * ( Infiltration( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ ) ) * Infiltration( j ).TemperatureTermCoef + WindExt * ( Infiltration( j ).VelocityTermCoef + WindExt * Infiltration( j ).VelocitySQTermCoef ) );
-					Zone( NZ ).IVFHM = Zone( NZ ).MCPIHM / (AirDensity * CpAir * (Infiltration( j ).ConstantTermCoef + std::abs( TempExt - ZMAT( NZ )) * Infiltration( j ).TemperatureTermCoef + WindExt * ( Infiltration( j ).VelocityTermCoef + WindExt * Infiltration( j ).VelocitySQTermCoef ))); // in m3/second, Infiltration design air flow rate considering schedule
-					//IVF = Infiltration(j).DesignLevel * GetCurrentScheduleValue(Infiltration(j).SchedPtr);
-					Zone( NZ ).InfiltrationDesignLevelHM = Zone( NZ ).InfiltrationVolumeFlowRateHM * 3600 / Zone( NZ ).Volume; // ACH
-
-				}
-				else {
-					Zone( NZ ).InfiltrationVolumeFlowRateHM = 0.0;
-					Zone( NZ ).IVFHM = 0.0;
-					Zone( NZ ).InfiltrationDesignLevelHM = 0.0;
-				}
-				
-			} // When Hybrid Modeling Infiltration is YES_added by Sang Hoon Lee, November 2015. End
-	
 		}
 
 		// Add infiltration rate enhanced by the existence of thermal chimney

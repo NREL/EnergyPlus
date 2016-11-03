@@ -81,13 +81,13 @@ namespace HybridModel {
 		NumOfHybridModelZones = GetNumObjectsFound( CurrentModuleObject );
 		HybridModelZone.allocate( NumOfZones );
 
-		if (NumOfHybridModelZones > 0) {
+		if ( NumOfHybridModelZones > 0 ) {
 
 			RunMeOnceFlag = true;
 		
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
-				GetObjectItem(CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+				GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				
 				ZoneListPtr = 0;
 				ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -96,7 +96,7 @@ namespace HybridModel {
 					HybridModelZone( ZonePtr ).Name = cAlphaArgs( 1 );
 					HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "YES" );
 					HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "YES" );
-					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ));
+					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
 					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartMonth = rNumericArgs( 1 );
 					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate = rNumericArgs( 2 );
 					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth = rNumericArgs( 3 );
@@ -107,7 +107,7 @@ namespace HybridModel {
 						ZonePtr = ZoneList( ZoneListPtr ).Zone( ZonePtrNum );
 						HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "YES" );
 						HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "YES" );
-						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ));
+						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
 						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartMonth = rNumericArgs( 1 );
 						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate = rNumericArgs( 2 );
 						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth = rNumericArgs( 3 );
@@ -146,14 +146,14 @@ namespace HybridModel {
 			//RoomAirModelType should be Mixing if Hybrid Modeling is performed for the zone
 			if( FlagHybridModel ){
 				for ( ZonePtr = 1; ZonePtr <= NumOfZones; ZonePtr++ ) {
-					if(( HybridModelZone( ZonePtr ).InternalThermalMassCalc || HybridModelZone( ZonePtr ).InfiltrationCalc ) && ( AirModel( ZonePtr ).AirModelType != RoomAirModel_Mixing )){
+					if( ( HybridModelZone( ZonePtr ).InternalThermalMassCalc || HybridModelZone( ZonePtr ).InfiltrationCalc ) && ( AirModel( ZonePtr ).AirModelType != RoomAirModel_Mixing ) ){
 						AirModel( ZonePtr ).AirModelType = RoomAirModel_Mixing;
 						ShowWarningError( "Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone." );
 					}
 				}
 			}
 
-			if (ErrorsFound) {
+			if ( ErrorsFound ) {
 				ShowFatalError( "Errors getting Hybrid Model input data. Preceding condition(s) cause termination." );
 			}
 		}

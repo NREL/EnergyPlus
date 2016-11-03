@@ -1374,25 +1374,18 @@ namespace DataHeatBalance {
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
-		Real64 ZoneMeasuredTemperature; // Added by Sang Hoon Lee May 2015
-		Real64 ZoneVolCapMultpSens; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 ZoneVolCapMultpMoist; // Added by Sang Hoon June 2016
-		Real64 ZoneVolCapMultpCO2; // Added by Sang Hoon June 2016
-		Real64 ZoneVolCapMultpGenContam; // Added by Sang Hoon June 2016
-		Real64 ZoneVolCapMultpSensHM; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 ZoneVolCapMultpSensHMSum; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 ZoneVolCapMultpSensHMSum1; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 ZoneVolCapMultpSensHMCount; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 ZoneVolCapMultpSensHMCountSum; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 ZoneVolCapMultpSensHMCountSum1; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 ZoneVolCapMultpSensHMAverage; // Added by Sang Hoon Lee May 2015: Temperature capacity multiplier for this zone
-		Real64 InfiltrationVolumeFlowRateHM; // Added by Sang Hoon Lee February 2016
-		Real64 IVFHM; // Added by Sang Hoon Lee February 2016
-		Real64 InfiltrationDesignLevelHM; // Added by Sang Hoon Lee February 2016
-		Real64 MCPIHM; // Added by Sang Hoon Lee February 2016
-		Real64 InfilMdotHM; // Added by Sang Hoon Lee February 2016
-		Real64 InfilVdotOADensityHM; // Added by Sang Hoon Lee February 2016
-		Real64 InfilOAAirChangeRateHM; // Added by Sang Hoon Lee February 2016
+		// Added for hybrid modeling by Sang Hoon Lee, May 2015
+		Real64 ZoneMeasuredTemperature; // Measured zone air temperature input by user
+		Real64 ZoneVolCapMultpSens; // Zone temperature capacity multiplier, i.e. internal thermal mass multiplier
+		Real64 ZoneVolCapMultpMoist; // Zone humidity capacity multiplier
+		Real64 ZoneVolCapMultpCO2; // Zone carbon dioxide capacity multiplier
+		Real64 ZoneVolCapMultpGenContam; // Zone generic contaminant capacity multiplier
+		Real64 ZoneVolCapMultpSensHM; // Calculated temperature capacity multiplier by hybrid model
+		Real64 ZoneVolCapMultpSensHMSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMCountSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMAverage; // Temperature capacity multiplier average
+		Real64 MCPIHM; // Calcualted mass flow rate by hybrid model
+		Real64 InfilOAAirChangeRateHM; // Calcualted infilgration air change per hour by hybrid model
 
 		// Default Constructor
 		ZoneData() :
@@ -1459,25 +1452,18 @@ namespace DataHeatBalance {
 			ZoneMinCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
 			FlagCustomizedZoneCap( false ),
-			ZoneMeasuredTemperature( 0.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSens( 1.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpMoist( 0.0 ), // Added by Sang Hoon June 2016
-			ZoneVolCapMultpCO2( 1.0 ), // Added by Sang Hoon June 2016
-			ZoneVolCapMultpGenContam( 1.0 ), // Added by Sang Hoon June 2016
-			ZoneVolCapMultpSensHM( 0.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMSum( 0.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMSum1( 0.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMCount( 0.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMCountSum( 0.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMCountSum1( 0.0 ), // Added by Sang Hoon May 2015
-			ZoneVolCapMultpSensHMAverage( 1.0 ), // Added by Sang Hoon May 2015
-			InfiltrationVolumeFlowRateHM( 0.0 ), // Added by Sang Hoon Lee February 2016
-			IVFHM( 0.0 ), // Added by Sang Hoon Lee February 2016
-			InfiltrationDesignLevelHM( 0.0 ), // Added by Sang Hoon Lee February 2016
-			MCPIHM( 0.0 ), // Added by Sang Hoon Lee February 2016
-			InfilMdotHM( 0.0 ), // Added by Sang Hoon Lee February 2016
-			InfilVdotOADensityHM( 0.0 ), // Added by Sang Hoon Lee February 2016
-			InfilOAAirChangeRateHM( 0.0 ) // Added by Sang Hoon Lee February 2016
+			// Added for hybrid modeling by Sang Hoon Lee, Sep 2016
+			ZoneMeasuredTemperature( 0.0 ),
+			ZoneVolCapMultpSens( 1.0 ),
+			ZoneVolCapMultpMoist( 1.0 ),
+			ZoneVolCapMultpCO2( 1.0 ),
+			ZoneVolCapMultpGenContam( 1.0 ),
+			ZoneVolCapMultpSensHM( 1.0 ),
+			ZoneVolCapMultpSensHMSum( 0.0 ),
+			ZoneVolCapMultpSensHMCountSum( 0.0 ),
+			ZoneVolCapMultpSensHMAverage( 1.0 ),
+			MCPIHM( 0.0 ),
+			InfilOAAirChangeRateHM( 0.0 )
 		{}
 
 		void
@@ -2816,26 +2802,12 @@ namespace DataHeatBalance {
 		Real64 InfilTotalGain; // Total Gain {J} due to infiltration (sensible+latent)
 		Real64 InfilTotalLoss; // Total Loss {J} due to infiltration (sensible+latent)
 		Real64 InfilVolumeCurDensity; // Volume of Air {m3} due to infiltration at current zone air density
-		Real64 InfilVolumeCurDensityHM; // InfilVolumeCurDensity inversely calculated for Hyrbrid Modeling:Infiltration, added by Sang Hoon Lee February 2016
 		Real64 InfilVolumeStdDensity; // Volume of Air {m3} due to infiltration at standard density (adjusted for elevation)
 		Real64 InfilVdotCurDensity; // Volume flow rate of Air {m3/s} due to infiltration at current zone air density
 		Real64 InfilVdotStdDensity; // Volume flow rate of Air {m3/s} due to infiltration standard density (adjusted elevation)
 		Real64 InfilMass; // Mass of Air {kg} due to infiltration
 		Real64 InfilMdot; // Mass flow rate of Air (kg/s) due to infiltration
 		Real64 InfilAirChangeRate; // Infiltration air change rate {ach}
-		Real64 InfilAirChangeRateHM; // InfilAirChangeRate inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-
-		Real64 InfilVdotCurDensityHM; // InfilVdotCurDensity inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016		
-		Real64 InfilVdotOADensityHM; // Added by Sang Hoon Lee February 2016
-		Real64 InfilMassHM; // InfilMass inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-		Real64 InfilMdotHM; // InfilMdot inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-		Real64 InfilVolumeOADensityHM; // Added by Sang Hoon Lee February 2016
-		Real64 InfilOAAirChangeRateHM; // Added by Sang Hoon Lee February 2016
-		Real64 InfilOAAirChangeRate; // Added by Sang Hoon Lee February 2016
-		Real64 MCPIHM; // for Hyrbrid Modeling:Infiltration, added by Sang Hoon Lee February 2016
-		Real64 MCPIHMCalculated; // for Hyrbrid Modeling:Infiltration, added by Sang Hoon Lee February 2016
-		Real64 MCPI; // for Hyrbrid Modeling:Infiltration, added by Sang Hoon Lee February 2016
-
 		Real64 VentilHeatLoss; // Heat Gain {J} due to ventilation
 		Real64 VentilHeatGain; // Heat Loss {J} due to ventilation
 		Real64 VentilLatentLoss; // Latent Gain {J} due to ventilation
@@ -2905,24 +2877,12 @@ namespace DataHeatBalance {
 			InfilTotalGain( 0.0 ),
 			InfilTotalLoss( 0.0 ),
 			InfilVolumeCurDensity( 0.0 ),
-			InfilVolumeCurDensityHM( 0.0 ), // InfilVolumeCurDensity inversely calculated for Hyrbrid Modeling:Infiltration, added by Sang Hoon Lee February 2016
 			InfilVolumeStdDensity( 0.0 ),
 			InfilVdotCurDensity( 0.0 ),
 			InfilVdotStdDensity( 0.0 ),
 			InfilMass( 0.0 ),
 			InfilMdot( 0.0 ),
 			InfilAirChangeRate( 0.0 ),
-			InfilAirChangeRateHM( 0.0 ), // InfilAirChangeRate inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			InfilVdotCurDensityHM ( 0.0 ), // InfilVdotCurDensity inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			InfilVdotOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
-			InfilMassHM( 0.0 ), // InfilMass inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			InfilMdotHM( 0.0 ), // InfilMdot inversely calculated for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			InfilVolumeOADensityHM(0.0), // Added by Sang Hoon Lee February 2016
-			InfilOAAirChangeRateHM(0.0), // Added by Sang Hoon Lee February 2016
-			InfilOAAirChangeRate(0.0), // Added by Sang Hoon Lee February 2016
-			MCPIHM(0.0), // for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			MCPIHMCalculated(0.0), // for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
-			MCPI(0.0), // for Hybrid Modeling:Infiltration, Added by Sang Hoon Lee February 2016
 			VentilHeatLoss( 0.0 ),
 			VentilHeatGain( 0.0 ),
 			VentilLatentLoss( 0.0 ),

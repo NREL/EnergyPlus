@@ -9460,7 +9460,7 @@ namespace OutputReportTabular {
 		Real64 totLightPower;
 		Real64 totNumPeople;
 		Real64 totPlugProcess;
-		Real64 HMMultiplier; //Added by Sang Hoon Lee August 2015
+		Real64 HMMultiplier; // Added by Sang Hoon Lee August 2015
 		Real64 frameWidth;
 		Real64 frameArea;
 
@@ -9927,7 +9927,7 @@ namespace OutputReportTabular {
 			columnHead( 10 ) = "Lighting " + Wm2_unitName;
 			columnHead( 11 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
 			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
-			columnHead( 13 ) = "Capacitance Multiplier "; //Added by Sang Hoon Lee August 2015
+			columnHead( 13 ) = "Temperature Capacitance Multiplier "; // Added by Sang Hoon Lee August 2015
 
 			rowHead = "";
 
@@ -10016,9 +10016,9 @@ namespace OutputReportTabular {
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
 					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
-				// HM Multiplier Added by Sang Hoon Lee August 2015
-				HMMultiplier = Zone(iZone).ZoneVolCapMultpSensHMAverage;
-				tableBody(13, iZone) = RealToStr(HMMultiplier, 2);
+				// Hybrid Model Multiplier Added by Sang Hoon Lee August 2015
+				HMMultiplier = Zone( iZone ).ZoneVolCapMultpSensHMAverage;
+				tableBody( 13, iZone ) = RealToStr( HMMultiplier, 2 );
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
 					zstArea( grandTotal ) += mult * Zone( iZone ).FloorArea;

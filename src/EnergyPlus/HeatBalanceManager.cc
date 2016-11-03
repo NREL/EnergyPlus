@@ -4450,18 +4450,8 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
-		
-		//Internal mass: Hybrid model output added by Sang Hoon Lee August 2016
-		SetupOutputVariable("Zone Volume Capacitance Multiplier HM [ ]", Zone(ZoneLoop).ZoneVolCapMultpSensHM, "Zone", "Average", Zone(ZoneLoop).Name);
-		SetupOutputVariable("Zone Volume Capacitance Multiplier HM Sum [ ]", Zone(ZoneLoop).ZoneVolCapMultpSensHMSum, "Zone", "Average", Zone(ZoneLoop).Name);
-		SetupOutputVariable("Zone Volume Capacitance Multiplier HM Count [ ]", Zone(ZoneLoop).ZoneVolCapMultpSensHMCount, "Zone", "Average", Zone(ZoneLoop).Name);
-		SetupOutputVariable("Zone Volume Capacitance Multiplier HM Count Sum [ ]", Zone(ZoneLoop).ZoneVolCapMultpSensHMCountSum, "Zone", "Average", Zone(ZoneLoop).Name);
-		SetupOutputVariable("Zone Volume Capacitance Multiplier HM Average [ ]", Zone(ZoneLoop).ZoneVolCapMultpSensHMAverage, "Zone", "Average", Zone(ZoneLoop).Name);
-		// Infiltration: Hybrid model output added by Sang Hoon Lee August 2016
-		SetupOutputVariable("InfiltrationVolumeFlowRateHM [m3/s]", Zone(ZoneLoop).InfiltrationVolumeFlowRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
-		SetupOutputVariable("Zone Infiltration OA Mass Flow Rate HM [kg/s]", Zone(ZoneLoop).InfilMdotHM, "Zone", "Average", Zone(ZoneLoop).Name);
-		SetupOutputVariable("Zone Infiltration OA Density Volume Flow Rate HM [m3/s]", Zone(ZoneLoop).InfilVdotOADensityHM, "Zone", "Average", Zone(ZoneLoop).Name);
-		SetupOutputVariable("Zone Infiltration OA Air Change Rate HM [ach]", Zone(ZoneLoop).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		// Hybrid model output added by Sang Hoon Lee August 2016
+		SetupOutputVariable( "Zone Infiltration OA Air Change Rate HM [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone( ZoneLoop ).Name );
 	}
 
 	// End of Get Input subroutines for the HB Module
@@ -4662,7 +4652,6 @@ namespace HeatBalanceManager {
 		DSXM4T.dimension( NumOfZones, 23.0 );
 		XMPT.dimension( NumOfZones, 23.0 );
 		MCPI.dimension( NumOfZones, 0.0 );
-		MCPIHM.dimension( NumOfZones, 0.0 ); // Added by Sang Hoon Lee
 		MCPTI.dimension( NumOfZones, 0.0 );
 		MCPV.dimension( NumOfZones, 0.0 );
 		MCPTV.dimension( NumOfZones, 0.0 );

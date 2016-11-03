@@ -91,7 +91,6 @@
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
-#include <HybridModel.hh>// Addedy by Sang Hoon Lee May 2015s
 
 namespace EnergyPlus {
 
@@ -6296,7 +6295,6 @@ Label9999: ;
 		using namespace DataIPShortCuts;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
-		using namespace HybridModel; // Added by Sang Hoon Lee July 2015
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6315,11 +6313,9 @@ Label9999: ;
 		int NumAlphas;
 		int IOStat;
 		int NumNumbers;
-		// int Loop; //Added by Sang Hoon Lee July 2015
-		// int ZoneNum; //Added by Sang Hoon Lee July 2015
+
 		cCurrentModuleObject = "RunPeriodControl:DaylightSavingTime";
-		// for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) { //Added by Sang Hoon Lee July 2015
-		// 	if ( !HybridModelZone(ZoneNum).InternalThermalMassCalc && (!WarmupFlag) && (!DoingSizing)) { //Added by Sang Hoon Lee July 2015
+
 		NumFound = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumFound == 1 ) {
@@ -6344,8 +6340,6 @@ Label9999: ;
 			ShowSevereError( cCurrentModuleObject + ": Too many objects in Input File, only one allowed." );
 			ErrorsFound = true;
 		}
-			//} //if
-		//} //for loop
 
 	}
 

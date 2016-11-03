@@ -3904,25 +3904,19 @@ namespace ZoneTempPredictorCorrector {
 		static Real64 SNLoad( 0.0 ); // Sensible load calculated for zone in watts and then loaded in report variables
 		static int ZoneNum( 0 );
 		static int ZoneNodeNum( 0 ); // System node number for air flow through zone either by system or as a plenum
-		// static Real64 ResearchSpecialZoneVolCapMultpSens(1.0); // Added by Sang Hoon Lee October 2015
-		// static Real64 ResearchSpecialZoneVolCapMultpMoist(1.0); // Added by Sang Hoon Lee October 2015
-		// static Real64 ResearchSpecialZoneVolCapMultpCO2(1.0); // Added by Sang Hoon Lee October 2015
-		// static Real64 ResearchSpecialZoneVolCapMultpGenContam(1.0); // Added by Sang Hoon Lee October 2015
 		
-		static int HMStartDay( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		static int HMEndDay( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		static int HybridModelStartMonth ( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		static int HybridModelStartDate( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		static int HybridModelEndMonth( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		static int HybridModelEndDate( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		static int HybridStartDayOfYear( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		static int HybridEndDayOfYear( 0 ); // Added by Sang Hoon Lee July 2015, Hybrid start day of year 
-		// int HMCount; // Added by Sang Hoon Lee August 2015
-		// Real64 HMMultiplierSum; // Added by Sang Hoon Lee August 2015
-		Real64 HMMultiplierAverage;
-		static Real64 MultpHM(10.0);
-		static int MultpHMCount (0);
-		static Real64 InfilOAACHHM(0.0);
+		// Added for hybrid model by Sang Hoon Lee, July 2015
+		static int HMStartDay( 0 ); // Temporary date   
+		static int HMEndDay( 0 ); // Temporary date   
+		static int HybridModelStartMonth ( 0 ); // Hybrid start month 
+		static int HybridModelStartDate( 0 ); // Hybrid start date of month 
+		static int HybridModelEndMonth( 0 ); // Hybrid end month 
+		static int HybridModelEndDate( 0 ); // Hybrid end date of month 
+		static int HybridStartDayOfYear( 0 ); // Hybrid start date of year 
+		static int HybridEndDayOfYear( 0 ); // Hybrid end date of year 
+		Real64 HMMultiplierAverage ( 1.0 );
+		static Real64 MultpHM( 1.0 );
+		static Real64 InfilOAACHHM( 0.0 );
 		//  LOGICAL,SAVE   :: OneTimeFlag = .TRUE.
 		//unusd1208  LOGICAL,SAVE   :: MyEnvrnFlag = .TRUE.
 		Real64 TempSupplyAir;
@@ -4126,14 +4120,8 @@ namespace ZoneTempPredictorCorrector {
 				SNLoad = 0.0;
 			}
 
-			//Hybrid modeling start: Added by Sang Hoon Lee May 2015 for Hybrid Modeling
-			//Zone(ZoneNum).ZoneVolCapMultpSens = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpSens;
-			//Zone(ZoneNum).ZoneVolCapMultpMoist = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpMoist;
-			//Zone(ZoneNum).ZoneVolCapMultpCO2 = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpCO2;
-			//Zone(ZoneNum).ZoneVolCapMultpGenContam = ZoneCapacitanceMultiplierResearchSpecialZone(ZoneNum).ZoneVolCapMultpGenContam;
-			
-			// Hybrid model trigger start
-			if ( FlagHybridModel && ( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc ) && ( !WarmupFlag ) && ( !DoingSizing )) {
+			//Hybrid modeling start: Added by Sang Hoon Lee May 2015
+			if ( FlagHybridModel && ( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc ) && ( !WarmupFlag ) && ( !DoingSizing ) ) {
 				
 				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
 
@@ -4165,96 +4153,96 @@ namespace ZoneTempPredictorCorrector {
 				// HM calculation only HM calculation period start
 				if ( DayOfYear >= HybridStartDayOfYear && DayOfYear <= HybridEndDayOfYear ){
 
-					ZT(ZoneNum) = Zone(ZoneNum).ZoneMeasuredTemperature;
+					ZT( ZoneNum ) = Zone( ZoneNum ).ZoneMeasuredTemperature;
 					
-					// * Hybrid Modeling-Infiltration calcualtion start
-					if ( HybridModelZone(ZoneNum).InfiltrationCalc ){
+					// Hybrid Modeling-Infiltration calcualtion start
+					if ( HybridModelZone( ZoneNum ).InfiltrationCalc ){
 
-						// Calculate MCPI included in TempIndCoef and TempDepCoef
-						double a = Zone(ZoneNum).OutDryBulbTemp;
-						double b = SumIntGain + SumHATsurf - SumHATref + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
-						double c = SumHA + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
+						// Calculate MCPI used for hybrid modeling included in TempIndCoef and TempDepCoef
+						double a = Zone( ZoneNum ).OutDryBulbTemp;
+						double b = SumIntGain + SumHATsurf - SumHATref + MCPTV( ZoneNum ) + MCPTM( ZoneNum ) + MCPTE( ZoneNum ) + MCPTC( ZoneNum ) + MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp;
+						double c = SumHA + MCPV( ZoneNum ) + MCPM( ZoneNum ) + MCPE( ZoneNum ) + MCPC( ZoneNum ) + MDotCPOA( ZoneNum );
 						double d = AirCap;
 						//Use3rdOrder
-						double AA = b + d * (3.0 * PreviousMeasuredZT1(ZoneNum) - (3.0 / 2.0) * PreviousMeasuredZT2(ZoneNum) + (1.0 / 3.0) * PreviousMeasuredZT3(ZoneNum));
-						double BB = (11.0 / 6.0) * d + c;
+						double AA = b + d * (3.0 * PreviousMeasuredZT1( ZoneNum ) - ( 3.0 / 2.0 ) * PreviousMeasuredZT2( ZoneNum ) + ( 1.0 / 3.0 ) * PreviousMeasuredZT3( ZoneNum ) );
+						double BB = ( 11.0 / 6.0 ) * d + c;
 						double InfilVolumeOADensityHM;
 						double AirDensity;
 						double CpAir;
 						double MCPIHM;
-						static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+						static std::string const RoutineNameInfiltration( "CalcAirFlowSimple:Infiltration" );
 
-						CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
-						AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
-						MCPIHM = (AA - Zone(ZoneNum).ZoneMeasuredTemperature * BB) / (Zone(ZoneNum).ZoneMeasuredTemperature - a); // MCPIHM calculation using Use3rdOrder method 
-						InfilVolumeOADensityHM = (MCPIHM / CpAir / AirDensity) * TimeStepZone * SecInHour;
+						CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneNum ).OutDryBulbTemp );
+						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Zone( ZoneNum ).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration );
+						MCPIHM = ( AA - Zone( ZoneNum ).ZoneMeasuredTemperature * BB ) / ( Zone( ZoneNum ).ZoneMeasuredTemperature - a ); // MCPIHM calculation using Use3rdOrder method 
+						InfilVolumeOADensityHM = ( MCPIHM / CpAir / AirDensity ) * TimeStepZone * SecInHour;
 						
-						if (abs(Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp) > 5.0 && abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) < 0.1) {// Filter
-							InfilOAACHHM = InfilVolumeOADensityHM / (TimeStepZone * Zone(ZoneNum).Volume);
-							InfilOAACHHM = max( 0.0, min( 10.0, InfilOAACHHM ));  // ACH max 10, min 0
+						if ( abs( Zone( ZoneNum ).ZoneMeasuredTemperature - Zone( ZoneNum ).OutDryBulbTemp ) > 5.0 && abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) < 0.1 ) {// Filter
+							InfilOAACHHM = InfilVolumeOADensityHM / ( TimeStepZone * Zone( ZoneNum ).Volume );
+							InfilOAACHHM = max( 0.0, min( 10.0, InfilOAACHHM ) );  // ACH max 10, min 0
 						} else {
 							InfilOAACHHM = 0.0;
 						}
 
 						Zone(ZoneNum).InfilOAAirChangeRateHM = InfilOAACHHM;
-						Zone(ZoneNum).MCPIHM = InfilOAACHHM * CpAir * AirDensity / SecInHour * Zone(ZoneNum).Volume;
-						Zone(ZoneNum).InfilMdotHM = Zone(ZoneNum).MCPIHM / CpAir;
-						Zone(ZoneNum).InfilVdotOADensityHM = Zone(ZoneNum).MCPIHM / CpAir / AirDensity;
+						Zone(ZoneNum).MCPIHM = InfilOAACHHM * CpAir * AirDensity / SecInHour * Zone( ZoneNum ).Volume;
 
-					} // Infiltration calcualtion end
+					} // Hybrid model infiltration calcualtion end
 
-					// * Hybrid Modeling-Internal thermal mass calcualtion start
-					if ( HybridModelZone(ZoneNum).InternalThermalMassCalc ){
+					// Hybrid modeling internal thermal mass calcualtion start
+					if ( HybridModelZone( ZoneNum ).InternalThermalMassCalc ){
 
-						if ( SumSysMCpT == 0 && ZT(ZoneNum) != PreviousMeasuredZT1(ZoneNum) && UseZoneTimeStepHistory ){ // HM calculation only when HVAC off
-							// Calculate air capacity using UseAnalyticalSolution)
-							if (TempDepCoef == 0.0) {
-								AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); // Inverse equation
-							} else {
-								Real64 AirCapHM_temp = (TempIndCoef - TempDepCoef * PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * ZT(ZoneNum));
-								if(( AirCapHM_temp > 0 ) && ( AirCapHM_temp != 1 )){ // Avoide IND
+						if ( SumSysMCpT == 0 && ZT( ZoneNum ) != PreviousMeasuredZT1( ZoneNum ) && UseZoneTimeStepHistory ){ // HM calculation only when HVAC off
+							// Calculate air capacity using UseAnalyticalSolution
+							if ( TempDepCoef == 0.0 ) {
+								AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ); // Inverse equation
+							}
+							else {
+								Real64 AirCapHM_temp = ( TempIndCoef - TempDepCoef * PreviousMeasuredZT1( ZoneNum ) ) / ( TempIndCoef - TempDepCoef * ZT( ZoneNum ) );
+								if ( (AirCapHM_temp > 0 ) && ( AirCapHM_temp != 1 ) ){ // Avoide IND
 									AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
-								} else {
-									AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); //@@
+								}
+								else {
+									AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) );
 								}
 							}
+
 							// Calculate multiplier
-							MultpHM = AirCapHM / (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) * (TimeStepSys * SecInHour); // Inverse equation
-
-							if ((MultpHM < 1.0) || (MultpHM > 30.0)){ // HM multiplier must be greater than 1 and less than 30
-								MultpHM = 1.0; // @@ 1.0 is the default value_zrp
+							if ( abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) > 0.05 ){
+								MultpHM = AirCapHM / ( Zone( ZoneNum ).Volume * PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ) ) * ( TimeStepSys * SecInHour ); // Inverse equation
+								if ( ( MultpHM < 1.0 ) || ( MultpHM > 30.0 ) ){ // Temperature capacity multiplier greater than 1 and less than 30
+									MultpHM = 1.0; // Default value 1.0 
+								}
+							}
+							else {
+								MultpHM = 1.0; // Default value 1.0 
 							}
 						}
 
-						// Calculate the average multiplier of the zone for the running period
+						// For timestep output
+						Zone(ZoneNum).ZoneVolCapMultpSensHM = MultpHM;
+
+						// Calculate the average multiplier of the zone for the whole running period
 						{
-							// Count HM number of calculations
-							if( MultpHM != 0.0 ){
-								MultpHMCount = 1;
-							} else {
-								MultpHMCount = 0;
+							// count for hybrid model calculations
+							if( MultpHM > 1.0 ){
+								Zone( ZoneNum ).ZoneVolCapMultpSensHMSum += MultpHM;
+								Zone( ZoneNum ).ZoneVolCapMultpSensHMCountSum++;
 							}
-
-							Zone(ZoneNum).ZoneVolCapMultpSensHM = MultpHM;
-							Zone(ZoneNum).ZoneVolCapMultpSensHMCount = MultpHMCount;
-
-							// Get the sum of HM multiplers and total count during only for the HM calculation period.
-							Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum += Zone(ZoneNum).ZoneVolCapMultpSensHMCount;
-							Zone(ZoneNum).ZoneVolCapMultpSensHMSum += Zone(ZoneNum).ZoneVolCapMultpSensHM;
-							HMMultiplierAverage = Zone(ZoneNum).ZoneVolCapMultpSensHMSum / Zone(ZoneNum).ZoneVolCapMultpSensHMCountSum;
-
-							// Store the last timestep value for hybrid model calculation period
-							if (DayOfYear == HybridEndDayOfYear && EndDayFlag){
-								Zone(ZoneNum).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
+							
+							// Calculate and store the multiplier average at the end of HM simulations 
+							if ( DayOfYear == HybridEndDayOfYear && EndDayFlag ){
+								HMMultiplierAverage = Zone( ZoneNum ).ZoneVolCapMultpSensHMSum / Zone( ZoneNum ).ZoneVolCapMultpSensHMCountSum;
+								Zone( ZoneNum ).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
 							}
 						}
-					} // Internal thermal mass calcualtion end
+					} // Hybrid model internal thermal mass calcualtion end
 				}
 
 				// Update zone temperatures in the previous steps
-				PreviousMeasuredZT3(ZoneNum) = PreviousMeasuredZT2(ZoneNum);
-				PreviousMeasuredZT2(ZoneNum) = PreviousMeasuredZT1(ZoneNum);
-				PreviousMeasuredZT1(ZoneNum) = ZT(ZoneNum);
+				PreviousMeasuredZT3( ZoneNum ) = PreviousMeasuredZT2( ZoneNum );
+				PreviousMeasuredZT2( ZoneNum ) = PreviousMeasuredZT1( ZoneNum );
+				PreviousMeasuredZT1( ZoneNum ) = ZT( ZoneNum );
 
 			} // Hybrid model end
 			
