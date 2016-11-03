@@ -500,11 +500,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 		ProcessScheduleInput(); // read schedules
 
-		DaySchedule( 9 ).TSValue = 4; // 9 corresponds to 1 in old schedule
-		DaySchedule( 7 ).TSValue = 3; // 7 corresponds to 3 in old schedule
-		DaySchedule( 8 ).TSValue = 1; // 8 corresponds to 5 in old schedule
-		DaySchedule( 3 ).TSValue = 2; // 3 corresponds to 6 in old schedule
-
 		GetZoneAirSetPoints();
 
 		DeadBandOrSetback.allocate( NumTempControlledZones );
