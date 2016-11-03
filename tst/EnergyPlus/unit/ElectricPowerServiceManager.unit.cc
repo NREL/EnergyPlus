@@ -557,6 +557,8 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
+	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
 

@@ -177,7 +177,6 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel 
 
 	std::string const error_string = delimited_string({
 		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank schedule_type_limits_name input -- will not be validated.",
-		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank schedule_type_limits_name input -- will not be validated.",
 		"   ** Severe  ** GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", design_level is not allowed to be negative",
 		"   **   ~~~   ** ... when a fuel type of FuelOil#1 is specified.",
 		"   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
@@ -231,7 +230,6 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
 	std::string const error_string = delimited_string({
 		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank schedule_type_limits_name input -- will not be validated.",
 		"   ** Severe  ** GetInternalHeatGains: OtherEquipment: invalid fuel_type entered=WATER for name=OTHEREQ1",
-		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank schedule_type_limits_name input -- will not be validated.",
 		"   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
 		"   ...Summary of Errors that led to program termination:",
 		"   ..... Reference severe error count=1",

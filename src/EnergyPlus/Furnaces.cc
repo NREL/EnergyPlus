@@ -221,7 +221,7 @@ namespace Furnaces {
 	int const DehumidControl_CoolReheat( 2 );
 
 	static std::string const fluidNameSteam( "STEAM" );
-	bool GetInputFlag( true ); // Logical to allow "GetInput" only once per simulation
+	bool GetFurnaceInputFlag( true ); // Logical to allow "GetInput" only once per simulation
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -267,7 +267,7 @@ namespace Furnaces {
 
 	// Object Data
 	Array1D< FurnaceEquipConditions > Furnace;
-	std::unordered_map< std::string, std::string > Furnace_map;
+	std::unordered_map< std::string, std::string > UniqueFurnaceNames;
 
 	// Utility routines for module
 	// na
@@ -295,12 +295,12 @@ namespace Furnaces {
 		EconomizerFlag = false;
 		AirLoopPass = 0;
 		HPDehumidificationLoadFlag = false;
-		GetInputFlag = true;
+		GetFurnaceInputFlag = true;
 		TempSteamIn = 100.0;
 		SaveCompressorPLR = 0.0;
 		CurrentModuleObject = "";
 		Furnace.deallocate();
-		Furnace_map.clear();
+		UniqueFurnaceNames.clear();
 	}
 
 
@@ -385,10 +385,10 @@ namespace Furnaces {
 		Real64 TempMassFlowRateMaxAvail;
 
 		// Obtains and Allocates Furnace related parameters from input file
-		if ( GetInputFlag ) { //First time subroutine has been entered
+		if ( GetFurnaceInputFlag ) { //First time subroutine has been entered
 			//Get the furnace input
 			GetFurnaceInput();
-			GetInputFlag = false;
+			GetFurnaceInputFlag = false;
 		}
 
 		// Find the correct Furnace
@@ -885,7 +885,7 @@ namespace Furnaces {
 		int IHPCoilIndex( 0 );//IHP cooling coil id
 
 		// Flow
-		GetInputFlag = false;
+		GetFurnaceInputFlag = false;
 		MaxNumbers = 0;
 		MaxAlphas = 0;
 
@@ -936,7 +936,7 @@ namespace Furnaces {
 
 		if ( NumFurnaces > 0 ) {
 			Furnace.allocate( NumFurnaces );
-			Furnace_map.reserve( NumFurnaces );
+			UniqueFurnaceNames.reserve( NumFurnaces );
 		}
 		CheckEquipName.dimension( NumFurnaces, true );
 
@@ -970,7 +970,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -1482,7 +1482,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -2620,7 +2620,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
@@ -3520,7 +3520,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			InputProcessor::VerifyUniqueInterObjectName( Furnace_map, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			InputProcessor::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).FurnaceType_Num = UnitarySys_HeatPump_WaterToAir;
 			Furnace( FurnaceNum ).Name = Alphas( 1 );

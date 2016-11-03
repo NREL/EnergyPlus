@@ -167,8 +167,11 @@ namespace ScheduleManager {
 	// Object Data
 	Array1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
 	Array1D< DayScheduleData > DaySchedule; // Day Schedule Storage
+	std::unordered_map< std::string, std::string > UniqueDayScheduleNames;
 	Array1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
+	std::unordered_map< std::string, std::string > UniqueWeekScheduleNames;
 	Array1D< ScheduleData > Schedule; // Schedule Storage
+	std::unordered_map< std::string, std::string > UniqueScheduleNames;
 
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
@@ -192,8 +195,11 @@ namespace ScheduleManager {
 		CheckScheduleValueMinMaxRunOnceOnly = true;
 		ScheduleType.deallocate();
 		DaySchedule.deallocate();
+		UniqueDayScheduleNames.clear();
 		WeekSchedule.deallocate();
+		UniqueWeekScheduleNames.clear();
 		Schedule.deallocate();
+		UniqueScheduleNames.clear();
 	}
 
 	void
@@ -216,14 +222,6 @@ namespace ScheduleManager {
 		// na
 
 		// Using/Aliasing
-
-
-
-
-
-
-
-
 		using General::ProcessDateString;
 		using General::JulianDay;
 		using General::RoundSigDigits;
@@ -363,6 +361,11 @@ namespace ScheduleManager {
 		int numerrors;
 		int ifld;
 		int hrLimitCount;
+
+		if ( ScheduleInputProcessed ) {
+			return;
+		}
+		ScheduleInputProcessed = true;
 
 		MaxNums = 1; // Need at least 1 number because it's used as a local variable in the Schedule Types loop
 		MaxAlps = 0;
@@ -530,6 +533,7 @@ namespace ScheduleManager {
 		ScheduleType.allocate( {0,NumScheduleTypes} );
 
 		DaySchedule.allocate( {0,NumDaySchedules} );
+		UniqueDayScheduleNames.reserve( static_cast< unsigned >( NumDaySchedules ) );
 		//    Initialize
 		for ( LoopIndex = 0; LoopIndex <= NumDaySchedules; ++LoopIndex ) {
 			DaySchedule( LoopIndex ).TSValue.allocate( NumOfTimeStepInHour, 24 );
@@ -541,8 +545,11 @@ namespace ScheduleManager {
 		}
 
 		WeekSchedule.allocate( {0,NumWeekSchedules} );
+		UniqueWeekScheduleNames.reserve( static_cast< unsigned >( NumWeekSchedules ) );
 
 		Schedule.allocate( {-1,NumSchedules} );
+//		UniqueScheduleNames.clear();
+		UniqueScheduleNames.reserve( static_cast< unsigned >( NumSchedules ) );
 		Schedule( -1 ).ScheduleTypePtr = -1;
 		Schedule( -1 ).WeekSchedulePointer = 1;
 		Schedule( 0 ).ScheduleTypePtr = 0;
@@ -610,13 +617,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Day:Hourly";
 		for ( LoopIndex = 1; LoopIndex <= NumHrDaySchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DaySchedule, Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
@@ -666,13 +667,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Day:Interval";
 		for ( LoopIndex = 1; LoopIndex <= NumIntDaySchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DaySchedule, Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
@@ -750,13 +745,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Day:List";
 		for ( LoopIndex = 1; LoopIndex <= NumLstDaySchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DaySchedule, Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueDayScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++Count;
 			DaySchedule( Count ).Name = Alphas( 1 );
 			// Validate ScheduleType
@@ -876,13 +865,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Week:Daily";
 		for ( LoopIndex = 1; LoopIndex <= NumRegWeekSchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), WeekSchedule( {1,NumRegWeekSchedules} ), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueWeekScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			WeekSchedule( LoopIndex ).Name = Alphas( 1 );
 			// Rest of Alphas are processed into Pointers
 			for ( InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex ) {
@@ -901,14 +884,8 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Week:Compact";
 		for ( LoopIndex = 1; LoopIndex <= NumCptWeekSchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
 			if ( Count > 0 ) {
-				InputProcessor::VerifyName( Alphas( 1 ), WeekSchedule( {1,Count} ), Count, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
+				InputProcessor::VerifyUniqueInterObjectName( UniqueWeekScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			}
 			++Count;
 			WeekSchedule( Count ).Name = Alphas( 1 );
@@ -951,13 +928,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Year";
 		for ( LoopIndex = 1; LoopIndex <= NumRegSchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), LoopIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Schedule( LoopIndex ).Name = Alphas( 1 );
 			Schedule( LoopIndex ).SchType = ScheduleInput_year;
 			// Validate ScheduleType
@@ -1054,13 +1025,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Compact";
 		for ( LoopIndex = 1; LoopIndex <= NumCptSchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_compact;
@@ -1342,13 +1307,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:File";
 		for ( LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_file;
@@ -1660,13 +1619,7 @@ namespace ScheduleManager {
 		CurrentModuleObject = "Schedule:Constant";
 		for ( LoopIndex = 1; LoopIndex <= NumConstantSchedules; ++LoopIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_constant;
@@ -1708,14 +1661,7 @@ namespace ScheduleManager {
 		for ( LoopIndex = 1; LoopIndex <= NumExternalInterfaceSchedules; ++LoopIndex ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, LoopIndex, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-
-			InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" ); // Bug fix
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_external;
@@ -1762,15 +1708,10 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport." );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)", ErrorsFound );
 			} else {
-				InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			}
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
-			// END IF
 			++SchNum;
 			Schedule( SchNum ).Name = Alphas( 1 );
 			Schedule( SchNum ).SchType = ScheduleInput_external;
@@ -1818,13 +1759,9 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport." );
+				InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)", ErrorsFound );
 			} else {
-				InputProcessor::VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			}
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				InputProcessor::VerifyUniqueInterObjectName( UniqueScheduleNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			}
 
 			++SchNum;

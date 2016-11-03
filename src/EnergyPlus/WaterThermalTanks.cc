@@ -56,10 +56,6 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-
-// C++ Headers
-#include <map>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/floops.hh>
@@ -101,7 +97,6 @@
 #include <SolarCollectors.hh>
 #include <IntegratedHeatPump.hh>
 #include <VariableSpeedCoils.hh>
-#include <zlib/deflate.h>
 
 namespace EnergyPlus {
 
