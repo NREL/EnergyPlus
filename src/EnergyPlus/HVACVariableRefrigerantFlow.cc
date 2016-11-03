@@ -6741,24 +6741,24 @@ namespace HVACVariableRefrigerantFlow {
 		OutsideAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
 		AirRelNode = VRFTU( VRFTUNum ).VRFTUOAMixerRelNodeNum;
 
-		if ( VRFTU( VRFTUNum ).OpMode == CycFanCycCoil ) {
+//		if ( VRFTU( VRFTUNum ).OpMode == CycFanCycCoil ) {
 			AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
 			AverageOAMassFlow = ( PartLoadRatio * OACompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * OACompOffMassFlow );
-		} else {
-			if ( PartLoadRatio == 0.0 ) {
-				// set the average OA air flow to off compressor values if the compressor PartLoadRatio is zero
-				AverageUnitMassFlow = CompOffMassFlow;
-				AverageOAMassFlow = OACompOffMassFlow;
-			} else {
-				AverageUnitMassFlow = CompOnMassFlow;
-				AverageOAMassFlow = OACompOnMassFlow;
-			}
-		}
-		if ( CompOffFlowRatio > 0.0 ) {
+//		} else {
+//			if ( PartLoadRatio == 0.0 ) {
+//				// set the average OA air flow to off compressor values if the compressor PartLoadRatio is zero
+//				AverageUnitMassFlow = CompOffMassFlow;
+//				AverageOAMassFlow = OACompOffMassFlow;
+//			} else {
+//				AverageUnitMassFlow = CompOnMassFlow;
+//				AverageOAMassFlow = OACompOnMassFlow;
+//			}
+//		}
+//		if ( CompOffFlowRatio > 0.0 ) {
 			FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
-		} else {
-			FanSpeedRatio = CompOnFlowRatio;
-		}
+//		} else {
+//			FanSpeedRatio = CompOnFlowRatio;
+//		}
 
 		// if the terminal unit and fan are scheduled on then set flow rate
 		if ( GetCurrentScheduleValue( VRFTU( VRFTUNum ).SchedPtr ) > 0.0 && ( GetCurrentScheduleValue( VRFTU( VRFTUNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) {
