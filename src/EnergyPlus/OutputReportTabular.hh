@@ -185,6 +185,7 @@ namespace OutputReportTabular {
 	extern bool displayLifeCycleCostReport;
 	extern bool displayTariffReport;
 	extern bool displayEconomicResultSummary;
+	extern bool displayEioSummary;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS

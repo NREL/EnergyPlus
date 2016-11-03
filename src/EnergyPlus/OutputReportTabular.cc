@@ -288,6 +288,7 @@ namespace OutputReportTabular {
 	bool displayLifeCycleCostReport( false );
 	bool displayTariffReport( false );
 	bool displayEconomicResultSummary( false );
+	bool displayEioSummary( false );
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -524,6 +525,7 @@ namespace OutputReportTabular {
 		displayLifeCycleCostReport = false;
 		displayTariffReport = false;
 		displayEconomicResultSummary = false;
+		displayEioSummary = false;
 		meterNumTotalsBEPS = Array1D_int( numResourceTypes, 0 );
 		meterNumTotalsSource = Array1D_int ( numSourceTypes, 0 );
 		fuelfactorsused = Array1D_bool ( numSourceTypes, false );
@@ -1943,11 +1945,17 @@ namespace OutputReportTabular {
 					displayEconomicResultSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
+				} else if (SameString(AlphArray(iReport), "EnergyMeters")) {
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
+				} else if (SameString(AlphArray(iReport), "EIO")) {
 					WriteTabularFiles = true;
+					nameFound = true;
+				} else if (SameString(AlphArray(iReport), "InitializationSummary")) {
+					displayEioSummary = true;
+					nameFound = true;
+				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
+					displayEioSummary = true;
 					displayTabularBEPS = true;
 					displayTabularVeriSum = true;
 					displayTabularCompCosts = true;
@@ -1959,6 +1967,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -1976,6 +1985,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -2001,6 +2011,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -2021,6 +2032,7 @@ namespace OutputReportTabular {
 					displayLifeCycleCostReport = true;
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
+					displayEioSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -3559,6 +3571,7 @@ namespace OutputReportTabular {
 		static std::string const Component_Sizing_Summary( "Component Sizing Summary" );
 		static std::string const Surface_Shadowing_Summary( "Surface Shadowing Summary" );
 		static std::string const Adaptive_Comfort_Summary( "Adaptive Comfort Summary" );
+		static std::string const Initialization_Summary("Initialization Summary");
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3614,6 +3627,9 @@ namespace OutputReportTabular {
 				}
 				if ( displayAdaptiveComfort ){
 					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Adaptive_Comfort_Summary, Entire_Facility ) << "\">Adaptive Comfort Summary</a>\n";
+				}
+				if (displayEioSummary) {
+					tbl_stream << "<br><a href=\"#" << MakeAnchorName(Initialization_Summary, Entire_Facility) << "\">Initialization Summary</a>\n";
 				}
 				for ( kReport = 1; kReport <= numReportName; ++kReport ) {
 					if ( reportName( kReport ).show ) {
@@ -5170,7 +5186,6 @@ namespace OutputReportTabular {
 		int EchoInputFile; // found unit number for 'eplusout.audit'
 
 		FillWeatherPredefinedEntries();
-		WriteEioTables();
 		FillRemainingPredefinedEntries();
 
 		if ( WriteTabularFiles ) {
@@ -5185,6 +5200,7 @@ namespace OutputReportTabular {
 			WriteSurfaceShadowing();
 			WriteCompCostTable();
 			WriteAdaptiveComfortTable();
+			WriteEioTables();
 			WriteZoneLoadComponentTable();
 			if ( DoWeathSim ) {
 				WriteMonthlyTables();
@@ -10791,57 +10807,109 @@ namespace OutputReportTabular {
 	void
 	WriteEioTables() {
 
-		// since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
-		gio::close(OutputFileInits); 		// for testing only
-
-		std::ifstream eioFile;
-		eioFile.open(DataStringGlobals::outputEioFileName);
-		std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
-		std::vector<std::string> bodyLines;    // holds the data records only
-		std::string line;
-		while (std::getline(eioFile, line))
+		if (displayEioSummary)
 		{
-			if (line.at(0) == '!')
+			// all arrays are in the format: (row, column)
+			Array1D_string columnHead;
+			Array1D_int columnWidth;
+			Array1D_string rowHead;
+			Array2D_string tableBody;
+
+			// setting up  report header 
+			WriteReportHeaders("Initialization Summary", "Entire Facility", isAverage);
+
+			// since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
+			gio::close(OutputFileInits); 		// for testing only
+
+			std::ifstream eioFile;
+			eioFile.open(DataStringGlobals::outputEioFileName);
+			std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
+			std::vector<std::string> bodyLines;    // holds the data records only
+			std::string line;
+			while (std::getline(eioFile, line))
 			{
-				headerLines.push_back(line);
-			} else {
-				if (line.at(0) == ' ') {
-					bodyLines.push_back(line.erase(0, 1)); // remove leading space
-				} else {
-					bodyLines.push_back(line); 
+				if (line.at(0) == '!')
+				{
+					headerLines.push_back(line);
 				}
-			}
-		}
-		eioFile.close();
-
-		// now go through each header and create a report for each one
-		std::vector<std::string> headerFields;
-		std::string tableNameWithSigns;
-		std::string tableName;
-		for (auto headerLine : headerLines)
-		{
-			headerFields = splitCommaString(headerLine);
-			tableNameWithSigns = headerFields.at(0);
-			tableName = tableNameWithSigns.substr(3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
-			// first count the number of matching lines
-			int countOfMatchingLines = 0;
-			for (auto bodyLine : bodyLines)
-			{ 
-				if (bodyLine.size() > tableName.size()) {
-					if (bodyLine.substr(0, tableName.size()) == tableName) {
-						++countOfMatchingLines;
+				else {
+					if (line.at(0) == ' ') {
+						bodyLines.push_back(line.erase(0, 1)); // remove leading space
+					}
+					else {
+						bodyLines.push_back(line);
 					}
 				}
 			}
-			int numRows = countOfMatchingLines;
+			eioFile.close();
 
+			// now go through each header and create a report for each one
+			for (auto headerLine : headerLines)
+			{
+				std::vector<std::string> headerFields = splitCommaString(headerLine);
+				std::string tableNameWithSigns = headerFields.at(0);
+				std::string tableName = tableNameWithSigns.substr(3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
+				// first count the number of matching lines
+				int countOfMatchingLines = 0;
+				for (auto bodyLine : bodyLines)
+				{
+					if (bodyLine.size() > tableName.size()) {
+						if (bodyLine.substr(0, tableName.size()) == tableName) {  // this needs to match the test used to populate the body of table below
+							++countOfMatchingLines;
+						}
+					}
+				}
+				int numRows = countOfMatchingLines;
+				int numCols = headerFields.size() - 1;
 
+				if (numRows >= 1) {
+					rowHead.allocate(numRows);
+					columnHead.allocate(numCols);
+					columnWidth.allocate(numCols);
+					columnWidth = 14; //array assignment - same for all columns
+					tableBody.allocate(numCols, numRows);
+					tableBody = ""; // make sure everything is blank
+					std::string footnote = "";
+					// transfer the header row into column headings
+					for (int iCol = 1; iCol <= numCols; ++iCol)
+					{
+						columnHead(iCol) = headerFields.at(iCol);
+					}
+					// look for data lines
+					int rowNum = 0;
+					for (auto bodyLine : bodyLines)
+					{
+						if (bodyLine.size() > tableName.size()) {
+							if (bodyLine.substr(0, tableName.size()) == tableName) {  // this needs to match the test used in the original counting
+								++rowNum;
+								if (rowNum > countOfMatchingLines) break;  // should never happen since same test as original could
+								std::vector<std::string> dataFields = splitCommaString(bodyLine);
+								//rowHead(rowNum) = dataFields[1];  //original 
+								rowHead(rowNum) = IntToStr(rowNum);
+								//for (int iCol = 1; iCol < numCols && (iCol + 1) < dataFields.size(); ++iCol)
+									//tableBody(iCol, rowNum) = dataFields[iCol + 1]; 
+								for (int iCol = 1; iCol <= numCols && iCol < dataFields.size(); ++iCol)
+								{
+									tableBody(iCol, rowNum) = dataFields[iCol];
+								}
+							}
+						}
+					}
+
+					WriteSubtitle(tableName);
+					WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+					if (sqlite) {
+						sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+					}
+				}
+				
+			}
+
+			// reopen the EIO initilization file and position it at the end of the file so that additional writes continue to be added at the end.
+			int write_stat;
+			{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); flags.POSITION("APPEND"); gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags); write_stat = flags.ios(); }
+			// as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
 		}
-
-		// reopen the EIO initilization file and position it at the end of the file so that additional writes continue to be added at the end.
-		int write_stat;
-		{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); flags.POSITION("APPEND"); gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags); write_stat = flags.ios(); }
-		// as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
 	}
 
 	// function that returns a vector of strings when given a string with comma delimitters
