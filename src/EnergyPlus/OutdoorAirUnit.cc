@@ -406,8 +406,6 @@ namespace OutdoorAirUnit {
 		int InListNum;
 		int ListNum;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -455,10 +453,10 @@ namespace OutdoorAirUnit {
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(cAlphaArgs(1),CurrentModuleObject,ErrorsFound);
+
 			//A1
 			OutAirUnit( OAUnitNum ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
 
 			//A2
 			OutAirUnit( OAUnitNum ).SchedName = cAlphaArgs( 2 );

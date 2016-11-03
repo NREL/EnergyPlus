@@ -22,7 +22,6 @@
 #include <SortAndStringUtilities.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
-#include <mach/mach_types.h>
 
 using json = nlohmann::json;
 

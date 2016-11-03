@@ -532,7 +532,6 @@ namespace EnergyPlus {
 			int AlfaFieldIncre; // increment number of Alfa field
 
 			bool IsNotOK; // Flag to verify name
-			bool IsBlank; // Flag for blank name
 			bool errFlag;
 			int InNode( 0 );//inlet air or water node
 			int OutNode( 0 );//outlet air or water node

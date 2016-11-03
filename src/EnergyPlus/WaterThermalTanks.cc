@@ -101,6 +101,7 @@
 #include <SolarCollectors.hh>
 #include <IntegratedHeatPump.hh>
 #include <VariableSpeedCoils.hh>
+#include <zlib/deflate.h>
 
 namespace EnergyPlus {
 

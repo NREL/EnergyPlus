@@ -353,8 +353,6 @@ namespace HVACStandAloneERV {
 		int MaxNumbers; // Max between the two objects gotten here
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumERVCtrlrs; // total number of CONTROLLER:STAND ALONE ERV objects
 		int ERVControllerNum; // index to ERV controller
 		int WhichERV; // used in controller GetInput
