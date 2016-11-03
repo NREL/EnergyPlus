@@ -412,11 +412,6 @@ namespace WaterToAirHeatPumpSimple {
 			++HPNum;
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-<<<<<<< HEAD
-			InputProcessor::IsNameEmpty(AlphArray(1),CurrentModuleObject,ErrorsFound);
-
-=======
->>>>>>> input_processor_verify_name_experiment
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			SimpleWatertoAirHP( HPNum ).Name = AlphArray( 1 );
@@ -480,10 +475,6 @@ namespace WaterToAirHeatPumpSimple {
 			++HPNum;
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-<<<<<<< HEAD
-			InputProcessor::IsNameEmpty(AlphArray(1),CurrentModuleObject,ErrorsFound);
-=======
->>>>>>> input_processor_verify_name_experiment
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			SimpleWatertoAirHP( HPNum ).Name = AlphArray( 1 );
