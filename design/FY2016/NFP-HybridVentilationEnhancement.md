@@ -22,7 +22,7 @@ NA
 
 ## Overview ##
 
-Both operative temperature and CO2 controls through hybrid ventilation can be accomplished by adding more control options defined in the Ventilation Control Mode Schedule Name field. The operative temperature control is determined internally based on upper and lower 80% acceptability limits. The CO2 control is based on the CO2 setpoint.
+Both operative temperature and CO2 controls through hybrid ventilation can be accomplished by adding more control options defined in the Ventilation Control Mode Schedule Name field. The operative temperature control is determined internally based on upper and lower 80% and 90% acceptability limits. The CO2 control is based on the CO2 setpoint.
 
 
 ## Approach ##
@@ -35,6 +35,11 @@ Upper 80 acceptability limit = 0.31 * t_{pma(out)} + 21.3
 Lower 80 acceptability limit = 0.31 * t_{pma(out)} + 14.3 
 
 where t_{pma(out)} = the prevailing mean outdoor air temperature and can be calculated from available weather data. Both limits are available in the CalcThermalComfortAdaptiveASH55 function of the ThermalComfort module.
+
+The upper and lower 90% acceptability limits in degree of C are given in the following equations:
+
+Upper 80 acceptability limit = 0.31 * t_{pma(out)} + 20.3 
+Lower 80 acceptability limit = 0.31 * t_{pma(out)} + 15.3
 
 The control logic is that when the zone operative temperature is within the limits, HAVC operation is shut off, and natural ventilation is allowed, and vice versa.  
 
@@ -73,7 +78,8 @@ The name of a controlled zone served by the air loop defined in the previous fie
 \paragraph{Field: Ventilation Control Mode Schedule Name}\label{field-ventilation-control-mode-schedule-name}
 
 The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time the hybrid ventilation control mode is to be applied. Schedule values equal to zero indicate no ventilation control, resulting in natural ventilation and HVAC system operation being performed based on their own controls. Schedule values equal to one denote temperature control for either cooling or heating, which is determined internally based on thermostat set point and temperature control type. The temperature control is restricted between the minimum and maximum outdoor temperatures provided in two additional input fields (below). Schedule values equal to two denote enthalpy control, which is restricted between minimum and maximum outdoor enthalpy values given in two additional input fields (below). Schedule values equal to three denote dewpoint control for either dehumidification or humidification. Schedule values equal to four represent outdoor ventilation air control. The outdoor ventilation air control works with AirflowNetwork opening objects only, and is not allowed to work with ZoneVentilation:* and ZoneMixing objects. **<span style="color:red;">Schedule values equal to five represent operative temperature control. 
-If the operative temperature is within the upper and lower 80% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. Schedule values equal to six represent carbon dioxide (CO_2) control. If the zone CO_2 level is above the setpoint, the program will check the HVAC system availability first. If available, HVAC operation will be allowed, and natural ventilation is shut off. If the system is not available, the natural ventilation will be allowed.</span>**
+If the operative temperature is within the upper and lower 80% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. Schedule values equal to six also represent operative temperature control with 90% acceptability limits. If the operative temperature is within the upper and lower 90% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. 
+Schedule values equal to seven represent carbon dioxide (CO_2) control. If the zone CO_2 level is above the setpoint, the program will check the HVAC system availability first. If available, HVAC operation will be allowed, and natural ventilation is shut off. If the system is not available, the natural ventilation will be allowed.</span>**
 
 The detailed control logic is given in the EnergyPlus Engineering Reference.
 
@@ -215,8 +221,9 @@ This is the hybrid ventilation control status, which can have three integer valu
        \note 3 = Dewpoint control
        \note 4 = Outdoor ventilation air control
 **<span style="color:red;">
-       \note 5 = Operative temperature control
-       \note 6 = Carbon dioxide control
+       \note 5 = Operative temperature control with 80% acceptability limits
+       \note 6 = Operative temperature control with 90% acceptability limits
+       \note 7 = Carbon dioxide control
 </span>**
 
   	A5 , \field Use Weather File Rain Indicators
@@ -373,7 +380,7 @@ Since this temperature control type requires only a single setpoint, natural ven
 
 If the zone temperature is beyond the deadband, then the initial decision is overridden and natural ventilation is not allowed. This is intended to avoid either overcooling a space, which could result in additional heating load when the zone temperature is below the heating setpoint, or overheating a space, which could result in additional cooling load when the zone temperature is above the cooling setpoint.
 
-\subsubsection{Dew-Point control}\label{dew-point-control}
+\subsubsection{Dew-Point Control}\label{dew-point-control}
 
 This control mode checks whether the outdoor air dewpoint temperature is between the Minimum Outdoor Dew-Point and Maximum Outdoor Dew-Point specified. If the outdoor dewpoint temperature is between the two values then natural ventilation is allowed, else national ventilation is not allowed.
 
@@ -384,11 +391,19 @@ If the actual zone air humidity ratio is below the humidity ratio setpoint and t
 If the actual zone air humidity ratio is above the humidity ratio setpoint and the controlled zone needs dehumidification as the second scenario, then the initial decision is overridden and natural ventilation is not allowed. This is intended to avoid humidifying a space, which could result in additional dehumidification load.
 
 **<span style="color:red;">
-\subsubsection{Operative Temperature control}\label{operative-temperature-control}</span>**
+\subsubsection{Operative Temperature Control with 80% Acceptability Limits}\label{operative-temperature-control-with-80-acceptability-limits}</span>**
 
 
 **<span style="color:red;">
-This control mode checks whether the zone air operative temperature is between the lower and upper 80% acceptability limits or not. If the zone air operative temperatureis between the lower and upper limits, then natural ventilation is allowed, else natural ventilation is not allowed.
+This control mode checks whether the zone air operative temperature is between the lower and upper 80% acceptability limits or not. If the zone air operative temperature is between the lower and upper limits, then natural ventilation is allowed, else natural ventilation is not allowed.
+</span>**
+
+**<span style="color:red;">
+\subsubsection{Operative Temperature Control with 90% Acceptability Limits}\label{operative-temperature-control-with-90-acceptability-limits}</span>**
+
+
+**<span style="color:red;">
+This control mode checks whether the zone air operative temperature is between the lower and upper 90% acceptability limits or not. If the zone air operative temperature is between the lower and upper limits, then natural ventilation is allowed, else natural ventilation is not allowed.
 </span>**
 
 **<span style="color:red;">
