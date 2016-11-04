@@ -7,6 +7,96 @@ anyOf = [
     }
 ]
 
+extension_renaming = {
+    'LifeCycleCost:UseAdjustment': 'multipliers',
+    'LifeCycleCost:UsePriceEscalation': 'escalations',
+    'ElectricLoadCenter:Transformer': 'meters',
+    'ElectricLoadCenter:Generators': 'generator_outputs',
+    'Generator:FuelCell:AirSupply': 'constituent_fractions',
+    'DemandManager:ExteriorLights': 'lights',
+    'DemandManager:Ventilation': 'controllers',
+    'DemandManagerAssignmentList': 'manager_data',
+    'DemandManager:Lights': 'lights',
+    'DemandManager:Thermostats': 'thermostats',
+    'DemandManager:ElectricEquipment': 'equipment',
+    'DaylightingDevice:Tubular': 'transition_lengths',
+    'Daylighting:Controls': 'control_data',
+    'ZoneHVAC:Baseboard:RadiantConvective:Steam': 'surface_fractions',
+    'ZoneHVAC:Baseboard:RadiantConvective:Electric': 'surface_fractions',
+    'ZoneHVAC:HighTemperatureRadiant': 'surface_fractions',
+    'ZoneHVAC:LowTemperatureRadiant:SurfaceGroup': 'surface_fractions',
+    'ZoneHVAC:Baseboard:RadiantConvective:Water': 'surface_fractions',
+    'ZoneHVAC:VentilatedSlab:SlabGroup': 'data',
+    'ZoneHVAC:CoolingPanel:RadiantConvective:Water': 'surface_fractions',
+    'AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR': 'loading_indices',
+    'AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl': 'loading_indices',
+    'ZoneTerminalUnitList': 'terminal_units',
+    'RoomAir:TemperaturePattern:NondimensionalHeight': 'pairs',
+    'RoomAir:Node:AirflowNetwork:InternalGains': 'gains',
+    'RoomAirSettings:AirflowNetwork': 'nodes',
+    'RoomAir:Node:AirflowNetwork:HVACEquipment': 'equipment_fractions',
+    'RoomAir:TemperaturePattern:SurfaceMapping': 'surface_deltas',
+    'RoomAir:Node:AirflowNetwork:AdjacentSurfaceList': 'surfaces',
+    'Controller:MechanicalVentilation': 'zone_specifications',
+    'WaterUse:Connections': 'connections',
+    'WaterUse:RainCollector': 'surfaces',
+    'Output:Table:Annual': 'variable_details',
+    'Meter:CustomDecrement': 'variable_details',
+    'Output:Table:Monthly': 'variable_details',
+    'Output:Table:SummaryReports': 'reports',
+    'Meter:Custom': 'variable_details',
+    'UnitarySystemPerformance:Multispeed': 'flow_ratios',
+    'SurfaceProperty:ExteriorNaturalVentedCavity': 'surface',
+    'ZoneProperty:UserViewFactors:bySurfaceName': 'view_factors',
+    'SurfaceProperty:HeatTransferAlgorithm:SurfaceList': 'surface',
+    'AirLoopHVAC:ZoneSplitter': 'nodes',
+    'AirLoopHVAC:SupplyPath': 'components',
+    'AirLoopHVAC:ReturnPath': 'components',
+    'AirLoopHVAC:ReturnPlenum': 'nodes',
+    'AirLoopHVAC:ZoneMixer': 'nodes',
+    'AirLoopHVAC:SupplyPlenum': 'nodes',
+    'BuildingSurface:Detailed': 'vertices',
+    'Shading:Zone:Detailed': 'vertices',
+    'RoofCeiling:Detailed': 'vertices',
+    'Shading:Site:Detailed': 'vertices',
+    'Wall:Detailed': 'vertices',
+    'ZoneList': 'zones',
+    'Floor:Detailed': 'vertices',
+    'Shading:Building:Detailed': 'vertices',
+    'SolarCollector:UnglazedTranspired:Multisystem': 'systems',
+    'SolarCollector:UnglazedTranspired': 'surfaces',
+    'Parametric:SetValueForRun': 'values',
+    'Parametric:Logic': 'lines',
+    'Parametric:FileNameSuffix': 'suffixes',
+    'Parametric:RunControl': 'runs',
+    'ZoneHVAC:EquipmentList': 'equipment',
+    'AvailabilityManagerAssignmentList': 'managers',
+    'Table:MultiVariableLookup': 'values',
+    'Table:OneIndependentVariable': 'values',
+    'Table:TwoIndependentVariables': 'values',
+    'Matrix:TwoDimension': 'values',
+    'WindowMaterial:GlazingGroup:Thermochromic': 'temperature_data',
+    'Schedule:Compact': 'data',
+    'Schedule:Day:Interval': 'data',
+    'Schedule:Week:Compact': 'data',
+    'EnergyManagementSystem:GlobalVariable': 'variables',
+    'EnergyManagementSystem:ProgramCallingManager': 'programs',
+    'EnergyManagementSystem:Program': 'lines',
+    'EnergyManagementSystem:Subroutine': 'lines',
+    'Refrigeration:CaseAndWalkInList': 'cases_and_walkins',
+    'Refrigeration:CompressorList': 'compressors',
+    'ZoneHVAC:RefrigerationChillerSet': 'chillers',
+    'Refrigeration:WalkIn': 'zone_data',
+    'Refrigeration:TransferLoadList': 'transfer_loads',
+    'Branch': 'components',
+    'PipingSystem:Underground:Domain': 'pipe_circuits',
+    'Connector:Splitter': 'branches',
+    'Connector:Mixer': 'branches',
+    'BranchList': 'branches',
+    'PipingSystem:Underground:PipeCircuit': 'pipe_segments',
+    'NodeList': 'nodes',
+    'OutdoorAir:NodeList': 'nodes'
+}
 
 def change_version(schema):
     schema["jdd_version"] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
@@ -15,12 +105,10 @@ def change_version(schema):
     loc['default'] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"
     loc['type'] = "string"
 
-
 def change_schedule_compact(schema):
     loc = schema['properties']['Schedule:Compact']['patternProperties']['.*']['properties']['extensions']['items']['properties']['field']
     loc.pop('type')
     loc['anyOf'] = anyOf
-
 
 def change_special_cased_enums(schema):
     loc = schema['properties']['GroundHeatTransfer:Slab:Insulation']['patternProperties']['.*']['properties']['ivins_flag_is_there_vertical_insulation']
