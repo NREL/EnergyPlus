@@ -4208,7 +4208,7 @@ namespace ZoneTempPredictorCorrector {
 							}
 
 							// Calculate multiplier
-							if ( abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) > 0.05 ){
+							if ( abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) > 0.05 ){ // Filter
 								MultpHM = AirCapHM / ( Zone( ZoneNum ).Volume * PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ) ) * ( TimeStepSys * SecInHour ); // Inverse equation
 								if ( ( MultpHM < 1.0 ) || ( MultpHM > 30.0 ) ){ // Temperature capacity multiplier greater than 1 and less than 30
 									MultpHM = 1.0; // Default value 1.0 
