@@ -266,6 +266,7 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	Zone( ZoneNum ).IsControlled = true;
 	Zone( ZoneNum ).SurfaceFirst = 1;
 	Zone( ZoneNum ).SurfaceLast = 2;
+	Zone( ZoneNum ).ZoneVolCapMultpMoist = 0;
 
 	ZoneIntGain( ZoneNum ).NumberOfDevices = 1;
 	ZoneIntGain( ZoneNum ).Device.allocate( ZoneIntGain( 1 ).NumberOfDevices );
