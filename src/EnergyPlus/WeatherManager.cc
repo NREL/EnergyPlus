@@ -3639,8 +3639,8 @@ Label902: ;
 		Real64 const ZHGlobalSolarConstant( 1355.0 );
 		static gio::Fmt EnvDDHdFormat( "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   'Hum Ind Value at Max Temp, Hum Ind Type,Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind Speed {m/s}, Clearness, Rain, Snow')" );
 		static gio::Fmt EnvDDayFormat( "('Environment:Design Day Data,')" );
-		static gio::Fmt DDayMiscHdFormat( "('! <Environment:Design_Day_Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')" );
-		static gio::Fmt DDayMiscFormat( "('Environment:Design_Day_Misc,',I3,',')" );
+		static gio::Fmt DDayMiscHdFormat( "('! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')" );
+		static gio::Fmt DDayMiscFormat( "('Environment:Design Day Misc,',I3,',')" );
 		static gio::Fmt MnDyFmt( "(I2.2,'/',I2.2)" );
 		Real64 const ZhangHuangModCoeff_C0( 0.5598 ); // 37.6865d0
 		Real64 const ZhangHuangModCoeff_C1( 0.4982 ); // 13.9263d0

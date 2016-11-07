@@ -2222,7 +2222,7 @@ namespace SurfaceGeometry {
 			}
 		}
 
-		gio::write( OutputFileInits, Format_720 ) << "! <SurfaceGeometry>,Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference Point Coordinate System,Rectangular (Simple) Surface Coordinate System";
+		gio::write( OutputFileInits, Format_720 ) << "! <Surface Geometry>,Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference Point Coordinate System,Rectangular (Simple) Surface Coordinate System";
 		gio::write( OutputFileInits, Format_720 ) << OutMsg;
 
 	}

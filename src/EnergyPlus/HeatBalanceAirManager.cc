@@ -502,11 +502,11 @@ namespace HeatBalanceAirManager {
 		int IsSourceZone;
 
 		// Formats
-		static gio::Fmt Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
+		static gio::Fmt Format_720( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
 		static gio::Fmt Format_722( "(' ',A,', ',A)" );
-		static gio::Fmt Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
+		static gio::Fmt Format_723( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_724( "('! <',A,' Airflow Stats Nominal>, ',A)" );
 
 		RepVarSet.dimension( NumOfZones, true );
 
@@ -2533,7 +2533,7 @@ namespace HeatBalanceAirManager {
 		TotInfilVentFlow.dimension( NumOfZones, 0.0 );
 
 		for ( Loop = 1; Loop <= TotInfiltration; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Infiltration" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "ZoneInfiltration" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
 
 			ZoneNum = Infiltration( Loop ).ZonePtr;
 			if ( ZoneNum == 0 ) {
