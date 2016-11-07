@@ -1955,7 +1955,7 @@ namespace OutputReportTabular {
 					displayEioSummary = true;
 					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
-					displayEioSummary = true;
+					WriteTabularFiles = true;
 					displayTabularBEPS = true;
 					displayTabularVeriSum = true;
 					displayTabularCompCosts = true;
