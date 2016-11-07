@@ -395,22 +395,6 @@ namespace CurveManager {
 	}
 
 	void
-	VerifyUniqueCurveName(
-			std::string const & TypeToVerify,
-			std::string const & NameToVerify,
-			bool & ErrorsFound
-	) {
-		auto const & find_name = UniqueCurveNames.find( NameToVerify );
-		if ( find_name == UniqueCurveNames.end() ) {
-			UniqueCurveNames.emplace( NameToVerify, TypeToVerify );
-		} else {
-			ShowSevereError( "GetCurveInput: " + find_name->second + "=\"" + find_name->first + "\", duplicate curve name." );
-			ShowContinueError( "...Curve name duplicates one of the Curves. Names must be unique across all curves." );
-			ErrorsFound = true;
-		}
-	}
-
-	void
 	GetCurveInputData( bool & ErrorsFound )
 	{
 
@@ -575,9 +559,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Biquadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 
 			// could add checks for blank numeric fields, and use field names for errors.
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -635,9 +618,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
 		for ( CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 
 			PerfCurve( CurveNum ).CurveType = ChillerPartLoadWithLift;
@@ -701,7 +683,7 @@ namespace CurveManager {
 		for ( CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = Cubic;
 			PerfCurve( CurveNum ).ObjectType = CurveType_Cubic;
@@ -743,9 +725,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Quartic";
 		for ( CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = Quartic;
 			PerfCurve( CurveNum ).ObjectType = CurveType_Quartic;
@@ -788,9 +769,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Quadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = Quadratic;
 			PerfCurve( CurveNum ).ObjectType = CurveType_Quadratic;
@@ -831,9 +811,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:QuadraticLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = QuadraticLinear;
 			PerfCurve( CurveNum ).ObjectType = CurveType_QuadraticLinear;
@@ -888,9 +867,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:CubicLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = CubicLinear;
 			PerfCurve( CurveNum ).ObjectType = CurveType_CubicLinear;
@@ -945,9 +923,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Linear";
 		for ( CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = Linear;
 			PerfCurve( CurveNum ).ObjectType = CurveType_Linear;
@@ -986,9 +963,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Bicubic";
 		for ( CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = BiCubic;
 			PerfCurve( CurveNum ).ObjectType = CurveType_BiCubic;
@@ -1047,9 +1023,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Triquadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = TriQuadratic;
 			PerfCurve( CurveNum ).ObjectType = CurveType_TriQuadratic;
@@ -1141,9 +1116,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:QuadLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = QuadLinear;
 			PerfCurve( CurveNum ).ObjectType = CurveType_QuadLinear;
@@ -1223,9 +1197,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Exponent";
 		for ( CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = Exponent;
 			PerfCurve( CurveNum ).ObjectType = CurveType_Exponent;
@@ -1260,9 +1233,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:FanPressureRise";
 		for ( CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = FanPressureRise;
 			PerfCurve( CurveNum ).ObjectType = CurveType_FanPressureRise;
@@ -1302,9 +1274,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:ExponentialSkewNormal";
 		for ( CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = ExponentialSkewNormal;
 			PerfCurve( CurveNum ).ObjectType = CurveType_ExponentialSkewNormal;
@@ -1347,9 +1318,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:Sigmoid";
 		for ( CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = Sigmoid;
 			PerfCurve( CurveNum ).ObjectType = CurveType_Sigmoid;
@@ -1393,9 +1363,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:RectangularHyperbola1";
 		for ( CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = RectangularHyperbola1;
 			PerfCurve( CurveNum ).ObjectType = CurveType_RectangularHyperbola1;
@@ -1437,9 +1406,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:RectangularHyperbola2";
 		for ( CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = RectangularHyperbola2;
 			PerfCurve( CurveNum ).ObjectType = CurveType_RectangularHyperbola2;
@@ -1481,9 +1449,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:ExponentialDecay";
 		for ( CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = ExponentialDecay;
 			PerfCurve( CurveNum ).ObjectType = CurveType_ExponentialDecay;
@@ -1525,9 +1492,8 @@ namespace CurveManager {
 		CurrentModuleObject = "Curve:DoubleExponentialDecay";
 		for ( CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = DoubleExponentialDecay;
 			PerfCurve( CurveNum ).ObjectType = CurveType_DoubleExponentialDecay;
@@ -1573,13 +1539,12 @@ namespace CurveManager {
 		CurrentModuleObject = "Table:OneIndependentVariable";
 		for ( CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			++CurveNum;
 			++TableNum;
 			NumTableEntries = ( NumNumbers - 5 ) / 2;
 			TableData( TableNum ).X1.allocate( NumTableEntries );
 			TableData( TableNum ).Y.allocate( NumTableEntries );
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).ObjectType = CurveType_TableOneIV;
 			PerfCurve( CurveNum ).TableIndex = TableNum;
@@ -1784,14 +1749,13 @@ namespace CurveManager {
 		CurrentModuleObject = "Table:TwoIndependentVariables";
 		for ( CurveIndex = 1; CurveIndex <= NumTwoVarTab; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			++CurveNum;
 			++TableNum;
 			NumTableEntries = ( NumNumbers - 7 ) / 3;
 			TableData( TableNum ).X1.allocate( NumTableEntries );
 			TableData( TableNum ).X2.allocate( NumTableEntries );
 			TableData( TableNum ).Y.allocate( NumTableEntries );
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).ObjectType = CurveType_TableTwoIV;
 			PerfCurve( CurveNum ).TableIndex = TableNum;
@@ -2116,10 +2080,9 @@ namespace CurveManager {
 		TableNum = NumTables;
 		for ( CurveIndex = 1; CurveIndex <= NumMultVarLookup; ++CurveIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			++TableNum;
-			VerifyUniqueCurveName( CurrentModuleObject, Alphas( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).ObjectType = CurveType_TableMultiIV;
 			PerfCurve( CurveNum ).TableIndex = TableNum;
@@ -5307,9 +5270,7 @@ Label999: ;
 		PressureCurve.allocate( NumPressure );
 		for ( CurveNum = 1; CurveNum <= NumPressure; ++CurveNum ) {
 			InputProcessor::GetObjectItem( CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( Alphas( 1 ), CurveObjectName, ErrsFound );
-
-			VerifyUniqueCurveName( CurveObjectName, Alphas( 1 ), ErrsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurveObjectName, cAlphaFieldNames( 1 ), ErrsFound );
 			PressureCurve( CurveNum ).Name = Alphas( 1 );
 			PressureCurve( CurveNum ).EquivDiameter = Numbers( 1 );
 			PressureCurve( CurveNum ).MinorLossCoeff = Numbers( 2 );

@@ -2966,7 +2966,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
 				for ( CondNum = 1; CondNum <= NumSimulationCondAir; ++CondNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 					Condenser( CondNum ).CapCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -3069,7 +3069,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3262,7 +3262,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3390,7 +3390,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 

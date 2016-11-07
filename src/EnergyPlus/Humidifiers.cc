@@ -363,7 +363,7 @@ namespace Humidifiers {
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumElecSteamHums; ++HumidifierIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = HumidifierIndex;
-			InputProcessor::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			//    Humidifier(HumNum)%HumType = TRIM(CurrentModuleObject)
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Electric;
@@ -400,7 +400,7 @@ namespace Humidifiers {
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumGasSteamHums; ++HumidifierIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = NumElecSteamHums + HumidifierIndex;
-			InputProcessor::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Gas;
 			Humidifier( HumNum ).Sched = Alphas( 2 );

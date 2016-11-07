@@ -898,7 +898,7 @@ namespace ZoneTempPredictorCorrector {
 			InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
 			HumidityControlZone( HumidControlledZoneNum ).ControlName = cAlphaArgs( 1 );
-			InputProcessor::VerifyUniqueInterObjectName( HumidityControlZoneUniqueNames, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( HumidityControlZoneUniqueNames, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), ErrorsFound);
 
 			HumidityControlZone( HumidControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 			HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum = InputProcessor::FindItem( cAlphaArgs( 2 ), Zone );
@@ -1207,7 +1207,7 @@ namespace ZoneTempPredictorCorrector {
 
 		for ( SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedName = cAlphaArgs( 2 );
@@ -1233,7 +1233,7 @@ namespace ZoneTempPredictorCorrector {
 
 		for ( SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= NumSingleFangerHeatCoolControls; ++SingleFangerHeatCoolControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedName = cAlphaArgs( 2 );

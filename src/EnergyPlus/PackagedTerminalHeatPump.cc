@@ -728,7 +728,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			InputProcessor::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTHPUnit;
@@ -1398,7 +1398,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			InputProcessor::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTACUnit;
@@ -2009,7 +2009,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			InputProcessor::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTWSHPUnit;

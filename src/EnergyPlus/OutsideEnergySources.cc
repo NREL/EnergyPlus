@@ -321,7 +321,7 @@ namespace OutsideEnergySources {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				InputProcessor::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";
@@ -378,7 +378,7 @@ namespace OutsideEnergySources {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				InputProcessor::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";

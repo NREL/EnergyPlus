@@ -1316,7 +1316,7 @@ namespace ExternalInterface {
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).Name = cAlphaArgs( 2 );
 							// verify whether we have duplicate FMU input variables in the idf
-							InputProcessor::VerifyUniqueInterObjectName( UniqueFMUInputVarNames, FMU( i ).Instance( j ).fmuInputVariable( k ).Name, cCurrentModuleObject, FMU( i ).Instance( j ).Name, ErrorsFound );
+							GlobalNames::VerifyUniqueInterObjectName( UniqueFMUInputVarNames, FMU( i ).Instance( j ).fmuInputVariable( k ).Name, cCurrentModuleObject, FMU( i ).Instance( j ).Name, ErrorsFound );
 //							InputProcessor::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
 							if ( ErrorsFound ) {
 								StopExternalInterfaceIfError();

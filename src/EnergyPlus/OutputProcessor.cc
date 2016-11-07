@@ -1669,7 +1669,7 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			InputProcessor::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( ErrorsFound ) continue;
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );
@@ -1816,7 +1816,7 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			InputProcessor::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( ErrorsFound ) continue;
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );

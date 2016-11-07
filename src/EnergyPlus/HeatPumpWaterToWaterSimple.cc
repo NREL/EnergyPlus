@@ -336,7 +336,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHPNum = HPNum;
 
 			InputProcessor::GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			InputProcessor::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitCoolingUC, ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitCoolingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowCool = NumArray( 1 );
@@ -381,7 +381,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHPNum = NumCoolCoil + HPNum;
 
 			InputProcessor::GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			InputProcessor::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitHeatingUC, ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitHeatingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowHeat = NumArray( 1 );

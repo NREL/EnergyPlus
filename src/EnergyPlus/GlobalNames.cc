@@ -148,6 +148,51 @@ namespace GlobalNames {
 	}
 
 	void
+	VerifyUniqueInterObjectName(
+			std::unordered_map< std::string, std::string > & names,
+			std::string & object_name,
+			std::string const & object_type,
+			std::string const & field_name,
+			bool & ErrorsFound
+	) {
+		if ( object_name.empty() ) {
+			ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
+			ErrorsFound = true;
+			object_name = "xxxxx";
+			return;
+		}
+		auto const & names_iter = names.find( object_name );
+		if ( names_iter == names.end() ) {
+			names.emplace( object_name, object_type );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+		}
+	}
+
+	void
+	VerifyUniqueInterObjectName(
+			std::unordered_map< std::string, std::string > & names,
+			std::string & object_name,
+			std::string const & object_type,
+			bool & ErrorsFound
+	) {
+		if ( object_name.empty() ) {
+			ShowSevereError("E+ object type " + object_name + " has a blank field");
+			ErrorsFound = true;
+			object_name = "xxxxx";
+			return;
+		}
+		auto const & names_iter = names.find( object_name );
+		if ( names_iter == names.end() ) {
+			names.emplace( object_name, object_type );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+		}
+	}
+
+	void
 	VerifyUniqueChillerName(
 			std::string const & TypeToVerify,
 			std::string const & NameToVerify,

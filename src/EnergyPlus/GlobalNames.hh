@@ -130,6 +130,23 @@ namespace GlobalNames {
 	);
 
 	void
+	VerifyUniqueInterObjectName(
+			std::unordered_map< std::string, std::string > & names,
+			std::string & object_name,
+			std::string const & object_type,
+			std::string const & field_name,
+			bool & ErrorsFound
+	);
+
+	void
+	VerifyUniqueInterObjectName(
+			std::unordered_map< std::string, std::string > & names,
+			std::string & object_name,
+			std::string const & object_type,
+			bool & ErrorsFound
+	);
+
+	void
 	VerifyUniqueChillerName(
 		std::string const & TypeToVerify,
 		std::string const & NameToVerify,

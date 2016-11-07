@@ -2980,7 +2980,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:Program";
 				for ( StackNum = 1; StackNum <= NumErlPrograms; ++StackNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Programs", errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -3000,7 +3000,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
 				for ( StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Subroutines", errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -3104,7 +3104,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
 				for ( RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
 					if ( lbracket == std::string::npos ) {
@@ -3238,7 +3238,7 @@ namespace RuntimeLanguageProcessor {
 					RuntimeReportVarNum = NumEMSOutputVariables + loop;
 					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
 					if ( lbracket == std::string::npos ) {
