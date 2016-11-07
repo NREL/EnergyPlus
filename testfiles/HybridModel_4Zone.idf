@@ -119,12 +119,12 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
 ZoneInfiltration:DesignFlowRate,
     ZONE 1 Infil,  !- Name
     ZONE 1,        !- Zone or ZoneList Name
-    ALWAYSON,                !- Schedule Name
+    INFIL-SCHED,                !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Flow per Exterior Surface Area {m3/s-m2}
-    0.1,                     !- Air Changes per Hour {1/hr}
+    1.0,                     !- Air Changes per Hour {1/hr}
     1.0000,                  !- Constant Term Coefficient
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
@@ -133,12 +133,12 @@ ZoneInfiltration:DesignFlowRate,
 ZoneInfiltration:DesignFlowRate,
     ZONE 2 Infil,  !- Name
     ZONE 2,        !- Zone or ZoneList Name
-    ALWAYSON,                !- Schedule Name
+    INFIL-SCHED,                !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Flow per Exterior Surface Area {m3/s-m2}
-    0.3,                     !- Air Changes per Hour {1/hr}
+    1.0,                     !- Air Changes per Hour {1/hr}
     1.0000,                  !- Constant Term Coefficient
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
@@ -147,12 +147,12 @@ ZoneInfiltration:DesignFlowRate,
 ZoneInfiltration:DesignFlowRate,
     ZONE 3 Infil,  !- Name
     ZONE 3,        !- Zone or ZoneList Name
-    ALWAYSON,                !- Schedule Name
+    INFIL-SCHED,                !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Flow per Exterior Surface Area {m3/s-m2}
-    0.5,                     !- Air Changes per Hour {1/hr}
+    1.0,                     !- Air Changes per Hour {1/hr}
     1.0000,                  !- Constant Term Coefficient
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
@@ -161,30 +161,34 @@ ZoneInfiltration:DesignFlowRate,
 ZoneInfiltration:DesignFlowRate,
     ZONE 4 Infil,  !- Name
     ZONE 4,        !- Zone or ZoneList Name
-    ALWAYSON,                !- Schedule Name
+    INFIL-SCHED,                !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Flow per Exterior Surface Area {m3/s-m2}
-    0.7,                     !- Air Changes per Hour {1/hr}
+    1.0,                     !- Air Changes per Hour {1/hr}
     1.0000,                  !- Constant Term Coefficient
     0.0000,                  !- Temperature Term Coefficient
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
   
 Schedule:Compact,
-    ALWAYSON,                !- Name
-    On/Off,                  !- Schedule Type Limits Name
+    INFIL-SCHED,             !- Name
+    Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
+    Until: 06:00,            !- Field 3
+    1,                       !- Field 4
+    Until: 09:00,            !- Field 5
+    0.5,                     !- Field 6
+	Until: 19:00,            !- Field 7
+    0.25,                    !- Field 8
+	Until: 22:00,            !- Field 9
+    0.5,                     !- Field 10
+    Until: 24:00,            !- Field 11
+    1;                       !- Field 12
 
-ScheduleTypeLimits,
-    On/Off,                  !- Name
-    0,                       !- Lower Limit Value
-    1,                       !- Upper Limit Value
-    DISCRETE;                !- Numeric Type
-	
+
 !-   ===========  ALL OBJECTS IN CLASS: HYBRIDMODEL:ZONE ===========
 
 HybridModel:Zone,
@@ -236,7 +240,7 @@ HybridModel:Zone,
 Schedule:File,
     ZONE 1_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridModel_4Zone_TemperatureData.csv,  !- File Name
     2,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -247,7 +251,7 @@ Schedule:File,
 Schedule:File,
     ZONE 2_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridModel_4Zone_TemperatureData.csv,  !- File Name
     3,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -258,7 +262,7 @@ Schedule:File,
 Schedule:File,
     ZONE 3_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridModel_4Zone_TemperatureData.csv,  !- File Name
     4,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -269,7 +273,7 @@ Schedule:File,
 Schedule:File,
     ZONE 4_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_TemperatureData.csv,  !- File Name
+    HybridModel_4Zone_TemperatureData.csv,  !- File Name
     5,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -278,7 +282,7 @@ Schedule:File,
     10;                      !- Minutes per Item
 
 Output:Variable,*,Zone Infiltration OA Air Change Rate HM,Timestep;
-
+Output:Variable,*,Zone Mean Air Temperature,Timestep;
 Output:Table:SummaryReports,AllSummaryAndMonthly;
 
 OutputControl:Table:Style,Comma;

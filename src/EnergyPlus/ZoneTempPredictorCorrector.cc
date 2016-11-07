@@ -3827,7 +3827,7 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Russell Taylor
 		//       DATE WRITTEN   ???
-		//       MODIFIED       November 1999, LKL;
+		//       MODIFIED       November 1999, LKL; November 2016 Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang;
 		//       RE-ENGINEERED  July 2003 (Peter Graham Ellis)
 		//                      February 2008 (Brent Griffith reworked history )
 
