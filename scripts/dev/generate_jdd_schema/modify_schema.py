@@ -178,3 +178,10 @@ def change_special_cased_name_fields(schema):
     del schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['name'] = \
         schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('heat_pump_name')
+
+def change_extensions_name(schema):
+    for key, value in extension_renaming.items():
+        schema['properties'][key]['patternProperties']['.*']['properties'][value] = schema['properties'][key]['patternProperties']['.*']['properties']['extensions']
+        loc = schema['properties'][key]['patternProperties']['.*']['properties']
+        del loc['extensions']
+        schema['properties'][key]['legacy_idd']['extension'] = value
