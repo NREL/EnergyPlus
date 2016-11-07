@@ -10855,7 +10855,7 @@ namespace OutputReportTabular {
 				for (auto bodyLine : bodyLines)
 				{
 					if (bodyLine.size() > tableName.size()) {
-						if (bodyLine.substr(0, tableName.size()) == tableName) {  // this needs to match the test used to populate the body of table below
+						if (bodyLine.substr(0, tableName.size() + 1) == tableName + "," ) {  // this needs to match the test used to populate the body of table below
 							++countOfMatchingLines;
 						}
 					}
@@ -10901,7 +10901,7 @@ namespace OutputReportTabular {
 					for (auto bodyLine : bodyLines)
 					{
 						if (bodyLine.size() > tableName.size()) {
-							if (bodyLine.substr(0, tableName.size()) == tableName) {  // this needs to match the test used in the original counting
+							if (bodyLine.substr(0, tableName.size() + 1) == tableName + ",") {  // this needs to match the test used in the original counting
 								++rowNum;
 								if (rowNum > countOfMatchingLines) break;  // should never happen since same test as original could
 								std::vector<std::string> dataFields = splitCommaString(bodyLine);
