@@ -151,6 +151,42 @@ TEST( OutputReportTabularTest, RealToStr )
 
 }
 
+TEST(OutputReportTabularTest, isNumber)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, isNumber");
+	EXPECT_TRUE(isNumber("0"));
+	EXPECT_TRUE(isNumber("0.12"));
+	EXPECT_TRUE(isNumber("0.12E01"));
+	EXPECT_TRUE(isNumber("-6"));
+	EXPECT_TRUE(isNumber("-6.12"));
+	EXPECT_TRUE(isNumber("-6.12E-09"));
+	EXPECT_TRUE(isNumber(" 0"));
+	EXPECT_TRUE(isNumber(" 0.12"));
+	EXPECT_TRUE(isNumber(" 0.12E01"));
+	EXPECT_TRUE(isNumber("0 "));
+	EXPECT_TRUE(isNumber("0.12 "));
+	EXPECT_TRUE(isNumber("0.12E01 "));
+	EXPECT_TRUE(isNumber(" 0 "));
+	EXPECT_TRUE(isNumber(" 0.12 "));
+	EXPECT_TRUE(isNumber(" 0.12E01 "));
+}
+
+TEST(OutputReportTabularTest, digitsAferDecimal)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, digitsAferDecimal");
+	EXPECT_EQ(0, digitsAferDecimal("0"));
+	EXPECT_EQ(0, digitsAferDecimal("1."));
+	EXPECT_EQ(2, digitsAferDecimal("0.12"));
+	EXPECT_EQ(4, digitsAferDecimal("0.1234"));
+	EXPECT_EQ(2, digitsAferDecimal("3.12E01"));
+	EXPECT_EQ(0, digitsAferDecimal("-6"));
+	EXPECT_EQ(0, digitsAferDecimal("-6."));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12"));
+	EXPECT_EQ(5, digitsAferDecimal("-6.12765"));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
+}
+
+
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, ConfirmResourceWarning" );

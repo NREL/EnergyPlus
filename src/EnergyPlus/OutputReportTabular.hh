@@ -947,6 +947,12 @@ namespace OutputReportTabular {
 	std::string
 	DateToString( int const codedDate ); // word containing encoded month, day, hour, minute
 
+	bool
+	isNumber(std::string s);
+
+	int
+	digitsAferDecimal(std::string s);
+
 	void
 	AddTOCEntry(
 		std::string const & nameSection,

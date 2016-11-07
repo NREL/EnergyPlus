@@ -10814,6 +10814,7 @@ namespace OutputReportTabular {
 			Array1D_int columnWidth;
 			Array1D_string rowHead;
 			Array2D_string tableBody;
+			Array1D_int colUnitConv;
 
 			// setting up  report header 
 			WriteReportHeaders("Initialization Summary", "Entire Facility", isAverage);
@@ -10875,6 +10876,26 @@ namespace OutputReportTabular {
 					{
 						columnHead(iCol) = headerFields.at(iCol);
 					}
+					// set the unit conversions
+					colUnitConv.allocate(numCols);
+					for (int iCol = 1; iCol <= numCols; ++iCol)
+					{
+						std::string colTagWithSI = columnHead(iCol);
+						std::string curColTag = "";
+						int indexUnitConv = 0;
+						if (unitsStyle == unitsStyleInchPound) {
+							LookupSItoIP(colTagWithSI, indexUnitConv, curColTag);
+							colUnitConv(iCol) = indexUnitConv;
+						} else if (unitsStyle == unitsStyleJtoKWH) {
+							LookupJtokWH(colTagWithSI, indexUnitConv, curColTag);
+							colUnitConv(iCol) = indexUnitConv;
+						} else {
+							curColTag = colTagWithSI;
+							colUnitConv(iCol) = 0;
+						}
+						columnHead(iCol) = curColTag;
+					}
+
 					// look for data lines
 					int rowNum = 0;
 					for (auto bodyLine : bodyLines)
@@ -10884,13 +10905,20 @@ namespace OutputReportTabular {
 								++rowNum;
 								if (rowNum > countOfMatchingLines) break;  // should never happen since same test as original could
 								std::vector<std::string> dataFields = splitCommaString(bodyLine);
-								//rowHead(rowNum) = dataFields[1];  //original 
 								rowHead(rowNum) = IntToStr(rowNum);
-								//for (int iCol = 1; iCol < numCols && (iCol + 1) < dataFields.size(); ++iCol)
-									//tableBody(iCol, rowNum) = dataFields[iCol + 1]; 
 								for (int iCol = 1; iCol <= numCols && iCol < dataFields.size(); ++iCol)
 								{
-									tableBody(iCol, rowNum) = dataFields[iCol];
+									if (unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH) {
+										if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) {  // if it is a number that has a conversion
+											int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
+											Real64 convertedVal = ConvertIP(colUnitConv(iCol), StrToReal(dataFields[iCol]));
+											tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+										} else {
+											tableBody(iCol, rowNum) = dataFields[iCol];
+										}
+									} else {
+										tableBody(iCol, rowNum) = dataFields[iCol];
+									}
 								}
 							}
 						}
@@ -10921,7 +10949,7 @@ namespace OutputReportTabular {
 		std::stringstream inputSS(inputString);
 		while (std::getline(inputSS, field, ','))
 		{
-			fields.push_back(field);
+			fields.push_back(stripped(field));
 		}
 		return fields;
 	}
@@ -14321,6 +14349,37 @@ Label900: ;
 		return StringOut;
 	}
 
+	// adapted from http://stackoverflow.com/questions/4654636/how-to-determine-if-a-string-is-a-number-with-c
+	bool 
+	isNumber(std::string s)
+	{
+		std::string trimmed = stripped(s);
+		return(strspn(trimmed.c_str(), "-.0123456789eE") == trimmed.size());
+	}
+
+	// return the number of digits after the decimal point
+	// Glazer - November 2016
+	int
+	digitsAferDecimal(std::string s)
+	{
+		std::size_t decimalpos = s.find('.');
+		std::size_t numDigits;
+		if (decimalpos == s.npos)
+		{
+			numDigits = 0;
+		} else {
+			std::size_t epos = s.find('E');
+			if (epos == s.npos) epos = s.find('e');
+			if (epos == s.npos)
+			{
+				numDigits = s.length() - (decimalpos + 1);
+			} else {
+				numDigits = epos - (decimalpos + 1);
+			}
+		}
+		return int(numDigits);
+	}
+
 	void
 	AddTOCEntry(
 		std::string const & nameSection,
@@ -14902,7 +14961,8 @@ Label900: ;
 		int modeInString;
 		int const misBrac( 1 );
 		int const misParen( 2 );
-		int const misNoHint( 3 );
+		int const misBrce( 3 );
+		int const misNoHint( 4 );
 		std::string const stringInUpper( MakeUPPERCase( stringInWithSI ) );
 
 		stringOutWithIP = "";
@@ -14911,6 +14971,8 @@ Label900: ;
 		std::string::size_type posRBrac = index( stringInUpper, ']' ); // right bracket
 		std::string::size_type posLParen = index( stringInUpper, '(' ); // left parenthesis
 		std::string::size_type posRParen = index( stringInUpper, ')' ); // right parenthesis
+		std::string::size_type posLBrce = index(stringInUpper, '{'); // left brace
+		std::string::size_type posRBrce = index(stringInUpper, '}'); // right brace
 		bool noBrackets = true;
 		//extract the substring with the units
 		if ( ( posLBrac != std::string::npos ) && ( posRBrac != std::string::npos ) && ( posRBrac - posLBrac >= 1 ) ) {
@@ -14920,6 +14982,9 @@ Label900: ;
 		} else if ( ( posLParen != std::string::npos ) && ( posRParen != std::string::npos ) && ( posRParen - posLParen >= 1 ) ) {
 			unitSIOnly = stringInUpper.substr( posLParen + 1, posRParen - posLParen - 1 );
 			modeInString = misParen;
+		} else if ((posLBrce != std::string::npos) && (posRBrce != std::string::npos) && (posRBrce - posLBrce >= 1)) {
+			unitSIOnly = stringInUpper.substr(posLBrce + 1, posRBrce - posLBrce - 1);
+			modeInString = misBrce;
 		} else {
 			unitSIOnly = stringInUpper;
 			modeInString = misNoHint;
@@ -14969,6 +15034,8 @@ Label900: ;
 				stringOutWithIP = stringInWithSI.substr( 0, posLBrac + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRBrac );
 			} else if ( modeInString == misParen ) {
 				stringOutWithIP = stringInWithSI.substr( 0, posLParen + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRParen );
+			} else if (modeInString == misBrce) {
+				stringOutWithIP = stringInWithSI.substr(0, posLBrce + 1) + UnitConv(selectedConv).ipName + stringInWithSI.substr(posRBrce);
 			} else if ( modeInString == misNoHint ) {
 				stringOutWithIP = UnitConv( selectedConv ).ipName;
 			}
