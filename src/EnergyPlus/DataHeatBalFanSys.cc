@@ -104,6 +104,7 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > QHWBaseboardToPerson; // Sum of radiant gains to people from hot water baseboard heaters
 	Array1D< Real64 > QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
 	Array1D< Real64 > QElecBaseboardToPerson; // Sum of radiant gains to people from electric baseboard heaters
+	Array1D< Real64 > QCoolingPanelToPerson; // Sum of radiant losses to people from cooling panels
 	//Zone air drybulb conditions variables
 	Array1D< Real64 > ZTAV; // Zone Air Temperature Averaged over the Zone Time step
 	Array1D< Real64 > MAT; // MEAN AIR TEMPARATURE (C)
@@ -189,6 +190,8 @@ namespace DataHeatBalFanSys {
 
 	Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
 	// temperature at source
+	Array1D< Real64 > CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
+	// temperature at user specified location
 	Array1D< Real64 > QHTRadSysSurf; // Current radiant heat flux at a surface due to the presence
 	// of high temperature radiant heaters
 	Array1D< Real64 > QHWBaseboardSurf; // Current radiant heat flux at a surface due to the presence
@@ -197,6 +200,8 @@ namespace DataHeatBalFanSys {
 	// of steam baseboard heaters
 	Array1D< Real64 > QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
 	// of electric baseboard heaters
+	Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
+	// of simple cooling panels
 	Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
@@ -210,14 +215,13 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > SumHmAW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
 	Array1D< Real64 > SumHmARa; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 	Array1D< Real64 > SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
+	Array1D< Real64 > SumHmARaZ;
 
 	Array1D< Real64 > TempZoneThermostatSetPoint;
 	Array1D< Real64 > ZoneThermostatSetPointHi;
 	Array1D< Real64 > ZoneThermostatSetPointLo;
 
 	Array1D< Real64 > LoadCorrectionFactor; // PH 3/3/04
-
-	Array1D_bool CrossMixingFlag; // TRUE when a zone is mixing
 
 	Array1D< Real64 > AIRRAT; // "air power capacity"  PH 3/5/04
 	Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
@@ -321,6 +325,7 @@ namespace DataHeatBalFanSys {
 		TCondFDSourceNode.deallocate();
 		QPVSysSource.deallocate(); 
 		CTFTsrcConstPart.deallocate(); 
+		CTFTuserConstPart.deallocate();
 		QHTRadSysSurf.deallocate();
 		QHWBaseboardSurf.deallocate(); 
 		QSteamBaseboardSurf.deallocate(); 
@@ -340,7 +345,6 @@ namespace DataHeatBalFanSys {
 		ZoneThermostatSetPointHi.deallocate();
 		ZoneThermostatSetPointLo.deallocate();
 		LoadCorrectionFactor.deallocate(); 
-		CrossMixingFlag.deallocate(); 
 		AIRRAT.deallocate(); 
 		ZTM1.deallocate(); 
 		ZTM2.deallocate(); 

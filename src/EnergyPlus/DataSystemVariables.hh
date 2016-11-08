@@ -99,8 +99,6 @@ namespace DataSystemVariables {
 	extern std::string const cSutherlandHodgman;
 	extern std::string const cMinimalSurfaceVariables;
 	extern std::string const cMinimalShadowing;
-	extern std::string const cNumThreads;
-	extern std::string const cepNumThreads;
 	extern std::string const cNumActiveSims;
 	extern std::string const cInputPath1; // EP-Launch setting.  Full path + project name
 	extern std::string const cInputPath2; // RunEplus.bat setting.  Full path

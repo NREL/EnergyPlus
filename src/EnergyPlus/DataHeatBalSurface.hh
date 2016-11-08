@@ -97,6 +97,7 @@ namespace DataHeatBalSurface {
 	extern Array1D< Real64 > HSkyExtSurf; // Outside Convection Coefficient
 	extern Array1D< Real64 > HGrdExtSurf; // Outside Convection Coefficient
 	extern Array1D< Real64 > TempSource; // Temperature at the source location for each heat transfer surface
+	extern Array1D< Real64 > TempUserLoc; // Temperature at the user specified location for each heat transfer surface
 	extern Array1D< Real64 > TempSurfInRep; // Temperature of the Inside Surface for each heat transfer surface
 	// (report)
 	extern Array1D< Real64 > QConvInReport; // Surface convection heat gain at inside face [J]
@@ -230,8 +231,10 @@ namespace DataHeatBalSurface {
 	extern Array3D< Real64 > THM; // Master Temperature History (on the time step for the construct)
 	extern Array3D< Real64 > QHM; // Master Flux History (on the time step for the construct)
 	extern Array2D< Real64 > TsrcHist; // Temperature history at the source location (Term,SurfNum)
+	extern Array2D< Real64 > TuserHist; // Temperature history at the user specified location (Term,SurfNum)
 	extern Array2D< Real64 > QsrcHist; // Heat source/sink history for the surface (Term,SurfNum)
 	extern Array2D< Real64 > TsrcHistM; // Master temperature history at the source location (Term,SurfNum)
+	extern Array2D< Real64 > TuserHistM; // Master temperature history at the user specified location (Term,SurfNum)
 	extern Array2D< Real64 > QsrcHistM; // Master heat source/sink history for the surface (Term,SurfNum)
 
 	extern Array2D< Real64 > FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1

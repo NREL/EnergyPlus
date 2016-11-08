@@ -119,6 +119,7 @@ namespace HeatingCoils {
 		std::string HeatingCoilType; // Type of HeatingCoil ie. Heating or Cooling
 		std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
 		int HCoilType_Num;
+		int FuelType_Num; // Type of fuel used, reference resource type integers
 		std::string Schedule; // HeatingCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		int InsuffTemperatureWarn; // Used for recurring error message
@@ -132,9 +133,9 @@ namespace HeatingCoils {
 		Real64 OutletAirEnthalpy;
 		Real64 HeatingCoilLoad; // Total Load on the Coil [J]
 		Real64 HeatingCoilRate; // Total Coil Rate on the Coil [W]
-		Real64 GasUseLoad; // Gas Usage of Coil [J]
+		Real64 FuelUseLoad; // Fuel Usage of Coil [J]
 		Real64 ElecUseLoad; // Electric Usage of Coil [J]
-		Real64 GasUseRate; // Gas Usage of Coil [W]
+		Real64 FuelUseRate; // Fuel Usage of Coil [W]
 		Real64 ElecUseRate; // Electric Usage of Coil [W]
 		Real64 Efficiency; // HeatingCoil Efficiency Value
 		Real64 NominalCapacity; // Nominal Capacity of Coil [W]
@@ -147,11 +148,11 @@ namespace HeatingCoils {
 		int Control;
 		int PLFCurveIndex; // Index for part-load factor curve index for gas heating coil
 		Real64 ParasiticElecLoad; // parasitic electric load associated with the gas heating coil
-		Real64 ParasiticGasLoad; // parasitic gas load associated with the gas heating coil
+		Real64 ParasiticFuelLoad; // parasitic fuel load associated with the gas heating coil
 		// (standing pilot light) [J]
-		Real64 ParasiticGasRate; // avg. parasitic gas consumption rate with the gas heating coil
+		Real64 ParasiticFuelRate; // avg. parasitic fuel consumption rate with the gas heating coil
 		// (standing pilot light) [J]
-		Real64 ParasiticGasCapacity; // capacity of parasitic gas consumption rate, input by user [W]
+		Real64 ParasiticFuelCapacity; // capacity of parasitic fuel consumption rate, input by user [W]
 		Real64 RTF; // Heater runtime fraction, including PLF curve impacts
 		int RTFErrorIndex; // used in recurring error warnings
 		int RTFErrorCount; // used in recurring error warnings
@@ -178,6 +179,7 @@ namespace HeatingCoils {
 		// Default Constructor
 		HeatingCoilEquipConditions() :
 			HCoilType_Num( 0 ),
+			FuelType_Num( 0 ),
 			SchedPtr( 0 ),
 			InsuffTemperatureWarn( 0 ),
 			InletAirMassFlowRate( 0.0 ),
@@ -190,9 +192,9 @@ namespace HeatingCoils {
 			OutletAirEnthalpy( 0.0 ),
 			HeatingCoilLoad( 0.0 ),
 			HeatingCoilRate( 0.0 ),
-			GasUseLoad( 0.0 ),
+			FuelUseLoad( 0.0 ),
 			ElecUseLoad( 0.0 ),
-			GasUseRate( 0.0 ),
+			FuelUseRate( 0.0 ),
 			ElecUseRate( 0.0 ),
 			Efficiency( 0.0 ),
 			NominalCapacity( 0.0 ),
@@ -205,9 +207,9 @@ namespace HeatingCoils {
 			Control( 0 ),
 			PLFCurveIndex( 0 ),
 			ParasiticElecLoad( 0.0 ),
-			ParasiticGasLoad( 0.0 ),
-			ParasiticGasRate( 0.0 ),
-			ParasiticGasCapacity( 0.0 ),
+			ParasiticFuelLoad( 0.0 ),
+			ParasiticFuelRate( 0.0 ),
+			ParasiticFuelCapacity( 0.0 ),
 			RTF( 0.0 ),
 			RTFErrorIndex( 0 ),
 			RTFErrorCount( 0 ),
@@ -302,7 +304,7 @@ namespace HeatingCoils {
 	);
 
 	void
-	CalcGasHeatingCoil(
+	CalcFuelHeatingCoil(
 		int const CoilNum, // index to heating coil
 		Real64 const QCoilReq,
 		Real64 & QCoilActual, // coil load actually delivered (W)
