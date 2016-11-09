@@ -3,17 +3,18 @@ Allow Multiple Air Loops to One Thermal Zone
 
 **Michael J. Witte, GARD Analytics, Inc.**
 
- - October 28, 2016 - NFP
- - Revision Date
+ - October 28, 2016 - Initial NFP
+ - November 7, 2016 - Revised NFP
  
+*Reviewers - Hong, Horowitz, Gu, Scheier, Merket, Winkler
 
 ## Justification for New Feature ##
 
-The current limitation of one airloop (any system built using the `AirloopHVAC` object) serving a given zone has long been a barrier to modeling various system configurations. The most commong situation is a multi-zone DOAS running in parallel with single or multi-zone space conditioning systems.  EnergyPlus currently offers three workarounds for modeling DOAS systems in combination with other space-conditioning equipment:
+The current limitation of one airloop (any system built using the `AirloopHVAC` object) serving a given zone has long been a barrier to modeling various system configurations. The most common situation is a multi-zone DOAS running in parallel with single or multi-zone space conditioning systems.  EnergyPlus currently offers three workarounds for modeling DOAS systems in combination with other space-conditioning equipment:
 
 1. Model the DOAS as an airloop and the space-conditioning equipment as zone HVAC equipment (`ZoneHVAC:*`).
 2. Model the space-conditioning equipment as an airloop and the DOAS as zone HVAC equipment (`ZoneHVAC:OutdoorAirUnit`).
-3. Model the DOAS and the space-conditioning equipment as a dual-duct airloop where one deck is the DOAS side and the other deck is the space-conditining side. (`AirTerminal:DualDuct:VAV:OutdoorAir`).
+3. Model the DOAS and the space-conditioning equipment as a dual-duct airloop where one deck is the DOAS side and the other deck is the space-conditioning side. (`AirTerminal:DualDuct:VAV:OutdoorAir`).
 
 All of the current workarounds have limitations and none of them reflect the layout of the real systems.  
 
@@ -21,13 +22,17 @@ Recently, the NREL Residential Group and a consultant for NRCan (Natural Resourc
 
 > The configuration in question is one where zone air is re-circulated through a furnace while a DOAS, generally including a HRV/ERV, handles ventilation.  So the conditioning and ventilation loops operate in parallel.   The furnace coil must be centralized to be able to impose a capacity and calculate part-load factors: so re-heating coils are also not acceptable.  
 
-None of the available workarounds will model both systems correctly. In this particular case, one solution would be to build on #3 above with a new terminal unit that has heating and cooling capability on the VAV side.  The other solution is to use #2, but this raises issues of the HRV/ERV effiency and defrost operation as well as fan power.
+None of the available workarounds will model both systems correctly. In this particular case, one solution would be to build on #3 above with a new terminal unit that has heating and cooling capability on the VAV side.  The other solution is to use #2, but this raises issues of the HRV/ERV efficiency and defrost operation as well as fan power.
 
 Rather than develop more workaround components, it is time to remove the restriction of one airloop per zone.
 
 ## E-mail and  Conference Call Conclusions ##
 
-insert text
+1. Add output variables and/or table report to summarize how various air loops operate in a zone? E.g., what loads they meet, how many hours each loop operate.
+
+2. Clarify that control and load sharing issues between multiple loops serving the same zone will be part of Phase II "Allow Multiple/Partial HVAC in One Zone" (also funded for FY17).
+
+3. Add a table to clarify the relationships between overlapping fields in the proposed DesignSpecification:AirTerminal:Sizing object vs. Sizing:Zone, Sizing:System, AirTerminal:SingleDuct:VAV:NoReheat and AirTerminal:SingleDuct:VAV:Reheat, etc. This may result in changes to the proposed DesignSpecification:AirTerminal:Sizing object.
 
 ## Overview ##
 
@@ -140,6 +145,7 @@ Build example files and check results.
 ## Input Output Reference Documentation ##
 
 ## Input Description ##
+No transition required. One new object, and some minor field changes in existing objects.
 
 ### Modified: ZoneHVAC:EquipmentConnections ###
 * Change the current `Zone Return Air Node Name` to `Zone Return Air Node or NodeList Name`.
@@ -153,11 +159,11 @@ Zone Return Air Flow Rate Fraction Schedule Name
 Zone Return Air Flow Rate Basis Node or NodeList Name
 ```
 
-### New: DesignSpecification:AirTerminal:Sizing###
+### New Object: DesignSpecification:AirTerminal:Sizing###
 
 ```
   DesignSpecification:AirTerminal:Sizing,
-    DOAS Terminal Sizing,      !- Name
+    DOAS Terminal Sizing,    !- Name
     SupplyAirTemperature,    !- Cooling Design Supply Air Temperature Input Method
     14.,                     !- Cooling Design Supply Air Temperature {C}
     ,                        !- Cooling Design Supply Air Temperature Difference {deltaC}
@@ -190,6 +196,61 @@ Zone Return Air Flow Rate Basis Node or NodeList Name
     ;                        !- Heating Maximum Air Flow Fraction
 ```
 
+### New AirTerminal Unit Field: Design Specification Air Terminal Sizing Name###
+
+In all `AirTerminal:*` objects, add the following field at the end of the object.
+
+```
+  DOAS Terminal Sizing;    !-Design Specification Air Terminal Sizing Name
+```
+
+This parallels the `Design Specification ZoneHVAC Sizing Object Name` field which is in many of the space conditioning `ZoneHVAC:*` objects:
+```
+ZoneHVAC:IdealLoadsAirSystem
+ZoneHVAC:FourPipeFanCoil
+ZoneHVAC:WindowAirConditioner
+ZoneHVAC:PackagedTerminalAirConditioner
+ZoneHVAC:PackagedTerminalHeatPump
+ZoneHVAC:WaterToAirHeatPump
+ZoneHVAC:UnitVentilator
+ZoneHVAC:UnitHeater
+ZoneHVAC:EvaporativeCoolerUnit
+ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+ZoneHVAC:VentilatedSlab
+```
+
+Objects which have a subset of the DesignSpecification:ZoneHVAC:Sizing fields embedded in them are:
+```
+ZoneHVAC:Baseboard:RadiantConvective:Water
+ZoneHVAC:Baseboard:RadiantConvective:Steam
+ZoneHVAC:Baseboard:RadiantConvective:Electric
+ZoneHVAC:CoolingPanel:RadiantConvective:Water
+ZoneHVAC:LowTemperatureRadiant:VariableFlow
+ZoneHVAC:LowTemperatureRadiant:Electric
+ZoneHVAC:HighTemperatureRadiant
+```
+
+And objects which have no scalable sizing inputs:
+```
+ZoneHVAC:Dehumidifier:DX
+ZoneHVAC:OutdoorAirUnit
+ZoneHVAC:EnergyRecoveryVentilator
+ZoneHVAC:LowTemperatureRadiant:ConstantFlow
+
+```
+
+### Relevant Fields in Air Terminal Units
+
+The following fields from various air terminal units are impacted by `Sizing:Zone` or `DesignSpecification:AirTerminal:Sizing` or they are used only for control of the terminal unit (not related to sizing).
+
+Field Name | Sizing/Control | Notes
+------------------|------------------|----------
+Maximum Air Flow Rate | Sizing | |
+Constant Minimum Air Flow Fraction | Sizing | |
+Fixed Minimum Air Flow Rate | Sizing | |
+Maximum Flow per Zone Floor Area During Reheat | Sizing | |
+Maximum Flow Fraction During Reheat | Sizing | |
+Design Specification Outdoor Air Object Name | Control | |
 
 ## Outputs Description ##
 
@@ -205,9 +266,48 @@ No transition is anticipated.
 
 New example files will be made to show various combinations of systems.
 
-## References ##
+## Detailed Comments and Responses ##
 
-n/a
+10/30 - Hong
+
+1. Do we allow multiple outdoor air loops (DOAS systems) to a zone?
+
+	*MJW 1.  I don't see any reason this would not work, but the user would need to specify the OA requirements to avoid over-ventilating the zone.*
+
+2. How do we control the operation of multiple air loops? For example, if we have two air loops to a zone with each sized to meet half of the zone peak loads, at 50% zone load, do we operate only one air loop at 100%, or two with each at 50%? We may need a control scheme for this to make it more flexible.
+
+	*MJW 2.  That's actually a second project that is also funded for the next release "Allow Multiple/Partial HVAC in One Zone" similar, but focused on the control aspect for all equipment serving a zone, including ZoneHVAC equipment.*
+
+3. How to avoid fight of different air loops (e..g, some doing cooling/dehumidifying while others doing heating/humidifying)? We saw this in data centers with multiple RTUs.
+
+	*MJW 3.  That's a good question - at this point I was assuming all of the systems would work off the same thermostat, but that may not be adequate in the long run (this kind of fits into the part two project as well).*
+
+4. Any high level report to summarize how various air loops operate in a zone? E.g., what loads they meet, how many hours each loop operate?
+
+	*MJW 4.  That would be useful - will think about what that might contain.*
+
+
+10/31 - Scheier - The proposed DesignSpecification:AirTerminal:Sizing object contains many fields that currently exist on some AirTerminal objects, but not others.
+
+1. Should users expect the new fields to be used solely for sizing the AT or will some also have an effect on the HVAC simulation? For example, for VAV AT's, will the "Design Spec OA Object Name" field on the new DesignSpecification:AirTerminal:Sizing object have an effect on the HVAC simulation of minimum airflow as is now done for the AT:SingleDuct:VAV:NoReheat and AT:SingleDuct:VAV:Reheat objects?
+
+	*MJW 1. Good point - I didn't think about those overlaps.  The intent of the proposal was that the new sizing object would work the same way that `Sizing:Zone` currently works - just for sizing.  Maybe a better solution is to allow generic `Sizing:Zone` objects that aren't linked to a specific zone?  Or to shorten the proposed new object to be exactly like `Sizing:Zone`.*
+
+2. It would be nice to have a table of the new fields on the new DesignSpecification:AirTerminal:Sizing object vs each AirTerminal object, i.e., which new DsnSpec:AT fields match functionality of existing AirTerminal fields, which new DsnSpec:AT fields do not apply to existing AirTerminals fields, which new DsnSpec:AT fields provide new functionality, etc.
+
+	*MJW 2. This would be good in general for the existing sizing and terminal unit objects.  I'll work on this table and that may help guide this proposal or at least provide some discussion points.*
+
+10/31 - Gu
+
+1. You have an option: 6. Optional - Allow an airloop with no return path. How do you handle mass balance without return path? Do you plan to use other objects?
+
+	*MJW 1. The zone air balance would work as it currently does, except there wouldn't be a return node for that air loop.  The zone air mass balance should work the same as it currently does.  If there is more supply than exhaust (plus return to another airloop if present) then the excess air is assumed to exfiltrate and doesn't impact the zone air balance.  Of if the ZoneAirMassBalance option is active then that would take over and balance by adjusting infiltration and/or mixing.*
+
+	*For the airloop itself without return, it would need to take in outdoor air to match the supply and complain if the OA controller didn't allow that.*
+
+11/1 - Horowitz
+
+1. Allowing an airloop with no return path has been identified as a high priority for modeling airflow in residential buildings. If the funding allows for this, we would definitely like to see it included in the work.
 
 
 
