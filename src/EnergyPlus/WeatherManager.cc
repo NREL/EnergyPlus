@@ -7776,7 +7776,7 @@ Label9999: ;
 		WeatherFileTempModCoeff = AtmosphericTempGradient * EarthRadius * WeatherFileTempSensorHeight / ( EarthRadius + WeatherFileTempSensorHeight );
 
 		// Write to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal],Temperature Modifier Coefficient [Internal]";
+		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient-Internal,Temperature Modifier Coefficient-Internal";
 
 		gio::write( OutputFileInits, Format_720 ) << RoundSigDigits( WeatherFileWindSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindExp, 3 ) << RoundSigDigits( WeatherFileWindBLHeight, 3 ) << RoundSigDigits( WeatherFileTempSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindModCoeff, 3 ) << RoundSigDigits( WeatherFileTempModCoeff, 3 );
 

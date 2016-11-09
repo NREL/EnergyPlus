@@ -14997,6 +14997,7 @@ Label900: ;
 			unitSIOnly = stringInUpper;
 			modeInString = misNoHint;
 		}
+		unitSIOnly = stripped(unitSIOnly);
 		int defaultConv = 0;
 		int foundConv = 0;
 		int firstOfSeveral = 0;
