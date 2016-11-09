@@ -186,6 +186,39 @@ TEST(OutputReportTabularTest, digitsAferDecimal)
 	EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
 }
 
+TEST(OutputReportTabularTest, splitCommaString)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, splitCommaString");
+	std::vector<std::string> actual;
+	actual.push_back("part1");
+	EXPECT_EQ(actual, splitCommaString("part1"));
+	actual.push_back("part2");
+	EXPECT_EQ(actual, splitCommaString("part1,part2"));
+	EXPECT_EQ(actual, splitCommaString(" part1,part2 "));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 "));
+	actual.push_back("part3");
+	EXPECT_EQ(actual, splitCommaString("part1,part2,part3"));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 , part3 "));
+}
+
+TEST(OutputReportTabularTest, unitsFromHeading)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
+	std::string unitString;
+	SetupUnitConversions();
+	unitsStyle = unitsStyleInchPound;
+	unitString = "";
+	EXPECT_EQ(96, unitsFromHeading(unitString)); 
+	EXPECT_EQ("", unitString);
+	unitString = "Zone Floor Area {m2}";
+	EXPECT_EQ(46, unitsFromHeading(unitString));
+	EXPECT_EQ("Zone Floor Area {ft2}", unitString);
+	unitString = "Fictional field {nonsense}";
+	EXPECT_EQ(0, unitsFromHeading(unitString));
+	EXPECT_EQ("Fictional field {nonsense}", unitString);
+
+}
+
 
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
