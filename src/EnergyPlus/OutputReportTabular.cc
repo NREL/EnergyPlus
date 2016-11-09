@@ -10803,7 +10803,7 @@ namespace OutputReportTabular {
 	}
 
     // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
-	// J. Glazer - October 2, 2016
+	// Glazer - November 2016
 	void
 	WriteEioTables() {
 
@@ -10871,31 +10871,14 @@ namespace OutputReportTabular {
 					tableBody.allocate(numCols, numRows);
 					tableBody = ""; // make sure everything is blank
 					std::string footnote = "";
+					colUnitConv.allocate(numCols);
 					// transfer the header row into column headings
 					for (int iCol = 1; iCol <= numCols; ++iCol)
 					{
 						columnHead(iCol) = headerFields.at(iCol);
+						// set the unit conversions
+						colUnitConv(iCol) = unitsFromHeading(columnHead(iCol));
 					}
-					// set the unit conversions
-					colUnitConv.allocate(numCols);
-					for (int iCol = 1; iCol <= numCols; ++iCol)
-					{
-						std::string colTagWithSI = columnHead(iCol);
-						std::string curColTag = "";
-						int indexUnitConv = 0;
-						if (unitsStyle == unitsStyleInchPound) {
-							LookupSItoIP(colTagWithSI, indexUnitConv, curColTag);
-							colUnitConv(iCol) = indexUnitConv;
-						} else if (unitsStyle == unitsStyleJtoKWH) {
-							LookupJtokWH(colTagWithSI, indexUnitConv, curColTag);
-							colUnitConv(iCol) = indexUnitConv;
-						} else {
-							curColTag = colTagWithSI;
-							colUnitConv(iCol) = 0;
-						}
-						columnHead(iCol) = curColTag;
-					}
-
 					// look for data lines
 					int rowNum = 0;
 					for (auto bodyLine : bodyLines)
@@ -10906,12 +10889,17 @@ namespace OutputReportTabular {
 								if (rowNum > countOfMatchingLines) break;  // should never happen since same test as original could
 								std::vector<std::string> dataFields = splitCommaString(bodyLine);
 								rowHead(rowNum) = IntToStr(rowNum);
-								for (int iCol = 1; iCol <= numCols && iCol < dataFields.size(); ++iCol)
+								for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol)
 								{
 									if (unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH) {
 										if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) {  // if it is a number that has a conversion
 											int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
 											Real64 convertedVal = ConvertIP(colUnitConv(iCol), StrToReal(dataFields[iCol]));
+											tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+										} else if (iCol == numCols && columnHead(iCol) == "Value" && iCol > 1) {  // if it is the last column and the header is Value then treat the previous column as source of units
+											int indexUnitConv = unitsFromHeading(tableBody(iCol - 1, rowNum)); //base units on previous column
+											int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
+											Real64 convertedVal = ConvertIP(indexUnitConv, StrToReal(dataFields[iCol]));
 											tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
 										} else {
 											tableBody(iCol, rowNum) = dataFields[iCol];
@@ -10940,7 +10928,27 @@ namespace OutputReportTabular {
 		}
 	}
 
+	// changes the heading that contains and SI to IP as well as providing the unit conversion index
+	// Glazer Nov 2016
+    int
+	unitsFromHeading(std::string & heading)
+	{
+		std::string curHeading = "";
+		int unitConv = 0;
+		if (unitsStyle == unitsStyleInchPound) {
+			LookupSItoIP(heading, unitConv, curHeading);
+		} else if (unitsStyle == unitsStyleJtoKWH) {
+			LookupJtokWH(heading, unitConv, curHeading);
+		} else {
+			curHeading = heading;
+		}
+		heading = curHeading;
+		return(unitConv);
+	}
+
+
 	// function that returns a vector of strings when given a string with comma delimitters
+	// Glazer Nov 2016
 	std::vector<std::string>
 	splitCommaString(std::string inputString) 
 	{

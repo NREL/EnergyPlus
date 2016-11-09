@@ -777,6 +777,9 @@ namespace OutputReportTabular {
 	void
 	WriteEioTables();
 
+	int
+	unitsFromHeading(std::string & heading);
+
 	std::vector<std::string>
 	splitCommaString(std::string inputString);
 	
