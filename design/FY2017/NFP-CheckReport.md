@@ -4,6 +4,7 @@ Add Checksums Tabular Output Reports
 **Jason Glazer, GARD Analytics**
 
  - October 31, 2016
+ - November 10, 2016 - Revision 1
  
 
 ## Justification for New Feature ##
@@ -13,7 +14,14 @@ Output reporting in EnergyPlus is extremely detail-oriented, which is one of the
 
 ## E-mail and  Conference Call Conclusions ##
 
-None yet.
+Comments received are summarized as:
+
+- Add difference between actual and design peak load
+- Add total heating and cooling capacity per area report in the engineering checks section
+- Add total condenser-water-side pump power per flow rate for facility level engineering checks section
+- Add total chilled-water-side pump power per flow rate for facility level engineering checks section
+- Add table of zones for AirLoop report 
+- In general, add more checks to help detect errors
 
 ## Overview ##
 
@@ -123,9 +131,11 @@ Timestamp: **2016-10-28 15:58:05**
 | outside air flow [m3/s]| 0.3 | 0.1 |
 | infiltration air flow [m3/s]| 0.15| 0.15 |
 | exhaust air flow [m3/s]| 0.10| 0.10 |
+| Design peak load [W] | 2600.00 | -1600.00 |
+| Difference between Design and Peak Load [W] | 47.21 | -24.10 |
 | Peak Design Sensible Load [W] | 2647.21 | -1624.1 |
 | Estimated Instant + Delayed Sensible Load [W] | 2890.88 | -1619.7|
-| Difference [W] | -243.7 | -5.5 |
+| Difference beween Peak and Estimated Sensible Load [W] | -243.7 | -5.5 |
 
 **Engineering Checks**
 
@@ -135,8 +145,22 @@ Timestamp: **2016-10-28 15:58:05**
 | Airflow per floor area [m3/s-m2] | 1.1 | 1.1 |
 | Airflow per total capacity [m3/2-W] | 1.1 | 1.1 |
 | Area per total capacity [m2/W]  | 1.1 | 1.1 |
+| Total capacity per area [W/m2]  | 0.9 | 0.9 |
+| Chiller pump power per flow [W/m3] | 0.004 | 0.003 |
+| Condenser pump power per flow [W/m3] | 0.003 | 0.002 |
 | Number of people  | 4 | 4 |
 
+**Zones Included**
+
+|     | Name  |
+| --- | ---   |
+|   1 | Zone A |
+|   2 | Zone B |
+|   3 | Zone C |
+|   4 | Zone D |
+|   5 | Zone E |
+
+The Engineering Checks table would not include pump related lines for the zone or airloop level reports. Additional lines in the engineering checks table may be added if time permits. The Zones Included table would only appear for the AirLoop level report.
 
 
 ## Example File and Transition Changes ##
