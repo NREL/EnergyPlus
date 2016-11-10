@@ -54,11 +54,12 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 	std::string end_of_field( "," + EnergyPlus::DataStringGlobals::NL + "  " );
 	std::string end_of_object( ";" + EnergyPlus::DataStringGlobals::NL + EnergyPlus::DataStringGlobals::NL );
 
-	std::string encoded;
+	std::string encoded, extension_key;
 
 	for ( auto obj = root.begin(); obj != root.end(); ++obj ) {
 		const auto & legacy_idd = schema[ "properties" ][ obj.key() ][ "legacy_idd" ][ "fields" ];
-		std::string key = schema[ "properties" ][ obj.key() ][ "legacy_idd" ][ "extension" ];
+		auto key = schema[ "properties" ][ obj.key() ][ "legacy_idd" ].find( "extension" );
+		if (key != schema[ "properties" ][ obj.key() ][ "legacy_idd" ].end() ) extension_key = key.value();
 		for ( auto obj_in = obj.value().begin(); obj_in != obj.value().end(); ++obj_in ) {
 			encoded += obj.key();
 			int skipped_fields = 0;
@@ -81,12 +82,12 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 				}
 			}
 
-			if ( obj_in.value().find( key ) == obj_in.value().end() ) {
+			if ( obj_in.value().find( extension_key ) == obj_in.value().end() ) {
 				encoded += end_of_object;
 				continue;
 			}
 
-			auto & extensions = obj_in.value()[ key ];
+			auto & extensions = obj_in.value()[ extension_key ];
 			for ( int extension_i = 0; extension_i < extensions.size(); extension_i++ ) {
 				auto & cur_extension_obj = extensions[ extension_i ];
 				auto & extensible = schema[ "properties" ][ obj.key() ][ "legacy_idd" ][ "extensibles" ];
@@ -172,6 +173,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	json extensible = json::object();
 	json array_of_extensions = json::array();
 	Token token;
+	std::string extension_key;
 	int legacy_idd_index = 0, extensible_index = 0;
 	success = true;
 	bool was_value_parsed = false;
@@ -181,11 +183,12 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	auto const & schema_patternProperties = schema_obj_loc[ "patternProperties" ];
 	auto const & schema_dot_star = schema_patternProperties[ ".*" ];
 	auto const & schema_obj_props = schema_dot_star[ "properties" ];
-	std::string key = legacy_idd[ "extension" ];
+	auto key = legacy_idd.find( "extension" );
 
 	json const * schema_obj_extensions = nullptr;
     if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
-		schema_obj_extensions = & schema_obj_props[ key ][ "items" ][ "properties" ];
+	    extension_key = key.value();
+		schema_obj_extensions = & schema_obj_props[ extension_key ][ "items" ][ "properties" ];
 	}
 
 	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
@@ -272,7 +275,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		}
 	}
 	if ( array_of_extensions.size() ) {
-		root[ key ] = std::move( array_of_extensions );
+		root[ extension_key ] = std::move( array_of_extensions );
 		array_of_extensions = nullptr;
 	}
 	return root;
@@ -1076,6 +1079,7 @@ namespace EnergyPlus {
 		NumAlphas = 0;
 		NumNumbers = 0;
 		Status = -1;
+		std::string extension_key;
         auto const & is_AlphaBlank = present(AlphaBlank);
 		auto const & is_AlphaFieldNames = present(AlphaFieldNames);
 		auto const & is_NumBlank = present(NumBlank);
@@ -1093,7 +1097,8 @@ namespace EnergyPlus {
 		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
 		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
 		auto const & schema_name_field = jdd_it_val.find( "name" );
-		std::string key = legacy_idd["extension"];
+		auto key = legacy_idd.find("extension");
+		if (key != legacy_idd.end() ) extension_key = key.value();
 
 
 		Alphas = "";
@@ -1161,8 +1166,8 @@ namespace EnergyPlus {
 		auto const & legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
 		if ( legacy_idd_alphas_extension_iter != legacy_idd_alphas.end() ) {
 			auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
-			auto const & jdf_extensions_array = obj.value()[ key ];
-			auto const & schema_extension_fields = schema_obj_props[ key ][ "items" ][ "properties" ];
+			auto const & jdf_extensions_array = obj.value()[ extension_key];
+			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
 			int alphas_index = static_cast <int> ( legacy_idd_alphas_fields.size() );
 
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
@@ -1255,8 +1260,8 @@ namespace EnergyPlus {
 		auto const & legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
 		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() ) {
 			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
-			auto const & schema_extension_fields = schema_obj_props[ key ][ "items" ][ "properties" ];
-			auto const & jdf_extensions_array = obj.value()[ key ];
+			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
+			auto const & jdf_extensions_array = obj.value()[ extension_key ];
 			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
 
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
@@ -1939,16 +1944,18 @@ namespace EnergyPlus {
 		NumArgs = 0;
 		NumAlpha = 0;
 		NumNumeric = 0;
+		std::string extension_key;
 		auto const & schema_properties = schema.at( "properties" );
 
 		for ( json::iterator object = jdf.begin(); object != jdf.end(); ++object ) {
 			int num_alpha = 0;
 			int num_numeric = 0;
 			const json & legacy_idd = schema_properties.at( object.key() ).at( "legacy_idd" );
-			std::string key = legacy_idd.at( "extension" );
+			auto key = legacy_idd.find("extension");
+			if (key != legacy_idd.end()) extension_key = key.value();
 			size_t max_size = 0;
 			for ( auto const & obj : object.value() ) {
-                auto const & find_extensions = obj.find( key );
+                auto const & find_extensions = obj.find( extension_key );
 				if ( find_extensions != obj.end() ) {
 					auto const size = find_extensions.value().size();
 					if ( size > max_size ) max_size = size;
@@ -1997,6 +2004,7 @@ namespace EnergyPlus {
 		NumArgs = 0;
 		NumAlpha = 0;
 		NumNumeric = 0;
+		std::string extension_key;
 		json * object;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
 			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
@@ -2026,10 +2034,11 @@ namespace EnergyPlus {
 
 		size_t max_size = 0;
 
-		std::string key = legacy_idd["extension"];
+		auto key = legacy_idd.find("extension");
+		if ( key != legacy_idd.end() ) extension_key = key.value();
 		for ( auto const obj : *objects ) {
-			if ( obj.find( key ) != obj.end() ) {
-				auto const size = obj[ key ].size();
+			if ( obj.find( extension_key ) != obj.end() ) {
+				auto const size = obj[ extension_key ].size();
 				if ( size > max_size ) max_size = size;
 			}
 		}
@@ -2392,7 +2401,7 @@ namespace EnergyPlus {
 		int CurrentRecord;
 		int Loop;
 		int Loop1;
-
+		std::string extension_key;
 		OutputVariablesForSimulation.allocate( 10000 );
 		MaxConsideredOutputVariables = 10000;
 
@@ -2414,12 +2423,13 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( MeterCustom );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			std::string key = jdf_object["legacy_idd"]["extension"];
+			auto key = jdf_object["legacy_idd"].find("extension");
+			if (key != jdf_object["legacy_idd"].end()) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 
 				//TODO: Might be incorrect
-				for ( auto const & extensions : fields[ key ] ) {
+				for ( auto const & extensions : fields[ extension_key ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
 						                                                    extensions.at(
@@ -2435,12 +2445,13 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( MeterCustomDecrement );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			std::string key = jdf_object["legacy_idd"]["extension"];
+			auto key = jdf_object["legacy_idd"].find("extension");
+			if (key != jdf_object["legacy_idd"].end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 
 				//TODO: Might be incorrect
-				for ( auto const & extensions : fields[ key ] ) {
+				for ( auto const & extensions : fields[ extension_key ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
 						                                                    extensions.at(
@@ -2494,12 +2505,13 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( OutputTableMonthly );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			std::string key = jdf_object["legacy_idd"]["extension"];
+			auto key = jdf_object["legacy_idd"].find("extension");
+			if (key != jdf_object["legacy_idd"].end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 
 				//TODO: Might be incorrect
-				for ( auto const & extensions : fields[ key ] ) {
+				for ( auto const & extensions : fields[ extension_key ] ) {
 					InputProcessor::AddRecordToOutputVariableStructure( "*",
 					                                                    extensions.at( "variable_or_meter_name" ) );
 				}
@@ -2509,10 +2521,11 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( OutputTableAnnual );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			std::string key = jdf_object["legacy_idd"]["extension"];
+			auto key = jdf_object["legacy_idd"].find("extension");
+			if (key != jdf_object["legacy_idd"].end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-				for ( auto const & extensions : fields[ key ] ) {
+				for ( auto const & extensions : fields[ extension_key ] ) {
 					InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
 					"variable_or_meter_or_ems_variable_or_field_name" ) );
 				}
@@ -2522,10 +2535,12 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( OutputTableSummaries );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			std::string key = jdf_object["legacy_idd"]["extension"];
+			auto const & legacy_idd = jdf_object["legacy_idd"];
+			auto key = legacy_idd.find("extension");
+			if (key != legacy_idd.end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-				for ( auto const & extensions : fields[ key ] ) {
+				for ( auto const & extensions : fields[ extension_key ] ) {
 					auto const report_name = MakeUPPERCase( extensions.at( "report_name" ) );
 					if ( report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY" ) {
 						for ( Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1 ) {
