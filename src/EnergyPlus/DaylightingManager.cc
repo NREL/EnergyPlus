@@ -679,7 +679,7 @@ namespace DaylightingManager {
 			// Skip zones that are not Daylighting:Detailed zones.
 			// TotalDaylRefPoints = 0 means zone has (1) no daylighting or
 			// (3) Daylighting:DElight
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
+			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 || ZoneDaylight( ZoneNum ).DaylightMethod != SplitFluxDaylighting ) continue;
 
 			// Skip zones with no exterior windows in the zone or in adjacent zone with which an interior window is shared
 			if ( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins == 0 ) continue;
@@ -696,7 +696,7 @@ namespace DaylightingManager {
 					// due to change in ground reflectance from month to month, or change in storm window status.
 					gio::write( OutputFileInits, Format_700 );
 					for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-						if ( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins == 0 ) continue;
+						if ( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins == 0 || ZoneDaylight( ZoneNum ).DaylightMethod != SplitFluxDaylighting ) continue;
 						for ( loop = 1; loop <= ZoneDaylight( ZoneNum ).NumOfDayltgExtWins; ++loop ) {
 							IWin = ZoneDaylight( ZoneNum ).DayltgExtWinSurfNums( loop );
 							// For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
@@ -4259,7 +4259,6 @@ namespace DaylightingManager {
 				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
-			SetupDElightOutput4EPlus();
 		}
 		// RJH DElight Modification End - Calls to DElight preprocessing subroutines
 
@@ -4688,7 +4687,12 @@ namespace DaylightingManager {
 				ShowContinueError( "No glare calculation performed, and the simulation continues." );
 			}
 
-			zone_daylight.ViewAzimuthForGlare = rNumericArgs( 5 ); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+			if ( !lNumericFieldBlanks( 5 ) ){
+				zone_daylight.ViewAzimuthForGlare = rNumericArgs( 5 ); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+			} else{
+				zone_daylight.ViewAzimuthForGlare = 0.;
+			}
+
 			zone_daylight.MaxGlareallowed = rNumericArgs( 6 ); // Field: Maximum Allowable Discomfort Glare Index
 			zone_daylight.DElightGriddingResolution = rNumericArgs( 7 ); // Field: DElight Gridding Resolution
 
@@ -4766,9 +4770,7 @@ namespace DaylightingManager {
 				ShowContinueError( "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs( 2 ) + "\", will use 1" );
 				zone_daylight.LightControlSteps = 1;
 			}
-			if ( zone_daylight.DaylightMethod == SplitFluxDaylighting ){
-				SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", zone_daylight.Name );
-			}
+			SetupOutputVariable( "Daylighting Lighting Power Multiplier []", zone_daylight.ZonePowerReductionFactor, "Zone", "Average", zone_daylight.Name );
 		}
 
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
@@ -9776,13 +9778,13 @@ Label903: ;
 
 		gio::write( OutputFileInits, Format_700 );
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
+			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting ) continue;
 			gio::write( OutputFileInits, Format_701 ) << Zone( ZoneNum ).Name << RoundSigDigits( ZoneDaylight( ZoneNum ).TotalExtWindows ) << RoundSigDigits( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins - ZoneDaylight( ZoneNum ).TotalExtWindows );
 		}
 
 		gio::write( OutputFileInits, Format_702 );
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
+			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
 			gio::write( OutputFileInits, Format_703 ) << Zone( ZoneNum ).Name << RoundSigDigits( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones );
 			for ( int loop = 1, loop_end = min( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones, 100 ); loop <= loop_end; ++loop ) {
 				gio::write( OutputFileInits, fmtCommaA ) << Zone( ZoneDaylight( ZoneNum ).AdjIntWinZoneNums( loop ) ).Name;

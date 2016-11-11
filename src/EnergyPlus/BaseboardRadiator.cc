@@ -681,6 +681,8 @@ namespace BaseboardRadiator {
 
 		if ( PltSizHeatNum > 0 ) {
 
+			DataScalableCapSizingON = false;
+			
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {
@@ -730,6 +732,7 @@ namespace BaseboardRadiator {
 						}
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0;
 					}
@@ -820,6 +823,7 @@ namespace BaseboardRadiator {
 						}
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 					}

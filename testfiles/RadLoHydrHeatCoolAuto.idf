@@ -1517,16 +1517,16 @@
     Circ Pump,               !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -1744,16 +1744,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   DistrictHeating,
@@ -1856,7 +1856,7 @@
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name
+    West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1865,7 +1865,7 @@
     ,                        !- Fraction of Autosized Cooling Design Capacity
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 1 Cooling Water Outlet Node, !- Cooling Water Outlet Node Name
+    Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     Off,                     !- Condensation Control Type
@@ -1896,7 +1896,7 @@
     ,                        !- Fraction of Autosized Cooling Design Capacity
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 2 Cooling Water Outlet Node, !- Cooling Water Outlet Node Name
+    Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     Off,                     !- Condensation Control Type
@@ -1912,16 +1912,16 @@
     0.013,                   !- Hydronic Tubing Inside Diameter {m}
     autosize,                !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
-    FractionOfAutosizedHeatingCapacity,   !- Heating Design Capacity Method
+    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method
     ,                        !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     1.0,                     !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    North Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name
+    North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    FractionOfAutosizedCoolingCapacity,   !- Cooling Design Capacity Method
+    FractionOfAutosizedCoolingCapacity,  !- Cooling Design Capacity Method
     ,                        !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
     1.0,                     !- Fraction of Autosized Cooling Design Capacity
@@ -2002,5 +2002,5 @@
     AllSummary;              !- Report 1 Name
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

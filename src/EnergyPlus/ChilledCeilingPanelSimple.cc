@@ -87,6 +87,7 @@
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -107,7 +108,7 @@ namespace CoolingPanelSimple {
 
 	// REFERENCES:
     // Existing code for hot water baseboard models (radiant-convective variety)
-    
+
 	// USE STATEMENTS:
 	// Using/Aliasing
 	using namespace DataGlobals;
@@ -141,13 +142,17 @@ namespace CoolingPanelSimple {
 	Array1D_bool CheckEquipName;
 	Array1D_bool SetLoopIndexFlag; // get loop number flag
 
+	// Autosizing variables
+	Array1D_bool MySizeFlagCoolPanel;
+
 	// Other variables
 	static bool GetInputFlag( true ); // One time get input flag
 	static bool MyOneTimeFlag( true );
-	
+
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Simple Chilled Ceiling Panel
 	// Object Data
 	Array1D< CoolingPanelParams > CoolingPanel;
+	Array1D< CoolingPanelSysNumericFieldData > CoolingPanelSysNumericFields;
 
 	// Functions
 
@@ -165,8 +170,10 @@ namespace CoolingPanelSimple {
 		CheckEquipName.deallocate();
 		SetLoopIndexFlag.deallocate();
 		CoolingPanel.deallocate();
+		CoolingPanelSysNumericFields.deallocate();
+		MySizeFlagCoolPanel.deallocate();
 	}
-	
+
 	void
 	SimCoolingPanel(
 		std::string const & EquipName,
@@ -330,6 +337,7 @@ namespace CoolingPanelSimple {
 		// Count total number of baseboard units
 
 		CoolingPanel.allocate( NumCoolingPanels );
+		CoolingPanelSysNumericFields.allocate( NumCoolingPanels );
 		CheckEquipName.allocate( NumCoolingPanels );
 		CheckEquipName = true;
 
@@ -391,7 +399,7 @@ namespace CoolingPanelSimple {
 				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinWaterTempAvg, 2 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = MinWaterTempAvg;
 			}
-			
+
 			CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = rNumericArgs( 3 );
 			if ( CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate < 0.00001  || CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate > 10.0 ) {
 				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 2 ) + " is an invalid Standard Water mass flow rate." );
@@ -402,8 +410,8 @@ namespace CoolingPanelSimple {
 			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "CoolingDesignCapacity" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
 				if ( ! lNumericFieldBlanks( 4 ) ) {
-					CoolingPanel( CoolingPanelNum ).RatedCapacity = rNumericArgs( 4 );
-					if ( CoolingPanel( CoolingPanelNum ).RatedCapacity < 0.0 && CoolingPanel( CoolingPanelNum ).RatedCapacity != DataSizing::AutoSize ) {
+					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 4 );
+					if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity < 0.0 && CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity != DataSizing::AutoSize ) {
 						ShowSevereError( cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
 						ShowContinueError( "Illegal " + cNumericFieldNames( 4 ) + " = " + TrimSigDigits( rNumericArgs( 4 ), 7 ) );
 						ErrorsFound = true;
@@ -457,9 +465,9 @@ namespace CoolingPanelSimple {
 				ShowContinueError( "Illegal " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
 				ErrorsFound = true;
 			}
-			
+
 			CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax = rNumericArgs( 7 );
-			if ( std::abs( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax ) <= MinWaterFlowRate ) {
+			if ( ( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax <= MinWaterFlowRate ) && CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax != DataSizing::AutoSize ) {
 				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 7 ) + " was less than the allowable minimum." );
 				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinWaterFlowRate, 2 ) + "]." );
 				CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax = MinWaterFlowRate;
@@ -497,7 +505,7 @@ namespace CoolingPanelSimple {
 				ShowContinueError( "Occurs in Cooling Panel=" + CoolingPanel( CoolingPanelNum ).EquipID );
 				CoolingPanel( CoolingPanelNum ).ColdThrottlRange = MinThrottlingRange;
 			}
-			
+
 			CoolingPanel( CoolingPanelNum ).ColdSetptSched = cAlphaArgs( 7 );
 			CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) );
 			if ( ( CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr == 0 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
@@ -505,7 +513,7 @@ namespace CoolingPanelSimple {
 				ShowContinueError( "Occurs in " + RoutineName + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
-			
+
 			if ( InputProcessor::SameString( cAlphaArgs( 8 ), Off ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlNone;
 			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), SimpleOff ) ) {
@@ -515,9 +523,9 @@ namespace CoolingPanelSimple {
 			} else {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlSimpleOff;
 			}
-			
+
 			CoolingPanel( CoolingPanelNum ).CondDewPtDeltaT = rNumericArgs( 9 );
-			
+
 			CoolingPanel( CoolingPanelNum ).FracRadiant = rNumericArgs( 10 );
 			if ( CoolingPanel( CoolingPanelNum ).FracRadiant < MinFraction ) {
 				ShowWarningError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 10 ) + " was lower than the allowable minimum." );
@@ -678,11 +686,6 @@ namespace CoolingPanelSimple {
 		int ZoneNum;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 MDot; // local mass flow rate
-		Real64 MDotXCp; // local mass flow rate times specific heat
-		Real64 Qrated; // local rated capacity
-		Real64 Tinletr; // local rated inlet fluid temperature
-		Real64 Tzoner; // local rated zone air temperature
 		bool errFlag;
 
 		// Do the one time initializations
@@ -703,30 +706,11 @@ namespace CoolingPanelSimple {
 			LastTimeStepSys.allocate( NumCoolingPanels );
 			LastTimeStepSys = 0.0;
 			SetLoopIndexFlag.allocate( NumCoolingPanels );
+			MySizeFlagCoolPanel.allocate( NumCoolingPanels );
+			MySizeFlagCoolPanel = true;
 			MyEnvrnFlag = true;
 			MyOneTimeFlag = false;
 			SetLoopIndexFlag = true;
-			
-			// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
-			Cp = 4120.0; // Just an approximation, don't need to get an exact number
-			MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
-			MDotXCp = Cp * MDot;
-			Qrated = CoolingPanel( CoolingPanelNum ).RatedCapacity;
-			Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
-			Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
-			if ( Tinletr >= Tzoner ) {
-				ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
-				ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-				ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
-				CoolingPanel( CoolingPanelNum ).UA = 1.0;
-			} else {
-				CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
-				if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-					ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
-					ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-					ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
-				}
-			}
 
 		}
 
@@ -751,7 +735,23 @@ namespace CoolingPanelSimple {
 				SetLoopIndexFlag( CoolingPanelNum ) = false;
 			}
 		}
-		
+
+		if ( ! SysSizingCalc ) {
+			if ( MySizeFlagCoolPanel( CoolingPanelNum ) && ! SetLoopIndexFlag( CoolingPanelNum ) ) {
+				// for each cooling panel do the sizing once.
+				SizeCoolingPanel( CoolingPanelNum );
+				MySizeFlagCoolPanel( CoolingPanelNum ) = false;
+
+				//set design mass flow rates
+				if ( CoolingPanel( CoolingPanelNum ).WaterInletNode > 0 ) {
+					rho = GetDensityGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
+					CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax = rho * CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax;
+					InitComponentNodes( 0.0, CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax, CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterOutletNode, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum, CoolingPanel( CoolingPanelNum ).CompNum );
+				}
+			}
+		}
+
+
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CoolingPanelNum ) ) {
 			// Initialize
@@ -811,7 +811,231 @@ namespace CoolingPanelSimple {
 		CoolingPanel( CoolingPanelNum ).RadEnergy = 0.0;
 
 	}
-	
+
+	void
+	SizeCoolingPanel(
+		int const CoolingPanelNum
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Sept 2016
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sizes the simple chilled ceiling panel.  The process used here
+		// was derived from the low temperature radiant system model and adapted for
+		// cooling only.
+
+		using DataSizing::DataScalableCapSizingON;
+		using DataSizing::CurZoneEqNum;
+		using DataSizing::ZoneEqSizing;
+		using DataSizing::ZoneSizingRunDone;
+		using DataSizing::AutoSize;
+		using DataSizing::CoolingDesignCapacity;
+		using DataSizing::CapacityPerFloorArea;
+		using DataSizing::FractionOfAutosizedCoolingCapacity;
+		using DataSizing::DataConstantUsedForSizing;
+		using DataSizing::DataFractionUsedForSizing;
+		using DataSizing::CalcFinalZoneSizing;
+		using DataSizing::PlantSizData;
+		using DataSizing::AutoVsHardSizingThreshold;
+		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHVACGlobals::AutoCalculateSizing;
+		using DataHVACGlobals::SmallLoad;
+		using DataPlant::PlantLoop;
+
+		using ReportSizingManager::RequestSizing;
+		using ReportSizingManager::ReportSizingOutput;
+		using DataHeatBalance::Zone;
+		using DataPlant::MyPlantSizingIndex;
+		using FluidProperties::GetDensityGlycol;
+		using FluidProperties::GetSpecificHeatGlycol;
+		using General::RoundSigDigits;
+		using PlantUtilities::RegisterPlantCompDesignFlow;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "SizeCoolingPanel" );
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool ErrorsFound( false ); // If errors detected in input
+		std::string CompName; // component name
+		std::string CompType; // component type
+		bool IsAutoSize( false ); // Indicator to autosize
+		Real64 DesCoilLoad; // design autosized or user specified capacity
+		int SizingMethod; // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
+		int FieldNum = 1; // IDD numeric field number where input field description is found
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+		int PltSizCoolNum( 0 ); // index of plant sizing object for 1st cooling loop
+		Real64 rho;
+		Real64 Cp;
+		Real64 WaterVolFlowMaxCoolDes( 0.0 ); // Design chilled water flow for reporting
+		Real64 WaterVolFlowMaxCoolUser( 0.0 ); // User hard-sized chilled water flow for reporting
+
+		DesCoilLoad = 0.0;
+		DataScalableCapSizingON = false;
+
+		CompType = "ZoneHVAC:CoolingPanel:RadiantConvective:Water";
+		CompName = CoolingPanel( CoolingPanelNum ).EquipID;
+
+		IsAutoSize = false;
+		if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity == AutoSize ) {
+			IsAutoSize = true;
+		}
+
+		if ( CurZoneEqNum > 0 ) {
+
+			SizingMethod = CoolingCapacitySizing;
+			FieldNum = 4;
+			PrintFlag = true;
+			SizingString = CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames( FieldNum ) + " [W]";
+			CapSizingMethod = CoolingPanel( CoolingPanelNum ).CoolingCapMethod;
+			ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+
+			if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
+				if ( CapSizingMethod == CoolingDesignCapacity && CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity > 0.0 ) {
+					TempSize = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DesCoilLoad = TempSize;
+				} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+					DataScalableCapSizingON = true;
+					TempSize = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity * Zone( CoolingPanel( CoolingPanelNum ).ZonePtr ).FloorArea;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DesCoilLoad = TempSize;
+					DataScalableCapSizingON = false;
+				} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+					if ( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax == AutoSize ) {
+						ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + CoolingPanel( CoolingPanelNum ).EquipID + "\"." );
+						ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\"." );
+						ErrorsFound = true;
+					}
+				}
+			} else { // Autosize or hard-size with sizing run
+				if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+					if ( CapSizingMethod == CoolingDesignCapacity ) {
+						if ( ZoneSizingRunDone ) {
+							CheckZoneSizing( CompType, CompName );
+							SizingMethod = AutoCalculateSizing;
+							DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
+							DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+						}
+						if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity == AutoSize ) {
+							TempSize = AutoSize;
+						} else {
+							TempSize = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
+						}
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						if ( ZoneSizingRunDone ) {
+							CheckZoneSizing( CompType, CompName );
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+						}
+						TempSize = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity * Zone( CoolingPanel( CoolingPanelNum ).ZonePtr ).FloorArea;
+						DataScalableCapSizingON = true;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+						CheckZoneSizing( CompType, CompName );
+						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
+						DataScalableCapSizingON = true;
+
+					} else {
+						TempSize = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
+					}
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DesCoilLoad = TempSize;
+					DataConstantUsedForSizing = 0.0;
+					DataFractionUsedForSizing = 0.0;
+					DataScalableCapSizingON = false;
+				} else {
+					DesCoilLoad = 0.0;
+				}
+			}
+			// finally cooling capacity is saved in this variable
+			CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = DesCoilLoad;
+		}
+
+		IsAutoSize = false;
+		if ( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax == AutoSize ) {
+			IsAutoSize = true;
+		}
+		if ( CurZoneEqNum > 0 ) {
+			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
+				if ( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax > 0.0 ) {
+					ReportSizingOutput( CompType, CoolingPanel( CoolingPanelNum ).EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
+				}
+			} else { // Autosize or hard-size with sizing run
+				if ( CoolingPanel( CoolingPanelNum ).WaterInletNode > 0 && CoolingPanel( CoolingPanelNum ).WaterOutletNode > 0 ) {
+					PltSizCoolNum = MyPlantSizingIndex( CompType, CoolingPanel( CoolingPanelNum ).EquipID, CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterOutletNode, ErrorsFound );
+					if ( PltSizCoolNum > 0 ) {
+						if ( DesCoilLoad >= SmallLoad ) {
+							rho = GetDensityGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, 5., PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
+							Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, 5.0, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
+							WaterVolFlowMaxCoolDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
+						} else {
+							WaterVolFlowMaxCoolDes = 0.0;
+						}
+					} else {
+						ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
+						ShowContinueError( "Occurs in ZoneHVAC:CoolingPanel:RadiantConvective:Water Object=" + CoolingPanel( CoolingPanelNum ).EquipID );
+						ErrorsFound = true;
+					}
+				}
+
+				if ( IsAutoSize ) {
+					CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax = WaterVolFlowMaxCoolDes;
+					ReportSizingOutput( CompType, CoolingPanel( CoolingPanelNum ).EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes );
+				} else { // hard-size with sizing data
+					if ( CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax > 0.0 && WaterVolFlowMaxCoolDes > 0.0 ) {
+						WaterVolFlowMaxCoolUser = CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax;
+						ReportSizingOutput( CompType, CoolingPanel( CoolingPanelNum ).EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes, "User-Specified Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolUser );
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser ) / WaterVolFlowMaxCoolUser ) > AutoVsHardSizingThreshold ) {
+								ShowMessage( "SizeCoolingPanel: Potential issue with equipment sizing for ZoneHVAC:CoolingPanel:RadiantConvective:Water = \"" + CoolingPanel( CoolingPanelNum ).EquipID + "\"." );
+								ShowContinueError( "User-Specified Maximum Cool Water Flow of " + RoundSigDigits( WaterVolFlowMaxCoolUser, 5 ) + " [m3/s]" );
+								ShowContinueError( "differs from Design Size Maximum Cool Water Flow of " + RoundSigDigits( WaterVolFlowMaxCoolDes, 5 ) + " [m3/s]" );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+							}
+						}
+					}
+				}
+
+			}
+		}
+
+		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
+
+		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
+		Real64 MDot;
+		Real64 MDotXCp;
+		Real64 Qrated;
+		Real64 Tinletr;
+		Real64 Tzoner;
+		Cp = 4120.0; // Just an approximation, don't need to get an exact number
+		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
+		MDotXCp = Cp * MDot;
+		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
+		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
+		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+		if ( Tinletr >= Tzoner ) {
+			ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
+			ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+		} else {
+			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
+			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
+				ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
+				ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			}
+		}
+
+	}
+
 	void
 	CalcCoolingPanel(
 		int & CoolingPanelNum
@@ -904,7 +1128,7 @@ namespace CoolingPanelSimple {
 
 		// Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
 		if ( WaterInletTemp >= Tzone ) CoolingPanelOn = false;
-		
+
 		// Condensation Controls based on dewpoint temperature of the zone.
 		// The assumption here is that condensation might take place if the inlet water temperature
 		// is below the dewpoint temperature of the space.  This assumption is made because we are
@@ -916,11 +1140,11 @@ namespace CoolingPanelSimple {
 		// not calculated.  So, we can deal with this upfront rather than after calculation and then more
 		// iteration.
 		DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress );
-		
+
 		if ( WaterInletTemp < ( DewPointTemp + CoolingPanel( CoolingPanelNum ).CondDewPtDeltaT ) && ( CoolingPanelOn ) ) {
-			
+
 			// Condensation is possible so invoke the three possible ways of handling this based on the user's choice...
-			
+
 			if ( CoolingPanel( CoolingPanelNum ).CondCtrlType == CondCtrlNone) {
 				// Condensation control is "off" which means don't do anything, simply let it run and ignore condensation
 			} else if ( CoolingPanel( CoolingPanelNum ).CondCtrlType == CondCtrlSimpleOff) {
@@ -953,9 +1177,9 @@ namespace CoolingPanelSimple {
 		// The next IF block is to find the mass flow rate based on what type of control the user has requested.  Load based controls
 		// vary the flow to meet the zone load calculated by the user-defined thermostat.  Temperature based controls vary the flow
 		// based on a comparison between the control temperature and the setpoint schedule and throttling range.
-		
+
 		if ( ( CoolingPanel( CoolingPanelNum ).ControlType == ZoneTotalLoadControl ) || ( CoolingPanel( CoolingPanelNum ).ControlType == ZoneConvectiveLoadControl ) ) {
-	
+
 			if ( QZnReq < -SmallLoad && ! CurDeadBandOrSetback( ZoneNum ) && ( CoolingPanelOn ) ) {
 
 				Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
@@ -967,7 +1191,7 @@ namespace CoolingPanelSimple {
 				if ( CoolingPanel( CoolingPanelNum).ControlType == ZoneConvectiveLoadControl ) {
 					QZnReq = QZnReq / CoolingPanel( CoolingPanelNum ).FracConvect;
 				}
-				
+
 				// Now for a small amount of iteration.  Try to find the value of mass flow rate that will come the closest to giving
 				// the proper value for MCpEpsAct.  Limit iterations to avoid too much time wasting.
 				MCpEpsAct = QZnReq / ( WaterInletTemp - Tzone );
@@ -1003,17 +1227,17 @@ namespace CoolingPanelSimple {
 						}
 					}
 				}
-				
+
 			} else {
 				CoolingPanelOn = false;
 			}
 
 		} else { // temperature control rather than zone load control
-			
+
 			if ( CoolingPanelOn ) {
-			
+
 				SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
-				
+
 				SetPointTemp = GetCurrentScheduleValue( CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr );
 				OffTempCool = SetPointTemp - 0.5 * CoolingPanel( CoolingPanelNum ).ColdThrottlRange;
 				FullOnTempCool = SetPointTemp + 0.5 * CoolingPanel( CoolingPanelNum ).ColdThrottlRange;
@@ -1031,14 +1255,14 @@ namespace CoolingPanelSimple {
 				WaterMassFlowRate = MassFlowFrac * WaterMassFlowRateMax;
 
 			}
-			
+
 		}
-		
+
 		if ( CoolingPanelOn ) {
 			SetComponentFlowRate( WaterMassFlowRate, CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterOutletNode, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum, CoolingPanel( CoolingPanelNum ).CompNum );
 			if ( WaterMassFlowRate <= 0.0 ) CoolingPanelOn = false;
 		}
-		
+
 		if ( CoolingPanelOn ) {
 			// Now simulate the system...
 			Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
@@ -1052,18 +1276,18 @@ namespace CoolingPanelSimple {
 			WaterOutletTemp = CoolingPanel( CoolingPanelNum ).WaterInletTemp - ( CoolingPanelCool / ( WaterMassFlowRate * Cp ) );
 			RadHeat = CoolingPanelCool * CoolingPanel( CoolingPanelNum ).FracRadiant;
 			CoolingPanelSource( CoolingPanelNum ) = RadHeat;
-			
+
 			if ( CoolingPanel( CoolingPanelNum ).FracRadiant <= MinFrac ) {
 				LoadMet = CoolingPanelCool;
 			} else {
-				
+
 				// Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
 				DistributeCoolingPanelRadGains();
 				// Now "simulate" the system by recalculating the heat balances
 				HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
-				
+
 				HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
-				
+
 				// Here an assumption is made regarding radiant heat transfer to people.
 				// While the radiant heat transfer to people array will be used by the thermal comfort
 				// routines, the energy transfer to people would get lost from the perspective
@@ -1075,8 +1299,8 @@ namespace CoolingPanelSimple {
 				LoadMet = ( SumHATsurf( ZoneNum ) - ZeroSourceSumHATsurf( ZoneNum ) ) + ( CoolingPanelCool * CoolingPanel( CoolingPanelNum ).FracConvect ) + ( RadHeat * CoolingPanel( CoolingPanelNum ).FracDistribPerson );
 			}
 			CoolingPanel( CoolingPanelNum ).WaterOutletEnthalpy = CoolingPanel( CoolingPanelNum ).WaterInletEnthalpy - CoolingPanelCool / WaterMassFlowRate;
-			
-			
+
+
 		} else { // cooling panel off
 			CapacitanceWater = 0.0;
 			NTU = 0.0;
@@ -1089,7 +1313,7 @@ namespace CoolingPanelSimple {
 			CoolingPanelSource( CoolingPanelNum ) = 0.0;
 			CoolingPanel( CoolingPanelNum ).WaterOutletEnthalpy = CoolingPanel( CoolingPanelNum ).WaterInletEnthalpy;
 		}
-		
+
 		CoolingPanel( CoolingPanelNum ).WaterOutletTemp = WaterOutletTemp;
 		CoolingPanel( CoolingPanelNum ).WaterMassFlowRate = WaterMassFlowRate;
 		CoolingPanel( CoolingPanelNum ).TotPower = LoadMet;
@@ -1106,14 +1330,14 @@ namespace CoolingPanelSimple {
 		int const ZoneNum
 	)
 	{
-	
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   July 2016
-		
+
 		// METHODOLOGY EMPLOYED:
 		// This subroutine sets the control temperature for the simple cooling panel.
-		
+
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using DataHeatBalance::Zone;
@@ -1137,9 +1361,9 @@ namespace CoolingPanelSimple {
 			}
 		}
 
-		
+
 	}
-	
+
 	void
 	UpdateCoolingPanel( int const CoolingPanelNum )
 	{
@@ -1268,7 +1492,7 @@ namespace CoolingPanelSimple {
 
 		// REFERENCES:
 		// Existing code for hot water baseboard models (radiant-convective variety)
-		
+
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataHeatBalFanSys::QCoolingPanelToPerson;
@@ -1339,7 +1563,7 @@ namespace CoolingPanelSimple {
 		// Existing code for hot water baseboard models (radiant-convective variety)
 
 		using DataHVACGlobals::TimeStepSys;
-		
+
 		CoolingPanel( CoolingPanelNum ).TotEnergy = CoolingPanel( CoolingPanelNum ).TotPower * TimeStepSys * SecInHour;
 		CoolingPanel( CoolingPanelNum ).Energy = CoolingPanel( CoolingPanelNum ).Power * TimeStepSys * SecInHour;
 		CoolingPanel( CoolingPanelNum ).ConvEnergy = CoolingPanel( CoolingPanelNum ).ConvPower * TimeStepSys * SecInHour;
@@ -1362,7 +1586,7 @@ namespace CoolingPanelSimple {
 
 		// REFERENCES:
 		// Existing code for hot water baseboard models (radiant-convective variety)
-		
+
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceWindow;

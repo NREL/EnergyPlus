@@ -11,7 +11,6 @@
 ! All of these glycols are "built in" properties to EnergyPlus.
 ! This data set provided for completeness and documentation.
 ! GLYCOL TEMPERATURES
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   FluidProperties:Temperatures,

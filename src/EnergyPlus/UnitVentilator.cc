@@ -1696,6 +1696,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1789,6 +1790,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesHeatingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1893,6 +1895,7 @@ namespace UnitVentilator {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoolingLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;

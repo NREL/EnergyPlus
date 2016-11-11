@@ -253,13 +253,11 @@ namespace EnergyPlus {
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->m_delightin_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
-		DataGlobals::delightin_stream = this->m_delightin_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
@@ -504,15 +502,6 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_delightin_stream( std::string const & expected_string, bool reset_stream ) {
-		auto const stream_str = this->m_delightin_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if (reset_stream) this->m_delightin_stream->str(std::string());
-		return are_equal;
-	}
-
-
 	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
 	{
 		auto const has_output = this->eso_stream->str().size() > 0;
@@ -555,13 +544,6 @@ namespace EnergyPlus {
 		return has_output;
 	}
 
-
-	bool EnergyPlusFixture::has_delightin_output( bool reset_stream )
-	{
-		auto const has_output = this->m_delightin_stream->str().size() > 0;
-		if ( reset_stream ) this->m_delightin_stream->str( std::string() );
-		return has_output;
-	}
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
 		InputProcessor::jdf = InputProcessor::idf_parser.decode(idf_snippet, InputProcessor::schema);

@@ -1672,7 +1672,7 @@
     DX Cooling Coil System 1,!- Component 2 Name
     Mixed Air 1 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     DX Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 1 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -1692,7 +1692,7 @@
     DX Cooling Coil System 2,!- Component 2 Name
     Mixed Air 2 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 2 Outlet Node,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 2,     !- Component 3 Name
     DX Cooling Coil 2 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 2 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -1712,7 +1712,7 @@
     DX Cooling Coil System 3,!- Component 2 Name
     Mixed Air 3 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 3 Outlet Node,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 3,     !- Component 3 Name
     DX Cooling Coil 3 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 3 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -1732,7 +1732,7 @@
     DX Cooling Coil System 4,!- Component 2 Name
     Mixed Air 4 Node,        !- Component 2 Inlet Node Name
     DX Cooling Coil 4 Outlet Node,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 4,     !- Component 3 Name
     DX Cooling Coil 4 Outlet Node,  !- Component 3 Inlet Node Name
     Main Heating Coil 4 Air Outlet Node,  !- Component 3 Outlet Node Name
@@ -2570,8 +2570,8 @@
     0.900000,                !- Conductivity {W/m-K}
     ,                        !- Dirt Correction Factor for Solar and Visible Transmittance
     ,                        !- Solar Diffusing
-    7.2e10,                  !- Young’s modulus {Pa}
-    0.22;                    !- Poisson’s ratio
+    7.2e10,                  !- Young's modulus {Pa}
+    0.22;                    !- Poisson's ratio
 
   WindowMaterial:Glazing,
     Glass_5012_Layer,        !- Name
@@ -2590,8 +2590,8 @@
     1.000000,                !- Conductivity {W/m-K}
     ,                        !- Dirt Correction Factor for Solar and Visible Transmittance
     ,                        !- Solar Diffusing
-    7.2e10,                  !- Young’s modulus {Pa}
-    0.22;                    !- Poisson’s ratio
+    7.2e10,                  !- Young's modulus {Pa}
+    0.22;                    !- Poisson's ratio
 
 !----------------------------------------------------------------------
 !         Window Gas Layers
@@ -9731,7 +9731,6 @@
 !----------------------------------------------------------------------
 !         Window Gap Layers
 !----------------------------------------------------------------------
-
 ! There were two materials called "Gap_1_Layer" and this slipped through
 ! the input processing cracks.  Once this was fixed, this testfile failed,
 ! so this second instance is just commented out, which is likely what
@@ -9742,7 +9741,6 @@
 !    0.0127,                  !- Thickness {m}
 !    Gas_1_W_0_0127,          !- Gas (or Gas Mixture)
 !    101325.0000;             !- Pressure {Pa}
-
 !----------------------------------------------------------------------
 !         Complex Shade
 !----------------------------------------------------------------------

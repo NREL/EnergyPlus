@@ -968,6 +968,9 @@ namespace SizingManager {
 				OARequirements( OAIndex ).OAFlowACH = 0.0;
 			}
 		}
+
+		// Set default schedule
+		OARequirements( OAIndex ).OAFlowFracSchPtr = DataGlobals::ScheduleAlwaysOn;
 		if ( NumAlphas > 2 ) {
 			if ( !lAlphaBlanks( 3 ) ) {
 				OARequirements( OAIndex ).OAFlowFracSchPtr = GetScheduleIndex( Alphas( 3 ) );
@@ -977,8 +980,6 @@ namespace SizingManager {
 						ShowContinueError( "Error found in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
 						ErrorsFound = true;
-					} else {
-						OARequirements( OAIndex ).MaxOAFractionSchValue = GetScheduleMaxValue( OARequirements( OAIndex ).OAFlowFracSchPtr );
 					}
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );

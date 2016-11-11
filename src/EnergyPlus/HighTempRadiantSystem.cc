@@ -867,6 +867,7 @@ namespace HighTempRadiantSystem {
 				}
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
+				DataScalableCapSizingON = false;
 			}
 
 		}

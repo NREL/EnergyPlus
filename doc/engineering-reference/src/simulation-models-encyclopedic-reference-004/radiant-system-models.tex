@@ -859,26 +859,25 @@ As stated above in the assumptions, the most prudent simple method for calculati
 
 Several heat balances can be constructed that relate to the situation at hand.  First, a heat balance on the water loop results in:
 
-q=(m ̇c_p )_water (T_wi-T_wo )	(1)
+$ q = \PB{m c_p}_{water} \PB{T_{wi}-T_{wo}} $  % note \PB is defined in header.tex
 
 where q is the energy transferred between the water loop and the surrounding space to which the cooling panel is exposed, m ̇ is the mass flow rate of the water, cp is the specific heat of the water, Twi is the inlet water temperature and Two is the outlet water temperature.
 
 The maximum amount of heat transfer that is possible according to the Second Law of Thermodynamics is:
 
-q_max=(m ̇c_p )_water (T_wi-T_z )	(2)
+$ q_{max} = \PB{m c_p}_{water} \PB{T_{wi} - T_z} $
 
 where qmax is the maximum possible energy transfer and Tz is the temperature of the surroundings (assumes that the air and the unconditioned surfaces in the space are at the same temperature for the sake of this development and the calculation of a UA; more explanation of Tz is given in the next section).
 
-
-The ratio of the actual energy exchange to the maximum possible is known as the effectiveness of the heat exchanger, ε.  Thus, ε = q/qmax.
+The ratio of the actual energy exchange to the maximum possible is known as the effectiveness of the heat exchanger, ε.  Thus, $ε = \frac{q}{q_{max}}$.
 
 For the case when one fluid is stationary in a heat exchanger, Incropera and DeWitt (1985) state that the effectiveness of a heat exchanger can be related to the number of transfer units (NTU) through the following relation:
 
-ε =1-e^(-NTU)	(3)
+$ε = 1 - e^{-NTU}$
 
 and NTU is defined by:
 
-NTU=UA/(m ̇c_p )_water  	(4)
+$NTU = \frac{UA}{ \PB{m c_p}_{water} } $
 
 The above equations will be used to model the performance of the panel within EnergyPlus and also to obtain a “design” UA value for the panel.
 
@@ -898,19 +897,19 @@ The development of the method for estimating the panel UA value will use the sam
   Rated Output Capacity (Qr)
 \end{itemize}
 
-To find UA, we first rearrange Equation 3 above to make NTU a function of effectiveness as follows:
+To find UA, we first rearrange equations above to make NTU a function of effectiveness as follows:
 
-ε =1-e^(-NTU)	(3)
+$ε = 1 - e^{-NTU}$
 
-NTU=-ln⁡(1-ε) 	(5)
+$NTU = -\ln{\PB{1-ε}}$
 
-where ε = Qr/qmax and qmax is calculated using design conditions.  This leads to:
+where $ε = Qr/qmax$ and qmax is calculated using design conditions.  This leads to:
 
-NTU=-ln⁡(1-Q_r/(((m_r ) ̇c_p )_water (T_rwi-T_rz ) )) 	(6)
+$NTU = -\ln⁡{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T{rz}}}}$
 
 Finally, substituting the definition of NTU as shown in Equation 4, we obtain an equation for UA that is calculated directly from the rated values that the user supplies:
 
-UA=-((m_r ) ̇c_p )_water ln⁡(1-Q_r/(((m_r ) ̇c_p )_water (T_rwi-T_rz ) )) 	(7)
+$UA = -\PB{m_r c_p}_{water} \ln⁡{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T{rz}}}}$
 
 This UA value will be used by the simple model to calculate the output of the radiant cooling panel based on the current water inlet temperature and mass flow rate as well as the space temperature (combination of air and radiant temperature) as described below.
 
@@ -918,17 +917,17 @@ This UA value will be used by the simple model to calculate the output of the ra
 
 The output from the panel will be based on the mean air temperature (MAT) and the mean radiant temperature (MRT) from the space.  These two temperatures will be combined to create a “zone” temperature that will be used in the model to calculate the radiant cooling panel output.  As shown in the previous section, a UA value will be calculated using rated conditions.  This UA value will be assumed to be constant and used in conjunction with the effectiveness-NTU method described in the previous section to determine the output of the panel based on water inlet temperature, water mass flow rate, and space conditions.  The space conditions will take into account both the mean air temperature and the mean radiant temperature via the following equation:
 
-T_z=x_r MRT+(1-x_r )MAT 	(8)
+$T_z = x_r MRT+ ( 1-x_r ) MAT$
 
 where xr is the “Fraction Radiant” for the radiant cooling panel that the user provides.
 
 This will then be used in Equation 2 above to calculate the maximum possible panel output, qmax.  Knowing UA from Equation 7 and knowing what the water mass flow rate for the system is based on controls, NTU can be calculated.  Once NTU is calculated, the effectiveness can be computed using Equation 3 and then the panel output (q) can be found from:
 
-q=εq_max 	(9)
+$q=ε q_{max}$
 
 Thus, the modeling equation to find the panel output is:
 
-q=(1-e^(-UA/(m ̇c_p )_water ) ) (m ̇c_p )_water (T_wi-T_z ) 	(10)
+$q=(1-e^(-UA/(m ̇c_p )_water ) ) (m ̇c_p )_water (T_wi-T_z )$
 
 Using the results of Equation 10, the outlet water temperature can also be calculated using a rearranged form of Equation 1.
 

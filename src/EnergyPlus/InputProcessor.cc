@@ -20,6 +20,7 @@
 #include <SortAndStringUtilities.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
+#include <iomanip>
 
 using json = nlohmann::json;
 
@@ -852,7 +853,6 @@ namespace EnergyPlus {
 		state.warnings.clear();
 		jdf.clear();
 		jdd_jdf_cache_map.clear();
-        SurfaceTmp_set.clear();
 		EchoInputFile = 0;
 		echo_stream = nullptr;
 	}
@@ -1031,10 +1031,18 @@ namespace EnergyPlus {
 			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
-			return static_cast<int>(jdf[ tmp_umit->second ].size());
+			return static_cast< int >( jdf[ tmp_umit->second ].size() );
 		} else {
-			return static_cast<int>(find_obj.value().size());
+			return static_cast< int >( find_obj.value().size() );
 		}
+
+		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
+			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+			}
+		}
+		return 0;
 	}
 
 	void

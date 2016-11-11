@@ -866,6 +866,8 @@ namespace SteamBaseboardRadiator {
 
 		if ( PltSizSteamNum > 0 ) {
 
+			DataScalableCapSizingON = false;
+			
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax == AutoSize ) {
@@ -914,6 +916,7 @@ namespace SteamBaseboardRadiator {
 						}
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 					}
