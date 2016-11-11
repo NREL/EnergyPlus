@@ -32,7 +32,6 @@ std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
 std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > >
 		EnergyPlus::InputProcessor::jdd_jdf_cache_map =
 		std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > ();
-std::unordered_set < std::string > EnergyPlus::InputProcessor::SurfaceTmp_set = std::unordered_set < std::string > ();
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
