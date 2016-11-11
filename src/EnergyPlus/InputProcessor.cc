@@ -129,9 +129,9 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 		} else {
 			std::string obj_name = parse_string( idf, index, success );
 			for ( char & c : obj_name ) c = ( char ) toupper( c );
-			auto tmp_umit = case_insensitive_keys.find( obj_name );
-			if ( tmp_umit != case_insensitive_keys.end() ) {
-				obj_name = tmp_umit->second;
+			auto const & find_key = case_insensitive_keys.find( obj_name );
+			if ( find_key != case_insensitive_keys.end() ) {
+				obj_name = find_key->second;
 			} else {
 				print_out_line_error( idf, false );
 				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
