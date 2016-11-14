@@ -5,8 +5,8 @@ Airflow Network Modeling Changes for Polygonal Windows Support
 
 **Florida Solar Energy Center**
 
- - Oct. 28, 2016
- - Original version
+ - Nov. 10, 2016 Second Edition 
+ - Original version on Oct. 28, 2016
  
 
 ## Justification for New Feature ##
@@ -15,15 +15,83 @@ The AirflowNetowrk model currently implemented in EnergyPlus is used to accurate
 
 ## E-mail and  Conference Call Conclusions ##
 
-NA
+E-mail communication between Mike and Gu
+
+>On 11/10/2016 2:43 PM
+>Thanks for the explanation.  Sounds good.
+
+>Mike
+
+>On 11/10/2016 1:41 PM, Lixing Gu wrote:
+> Mike:
+>
+> Thanks for your comments. The formulas for effective height and width are from the ProcessSurfaceVertices function of the SurfaceGeometry module. The main purpose is used to calculate convection coefficients. Since the effective height and width are available, the AirflowNetwork model just uses them. However, the effective height and width do not provide the same area. I would like to replace the values using the proposed method. Physically, both values do not have physical sense.
+>
+> Therefore, the reported values will not be used in the proposed approach. The purpose is that if a rectangular is cut into two triangular through a diagonal line. The effective area from the same two triangulars based on the proposed approach is the same as a rectangular.
+>
+> Thanks.
+>
+> Gu
+>
+> -----Original Message-----
+> From: Michael J Witte [mailto:mjwitte@gard.com]
+> Sent: Thursday, November 10, 2016 2:10 PM
+> To: Lixing Gu <gu@fsec.ucf.edu>
+> Subject: Re: [energyplusdevteam] NFP to allow polygonal windows using AirflowNetwork
+>
+> Gu:
+>
+> Sorry - I don't think I provided any comments on this yet.
+>
+> Where do the formulas for effective height and width come from? In the I/O description you talk about long and short axes rather than specific vertices.  I realize this is just the NFP stage, but I'm wondering how you will do that.  And could you use the same height and width values that are already calculated which are reported in the surface details report?
+>
+> Mike
+>
+
+Github communication between Jason, Edwin, and Gu
+
+1.  
+jasondegraw  4 days ago   National Renewable Energy Laboratory member 
+
+Is there another way to input the aspect ratio? Wouldn't this limit models to a single non-rectangular window aspect ratio?
+
+ 
+Myoldmopar  3 days ago   National Renewable Energy Laboratory member 
+
+@lgu1234 I like the effort here to possibly reuse a previous field. But I don't like the idea of applying a plan-aspect-ratio to an elevation-aspect-ratio. If you want to leave this as a choice field, I'd like this:
+•Field 1: Input Type ◦Option 1: Hardwired Aspect Ratio
+◦Option 2: Height-based Autocalculated Aspect Ratio
+◦Option 3: Parent surface-based adopted aspect ratio
+
+
+Where the user can enter a fixed aspect ratio, or one will be created with the same height as the polygonal window, or the parent surface's aspect ratio is used. I don't know how valid option 3 is, but it certainly has to be a better assumption that just using the building's plan-view aspect ratio across the board.
+
+ 
+lgu1234  40 minutes ago   National Renewable Energy Laboratory member 
+
+@Myoldmopar I like your suggestion to have 3 options. I am going to revise the NFP.
+
+2.
+
+ 
+jasondegraw  4 days ago   National Renewable Energy Laboratory member 
+
+Should this be "Height"?
+
+ 
+lgu1234  an hour ago   National Renewable Energy Laboratory member 
+
+@jasondegraw You are right. I am going to make a change.
+
+
 
 ## Overview ##
 
-In order to allow the AirflowNetwork model to handle polygonal windows, an equivalent rectangular shape will be used with the same area and height or aspect ratio. The same height is preferred as a default choice, since the airflow rate calculation is heavily dependent on height.     
+In order to allow the AirflowNetwork model to handle polygonal windows, an equivalent rectangular shape will be used with the same area and user input choices. The choices include Aspect Ratio from user input, Height Based, and Parent Surface Aspect Ratio. The same height is preferred as a default choice, since the airflow rate calculation is heavily dependent on height.     
 
 ## Approach ##
 
-A new optional field will be added as "Equivalent Rectangular Shape Choice" in the AirflowNetwork:MultiZone:Surface object. The allowed choice will be "Height" or "AspectRatio". Since one of choices is enough to define the equivalent rectangular window, there is no need to allow both options at the same time. The default choice is Height, because the same height will generate the same equivalent flows. 
+A new optional field will be added as "Equivalent Rectangular Shape Choice" in the AirflowNetwork:MultiZone:Surface object. The allowed choice will be "Aspect Ratio from Input", "Height Based" or "Parent Surface Aspect Ratio". Since one of choices is enough to define the equivalent rectangular window, these choices are interlocked. The default choice is Height Based, because the same height will generate the same equivalent flows. 
 
 ## Testing/Validation/Data Sources ##
 
@@ -219,8 +287,7 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 \subsubsection{Field: Equivalent Rectangular Shape Choice}\label{equivalent-rectangular-shape- choice}bold red</span>**
 
 **<span style="color:red;">
-This field is applied to a non-rectangular window or door. The equivalent surface has the same area as the non-rectangular one. When Height is entered, the equivalent width is equal to the area divided by the height. When AspectRatio is entered, the value of the Ratio of Building Width Along Short Axis to Width Along Long Axis field in the AirflowNetwork:SimulationControl object is used to calculate equivalent height and width. The equivalent height is equal to Square Root of Area divided by AspectRatio. The equivalent width is equal to the equivalent height * AspectRatio.
-</span>**
+This field is applied to a non-rectangular window or door. The equivalent surface has the same area as the non-rectangular one. When Height is entered, the equivalent width is equal to the area divided by the height. When "Aspect Ratio from Input" is entered, the equivalent height is equal to Square Root of Area divided by AspectRatio. The equivalent width is equal to the equivalent height * AspectRatio. When "Parent Surface Aspect Ratio" is entered, the equivalent height is equal to Square Root of Area divided by the parent surface AspectRatio. The equivalent width is equal to the equivalent height * parant surface AspectRatio. </span>**
    
 IDF examples are provided below:
 
@@ -388,9 +455,10 @@ Revisions to the IDD are noted as **<span style="color:red;">bold red</span>** n
   	A8; \field Equivalent Rectangular Shape Choice </span>**
 
       \type choice
-      \key Height
-      \Key AspectRatio
-      \default ZoneLevel
+      \key Aspect Ratio from Input
+      \Key Height Based
+      \Key Parent Surface Aspect Ratio
+      \default Height Based
       \note This field is applied to a non-rectangular window or door. The equivalent shape has
       \note the same area as a polygonal window or door. 
 
