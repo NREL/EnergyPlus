@@ -2423,8 +2423,9 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( MeterCustom );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			auto key = jdf_object["legacy_idd"].find("extension");
-			if (key != jdf_object["legacy_idd"].end()) extension_key = key.value();
+			auto const & legacy_idd = schema[ "properties" ][ MeterCustom ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if (key != legacy_idd.end()) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 
@@ -2445,8 +2446,9 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( MeterCustomDecrement );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			auto key = jdf_object["legacy_idd"].find("extension");
-			if (key != jdf_object["legacy_idd"].end() ) extension_key = key.value();
+			auto const & legacy_idd = schema[ "properties" ][ MeterCustomDecrement ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if (key != legacy_idd.end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 
@@ -2505,8 +2507,9 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( OutputTableMonthly );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			auto key = jdf_object["legacy_idd"].find("extension");
-			if (key != jdf_object["legacy_idd"].end() ) extension_key = key.value();
+			auto const & legacy_idd = schema[ "properties" ][ OutputTableMonthly ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if (key != legacy_idd.end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 
@@ -2521,8 +2524,9 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( OutputTableAnnual );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			auto key = jdf_object["legacy_idd"].find("extension");
-			if (key != jdf_object["legacy_idd"].end() ) extension_key = key.value();
+			auto const & legacy_idd = schema[ "properties" ][ OutputTableAnnual ][ "legacy_idd" ];
+			auto key = legacy_idd.find("extension");
+			if (key != legacy_idd.end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
@@ -2535,7 +2539,7 @@ namespace EnergyPlus {
 		jdf_objects = jdf.find( OutputTableSummaries );
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
-			auto const & legacy_idd = jdf_object["legacy_idd"];
+			auto const & legacy_idd = schema[ "properties" ][ OutputTableSummaries ][ "legacy_idd" ];
 			auto key = legacy_idd.find("extension");
 			if (key != legacy_idd.end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
