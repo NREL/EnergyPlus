@@ -119,14 +119,14 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas ) {
 		std::string const idf_objects = delimited_string({
-																 "Coil:Heating:Fuel,",
-																 "  Furnace Coil,            !- Name",
-																 "  ,    !- Availability Schedule Name",
-																 "  PropaneGas,              !- FuelType",
-																 "  0.8,                     !- Gas Burner Efficiency",
-																 "  20000,                   !- Nominal Capacity {W}",
-																 "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
-																 "  Air Loop Outlet Node;    !- Air Outlet Node Name"
+			 "Coil:Heating:Fuel,",
+			 "  Furnace Coil,            !- Name",
+			 "  ,    !- Availability Schedule Name",
+			 "  PropaneGas,              !- FuelType",
+			 "  0.8,                     !- Gas Burner Efficiency",
+			 "  20000,                   !- Nominal Capacity {W}",
+			 "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+			 "  Air Loop Outlet Node;    !- Air Outlet Node Name"
 														 });
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
