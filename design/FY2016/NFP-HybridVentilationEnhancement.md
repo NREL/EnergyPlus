@@ -1,10 +1,11 @@
 Hybrid Ventilation Controls Enhancements - CO_2 and adaptive temperatures
 ================
 
-**Author, Company**
+**Lixing Gu **
+**Florida Solar Energy Center **
 
- - 10/17/16
- - Original Edition
+ - 11/15/16,  - Second Edition
+ - 10/17/16  - Original Edition
  
 
 ## Justification for New Feature ##
@@ -18,11 +19,72 @@ One of two main hybrid ventilation applications is to control indoor air quality
 
 ## E-mail and  Conference Call Conclusions ##
 
-NA
+###Tianzhen Hong###
+
+11/3/16
+
+Lixing,
+
+A great new addition!
+
+Do you plan to enable the 90% acceptability limits as well? Also, it will be good to have the EN adaptive comfort model options.
+
+###Reply###
+
+11/4/16
+
+Tianzhen:
+
+I will add an option for 90% acceptability limits, in addition to proposed 80% acceptability limits.
+
+Thanks.
+
+###Mike Witte###
+
+On 11/10/2016 8:07 AM, Lixing Gu wrote:
+> Mike:
+>
+> I like your suggestion and I also proposed this before. Obviously, this new capability is beyond the original scope. However, as long as time and budget allow, I definitely want to include this one. I don't want to make a promise in the beginning.
+>
+> I will add this as optional based on time and budget. I propose to add two new optional fields, similar fields available in the AirflowNetwork:OccupantVentilationControl object:
+>
+>    Nx, \field Minimum HVAC Operation Time
+>        \type real
+>        \units minutes
+>        \minimum 0.0
+>        \default 0.0
+>    Nx, \field Minimum Ventilation Time
+>        \type real
+>        \units minutes
+>        \minimum 0.0
+>        \default 0.0
+>
+> What do you think?
+>
+> By the way, I have received comments from you and Tianzhen so far. It seems no major issues. I propose no conference call and would like to invite you as a reviewer assigned in both PivotalTracker and GitHub.
+>
+> Thanks.
+>
+> Gu
+> -----Original Message-----
+> From: Michael J Witte [mailto:mjwitte@gard.com]
+> Sent: Wednesday, November 09, 2016 4:46 PM
+> To: Lixing Gu <gu@fsec.ucf.edu>
+> Subject: Re: [energyplusdevteam] RE: NFP to enhance hybrid ventilation controls - CO_2 and adaptive temperatures
+>
+> Gu:
+>
+> This will be useful.  Any chance you could add a field to specify the minimum time between on/off changes?  This would be a general addition that applies to any control mode.
+>
+> Mike
+>
+
 
 ## Overview ##
 
 Both operative temperature and CO2 controls through hybrid ventilation can be accomplished by adding more control options defined in the Ventilation Control Mode Schedule Name field. The operative temperature control is determined internally based on upper and lower 80% and 90% acceptability limits. The CO2 control is based on the CO2 setpoint.
+
+Optional addition will specify the minimum HVAC operation and ventilation times, so that system and ventilation will be allowed to remain the same operation within the minimum operation time. The optional addition will be performed when time and budget allow.
 
 
 ## Approach ##
@@ -45,6 +107,8 @@ The control logic is that when the zone operative temperature is within the limi
 
 The CO2 control will check the CO2 level in the controlled zone first. If the CO2 level is above the CO2 setpoint, the control will check the availability of HVAC system (either AirLoop or a zone equipment). If HVAC system is available, the control will allow HVAC system operation first. If not available, natural ventilation is allowed. If the CO2 level is below the setpoint, no action will be taken. 
 
+The control of the minimum HVAC operation and ventilation time will be accomplished by checking accumulated times of either system or ventilation first. When the accumulated time is less than the minimum time specified in the input, the previous control status will be forced, no matter what other conditions changes. In other words, the control will be applied to any control modes.
+    
 ## Testing/Validation/Data Sources ##
 
 Various combinations of test cases will be checked to ensure the outputs of hybrid ventilation control is performed as expected.
@@ -57,7 +121,7 @@ This availability manager is executed at the start of each HVAC system timestep,
 
 Each AirLoopHVAC can have a corresponding hybrid ventilation availability manager. Each hybrid ventilation manager can control natural ventilation in the zones served by the AirLoopHVAC. The hybrid ventilation availability manager is triggered by zone air conditions for the controlled zone specified in an object input field. If there is no air loop, hybrid ventilation manager can still be applied to controlled zone specified in the object. To apply hybrid ventilation manager to the controlled zone not served by any air loop, the HVAC air loop name input field must be left blank. Currently, zone component objects such as unit heater, unit ventilator, packaged terminal air conditioner, packaged terminal heat pump, zone water source heat pump, window air conditioner, variable refrigerant flow, energy recovery ventilator, outdoor air unit, fan coil unit, and ventilated slab can individually use hybrid ventilation managers to make a decision regarding whether their fan should be on or off. Also, hybrid ventilation managers can be applied to zones served by ideal load zone components to turn them off when natural ventilation is active. Currently, hybrid ventilation manager is restricted to one per zone. It can either be applied through the air loop or directly to the zone. If hybrid ventilation manager is applied to an air loop and one of the zones served by the air loop also has hybrid ventilation manager, then zone hybrid ventilation manager is disabled. Presently, this availability manager must be used either with the ZoneVentilation:* and ZoneMixing objects or with the AirflowNetwork model.
 
-The inputs for this availability manager consist of the name for the air loop (AirLoopHVAC) being controlled, the controlled zone name to determine which zone air conditions are used to determine system availability, a ventilation control mode schedule, maximum wind speed and rain indicator to determine whether natural ventilation is allowed or not, a low limit and high limit for dry-bulb temperature, enthalpy and dewpoint temperature to determine the hybrid ventilation control, and a minimum outdoor air ventilation schedule. **<span style="color:red;">The operative temperature and zone air CO2 are also allowed to control natural ventilation.</span>** The last control allows user to use a wind speed modifier to adjust openness when the AirflowNetwork opening objects are selected. The other inputs include how to control simple airflow objects and AirflowNetwork opening objects.
+The inputs for this availability manager consist of the name for the air loop (AirLoopHVAC) being controlled, the controlled zone name to determine which zone air conditions are used to determine system availability, a ventilation control mode schedule, maximum wind speed and rain indicator to determine whether natural ventilation is allowed or not, a low limit and high limit for dry-bulb temperature, enthalpy and dewpoint temperature to determine the hybrid ventilation control, and a minimum outdoor air ventilation schedule. The Opening Factor Function of Wind Speed Curve allows user to use a wind speed modifier to adjust openness when the AirflowNetwork opening objects are selected. The other inputs include how to control simple airflow objects and AirflowNetwork opening objects. **<span style="color:red;">The operative temperature and zone air CO2 are also allowed to control natural ventilation. The minimum HVAC system operation and natural ventilation time fields will provide users with more flexibility to force any operation model to remain the same status within minimum time duration.</span>**
 
 The hybrid ventilation availability manager works independently of all other system availability manager objects, so this manager is not a valid system availability manager type in the AvailabilityManagerAssignmentList object.
 
@@ -140,6 +204,16 @@ Schedule values equal to zero indicate the individual ventilation control based 
 The name of a ZoneVentilation:* object whose zone name is the controlled zone name defined in a previous input field for this availability manager object (Ref. Field Controlled Zone Name ). The controls defined for this specific ZoneVentilation:* object to enable ventilation air will be applied to other ZoneVentilation:* and ZoneMixing objects served by the air loop controlled by this availability manager, regardless of the controls defined for the other ZoneVentilation:* and ZoneMixing objects. In other words, when ventilation is enabled by this specific ZoneVentilation:* object, the other ZoneVentilation:* and ZoneMixing objects in the zones served by the primary air loop are also enabled.
 
 \textbf{Note:} A \textbf{ZoneInfiltration:*} object indicates any one of \textbf{ZoneInfiltration:DesignFlowRate}, \textbf{ZoneInfiltration:EffectiveLeakageArea},and \textbf{ZoneInfiltration:FlowCoefficient} objects.A object of\textbf{ZoneVentilation:*} indicates any one of \textbf{ZoneVentilation:DesignFlowRate} and \textbf{ZoneVentilation:WindandStackOpenArea} objects.
+
+####Minimum HVAC Operation Time </span>####
+**<span style="color:red;">
+The field represents the minimum time that HVAC system operation will be allowed. If accumulated system operation time is less than this value, the system operation status will be forced regardless of other operation conditions, and natural ventilation will shut off.
+</span>**
+
+####Minimum Ventilation Time </span>####
+**<span style="color:red;">
+The field represents the minimum time that natural ventilation will remain. If accumulated ventilation time is less than this value, the natural ventilation will be forced regardless of other operation conditions.
+</span>**
 
 An example of this object in an input file:
 
@@ -304,7 +378,7 @@ This is the hybrid ventilation control status, which can have three integer valu
        \note The schedule is used to incorporate operation of simple airflow objects and HVAC
        \note system operation.
        \note The simple airflow objects are Ventilation and Mixing only
-  	A10; \field ZoneVentilation Object Name
+  	A10, \field ZoneVentilation Object Name
        \note This field has not been instrumented to work with
        \note global Zone or Zone List names option for Ventilation:DesignFlowRate.  In order to
        \note use, you must enter the single <Ventilation:DesignFlowRate> name in this field.
@@ -314,6 +388,20 @@ This is the hybrid ventilation control status, which can have three integer valu
        \object-list VentilationNames
        \note The other ZoneVentilation:* and ZoneMixing objects controlled in the same AirLoopHVAC
        \note will work in the same way as this ventilation object.
+**<span style="color:red;">
+    N8 , \field Minimum HVAC Operation Time</span>**
+
+        \type real
+        \units minutes
+        \minimum 0.0
+        \default 0.0
+**<span style="color:red;">
+    N9 ; \field Minimum Ventilation Time </span>**
+
+        \type real
+        \units minutes
+        \minimum 0.0
+        \default 0.0
 
 
 ## Outputs Description ##
