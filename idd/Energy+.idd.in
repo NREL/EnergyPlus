@@ -81631,10 +81631,10 @@ HybridModel:Zone,
   A1 , \field Name
        \required-field
        \type alpha
-  A2 , \field Zone or ZoneList Name
+  A2 , \field Zone Name
        \required-field
        \type object-list
-       \object-list ZoneAndZoneListNames
+       \object-list ZoneNames
   A3 , \field Calculate Zone Internal Thermal Mass
        \note Use measured temperature data to calculate zone temperature capacity multiplier
        \note Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously

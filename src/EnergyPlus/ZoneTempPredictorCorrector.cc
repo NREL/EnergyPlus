@@ -3917,6 +3917,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 HMMultiplierAverage ( 1.0 );
 		static Real64 MultpHM( 1.0 );
 		static Real64 InfilOAACHHM( 0.0 );
+
 		//  LOGICAL,SAVE   :: OneTimeFlag = .TRUE.
 		//unusd1208  LOGICAL,SAVE   :: MyEnvrnFlag = .TRUE.
 		Real64 TempSupplyAir;
@@ -4154,7 +4155,7 @@ namespace ZoneTempPredictorCorrector {
 				if ( DayOfYear >= HybridStartDayOfYear && DayOfYear <= HybridEndDayOfYear ){
 
 					ZT( ZoneNum ) = Zone( ZoneNum ).ZoneMeasuredTemperature;
-					
+
 					// Hybrid Modeling-Infiltration calcualtion start
 					if ( HybridModelZone( ZoneNum ).InfiltrationCalc ){
 
@@ -4219,9 +4220,10 @@ namespace ZoneTempPredictorCorrector {
 							}
 						}
 
+
 						// For timestep output
 						Zone(ZoneNum).ZoneVolCapMultpSensHM = MultpHM;
-
+						
 						// Calculate the average multiplier of the zone for the whole running period
 						{
 							// count for hybrid model calculations

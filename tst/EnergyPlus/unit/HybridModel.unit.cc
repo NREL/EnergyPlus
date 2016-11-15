@@ -15,7 +15,7 @@
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
 //
-// (1) Redistributions of source code must retain the above copyright notice, this list of
+// ( 1 ) Redistributions of source code must retain the above copyright notice, this list of
 //     conditions and the following disclaimer.
 //
 // (2) Redistributions in binary form must reproduce the above copyright notice, this list of
@@ -60,8 +60,10 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
-
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -83,6 +85,8 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -104,540 +108,181 @@ using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::HybridModel;
+using namespace EnergyPlus::DataPrecisionGlobals;
 
-TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
+TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 {
 
-	TimeStepSys = 15.0 / 60.0; // System timestep in hours
-
-	ZoneEquipConfig.allocate(1);
-	ZoneEquipConfig(1).ZoneName = "Zone 1";
-	ZoneEquipConfig(1).ActualZoneNum = 1;
+	// ZoneTempPredictorCorrector variable initialization 
 	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back(1);
+	controlledZoneEquipConfigNums.push_back( 1 );
+	Zone.allocate( 1 );
+	HybridModelZone.allocate( 1 );
+	AirModel.allocate( 1 );
+	ZTM1.allocate( 1 );
+	ZTM2.allocate( 1 );
+	ZTM3.allocate( 1 );
+	XMAT.allocate( 1 );
+	XM2T.allocate( 1 );
+	XM3T.allocate( 1 );
+	ZTOC.allocate( 1 );
+	ZTOC.allocate( 1 );
+	ZTMX.allocate( 1 );
+	ZTM1MX.allocate( 1 );
+	ZTM1.allocate( 1 );
+	WZoneTimeMinus1Temp.allocate( 1 );
+	WZoneTimeMinus2Temp.allocate( 1 );
+	WZoneTimeMinus3Temp.allocate( 1 );
+	WZoneTimeMinus1.allocate( 1 );
+	WZoneTimeMinus2.allocate( 1 );
+	WZoneTimeMinus3.allocate( 1 );
+	AIRRAT.allocate( 1 );
+	ZoneAirHumRat.allocate( 1 );
+	NonAirSystemResponse.allocate( 1 );
+	NonAirSystemResponse( 1 ) = 0.0;
+	SysDepZoneLoadsLagged.allocate( 1 );
+	SysDepZoneLoadsLagged( 1 ) = 0.0;
+	AirflowNetworkExchangeData.allocate( 1 );
+	Node.allocate( 1 );
+	TempTstatAir.allocate( 1 );
+	LoadCorrectionFactor.allocate( 1 );
+	MAT.allocate( 1 );
+	ZT.allocate( 1 );
+	PreviousMeasuredZT1.allocate( 1 );
+	PreviousMeasuredZT2.allocate( 1 );
+	PreviousMeasuredZT3.allocate( 1 );
+	
+	// CalcZoneComponentLoadSums variable initialization
+	MCPI.allocate( 1 );
+	MCPI( 1 ) = 0.0;
+	MCPV.allocate( 1 );
+	MCPM.allocate( 1 );
+	MCPM( 1 ) = 0.0;
+	MCPE.allocate( 1 );
+	MCPE( 1 ) = 0.0;
+	MCPC.allocate( 1 );
+	MCPC( 1 ) = 0.0;
+	MDotCPOA.allocate( 1 );
+	MDotCPOA( 1 ) = 0.0;
+	MDotOA.allocate( 1 );
+	MDotOA( 1 ) = 0.0;
+	MCPTI.allocate( 1 );
+	MCPTI( 1 ) = 0.0;
+	MCPTV.allocate( 1 );
+	MCPTM.allocate( 1 );
+	MCPTM( 1 ) = 0.0;
+	MCPTE.allocate( 1 );
+	MCPTE( 1 ) = 0.0;
+	MCPTC.allocate( 1 );
+	MCPTC( 1 ) = 0.0;
+	SurfaceWindow.allocate( 1 );
+	Surface.allocate( 2 );
+	HConvIn.allocate( 1 );
+	SNLoadHeatRate.allocate( 1 );
+	SNLoadCoolRate.allocate( 1 );
+	SNLoadHeatEnergy.allocate( 1 );
+	SNLoadCoolEnergy.allocate( 1 );
+	ZoneAirRelHum.allocate( 1 );
+	IsZoneDV.allocate( 1 );
+	ZoneDVMixedFlag.allocate( 1 );
+	ZnAirRpt.allocate( 1 );
+	ZoneEquipConfig.allocate( 1 );
+	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+	ZoneIntGain.allocate( 1 );
+	ZoneIntGain( 1 ).NumberOfDevices = 0;
+	ZoneEqSizing.allocate( 1 );
 
-	ZoneEquipConfig(1).NumInletNodes = 2;
-	ZoneEquipConfig(1).InletNode.allocate(2);
-	ZoneEquipConfig(1).InletNode(1) = 1;
-	ZoneEquipConfig(1).InletNode(2) = 2;
-	ZoneEquipConfig(1).NumExhaustNodes = 1;
-	ZoneEquipConfig(1).ExhaustNode.allocate(1);
-	ZoneEquipConfig(1).ExhaustNode(1) = 3;
-	ZoneEquipConfig(1).ReturnAirNode = 4;
-
-	Node.allocate(5);
-
-	Zone.allocate(1);
-	Zone(1).Name = ZoneEquipConfig(1).ZoneName;
-	ZoneEqSizing.allocate(1);
+	// CorrectZoneHumRat variable initialization
+	ZoneLatentGain.allocate( 1 );
+	ZoneLatentGain( 1 ) = 0.0;
+	SumLatentHTRadSys.allocate( 1 );
+	SumLatentHTRadSys( 1 ) = 0.0;
+	SumHmARaW.allocate( 1 );
+	SumConvHTRadSys.allocate( 1 );
+	SumConvHTRadSys( 1 ) = 0.0;
+	SumConvPool.allocate( 1 );
+	SumConvPool( 1 ) = 0.0;
+	SumHmARa.allocate( 1 );
+	MixingMassFlowXHumRat.allocate( 1 );
+	MixingMassFlowZone.allocate( 1 );
+	ZoneW1.allocate( 1 );
+	ZoneAirHumRatTemp.allocate( 1 );
+	WZoneTimeMinus1Temp.allocate( 1 );
+	WZoneTimeMinus2Temp.allocate( 1 );
+	WZoneTimeMinus3Temp.allocate( 1 );
+	SumLatentPool.allocate( 1 );
+	SumLatentPool( 1 ) = 0.0;
+	OAMFL.allocate( 1 );
+	VAMFL.allocate( 1 );
+	EAMFL.allocate( 1 );EAMFL.allocate( 1 );
+	CTMFL.allocate( 1 );
+	
+	// Parameter setup
+	NumOfZones = 1;
 	CurZoneEqNum = 1;
-	Zone(1).Multiplier = 1.0;
-	Zone(1).Volume = 1000.0;
-	Zone(1).SystemZoneNodeNumber = 5;
-	ZoneVolCapMultpMoist = 1.0;
-	ZoneLatentGain.allocate(1);
-	ZoneLatentGain(1) = 0.0;
-	SumLatentHTRadSys.allocate(1);
-	SumLatentHTRadSys(1) = 0.0;
-	SumLatentPool.allocate(1);
-	SumLatentPool(1) = 0.0;
-	OutBaroPress = 101325.0;
-	ZT.allocate(1); // Zone temperature C
-	ZT(1) = 24.0;
-	ZoneAirHumRat.allocate(1);
-
-	Zone(1).SurfaceFirst = 1;
-	Zone(1).SurfaceLast = 2;
-	Surface.allocate(2);
-
 	NumZoneReturnPlenums = 0;
 	NumZoneSupplyPlenums = 0;
-
-	OAMFL.allocate(1);
-	VAMFL.allocate(1);
-	EAMFL.allocate(1);
-	CTMFL.allocate(1);
-
-	SumHmARaW.allocate(1);
-	SumHmARa.allocate(1);
-	MixingMassFlowXHumRat.allocate(1);
-	MixingMassFlowZone.allocate(1);
 	SimulateAirflowNetwork = 0;
-	MDotOA.allocate(1);
+	Zone( 1 ).Multiplier = 1;
+	Zone( 1 ).SystemZoneNodeNumber = 1;
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 2;
+	Zone( 1 ).Volume = 1061.88;
+	ShortenTimeStepSys = false;
+	TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
+	TimeStepSys = 10.0 / 60.0;
+	Real64 ZoneTempChange = 0.0;
+	Real64 PriorTimeStep = 10.0 / 60.0;
 
-	ZoneAirSolutionAlgo = UseEulerMethod;
-	ZoneAirHumRatTemp.allocate(1);
-	ZoneW1.allocate(1);
+	// Hybrid modeling trigger
+	FlagHybridModel = true;
+	WarmupFlag = false;
+	DoingSizing = false;
+	UseZoneTimeStepHistory = true;
+	DayOfYear = 1;
 
-	AirModel.allocate(1);
+	// Case 1: Hybrid model internal thermal mass
 
+	HybridModelZone( 1 ).InfiltrationCalc = false;
+	HybridModelZone( 1 ).InternalThermalMassCalc = true;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureStartMonth = 1;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureStartDate = 1;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureEndMonth = 1;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureEndDate = 2;
+	MAT( 1 ) = 0.0;
+	PreviousMeasuredZT1( 1 ) = 0.1;
+	PreviousMeasuredZT2( 1 ) = 0.2;
+	PreviousMeasuredZT3( 1 ) = 0.3;
+	Zone( 1 ).OutDryBulbTemp = -5.21;
+	ZoneAirHumRat( 1 ) = 0.002083;
+	MCPV( 1 ) = 1414.60; // Assign TempDepCoef
+	MCPTV( 1 ) = -3335.10; // Assign TempIndCoef
+	OutBaroPress = 99166.67;
 
-	// Case 1 - All flows at the same humrat
-	ZoneW1(1) = 0.008;
-	Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-	Node(1).HumRat = 0.008;
-	Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-	Node(2).HumRat = 0.008;
-	ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-	Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-	Node(3).HumRat = ZoneW1(1);
-	Node(4).MassFlowRate = 0.03; // Zone return node
-	Node(4).HumRat = 0.000;
-	Node(5).HumRat = 0.000;
-	ZoneAirHumRat(1) = 0.008;
-	OAMFL(1) = 0.0;
-	VAMFL(1) = 0.0;
-	EAMFL(1) = 0.0;
-	CTMFL(1) = 0.0;
-	OutHumRat = 0.008;
-	MixingMassFlowXHumRat(1) = 0.0;
-	MixingMassFlowZone(1) = 0.0;
-	MDotOA(1) = 0.0;
+	CorrectZoneAirTemp(ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+	EXPECT_NEAR( 15.13, Zone( 1 ).ZoneVolCapMultpSensHM, 0.01 );
 
-	CorrectZoneHumRat(1, controlledZoneEquipConfigNums);
-	EXPECT_EQ(0.008, Node(5).HumRat);
+	// Case 2: Hybrid model infiltration
 
-	// Case 2 - Unbalanced exhaust flow
-	ZoneW1(1) = 0.008;
-	Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-	Node(1).HumRat = 0.008;
-	Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-	Node(2).HumRat = 0.008;
-	ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-	Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
-	Node(3).HumRat = ZoneW1(1);
-	Node(4).MassFlowRate = 0.01; // Zone return node
-	Node(4).HumRat = ZoneW1(1);
-	Node(5).HumRat = 0.000;
-	ZoneAirHumRat(1) = 0.008;
-	OAMFL(1) = 0.0;
-	VAMFL(1) = 0.0;
-	EAMFL(1) = 0.0;
-	CTMFL(1) = 0.0;
-	OutHumRat = 0.004;
-	MixingMassFlowXHumRat(1) = 0.0;
-	MixingMassFlowZone(1) = 0.0;
-	MDotOA(1) = 0.0;
+	HybridModelZone( 1 ).InfiltrationCalc = true;
+	HybridModelZone( 1 ).InternalThermalMassCalc = false;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureStartMonth = 1;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureStartDate = 1;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureEndMonth = 1;
+	HybridModelZone( 1 ).ZoneMeasuredTemperatureEndDate = 2;
+	MAT( 1 ) = 0.0;
+	PreviousMeasuredZT1( 1 ) = 0.02;
+	PreviousMeasuredZT2( 1 ) = 0.04;
+	PreviousMeasuredZT3( 1 ) = 0.06;
+	Zone( 1 ).ZoneVolCapMultpSens = 8.0;
+	Zone( 1 ).OutDryBulbTemp = -6.71;
+	ZoneAirHumRat( 1 ) = 0.002083;
+	MCPV( 1 ) = 539.49; // Assign TempDepCoef
+	MCPTV( 1 ) = 270.10; // Assign TempIndCoef
+	OutBaroPress = 99250;
 
-	CorrectZoneHumRat(1, controlledZoneEquipConfigNums);
-	EXPECT_EQ(0.008, Node(5).HumRat);
-
-	// Case 3 - Balanced exhaust flow with proper source flow from mixing
-	ZoneW1(1) = 0.008;
-	Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-	Node(1).HumRat = 0.008;
-	Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-	Node(2).HumRat = 0.008;
-	ZoneEquipConfig(1).ZoneExhBalanced = 0.02;
-	Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
-	Node(3).HumRat = ZoneW1(1);
-	Node(4).MassFlowRate = 0.03; // Zone return node
-	Node(4).HumRat = ZoneW1(1);
-	Node(5).HumRat = 0.000;
-	ZoneAirHumRat(1) = 0.008;
-	OAMFL(1) = 0.0;
-	VAMFL(1) = 0.0;
-	EAMFL(1) = 0.0;
-	CTMFL(1) = 0.0;
-	OutHumRat = 0.004;
-	MixingMassFlowXHumRat(1) = 0.02 * 0.008;
-	MixingMassFlowZone(1) = 0.02;
-	MDotOA(1) = 0.0;
-
-	CorrectZoneHumRat(1, controlledZoneEquipConfigNums);
-	EXPECT_EQ(0.008, Node(5).HumRat);
-
-	// Case 4 - Balanced exhaust flow without source flow from mixing
-	ZoneW1(1) = 0.008;
-	Node(1).MassFlowRate = 0.01; // Zone inlet node 1
-	Node(1).HumRat = 0.008;
-	Node(2).MassFlowRate = 0.02; // Zone inlet node 2
-	Node(2).HumRat = 0.008;
-	ZoneEquipConfig(1).ZoneExhBalanced = 0.02;
-	Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
-	Node(3).HumRat = ZoneW1(1);
-	Node(4).MassFlowRate = 0.01; // Zone return node
-	Node(4).HumRat = ZoneW1(1);
-	Node(5).HumRat = 0.000;
-	ZoneAirHumRat(1) = 0.008;
-	OAMFL(1) = 0.0;
-	VAMFL(1) = 0.0;
-	EAMFL(1) = 0.0;
-	CTMFL(1) = 0.0;
-	OutHumRat = 0.004;
-	MixingMassFlowXHumRat(1) = 0.0;
-	MixingMassFlowZone(1) = 0.0;
-	MDotOA(1) = 0.0;
-
-	CorrectZoneHumRat(1, controlledZoneEquipConfigNums);
-	EXPECT_FALSE((0.008 == Node(5).HumRat));
-
-	// Deallocate everything
-	ZoneEquipConfig(1).InletNode.deallocate();
-	ZoneEquipConfig(1).ExhaustNode.deallocate();
-	ZoneEquipConfig.deallocate();
-	Node.deallocate();
-	Zone.deallocate();
-	ZoneLatentGain.deallocate();
-	ZoneEqSizing.deallocate();
-	SumLatentHTRadSys.deallocate();
-	SumLatentPool.deallocate();
-	ZT.deallocate(); // Zone temperature C
-	ZoneAirHumRat.deallocate();
-	Surface.deallocate();
-	OAMFL.deallocate();
-	VAMFL.deallocate();
-	EAMFL.deallocate();
-	CTMFL.deallocate();
-	SumHmARaW.deallocate();
-	SumHmARa.deallocate();
-	MixingMassFlowXHumRat.deallocate();
-	MixingMassFlowZone.deallocate();
-	MDotOA.deallocate();
-	ZoneAirHumRatTemp.deallocate();
-	ZoneW1.deallocate();
-	AirModel.deallocate();
-
-}
-
-TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
-{
-	// AUTHOR: R. Raustad, FSEC
-	// DATE WRITTEN: Aug 2015
-
-	std::string const idf_objects = delimited_string({
-		"Version,8.3;",
-		" ",
-		"Zone,",
-		"  Core_top,             !- Name",
-		"  0.0000,                  !- Direction of Relative North {deg}",
-		"  0.0000,                  !- X Origin {m}",
-		"  0.0000,                  !- Y Origin {m}",
-		"  0.0000,                  !- Z Origin {m}",
-		"  1,                       !- Type",
-		"  1,                       !- Multiplier",
-		"  ,                        !- Ceiling Height {m}",
-		"  ,                        !- Volume {m3}",
-		"  autocalculate,           !- Floor Area {m2}",
-		"  ,                        !- Zone Inside Convection Algorithm",
-		"  ,                        !- Zone Outside Convection Algorithm",
-		"  Yes;                     !- Part of Total Floor Area",
-		" ",
-		"ZoneControl:Thermostat,",
-		"  Core_top Thermostat,     !- Name",
-		"  Core_top,                !- Zone or ZoneList Name",
-		"  Single Heating Control Type Sched,  !- Control Type Schedule Name",
-		"  ThermostatSetpoint:SingleHeating,  !- Control 1 Object Type",
-		"  Core_top HeatSPSched;    !- Control 1 Name",
-		" ",
-		"Schedule:Compact,",
-		"  Single Heating Control Type Sched,  !- Name",
-		"  Control Type,            !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,1;          !- Field 3",
-		" ",
-		"ThermostatSetpoint:SingleHeating,",
-		"  Core_top HeatSPSched,    !- Name",
-		"  SNGL_HTGSETP_SCH;        !- Heating Setpoint Temperature Schedule Name",
-		" ",
-		"Schedule:Compact,",
-		"  SNGL_HTGSETP_SCH,        !- Name",
-		"  Temperature,             !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,15.0;       !- Field 3",
-		" ",
-		"Zone,",
-		"  Core_middle,             !- Name",
-		"  0.0000,                  !- Direction of Relative North {deg}",
-		"  0.0000,                  !- X Origin {m}",
-		"  0.0000,                  !- Y Origin {m}",
-		"  0.0000,                  !- Z Origin {m}",
-		"  1,                       !- Type",
-		"  1,                       !- Multiplier",
-		"  ,                        !- Ceiling Height {m}",
-		"  ,                        !- Volume {m3}",
-		"  autocalculate,           !- Floor Area {m2}",
-		"  ,                        !- Zone Inside Convection Algorithm",
-		"  ,                        !- Zone Outside Convection Algorithm",
-		"  Yes;                     !- Part of Total Floor Area",
-		" ",
-		"ZoneControl:Thermostat,",
-		"  Core_middle Thermostat,  !- Name",
-		"  Core_middle,             !- Zone or ZoneList Name",
-		"  Single Cooling Control Type Sched,  !- Control Type Schedule Name",
-		"  ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type",
-		"  Core_middle CoolSPSched; !- Control 1 Name",
-		" ",
-		"Schedule:Compact,",
-		"  Single Cooling Control Type Sched,  !- Name",
-		"  Control Type,            !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,2;          !- Field 3",
-		" ",
-		"ThermostatSetpoint:SingleCooling,",
-		"  Core_middle CoolSPSched, !- Name",
-		"  SNGL_CLGSETP_SCH;        !- Cooling Setpoint Temperature Schedule Name",
-		" ",
-		"Schedule:Compact,",
-		"  SNGL_CLGSETP_SCH,        !- Name",
-		"  Temperature,             !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,24.0;       !- Field 3",
-		" ",
-		"Zone,",
-		"  Core_basement,             !- Name",
-		"  0.0000,                  !- Direction of Relative North {deg}",
-		"  0.0000,                  !- X Origin {m}",
-		"  0.0000,                  !- Y Origin {m}",
-		"  0.0000,                  !- Z Origin {m}",
-		"  1,                       !- Type",
-		"  1,                       !- Multiplier",
-		"  ,                        !- Ceiling Height {m}",
-		"  ,                        !- Volume {m3}",
-		"  autocalculate,           !- Floor Area {m2}",
-		"  ,                        !- Zone Inside Convection Algorithm",
-		"  ,                        !- Zone Outside Convection Algorithm",
-		"  Yes;                     !- Part of Total Floor Area",
-		" ",
-		"ZoneControl:Thermostat,",
-		"  Core_basement Thermostat,  !- Name",
-		"  Core_basement,             !- Zone or ZoneList Name",
-		"  Single Cooling Heating Control Type Sched,  !- Control Type Schedule Name",
-		"  ThermostatSetpoint:SingleHeatingOrCooling,  !- Control 1 Object Type",
-		"  Core_basement CoolHeatSPSched; !- Control 1 Name",
-		" ",
-		"Schedule:Compact,",
-		"  Single Cooling Heating Control Type Sched,  !- Name",
-		"  Control Type,            !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,3;          !- Field 3",
-		" ",
-		"ThermostatSetpoint:SingleHeatingOrCooling,",
-		"  Core_basement CoolHeatSPSched, !- Name",
-		"  CLGHTGSETP_SCH;             !- Heating Setpoint Temperature Schedule Name",
-		" ",
-		"Zone,",
-		"  Core_bottom,             !- Name",
-		"  0.0000,                  !- Direction of Relative North {deg}",
-		"  0.0000,                  !- X Origin {m}",
-		"  0.0000,                  !- Y Origin {m}",
-		"  0.0000,                  !- Z Origin {m}",
-		"  1,                       !- Type",
-		"  1,                       !- Multiplier",
-		"  ,                        !- Ceiling Height {m}",
-		"  ,                        !- Volume {m3}",
-		"  autocalculate,           !- Floor Area {m2}",
-		"  ,                        !- Zone Inside Convection Algorithm",
-		"  ,                        !- Zone Outside Convection Algorithm",
-		"  Yes;                     !- Part of Total Floor Area",
-		" ",
-		"ZoneControl:Thermostat,",
-		"  Core_bottom Thermostat,  !- Name",
-		"  Core_bottom,             !- Zone or ZoneList Name",
-		"  Dual Zone Control Type Sched,  !- Control Type Schedule Name",
-		"  ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
-		"  Core_bottom DualSPSched; !- Control 1 Name",
-		" ",
-		"Schedule:Compact,",
-		"  Dual Zone Control Type Sched,  !- Name",
-		"  Control Type,            !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,4;          !- Field 3",
-		" ",
-		"ThermostatSetpoint:DualSetpoint,",
-		"  Core_bottom DualSPSched, !- Name",
-		"  HTGSETP_SCH,             !- Heating Setpoint Temperature Schedule Name",
-		"  CLGSETP_SCH;             !- Cooling Setpoint Temperature Schedule Name",
-		" ",
-		"Schedule:Compact,",
-		"  CLGSETP_SCH,             !- Name",
-		"  Temperature,             !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,24.0;       !- Field 3",
-		" ",
-		"Schedule:Compact,",
-		"  HTGSETP_SCH,             !- Name",
-		"  Temperature,             !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,15.0;       !- Field 3",
-		" ",
-		"Schedule:Compact,",
-		"  CLGHTGSETP_SCH,          !- Name",
-		"  Temperature,             !- Schedule Type Limits Name",
-		"  Through: 12/31,          !- Field 1",
-		"  For: AllDays,            !- Field 2",
-		"  Until: 24:00,24.0;       !- Field 3",
-	});
-
-	ASSERT_FALSE(process_idf(idf_objects));
-
-	bool ErrorsFound(false); // If errors detected in input
-	GetZoneData(ErrorsFound);
-	ASSERT_FALSE(ErrorsFound);
-
-	int HeatZoneNum(1);
-	int CoolZoneNum(2);
-	int CoolHeatZoneNum(3);
-	int DualZoneNum(4);
-
-	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-	ProcessScheduleInput(); // read schedules
-
-	DaySchedule(1).TSValue = 1;
-	DaySchedule(3).TSValue = 2;
-	DaySchedule(5).TSValue = 3;
-	DaySchedule(6).TSValue = 4;
-
-	GetZoneAirSetPoints();
-
-	DeadBandOrSetback.allocate(NumTempControlledZones);
-	CurDeadBandOrSetback.allocate(NumTempControlledZones);
-	TempControlType.allocate(NumTempControlledZones);
-	ZoneSysEnergyDemand.allocate(NumTempControlledZones);
-	TempZoneThermostatSetPoint.allocate(NumTempControlledZones);
-	ZoneSetPointLast.allocate(NumTempControlledZones);
-	Setback.allocate(NumTempControlledZones);
-	ZoneThermostatSetPointLo.allocate(NumTempControlledZones);
-	ZoneThermostatSetPointHi.allocate(NumTempControlledZones);
-	TempDepZnLd.allocate(NumTempControlledZones);
-	TempIndZnLd.allocate(NumTempControlledZones);
-	TempDepZnLd = 0.0;
-	TempIndZnLd = 0.0;
-
-	SNLoadPredictedRate.allocate(NumTempControlledZones);
-	LoadCorrectionFactor.allocate(NumTempControlledZones);
-	SNLoadPredictedHSPRate.allocate(NumTempControlledZones);
-	SNLoadPredictedCSPRate.allocate(NumTempControlledZones);
-
-	LoadCorrectionFactor(HeatZoneNum) = 1.0;
-	LoadCorrectionFactor(CoolZoneNum) = 1.0;
-	LoadCorrectionFactor(CoolHeatZoneNum) = 1.0;
-	LoadCorrectionFactor(DualZoneNum) = 1.0;
-
-	// The following parameters describe the setpoint types in TempControlType(ActualZoneNum)
-	//	extern int const SingleHeatingSetPoint; = 1
-	//	extern int const SingleCoolingSetPoint; = 2
-	//	extern int const SingleHeatCoolSetPoint; = 3
-	//	extern int const DualSetPointWithDeadBand; = 4
-	Schedule(TempControlledZone(HeatZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::SingleHeatingSetPoint;
-	Schedule(TempControlledZone(CoolZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::SingleCoolingSetPoint;
-	Schedule(TempControlledZone(CoolHeatZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::SingleHeatCoolSetPoint;
-
-	Schedule(TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = 0; // simulate no thermostat or non-controlled zone
-
-	ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired = 0.0; // no load and no thermostat since control type is set to 0 above
-	CalcZoneAirTempSetPoints();
-	CalcPredictedSystemLoad(DualZoneNum, 1.0);
-
-	EXPECT_EQ(0.0, TempZoneThermostatSetPoint(DualZoneNum)); // Set point initialized to 0 and never set since thermostat control type = 0
-
-	Schedule(TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand; // reset Tstat control schedule to dual thermostat control
-
-	// set up a back calculated load
-	// for the first few, TempIndZnLd() = 0.0
-	// LoadToHeatingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
-	// LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
-	int SetPointTempSchedIndex = SetPointSingleHeating(TempControlledZone(HeatZoneNum).ControlTypeSchIndx(TempControlledZone(HeatZoneNum).SchIndx_SingleHeatSetPoint)).TempSchedIndex;
-	Schedule(SetPointTempSchedIndex).CurrentValue = 20.0;
-	ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired = -1000.0; // cooling load
-	TempDepZnLd(HeatZoneNum) = ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
-
-	CalcZoneAirTempSetPoints();
-	CalcPredictedSystemLoad(HeatZoneNum, 1.0);
-
-	EXPECT_EQ(20.0, TempZoneThermostatSetPoint(HeatZoneNum));
-	EXPECT_EQ(-1000.0, ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
-	EXPECT_TRUE(CurDeadBandOrSetback(HeatZoneNum)); // Tstat should show there is no load on a single heating SP
-
-	SetPointTempSchedIndex = SetPointSingleHeating(TempControlledZone(HeatZoneNum).ControlTypeSchIndx(TempControlledZone(HeatZoneNum).SchIndx_SingleHeatSetPoint)).TempSchedIndex;
-	Schedule(SetPointTempSchedIndex).CurrentValue = 21.0;
-	ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired = 1000.0; // heating load
-	TempDepZnLd(HeatZoneNum) = ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
-
-	SetPointTempSchedIndex = SetPointSingleCooling(TempControlledZone(CoolZoneNum).ControlTypeSchIndx(TempControlledZone(CoolZoneNum).SchIndx_SingleCoolSetPoint)).TempSchedIndex;
-	Schedule(SetPointTempSchedIndex).CurrentValue = 23.0;
-	ZoneSysEnergyDemand(CoolZoneNum).TotalOutputRequired = -3000.0; // cooling load
-	TempDepZnLd(CoolZoneNum) = ZoneSysEnergyDemand(CoolZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
-
-	SetPointTempSchedIndex = SetPointSingleHeatCool(TempControlledZone(CoolHeatZoneNum).ControlTypeSchIndx(TempControlledZone(CoolHeatZoneNum).SchIndx_SingleHeatCoolSetPoint)).TempSchedIndex;
-	Schedule(SetPointTempSchedIndex).CurrentValue = 22.0;
-	ZoneSysEnergyDemand(CoolHeatZoneNum).TotalOutputRequired = -4000.0; // cooling load
-	TempDepZnLd(CoolHeatZoneNum) = ZoneSysEnergyDemand(CoolHeatZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
-
-	SetPointTempSchedIndex = SetPointDualHeatCool(TempControlledZone(DualZoneNum).ControlTypeSchIndx(TempControlledZone(DualZoneNum).SchIndx_DualSetPointWDeadBand)).CoolTempSchedIndex;
-	Schedule(SetPointTempSchedIndex).CurrentValue = 24.0;
-	SetPointTempSchedIndex = SetPointDualHeatCool(TempControlledZone(DualZoneNum).ControlTypeSchIndx(TempControlledZone(DualZoneNum).SchIndx_DualSetPointWDeadBand)).HeatTempSchedIndex;
-	Schedule(SetPointTempSchedIndex).CurrentValue = 20.0;
-	ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired = 2500.0; // heating load
-	TempDepZnLd(DualZoneNum) = ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
-
-	CalcZoneAirTempSetPoints();
-	CalcPredictedSystemLoad(HeatZoneNum, 1.0);
-
-	EXPECT_EQ(21.0, TempZoneThermostatSetPoint(HeatZoneNum));
-	EXPECT_FALSE(CurDeadBandOrSetback(HeatZoneNum)); // Tstat should show there is load on a single heating SP
-	EXPECT_EQ(1000.0, ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
-
-	CalcPredictedSystemLoad(CoolZoneNum, 1.0);
-
-	EXPECT_EQ(23.0, TempZoneThermostatSetPoint(CoolZoneNum));
-	EXPECT_FALSE(CurDeadBandOrSetback(CoolZoneNum)); // Tstat should show there is load on a single cooling SP
-	EXPECT_EQ(-3000.0, ZoneSysEnergyDemand(CoolZoneNum).TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
-
-	CalcPredictedSystemLoad(CoolHeatZoneNum, 1.0);
-
-	ASSERT_EQ(22.0, TempZoneThermostatSetPoint(CoolHeatZoneNum));
-	EXPECT_FALSE(CurDeadBandOrSetback(CoolHeatZoneNum)); // Tstat should show there is load on a single heating or cooling SP
-	EXPECT_EQ(-4000.0, ZoneSysEnergyDemand(CoolHeatZoneNum).TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
-
-	CalcPredictedSystemLoad(DualZoneNum, 1.0);
-
-	EXPECT_EQ(20.0, TempZoneThermostatSetPoint(DualZoneNum));
-	EXPECT_FALSE(CurDeadBandOrSetback(DualZoneNum)); // Tstat should show there is load on a dual SP
-	EXPECT_EQ(2500.0, ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
-
-	SetPointTempSchedIndex = SetPointDualHeatCool(TempControlledZone(DualZoneNum).ControlTypeSchIndx(TempControlledZone(DualZoneNum).SchIndx_DualSetPointWDeadBand)).CoolTempSchedIndex;
-	Schedule(SetPointTempSchedIndex).CurrentValue = 25.0;
-	ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired = 1000.0;
-	// LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
-	TempDepZnLd(DualZoneNum) = ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
-	TempIndZnLd(DualZoneNum) = 3500.0; // results in a cooling load
-
-	CalcZoneAirTempSetPoints();
-	CalcPredictedSystemLoad(DualZoneNum, 1.0);
-
-	EXPECT_EQ(25.0, TempZoneThermostatSetPoint(DualZoneNum));
-	EXPECT_FALSE(CurDeadBandOrSetback(DualZoneNum)); // Tstat should show there is load on a dual SP
-	EXPECT_EQ(-2500.0, ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired); // should show a cooling load
-
-	NumTempControlledZones = 0;
-	Zone.deallocate();
-	DeadBandOrSetback.deallocate();
-	CurDeadBandOrSetback.deallocate();
-	TempControlType.deallocate();
-	TempControlledZone.deallocate();
-	ZoneSysEnergyDemand.deallocate();
-	TempZoneThermostatSetPoint.deallocate();
-	ZoneSetPointLast.deallocate();
-	Setback.deallocate();
-	ZoneThermostatSetPointLo.deallocate();
-	ZoneThermostatSetPointHi.deallocate();
-	SNLoadPredictedRate.deallocate();
-	LoadCorrectionFactor.deallocate();
-	SNLoadPredictedHSPRate.deallocate();
-	SNLoadPredictedCSPRate.deallocate();
-	TempDepZnLd.deallocate();
-	TempIndZnLd.deallocate();
-	OccRoomTSetPointHeat.deallocate();
-	OccRoomTSetPointCool.deallocate();
+	CorrectZoneAirTemp(ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+	EXPECT_NEAR( 0.2444, Zone( 1 ).InfilOAAirChangeRateHM, 0.01 );
 
 }
