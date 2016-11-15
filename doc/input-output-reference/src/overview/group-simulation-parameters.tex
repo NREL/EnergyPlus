@@ -690,6 +690,14 @@ This field is used to alter the effective carbon dioxide capacitance of the zone
 
 This field is used to alter the effective generic contaminant capacitance of the zone air volume. This affects the transient calculations of zone air generic contaminantconcentration. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminantlevel of zone air from timestep to timestep.
 
+\paragraph{Field: Name}\label{field-name-hybrid-model}
+
+The name of the ZoneCapacitanceMultiplier:ResearchSpecial object.
+
+\paragraph{Field: Zone or ZoneList Name}\label{field-Zone-or-zonelist-name-hybrid-model}
+
+This field is the name of the thermal zone (ref: Zone) and attaches a particular zone capacitance multiplier to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then capacity multiplier is applied to each of the zones in the zone list.
+
 \subsection{SimulationControl}\label{simulationcontrol}
 
 The input for SimulationControl allows the user to specify what kind of calculations a given EnergyPlus simulation will perform. For instance the user may want to perform one or more of the sizing calculations but not proceed to an annual weather file simulation. Or the user might have all flow rates and equipment sizes already specified and desire an annual weather without any preceding sizing calculations. Sizing runs, even for large projects, are quickly run -- they do not add much to the overall simulation time. The SimulationControl input allows all permutations of run selection by means of 5 yes/no inputs.
