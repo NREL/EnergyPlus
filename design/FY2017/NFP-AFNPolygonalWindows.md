@@ -83,7 +83,9 @@ lgu1234  an hour ago   National Renewable Energy Laboratory member
 
 @jasondegraw You are right. I am going to make a change.
 
+###More communications
 
+More communications are available in GitHub: https://github.com/NREL/EnergyPlus/pull/5924 
 
 ## Overview ##
 
@@ -287,13 +289,13 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 \subsubsection{Field: Equivalent Rectangular Shape Choice}\label{equivalent-rectangular-shape- choice}bold red</span>**
 
 **<span style="color:red;">
-This field is applied to a non-rectangular window or door. The equivalent surface has the same area as the non-rectangular one. When Height is entered, the equivalent width is equal to the area divided by the height. When "Aspect Ratio from Input" is entered, the equivalent height is equal to Square Root of Area divided by AspectRatio. The equivalent width is equal to the equivalent height * AspectRatio. When "Parent Surface Aspect Ratio" is entered, the equivalent height is equal to Square Root of Area divided by the parent surface AspectRatio. The equivalent width is equal to the equivalent height * parant surface AspectRatio. </span>**
+This field is applied to a non-rectangular window or door. The equivalent surface has the same area as the non-rectangular one. When PolygonHeight is entered, the equivalent width is equal to the area divided by the PolygonHeight.  When BaseSurfaceAspectRatio is entered, the equivalent height is equal to Square Root of Area divided by the base surface aspect ratio. The equivalent width is equal to the equivalent height * base surface aspect ratio. When UserDefinedAspectRatio is entered, the equivalent height is equal to Square Root of Area divided by UserDefinedAspectRatio. The equivalent width is equal to the equivalent height * user defined aspect ratio.</span>**
 
 **<span style="color:red;">
-\subsubsection{Field: Aspect Ratio}\label{equivalent-rectangular-aspect-ratio}bold red</span>**
+\subsubsection{Field: Equivalent Rectangle Aspect Ratio}\label{equivalent-rectangular-aspect-ratio}bold red</span>**
 
 **<span style="color:red;">
-This field applies only if Equivalent Rectangular Shape Choice = Aspect Ratio from Input. This value must be greater than zero, with the default being 1.0. </span>**
+This field applies only if Equivalent Rectangular Shape Choice = UserDefinedAspectRatio. This value must be greater than zero, with the default being 1.0. </span>**
    
 IDF examples are provided below:
 
@@ -458,20 +460,20 @@ Revisions to the IDD are noted as **<span style="color:red;">bold red</span>** n
       \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required.
 **<span style="color:red;">
-  	A8, \field Equivalent Rectangular Shape Choice </span>**
+  	A8, \field Equivalent Rectangular Method </span>**
 
       \type choice
-      \key Aspect Ratio from Input
-      \Key Height Based
-      \Key Parent Surface Aspect Ratio
-      \default Height Based
+      \key PolygonHeight
+      \Key BaseSurfaceAspectRatio
+      \Key UserDefinedAspectRatio
+      \default PolygonHeight
       \note This field is applied to a non-rectangular window or door. The equivalent shape has
       \note the same area as a polygonal window or door. 
 
 **<span style="color:red;">
-  	N7; \field Aspect Ratio </span>**
-       \note This field is used when Aspect Ratio from Input is entered in the Equivalent 
-       \note Rectangular Shape Choice field.
+  	N7; \field Equivalent Rectangle Aspect Ratio </span>**
+       \note This field is used when UserDefinedAspectRatio is entered in the Equivalent 
+       \note Rectangular Method field.
        \units dimensionless
        \type real
        \minimum> 0.0
