@@ -288,6 +288,12 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 
 **<span style="color:red;">
 This field is applied to a non-rectangular window or door. The equivalent surface has the same area as the non-rectangular one. When Height is entered, the equivalent width is equal to the area divided by the height. When "Aspect Ratio from Input" is entered, the equivalent height is equal to Square Root of Area divided by AspectRatio. The equivalent width is equal to the equivalent height * AspectRatio. When "Parent Surface Aspect Ratio" is entered, the equivalent height is equal to Square Root of Area divided by the parent surface AspectRatio. The equivalent width is equal to the equivalent height * parant surface AspectRatio. </span>**
+
+**<span style="color:red;">
+\subsubsection{Field: Aspect Ratio}\label{equivalent-rectangular-aspect-ratio}bold red</span>**
+
+**<span style="color:red;">
+This field applies only if Equivalent Rectangular Shape Choice = Aspect Ratio from Input. This value must be greater than zero, with the default being 1.0. </span>**
    
 IDF examples are provided below:
 
@@ -452,7 +458,7 @@ Revisions to the IDD are noted as **<span style="color:red;">bold red</span>** n
       \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required.
 **<span style="color:red;">
-  	A8; \field Equivalent Rectangular Shape Choice </span>**
+  	A8, \field Equivalent Rectangular Shape Choice </span>**
 
       \type choice
       \key Aspect Ratio from Input
@@ -462,6 +468,14 @@ Revisions to the IDD are noted as **<span style="color:red;">bold red</span>** n
       \note This field is applied to a non-rectangular window or door. The equivalent shape has
       \note the same area as a polygonal window or door. 
 
+**<span style="color:red;">
+  	N7; \field Aspect Ratio </span>**
+       \note This field is used when Aspect Ratio from Input is entered in the Equivalent 
+       \note Rectangular Shape Choice field.
+       \units dimensionless
+       \type real
+       \minimum> 0.0
+       \default 1.0
 
 
 ## Outputs Description ##
