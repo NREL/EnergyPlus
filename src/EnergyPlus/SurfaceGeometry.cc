@@ -8471,11 +8471,14 @@ namespace SurfaceGeometry {
 
 				// Processing of 4-sided but non-rectangular Window, Door or GlassDoor, for use in calc of convective air flow.
 				if ( ! isRectangle( ThisSurf ) ) {
-					ShowWarningError( RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:" );
-					ShowContinueError( "Surface=" + Surface( ThisSurf ).Name + " is transformed into an equivalent rectangular surface with the same area and aspect ratio. ");
-					
+
 					// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio. 
 					MakeEquivalentRectangle( ThisSurf, ErrorsFound );
+
+					if( DisplayExtraWarnings ){
+						ShowWarningError( RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:" );
+						ShowContinueError( "Surface=" + Surface( ThisSurf ).Name + " is transformed into an equivalent rectangular surface with the same area and aspect ratio. ");
+					}
 				}
 
 				Xpsv( 1 ) = XLLC;
