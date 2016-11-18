@@ -65,6 +65,7 @@
 #include <fstream>
 #include <ostream>
 #include <string>
+#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -1673,12 +1674,13 @@ namespace OutputProcessor {
 		NumCustomMeters = GetNumObjectsFound( cCurrentModuleObject );
 
         //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
-		std::vector<std::string> namesOfMeterCustom;
+		std::unordered_set<std::string> namesOfMeterCustom;
+		namesOfMeterCustom.reserve(NumCustomMeters);
+
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			GetObjectItem (cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-			namesOfMeterCustom.push_back(cAlphaArgs(1));
+			namesOfMeterCustom.emplace(MakeUPPERCase(cAlphaArgs(1)));
 		}
-
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1700,12 +1702,9 @@ namespace OutputProcessor {
 			// check if any fields reference another Meter:Custom
 			int found = 0;
 			for ( fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2 ) {
-				for ( auto nameOfMeterCustom : namesOfMeterCustom ) {
-					if ( SameString (cAlphaArgs (fldIndex), nameOfMeterCustom)) {
-						found = fldIndex;
-						break;
-					}
-				if ( found != 0) break;
+				if ( namesOfMeterCustom.find(MakeUPPERCase(cAlphaArgs(fldIndex) ) ) != namesOfMeterCustom.end()) {
+					found = fldIndex;
+					break;
 				}
 			}
 			if ( found != 0 ) {

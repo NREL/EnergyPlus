@@ -3355,7 +3355,7 @@ namespace EnergyPlus {
 			} ) );
 
 		}
-		TEST_F (SQLiteFixture, OutputProcessor_GenOutputVariablesAuditReport)
+		TEST_F (EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
 		{
 			std::string const idf_objects = delimited_string ({
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
@@ -3401,7 +3401,6 @@ namespace EnergyPlus {
 			TimeValue (1).CurMinute = 50;
 			TimeValue (2).CurMinute = 50;
 
-			EnergyPlus::sqlite = std::move (sqlite_test);
 			GetReportVariableInput ();
 			SetupOutputVariable ("Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
 			Real64 light_consumption = 999;
