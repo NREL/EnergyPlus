@@ -453,11 +453,7 @@ namespace FaultsManager {
 					if( CoilNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
-					} else {
-					// Link the coil with the fault model
-						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATFlag = true;
-						WaterCoils::WaterCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
-					}
+					} 
 					
 					// Read in Water Coil Controller Name
 					FaultsCoilSATSensor( jFault_CoilSAT ).WaterCoilControllerName = cAlphaArgs( 6 );

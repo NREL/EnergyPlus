@@ -80461,7 +80461,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \object-list HeatingCoilsGasMultiStage
        \object-list HeatingCoilsDesuperheater
    A6, \field Water Coil Controller Name
-       \note Enter the name of the coil affected
+       \note Enter the name of controller for the water coil affected
        \required for water coils
        \type object-list
        \object-list WaterCoilControllers
