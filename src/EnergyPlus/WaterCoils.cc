@@ -1668,6 +1668,7 @@ namespace WaterCoils {
 		Real64 DesCoilExitTemp; // design coil exit temperature [C]
 		Real64 Cp;
 		bool NomCapUserInp = false; // flag for whether user has onput a nominal heating capacity
+		int SizingMethod; // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
 
 		ErrorsFound = false;
 		PltSizCoolNum = 0;
@@ -2001,6 +2002,8 @@ namespace WaterCoils {
 				} else {
 					SizingType = WaterHeatingCapacitySizing;
 				}
+				FieldNum = 3; //  N3 , \field Rated Capacity
+				SizingString = WaterCoilNumericFields( CoilNum ).FieldNames( FieldNum ) + " [W]";
 				RequestSizing( CompType, CompName, SizingType, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil( CoilNum ).DesWaterHeatingCoilRate = TempSize;
 				WaterCoil( CoilNum ).DesTotWaterCoilLoad = TempSize;
@@ -2019,21 +2022,26 @@ namespace WaterCoils {
 
 				FieldNum = 2; // N2 , \field Maximum Water Flow Rate
 				SizingString = WaterCoilNumericFields( CoilNum ).FieldNames( FieldNum ) + " [m3/s]";
-				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
+				TempSize = WaterCoil( CoilNum ).MaxWaterVolFlowRate;
+				SizingMethod = HeatingWaterflowSizing;
+
+				if( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
 					if ( WaterCoil( CoilNum ).DesTotWaterCoilLoad > SmallLoad ) {
 						WaterCoil( CoilNum ).MaxWaterVolFlowRate = DataCapacityUsedForSizing
 							/ ( Cp * rho * ( WaterCoil( CoilNum ).DesInletWaterTemp - WaterCoil( CoilNum ).DesOutletWaterTemp ) );
 					} else {
 						WaterCoil( CoilNum ).MaxWaterVolFlowRate = 0.0;
 					}
-					ReportSizingOutput( CompType, CompName, SizingString, WaterCoil( CoilNum ).MaxWaterVolFlowRate );
-				}  else {
-					TempSize = WaterCoil( CoilNum ).MaxWaterVolFlowRate;
-					RequestSizing( CompType, CompName, HeatingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName );
-					WaterCoil( CoilNum ).MaxWaterVolFlowRate = TempSize;
+					SizingMethod = AutoCalculateSizing;
+					DataConstantUsedForSizing = WaterCoil( CoilNum ).MaxWaterVolFlowRate;
+					DataFractionUsedForSizing = 1.0;
 				}
-				DataWaterFlowUsedForSizing = WaterCoil ( CoilNum ).MaxWaterVolFlowRate;
-				if ( WaterCoil ( CoilNum ).MaxWaterVolFlowRate <= 0.0 ) {
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName );
+				WaterCoil( CoilNum ).MaxWaterVolFlowRate = TempSize;
+				DataWaterFlowUsedForSizing = WaterCoil( CoilNum ).MaxWaterVolFlowRate;
+				DataConstantUsedForSizing = 0.0; // reset these in case NomCapUserInp was true
+				DataFractionUsedForSizing = 0.0;
+				if( WaterCoil( CoilNum ).MaxWaterVolFlowRate <= 0.0 ) {
 //					MaxWaterVolFlowRateDes = 0.0;
 					ShowWarningError( "The design coil load is zero for Coil:Heating:Water " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "The autosize value for maximum water flow rate is zero" );
