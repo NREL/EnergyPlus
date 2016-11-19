@@ -866,7 +866,6 @@ namespace WaterCoils {
 		Real64 const SmallNo( 1.e-9 ); // SmallNo number in place of zero
 		int const itmax( 10 );
 		int const MaxIte( 500 ); // Maximum number of iterations
-		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const RoutineName( "InitWaterCoil" );
 		static gio::Fmt fmtA( "(A)" );
 
@@ -910,7 +909,6 @@ namespace WaterCoils {
 		Real64 FinDiamVar;
 		Real64 TubeToFinDiamRatio;
 
-		Real64 RhoAirStd; // density of air at standard conditions
 		Real64 CpAirStd; // specific heat of air at std conditions
 		int SolFla; // Flag of solver
 		Real64 UA0; // lower bound for UA

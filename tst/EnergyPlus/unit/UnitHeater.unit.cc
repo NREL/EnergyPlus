@@ -1157,7 +1157,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		// calculate hot water coil design capacity
 		HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
 		EXPECT_NEAR( HWCoilDesignCapacity, WaterCoils::WaterCoil( CoilNum ).DesWaterHeatingCoilRate, 1.0 );
-		EXPECT_NEAR( 111.02, WaterCoils::WaterCoil( CoilNum ).UACoil, 0.02 );
+		EXPECT_NEAR( 111.27, WaterCoils::WaterCoil( CoilNum ).UACoil, 0.02 );
 
 }
 
