@@ -4894,7 +4894,11 @@ namespace DaylightingManager {
 					refName = curRefPt.Name;
 					PreDefTableEntry(pdchDyLtZone, refName, daylCntrl.ZoneName);
 					PreDefTableEntry(pdchDyLtCtrlName, refName, daylCntrl.Name );
-					PreDefTableEntry( pdchDyLtKind, refName, "Detailed" );
+					if (daylCntrl.DaylightMethod == SplitFluxDaylighting ){
+						PreDefTableEntry (pdchDyLtKind, refName, "SplitFlux");
+					} else {
+						PreDefTableEntry (pdchDyLtKind, refName, "DElight");
+					}
 					// (1=continuous, 2=stepped, 3=continuous/off)
 					if ( daylCntrl.LightControlType == Continuous ) {
 						PreDefTableEntry( pdchDyLtCtrlType, refName, "Continuous" );

@@ -1443,7 +1443,7 @@ namespace OutputReportPredefined {
 
 		pdchDyLtZone = newPreDefColumn( pdstDaylight, "Zone" );
 		pdchDyLtCtrlName = newPreDefColumn (pdstDaylight, "Control Name");
-		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Type" ); //detailed or DElight
+		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Method" ); //detailed or DElight
 		pdchDyLtCtrlType = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
 		pdchDyLtFrac = newPreDefColumn( pdstDaylight, "Fraction Controlled" );
 		pdchDyLtWInst = newPreDefColumn( pdstDaylight, "Lighting Installed in Zone [W]" );
