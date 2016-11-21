@@ -5,6 +5,7 @@ Airflow Network Modeling Changes for Polygonal Windows Support
 
 **Florida Solar Energy Center**
 
+ - Nov. 21, 2016, First revision of Design Document 
  - Nov. 17, 2016, Third Edition Design Document 
  - Nov. 10, 2016, Second Edition 
  - Original version on Oct. 28, 2016
@@ -506,9 +507,9 @@ NA
 
 ## Design Document ##
 
-This new feature will revise several modules: DataAirflowNetwork, AirflowNetworkBalanceManager, and AirfowNetworkSolver.
+This new feature will revise several modules: DataAirflowNetwork, and AirflowNetworkBalanceManager.
 
-The revision of DataAirflowNetwork is to add 5 members in the struct MultizoneSurfaceProp to handle new fields for polygonal surfaces. The revision of AirflowNetworkBalanceManager will involve GetInput to read new fields of the AirflowNetwork:MultiZone:Surface object, and calculate equivalent width and height for polygonal surfaces. Then the equivalent width and height of a polygonal surface will be used in 3 functions in AirflowNetworkSolver for 3 large opening components for polygonal surfaces.   
+The revision of DataAirflowNetwork is to add 3 members in the struct MultizoneSurfaceProp to handle new fields for polygonal surfaces. The revision of AirflowNetworkBalanceManager will involve GetInput to read new fields of the AirflowNetwork:MultiZone:Surface object, and calculate equivalent width and height for polygonal surfaces. 
 
 ### AirflowNetworkBalanceManager
 
@@ -545,8 +546,8 @@ End If
 
 ##### PolygonHeight
 
-Equivalent Height = PolygonHeight
-Equivalent Width = Area / PolygonHeight
+Height = PolygonHeight
+Width = Area / PolygonHeight
 
 ##### BaseSurfaceAspectRatio
 
@@ -554,8 +555,8 @@ Note: The aspect ratio of a rectangle is the ratio of its longer side to its sho
 
 If base surface is rectangular
 
-Equivalent Width = sqrt ( Area * BaseAspectRatio )
-Equivalent Height = Area /  Equivalent Width
+Width = sqrt ( Area * BaseAspectRatio )
+Height = Area /  Equivalent Width
 
 Else
 
@@ -565,8 +566,8 @@ End if
 
 ##### UserDefinedAspectRatio
 
-Equivalent Width = sqrt ( Area * UserAspectRatio )
-Equivalent Height = Area /  Equivalent Width
+Width = sqrt ( Area * UserAspectRatio )
+Height = Area /  Equivalent Width
 
 Here are actions for special cases:
 
@@ -583,37 +584,9 @@ When BaseSurfaceAspectRatio is entered and base surface is not rectangular, Poly
 
 #### struct MultizoneSurfaceProp
 
-Add 5 members with default values to handle new fields
+Add 3 members with default values to handle new fields
 
 		bool NonRectangular( false ); // True if this surface is not rectangular
-		Real64 EquivHeight( 0.0 ); // Equivalent height for non-rectangle surface
-		Real64 EquivWidth( 0.0 ); // Equivalent width for non-rectangle surface
 		int EquivRecMethod( 1 ); // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
 		Real64 EquivRecUserAspRatio( 1.0 ); // user input value when EquivRecMethod = 3 
  
-### AirflowNetworkSolver
-
-
-#### AFEDOP (DetailedOpening), AFESOP (SimpleOpening), and AFEHOP (HorizontalOpening)
-
-AirflowNetwork:MultiZone:Component:DetailedOpening
-AirflowNetwork:MultiZone:Component:SimpleOpening
-AirflowNetwork:MultiZone:Component:HorizontalOpening   
-
-Existing
-
-		Width = MultizoneSurfaceData( IL ).Width;
-		Height = MultizoneSurfaceData( IL ).Height;
-
-will be replaced by
-
-If ( MultizoneSurfaceData( IL ).NonRectangular ) Then
-
-		Width = MultizoneSurfaceData( IL ).EquivWidth;
-		Height = MultizoneSurfaceData( IL ).EquivHeight;
-
-Else
-
-		Width = MultizoneSurfaceData( IL ).Width;
-		Height = MultizoneSurfaceData( IL ).Height;
-End If
