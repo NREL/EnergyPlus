@@ -518,8 +518,8 @@ The revision of DataAirflowNetwork is to add 3 members in the struct MultizoneSu
 Add 3 parameter to define choices of Equivalent Rectangle Method in the module
 
 	int const EquivRec_Height( 1 ); // Effective rectangle polygonal height selection
-	int const EquivRec_BaseAspRatio( 2 ); // Effective rectangle base surface aspect ratio selection
-	int const EquivRec_UserAspRatio( 3 ); // Effective rectangle user input aspect ratio selection
+	int const EquivRec_BaseAspectRatio( 2 ); // Effective rectangle base surface aspect ratio selection
+	int const EquivRec_UserAspectRatio( 3 ); // Effective rectangle user input aspect ratio selection
 
 #### Revise a GetInout section of AirflowNetwork:MultiZone:Surface
 
@@ -588,5 +588,5 @@ Add 3 members with default values to handle new fields
 
 		bool NonRectangular( false ); // True if this surface is not rectangular
 		int EquivRecMethod( 1 ); // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
-		Real64 EquivRecUserAspRatio( 1.0 ); // user input value when EquivRecMethod = 3 
+		Real64 EquivRecUserAspectRatio( 1.0 ); // user input value when EquivRecMethod = 3 
  
