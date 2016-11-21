@@ -286,8 +286,9 @@ namespace OutputReportPredefined {
 	extern int pdchExLtConsump;
 	extern int pdstDaylight;
 	extern int pdchDyLtZone;
+	extern int pdchDyLtCtrlName;
 	extern int pdchDyLtKind;
-	extern int pdchDyLtCtrl;
+	extern int pdchDyLtCtrlType;
 	extern int pdchDyLtFrac;
 	extern int pdchDyLtWInst;
 	extern int pdchDyLtWCtrl;

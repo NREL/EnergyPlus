@@ -295,8 +295,9 @@ namespace OutputReportPredefined {
 	int pdchExLtConsump;
 	int pdstDaylight;
 	int pdchDyLtZone;
+	int pdchDyLtCtrlName;
 	int pdchDyLtKind;
-	int pdchDyLtCtrl;
+	int pdchDyLtCtrlType;
 	int pdchDyLtFrac;
 	int pdchDyLtWInst;
 	int pdchDyLtWCtrl;
@@ -914,8 +915,9 @@ namespace OutputReportPredefined {
 		pdchExLtConsump = 0;
 		pdstDaylight = 0;
 		pdchDyLtZone = 0;
+		pdchDyLtCtrlName = 0;
 		pdchDyLtKind = 0;
-		pdchDyLtCtrl = 0;
+		pdchDyLtCtrlType = 0;
 		pdchDyLtFrac = 0;
 		pdchDyLtWInst = 0;
 		pdchDyLtWCtrl = 0;
@@ -1440,8 +1442,9 @@ namespace OutputReportPredefined {
 		pdstDaylight = newPreDefSubTable( pdrLighting, "Daylighting" );
 
 		pdchDyLtZone = newPreDefColumn( pdstDaylight, "Zone" );
+		pdchDyLtCtrlName = newPreDefColumn (pdstDaylight, "Control Name");
 		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Type" ); //detailed or DElight
-		pdchDyLtCtrl = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
+		pdchDyLtCtrlType = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
 		pdchDyLtFrac = newPreDefColumn( pdstDaylight, "Fraction Controlled" );
 		pdchDyLtWInst = newPreDefColumn( pdstDaylight, "Lighting Installed in Zone [W]" );
 		pdchDyLtWCtrl = newPreDefColumn( pdstDaylight, "Lighting Controlled [W]" );

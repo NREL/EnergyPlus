@@ -4892,15 +4892,16 @@ namespace DaylightingManager {
 						}
 					}
 					refName = curRefPt.Name;
-					PreDefTableEntry( pdchDyLtZone, refName, daylCntrl.Name );
+					PreDefTableEntry(pdchDyLtZone, refName, daylCntrl.ZoneName);
+					PreDefTableEntry(pdchDyLtCtrlName, refName, daylCntrl.Name );
 					PreDefTableEntry( pdchDyLtKind, refName, "Detailed" );
 					// (1=continuous, 2=stepped, 3=continuous/off)
 					if ( daylCntrl.LightControlType == Continuous ) {
-						PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous" );
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Continuous" );
 					} else if ( daylCntrl.LightControlType == Stepped ) {
-						PreDefTableEntry( pdchDyLtCtrl, refName, "Stepped" );
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Stepped" );
 					} else if ( daylCntrl.LightControlType == ContinuousOff ) {
-						PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous/Off" );
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Continuous/Off" );
 					}
 					PreDefTableEntry( pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit( refPtNum ) );
 					PreDefTableEntry( pdchDyLtWInst, refName, rLightLevel );
