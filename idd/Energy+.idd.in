@@ -19985,8 +19985,7 @@ Lights,
        \maximum 1.0
        \default 0
   N7 , \field Fraction Replaceable
-       \note For Daylighting:Controls and Daylighting:DElight:Controls,
-       \note must be 0 or 1:  0 = no dimming control, 1 = full dimming control
+       \note For Daylighting:Controls must be 0 or 1:  0 = no dimming control, 1 = full dimming control
        \type real
        \minimum 0.0
        \maximum 1.0
