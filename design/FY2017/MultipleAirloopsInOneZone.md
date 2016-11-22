@@ -4,9 +4,15 @@ Allow Multiple Air Loops to One Thermal Zone
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - October 28, 2016 - Initial NFP
- - November 7, 2016 - Revised NFP
+ - November 10, 2016 - Revised NFP
+ - November 22, 2016 - Draft final NFP
+	 - Simplified proposal for new DesignSpecification:AirTerminal:Sizing object
+	 - Add new field to AirLoopHVAC to control return flows
+	 - Add new fields for Lights and Refrigeration:Case objects return heat gain
+	 - Add new outputs
+	 - Add method to allocate return flows to multiple loops
  
-*Reviewers - Hong, Horowitz, Gu, Scheier, Merket, Winkler
+*Reviewers - Hong, Griffith, Gu, Buhl, Raustad, Horowitz, Merket, Winkler, Scheier
 
 ## Justification for New Feature ##
 
@@ -28,15 +34,17 @@ Rather than develop more workaround components, it is time to remove the restric
 
 ## E-mail and  Conference Call Conclusions ##
 
-1. Add output variables and/or table report to summarize how various air loops operate in a zone? E.g., what loads they meet, how many hours each loop operate.
+1. Add output variables and/or table report to summarize how various air loops operate in a zone. E.g., what loads they meet, how many hours each loop operate.
 
 2. Clarify that control and load sharing issues between multiple loops serving the same zone will be part of Phase II "Allow Multiple/Partial HVAC in One Zone" (also funded for FY17).
 
-3. Add a table to clarify the relationships between overlapping fields in the proposed DesignSpecification:AirTerminal:Sizing object vs. Sizing:Zone, Sizing:System, AirTerminal:SingleDuct:VAV:NoReheat and AirTerminal:SingleDuct:VAV:Reheat, etc. This may result in changes to the proposed DesignSpecification:AirTerminal:Sizing object.
+3. Minimize the amount of fields in the new DesignSpecification:AirTerminal:Sizing object.  Focus only on changes from the base Sizing:Zone values.
+
+4. Need more details on how return flows will be determined.
 
 ## Overview ##
 
-This new feature will remove the limitation of one airloop (`AirLoopHVAC`) system per zone, and will add options for user-control of sizing and return air flow allocation. Currently, EnergyPlus issues a fatal error if more than one `ZoneHVAC:AirDistributionUnit` or `AirTerminal:SingleDuct:Uncontrolled` are connected to a given zone:
+This new feature will remove the limitation of one airloop (`AirLoopHVAC`) system per zone, and will add options for user-control of sizing and return air flow allocation. Currently, EnergyPlus issues a fatal error if both a `ZoneHVAC:AirDistributionUnit` and a `AirTerminal:SingleDuct:Uncontrolled` are connected to a given zone:
 
 ```
 ** Severe  ** In zone "ZONE ONE" there are too many air terminals served by AirLoopHVAC systems.
@@ -44,11 +52,15 @@ This new feature will remove the limitation of one airloop (`AirLoopHVAC`) syste
 **  Fatal  ** Preceding condition causes termination
 ```
 
+Surprisingly, there is no check for more than one `ZoneHVAC:AirDistributionUnit` in the same zone.
+
 Also, EnergyPlus currently allows only one Return Air Node per zone.
 
 This feature will remove these limitations and allow any number of airloop systems to serve a given zone.
 
 If time allows, this work will also remove the current requirement that a return path must always be described even if it does not exist in the system.  For example, most DOAS systems and direct-fired heaters only supply outdoor air and do not have any return path.
+
+Load-sharing and control issues will be addressed in a related development project, "Allow Multiple/Partial HVAC in One Zone" (also funded for FY17).
 
 ## Approach ##
 
@@ -57,86 +69,60 @@ If time allows, this work will also remove the current requirement that a return
 ### 2. Allow more than one return air node in a zone ###
 Change the `Zone Return Air Node Name` field to allow a NodeList, similar to the way that zone inlet nodes are input.
 
+### 3. Add a new field to AirloopHVAC to specify loop return air flow fraction
+To model pressurized systems and to help allocate return flows among multiple airloops, it is proposed that a new field be added to control the loop return flow rate as a fraction of the loop supply flow rate.
 
-### 3. Revise return air flow and air loop flow balance calculations
-Currently, the zone return air node is passive and receives whatever flow is left over from total supply less total exhaust.  There is also an option to control the return air flow using the `Zone Return Air Flow Rate Fraction Schedule Name` and `Zone Return Air Flow Rate Basis Node or NodeList Name` fields.
+### 4. Revise return air flow and air loop flow balance calculations
+Currently, the zone return air node is passive and receives whatever flow is left over from total supply less total unbalanced exhaust for that zone.  There is also an option to control the return air flow using the `Zone Return Air Flow Rate Fraction Schedule Name` and `Zone Return Air Flow Rate Basis Node or NodeList Name` fields. Also, each airloop checks the total supply vs unbalanced exhaust on the loop and balances the loop by adjusting return node flows proportionally to match.  The heart of these calculations is ZoneEquipmentManager::CalcZoneMassBalance.
 
-### 4. Allocate return air heat gains to specific return air nodes
-This applies to return air heat gain from lights and loss from refrigeration equipment.
+The return air flow will be allocated as follows, similar to the current return air flow calculations with some added or modified steps:
 
-### 4. Revise other places that assume a single airloop is associated with a zone
-Preliminary code review shows that there are several places that use `ZoneEquipConfig::AirLoopNum`.
+  - Step 1 - Set known return node flows
+	  - Set any return nodes that have a flow rate specified in the ZoneHVAC:EquipmentConnections object. (*existing step*)
+	  - For an air loop without an outdoor air system, set the return node flow equal to the corresponding supply air inlet multiplied by the system return flow fraction (input value from AirloopHVAC). (*new step*)
+  - Step 2 - Calculate remaining unallocated return air flow for each zone (*modified step*)
+      - UnallocatedReturn = TotalSupply - UnbalancedExhaust - KnownReturnFlows
+  - Step 3 - Set remaining return node flows (*new step*)
+      - Set remaining return node flows proportional to the supply flow to that zone from the corresponding airloop.  
+      - For example, if Zone 1 is supplied with 0.8 m3/s from Air Loop A and 0.2 m3/s from Air Loop B, then allocate 80% of the remaining return flow to the return air node connected to Loop A and 20% to Loop B.
+  - Step 4 - Allocate unbalanced exhaust air flows to each air loop (*modified step*)
+      - For a given zone, the unbalanced exhaust air flow is distributed to any air loop that has an outdoor air system in proportion to the loop's supply flow to that zone. Air systems without an outdoor air inlet are excluded.
+  - Step 5 - Balance each air loop (*existing step*)
+      - LoopReturn0 = Sum of Return Node flow rates on the loop after Steps 1-4.
+      - LoopReturn = LoopSupply - LoopExhaust
+      - For each return node on the loop AdjustedReturnFlow = ReturnFlow*LoopReturn/LoopReturn0
 
-### 5. Allow different sizing specifications for different air terminal units
-The present sizing inputs apply a single `Sizing:Zone` object to a given zone to calculate the design load and airflow rates.  Then ZoneHVAC:* equipment (such as fan coils or PTACs) can reference a `DesignSpecification:ZoneHVAC:Sizing` object to scale it's flow rates and capacities based on the results from the `Sizing:Zone` calculations or entirely on user-specified values or values based on floor area.  But multiple air terminals in the same zone will typically need to use different supply air temperatures for sizing.
+### 5. Allocate return air heat gains to specific return air nodes
+This applies to return air heat gain from lights and refrigerated case under-case return.
 
-Here are examples of the current zone sizing objects:
+### 6. Revise other places that assume a single airloop is associated with a zone
+Preliminary code review shows that there are several places that use `ZoneEquipConfig::AirLoopNum`.  More details to follow in the design doc.
 
-```
-  Sizing:Zone,
-    West Zone,               !- Zone or ZoneList Name
-    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Zone Cooling Design Supply Air Temperature {C}
-    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50.,                     !- Zone Heating Design Supply Air Temperature {C}
-    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA West Zone,       !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Zone Heating Sizing Factor
-    0.0,                     !- Zone Cooling Sizing Factor
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
-```
+### 7. Allow different sizing specifications for different air terminal units
+The present sizing inputs apply a single `Sizing:Zone` object to a given zone to calculate the design loads and airflow rates for cooling, heating, and outdoor air.
 
-```
-  DesignSpecification:ZoneHVAC:Sizing,
-    FanCoilDesignSpec1,      !- Name
-    SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
-    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
-    0.0,                     !- No Load Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- No Load Fraction of Cooling Supply Air Flow Rate
-    ,                        !- No Load Fraction of Heating Supply Air Flow Rate
-    SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
-    autosize,                !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Heating Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    CapacityPerFloorArea,    !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W}
-    156.89549,               !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Heating Design Capacity
+ZoneHVAC:* equipment (such as fan coils or PTACs) can reference a `DesignSpecification:ZoneHVAC:Sizing` object to customize the sizing for a given ZoneHVAC unit.  A similar approach is proposed for air terminal units.
+
+
+A new object named `DesignSpecification:AirTerminal:Sizing` will be added to allow specification of any required differences from the base Sizing:Zone specifications. 
+
+A new optional field will be added at the end of every `AirTerminal:*` object to reference a `DesignSpecification:AirTerminal:Sizing` object as needed.
+
+### 8. Allow an airloop with no return path *(if budget allows)*
+This would remove any checks that throw errors when there is no return path.  Beyond that the airloop should function normally with zero flow at the supply side inlet node.  Input changes would include making the following nodes optional with a blank allowed:
 
 ```
+  AirLoopHVAC,
+    ,  !- Demand Side Outlet Node Name
 
-In the most general sense, an air terminal unit in a zone with multiple air terminal units would require data from both of these objects in order to size correctly - it could have different supply air temperature, OA requirements, and scalable sizing factors. 
+  OutdoorAir:Mixer,
+    ;  !- Return Air Stream Node Name
 
-The initial proposal is to add a new object named `DesignSpecification:AirTerminal:Sizing` which is a combination of the `Sizing:Zone` object plus the airflow fields from the `DesignSpecification:ZoneHVAC:Sizing` object.
+  ZoneHVAC:EquipmentConnections,
+    ;  !- Zone Return Air Node Name
+```
+The `AirLoopHVAC` Supply Side Inlet Node Name would still be used, because the main airloop branch uses that as its first inlet node.  This could be an outdoor air node in which case the entire outdoor air subsystem, mixer and OA controller would not be necessary.
 
-Another option would be to allow names Sizing:Zone object which are not associated with a particular zone.
-
-In either case, a new field would be added at the end of the AirTerminal objects to reference a `DesignSpecification:AirTerminal:Sizing` or `Sizing:Zone` object.
-
-
-### 6. *Optional* - Allow an airloop with no return path
 
 ## Testing/Validation/Data Sources ##
 
@@ -144,65 +130,122 @@ Build example files and check results.
 
 ## Input Output Reference Documentation ##
 
-## Input Description ##
-No transition required. One new object, and some minor field changes in existing objects.
+### Input Description ###
+No transition required. One new object, and some new fields at the end of some existing objects.
 
-### Modified: ZoneHVAC:EquipmentConnections ###
+### Modified Object: ZoneHVAC:EquipmentConnections ###
 * Change the current `Zone Return Air Node Name` to `Zone Return Air Node or NodeList Name`.
 
-* Change the following fields to apply only to the first zone return air node 
-
-* OR make these an extensible group:
+* Change the following fields to be an extensible group:
 
 ```
 Zone Return Air Flow Rate Fraction Schedule Name
 Zone Return Air Flow Rate Basis Node or NodeList Name
 ```
 
+### Modified Object: AirloopHVAC###
+*New Field:: Return Air Flow Fraction of Supply Air Flow*
+
+This field specified the air loop return air flow as a fraction of the supply flow.  It may be used to set zero return air flow for a DOAS system or to model a pressurized system where the return flow is a fraction of the supply flow. The return air flow rate will never be greater than the current supply air flow rate multiplied by this fraction.  It may be less if there is unbalanced exhaust from any zones served by this airloop. The default is 1.0.
+
+```
+  AirLoopHVAC,
+    VAV Sys 1,               !- Name
+    ,                        !- Controller List Name
+    VAV Sys 1 Avail List,    !- Availability Manager List Name
+    autosize,                !- Design Supply Air Flow Rate {m3/s}
+    VAV Sys 1 Branches,      !- Branch List Name
+    ,                        !- Connector List Name
+    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name
+    PLENUM-1 Out Node,       !- Demand Side Outlet Node Name
+    Zone Eq In Node,         !- Demand Side Inlet Node Names
+    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names
+    0.90;                    !- Return Air Flow Fraction of Supply Air Flow
+```
+
 ### New Object: DesignSpecification:AirTerminal:Sizing###
+
+This object modifies the sizing of a given terminal unit given the base sizing results from the corresponding `Sizing:Zone` inputs. Any given `DesignSpecification:AirTerminal:Sizing` object is generic and may be used by multiple terminal units with similar characteristics. 
+
+
+*Name*
+
+Name of the design specification air terminal sizing object. This name may be reference by any `AirTerminal:*` object.
+
+*Fraction of Design Cooling Load*
+
+The fraction of the design cooling load to be met by this terminal unit. This fraction is applied after the Zone Cooling Sizing Factor (see `Sizing:Zone`).
+
+*Cooling Design Supply Air Temperature Difference Ratio*
+
+This ratio adjusts the supply air temperature difference used to calculate the cooling design supply air flow rate for this terminal unit.
+
+*Fraction of Design Heating Load*
+
+The fraction of the design heating load to be met by this terminal unit. This fraction is applied after the Zone Heating Sizing Factor (see `Sizing:Zone`).
+
+*Heating Design Supply Air Temperature Difference Ratio*
+
+This ratio adjusts the supply air temperature difference used to calculate the cooling design supply air flow rate for this terminal unit.
+
+*Fraction of Minimum Outdoor Air Flow*
+
+The fraction of the zone minimum outdoor air requirement to be met by this terminal unit.
+
+#### Example calculations for cooling airflow rate
+Results from base `Sizing:Zone` calculations:
+
+Design sensible cooling load 1000 [W]
+
+Design cooling supply air temperature difference 10.0 [deltaC]
+
+Design cooling supply air flow rate 0.085 [m3/s]
+
+Minimum outdoor air flow rate 0.1 [m3/s]
+
+Default terminal unit flow rate would be Max(0.085, 0.1) = 0.1 [m3/s]
 
 ```
   DesignSpecification:AirTerminal:Sizing,
     DOAS Terminal Sizing,    !- Name
-    SupplyAirTemperature,    !- Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Cooling Design Supply Air Temperature {C}
-    ,                        !- Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Heating Design Supply Air Temperature Input Method
-    50.,                     !- Heating Design Supply Air Temperature {C}
-    ,                        !- Heating Design Supply Air Temperature Difference {deltaC}
-    0.009,                   !- Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.004,                   !- Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA West Zone,       !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Heating Sizing Factor
-    0.0,                     !- Cooling Sizing Factor
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
-    0.0,                     !- No Load Supply Air Flow Rate {m3/s}
-    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- No Load Fraction of Cooling Supply Air Flow Rate
-    ,                        !- No Load Fraction of Heating Supply Air Flow Rate
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Heating Supply Air Flow Rate
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    0.0,                     !- Fraction of Design Cooling Load
+    ,                        !- Cooling Design Supply Air Temperature Difference Ratio
+    0.0,                     !- Fraction of Design Heating Load
+    ,                        !- Heating Design Supply Air Temperature Difference Ratio
+    1.0;                     !- Fraction of Minimum Outdoor Air Flow
+```
+Design cooling supply air flow rate = 0.085\*0.0 = 0.0 [m3/s]
+
+Minimum outdoor air flow rate = 0.1\*1.0 = 0.1 [m3/s]
+
+DOAS terminal unit flow rate = Max(0.0, 0.1) = 0.1 [m3/s]
+
+
+```
+  DesignSpecification:AirTerminal:Sizing,
+    Recirculation System A Terminal Sizing, !- Name
+    0.6,                     !- Fraction of Design Cooling Load
+    0.8,                     !- Cooling Design Supply Air Temperature Difference Ratio
+    1.0,                     !- Fraction of Design Heating Load
+    1.0,                     !- Heating Design Supply Air Temperature Difference Ratio
+    0.0;                     !- Fraction of Minimum Outdoor Air Flow
 ```
 
-### New AirTerminal Unit Field: Design Specification Air Terminal Sizing Name###
+Design cooling supply air flow rate = 0.085\*0.6\*(1/0.8) = 0.06375 [m3/s]
+
+Minimum outdoor air flow rate = 0.1\*0.0 = 0.0 [m3/s]
+
+Recirculation terminal unit flow rate = Max(0.06375, 0.0) = 0.06375 [m3/s]
+
+### Modified Objects: AirTerminal:*###
 
 In all `AirTerminal:*` objects, add the following field at the end of the object.
 
-```
-  DOAS Terminal Sizing;    !-Design Specification Air Terminal Sizing Name
-```
+*New field:  Design Specification Air Terminal Sizing Name*
+
+This optional input field is the name of a DesignSpecification:AirTerminal:Sizing object which specifies sizing adjustments to be made for this terminal unit. See DesignSpecification:AirTerminal:Sizing for more details. If left blank, this terminal unit will be sized according to the inputs in the corresponding Sizing:Zone object.
+
+*Additional notes*
 
 This parallels the `Design Specification ZoneHVAC Sizing Object Name` field which is in many of the space conditioning `ZoneHVAC:*` objects:
 ```
@@ -239,22 +282,22 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow
 
 ```
 
-### Relevant Fields in Air Terminal Units
+### Modified Object: Lights###
 
-The following fields from various air terminal units are impacted by `Sizing:Zone` or `DesignSpecification:AirTerminal:Sizing` or they are used only for control of the terminal unit (not related to sizing).
+*New Field: Return Air Heat Gain Node Name*
 
-Field Name | Sizing/Control | Notes
-------------------|------------------|----------
-Maximum Air Flow Rate | Sizing | |
-Constant Minimum Air Flow Fraction | Sizing | |
-Fixed Minimum Air Flow Rate | Sizing | |
-Maximum Flow per Zone Floor Area During Reheat | Sizing | |
-Maximum Flow Fraction During Reheat | Sizing | |
-Design Specification Outdoor Air Object Name | Control | |
+Name of the return air node for this heat gain. If left blank, defaults to the first return air node for this zone.
+
+### Modified Object: Refrigeration:Case###
+
+*New Field: Under Case HVAC Return Air Node Name*
+
+Name of the return air node for this case. If left blank, defaults to the first return air node for this zone.
 
 ## Outputs Description ##
 
-No new outputs are anticipated
+Existing output variables for "Zone Air Terminal * " and "Air System * " should provide details about each airloop.  For other types of zone equipment, outputs are available by type of equipment, such as "Fan Coil * " and "Zone Radiant HVAC * ". It would be useful to have a general set of output variables that report the contribution of each piece of zone equipment, regardless of type.  
+
 
 ## Engineering Reference ##
 
@@ -295,7 +338,7 @@ New example files will be made to show various combinations of systems.
 
 2. It would be nice to have a table of the new fields on the new DesignSpecification:AirTerminal:Sizing object vs each AirTerminal object, i.e., which new DsnSpec:AT fields match functionality of existing AirTerminal fields, which new DsnSpec:AT fields do not apply to existing AirTerminals fields, which new DsnSpec:AT fields provide new functionality, etc.
 
-	*MJW 2. This would be good in general for the existing sizing and terminal unit objects.  I'll work on this table and that may help guide this proposal or at least provide some discussion points.*
+	*MJW 2. This would be good in general for the existing sizing and terminal unit objects.  I'll work on this table and that may help guide this proposal or at least provide some discussion points.  Revised Nov 14, 2016 - this is no longer needed, because the proposed new object is very simple with no overlapping fields.*
 
 10/31 - Gu
 
@@ -309,5 +352,7 @@ New example files will be made to show various combinations of systems.
 
 1. Allowing an airloop with no return path has been identified as a high priority for modeling airflow in residential buildings. If the funding allows for this, we would definitely like to see it included in the work.
 
+11/9 - Sizing Group Conference Call
 
+1. Try to minimize the size of the new DesignSpecification:AirTerminal:Sizing object.  Think in terms of only what might be different from the base Sizing:Zone inputs.  Fields such as VentilationRequirement, Do/Don't use OA specifications, 
 
