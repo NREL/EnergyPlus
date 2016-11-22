@@ -4,6 +4,7 @@ Hybrid Ventilation Controls Enhancements - CO_2 and adaptive temperatures
 **Lixing Gu **
 **Florida Solar Energy Center **
 
+ - 11/21/16,  - Third Edition: Design Document
  - 11/15/16,  - Second Edition
  - 10/17/16  - Original Edition
  
@@ -141,8 +142,7 @@ The name of a controlled zone served by the air loop defined in the previous fie
 
 \paragraph{Field: Ventilation Control Mode Schedule Name}\label{field-ventilation-control-mode-schedule-name}
 
-The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time the hybrid ventilation control mode is to be applied. Schedule values equal to zero indicate no ventilation control, resulting in natural ventilation and HVAC system operation being performed based on their own controls. Schedule values equal to one denote temperature control for either cooling or heating, which is determined internally based on thermostat set point and temperature control type. The temperature control is restricted between the minimum and maximum outdoor temperatures provided in two additional input fields (below). Schedule values equal to two denote enthalpy control, which is restricted between minimum and maximum outdoor enthalpy values given in two additional input fields (below). Schedule values equal to three denote dewpoint control for either dehumidification or humidification. Schedule values equal to four represent outdoor ventilation air control. The outdoor ventilation air control works with AirflowNetwork opening objects only, and is not allowed to work with ZoneVentilation:* and ZoneMixing objects. **<span style="color:red;">Schedule values equal to five represent operative temperature control. 
-If the operative temperature is within the upper and lower 80% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. Schedule values equal to six also represent operative temperature control with 90% acceptability limits. If the operative temperature is within the upper and lower 90% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. 
+The name of a schedule defined elsewhere in the input file. This schedule determines whether or not for a given time the hybrid ventilation control mode is to be applied. Schedule values equal to zero indicate no ventilation control, resulting in natural ventilation and HVAC system operation being performed based on their own controls. Schedule values equal to one denote temperature control for either cooling or heating, which is determined internally based on thermostat set point and temperature control type. The temperature control is restricted between the minimum and maximum outdoor temperatures provided in two additional input fields (below). Schedule values equal to two denote enthalpy control, which is restricted between minimum and maximum outdoor enthalpy values given in two additional input fields (below). Schedule values equal to three denote dewpoint control for either dehumidification or humidification. Schedule values equal to four represent outdoor ventilation air control. The outdoor ventilation air control works with AirflowNetwork opening objects only, and is not allowed to work with ZoneVentilation:* and ZoneMixing objects. **<span style="color:red;">Schedule values equal to five represent operative temperature control using 80% acceptability limits. If the operative temperature is within the upper and lower 80% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. Schedule values equal to six also represent operative temperature control using 90% acceptability limits. If the operative temperature is within the upper and lower 90% acceptability limits specified in ASHRAE Standard 55-2010, the natural ventilation is allowed, and HVAC operation is forced off. If the operative temperature is beyond the upper and lower limits, HVAC system operation is allowed, and the natural ventilation is shut off. 
 Schedule values equal to seven represent carbon dioxide (CO_2) control. If the zone CO_2 level is above the setpoint, the program will check the HVAC system availability first. If available, HVAC operation will be allowed, and natural ventilation is shut off. If the system is not available, the natural ventilation will be allowed.</span>**
 
 The detailed control logic is given in the EnergyPlus Engineering Reference.
@@ -205,12 +205,12 @@ The name of a ZoneVentilation:* object whose zone name is the controlled zone na
 
 \textbf{Note:} A \textbf{ZoneInfiltration:*} object indicates any one of \textbf{ZoneInfiltration:DesignFlowRate}, \textbf{ZoneInfiltration:EffectiveLeakageArea},and \textbf{ZoneInfiltration:FlowCoefficient} objects.A object of\textbf{ZoneVentilation:*} indicates any one of \textbf{ZoneVentilation:DesignFlowRate} and \textbf{ZoneVentilation:WindandStackOpenArea} objects.
 
-####Minimum HVAC Operation Time </span>####
+####Minimum HVAC Operation Time ####
 **<span style="color:red;">
 The field represents the minimum time that HVAC system operation will be allowed. If accumulated system operation time is less than this value, the system operation status will be forced regardless of other operation conditions, and natural ventilation will shut off.
 </span>**
 
-####Minimum Ventilation Time </span>####
+####Minimum Ventilation Time ####
 **<span style="color:red;">
 The field represents the minimum time that natural ventilation will remain. If accumulated ventilation time is less than this value, the natural ventilation will be forced regardless of other operation conditions.
 </span>**
@@ -535,4 +535,40 @@ Santamouris, M, 2006, “Adaptive Thermal Comfort and Ventilation,” Ventilatio
 
 Brager, G.S., and R.J. de Dear, 2001. “Climate, Comfort & Natural Ventilation: A new adaptive comfort standard for ASHRAE Standard 55.” Proceedings, Moving Thermal Comfort Standards into the 21st Century, Windsor, UK, April 2001.
 
+##Design Document ##
 
+This new feature will revise SystemAvailabilityManager module.
+
+### Add 4 members in struct DefineHybridVentSysAvailManager
+
+Four members will be added in the struct DefineHybridVentSysAvailManager:
+
+		Real64 MinOperTime( 0.0 ); // Minimum HVAC Operation Time
+		Real64 MinVentTime( 0.0 ); // Minimum Ventilation Time
+		Real64 TimeOperDuration( 0.0 ); // Time duration with continuous HVAC operation
+		Real64 TimeVentDuration( 0.0 ); // Time duration with continuous ventilation
+ 
+
+### GetHybridVentilationInputs
+
+A section will be revised to handle new choices form the Ventilation Control Mode Schedule Name field and read two more optional fields. Error checks will be performed.    
+
+### InitHybridVentSysAvailMgr
+
+#### Update two variables 
+
+TimeOperDuration and TimeVentDuration are updated based on time duration at every time step. The update procedures are very similar to OpenElapsedTime and CloseElapsedTime in the occupant ventilation control in the AirflowNetworkBalanceManager module.
+
+#### Check minimum time operation to determine if the previous status remains or not  
+
+If either of TimeOperDuration or TimeVentDuration is less than the minimum time, the status at the previous time step will be kept and No call to CalcHybridVentSysAvailMgr is needed.     
+
+### CalcHybridVentSysAvailMgr
+
+#### Operative temperature check
+
+When the schedule value of Ventilation Control Mode Schedule is equal to either 5 or 6, operative temperature will be checked. If the operative temperature is between the low and high acceptability limits, natural ventilation will be allowed. Otherwise, HVAC system operation is allowed.
+
+#### CO2 check
+
+When the schedule value of Ventilation Control Mode Schedule is equal to 7, CO2 check will be performed. If the CO2 level is less than the CO2 setpoint, no action will be taken. Otherwise, either HVAC operation or natural ventilation will be allowed. 
