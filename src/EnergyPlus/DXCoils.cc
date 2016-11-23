@@ -8639,7 +8639,7 @@ Label50: ;
 				TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * TotCapFlowModFac * TotCapTempModFac;
 			}
 
-//			TotCap *= PartLoadRatio;
+			TotCap *= PartLoadRatio;
 
 			// Calculate apparatus dew point conditions using TotCap and CBF
 			hDelta = TotCap / AirMassFlow;

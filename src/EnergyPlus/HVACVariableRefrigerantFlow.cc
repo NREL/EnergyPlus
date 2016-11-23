@@ -5958,29 +5958,41 @@ namespace HVACVariableRefrigerantFlow {
 			return;
 		}
 
-		// Get result when DX coil is off
-		PartLoadRatio = 0.0;
+		// Get result when DX coil is operating at the minimum PLR (1E-20) if not otherwise specified
+		PartLoadRatio = VRFTU( VRFTUNum ).MinOperatingPLR;
 
 		if ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 		// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-			VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
+			VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio );
 		} else {
 		// Algorithm Type: VRF model based on system curve
-			CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
+			CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio );
 		}
 
 		if ( VRFCoolingMode && HRHeatingMode ) {
 			// IF the system is in cooling mode, but the terminal unit requests heating (heat recovery)
-			if ( NoCompOutput >= QZnReq ) return;
+			if ( NoCompOutput >= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		} else if ( VRFHeatingMode && HRCoolingMode ) {
 			// IF the system is in heating mode, but the terminal unit requests cooling (heat recovery)
-			if ( NoCompOutput <= QZnReq ) return;
+			if ( NoCompOutput <= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		} else if ( VRFCoolingMode || HRCoolingMode ) {
 			// IF the system is in cooling mode and/or the terminal unit requests cooling
-			if ( NoCompOutput <= QZnReq ) return;
+			if ( NoCompOutput <= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		} else if ( VRFHeatingMode || HRHeatingMode ) {
 			// IF the system is in heating mode and/or the terminal unit requests heating
-			if ( NoCompOutput >= QZnReq ) return;
+			if ( NoCompOutput >= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		}
 
 		// Otherwise the coil needs to turn on. Get full load result
