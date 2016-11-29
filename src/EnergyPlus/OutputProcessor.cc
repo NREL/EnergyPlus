@@ -1708,7 +1708,7 @@ namespace OutputProcessor {
 				}
 			}
 			if ( found != 0 ) {
-				ShowWarningError (cCurrentModuleObject + "=\"" + cAlphaArgs (1) + "\", contains a reference to another " + cCurrentModuleObject + "in field: " + cAlphaFieldNames (found) + "=\"" + cAlphaArgs (found) + "\".");
+				ShowWarningError (cCurrentModuleObject + "=\"" + cAlphaArgs (1) + "\", contains a reference to another " + cCurrentModuleObject + " in field: " + cAlphaFieldNames (found) + "=\"" + cAlphaArgs (found) + "\".");
 				continue;
 			}
 
@@ -2729,10 +2729,10 @@ namespace OutputProcessor {
 
 		} else if ( endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS" ) {
 			EndUse = "Baseboard";
-			
+
 		} else if ( endUseMeter == "COOLINGPANEL" || endUseMeter == "COOLINGPANELS" ) {
 			EndUse = "CoolingPanel";
-			
+
 		} else if ( endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION" ) {
 			EndUse = "HeatRejection";
 

@@ -3421,6 +3421,43 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F( EnergyPlusFixture, OutputProcessor_DuplicateMeterCustom )
+		{
+			std::string const idf_objects = delimited_string({
+				"Version,8.6;",
+				"Meter:Custom,",
+				"CustomMeter1,               !- Name",
+				"Generic,                    !- Fuel Type",
+				",                           !- Key Name 1",
+				"DistrictHeating:Facility;   !- Variable or Meter 1 Name",
+				"Meter:Custom,",
+				"CustomMeter2,               !- Name",
+				"Generic,                    !- Fuel Type",
+				",                           !- Key Name 1",
+				"CustomMeter1;               !- Variable or Meter 1 Name",
+				"Output:Meter,CustomMeter1,Hourly;",
+				"Output:Meter,CustomMeter2,Hourly;"
+			});
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			bool errors_found = false;
+
+			GetCustomMeterInput( errors_found );
+
+			EXPECT_FALSE( errors_found );
+
+			std::string errMsg = delimited_string ({
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name 1=\"DISTRICTHEATING:FACILITY\".",
+				"   **   ~~~   ** ...will not be shown with the Meter results.",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
+				"   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter Name 1=\"CUSTOMMETER1\"."
+			});
+
+			compare_err_stream(errMsg);
+		}
+
 	}
 
 }
