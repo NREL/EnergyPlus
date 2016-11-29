@@ -1365,9 +1365,9 @@ namespace EnergyPlus {
 					if ( fldStIt->m_indexesForKeyVar.size() > 0 ){
 						int varNum = fldStIt->m_indexesForKeyVar[ 0 ];
 						if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Real ) {
-							fldStIt->m_colHead = OutputProcessor::RVariableTypes[varNum].VarNameOnly;
+							fldStIt->m_colHead = OutputProcessor::RVariableTypes(varNum).VarNameOnly;
 						} else if ( fldStIt->m_typeOfVar == OutputProcessor::VarType_Meter ) {
-							fldStIt->m_colHead = OutputProcessor::EnergyMeters[varNum].Name;
+							fldStIt->m_colHead = OutputProcessor::EnergyMeters(varNum).Name;
 						}
 					}
 				}

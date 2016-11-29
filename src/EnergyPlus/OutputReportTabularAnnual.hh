@@ -163,6 +163,9 @@ public:
 	void
 	clearTable();
 
+	// this could be private but was made public for unit testing only
+	void
+	columnHeadersToTitleCase ();
 
 
 private:
@@ -214,8 +217,6 @@ private:
 					   Real64 & timeAboveTopBin,
 					   Real64 & timeBelowBottomBin );
 
-	void
-	columnHeadersToTitleCase();
 
 }; // class AnnualTable
 
