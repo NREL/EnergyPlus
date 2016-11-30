@@ -65,6 +65,7 @@
 #include <Fans.hh>
 #include <HeatingCoils.hh>
 #include <HVACControllers.hh>
+#include <HVACDXSystem.hh>
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
@@ -395,7 +396,7 @@ namespace FaultsManager {
 			// Coil check and link
 			{ auto const SELECT_CASE_VAR( FaultsCoilSATSensor( jFault_CoilSAT ).CoilType );
 	   
-				if( SameString( SELECT_CASE_VAR, "Coil:Heating:Electric" ) ||
+				if ( SameString( SELECT_CASE_VAR, "Coil:Heating:Electric" ) ||
 					SameString( SELECT_CASE_VAR, "Coil:Heating:Gas" ) ||
 					SameString( SELECT_CASE_VAR, "Coil:Heating:Desuperheater" )
 				){
@@ -415,7 +416,7 @@ namespace FaultsManager {
 						HeatingCoils::HeatingCoil( CoilNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
 					
-				} else if( SameString( SELECT_CASE_VAR, "Coil:Heating:Steam" ) ) {
+				} else if ( SameString( SELECT_CASE_VAR, "Coil:Heating:Steam" ) ) {
 					
 					// Read in coil input if not done yet
 					if ( SteamCoils::GetSteamCoilsInputFlag ) {
@@ -439,7 +440,7 @@ namespace FaultsManager {
 						}
 					}
 					
-				} else if( SameString( SELECT_CASE_VAR, "Coil:Heating:Water" ) ||
+				} else if ( SameString( SELECT_CASE_VAR, "Coil:Heating:Water" ) ||
 					SameString( SELECT_CASE_VAR, "Coil:Cooling:Water" ) ||
 					SameString( SELECT_CASE_VAR, "Coil:Cooling:Water:Detailedgeometry" )
 				){
@@ -481,6 +482,23 @@ namespace FaultsManager {
 							ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" does not match " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) );
 							ErrorsFound = true;
 						}
+					}
+				} else if ( SameString( SELECT_CASE_VAR, "CoilSystem:Cooling:DX" ) ){
+					// Read in DXCoolingSystem input if not done yet
+					if ( HVACDXSystem::GetInputFlag ) {
+						HVACDXSystem::GetDXCoolingSystemInput();
+						HVACDXSystem::GetInputFlag = false;
+					}
+		
+					// Check the coil name and coil type
+					int CoilSysNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACDXSystem::DXCoolingSystem );
+					if( CoilSysNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the coil system with the fault model
+						HVACDXSystem::DXCoolingSystem( CoilSysNum ).FaultyCoilSATFlag = true;
+						HVACDXSystem::DXCoolingSystem( CoilSysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
 				}
 			}

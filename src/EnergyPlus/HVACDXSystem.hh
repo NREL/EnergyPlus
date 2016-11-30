@@ -195,6 +195,10 @@ namespace HVACDXSystem {
 		int SpeedNum; // select speed number for variable-speed coil
 		// Packaged thermal energy storage coil
 		int TESOpMode;
+		// Fault model of coil SAT sensor
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		DXCoolingConditions() :
@@ -257,7 +261,10 @@ namespace HVACDXSystem {
 			DOASDXCoolingCoilMinTout( 0.0 ),
 			FrostControlStatus( 0 ),
 			SpeedNum( 0 ),
-			TESOpMode( 0 )
+			TESOpMode( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};
