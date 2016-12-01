@@ -71,6 +71,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -122,6 +123,8 @@ namespace HVACDXHeatPumpSystem {
 	// Compressor operation
 	int const On( 1 ); // normal compressor operation
 	int const Off( 0 ); // signal DXCoil that compressor shouldn't run
+
+	bool GetInputFlag( true ); // Flag to get input only once
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -211,7 +214,6 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of CoilSystem:Heating:DX object
 		int DXSystemNum; // Index to CoilSystem:Heating:DX object
-		static bool GetInputFlag( true ); // Flag to get input only once
 		Real64 AirMassFlow; // DX System air mass flow rate
 		int InletNodeNum; // DX System inlet node number
 		int OutletNodeNum; // DX System outlet node number
@@ -432,6 +434,7 @@ namespace HVACDXHeatPumpSystem {
 				DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNode( DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType, DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilName, ErrorsFound );
 			}
 
+			//Coil air-side outlet node is the control node
 			DXHeatPumpSystem( DXHeatSysNum ).DXSystemControlNodeNum = DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilOutletNodeNum;
 
 			TestCompSet( CurrentModuleObject, DXHeatPumpSystem( DXHeatSysNum ).Name, NodeID( DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilInletNodeNum ), NodeID( DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpCoilOutletNodeNum ), "Air Nodes" );
@@ -592,12 +595,11 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Brent Griffith (derived from ControlDXSystem by Richard Liesen)
 		//       DATE WRITTEN   Jan 2012
-		//       MODIFIED       Richard Raustad, FSEC Nov 2003
-		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
-		//                        Add dehumidification controls and support for multimode DX coil
-		//                      Jan 2008 R. Raustad, FSEC. Added coolreheat to all coil types
-		//                      Feb 2013, Bo Shen, Oak Ridge National Lab
-		//                      Add Coil:Heating:DX:VariableSpeed
+		//       MODIFIED       Nov. 2003, R. Raustad, FSEC 
+		//                      Feb. 2005, M. J. Witte, GARD. Add dehumidification controls and support for multimode DX coil
+		//                      Jan. 2008, R. Raustad, FSEC. Added coolreheat to all coil types
+		//                      Feb. 2013, B. Shen, ORNL. Add Coil:Heating:DX:VariableSpeed
+		//                      Nov. 2016, R. Zhang, LBNL. Applied the coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -611,14 +613,18 @@ namespace HVACDXHeatPumpSystem {
 
 		// Using/Aliasing
 		using namespace ScheduleManager;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using DXCoils::SimDXCoil;
+		using DXCoils::DXCoilOutletTemp;
+		using FaultsManager::FaultsCoilSATSensor;
+		using General::SolveRegulaFalsi;
+		using General::RoundSigDigits;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
-		using General::SolveRegulaFalsi;
-		using General::RoundSigDigits;
-		using DXCoils::SimDXCoil;
-		using DXCoils::DXCoilOutletTemp;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 
@@ -694,6 +700,15 @@ namespace HVACDXHeatPumpSystem {
 		I = 1;
 		SpeedRatio = 0.0;
 
+		//If there is a fault of coil SAT Sensor (zrp_Nov2016)
+		if( DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATIndex;
+			DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the DesOutTemp
+			DesOutTemp -= DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATOffset;
+		}
+		
 		// If DXHeatingSystem is scheduled on and there is flow
 		if ( ( GetCurrentScheduleValue( DXHeatPumpSystem( DXSystemNum ).SchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
@@ -717,7 +732,7 @@ namespace HVACDXHeatPumpSystem {
 
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXHeatPumpSystem( DXSystemNum ).DesiredOutletTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
 					//         IF NoOutput is higher than (more heating than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) > Acc ) {
@@ -804,7 +819,7 @@ namespace HVACDXHeatPumpSystem {
 
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXHeatPumpSystem( DXSystemNum ).DesiredOutletTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 					//         IF NoOutput is higher than (more heating than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) > Acc ) {
 						PartLoadFrac = 0.0;
@@ -928,11 +943,11 @@ namespace HVACDXHeatPumpSystem {
 				}}
 			} // End of cooling load type (sensible or latent) if block
 		} // End of If DXheatingSystem is scheduled on and there is flow
+
 		//Set the final results
 		DXHeatPumpSystem( DXSystemNum ).PartLoadFrac = PartLoadFrac;
 		DXHeatPumpSystem( DXSystemNum ).SpeedRatio = SpeedRatio;
 		DXHeatPumpSystem( DXSystemNum ).SpeedNum = SpeedNum;
-
 	}
 
 	Real64

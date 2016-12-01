@@ -50417,6 +50417,7 @@ CoilSystem:Heating:DX,
         \min-fields 4
    A1 , \field Name
         \required-field
+        \reference HeatingCoilSystemName
         \type alpha
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -80453,6 +80454,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:Detailedgeometry
        \key CoilSystem:Cooling:DX
+       \key CoilSystem:Heating:DX
    A5, \field Coil Object Name
        \note Enter the name of the coil affected
        \required-field
@@ -80460,6 +80462,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \object-list CoolingCoilName
        \object-list CoolingCoilSystemName
        \object-list HeatingCoilName
+       \object-list HeatingCoilSystemName
        \object-list HeatingCoilsElectricMultiStage
        \object-list HeatingCoilsGasMultiStage
        \object-list HeatingCoilsDesuperheater

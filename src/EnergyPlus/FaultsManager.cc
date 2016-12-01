@@ -66,6 +66,7 @@
 #include <HeatingCoils.hh>
 #include <HVACControllers.hh>
 #include <HVACDXSystem.hh>
+#include <HVACDXHeatPumpSystem.hh>
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
@@ -499,6 +500,23 @@ namespace FaultsManager {
 					// Link the coil system with the fault model
 						HVACDXSystem::DXCoolingSystem( CoilSysNum ).FaultyCoilSATFlag = true;
 						HVACDXSystem::DXCoolingSystem( CoilSysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+					}
+				} else if ( SameString( SELECT_CASE_VAR, "CoilSystem:Heating:DX" ) ){
+					// Read in DXCoolingSystem input if not done yet
+					if ( HVACDXHeatPumpSystem::GetInputFlag ) {
+						HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput();
+						HVACDXHeatPumpSystem::GetInputFlag = false;
+					}
+		
+					// Check the coil name and coil type
+					int CoilSysNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACDXHeatPumpSystem::DXHeatPumpSystem );
+					if( CoilSysNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the coil system with the fault model
+						HVACDXHeatPumpSystem::DXHeatPumpSystem( CoilSysNum ).FaultyCoilSATFlag = true;
+						HVACDXHeatPumpSystem::DXHeatPumpSystem( CoilSysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
 				}
 			}
