@@ -220,7 +220,7 @@ class Replacer(CodeChecker):
             if self.oldtxt in txt:
                 self.replaced+=1
         else:
-            txt = txt.replace(oldtxt, newtxt)
+            txt = txt.replace(self.oldtxt, self.newtxt)
             if self.newtxt in txt:
                 fp = open(filepath,'w')
                 fp.write(txt)
