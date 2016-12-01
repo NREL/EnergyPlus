@@ -67,6 +67,7 @@
 #include <HVACControllers.hh>
 #include <HVACDXSystem.hh>
 #include <HVACDXHeatPumpSystem.hh>
+#include <HVACUnitarySystem.hh>
 #include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
@@ -517,6 +518,23 @@ namespace FaultsManager {
 					// Link the coil system with the fault model
 						HVACDXHeatPumpSystem::DXHeatPumpSystem( CoilSysNum ).FaultyCoilSATFlag = true;
 						HVACDXHeatPumpSystem::DXHeatPumpSystem( CoilSysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+					}
+				} else if ( SameString( SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem" ) ){
+					// Read in DXCoolingSystem input if not done yet
+					if ( HVACUnitarySystem::GetInputFlag ) {
+						HVACUnitarySystem::GetUnitarySystemInput();
+						HVACUnitarySystem::GetInputFlag = false;
+					}
+		
+					// Check the coil name and coil type
+					int UnitarySysNum = FindItemInList( FaultsCoilSATSensor( jFault_CoilSAT ).CoilName, HVACUnitarySystem::UnitarySystem );
+					if( UnitarySysNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the coil system with the fault model
+						HVACUnitarySystem::UnitarySystem( UnitarySysNum ).FaultyCoilSATFlag = true;
+						HVACUnitarySystem::UnitarySystem( UnitarySysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
 					}
 				}
 			}

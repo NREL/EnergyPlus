@@ -80446,6 +80446,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \note Enter the type of the coil affected
        \required-field
        \type choice
+       \key AirLoopHVAC:UnitarySystem
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Desuperheater
@@ -80461,6 +80462,7 @@ FaultModel:TemperatureSensorOffset:CoilSupplyAir,
        \type object-list
        \object-list CoolingCoilName
        \object-list CoolingCoilSystemName
+       \object-list DOAToZonalUnit
        \object-list HeatingCoilName
        \object-list HeatingCoilSystemName
        \object-list HeatingCoilsElectricMultiStage

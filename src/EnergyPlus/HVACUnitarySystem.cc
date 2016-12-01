@@ -88,6 +88,7 @@
 #include <DXCoils.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -8368,7 +8369,7 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   February 2013
-		//       MODIFIED       na
+		//       MODIFIED       Nov. 2016, R. Zhang, LBNL. Applied the coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -8383,6 +8384,10 @@ namespace HVACUnitarySystem {
 
 		// Using/Aliasing
 		using DataAirLoop::LoopDXCoilRTF;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
+		using FaultsManager::FaultsCoilSATSensor;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::SolveRegulaFalsi;
@@ -8498,6 +8503,15 @@ namespace HVACUnitarySystem {
 			HXUnitOn = true;
 		} else {
 			HXUnitOn = false;
+		}
+
+		// IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+		if( UnitarySystem( UnitarySysNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = UnitarySystem( UnitarySysNum ).FaultyCoilSATIndex;
+			UnitarySystem( UnitarySysNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the DesOutTemp
+			DesOutTemp -= UnitarySystem( UnitarySysNum ).FaultyCoilSATOffset;
 		}
 
 		// IF DXCoolingSystem is scheduled on and there is flow
@@ -9358,7 +9372,7 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   February 2013
-		//       MODIFIED       na
+		//       MODIFIED       Nov. 2016, R. Zhang, LBNL. Applied the coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -9371,6 +9385,10 @@ namespace HVACUnitarySystem {
 		//  na
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
+		using FaultsManager::FaultsCoilSATSensor;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::SolveRegulaFalsi;
@@ -9493,6 +9511,15 @@ namespace HVACUnitarySystem {
 			OutdoorWetBulb = OutWetBulbTemp;
 		}
 
+		// IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+		if( UnitarySystem( UnitarySysNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = UnitarySystem( UnitarySysNum ).FaultyCoilSATIndex;
+			UnitarySystem( UnitarySysNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the DesOutTemp
+			DesOutTemp -= UnitarySystem( UnitarySysNum ).FaultyCoilSATOffset;
+		}
+
 		// IF DXHeatingSystem is scheduled on and there is flow
 		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr ) > 0.0 && Node( InletNode ).MassFlowRate > MinAirMassFlow && UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac == 0.0 ) {
 
@@ -9503,7 +9530,7 @@ namespace HVACUnitarySystem {
 			// IF DXHeatingSystem runs with a heating load then set PartLoadFrac on Heating System
 			if ( SensibleLoad ) {
 
-				ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( UnitarySystem( UnitarySysNum ).DesiredOutletTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+				ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
 				// Get no load result
 				PartLoadFrac = 0.0;
@@ -9843,7 +9870,7 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   February 2013
-		//       MODIFIED       na
+		//       MODIFIED       Nov. 2016, R. Zhang, LBNL. Applied the coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -9856,8 +9883,12 @@ namespace HVACUnitarySystem {
 		//  na
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
 		using DataAirLoop::LoopDXCoilRTF;
+		using FaultsManager::FaultsCoilSATSensor;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::SolveRegulaFalsi;
@@ -9928,6 +9959,15 @@ namespace HVACUnitarySystem {
 		LoopDXCoilMaxRTFSave = LoopDXCoilRTF;
 		LoopDXCoilRTF = 0.0;
 
+		// IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+		if( UnitarySystem( UnitarySysNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = UnitarySystem( UnitarySysNum ).FaultyCoilSATIndex;
+			UnitarySystem( UnitarySysNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the DesOutTemp
+			DesOutTemp -= UnitarySystem( UnitarySysNum ).FaultyCoilSATOffset;
+		}
+
 		if ( ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
 			// Determine if there is a sensible load on this system
@@ -9935,7 +9975,7 @@ namespace HVACUnitarySystem {
 
 			if ( SensibleLoad ) {
 
-				ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( UnitarySystem( UnitarySysNum ).DesiredOutletTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+				ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
 				// Get no load result
 				PartLoadFrac = 0.0;
