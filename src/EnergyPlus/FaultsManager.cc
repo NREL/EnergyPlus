@@ -532,9 +532,16 @@ namespace FaultsManager {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
-					// Link the coil system with the fault model
-						HVACUnitarySystem::UnitarySystem( UnitarySysNum ).FaultyCoilSATFlag = true;
-						HVACUnitarySystem::UnitarySystem( UnitarySysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+					// Link the unitary system with the fault model
+
+						if( HVACUnitarySystem::UnitarySystem( UnitarySysNum ).ControlType != HVACUnitarySystem::SetPointBased ){
+						// The fault model is only applicable to the unitary system controlled on leaving air temperature
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified unitary system is not controlled on leaving air temperature. The coil SAT sensor fault model will not be applied." );
+						} else {
+						// Link the fault model with the coil that is controlled on leaving air temperature
+							HVACUnitarySystem::UnitarySystem( UnitarySysNum ).FaultyCoilSATFlag = true;
+							HVACUnitarySystem::UnitarySystem( UnitarySysNum ).FaultyCoilSATIndex = jFault_CoilSAT;
+						}
 					}
 				}
 			}
