@@ -96,32 +96,31 @@ namespace HybridModel {
 					HybridModelZone( ZonePtr ).Name = cAlphaArgs( 1 );
 					HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "YES" );
 					HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "YES" );
-					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
-					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartMonth = rNumericArgs( 1 );
-					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate = rNumericArgs( 2 );
-					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth = rNumericArgs( 3 );
-					HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndDate = rNumericArgs( 4 );
+
+					// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
+					if (HybridModelZone(ZonePtr).InternalThermalMassCalc && HybridModelZone(ZonePtr).InfiltrationCalc){
+						HybridModelZone(ZonePtr).InfiltrationCalc = false;
+						ShowWarningError(CurrentModuleObject + "=\"" + HybridModelZone(ZonePtr).Name + "\" invalid " + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + ".");
+						ShowContinueError("Field " + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
+						ShowContinueError("Field " + cAlphaFieldNames(4) + "\" is changed to NO for the hybrid modeling simulations.");
+					}
+
+					// Flags showing Hybrid Modeling settings
+					if (HybridModelZone(ZonePtr).InternalThermalMassCalc || HybridModelZone(ZonePtr).InfiltrationCalc){
+						FlagHybridModel = true;
+						if (HybridModelZone(ZonePtr).InfiltrationCalc) FlagHybridModelInf = true;
+					}
+
+					if ( FlagHybridModel ){
+						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
+						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartMonth = rNumericArgs( 1 );
+						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate = rNumericArgs( 2 );
+						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth = rNumericArgs( 3 );
+						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndDate = rNumericArgs( 4 );
+					}
 				} else {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 					ErrorsFound = true;
-				}
-			}
-
-			//Post-processing of Hybrid Model settings 
-			for( ZonePtr = 1; ZonePtr <= NumOfZones; ZonePtr++ ){
-
-				// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
-				if( HybridModelZone( ZonePtr ).InternalThermalMassCalc && HybridModelZone( ZonePtr ).InfiltrationCalc ){
-					HybridModelZone( ZonePtr ).InfiltrationCalc = false;
-					ShowWarningError( CurrentModuleObject + "=\"" + HybridModelZone( ZonePtr ).Name + "\" invalid " + cAlphaFieldNames( 3 ) + " and " + cAlphaFieldNames( 4 ) + "." );
-					ShowContinueError( "Field " + cAlphaFieldNames( 3 ) + " and " + cAlphaFieldNames( 4 ) + "\" cannot be both set to YES." );
-					ShowContinueError( "Field " + cAlphaFieldNames( 4 ) + "\" is changed to NO for the hybrid modeling simulations." );
-				}
-
-				// Flags showing Hybrid Modeling settings
-				if( HybridModelZone( ZonePtr ).InternalThermalMassCalc || HybridModelZone( ZonePtr ).InfiltrationCalc ){
-					FlagHybridModel = true;
-					if( HybridModelZone( ZonePtr ).InfiltrationCalc ) FlagHybridModelInf = true;
 				}
 			}
 

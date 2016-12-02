@@ -29,7 +29,6 @@ namespace HybridModel {
 	{
 		// Members
 		std::string Name;
-		int ZonePtr;
 		int ZoneMeasuredTemperatureSchedulePtr;
 		bool InternalThermalMassCalc;
 		bool InfiltrationCalc;
@@ -40,14 +39,13 @@ namespace HybridModel {
 
 		// Default Constructor
 		HybridModelProperties() :
-			ZonePtr( 0 ),
 			ZoneMeasuredTemperatureSchedulePtr( 0 ),
 			InternalThermalMassCalc( false ),
 			InfiltrationCalc( false ),
-			ZoneMeasuredTemperatureStartMonth( 1 ),
-			ZoneMeasuredTemperatureStartDate( 1 ),
-			ZoneMeasuredTemperatureEndMonth( 1 ),
-			ZoneMeasuredTemperatureEndDate( 1 )
+			ZoneMeasuredTemperatureStartMonth( 0 ),
+			ZoneMeasuredTemperatureStartDate( 0 ),
+			ZoneMeasuredTemperatureEndMonth( 0 ),
+			ZoneMeasuredTemperatureEndDate( 0 )
 		{}
 
 	};
