@@ -1551,10 +1551,10 @@ namespace ZoneTempPredictorCorrector {
 		CheckAndReadHybridModelZone(); // Added by Sang Hoon Lee May 2015
 		
 		// Default multiplier values
-		ZoneVolCapMultpSens = 1.0;
-		ZoneVolCapMultpMoist = 1.0;
-		ZoneVolCapMultpCO2 = 1.0;
-		ZoneVolCapMultpGenContam = 1.0;
+		Real64 ZoneVolCapMultpSens = 1.0;
+		Real64 ZoneVolCapMultpMoist = 1.0;
+		Real64 ZoneVolCapMultpCO2 = 1.0;
+		Real64 ZoneVolCapMultpGenContam = 1.0;
 
 		// Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
 		cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
@@ -1626,7 +1626,7 @@ namespace ZoneTempPredictorCorrector {
 			// Assign default multiplier values to all the other zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
 				if( ! Zone( ZoneNum ).FlagCustomizedZoneCap ){
-					Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+					Zone(ZoneNum).ZoneVolCapMultpSens = 1.0; // ZoneVolCapMultpSens;
 					Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
 					Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
 					Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;

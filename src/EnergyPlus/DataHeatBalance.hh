@@ -1293,7 +1293,7 @@ namespace DataHeatBalance {
 		// Default Constructor
 		ZoneCapMultiplierData() :
 			ZoneVolCapMultpSens( 1.0 ), 
-			ZoneVolCapMultpMoist( 0.0 ), 
+			ZoneVolCapMultpMoist( 1.0 ), 
 			ZoneVolCapMultpCO2( 1.0 ), 
 			ZoneVolCapMultpGenContam( 1.0 ) 
 		{}

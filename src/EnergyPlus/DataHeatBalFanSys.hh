@@ -231,13 +231,13 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
 	extern Array1D< Real64 > ZoneW1; // Zone temperature at the previous time step used in Exact and Euler method
 
-	extern Real64 ZoneVolCapMultpSens; // This is a multiplier used on the zone volume to make the capacitance more realistic
+	//extern Real64 ZoneVolCapMultpSens; // This is a multiplier used on the zone volume to make the capacitance more realistic
 	// for the calculation of the zone temp in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpMoist; // This is a multiplier used on the zone volume to make the capacitance more realistic
+	// extern Real64 ZoneVolCapMultpMoist; // This is a multiplier used on the zone volume to make the capacitance more realistic
 	// for the calculation of the zone humidity ratio in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpCO2; // This is a multiplier used on the zone volume to make the capacitance more realistic
+	// extern Real64 ZoneVolCapMultpCO2; // This is a multiplier used on the zone volume to make the capacitance more realistic
 	// for the calculation of the zone CO2 concentration in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpGenContam; // This is a multiplier used on the zone volume to make the capacitance more realistic
+	// extern Real64 ZoneVolCapMultpGenContam; // This is a multiplier used on the zone volume to make the capacitance more realistic
 	// for the calculation of the zone generic contaminant concentration in the predictor
 	// and corrector step
 

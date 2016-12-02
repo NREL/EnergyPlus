@@ -96,6 +96,7 @@
 #include <General.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MatrixDataManager.hh>
@@ -4450,8 +4451,11 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
-		// Hybrid model output added by Sang Hoon Lee August 2016
-		SetupOutputVariable( "Zone Infiltration OA Air Change Rate HM [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone( ZoneLoop ).Name );
+
+		if ( HybridModel::FlagHybridModel ){
+			// Hybrid model output added by Sang Hoon Lee August 2016
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+		}
 	}
 
 	// End of Get Input subroutines for the HB Module
