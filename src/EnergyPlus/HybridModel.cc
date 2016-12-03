@@ -39,7 +39,8 @@ namespace HybridModel {
 	using General::CheckCreatedZoneItemName;
 	
 	bool FlagHybridModel( false ); // True if hybrid model is activated
-	bool FlagHybridModelInf( false ); // True if hybrid model (infiltration) is activated
+	bool FlagHMInternalThermalMass( false ); // True if hybrid model (internal thermal mass) is activated
+	bool FlagHMInfiltration( false ); // True if hybrid model (infiltration) is activated
 	int NumOfHybridModelZones( 0 ); // Number of hybrid model zones in the model
 	std::string CurrentModuleObject; // to assist in getting input
 
@@ -105,7 +106,10 @@ namespace HybridModel {
 					// Flags showing Hybrid Modeling settings
 					if (HybridModelZone(ZonePtr).InternalThermalMassCalc || HybridModelZone(ZonePtr).InfiltrationCalc){
 						FlagHybridModel = true;
-						if (HybridModelZone(ZonePtr).InfiltrationCalc) FlagHybridModelInf = true;
+						if (HybridModelZone(ZonePtr).InfiltrationCalc)
+							FlagHMInfiltration = true;
+						else
+							FlagHMInternalThermalMass = true;
 					}
 
 					if ( FlagHybridModel ){
@@ -122,7 +126,7 @@ namespace HybridModel {
 			}
 
 			//ZoneAirMassFlowConservation should not be activated during the Hybrid Modeling infiltration calculations
-			if( FlagHybridModelInf && ZoneAirMassFlow.EnforceZoneMassBalance){
+			if (FlagHMInfiltration && ZoneAirMassFlow.EnforceZoneMassBalance){
 				ZoneAirMassFlow.EnforceZoneMassBalance = false;
 				ShowWarningError( "ZoneAirMassFlowConservation is deactivated when Hybrid Modeling is performed." );
 			}

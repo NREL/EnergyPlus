@@ -81,7 +81,7 @@
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
-#include <DataGlobals.hh> // Added by Sang Hoon Lee August 2015
+#include <DataGlobals.hh>
 #include <DataGlobalConstants.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -99,6 +99,7 @@
 #include <EconomicLifeCycleCost.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
+#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <LowTempRadiantSystem.hh>
 #include <ElectricPowerServiceManager.hh>
@@ -9326,8 +9327,8 @@ namespace OutputReportTabular {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   June 2006
-		//       MODIFIED       January 2010, Kyle Benne
-		//                      Added SQLite output
+		//       MODIFIED       Jan. 2010, Kyle Benne. Added SQLite output
+		//                      Aug. 2015, Sang Hoon Lee. Added a new column for hybrid modeling multiplier.
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -9379,6 +9380,7 @@ namespace OutputReportTabular {
 		using DataSurfaces::Ground;
 		using DataSurfaces::OtherSideCondModeledExt;
 		using DataSurfaces::GroundFCfactorMethod;
+		using HybridModel::FlagHMInternalThermalMass;
 		using ScheduleManager::ScheduleAverageHoursPerWeek;
 		using ScheduleManager::GetScheduleName;
 		using ExteriorEnergyUse::ExteriorLights;
@@ -9424,6 +9426,7 @@ namespace OutputReportTabular {
 		int iZone;
 		int iPeople;
 		int iPlugProc;
+		int NumOfCol;
 		Real64 mult;
 		Real64 curAzimuth;
 		Real64 curArea;
@@ -9460,7 +9463,6 @@ namespace OutputReportTabular {
 		Real64 totLightPower;
 		Real64 totNumPeople;
 		Real64 totPlugProcess;
-		Real64 HMMultiplier;
 		Real64 frameWidth;
 		Real64 frameArea;
 
@@ -9910,10 +9912,16 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			columnHead.allocate( 13 );
-			columnWidth.allocate( 13 );
+			if( FlagHMInternalThermalMass ){
+			// Two additional columns just for the Hybrid Models_SHL2016Nov
+				NumOfCol = 14; 
+			} else {
+				NumOfCol = 12;
+			}
+			columnHead.allocate( NumOfCol );
+			columnWidth.allocate( NumOfCol );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 13, NumOfZones + 4 );
+			tableBody.allocate( NumOfCol, NumOfZones + 4 );
 
 			columnHead( 1 ) = "Area " + m2_unitName;
 			columnHead( 2 ) = "Conditioned (Y/N)";
@@ -9927,8 +9935,13 @@ namespace OutputReportTabular {
 			columnHead( 10 ) = "Lighting " + Wm2_unitName;
 			columnHead( 11 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
 			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
-			columnHead( 13 ) = "Temperature Capacitance Multiplier "; 
-
+			
+			if( FlagHMInternalThermalMass ){
+			// Two additional columns just for the Hybrid Models_SHL2016Nov
+				columnHead( 13 ) = "Hybrid Modeling (Y/N)"; 
+				columnHead( 14 ) = "Temperature Capacitance Multiplier "; 
+			} 
+			
 			rowHead = "";
 
 			rowHead( NumOfZones + grandTotal ) = "Total";
@@ -10017,9 +10030,20 @@ namespace OutputReportTabular {
 					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
 
+				
+				if( FlagHMInternalThermalMass ){
+				// Two additional columns just for the Hybrid Models_SHL2016Nov
+					if ( Zone( iZone ).FlagHMInternalThermalMass ) {
+						tableBody( 13, iZone ) = "Yes";
+					} else {
+						tableBody( 13, iZone ) = "No";
+					}
+				
+					tableBody( 14, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
+				} 
+			
 				// Hybrid Model Multiplier Added by Sang Hoon Lee August 2015
-				HMMultiplier = Zone( iZone ).ZoneVolCapMultpSensHMAverage;
-				tableBody( 13, iZone ) = RealToStr( HMMultiplier, 2 );
+				
 
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {
