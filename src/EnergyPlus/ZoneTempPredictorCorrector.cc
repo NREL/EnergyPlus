@@ -1548,7 +1548,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( allocated( TComfortControlTypes ) ) TComfortControlTypes.deallocate();
 
 		// Get the Hybrid Model setting inputs
-		CheckAndReadHybridModelZone(); // Added by Sang Hoon Lee May 2015
+		CheckAndReadHybridModelZone();
 		
 		// Default multiplier values
 		Real64 ZoneVolCapMultpSens = 1.0;

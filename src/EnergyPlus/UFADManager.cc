@@ -1200,8 +1200,9 @@ namespace UFADManager {
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
 				GainsFrac = ZoneUCSDUI( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUI( UINum ).B_Kc ) + ZoneUCSDUI( UINum ).C_Kc + ZoneUCSDUI( UINum ).D_Kc * Gamma + ZoneUCSDUI( UINum ).E_Kc * pow_2( Gamma );
 				GainsFrac = max( 0.6, min( GainsFrac, 1.0 ) );
-				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour ); // modified by Sang Hoon Lee July 2016
-				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour ); // modified by Sang Hoon Lee July 2016
+				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+
 				if ( UseZoneTimeStepHistory ) {
 					ZTM3OC( ZoneNum ) = XM3TOC( ZoneNum );
 					ZTM2OC( ZoneNum ) = XM2TOC( ZoneNum );
@@ -1655,8 +1656,9 @@ namespace UFADManager {
 				if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 					GainsFrac -= 0.2;
 				}
-				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour ); // modified by Sang Hoon Lee July 2016
-				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour ); // modified by Sang Hoon Lee July 2016				
+				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
+				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
+
 				if ( UseZoneTimeStepHistory ) {
 					ZTM3OC( ZoneNum ) = XM3TOC( ZoneNum );
 					ZTM2OC( ZoneNum ) = XM2TOC( ZoneNum );

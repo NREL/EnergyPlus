@@ -4452,8 +4452,8 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
 
-		if ( HybridModel::FlagHybridModel ){
-			// Hybrid model output added by Sang Hoon Lee August 2016
+		// Hybrid model output added by Sang Hoon Lee August 2016
+		if ( HybridModel::FlagHybridModel ){			
 			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
 		}
 	}

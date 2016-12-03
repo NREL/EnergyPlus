@@ -20,9 +20,6 @@ namespace HybridModel {
 	// MODULE INFORMATION:
 	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL 
 	//       DATE WRITTEN   Oct 2015
-	//       MODIFIED       
-	//       MODIFIED       
-	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
 	// This module manages hybrid model.
@@ -94,8 +91,8 @@ namespace HybridModel {
 				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 				if ( ZonePtr > 0 ) {
 					HybridModelZone( ZonePtr ).Name = cAlphaArgs( 1 );
-					HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "YES" );
-					HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "YES" );
+					HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "Yes" );
+					HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "Yes" );
 
 					// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
 					if (HybridModelZone(ZonePtr).InternalThermalMassCalc && HybridModelZone(ZonePtr).InfiltrationCalc){

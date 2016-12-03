@@ -722,6 +722,12 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \format singleLine
        \memo Multiplier altering the relative capacitance of the air compared to an empty zone
        \min-fields 6
+  A1 , \field Name
+       \type alpha
+  A2 , \field Zone or ZoneList Name
+       \type object-list
+       \object-list ZoneAndZoneListNames
+       \note If this field is left blank, the multipliers are applied to all the zones not specified
   N1 , \field Temperature Capacity Multiplier
        \type real
        \default 1.0
@@ -737,17 +743,11 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \default 1.0
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air carbon dioxide concentration
-  N4 , \field Generic Contaminant Capacity Multiplier
+  N4 ; \field Generic Contaminant Capacity Multiplier
        \type real
        \default 1.0
        \minimum> 0.0
        \note Used to alter the capacitance of zone air with respect to zone air generic contaminant concentration
-  A1 , \field Name
-       \type alpha
-  A2 ; \field Zone or ZoneList Name
-       \type object-list
-       \object-list ZoneAndZoneListNames
-       \note If this field is left blank, the multipliers are applied to all the zones not specified
 
 Timestep,
        \memo Specifies the "basic" timestep for the simulation. The
@@ -81639,16 +81639,16 @@ HybridModel:Zone,
        \note Use measured temperature data to calculate zone temperature capacity multiplier
        \note Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
        \type choice
-       \key NO
-       \key YES
-       \default NO
+       \key No
+       \key Yes
+       \default No
   A4 , \field Calculate Zone Air Infiltration Rate
        \note Use measured temperature data to calculate zone air infiltration air flow rate
        \note Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
        \type choice
-       \key NO
-       \key YES
-       \default NO
+       \key No
+       \key Yes
+       \default No
   A5 , \field Zone Measured Air Temperature Schedule Name
        \required-field
        \type object-list
