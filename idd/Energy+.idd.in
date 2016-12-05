@@ -98578,6 +98578,7 @@ Meter:Custom,
    \memo Used to allow users to combine specific variables and/or meters into
    \memo "custom" meter configurations. To access these meters by name, one must
    \memo first run a simulation to generate the RDD/MDD files and names.
+   \memo A Meter:Custom cannot reference another Meter:Custom.
    A1,  \field Name
         \required-field
    A2,  \field Fuel Type
