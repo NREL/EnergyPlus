@@ -1529,12 +1529,12 @@ namespace OutputProcessor {
 		NumCustomMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
         //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
-		std::unordered_set<std::string> namesOfMeterCustom;
-		namesOfMeterCustom.reserve(NumCustomMeters);
+		std::unordered_set< std::string > namesOfMeterCustom;
+		namesOfMeterCustom.reserve( NumCustomMeters );
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
-			GetObjectItem (cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-			namesOfMeterCustom.emplace(MakeUPPERCase(cAlphaArgs(1)));
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			namesOfMeterCustom.emplace( InputProcessor::MakeUPPERCase( cAlphaArgs( 1 ) ) );
 		}
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
@@ -1557,13 +1557,13 @@ namespace OutputProcessor {
 			// check if any fields reference another Meter:Custom
 			int found = 0;
 			for ( fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2 ) {
-				if ( namesOfMeterCustom.find(MakeUPPERCase(cAlphaArgs(fldIndex) ) ) != namesOfMeterCustom.end()) {
+				if ( namesOfMeterCustom.find( InputProcessor::MakeUPPERCase( cAlphaArgs( fldIndex ) ) ) != namesOfMeterCustom.end() ) {
 					found = fldIndex;
 					break;
 				}
 			}
 			if ( found != 0 ) {
-				ShowWarningError (cCurrentModuleObject + "=\"" + cAlphaArgs (1) + "\", contains a reference to another " + cCurrentModuleObject + " in field: " + cAlphaFieldNames (found) + "=\"" + cAlphaArgs (found) + "\".");
+				ShowWarningError ( cCurrentModuleObject + "=\"" + cAlphaArgs ( 1 ) + "\", contains a reference to another " + cCurrentModuleObject + " in field: " + cAlphaFieldNames ( found ) + "=\"" + cAlphaArgs( found ) + "\"." );
 				continue;
 			}
 

@@ -153,7 +153,7 @@ public:
 
 	void traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index );
 
-	void validate( json const * loc, json & parsed, unsigned line_num, unsigned line_index );
+	void validate( json & parsed, unsigned line_num, unsigned line_index );
 
 	void add_error( ErrorType err, double val, unsigned line_num, unsigned line_index );
 

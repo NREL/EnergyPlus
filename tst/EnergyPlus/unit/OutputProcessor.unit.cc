@@ -3364,7 +3364,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,timestep;",
 			});
 
-			ASSERT_FALSE (process_idf (idf_objects));
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -3439,7 +3439,7 @@ namespace EnergyPlus {
 				"Output:Meter,CustomMeter2,Hourly;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			bool errors_found = false;
 
@@ -3448,11 +3448,11 @@ namespace EnergyPlus {
 			EXPECT_FALSE( errors_found );
 
 			std::string errMsg = delimited_string ({
-				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name 1=\"DISTRICTHEATING:FACILITY\".",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid output_variable_or_meter_name=\"DISTRICTHEATING:FACILITY\".",
 				"   **   ~~~   ** ...will not be shown with the Meter results.",
 				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
 				"   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.",
-				"   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter Name 1=\"CUSTOMMETER1\"."
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: output_variable_or_meter_name=\"CUSTOMMETER1\"."
 			});
 
 			compare_err_stream(errMsg);

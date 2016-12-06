@@ -576,7 +576,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight ModernJSON )
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
 endif()

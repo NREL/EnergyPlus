@@ -846,7 +846,7 @@ TEST_F( EnergyPlusFixture, MakeEquivalentRectangle )
 		"	0.0, 11.4, 2.1,          !- X,Y,Z ==> Vertex 1 {m}           ",
 		"	0.0, 12.4, 0.9,          !- X,Y,Z ==> Vertex 2 {m}           ",
 		"	0.0, 4.8,  0.9,          !- X,Y,Z ==> Vertex 3 {m}           ",
-		"	0.0, 3.8,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",    
+		"	0.0, 3.8,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",
 		"                                                                ",
 		"BuildingSurface:Detailed,                                       ",
 		"	WallExample,   !- Name                                       ",
@@ -859,10 +859,10 @@ TEST_F( EnergyPlusFixture, MakeEquivalentRectangle )
 		"	NoWind,                  !- Wind Exposure                    ",
 		"	,                        !- View Factor to Ground            ",
 		"	,                        !- Number of Vertices               ",
-		"	0.0, 15.2, 2.4,          !- X,Y,Z ==> Vertex 1 {m}           ",        
-		"	0.0, 15.2, 0.0,          !- X,Y,Z ==> Vertex 2 {m}           ",        
-		"	0.0, 0.0,  0.0,          !- X,Y,Z ==> Vertex 3 {m}           ",        
-		"	0.0, 0.0,  2.4;          !- X,Y,Z ==> Vertex 4 {m}           ",        
+		"	0.0, 15.2, 2.4,          !- X,Y,Z ==> Vertex 1 {m}           ",
+		"	0.0, 15.2, 0.0,          !- X,Y,Z ==> Vertex 2 {m}           ",
+		"	0.0, 0.0,  0.0,          !- X,Y,Z ==> Vertex 3 {m}           ",
+		"	0.0, 0.0,  2.4;          !- X,Y,Z ==> Vertex 4 {m}           ",
 		"	                                                             ",
 		"BuildingSurface:Detailed,                                       ",
 		"	FloorExample,            !- Name                             ",
@@ -940,15 +940,15 @@ TEST_F( EnergyPlusFixture, MakeEquivalentRectangle )
 		});
 
 	// Prepare data for the test
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	GetMaterialData( ErrorsFound ); // read material data
-	EXPECT_FALSE( ErrorsFound ); 
+	EXPECT_FALSE( ErrorsFound );
 	GetConstructData( ErrorsFound ); // read construction data
-	EXPECT_FALSE( ErrorsFound ); 
+	EXPECT_FALSE( ErrorsFound );
 	GetZoneData( ErrorsFound ); // read zone data
-	EXPECT_FALSE( ErrorsFound ); 
+	EXPECT_FALSE( ErrorsFound );
 	GetProjectControlData( ErrorsFound ); // read project control data
-	EXPECT_FALSE( ErrorsFound ); 
+	EXPECT_FALSE( ErrorsFound );
 	CosZoneRelNorth.allocate( 1 );
 	SinZoneRelNorth.allocate( 1 );
 	CosZoneRelNorth( 1 ) = std::cos( -Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
