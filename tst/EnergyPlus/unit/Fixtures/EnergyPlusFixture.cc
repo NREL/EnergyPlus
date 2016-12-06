@@ -118,10 +118,7 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-<<<<<<< HEAD
-=======
 #include <EnergyPlus/DualDuct.hh>
->>>>>>> input_processor_refactor_verify_name
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
