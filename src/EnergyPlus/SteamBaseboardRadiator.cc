@@ -336,7 +336,6 @@ namespace SteamBaseboardRadiator {
 		int SurfNum; // Surface number Do loop counter
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool errFlag;
 		bool SteamMessageNeeded;
 
 		SteamMessageNeeded = true;

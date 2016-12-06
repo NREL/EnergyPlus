@@ -325,7 +325,6 @@ namespace CoolingPanelSimple {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
 		int CoolingPanelNum; // Cooling panel number
-		int CoolPanelNumI; // For loop index
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int SurfNum; // Surface number Do loop counter

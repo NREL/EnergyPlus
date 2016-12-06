@@ -480,7 +480,6 @@ namespace CurveManager {
 
 		std::string FileName; // name of external table data file
 		bool ReadFromFile; // True if external data file exists
-		int CurveFound;
 
 		// Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
@@ -5104,7 +5103,6 @@ Label999: ;
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int CurveNum;
-		int CurveFound;
 
 		NumPressure = InputProcessor::GetNumObjectsFound( CurveObjectName );
 		PressureCurve.allocate( NumPressure );

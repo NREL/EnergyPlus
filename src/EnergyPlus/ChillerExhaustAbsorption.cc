@@ -344,7 +344,6 @@ namespace ChillerExhaustAbsorption {
 		int IOStat; // IO Status when calling get input subroutine
 		int MTExhaustNodeNum; // Exhaust node number passed from MicroTurbine
 		std::string ChillerName;
-		bool errFlag;
 		bool Okay;
 
 		//FLOW

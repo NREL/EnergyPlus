@@ -311,7 +311,6 @@ namespace ChillerGasAbsorption {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		std::string ChillerName;
-		bool errFlag;
 		bool Okay;
 
 		//FLOW

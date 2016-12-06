@@ -276,7 +276,6 @@ namespace ElectricBaseboardRadiator {
 		int SurfNum; // surface number that radiant heat delivered
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool errFlag;
 
 		cCurrentModuleObject = cCMO_BBRadiator_Electric;
 

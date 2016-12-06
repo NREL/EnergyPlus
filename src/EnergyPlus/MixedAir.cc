@@ -1221,7 +1221,6 @@ namespace MixedAir {
 		static bool ErrorsFound( false ); // Flag identifying errors found during get input
 		int ZoneListNum; // Index to Zone List
 		int MechVentZoneCount; // Index counter for zones with mechanical ventilation
-		bool ErrorInName; // Error returned from VerifyName call
 		int NumArg; // Number of arguments from GetObjectDefMaxArgs call
 		int MaxAlphas; // Maximum alphas in multiple objects
 		int MaxNums; // Maximum numbers in multiple objects
