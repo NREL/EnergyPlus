@@ -522,7 +522,9 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVSimplePerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				tmpSimpleModuleParams( ModNum ).Name = cAlphaArgs( 1 );
 				tmpSimpleModuleParams( ModNum ).ActiveFraction = rNumericArgs( 1 );
 
@@ -560,7 +562,9 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
 			for ( ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				tmpTNRSYSModuleParams( ModNum ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "CrystallineSilicon" ) ) {
 					tmpTNRSYSModuleParams( ModNum ).CellType = CrystallineSiPVCells;
@@ -608,7 +612,9 @@ namespace Photovoltaics {
 			for ( ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum ) {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 
 				tmpSNLModuleParams( ModNum ).name = cAlphaArgs( 1 );
 				tmpSNLModuleParams( ModNum ).Acoll = rNumericArgs( 1 );

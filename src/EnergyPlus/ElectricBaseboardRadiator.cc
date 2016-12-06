@@ -327,7 +327,9 @@ namespace ElectricBaseboardRadiator {
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames.allocate(NumNumbers);
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) {
+				continue;
+			}
 			VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound, cCurrentModuleObject + " Name" );
 
 

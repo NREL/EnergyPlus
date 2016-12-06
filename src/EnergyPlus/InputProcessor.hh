@@ -24,7 +24,6 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <UtilityRoutines.hh>
-#include <GlobalNames.hh>
 
 using json = nlohmann::json;
 
@@ -804,23 +803,23 @@ namespace EnergyPlus {
 		static
 		bool
 		IsNameEmpty(
-				std::string & NameToVerify,
-				std::string const & StringToDisplay,
-				bool & ErrorFound
+			std::string & NameToVerify,
+			std::string const & StringToDisplay,
+			bool & ErrorFound
 		);
 		static
 		void
 		RangeCheck(
-				bool & ErrorsFound, // Set to true if error detected
-				std::string const & WhatFieldString, // Descriptive field for string
-				std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
-				std::string const & ErrorLevel, // 'Warning','Severe','Fatal')
-				Optional_string_const LowerBoundString = _, // String for error message, if applicable
-				Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
-				Optional_string_const UpperBoundString = _, // String for error message, if applicable
-				Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
-				Optional_string_const ValueString = _, // Value with digits if to be displayed with error
-				Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
+			bool & ErrorsFound, // Set to true if error detected
+			std::string const & WhatFieldString, // Descriptive field for string
+			std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
+			std::string const & ErrorLevel, // 'Warning','Severe','Fatal')
+			Optional_string_const LowerBoundString = _, // String for error message, if applicable
+			Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
+			Optional_string_const UpperBoundString = _, // String for error message, if applicable
+			Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
+			Optional_string_const ValueString = _, // Value with digits if to be displayed with error
+			Optional_string_const WhatObjectName = _ // ObjectName -- used for error messages
 		);
 
 //	void

@@ -83,6 +83,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
 #include <HVACDXHeatPumpSystem.hh>
@@ -622,7 +623,7 @@ namespace OutdoorAirUnit {
 
 			//A16 : component list
 
-			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 16 ), CurrentModuleObject, cAlphaFields( 16 ), SupplyFanUniqueNames, ErrorsFound );
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 16 ), CurrentModuleObject, cAlphaFields( 16 ), ComponentListUniqueNames, ErrorsFound );
 			ComponentListName = cAlphaArgs( 16 );
 			OutAirUnit( OAUnitNum ).ComponentListName = ComponentListName;
 			if ( ! lAlphaBlanks( 16 ) ) {

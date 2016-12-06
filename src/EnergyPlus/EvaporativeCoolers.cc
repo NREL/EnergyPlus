@@ -85,6 +85,7 @@
 #include <Fans.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -3454,7 +3455,8 @@ namespace EvaporativeCoolers {
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = "";
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = cNumericFields;
 
-				GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound );
+
 				ZoneEvapUnit( UnitLoop ).Name = Alphas( 1 );
 				if ( lAlphaBlanks( 2 ) ) {
 					ZoneEvapUnit( UnitLoop ).AvailSchedIndex = ScheduleAlwaysOn;

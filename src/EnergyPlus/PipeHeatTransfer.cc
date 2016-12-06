@@ -80,6 +80,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>

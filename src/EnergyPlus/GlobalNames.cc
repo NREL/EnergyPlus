@@ -60,7 +60,6 @@
 #include <GlobalNames.hh>
 #include <DataPrecisionGlobals.hh>
 #include <InputProcessor.hh>
-#include <unordered_map>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -124,11 +123,11 @@ namespace GlobalNames {
 
 	void
 	IntraObjUniquenessCheck(
-			std::string & NameToVerify,
-			std::string const & CurrentModuleObject,
-			std::string const & FieldName,
-			std::unordered_set < std::string > UniqueStrings,
-			bool & ErrorsFound
+		std::string & NameToVerify,
+		std::string const & CurrentModuleObject,
+		std::string const & FieldName,
+		std::unordered_set< std::string > & UniqueStrings,
+		bool & ErrorsFound
 	)
 	{
 		if ( NameToVerify.empty() ) {
@@ -147,19 +146,19 @@ namespace GlobalNames {
 		}
 	}
 
-	void
+	bool
 	VerifyUniqueInterObjectName(
-			std::unordered_map< std::string, std::string > & names,
-			std::string & object_name,
-			std::string const & object_type,
-			std::string const & field_name,
-			bool & ErrorsFound
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		std::string const & field_name,
+		bool & ErrorsFound
 	) {
 		if ( object_name.empty() ) {
 			ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
 			ErrorsFound = true;
 			object_name = "xxxxx";
-			return;
+			return true;
 		}
 		auto const & names_iter = names.find( object_name );
 		if ( names_iter == names.end() ) {
@@ -167,21 +166,23 @@ namespace GlobalNames {
 		} else {
 			ErrorsFound = true;
 			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+			return true;
 		}
+		return false;
 	}
 
-	void
+	bool
 	VerifyUniqueInterObjectName(
-			std::unordered_map< std::string, std::string > & names,
-			std::string & object_name,
-			std::string const & object_type,
-			bool & ErrorsFound
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		bool & ErrorsFound
 	) {
 		if ( object_name.empty() ) {
 			ShowSevereError("E+ object type " + object_name + " has a blank field");
 			ErrorsFound = true;
 			object_name = "xxxxx";
-			return;
+			return true;
 		}
 		auto const & names_iter = names.find( object_name );
 		if ( names_iter == names.end() ) {
@@ -189,15 +190,17 @@ namespace GlobalNames {
 		} else {
 			ErrorsFound = true;
 			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+			return true;
 		}
+		return false;
 	}
 
 	void
 	VerifyUniqueChillerName(
-			std::string const & TypeToVerify,
-			std::string const & NameToVerify,
-			bool & ErrorFound,
-			std::string const & StringToDisplay
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		std::string const & StringToDisplay
 	)
 	{
 
@@ -291,7 +294,7 @@ namespace GlobalNames {
 	void
 	VerifyUniqueCoilName(
 		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
+		std::string & NameToVerify,
 		bool & ErrorFound,
 		std::string const & StringToDisplay
 	)
@@ -306,6 +309,13 @@ namespace GlobalNames {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine verifys that a new name will be unique in the list of
 		// Coils.  If not found in the list, it is added before returning.
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( "\"" + TypeToVerify + "\" cannot have a blank field" );
+			ErrorFound = true;
+			NameToVerify = "xxxxx";
+			return;
+		}
 
         ErrorFound = false;
         auto const iter = CoilNames.find( NameToVerify );

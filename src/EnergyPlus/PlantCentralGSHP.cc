@@ -673,7 +673,9 @@ namespace PlantCentralGSHP {
 
 			// intialize nth chiller heater index (including identical units) for current wrapper
 			NumChHtrPerWrapper = 0;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 
 			if ( cAlphaArgs( 2 ) == "SMARTMIXING" ) {
 				Wrapper( WrapperNum ).ControlMode = SmartMixing;

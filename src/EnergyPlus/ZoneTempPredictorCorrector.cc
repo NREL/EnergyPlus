@@ -85,6 +85,7 @@
 #include <EMSManager.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
@@ -242,14 +243,13 @@ namespace ZoneTempPredictorCorrector {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	std::unordered_map<std::string, std::string> HumidityControlZoneUniqueNames;
+	std::unordered_set< std::string > HumidityControlZoneUniqueNames;
 	Array1D< ZoneTempControlType > SetPointSingleHeating;
 	Array1D< ZoneTempControlType > SetPointSingleCooling;
 	Array1D< ZoneTempControlType > SetPointSingleHeatCool;
 	Array1D< ZoneTempControlType > SetPointDualHeatCool;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
-	std::unordered_map <std::string, std::string> SetPointSingleCoolingFangerUniqueNames;
 	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
@@ -283,7 +283,6 @@ namespace ZoneTempPredictorCorrector {
 		SetPointDualHeatCool.deallocate();
 		SetPointSingleHeatingFanger.deallocate();
 		SetPointSingleCoolingFanger.deallocate();
-		SetPointSingleCoolingFangerUniqueNames.clear();
 		SetPointSingleHeatCoolFanger.deallocate();
 		SetPointDualHeatCoolFanger.deallocate();
 	}
@@ -898,7 +897,7 @@ namespace ZoneTempPredictorCorrector {
 			InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
 			HumidityControlZone( HumidControlledZoneNum ).ControlName = cAlphaArgs( 1 );
-			GlobalNames::VerifyUniqueInterObjectName( HumidityControlZoneUniqueNames, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), ErrorsFound);
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), HumidityControlZoneUniqueNames, ErrorsFound);
 
 			HumidityControlZone( HumidControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
 			HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum = InputProcessor::FindItem( cAlphaArgs( 2 ), Zone );
@@ -1202,12 +1201,11 @@ namespace ZoneTempPredictorCorrector {
 
 		if ( NumSingleFangerCoolingControls > 0 ) {
 			SetPointSingleCoolingFanger.allocate(NumSingleFangerCoolingControls);
-			SetPointSingleCoolingFangerUniqueNames.reserve(static_cast< unsigned >(NumSingleFangerCoolingControls));
 		}
 
 		for ( SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerCoolingControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleCoolingFanger( SingleFangerCoolingControlNum ).PMVSchedName = cAlphaArgs( 2 );
@@ -1233,7 +1231,7 @@ namespace ZoneTempPredictorCorrector {
 
 		for ( SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= NumSingleFangerHeatCoolControls; ++SingleFangerHeatCoolControlNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleFangerHeatCoolControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName(SetPointSingleCoolingFangerUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).Name = cAlphaArgs( 1 );
 			SetPointSingleHeatCoolFanger( SingleFangerHeatCoolControlNum ).PMVSchedName = cAlphaArgs( 2 );

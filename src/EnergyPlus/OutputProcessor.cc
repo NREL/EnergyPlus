@@ -84,6 +84,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -1669,8 +1670,9 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );
 			VarsOnCustomMeter = 0;
@@ -1816,8 +1818,9 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );
 			VarsOnCustomMeter = 0;
@@ -2684,10 +2687,10 @@ namespace OutputProcessor {
 
 		} else if ( endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS" ) {
 			EndUse = "Baseboard";
-			
+
 		} else if ( endUseMeter == "COOLINGPANEL" || endUseMeter == "COOLINGPANELS" ) {
 			EndUse = "CoolingPanel";
-			
+
 		} else if ( endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION" ) {
 			EndUse = "HeatRejection";
 

@@ -76,6 +76,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -439,7 +440,7 @@ namespace HeatRecovery {
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = "";
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = cNumericFieldNames;
 
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( HeatExchangerUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			ExchCond( ExchNum ).Name = cAlphaArgs( 1 );
 			ExchCond( ExchNum ).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
@@ -501,6 +502,7 @@ namespace HeatRecovery {
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = "";
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = cNumericFieldNames;
+
 			GlobalNames::VerifyUniqueInterObjectName( HeatExchangerUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			ExchCond( ExchNum ).Name = cAlphaArgs( 1 );
@@ -611,6 +613,7 @@ namespace HeatRecovery {
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames.allocate( NumNumbers );
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = "";
 			HeatExchCondNumericFields( ExchNum ).NumericFieldNames = cNumericFieldNames;
+
 			GlobalNames::VerifyUniqueInterObjectName( HeatExchangerUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			ExchCond( ExchNum ).Name = cAlphaArgs( 1 );
@@ -670,7 +673,7 @@ namespace HeatRecovery {
 			cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PerfDataIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			PerfDataNum = PerfDataIndex;
-						
+
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames.allocate( NumNumbers );
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = "";
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = cNumericFieldNames;
@@ -1486,7 +1489,7 @@ namespace HeatRecovery {
 				}
 				DataFractionUsedForSizing = 1.0;
 			} else {
-				if ( ZoneSizingRunDone ) {					
+				if ( ZoneSizingRunDone ) {
 					SizingMethod = AutoCalculateSizing;
 					if ( ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent ) {
 						// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment

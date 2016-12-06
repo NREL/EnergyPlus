@@ -1412,8 +1412,8 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).ZoneName = "Invalid Zone Name";
 						}
 					}
-					InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-					if ( ErrorsFound && ! SizingZoneObjects( Item ).ZoneListActive ) {
+					bool const nameEmpty = InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+					if ( nameEmpty && ! SizingZoneObjects( Item ).ZoneListActive ) {
 						ShowContinueError( "Zone may have been entered in a ZoneList assignment." );
 					}
 

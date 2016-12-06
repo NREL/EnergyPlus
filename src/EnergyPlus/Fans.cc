@@ -77,6 +77,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>

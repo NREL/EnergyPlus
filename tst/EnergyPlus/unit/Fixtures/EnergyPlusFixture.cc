@@ -149,6 +149,7 @@
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -373,6 +374,7 @@ namespace EnergyPlus {
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
 		HVACDXSystem::clear_state();
+		HVACHXAssistedCoolingCoil::clear_state();
 		HVACManager::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();

@@ -335,7 +335,7 @@ namespace PhotovoltaicThermalCollectors {
 			tmpSimplePVTperf.allocate( NumSimplePVTPerform );
 			for ( Item = 1; Item <= NumSimplePVTPerform; ++Item ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) continue;
 
 				tmpSimplePVTperf( Item ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Fixed" ) ) {

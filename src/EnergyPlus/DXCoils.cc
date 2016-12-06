@@ -995,8 +995,6 @@ namespace DXCoils {
 		Real64 MaxCurvePLR; // used for testing PLF curve output
 		Real64 CurveInput; // index used for testing PLF curve output
 
-		bool errFlag;
-
 		// find number of each type of DX coil and calculate the total number
 		NumDoe2DXCoils = InputProcessor::GetNumObjectsFound( "Coil:Cooling:DX:SingleSpeed" );
 		NumDXHeatingCoils = InputProcessor::GetNumObjectsFound( "Coil:Heating:DX:SingleSpeed" );
@@ -1981,10 +1979,7 @@ namespace DXCoils {
 			DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate ( MaxNumbers );
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
-			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), errFlag, CurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 			DXCoil( DXCoilNum ).Name = Alphas( 1 );
 			DXCoil( DXCoilNum ).DXCoilType = CurrentModuleObject;
 			DXCoil( DXCoilNum ).DXCoilType_Num = CoilDX_HeatingEmpirical;
@@ -3678,9 +3673,6 @@ namespace DXCoils {
 			DXCoilNumericFields ( DXCoilNum ).PerfMode ( 1 ).FieldNames = cNumericFields;
 			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, Alphas( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
 			DXCoil( DXCoilNum ).Name = Alphas( 1 );
 			// Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
 			HeatReclaimDXCoil( DXCoilNum ).Name = DXCoil( DXCoilNum ).Name;
@@ -5478,7 +5470,7 @@ namespace DXCoils {
 				if ( ErrorsFound ) {
 					ShowFatalError( "Preceding condition causes termination." );
 				}
-				
+
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
 				if( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Cooling ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
 					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -5544,7 +5536,7 @@ namespace DXCoils {
 				RatedHeatPumpIndoorAirTemp = 21.11; // 21.11C or 70F
 				RatedHeatPumpIndoorHumRat = 0.00881; // Humidity ratio corresponding to 70F dry bulb/60F wet bulb
 				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName );
-				
+
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
 				if( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
 					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -14593,7 +14585,7 @@ Label50: ;
 		// 		ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet temperature error continues...", DXCoil( DXCoilNum ).LowAmbErrIndex, DXCoil( DXCoilNum ).LowTempLast, DXCoil( DXCoilNum ).LowTempLast, _, "[C]", "[C]" );
 		// 	}
 		// }
-        // 
+        //
 		// if ( DXCoil( DXCoilNum ).PrintHighAmbMessage ) { // .AND. &
 		// 	if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
 		// 		if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
@@ -14673,7 +14665,7 @@ Label50: ;
 			// 		DXCoil( DXCoilNum ).LowAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString();
 			// 	}
 			// }
-            // 
+            //
 			// // check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
 			// if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! WarmupFlag ) {
 			// 	DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
@@ -15228,7 +15220,7 @@ Label50: ;
 			C2Tevap = DXCoil( CoilIndex ).C2Te;
 			C3Tevap = DXCoil( CoilIndex ).C3Te;
 			BF = DXCoil( CoilIndex ).RateBFVRFIUEvap;
-			
+
 			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = Tin - QinSenPerFlowRate / 1005;
@@ -15329,7 +15321,7 @@ Label50: ;
 			C2Tcond = DXCoil( CoilIndex ).C2Tc;
 			C3Tcond = DXCoil( CoilIndex ).C3Tc;
 			BF = DXCoil( CoilIndex ).RateBFVRFIUCond;
-			
+
 			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = QinSenPerFlowRate / 1005 + Tin;
@@ -15548,7 +15540,7 @@ Label50: ;
 
 		if( OperationMode == FlagCoolMode ) {
 		//Cooling: OperationMode 0
-			
+
 			if( present( BF ) ) {
 				BF_real = BF;
 			} else {
@@ -15564,10 +15556,10 @@ Label50: ;
 			} else {
 				SHSC_real = SH_rate;
 			}
-			
+
 			// Coil capacity at rated conditions
 			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, 26, Te_rate, SH_rate, BFC_rate, Q_rate, Ts );
-			
+
 			// Coil capacity at given conditions
 			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, Tinlet, TeTc_real, SHSC_real, BF_real, Q_real, Ts );
 

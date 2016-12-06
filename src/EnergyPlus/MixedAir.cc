@@ -90,6 +90,7 @@
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
 #include <HVACDXHeatPumpSystem.hh>
@@ -305,7 +306,7 @@ namespace MixedAir {
 	Array1D< OAMixerProps > OAMixer;
 	Array1D< VentilationMechanicalProps > VentilationMechanical;
 	std::unordered_set< std::string > ControllerListUniqueNames;
-	std::unordered_map< std::string, std::string > OutsideAirSysUniqueNames;
+	std::unordered_map< std::string, std::string > OAControllerUniqueNames;
 
 	// Functions
 
@@ -382,7 +383,7 @@ namespace MixedAir {
 		DesignSpecZoneADObjName.deallocate();
 		DesignSpecZoneADObjIndex.deallocate();
 		ControllerListUniqueNames.clear();
-		OutsideAirSysUniqueNames.clear();
+		OAControllerUniqueNames.clear();
 	}
 
 	void
@@ -1047,14 +1048,13 @@ namespace MixedAir {
 		OutsideAirSys.allocate( NumOASystems );
 		OASysEqSizing.allocate( NumOASystems );
 		ControllerListUniqueNames.reserve( static_cast< unsigned >( NumOASystems ) );
-		OutsideAirSysUniqueNames.reserve( static_cast< unsigned >( NumOASystems ) );
 		MyOneTimeErrorFlag.dimension( NumOASystems, true );
 		MyOneTimeCheckUnitarySysFlag.dimension( NumOASystems,true );
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			GlobalNames::VerifyUniqueInterObjectName( OutsideAirSysUniqueNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			InputProcessor::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 			OutsideAirSys( OASysNum ).Name = AlphArray( 1 );
 			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), ControllerListUniqueNames, ErrorsFound );
 			ControllerListName = AlphArray( 2 );
@@ -1350,7 +1350,6 @@ namespace MixedAir {
 		// Count OAcontrollers and ERVcontrollers and allocate arrays
 		AllocateOAControllers();
 
-
 		// If there are ERV controllers, they have been filled before now NumOAControllers includes the count of NumERVControllers
 		if ( NumOAControllers > NumERVControllers ) {
 			CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
@@ -1358,7 +1357,7 @@ namespace MixedAir {
 			for ( OutAirNum = NumERVControllers+1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
 				++currentOAControllerNum;
 				InputProcessor::GetObjectItem( CurrentModuleObject, currentOAControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				GlobalNames::VerifyUniqueInterObjectName( OutsideAirSysUniqueNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( OAControllerUniqueNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 				ProcessOAControllerInputs( CurrentModuleObject, OutAirNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 
@@ -1901,6 +1900,7 @@ namespace MixedAir {
 			NumERVControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
 			NumOAControllers += NumERVControllers;
 			OAController.allocate( NumOAControllers );
+			OAControllerUniqueNames.reserve( static_cast< unsigned >( NumOAControllers ) );
 			AllocateOAControllersFlag = false;
 		}
 
@@ -1926,7 +1926,7 @@ namespace MixedAir {
 		// na
 
 		// Using/Aliasing
-				using NodeInputManager::GetOnlySingleNode;
+		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 
 		// Locals
@@ -5778,6 +5778,34 @@ namespace MixedAir {
 			}
 		}
 
+	}
+
+	void
+	CheckOAControllerName(
+		std::string & OAControllerName,
+		std::string const & ObjectType,
+		std::string const & FieldName,
+		bool & ErrorsFound
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   October 2006
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// When OA Controller data is gotten from other routines, must check to make sure
+		// new name doesn't duplicate.  (Essentially a pass through to call Verify Name)
+		// Currently, this is only called from HVACStandAlongERV::GetStandaloneERV()
+
+		if ( AllocateOAControllersFlag ) {
+			// Make sure OAControllers are allocated
+			AllocateOAControllers();
+		}
+
+		GlobalNames::VerifyUniqueInterObjectName( OAControllerUniqueNames, OAControllerName, ObjectType, FieldName, ErrorsFound );
 	}
 
 	void

@@ -80,6 +80,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HVACManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -131,7 +132,7 @@ namespace HeatBalanceAirManager {
 
 	// Data
 	std::unordered_set< std::string > UniqueZoneNames;
-	std::unordered_map< std::string, std::string > Infiltration_map;
+	std::unordered_map< std::string, std::string > UniqueInfiltrationNames;
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
@@ -163,7 +164,7 @@ namespace HeatBalanceAirManager {
 	{
 		ManageAirHeatBalanceGetInputFlag =  true;
 		UniqueZoneNames.clear();
-		Infiltration_map.clear();
+		UniqueInfiltrationNames.clear();
 	}
 
 
@@ -710,7 +711,7 @@ namespace HeatBalanceAirManager {
 		TotInfiltration = TotDesignFlowInfiltration + TotShermGrimsInfiltration + TotAIM2Infiltration;
 
 		Infiltration.allocate( TotInfiltration );
-		Infiltration_map.reserve( static_cast< unsigned > ( TotInfiltration ) );
+		UniqueInfiltrationNames.reserve( static_cast< unsigned > ( TotInfiltration ) );
 
 		if ( TotDesignFlowInfiltration > 0 ) {
 			Loop = 0;
@@ -871,7 +872,7 @@ namespace HeatBalanceAirManager {
 		for ( Loop = 1; Loop <= TotShermGrimsInfiltration; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			GlobalNames::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -919,7 +920,7 @@ namespace HeatBalanceAirManager {
 		for ( Loop = 1; Loop <= TotAIM2Infiltration; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			GlobalNames::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );

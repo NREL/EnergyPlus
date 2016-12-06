@@ -122,28 +122,28 @@ namespace GlobalNames {
 
 	void
 	IntraObjUniquenessCheck(
-			std::string & NameToVerify,
-			std::string const & CurrentModuleObject,
-			std::string const & FieldName,
-			std::unordered_set < std::string > UniqueStrings,
-			bool & ErrorsFound
+		std::string & NameToVerify,
+		std::string const & CurrentModuleObject,
+		std::string const & FieldName,
+		std::unordered_set< std::string > & UniqueStrings,
+		bool & ErrorsFound
 	);
 
-	void
+	bool
 	VerifyUniqueInterObjectName(
-			std::unordered_map< std::string, std::string > & names,
-			std::string & object_name,
-			std::string const & object_type,
-			std::string const & field_name,
-			bool & ErrorsFound
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		std::string const & field_name,
+		bool & ErrorsFound
 	);
 
-	void
+	bool
 	VerifyUniqueInterObjectName(
-			std::unordered_map< std::string, std::string > & names,
-			std::string & object_name,
-			std::string const & object_type,
-			bool & ErrorsFound
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		bool & ErrorsFound
 	);
 
 	void
@@ -173,12 +173,12 @@ namespace GlobalNames {
 	void
 	VerifyUniqueCoilName(
 		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
+		std::string & NameToVerify,
 		bool & ErrorFound,
 		std::string const & StringToDisplay
 	);
 
-	void 
+	void
 	VerifyUniqueADUName(
 		std::string const & TypeToVerify,
 		std::string const & NameToVerify,

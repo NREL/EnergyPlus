@@ -76,6 +76,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>

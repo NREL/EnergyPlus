@@ -94,6 +94,7 @@
 #include <EconomicTariff.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
@@ -1434,7 +1435,9 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 			//Load the material derived type from the input data.
 			++MaterNum;
 			Material( MaterNum ).Group = RegularMaterial;
@@ -1504,7 +1507,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			//Load the material derived type from the input data.
 			++MaterNum;
@@ -1562,7 +1568,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			//Load the material derived type from the input data.
 			++MaterNum;
@@ -1583,7 +1592,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = IRTMaterial;
@@ -1630,7 +1642,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = WindowGlass;
@@ -1834,7 +1849,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = WindowGlass;
@@ -1902,7 +1920,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = GlassEquivalentLayer;
@@ -1971,7 +1992,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = WindowGas;
@@ -2068,7 +2092,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = GapEquivalentLayer;
@@ -2174,7 +2201,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = WindowGasMixture;
@@ -2233,7 +2263,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = Shade;
@@ -2296,7 +2329,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = ShadeEquivalentLayer;
@@ -2360,7 +2396,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = DrapeEquivalentLayer;
@@ -2423,7 +2462,10 @@ namespace HeatBalanceManager {
 
 			//Call GetObjectItem routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = Screen;
@@ -2575,7 +2617,10 @@ namespace HeatBalanceManager {
 
 			//Call GetObjectItem routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = ScreenEquivalentLayer;
@@ -2691,7 +2736,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = WindowBlind;
@@ -2931,7 +2979,10 @@ namespace HeatBalanceManager {
 
 			//Call Input Get routine to retrieve material data
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = BlindEquivalentLayer;
@@ -3062,7 +3113,10 @@ namespace HeatBalanceManager {
 			//Call Input Get Routine to retrieve material data from ecoroof
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, MaterialNames( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			//this part is similar to the regular material
 			//Load the material derived type from the input data.
@@ -3126,7 +3180,10 @@ namespace HeatBalanceManager {
 				//Get each TCGlazings from the input processor
 				InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
+					ShowContinueError( "...All Thermochromic Glazing names must be unique regardless of subtype." );
+					continue;
+				}
 
 				if ( MaterialNumProp + 1 != MaterialNumAlpha ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
@@ -3178,7 +3235,10 @@ namespace HeatBalanceManager {
 		for ( Loop = 1; Loop <= TotSimpleWindow; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, MaterialNumAlpha, rNumericArgs, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 			++MaterNum;
 			Material( MaterNum ).Group = WindowSimpleGlazing;
 			Material( MaterNum ).Name = cAlphaArgs( 1 );
@@ -3544,8 +3604,9 @@ namespace HeatBalanceManager {
 
 			//Get the object names for each construction from the input processor
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			//Glass layer counter
 			iMatGlass = 0;
@@ -3635,8 +3696,9 @@ namespace HeatBalanceManager {
 
 			//Get the object names for each construction from the input processor
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			++ConstrNum;
 			//Assign Construction name to the Derived Type using the zeroth position of the array
@@ -3712,8 +3774,9 @@ namespace HeatBalanceManager {
 
 			//Get the object names for each construction from the input processor
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 0 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			++ConstrNum;
 			//Assign Construction name to the Derived Type using the zeroth position of the array
@@ -6063,8 +6126,9 @@ Label1000: ;
 
 			// Get the object names for each construction from the input processor
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			++ConstrNum;
 
@@ -6137,8 +6201,9 @@ Label1000: ;
 
 			//Get the object names for each construction from the input processor
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, ConstructAlphas, ConstructNumAlpha, DummyProps, DummyNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, ConstructAlphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			++ConstrNum;
 
@@ -6284,7 +6349,10 @@ Label1000: ;
 
 			for ( Loop = 1; Loop <= TotSurfIncSolSSG; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) {
+					ShowContinueError( "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name" );
+					continue;
+				}
 
 				SurfIncSolSSG( Loop ).Name = cAlphaArgs( 1 );
 
@@ -6333,7 +6401,10 @@ Label1000: ;
 
 			for ( Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+				if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) {
+					ShowContinueError( "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other ComplexFenestrationProperty:SolarAbsorbedLayers name" );
+					continue;
+				}
 
 				FenLayAbsSSG( Loop ).Name = cAlphaArgs( 1 );
 
@@ -6825,6 +6896,7 @@ Label1000: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
 			}
 
@@ -6853,6 +6925,7 @@ Label1000: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
 			}
 
@@ -6872,7 +6945,10 @@ Label1000: ;
 		//ALLOCATE(DeflectionState(W7DeflectionStates))
 		for ( Loop = 1; Loop <= W7MaterialGaps; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMaterialNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
+				continue;
+			}
 
 			++MaterNum;
 			Material( MaterNum ).Group = ComplexWindowGap;
@@ -6921,6 +6997,7 @@ Label1000: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
+				ShowContinueError( "...All Material names must be unique regardless of subtype." );
 				continue;
 			}
 
@@ -7264,9 +7341,10 @@ Label1000: ;
 		FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
 		for ( Loop = 1; Loop <= TotComplexFenStates; ++Loop ) {
 			InputProcessor::GetObjectItem( locCurrentModuleObject, Loop, locAlphaArgs, NumAlphas, locNumericArgs, NumNumbers, IOStatus, locNumericFieldBlanks, _, locAlphaFieldNames, locNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, locAlphaArgs( 1 ), CurrentModuleObject, locAlphaFieldNames( 1 ), ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueConstructNames, locAlphaArgs( 1 ), CurrentModuleObject, locAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 			++ConstrNum;
-			if ( ErrorsFound ) continue;
 			//Glass layer counter
 			iMatGlass = 0;
 			//Simon TODO: This is to be confirmed.  If this is just initial value, then we might want to make better guess

@@ -87,6 +87,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -1558,7 +1559,7 @@ namespace LowTempRadiantSystem {
 		// FLOW:
 
 		InitErrorsFound = false;
-		
+
 		if ( MyOneTimeFlag ) {
 			MyEnvrnFlagHydr.allocate( NumOfHydrLowTempRadSys );
 			MyEnvrnFlagCFlo.allocate( NumOfCFloLowTempRadSys );

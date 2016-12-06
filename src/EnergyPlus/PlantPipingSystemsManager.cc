@@ -85,6 +85,7 @@
 #include <DataSurfaces.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -142,7 +143,7 @@ namespace PlantPipingSystemsManager {
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_int NeighborFieldCells;
 	Array1D_int NeighborBoundaryCells;
-	std::unordered_set< std::string > GroundDomainUniqueNames;
+	std::unordered_map< std::string, std::string > GroundDomainUniqueNames;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// ************************************* !
@@ -1094,7 +1095,7 @@ namespace PlantPipingSystemsManager {
 
 				// Get the name, validate
 				Domain( ZoneCoupledDomainCtr ).ObjName = cAlphaArgs( 1 );
-				GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 1 ), ObjName_ZoneCoupled_Slab, cAlphaFieldNames( 1 ), GroundDomainUniqueNames, ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( GroundDomainUniqueNames, cAlphaArgs( 1 ), ObjName_ZoneCoupled_Slab, cAlphaFieldNames( 1 ), ErrorsFound );
 
 				// Read in the rest of the inputs into the local type for clarity during transition
 				Domain( ZoneCoupledDomainCtr ).OSCMName = cAlphaArgs( 4 );
@@ -1427,7 +1428,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			Domain( BasementCtr ).ObjName = cAlphaArgs( 1 );
-			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 1 ), ObjName_ZoneCoupled_Basement, cAlphaFieldNames( 1 ), GroundDomainUniqueNames, ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( GroundDomainUniqueNames, cAlphaArgs( 1 ), ObjName_ZoneCoupled_Basement, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			// Read in the some of the inputs into the local type for clarity during transition
 			Domain( BasementCtr ).Depth = rNumericArgs( 1 );

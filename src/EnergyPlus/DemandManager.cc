@@ -71,6 +71,7 @@
 #include <MixedAir.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <ScheduleManager.hh>
@@ -463,8 +464,8 @@ namespace DemandManager {
 			for ( ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
-				// unique_string_blank_key_check
 				DemandManagerList( ListNum ).Name = AlphArray( 1 );
 
 				DemandManagerList( ListNum ).Meter = GetMeterIndex( AlphArray( 2 ) );

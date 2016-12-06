@@ -79,6 +79,7 @@
 #include <DataZoneEquipment.hh>
 #include <Fans.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatRecovery.hh>
 #include <InputProcessor.hh>
 #include <MixedAir.hh>
@@ -407,6 +408,7 @@ namespace HVACStandAloneERV {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, StandAloneERVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			StandAloneERVNum = StandAloneERVIndex; // separate variables in case other objects read by this module at some point later
+			InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound );
 			StandAloneERV( StandAloneERVNum ).Name = Alphas( 1 );
 			StandAloneERV( StandAloneERVNum ).UnitType = CurrentModuleObject;
 
@@ -717,6 +719,7 @@ namespace HVACStandAloneERV {
 
 		for ( ERVControllerNum = 1; ERVControllerNum <= NumERVCtrlrs; ++ERVControllerNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, ERVControllerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			MixedAir::CheckOAControllerName( Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++OutAirNum;
 			auto & thisOAController( OAController( OutAirNum ) );
 
@@ -1379,10 +1382,10 @@ namespace HVACStandAloneERV {
 		// (i.e., ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;)
 		if ( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex > 0 ) {
 			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).SupplyAirFanName, true, StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex );
-		}		
+		}
 		if ( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex > 0 ) {
 			SimulateFanComponents( StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, true, StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex );
-		}			
+		}
 
 		// now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
 		ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow;

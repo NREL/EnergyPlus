@@ -81,6 +81,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessor.hh>
 #include <MixerComponent.hh>

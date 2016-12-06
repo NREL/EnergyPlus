@@ -346,16 +346,11 @@ namespace CoolingPanelSimple {
 
 			InputProcessor::GetObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
-			if ( CoolingPanelNum > 1 ) {
-				for ( CoolPanelNumI = 2; CoolPanelNumI <= NumCoolingPanels; ++CoolPanelNumI ) {
-					if ( cAlphaArgs(1) == CoolingPanel( CoolPanelNumI ).EquipID) {
-						ErrorsFound = true;
-						ShowSevereError( cAlphaArgs( 1 ) + " is used as a name for more than one simple COOLING PANEL." );
-						ShowContinueError( "This is not allowed.");
-					}
-				}
 
-			}
+			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames.allocate( NumNumbers );
+			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames = "";
+			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames = cNumericFieldNames;
+
 			CoolingPanel( CoolingPanelNum ).EquipID = cAlphaArgs( 1 ); // Name of this simple cooling panel
 			CoolingPanel( CoolingPanelNum ).EquipType = TypeOf_CoolingPanel_Simple; //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 

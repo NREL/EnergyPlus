@@ -93,6 +93,7 @@
 #include <Fans.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <InputProcessor.hh>
@@ -1876,7 +1877,9 @@ namespace AirflowNetworkBalanceManager {
 			MultizoneSurfaceStdConditionsCrackData.allocate( {0,AirflowNetworkNumOfStdCndns} );
 			for ( i = 1; i <= AirflowNetworkNumOfStdCndns; ++i ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				MultizoneSurfaceStdConditionsCrackData( i ).Name = Alphas( 1 );
 				MultizoneSurfaceStdConditionsCrackData( i ).StandardT = Numbers( 1 ); // Reference temperature for crack data
 				MultizoneSurfaceStdConditionsCrackData( i ).StandardP = Numbers( 2 ); // Reference barometric pressure for crack data
@@ -6573,7 +6576,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkLinkReport( i ).VolFLOW2 = 0.0;
 			}
 		}
-		
+
 		if ( !( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {

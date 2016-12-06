@@ -68,6 +68,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>

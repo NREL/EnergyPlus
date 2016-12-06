@@ -82,6 +82,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -2811,7 +2812,7 @@ namespace CondenserLoopTowers {
 					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA0, OutWaterTemp );
 					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
 					ShowContinueError( "Tower capacity at lower UA guess (" + TrimSigDigits( UA0, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );
-					
+
 					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA1, OutWaterTemp );
 					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
 					ShowContinueError( "Tower capacity at upper UA guess (" + TrimSigDigits( UA1, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );

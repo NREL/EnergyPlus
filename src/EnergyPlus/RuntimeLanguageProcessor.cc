@@ -81,6 +81,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -2102,7 +2103,7 @@ namespace RuntimeLanguageProcessor {
 	}
 
 	ErlValueType
-	EvaluateExpression( 
+	EvaluateExpression(
 		int const ExpressionNum,
 		bool & seriousErrorFound
 	)
@@ -2188,7 +2189,7 @@ namespace RuntimeLanguageProcessor {
 							}
 						}
 					}
-					
+
 				}
 			}
 
@@ -2289,7 +2290,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == OperatorRaiseToPower ) {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					TestValue = std::pow( Operand( 1 ).Number, Operand( 2 ).Number );
-					if ( std::isnan( TestValue ) ) { 
+					if ( std::isnan( TestValue ) ) {
 						// throw Error
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
@@ -3041,7 +3042,7 @@ namespace RuntimeLanguageProcessor {
 						// register the trend pointer in ErlVariable.
 						ErlVariable( VariableNum ).Value.TrendVariable = true;
 						ErlVariable( VariableNum ).Value.TrendVarPointer = TrendNum;
-						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this, 
+						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this,
 					}
 
 					NumTrendSteps = std::floor( rNumericArgs( 1 ) );

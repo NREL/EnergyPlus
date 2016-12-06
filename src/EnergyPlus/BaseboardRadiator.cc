@@ -354,7 +354,9 @@ namespace BaseboardRadiator {
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
-				InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;
@@ -682,7 +684,7 @@ namespace BaseboardRadiator {
 		if ( PltSizHeatNum > 0 ) {
 
 			DataScalableCapSizingON = false;
-			
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {

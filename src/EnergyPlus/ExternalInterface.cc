@@ -81,6 +81,7 @@ extern "C" {
 #include <DataSystemVariables.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <RuntimeLanguageProcessor.hh>

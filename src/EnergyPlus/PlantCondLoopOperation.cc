@@ -84,6 +84,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ReportSizingManager.hh>
@@ -425,7 +426,6 @@ namespace PlantCondLoopOperation {
 		std::string PlantOpSchemeName; // Name of the plant or condenser operating scheme
 		std::string CurrentModuleObject; // for ease in renaming
 		std::string PlantLoopObject; // for ease in renaming
-		Array1D_string OpSchemeNames; // Used to verify unique op scheme names
 		bool ErrorsFound; // Passed in from OpSchemeInput
 
 		ErrorsFound = false;
@@ -442,17 +442,15 @@ namespace PlantCondLoopOperation {
 		NumPlantOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
 		}
+
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
 		NumCondOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-
-
-			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
-				InputProcessor::GetObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
-				                              IOStat);
-				if ( InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound) ) continue;
-			}
+		for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
+			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
+		}
 
 		//Load the Plant data structure
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
@@ -676,13 +674,17 @@ namespace PlantCondLoopOperation {
 			}
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 		}
 
 		//**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
 		PELists = InputProcessor::GetNumObjectsFound( "PlantEquipmentList" );
 		CELists = InputProcessor::GetNumObjectsFound( "CondenserEquipmentList" );
 		NumSchemeLists = PELists + CELists;
+		UniqueNames.clear();
+		UniqueNames.reserve( NumSchemeLists );
 		Count = 0;
 		for ( Num = 1; Num <= NumSchemeLists; ++Num ) {
 			if ( Num <= PELists ) {
@@ -693,7 +695,9 @@ namespace PlantCondLoopOperation {
 				Count = Num - PELists;
 			}
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 		}
 
 		//**********GET INPUT AND LOAD PLANT DATA STRUCTURE*********

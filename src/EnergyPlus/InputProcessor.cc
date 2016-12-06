@@ -1744,10 +1744,10 @@ namespace EnergyPlus {
 	}
 
 	bool
-	EnergyPlus::InputProcessor::IsNameEmpty(
-			std::string & NameToVerify,
-			std::string const & StringToDisplay,
-			bool & ErrorFound
+	EnergyPlus::InputProcessor::IsNameEmpty (
+		std::string & NameToVerify,
+		std::string const & StringToDisplay,
+		bool & ErrorFound
 	){
 		if ( NameToVerify.empty() ) {
 			ShowSevereError(StringToDisplay + " Name, cannot be blank");

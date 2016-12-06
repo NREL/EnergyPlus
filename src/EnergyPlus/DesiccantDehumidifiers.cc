@@ -82,6 +82,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
 #include <InputProcessor.hh>

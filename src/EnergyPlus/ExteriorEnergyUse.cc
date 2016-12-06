@@ -63,6 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -325,8 +326,8 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
@@ -391,8 +392,8 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );

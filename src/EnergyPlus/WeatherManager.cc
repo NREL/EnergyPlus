@@ -83,6 +83,7 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
