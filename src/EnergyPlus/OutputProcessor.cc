@@ -65,6 +65,7 @@
 #include <fstream>
 #include <ostream>
 #include <string>
+#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -1527,6 +1528,15 @@ namespace OutputProcessor {
 		cCurrentModuleObject = "Meter:Custom";
 		NumCustomMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
+        //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
+		std::unordered_set<std::string> namesOfMeterCustom;
+		namesOfMeterCustom.reserve(NumCustomMeters);
+
+		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
+			GetObjectItem (cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+			namesOfMeterCustom.emplace(MakeUPPERCase(cAlphaArgs(1)));
+		}
+
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
@@ -1544,6 +1554,19 @@ namespace OutputProcessor {
 			VarsOnCustomMeter = 0;
 			MaxVarsOnCustomMeter = 1000;
 			NumVarsOnCustomMeter = 0;
+			// check if any fields reference another Meter:Custom
+			int found = 0;
+			for ( fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2 ) {
+				if ( namesOfMeterCustom.find(MakeUPPERCase(cAlphaArgs(fldIndex) ) ) != namesOfMeterCustom.end()) {
+					found = fldIndex;
+					break;
+				}
+			}
+			if ( found != 0 ) {
+				ShowWarningError (cCurrentModuleObject + "=\"" + cAlphaArgs (1) + "\", contains a reference to another " + cCurrentModuleObject + " in field: " + cAlphaFieldNames (found) + "=\"" + cAlphaArgs (found) + "\".");
+				continue;
+			}
+
 			for ( fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2 ) {
 				if ( cAlphaArgs( fldIndex ) == "*" || lAlphaFieldBlanks( fldIndex ) ) {
 					KeyIsStar = true;
@@ -1671,7 +1694,7 @@ namespace OutputProcessor {
 			}
 			if ( NumVarsOnCustomMeter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", no items assigned " );
-				ShowContinueError( "...will not be shown with the Meter results" );
+				ShowContinueError( "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom." );
 			}
 
 		}
