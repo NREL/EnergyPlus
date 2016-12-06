@@ -226,7 +226,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangulerWindowWarning ) {
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarning ) {
 
 		// Unit test for #5384
 
@@ -2765,7 +2765,7 @@ namespace EnergyPlus {
 		NumOfZones = 1;
 
 		std::string const idf_objects = delimited_string( {
-			"Version,8.3;",
+			"Version,8.6;",
 			"Schedule:Constant,OnSch,,1.0;",
 			"Schedule:Constant,Aula people sched,,0.0;",
 			"Schedule:Constant,Sempre 21,,21.0;",
