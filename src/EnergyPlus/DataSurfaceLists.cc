@@ -194,8 +194,6 @@ namespace DataSurfaceLists {
 		int AlphaArray;
 		int NumArray;
 		int SrfList;
-		bool IsNotOK;
-		bool IsBlank;
 
 		// Obtain all of the user data related to surface lists.  Need to get
 		// this before getting the radiant system or ventilated slab data.
@@ -220,14 +218,7 @@ namespace DataSurfaceLists {
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), SurfList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject1 + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
+				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject1, ErrorsFound);
 
 				SurfList( Item ).Name = Alphas( 1 );
 				SurfList( Item ).NumOfSurfaces = NumAlphas - 1;
@@ -305,14 +296,7 @@ namespace DataSurfaceLists {
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( Alphas( 1 ), SlabList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject2 + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
+				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject2, ErrorsFound);
 
 				SlabList( Item ).Name = Alphas( 1 );
 				SlabList( Item ).NumOfSurfaces = ( ( NumAlphas - 1 ) / 4 );

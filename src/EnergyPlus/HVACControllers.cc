@@ -614,8 +614,6 @@ namespace HVACControllers {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		int iNodeType; // for checking actuator node type
 		bool NodeNotFound; // flag true if the sensor node is on the coil air outlet node
@@ -661,14 +659,8 @@ namespace HVACControllers {
 		if ( NumSimpleControllers > 0 ) {
 			for ( Num = 1; Num <= NumSimpleControllers; ++Num ) {
 				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( AlphArray( 1 ), ControllerProps, &ControllerPropsType::ControllerName, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				ControllerProps( Num ).ControllerName = AlphArray( 1 );
 				ControllerProps( Num ).ControllerType = CurrentModuleObject;
 				{ auto const SELECT_CASE_var( AlphArray( 2 ) );

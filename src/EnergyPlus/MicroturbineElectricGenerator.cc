@@ -328,8 +328,6 @@ namespace MicroturbineElectricGenerator {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // Error flag... trips fatal error message at end of get input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 ElectOutFTempElevOutput; // Output of Electrical Power Output Modifier Curve (function of temp and elev)
 		Real64 ElecEfficFTempOutput; // Output of Electrical Efficiency Modifier Curve (function of temp)
 		Real64 ElecEfficFPLROutput; // Output of Electrical Efficiency Modifier Curve (function of PLR)
@@ -369,13 +367,7 @@ namespace MicroturbineElectricGenerator {
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), MTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			MTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			MTGenerator( GeneratorNum ).RefElecPowerOutput = NumArray( 1 );

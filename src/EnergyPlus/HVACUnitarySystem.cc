@@ -2835,7 +2835,6 @@ namespace HVACUnitarySystem {
 		Real64 SteamDensity; // steam density
 		Real64 TotalFloorAreaOnAirLoop; // AirloopHVAC total floor area served
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool AirNodeFound; // used in error checking
 		bool AirLoopFound; // used in error checking
 		bool OASysFound; // used in error checking
@@ -2979,14 +2978,7 @@ namespace HVACUnitarySystem {
 		for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, DesignSpecNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DesignSpecMSHP, DesignSpecNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			DesignSpecMSHP( DesignSpecNum ).Name = Alphas( 1 );
 
@@ -3131,13 +3123,7 @@ namespace HVACUnitarySystem {
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames = "";
 			UnitarySystemNumericFields( UnitarySysNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( iNameAlphaNum ), UnitarySystem, UnitarySysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( iNameAlphaNum ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas(iNameAlphaNum), CurrentModuleObject, ErrorsFound);
 
 			UnitarySystem( UnitarySysNum ).Name = Alphas( iNameAlphaNum );
 
@@ -3210,11 +3196,7 @@ namespace HVACUnitarySystem {
 			FanName = Alphas( iFanNameAlphaNum );
 
 			if ( ! lAlphaBlanks( iFanTypeAlphaNum ) ) {
-				IsNotOK = false;
-				GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, IsNotOK, CurrentModuleObject, Alphas( iNameAlphaNum ) );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-				}
+				GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, ErrorsFound, CurrentModuleObject, Alphas( iNameAlphaNum ) );
 				UnitarySystem( UnitarySysNum ).FanExists = true;
 			}
 

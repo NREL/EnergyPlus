@@ -314,8 +314,6 @@ namespace WaterManager {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		static bool IsNotOK( false );
-		static bool IsBlank( false );
 		static int alphaOffset( 0 );
 		static int SurfNum( 0 );
 		static std::string objNameMsg;
@@ -376,11 +374,7 @@ namespace WaterManager {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					AnyWaterSystemsInModel = true;
 					WaterStorage( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), WaterStorage, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " = " + cAlphaArgs( 1 );
 
 					WaterStorage( Item ).QualitySubCategoryName = cAlphaArgs( 2 );
@@ -532,11 +526,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumRainCollectors; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 					RainCollector( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), RainCollector, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Named " );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 
 					RainCollector( Item ).StorageTankName = cAlphaArgs( 2 );
@@ -634,11 +624,7 @@ namespace WaterManager {
 				for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					GroundwaterWell( Item ).Name = cAlphaArgs( 1 );
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), GroundwaterWell, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 					objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs( 1 );
 					GroundwaterWell( Item ).StorageTankName = cAlphaArgs( 2 );
 

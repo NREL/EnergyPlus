@@ -85,6 +85,7 @@
 #include <DataSurfaces.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -142,6 +143,7 @@ namespace PlantPipingSystemsManager {
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_int NeighborFieldCells;
 	Array1D_int NeighborBoundaryCells;
+	std::unordered_map< std::string, std::string > GroundDomainUniqueNames;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// ************************************* !
@@ -180,6 +182,11 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	// Functions
+
+	void
+	clear_state() {
+		GroundDomainUniqueNames.clear();
+	}
 
 	void
 	CheckIfAnySlabs()
@@ -785,8 +792,6 @@ namespace PlantPipingSystemsManager {
 		int NumSurfacesWithThisOSCM;
 		int NumAlphasBeforePipeCircOne;
 		int CurIndex;
-		bool IsBlank;
-		bool IsNotOK;
 
 		for ( DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum ) {
 
@@ -795,17 +800,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemDomains( DomainNum ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemDomains, DomainNum - 1, IsNotOK, IsBlank, ObjName_ug_GeneralDomain + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Blank name encountered";
-			}
-
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			// Mesh extents, validated by IP
 			PipingSystemDomains( DomainNum ).Extents.Xmax = rNumericArgs( 1 );
 			PipingSystemDomains( DomainNum ).Extents.Ymax = rNumericArgs( 2 );
@@ -1036,8 +1031,6 @@ namespace PlantPipingSystemsManager {
 			int IOStatus; // Used in GetObjectItem
 			int NumSurfacesWithThisOSCM;
 			int SurfCtr;
-			bool IsBlank;
-			bool IsNotOK;
 			Real64 ThisArea;
 
 			struct GroundDomainData
@@ -1102,16 +1095,7 @@ namespace PlantPipingSystemsManager {
 
 				// Get the name, validate
 				Domain( ZoneCoupledDomainCtr ).ObjName = cAlphaArgs( 1 );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, ZoneCoupledDomainCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Slab + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					cAlphaArgs( 1 ) = "Duplicate name encountered";
-				} else if ( IsBlank ) {
-					ErrorsFound = true;
-					cAlphaArgs( 1 ) = "Blank name encountered";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( GroundDomainUniqueNames, cAlphaArgs( 1 ), ObjName_ZoneCoupled_Slab, cAlphaFieldNames( 1 ), ErrorsFound );
 
 				// Read in the rest of the inputs into the local type for clarity during transition
 				Domain( ZoneCoupledDomainCtr ).OSCMName = cAlphaArgs( 4 );
@@ -1395,8 +1379,6 @@ namespace PlantPipingSystemsManager {
 		int IOStatus; // Used in GetObjectItem
 		int CurIndex;
 		int NumSurfacesWithThisOSCM;
-		bool IsBlank;
-		bool IsNotOK;
 		Real64 ThisArea;
 
 		struct GroundDomainData
@@ -1446,16 +1428,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			Domain( BasementCtr ).ObjName = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Domain, &GroundDomainData::ObjName, BasementCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled_Basement + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Blank name encountered";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( GroundDomainUniqueNames, cAlphaArgs( 1 ), ObjName_ZoneCoupled_Basement, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			// Read in the some of the inputs into the local type for clarity during transition
 			Domain( BasementCtr ).Depth = rNumericArgs( 1 );
@@ -1749,8 +1722,6 @@ namespace PlantPipingSystemsManager {
 		int IOStatus;
 		int PipeCircuitCounter;
 		int ThisCircuitPipeSegmentCounter;
-		bool IsNotOK;
-		bool IsBlank;
 		int CurIndex;
 		int NumAlphasBeforeSegmentOne;
 
@@ -1761,16 +1732,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemCircuits( PipeCircuitCounter ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemCircuits, PipeCircuitCounter - 1, IsNotOK, IsBlank, ObjName_Circuit + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Blank name encountered";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			// Read pipe thermal properties, validated by IP
 			PipingSystemCircuits( PipeCircuitCounter ).PipeProperties.Conductivity = rNumericArgs( 1 );
@@ -1874,8 +1836,6 @@ namespace PlantPipingSystemsManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		int CurIndex;
-		bool IsNotOK;
-		bool IsBlank;
 
 		// Read in all pipe segments
 		for ( SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr ) {
@@ -1885,17 +1845,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			PipingSystemSegments( SegmentCtr ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PipingSystemSegments, SegmentCtr - 1, IsNotOK, IsBlank, ObjName_Segment + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Blank name encountered";
-			}
-
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			// Read in the pipe location, validated as positive by IP
 			// -- note that these values will be altered by the main GetInput routine in two ways:
 			//   1) shift for basement wall if selected
@@ -1969,8 +1919,6 @@ namespace PlantPipingSystemsManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		int CurIndex;
-		bool IsNotOK;
-		bool IsBlank;
 		int DomainCtr;
 		int CircuitCtr;
 		int SegmentCtr;
@@ -2050,16 +1998,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			HGHX( HorizontalGHXCtr ).ObjName = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), HGHX, &HorizontalTrenchData::ObjName, HorizontalGHXCtr - 1, IsNotOK, IsBlank, ObjName_HorizTrench + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Duplicate name encountered";
-			} else if ( IsBlank ) {
-				ErrorsFound = true;
-				cAlphaArgs( 1 ) = "Blank name encountered";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			// Read in the rest of the inputs into the local type for clarity during transition
 			HGHX( HorizontalGHXCtr ).InletNodeName = cAlphaArgs( 2 );

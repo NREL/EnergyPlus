@@ -76,6 +76,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -131,6 +132,7 @@ namespace OutsideEnergySources {
 	// Object Data
 	Array1D< OutsideEnergySourceSpecs > EnergySource;
 	Array1D< ReportVars > EnergySourceReport;
+	std::unordered_map< std::string, std::string > EnergySourceUniqueNames;
 
 	// Functions
 	void
@@ -140,6 +142,7 @@ namespace OutsideEnergySources {
 		SimOutsideEnergyGetInputFlag = true;
 		EnergySource.deallocate();
 		EnergySourceReport.deallocate();
+		EnergySourceUniqueNames.clear();
 	}
 
 
@@ -297,8 +300,6 @@ namespace OutsideEnergySources {
 		int NumDistrictUnitsCool;
 		int IndexCounter;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "DistrictHeating";
@@ -310,6 +311,7 @@ namespace OutsideEnergySources {
 		if ( allocated( EnergySource ) ) return;
 
 		EnergySource.allocate( NumDistrictUnits );
+		EnergySourceUniqueNames.reserve( static_cast< unsigned >( NumDistrictUnits ) );
 		EnergySourceReport.allocate( NumDistrictUnits );
 
 		cCurrentModuleObject = "DistrictHeating";
@@ -320,13 +322,7 @@ namespace OutsideEnergySources {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";
@@ -383,13 +379,7 @@ namespace OutsideEnergySources {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";

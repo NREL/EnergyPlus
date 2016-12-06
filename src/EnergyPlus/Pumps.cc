@@ -79,6 +79,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -180,6 +181,7 @@ namespace Pumps {
 
 	// Object Data
 	Array1D< PumpSpecs > PumpEquip;
+	std::unordered_map< std::string, std::string > PumpUniqueNames;
 	Array1D< ReportVars > PumpEquipReport;
 
 	//*************************************************************************!
@@ -198,6 +200,7 @@ namespace Pumps {
 		ShaftPower= 0.0 ;
 		PumpEquip.deallocate();
 		PumpEquipReport.deallocate();
+		PumpUniqueNames.clear();
 	}
 
 	void
@@ -363,8 +366,6 @@ namespace Pumps {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		bool ErrorsFound;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int TempCurveIndex;
 		std::string TempCurveType;
 		int NumVarSpeedPumps;
@@ -397,6 +398,7 @@ namespace Pumps {
 		}
 
 		PumpEquip.allocate( NumPumps );
+		PumpUniqueNames.reserve( static_cast< unsigned >( NumPumps ) );
 		PumpEquipReport.allocate( NumPumps );
 
 		//LOAD ARRAYS WITH VARIABLE SPEED CURVE FIT PUMP DATA
@@ -407,13 +409,7 @@ namespace Pumps {
 			PumpNum = NumVarPump;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, NumVarPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = Pump_VarSpeed; //'Pump:VariableSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpVariableSpeed;
@@ -577,13 +573,7 @@ namespace Pumps {
 			PumpNum = NumVarSpeedPumps + NumConstPump;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, NumConstPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = Pump_ConSpeed; //'Pump:ConstantSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpConstantSpeed;
@@ -699,13 +689,7 @@ namespace Pumps {
 			PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, NumCondPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + "  Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = Pump_Cond; //'Pump:VariableSpeed:Condensate'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpCondensate;
@@ -796,13 +780,7 @@ namespace Pumps {
 			PumpNum = NumVarPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, NumVarPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = PumpBank_VarSpeed; //'HeaderedPumps:VariableSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
@@ -904,13 +882,7 @@ namespace Pumps {
 			PumpNum = NumConstPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, NumConstPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = PumpBank_ConSpeed; //'HeaderedPumps:ConstantSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpBankConstantSpeed;

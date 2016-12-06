@@ -246,8 +246,6 @@ namespace ThermalChimney {
 		int IOStat;
 		int Loop;
 		int Loop1;
-		bool IsNotOK;
-		bool IsBlank;
 
 		//  ALLOCATE(MCPTThermChim(NumOfZones))
 		//  MCPTThermChim=0.0
@@ -268,19 +266,11 @@ namespace ThermalChimney {
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 
 			// First Alpha is Thermal Chimney Name
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ThermalChimneySys, Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) {
-					continue;
-				} else {
-					cAlphaArgs( 1 ) = cAlphaArgs( 1 ) + "--dup";
-				}
-			}
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
 
 			// Second Alpha is Zone Name

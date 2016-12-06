@@ -77,6 +77,7 @@
 #include <DataSurfaces.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -140,6 +141,7 @@ namespace SolarCollectors {
 	// MODULE VARIABLE DECLARATIONS:
 	int NumOfParameters( 0 );
 	int NumOfCollectors( 0 );
+	bool GetInputFlag( true );
 
 	Array1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
 	Array1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
@@ -150,12 +152,20 @@ namespace SolarCollectors {
 
 	// Object Data
 	Array1D< ParametersData > Parameters;
+	std::unordered_map< std::string, std::string > UniqueParametersNames;
 	Array1D< CollectorData > Collector;
+	std::unordered_map< std::string, std::string > UniqueCollectorNames;
 
 	// MODULE SUBROUTINES:
 
 	// Functions
 
+	void
+	clear_state() {
+		GetInputFlag = false;
+		UniqueCollectorNames.clear();
+		UniqueParametersNames.clear();
+	}
 	void
 	SimSolarCollector(
 		int const EP_UNUSED( EquipTypeNum ),
@@ -189,7 +199,6 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true );
 		int CollectorNum;
 
 		// FLOW:
@@ -259,12 +268,6 @@ namespace SolarCollectors {
 
 		// Using/Aliasing
 		using namespace DataHeatBalance;
-
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -279,8 +282,6 @@ namespace SolarCollectors {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int CollectorNum; // Solar collector object number
@@ -363,13 +364,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleParamObject, ParametersNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Parameters, ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				Parameters( ParametersNum ).Name = cAlphaArgs( 1 );
 
 				// NOTE:  This values serves mainly as a reference.  The area of the associated surface object is used in all calculations.
@@ -443,13 +438,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 				// Collector name
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Collector, CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
 				Collector( CollectorNum ).Name = cAlphaArgs( 1 );
 				Collector( CollectorNum ).TypeNum = TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
 
@@ -541,13 +530,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleParamObject, ICSParamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Parameters, ParametersNum - 1, IsNotOK, IsBlank, CurrentModuleParamObject );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				Parameters( ParametersNum ).Name = cAlphaArgs( 1 );
 				// NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
 				//        added
@@ -629,13 +612,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleObject, ICSUnitsNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector name
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), Collector, CollectorNum - 1, IsNotOK, IsBlank, CurrentModuleObject );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				Collector( CollectorNum ).Name = cAlphaArgs( 1 );
 				Collector( CollectorNum ).TypeNum = TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
 

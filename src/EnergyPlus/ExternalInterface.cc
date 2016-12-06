@@ -81,6 +81,7 @@ extern "C" {
 #include <DataSystemVariables.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <RuntimeLanguageProcessor.hh>
@@ -169,6 +170,7 @@ namespace ExternalInterface {
 
 	// Object Data
 	Array1D< FMUType > FMU; // Variable Types structure
+	std::unordered_map< std::string, std::string > UniqueFMUInputVarNames;
 	Array1D< FMUType > FMUTemp; // Variable Types structure
 	Array1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
 
@@ -1059,8 +1061,6 @@ namespace ExternalInterface {
 		int retValfmiVersion;
 		int retValfmiPathLib;
 		Array1D_string NameListInstances( 5 );
-		bool IsNotOK;
-		bool IsBlank;
 		static bool FirstCallIni( true ); // First time, input has been read
 		bool fileExist;
 		std::string tempFullFileName;
@@ -1302,10 +1302,12 @@ namespace ExternalInterface {
 			strippedFileName.deallocate();
 			fullFileName.deallocate();
 
+			UniqueFMUInputVarNames.reserve( static_cast< unsigned >( NumFMUInputVariables ) );
 			for ( i = 1; i <= NumFMUObjects; ++i ) {
 				for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
 					FMU( i ).Instance( j ).fmuInputVariable.allocate( NumFMUInputVariables );
 					FMU( i ).Instance( j ).checkfmuInputVariable.allocate( NumFMUInputVariables );
+					UniqueFMUInputVarNames.clear();
 					FMU( i ).Instance( j ).eplusOutputVariable.allocate( NumFMUInputVariables );
 					k = 1;
 					for ( l = 1; l <= NumFMUInputVariables; ++l ) {
@@ -1315,9 +1317,9 @@ namespace ExternalInterface {
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).Name = cAlphaArgs( 2 );
 							// verify whether we have duplicate FMU input variables in the idf
-							InputProcessor::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
-							if ( IsNotOK ) {
-								ErrorsFound = true;
+							GlobalNames::VerifyUniqueInterObjectName( UniqueFMUInputVarNames, FMU( i ).Instance( j ).fmuInputVariable( k ).Name, cCurrentModuleObject, FMU( i ).Instance( j ).Name, ErrorsFound );
+//							InputProcessor::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
+							if ( ErrorsFound ) {
 								StopExternalInterfaceIfError();
 							} else {
 								FMU( i ).Instance( j ).checkfmuInputVariable( k ).Name = FMU( i ).Instance( j ).fmuInputVariable( k ).Name;

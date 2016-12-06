@@ -324,8 +324,6 @@ namespace PhotovoltaicThermalCollectors {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int SurfNum; // local use only
 		int ThisParamObj;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		// Object Data
 		Array1D< SimplePVTModelStruct > tmpSimplePVTperf;
@@ -337,16 +335,8 @@ namespace PhotovoltaicThermalCollectors {
 			tmpSimplePVTperf.allocate( NumSimplePVTPerform );
 			for ( Item = 1; Item <= NumSimplePVTPerform; ++Item ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpSimplePVTperf, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Names" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) {
-						ShowSevereError( "Invalid " + cCurrentModuleObject + ", Name cannot be blank" );
-					}
-					continue;
-				}
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) continue;
+
 				tmpSimplePVTperf( Item ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Fixed" ) ) {
 					tmpSimplePVTperf( Item ).ThermEfficMode = FixedThermEffic;
@@ -379,17 +369,8 @@ namespace PhotovoltaicThermalCollectors {
 
 		for ( Item = 1; Item <= NumPVT; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			//check name
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), PVT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) {
-					ShowSevereError( "Invalid " + cCurrentModuleObject + ", Name cannot be blank" );
-				}
-				continue;
-			}
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+
 			PVT( Item ).Name = cAlphaArgs( 1 );
 			PVT( Item ).TypeNum = TypeOf_PVTSolarCollectorFlatPlate; //DSU, assigned in DataPlant
 

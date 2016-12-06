@@ -84,6 +84,7 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -216,29 +217,6 @@ namespace SurfaceGeometry {
 		GetSurfaceDataOneTimeFlag = false;
 		UniqueSurfaceNames.clear();
 	}
-
-	void
-	VerifyUniqueSurfaceName(
-		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
-		bool & ErrorFound
-	) {
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( "Name cannot be blank, Surface Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-			return;
-		}
-
-		auto const iter = UniqueSurfaceNames.find( NameToVerify );
-		if ( iter != UniqueSurfaceNames.end() ) {
-			ShowSevereError( "Duplicate name=" + iter->first + ", Surface Type=\"" + iter->second + "\"." );
-			ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
-			ShowContinueError( "...Current entry is Surface Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			UniqueSurfaceNames.emplace( NameToVerify, TypeToVerify );
-		}
-  	}
 
 	void
 	SetupZoneGeometry( bool & ErrorsFound )
@@ -2398,8 +2376,9 @@ namespace SurfaceGeometry {
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-				if ( ErrorsFound ) continue;
+				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+					continue;
+				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -2552,8 +2531,9 @@ namespace SurfaceGeometry {
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-				if ( ErrorsFound ) continue;
+				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+					continue;
+				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -2790,8 +2770,9 @@ namespace SurfaceGeometry {
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-				if ( ErrorsFound ) continue;
+				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+					continue;
+				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -3184,8 +3165,9 @@ namespace SurfaceGeometry {
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-				if ( ErrorsFound ) continue;
+				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+					continue;
+				}
 
 				if ( NumNumbers < 7 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Too few number of numeric args=[" + TrimSigDigits( NumNumbers ) + "]." );
@@ -3663,8 +3645,9 @@ namespace SurfaceGeometry {
 		for ( Loop = 1; Loop <= TotHTSubs; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			if ( SurfaceNumProp < 12 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Too few number of numeric args=[" + TrimSigDigits( SurfaceNumProp ) + "]." );
@@ -4004,8 +3987,9 @@ namespace SurfaceGeometry {
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-				if ( ErrorsFound ) continue;
+				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+					continue;
+				}
 
 				if ( NumNumbers < 5 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Too few number of numeric args=[" + TrimSigDigits( NumNumbers ) + "]." );
@@ -4839,8 +4823,9 @@ namespace SurfaceGeometry {
 		for ( Loop = 1; Loop <= TotShdSubs; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			++SurfNum;
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -5035,8 +5020,9 @@ namespace SurfaceGeometry {
 			for ( Loop = 1; Loop <= ItemsToGet; ++Loop ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-				if ( ErrorsFound ) continue;
+				if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+					continue;
+				}
 
 				++SurfNum;
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
@@ -5377,8 +5363,9 @@ namespace SurfaceGeometry {
 		for ( Loop = 1; Loop <= TotIntMass; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			VerifyUniqueSurfaceName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueSurfaceNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 
 			++SurfNum;
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type

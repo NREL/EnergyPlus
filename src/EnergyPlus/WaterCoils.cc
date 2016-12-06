@@ -433,8 +433,6 @@ namespace WaterCoils {
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		static int j1( 0 );
 
@@ -480,14 +478,8 @@ namespace WaterCoils {
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
 			WaterCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -581,14 +573,7 @@ namespace WaterCoils {
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
 			WaterCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -691,14 +676,8 @@ namespace WaterCoils {
 			WaterCoilNumericFields( CoilNum ).FieldNames.allocate( MaxNums );
 			WaterCoilNumericFields( CoilNum ).FieldNames = "";
 			WaterCoilNumericFields( CoilNum ).FieldNames = cNumericFields;
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), WaterCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;

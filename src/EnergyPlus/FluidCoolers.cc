@@ -80,6 +80,7 @@
 #include <DataSizing.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -140,6 +141,7 @@ namespace FluidCoolers {
 	std::string const cFluidCooler_SingleSpeed( "FluidCooler:SingleSpeed" );
 	std::string const cFluidCooler_TwoSpeed( "FluidCooler:TwoSpeed" );
 
+	bool GetFluidCoolerInputFlag( true );
 	int const PIM_NominalCapacity( 1 );
 	int const PIM_UFactor( 2 );
 
@@ -182,6 +184,7 @@ namespace FluidCoolers {
 
 	// Object Data
 	Array1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
+	std::unordered_map< std::string, std::string > UniqueSimpleFluidCoolerNames;
 	Array1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
 	Array1D< ReportVars > SimpleFluidCoolerReport; // report variables
 
@@ -238,13 +241,12 @@ namespace FluidCoolers {
 		// na
 
 		// LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
 		int FluidCoolerNum;
 
 		// GET INPUT
-		if ( GetInput ) {
+		if ( GetFluidCoolerInputFlag ) {
 			GetFluidCoolerInput();
-			GetInput = false;
+			GetFluidCoolerInputFlag = false;
 		}
 		// INITIALIZE
 		// Find the correct Equipment
@@ -333,10 +335,6 @@ namespace FluidCoolers {
 		// Based on GetTowerInput subroutine from Don Shirey, Jan 2001 and Sept/Oct 2002;
 
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -370,8 +368,6 @@ namespace FluidCoolers {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
 		Array1D< Real64 > NumArray( 16 ); // Numeric input data array
 		Array1D_string AlphArray( 5 ); // Character string input data array
@@ -387,9 +383,11 @@ namespace FluidCoolers {
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleFluidCooler ) ) return;
+		GetFluidCoolerInputFlag = false;
 
 		// Allocate data structures to hold fluid cooler input data, report data and fluid cooler inlet conditions
 		SimpleFluidCooler.allocate( NumSimpleFluidCoolers );
+		UniqueSimpleFluidCoolerNames.reserve( NumSimpleFluidCoolers );
 		SimpleFluidCoolerReport.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerInlet.allocate( NumSimpleFluidCoolers );
 		CheckEquipName.dimension( NumSimpleFluidCoolers, true );
@@ -399,13 +397,8 @@ namespace FluidCoolers {
 		for ( SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = SingleSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SimpleFluidCooler, FluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num = FluidCooler_SingleSpeed;
@@ -451,13 +444,8 @@ namespace FluidCoolers {
 		for ( TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), SimpleFluidCooler, FluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num = FluidCooler_TwoSpeed;
@@ -2213,6 +2201,12 @@ namespace FluidCoolers {
 
 		}
 
+	}
+
+	void
+	clear_state() {
+		UniqueSimpleFluidCoolerNames.clear();
+		GetFluidCoolerInputFlag = true;
 	}
 
 } // FluidCoolers

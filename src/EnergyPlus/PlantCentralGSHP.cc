@@ -636,8 +636,6 @@ namespace PlantCentralGSHP {
 		// LOCAL VARIABLES
 		static std::string CompName; // component name
 		static bool ErrorsFound( false ); // True when input errors are found
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool AllocatedFlag( false ); // True when arrays are allocated
 		static bool CHAllocatedFlag( false ); // True when arrays are allocated
 		int NumAlphas; // Number of elements in the alpha array
@@ -675,14 +673,7 @@ namespace PlantCentralGSHP {
 
 			// intialize nth chiller heater index (including identical units) for current wrapper
 			NumChHtrPerWrapper = 0;
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), Wrapper, WrapperNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
 
@@ -935,8 +926,6 @@ namespace PlantCentralGSHP {
 		// LOCAL VARIABLES
 		std::string StringVar; // Used for EIRFPLR warning messages
 		static bool CHErrorsFound( false ); // True when input errors are found
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool FoundNegValue( false ); // Used to evaluate PLFFPLR curve objects
 		int CurveValPtr; // Index to EIRFPLR curve output
 		static int CurveCheck( 0 ); // Used to evaluate PLFFPLR curve objects
@@ -971,14 +960,7 @@ namespace PlantCentralGSHP {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, ChillerHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ChillerHeater( ChillerHeaterNum ).Name = cAlphaArgs( 1 );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ChillerHeater, ChillerHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				CHErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, CHErrorsFound);
 
 			ChillerHeater( ChillerHeaterNum ).CondModeCooling = cAlphaArgs( 4 );
 

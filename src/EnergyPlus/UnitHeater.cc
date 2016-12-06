@@ -348,7 +348,6 @@ namespace UnitHeater {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
 		bool IsNotOK; // TRUE if there was a problem with a list name
 		static bool errFlag( false ); // interim error flag
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -397,14 +396,7 @@ namespace UnitHeater {
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames.allocate( NumNumbers );
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = "";
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), UnitHeat, UnitHeatNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitHeat( UnitHeatNum ).Name = Alphas( 1 );
 			UnitHeat( UnitHeatNum ).SchedName = Alphas( 2 );

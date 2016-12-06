@@ -569,8 +569,6 @@ namespace NodeInputManager {
 		int NumNumbers; // Number of numerics in IDF item
 		int IOStatus; // IOStatus for IDF item (not checked)
 		int NCount; // Actual number of node lists
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool flagError; // true when error node list name should be output
 		Array1D_string cAlphas;
 		Array1D< Real64 > rNumbers;
@@ -589,13 +587,8 @@ namespace NodeInputManager {
 		NCount = 0;
 		for ( Loop = 1; Loop <= NumOfNodeLists; ++Loop ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphas( 1 ), NodeLists, NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			if ( InputProcessor::IsNameEmpty( cAlphas( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
+
 			++NCount;
 			NodeLists( NCount ).Name = cAlphas( 1 );
 			NodeLists( NCount ).NodeNames.allocate( NumAlphas - 1 );

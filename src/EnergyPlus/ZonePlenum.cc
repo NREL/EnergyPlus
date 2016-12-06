@@ -353,8 +353,6 @@ namespace ZonePlenum {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool NodeListError; // Flag for node list error
 		bool UniqueNodeError;
 		static std::string const RoutineName( "GetZonePlenumInput: " ); // include trailing blank space
@@ -396,13 +394,7 @@ namespace ZonePlenum {
 			CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another return plenum
@@ -526,14 +518,7 @@ namespace ZonePlenum {
 			CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another plenum

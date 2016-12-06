@@ -206,7 +206,6 @@ namespace ReturnAirPathManager {
 		// static bool ErrorsFound( false );
 		////////////////////////////////////////////////////////////////////////////////////
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		if ( allocated( ReturnAirPath ) ) {
 			return;
@@ -221,14 +220,8 @@ namespace ReturnAirPathManager {
 			for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				ReturnAirPath( PathNum ).Name = cAlphaArgs( 1 );
 				ReturnAirPath( PathNum ).NumOfComponents = nint( ( NumAlphas - 2.0 ) / 2.0 );
 

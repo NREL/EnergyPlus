@@ -2940,7 +2940,7 @@ namespace EnergyPlus {
 
 		DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
 		GlobalNames::NumCoils = 0; // remove this when clear_state gets added to GlobalNames
-		GlobalNames::CoilNames.deallocate(); // remove this when clear_state gets added to GlobalNames
+		GlobalNames::CoilNames.clear(); // remove this when clear_state gets added to GlobalNames
 
 		GetZoneEquipmentData(); // read equipment list and connections
 		ZoneInletAirNode = GetVRFTUZoneInletAirNode( VRFTUNum ); // trigger GetVRFInput by calling a mining function

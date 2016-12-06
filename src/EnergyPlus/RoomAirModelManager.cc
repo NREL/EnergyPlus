@@ -726,8 +726,6 @@ namespace RoomAirModelManager {
 		int NumOfSurfs; // Index number for last surface of zones
 		int ListSurfNum; // Index number of surfaces listed in the air node object
 		bool SurfNeeded;
-		bool IsNotOK;
-		bool IsBlank;
 
 		// FLOW:
 
@@ -756,13 +754,8 @@ namespace RoomAirModelManager {
 
 			// get air node objects
 			InputProcessor::GetObjectItem( cCurrentModuleObject, AirNodeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), AirNode, AirNodeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			AirNode( AirNodeNum ).Name = cAlphaArgs( 1 );
 
 			AirNode( AirNodeNum ).ZoneName = cAlphaArgs( 3 ); // Zone name

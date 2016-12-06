@@ -359,8 +359,6 @@ namespace PurchasedAirManager {
 		int NodeNum; // node index
 		static std::string const RoutineName( "GetPurchasedAir: " ); // include trailing blank space
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool IsOANodeListed; // Flag for OA node name listed in OutdoorAir:Node or Nodelist
 		bool UniqueNodeError; // Flag for non-unique node error(s)
 
@@ -383,14 +381,8 @@ namespace PurchasedAirManager {
 				PurchAirNumericFields( PurchAirNum ).FieldNames.allocate( NumNums );
 				PurchAirNumericFields( PurchAirNum ).FieldNames = "";
 				PurchAirNumericFields( PurchAirNum ).FieldNames = cNumericFieldNames;
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), PurchAir, PurchAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				PurchAir( PurchAirNum ).Name = cAlphaArgs( 1 );
 				// get optional  availability schedule
 				PurchAir( PurchAirNum ).AvailSched = cAlphaArgs( 2 );

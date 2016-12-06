@@ -319,8 +319,6 @@ namespace SwimmingPool {
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int SurfNum; // Surface number
@@ -360,14 +358,7 @@ namespace SwimmingPool {
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Pool, Item, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			Pool( Item ).Name = Alphas( 1 );
 
 			Pool( Item ).SurfaceName = Alphas( 2 );
