@@ -264,8 +264,6 @@ namespace CTElectricGenerator {
 		Array1D_string AlphArray( 12 ); // character string data
 		Array1D< Real64 > NumArray( 12 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		//FLOW
 
@@ -286,14 +284,8 @@ namespace CTElectricGenerator {
 		//LOAD ARRAYS WITH CT CURVE FIT Generator DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			InputProcessor::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), CTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			CTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			CTGenerator( GeneratorNum ).RatedPowerOutput = NumArray( 1 );

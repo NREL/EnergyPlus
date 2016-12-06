@@ -325,6 +325,9 @@ namespace SolarCollectors {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimSolarCollector(
 		int const EquipTypeNum,
 		std::string const & CompName,

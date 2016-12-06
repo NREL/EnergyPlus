@@ -113,20 +113,28 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+<<<<<<< HEAD
+=======
+#include <EnergyPlus/DualDuct.hh>
+>>>>>>> input_processor_refactor_verify_name
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
@@ -144,6 +152,7 @@
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -163,14 +172,17 @@
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -185,6 +197,7 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
@@ -339,16 +352,21 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DemandManager::clear_state();
 		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
+		DualDuct::clear_state();
 		DXCoils::clear_state();
 		clearFacilityElectricPowerServiceObject();
 		EconomicLifeCycleCost::clear_state();
 		EconomicTariff::clear_state();
 		EMSManager::clear_state();
+		EvaporativeCoolers::clear_state();
+		EvaporativeFluidCoolers::clear_state();
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();
+		FluidCoolers::clear_state();
 		FluidProperties::clear_state();
 		Furnaces::clear_state();
 		GlobalNames::clear_state();
@@ -367,6 +385,7 @@ namespace EnergyPlus {
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
 		HVACDXSystem::clear_state();
+		HVACHXAssistedCoolingCoil::clear_state();
 		HVACManager::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
@@ -387,6 +406,8 @@ namespace EnergyPlus {
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PackagedTerminalHeatPump::clear_state();
+		Pipes::clear_state();
+		PipeHeatTransfer::clear_state();
 		PlantCondLoopOperation::clear_state();
 		PlantChillers::clear_state();
 		PlantLoadProfile::clear_state();
@@ -394,8 +415,9 @@ namespace EnergyPlus {
 		PlantManager::clear_state();
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
-		Pipes::clear_state();
+		PlantPipingSystemsManager::clear_state();
 		PollutionModule::clear_state();
+		PoweredInductionUnits::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
@@ -409,6 +431,7 @@ namespace EnergyPlus {
 		SimulationManager::clear_state();
 		SingleDuct::clear_state();
 		SizingManager::clear_state();
+		SolarCollectors::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
 		SurfaceGeometry::clear_state();

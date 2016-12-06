@@ -331,8 +331,6 @@ namespace FluidProperties {
 		Real64 pTemp;
 		int iTemp;
 		int j;
-		bool ErrorInName;
-		bool IsBlank;
 		int FluidNum;
 
 		// SUBROUTINE LOCAL DATA:
@@ -521,15 +519,7 @@ namespace FluidProperties {
 		FluidNum = 0;
 		for ( Loop = 1; Loop <= NumOfOptionalInput; ++Loop ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), FluidNames, FluidNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
-				ErrorsFound = true;
-				continue;
-			}
+			if ( InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 			++FluidNum;
 			FluidNames( FluidNum ).Name = Alphas( 1 );
 			if ( InputProcessor::SameString( Alphas( 2 ), Refrig ) ) {
@@ -1746,13 +1736,7 @@ namespace FluidProperties {
 
 		for ( Loop = 1; Loop <= NumOfOptionalInput; ++Loop ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			// Check to see if glycol name is one of the defaults or is listed in the Fluid Name list
-			ErrorInName = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), GlycolData, NumOfGlyConcs, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
-				ErrorsFound = true;
+			if ( InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound ) ) {
 				continue;
 			}
 			GlycolFound = false;

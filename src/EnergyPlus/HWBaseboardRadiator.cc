@@ -329,8 +329,6 @@ namespace HWBaseboardRadiator {
 		int SurfNum; // Surface number Do loop counter
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		NumHWBaseboards = InputProcessor::GetNumObjectsFound( cCMO_BBRadiator_Water );
@@ -350,14 +348,8 @@ namespace HWBaseboardRadiator {
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames.allocate( NumNumbers );
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			HWBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), HWBaseboard, &HWBaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Water + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
 			VerifyUniqueBaseboardName( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), errFlag, cCMO_BBRadiator_Water + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;

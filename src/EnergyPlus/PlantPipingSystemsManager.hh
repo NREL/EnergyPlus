@@ -147,6 +147,9 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
+	clear_state();
+
+	void
 	SimPipingSystemCircuit(
 		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling

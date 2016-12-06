@@ -86,6 +86,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <InputProcessor.hh>
@@ -212,6 +213,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	Array1D< PTUnitData > PTUnit;
+	std::unordered_map< std::string, std::string > PTUnitUniqueNames;
 	Array1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
@@ -219,6 +221,7 @@ namespace PackagedTerminalHeatPump {
 	clear_state()
 	{
 		MyOneTimeFlag = true;
+		PTUnitUniqueNames.clear();
 	}
 
 
@@ -609,7 +612,6 @@ namespace PackagedTerminalHeatPump {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		static bool errFlag( false ); // Error flag returned during CALL to mining functions
 		Real64 FanVolFlow; // maximum supply air volumetric flow rate of fan
@@ -659,6 +661,7 @@ namespace PackagedTerminalHeatPump {
 		// allocate the data structures
 		if ( NumPTUs > 0 ) {
 			PTUnit.allocate( NumPTUs );
+			PTUnitUniqueNames.reserve( static_cast< unsigned >( NumPTUs ) );
 			CheckEquipName.allocate( NumPTUs );
 			PTUnitUNumericFields.allocate( NumPTUs );
 		}
@@ -688,14 +691,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTHPUnit;
@@ -1365,14 +1361,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTACUnit;
@@ -1983,14 +1972,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
 			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PTUnitUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			PTUnit( PTUnitNum ).Name = Alphas( 1 );
 			PTUnit( PTUnitNum ).UnitType = CurrentModuleObject;
 			PTUnit( PTUnitNum ).UnitType_Num = PTWSHPUnit;

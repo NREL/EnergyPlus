@@ -127,10 +127,10 @@ namespace HeatPumpWaterToWaterHEATING {
 	Real64 Power( 0.0 ); // power consumption Watts Joules/sec
 	Real64 QLoad( 0.0 ); // heat rejection from Load Side coil Joules
 	Real64 QSource( 0.0 ); // cooling capacity Joules
-	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
+	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
 	Array1D_bool CheckEquipName;
 
 	// Object Data
@@ -252,8 +252,6 @@ namespace HeatPumpWaterToWaterHEATING {
 		Array1D< Real64 > NumArray( 23 ); // numeric data
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		NumGSHPs = InputProcessor::GetNumObjectsFound( ModuleCompName );
@@ -270,14 +268,8 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			InputProcessor::VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			InputProcessor::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterPEHeating;
@@ -573,19 +565,19 @@ namespace HeatPumpWaterToWaterHEATING {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 SourceSideEffect; // Source Side effectiveness
 		Real64 LoadSideEffect; // Load Side effectiveness
-		Real64 SourceSideTemp; // Source Side temperature °C
-		Real64 LoadSideTemp; // Load Side temperature °C
+		Real64 SourceSideTemp; // Source Side temperature ï¿½C
+		Real64 LoadSideTemp; // Load Side temperature ï¿½C
 		Real64 SourceSideUA; // Source Side heat transfer coefficient    w/k
 		Real64 LoadSideUA; // Load Side heat transfer coefficient W/k
 		Real64 SourceSidePressure; // Source Side pressure Pascals
 		Real64 LoadSidePressure; // Load Side pressure Pascals
 		Real64 SuctionPr; // Suction Pressure  pascals
 		Real64 DischargePr; // Discharge Pressure pascals
-		Real64 CompressInletTemp; // Compressor inlet temperature  °C
-		Real64 PressureDrop; // Suction Pressure drop °C
+		Real64 CompressInletTemp; // Compressor inlet temperature  ï¿½C
+		Real64 PressureDrop; // Suction Pressure drop ï¿½C
 		Real64 ClearanceFactor; // Clearance factor
 		Real64 PistonDisp; // Compressor piston displacement  m3
-		Real64 ShTemp; // Superheat temperature °C
+		Real64 ShTemp; // Superheat temperature ï¿½C
 		Real64 LosFac; // Loss factor used to define the electromechanical loss for compressor
 		Real64 MassRef; // mass flow rate of refrigerant Kg/s
 		Real64 SourceSideOutletEnth; // Enthalpy at Source Side pressure Joules

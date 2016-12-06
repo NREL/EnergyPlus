@@ -519,8 +519,6 @@ namespace HVACUnitaryBypassVAV {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool DXErrorsFound( false ); // Set to true if errors in get coil input
 		//unused0509  LOGICAL                        :: FanErrorsFound=.FALSE. ! Set to true if errors in get fan input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		static bool FanErrFlag( false ); // Error flag returned during CALL to GetFanType
 		static bool errFlag( false ); // Error flag returned during CALL to mining functions
@@ -569,15 +567,9 @@ namespace HVACUnitaryBypassVAV {
 			HeatCoilInletNodeNum = 0;
 			HeatCoilOutletNodeNum = 0;
 			InputProcessor::GetObjectItem( CurrentModuleObject, CBVAVIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
 			CBVAVNum = CBVAVIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), CBVAV, CBVAVNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+
 			CBVAV( CBVAVNum ).Name = Alphas( 1 );
 			CBVAV( CBVAVNum ).UnitType = CurrentModuleObject;
 			CBVAV( CBVAVNum ).Sched = Alphas( 2 );

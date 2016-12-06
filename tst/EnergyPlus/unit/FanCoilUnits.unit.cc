@@ -425,7 +425,7 @@ namespace EnergyPlus {
 		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
-		CoilNames.deallocate();
+		CoilNames.clear();
 	}
 	TEST_F( EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest ) {
 
@@ -735,7 +735,7 @@ namespace EnergyPlus {
 		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
-		CoilNames.deallocate();
+		CoilNames.clear();
 
 	}
 	TEST_F( EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest ) {
@@ -1086,7 +1086,7 @@ namespace EnergyPlus {
 		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
-		CoilNames.deallocate();
+		CoilNames.clear();
 	}
 	TEST_F( EnergyPlusFixture, ElectricCoilFanCoilHeatingTest ) {
 
@@ -1391,7 +1391,7 @@ namespace EnergyPlus {
 		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
-		CoilNames.deallocate();
+		CoilNames.clear();
 	}
 	TEST_F( EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest ) {
 
@@ -1741,7 +1741,7 @@ namespace EnergyPlus {
 		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
-		CoilNames.deallocate();
+		CoilNames.clear();
 
 	}
 	TEST_F( EnergyPlusFixture, FanCoil_ASHRAE90VariableFan ) {
@@ -2120,7 +2120,7 @@ namespace EnergyPlus {
 		WaterCoil.deallocate();
 		ZoneEquipConfig.deallocate();
 		Zone.deallocate();
-		CoilNames.deallocate();
+		CoilNames.clear();
 
 	}
 

@@ -364,7 +364,6 @@ namespace HVACDXSystem {
 		static bool ErrorsFound( false ); // If errors detected in input
 		static bool ErrFound( false ); // used for mining functions
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int DXCoolSysNum;
 		bool FanErrorsFound; // flag returned on fan operating mode check
 		bool DXErrorsFound; // flag returned on DX coil name check
@@ -400,14 +399,8 @@ namespace HVACDXSystem {
 		for ( DXCoolSysNum = 1; DXCoolSysNum <= NumDXSystem; ++DXCoolSysNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, DXCoolSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), DXCoolingSystem, DXCoolSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
 			DXCoolingSystem( DXCoolSysNum ).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array
 			DXCoolingSystem( DXCoolSysNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {

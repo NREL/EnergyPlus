@@ -71,6 +71,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatRecovery.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -132,6 +133,7 @@ namespace HVACHXAssistedCoolingCoil {
 	// PUBLIC so others can access this information
 	bool GetCoilsInputFlag( true ); // Flag to allow input data to be retrieved from idf on first call to this subroutine
 	Array1D_bool CheckEquipName;
+	std::unordered_map< std::string, std::string > UniqueHXAssistedCoilNames;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -159,6 +161,18 @@ namespace HVACHXAssistedCoolingCoil {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		UniqueHXAssistedCoilNames.clear();
+		HXAssistedCoil.deallocate();
+		TotalNumHXAssistedCoils = 0;
+		HXAssistedCoilOutletTemp.deallocate();
+		HXAssistedCoilOutletHumRat.deallocate();
+		GetCoilsInputFlag = true;
+		CheckEquipName.deallocate();
+	}
 
 	void
 	SimHXAssistedCoolingCoil(
@@ -305,8 +319,6 @@ namespace HVACHXAssistedCoolingCoil {
 		int NumNums; // Number of number inputs
 		int IOStat; // Return status from GetObjectItem call
 		static bool ErrorsFound( false ); // set TRUE if errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumHXAssistedDXCoils; // Number of HXAssistedCoolingCoil objects using a DX coil
 		int NumHXAssistedWaterCoils; // Number of HXAssistedCoolingCoil objects using a chilled water coil
 		//    LOGICAL :: FanErrFlag              ! Error flag for fan operating mode mining call
@@ -337,6 +349,7 @@ namespace HVACHXAssistedCoolingCoil {
 			HXAssistedCoilOutletTemp.allocate( TotalNumHXAssistedCoils );
 			HXAssistedCoilOutletHumRat.allocate( TotalNumHXAssistedCoils );
 			CheckEquipName.dimension( TotalNumHXAssistedCoils, true );
+			UniqueHXAssistedCoilNames.reserve( TotalNumHXAssistedCoils );
 		}
 
 		InputProcessor::GetObjectDefMaxArgs( "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums );
@@ -358,15 +371,9 @@ namespace HVACHXAssistedCoolingCoil {
 
 		for ( HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueHXAssistedCoilNames, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
+			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType = AlphArray( 2 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName = AlphArray( 3 );
 
@@ -479,13 +486,8 @@ namespace HVACHXAssistedCoolingCoil {
 		for ( HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueHXAssistedCoilNames, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
+
 			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType = AlphArray( 2 );

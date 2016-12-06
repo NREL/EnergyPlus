@@ -87,6 +87,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -206,6 +207,7 @@ namespace LowTempRadiantSystem {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
+	bool GetInputFlag = true;
 	int NumOfHydrLowTempRadSys( 0 ); // Number of hydronic low tempererature radiant systems
 	int NumOfCFloLowTempRadSys( 0 ); // Number of constant flow (hydronic) low tempererature radiant systems
 	int NumOfElecLowTempRadSys( 0 ); // Number of electric low tempererature radiant systems
@@ -235,6 +237,7 @@ namespace LowTempRadiantSystem {
 	Array1D< ConstantFlowRadiantSystemData > CFloRadSys;
 	Array1D< ElectricRadiantSystemData > ElecRadSys;
 	Array1D< RadSysTypeData > RadSysTypes;
+	std::unordered_map< std::string, std::string > LowTempRadUniqueNames;
 	Array1D< ElecRadSysNumericFieldData > ElecRadSysNumericFields;
 	Array1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
 
@@ -270,6 +273,8 @@ namespace LowTempRadiantSystem {
 		RadSysTypes.deallocate();
 		ElecRadSysNumericFields.deallocate();
 		HydronicRadiantSysNumericFields.deallocate();
+		LowTempRadUniqueNames.clear();
+		GetInputFlag = true;
 	}
 
 	void
@@ -297,7 +302,6 @@ namespace LowTempRadiantSystem {
 		using General::TrimSigDigits;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int RadSysNum; // Radiant system number/index in local derived types
 		int SystemType; // Type of radiant system: hydronic, constant flow, or electric
 		bool InitErrorFound( false );
@@ -455,8 +459,6 @@ namespace LowTempRadiantSystem {
 		int SurfNum; // DO loop counter for surfaces
 		//unused1208  INTEGER    :: ZoneForSurface  ! Zone number that a particular surface is attached to
 		int BaseNum; // Temporary number for creating RadiantSystemTypes structure
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
@@ -490,6 +492,7 @@ namespace LowTempRadiantSystem {
 
 		TotalNumOfRadSystems = NumOfHydrLowTempRadSys + NumOfElecLowTempRadSys + NumOfCFloLowTempRadSys;
 		RadSysTypes.allocate( TotalNumOfRadSystems );
+		LowTempRadUniqueNames.reserve( static_cast< unsigned >( TotalNumOfRadSystems ) );
 		CheckEquipName.dimension( TotalNumOfRadSystems, true );
 
 		HydrRadSys.allocate( NumOfHydrLowTempRadSys );
@@ -530,18 +533,11 @@ namespace LowTempRadiantSystem {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-
 			HydronicRadiantSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HydronicRadiantSysNumericFields( Item ).FieldNames = "";
 			HydronicRadiantSysNumericFields( Item ).FieldNames = cNumericFields;
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = HydronicSystem;
@@ -871,14 +867,7 @@ namespace LowTempRadiantSystem {
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = ConstantFlowSystem;
@@ -1123,18 +1112,11 @@ namespace LowTempRadiantSystem {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-
 			ElecRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			ElecRadSysNumericFields( Item ).FieldNames = "";
 			ElecRadSysNumericFields( Item ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = ElectricSystem;

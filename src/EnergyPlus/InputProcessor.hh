@@ -69,6 +69,7 @@
 #include <map>
 #include <fstream>
 
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
@@ -294,6 +295,7 @@ namespace EnergyPlus {
 			Array1_string const & ListOfItems,
 			int const NumItems
 		);
+
 
 		static
 		inline
@@ -836,6 +838,13 @@ namespace EnergyPlus {
 			}
 		}
 
+		static
+		bool
+		IsNameEmpty(
+			std::string & NameToVerify,
+			std::string const & StringToDisplay,
+			bool & ErrorFound
+		);
 		static
 		void
 		RangeCheck(

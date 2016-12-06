@@ -365,8 +365,6 @@ namespace PlantManager {
 		Array1D_string Alpha( 18 ); // dimension to num of alpha fields in input
 		Array1D< Real64 > Num( 30 ); // dimension to num of numeric data fields in input
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string LoadingScheme;
 		bool ErrFound;
 		std::string CurrentModuleObject; // for ease in renaming.
@@ -412,15 +410,7 @@ namespace PlantManager {
 				CurrentModuleObject = "CondenserLoop";
 				InputProcessor::GetObjectItem( CurrentModuleObject, CondLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			}
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alpha( 1 ), PlantLoop, LoopNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alpha( 1 ) = "xxxxx";
-			}
-
+			InputProcessor::IsNameEmpty(Alpha( 1 ), CurrentModuleObject, ErrorsFound);
 			this_loop.Name = Alpha( 1 ); // Load the Plant Loop Name
 
 			if ( InputProcessor::SameString( Alpha( 2 ), "STEAM" ) ) {

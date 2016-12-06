@@ -157,6 +157,9 @@ namespace HVACHXAssistedCoolingCoil {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimHXAssistedCoolingCoil(
 		std::string const & HXAssistedCoilName, // Name of HXAssistedCoolingCoil
 		bool const FirstHVACIteration, // FirstHVACIteration flag

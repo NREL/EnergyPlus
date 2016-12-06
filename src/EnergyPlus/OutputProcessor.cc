@@ -85,6 +85,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -295,6 +296,7 @@ namespace OutputProcessor {
 	Array1D< MeterArrayType > VarMeterArrays;
 	Array1D< MeterType > EnergyMeters;
 	Array1D< EndUseCategoryType > EndUseCategory;
+	std::unordered_map< std::string, std::string > UniqueMeterNames;
 
 	// Routines tagged on the end of this module:
 	//  AddToOutputVariableList
@@ -391,6 +393,7 @@ namespace OutputProcessor {
 		VarMeterArrays.deallocate();
 		EnergyMeters.deallocate();
 		EndUseCategory.deallocate();
+		UniqueMeterNames.clear();
 	}
 
 	void
@@ -1493,8 +1496,6 @@ namespace OutputProcessor {
 		int IOStat;
 		int NumCustomMeters;
 		int NumCustomDecMeters;
-		bool IsNotOK;
-		bool IsBlank;
 		int fldIndex;
 		bool KeyIsStar;
 		Array1D_string NamesOfKeys; // Specific key name
@@ -1542,11 +1543,7 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
@@ -1707,11 +1704,7 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
 				continue;
 			}
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();

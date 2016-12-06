@@ -150,7 +150,7 @@ namespace GroundHeatExchangers {
 	int locDayOfSim( 0 );
 	namespace {
 		bool GetInput( true );
-		bool errorsFound( false );
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    		bool errorsFound( false );
 	}
 
 	Array1D< Real64 > prevTimeSteps; // This is used to store only the Last Few time step's time
@@ -1273,8 +1273,6 @@ namespace GroundHeatExchangers {
 		int numAlphas; // Number of elements in the alpha array
 		int numNums; // Number of elements in the numeric array. "numNums" :)
 		int IOStat; // IO Status when calling get input subroutine
-		bool isNotOK; // Flag to verify name
-		bool isBlank; // Flag for blank name
 		int indexNum;
 		int pairNum;
 		bool allocated;
@@ -1306,29 +1304,8 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
-				isNotOK = false;
-				isBlank = false;
-
-				// Create temporary array of previous names to pass to VerifyName
-				Array1D <std::string> tmpNames;
-				tmpNames.allocate( numVerticalGLHEs - 1 );
-
-				// Populate temporary array with previous entrys
-				for (int i = 1; i < numVerticalGLHEs - 1; ++i ) {
-					tmpNames( i ) = verticalGLHE( i ).Name;
-				}
-
-				//get object name
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
-
-				// Deallocate temporary array when no longer needed
-				tmpNames.deallocate();
-
-				if ( isNotOK ) {
-					errorsFound = true;
-					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num
@@ -1451,29 +1428,8 @@ namespace GroundHeatExchangers {
 
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, GLHENum, cAlphaArgs, numAlphas, rNumericArgs, numNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, errorsFound);
 
-				isNotOK = false;
-				isBlank = false;
-
-				// Create temporary array of previous names to pass to VerifyName
-				Array1D <std::string> tmpNames;
-				tmpNames.allocate( numSlinkyGLHEs - 1 );
-
-				// Populate temporary array with previous entrys
-				for (int i = 1; i < numSlinkyGLHEs - 1; ++i ) {
-					tmpNames( i ) = slinkyGLHE( i ).Name;
-				}
-
-				//get object name
-				InputProcessor::VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
-
-				// Deallocate temporary array when no longer needed
-				tmpNames.deallocate();
-
-				if ( isNotOK ) {
-					errorsFound = true;
-					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num

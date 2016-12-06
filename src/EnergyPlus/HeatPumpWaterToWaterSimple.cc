@@ -69,6 +69,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -135,12 +136,14 @@ namespace HeatPumpWaterToWaterSimple {
 	// Object Data
 	Array1D< GshpSpecs > GSHP;
 	Array1D< ReportVars > GSHPReport;
+	std::unordered_map< std::string, std::string > HeatPumpWaterUniqueNames;
 
 	void
 	clear_state(){
 		NumGSHPs = 0;
 		GetInputFlag = true;
 		InitWatertoWaterHPOneTimeFlag = true;
+		HeatPumpWaterUniqueNames.clear();
 		GSHP.deallocate();
 		GSHPReport.deallocate();
 	}
@@ -271,8 +274,6 @@ namespace HeatPumpWaterToWaterSimple {
 		Array1D< Real64 > NumArray( 15 ); // numeric data
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		NumCoolCoil = InputProcessor::GetNumObjectsFound( HPEqFitCoolingUC );
@@ -286,6 +287,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		if ( NumGSHPs > 0 ) {
 			GSHP.allocate( NumGSHPs );
+			HeatPumpWaterUniqueNames.reserve( NumGSHPs );
 			GSHPReport.allocate( NumGSHPs );
 			// initialize the data structures
 		}
@@ -296,14 +298,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHPNum = HPNum;
 
 			InputProcessor::GetObjectItem( HPEqFitCoolingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			InputProcessor::VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitCoolingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowCool = NumArray( 1 );
@@ -348,14 +343,7 @@ namespace HeatPumpWaterToWaterSimple {
 			GSHPNum = NumCoolCoil + HPNum;
 
 			InputProcessor::GetObjectItem( HPEqFitHeatingUC, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			InputProcessor::VerifyName( AlphArray( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, AlphArray( 1 ), HPEqFitHeatingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowHeat = NumArray( 1 );

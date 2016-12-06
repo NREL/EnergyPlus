@@ -276,8 +276,6 @@ namespace ElectricBaseboardRadiator {
 		int SurfNum; // surface number that radiant heat delivered
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		cCurrentModuleObject = cCMO_BBRadiator_Electric;
@@ -298,18 +296,11 @@ namespace ElectricBaseboardRadiator {
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames.allocate(NumNumbers);
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), ElecBaseboard, &ElecBaseboardParams::EquipName, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
+			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) {
 				continue;
 			}
-			VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), ErrorsFound, cCurrentModuleObject + " Name" );
+
 
 			ElecBaseboard( BaseboardNum ).EquipName = cAlphaArgs( 1 ); // name of this baseboard
 			ElecBaseboard( BaseboardNum ).EquipType = BaseboardRadiator_Electric;

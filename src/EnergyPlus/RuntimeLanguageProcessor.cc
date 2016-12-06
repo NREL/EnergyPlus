@@ -81,6 +81,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -183,15 +184,17 @@ namespace RuntimeLanguageProcessor {
 
 	// Object Data
 	Array1D< RuntimeReportVarType > RuntimeReportVar;
+	std::unordered_map< std::string, std::string > ErlStackUniqueNames;
+	std::unordered_map< std::string, std::string > RuntimeReportVarUniqueNames;
 
 	// MODULE SUBROUTINES:
 
 	// Functions
 	void
 	clear_state(){
-		GetInput =  true ;
-		InitializeOnce = true ;
-		MyEnvrnFlag = true ;
+		GetInput =  true;
+		InitializeOnce = true;
+		MyEnvrnFlag = true;
 		AlreadyDidOnce = false;
 
 		NullVariableNum = 0;
@@ -220,7 +223,8 @@ namespace RuntimeLanguageProcessor {
 		ActualDateAndTimeNum = 0;
 		ActualTimeNum = 0;
 		WarmUpFlagNum = 0;
-
+		ErlStackUniqueNames.clear();
+		RuntimeReportVarUniqueNames.clear();
 	}
 
 	void
@@ -2663,8 +2667,6 @@ namespace RuntimeLanguageProcessor {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		int VariableNum( 0 ); // temporary
 		int RuntimeReportVarNum;
@@ -2958,18 +2960,13 @@ namespace RuntimeLanguageProcessor {
 
 			NumErlStacks = NumErlPrograms + NumErlSubroutines;
 			ErlStack.allocate( NumErlStacks );
+			ErlStackUniqueNames.reserve( static_cast< unsigned >( NumErlStacks ) );
 
 			if ( NumErlPrograms > 0 ) {
 				cCurrentModuleObject = "EnergyManagementSystem:Program";
 				for ( StackNum = 1; StackNum <= NumErlPrograms; ++StackNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), ErlStack, StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Programs", errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -2989,14 +2986,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
 				for ( StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), ErlStack, StackNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Subroutines", errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -3018,13 +3008,7 @@ namespace RuntimeLanguageProcessor {
 				TrendVariable.allocate( NumErlTrendVariables );
 				for ( TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, TrendNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), TrendVariable, TrendNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 					ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -3106,14 +3090,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
 				for ( RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), RuntimeReportVar, RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
 					if ( lbracket == std::string::npos ) {
@@ -3247,13 +3224,7 @@ namespace RuntimeLanguageProcessor {
 					RuntimeReportVarNum = NumEMSOutputVariables + loop;
 					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					InputProcessor::VerifyName( cAlphaArgs( 1 ), RuntimeReportVar, RuntimeReportVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ErrorsFound = true;
-						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-					}
+					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
 					if ( lbracket == std::string::npos ) {

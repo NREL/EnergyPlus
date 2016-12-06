@@ -75,6 +75,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -147,8 +148,11 @@ namespace Humidifiers {
 	int const FixedInletWaterTemperature( 1 );
 	int const VariableInletWaterTemperature( 2 );
 
+	bool GetInputFlag = true; // moved up from a static function variable
+
 	// Object Data
 	Array1D< HumidifierData > Humidifier;
+	std::unordered_map< std::string, std::string > HumidifierUniqueNames;
 
 	// Clears the global data in Humidifiers.
 	// Needed for unit tests, should not be normally called.
@@ -160,6 +164,8 @@ namespace Humidifiers {
 		NumGasSteamHums = 0;
 		CheckEquipName.deallocate();
 		Humidifier.deallocate();
+		HumidifierUniqueNames.clear();
+		GetInputFlag = true;
 	}
 
 	void
@@ -184,7 +190,6 @@ namespace Humidifiers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HumNum; // index of humidifier unit being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		Real64 WaterAddNeeded; // output in kg/s needed from humidifier to meet humidity setpoint
 
 		if ( GetInputFlag ) {
@@ -284,8 +289,6 @@ namespace Humidifiers {
 		int MaxAlphas; // maximum Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string Alphas; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -310,6 +313,7 @@ namespace Humidifiers {
 
 		// allocate the data array
 		Humidifier.allocate( NumHumidifiers );
+		HumidifierUniqueNames.reserve( static_cast< unsigned >( NumHumidifiers ) );
 		CheckEquipName.dimension( NumHumidifiers, true );
 
 		Alphas.allocate( MaxAlphas );
@@ -324,13 +328,7 @@ namespace Humidifiers {
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumElecSteamHums; ++HumidifierIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = HumidifierIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			//    Humidifier(HumNum)%HumType = TRIM(CurrentModuleObject)
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Electric;
@@ -367,13 +365,7 @@ namespace Humidifiers {
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumGasSteamHums; ++HumidifierIndex ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = NumElecSteamHums + HumidifierIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Gas;
 			Humidifier( HumNum ).Sched = Alphas( 2 );

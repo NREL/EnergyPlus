@@ -204,10 +204,17 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			eat_comment( idf, index );
 		} else {
 			std::string obj_name = parse_string( idf, index, success );
+<<<<<<< HEAD
 
 			auto const converted = EnergyPlus::InputProcessor::ConvertInsensitiveObjectType( obj_name );
 			if ( converted.first ) {
 				obj_name = converted.second;
+=======
+			for ( char & c : obj_name ) c = ( char ) toupper( c );
+			auto const & find_key = case_insensitive_keys.find( obj_name );
+			if ( find_key != case_insensitive_keys.end() ) {
+				obj_name = find_key->second;
+>>>>>>> input_processor_refactor_verify_name
 			} else {
 				print_out_line_error( idf, false );
 				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
@@ -1703,6 +1710,7 @@ namespace EnergyPlus {
 		return 0; // Not found
 	}
 
+
 	int
 	InputProcessor::FindItemInSortedList(
 		std::string const & String,
@@ -1917,6 +1925,21 @@ namespace EnergyPlus {
 			IsBlank = false;
 		}
 
+	}
+
+	bool
+	EnergyPlus::InputProcessor::IsNameEmpty (
+		std::string & NameToVerify,
+		std::string const & StringToDisplay,
+		bool & ErrorFound
+	){
+		if ( NameToVerify.empty() ) {
+			ShowSevereError(StringToDisplay + " Name, cannot be blank");
+			ErrorFound = true;
+			NameToVerify = "xxxxx";
+			return true;
+		}
+		return false;
 	}
 
 	void

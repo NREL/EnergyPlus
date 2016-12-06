@@ -316,8 +316,6 @@ namespace HighTempRadiantSystem {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int SurfNum; // Surface number DO loop counter
 		Real64 TotalFracToSurfs; // Sum of fractions of radiation to surfaces
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		// FLOW:
 		// Initializations and allocations
@@ -339,14 +337,7 @@ namespace HighTempRadiantSystem {
 			HighTempRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HighTempRadSysNumericFields( Item ).FieldNames = "";
 			HighTempRadSysNumericFields( Item ).FieldNames = cNumericFieldNames;
-
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), HighTempRadSys, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			// General user input data
 			HighTempRadSys( Item ).Name = cAlphaArgs( 1 );
 

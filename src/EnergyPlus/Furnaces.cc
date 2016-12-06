@@ -87,6 +87,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACControllers.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -218,6 +219,7 @@ namespace Furnaces {
 	int const DehumidControl_CoolReheat( 2 );
 
 	static std::string const fluidNameSteam( "STEAM" );
+	bool GetFurnaceInputFlag( true ); // Logical to allow "GetInput" only once per simulation
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -263,6 +265,7 @@ namespace Furnaces {
 
 	// Object Data
 	Array1D< FurnaceEquipConditions > Furnace;
+	std::unordered_map< std::string, std::string > UniqueFurnaceNames;
 
 	// Utility routines for module
 	// na
@@ -290,10 +293,12 @@ namespace Furnaces {
 		EconomizerFlag = false;
 		AirLoopPass = 0;
 		HPDehumidificationLoadFlag = false;
+		GetFurnaceInputFlag = true;
 		TempSteamIn = 100.0;
 		SaveCompressorPLR = 0.0;
 		CurrentModuleObject = "";
 		Furnace.deallocate();
+		UniqueFurnaceNames.clear();
 	}
 
 
@@ -335,7 +340,6 @@ namespace Furnaces {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FurnaceNum; // Furnace number
-		static bool GetInputFlag( true ); // Logical to allow "GetInput" only once per simulation
 		Real64 HeatCoilLoad( 0.0 ); // Zone heating coil load
 		Real64 ReheatCoilLoad; // Load to be met by the reheat coil (if high humidity control)
 		Real64 ZoneLoad; // Control zone sensible load
@@ -356,10 +360,10 @@ namespace Furnaces {
 		Real64 TempMassFlowRateMaxAvail;
 
 		// Obtains and Allocates Furnace related parameters from input file
-		if ( GetInputFlag ) { //First time subroutine has been entered
+		if ( GetFurnaceInputFlag ) { //First time subroutine has been entered
 			//Get the furnace input
 			GetFurnaceInput();
-			GetInputFlag = false;
+			GetFurnaceInputFlag = false;
 		}
 
 		// Find the correct Furnace
@@ -787,7 +791,6 @@ namespace Furnaces {
 		std::string CompSetHeatOutlet;
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumHeatOnly; // Number of heat only furnaces
 		int NumHeatCool; // Number of heat/cool furnaces
 		int HeatOnlyNum; // Index to heat only furnaces
@@ -840,6 +843,7 @@ namespace Furnaces {
 		int IHPCoilIndex( 0 );//IHP cooling coil id
 
 		// Flow
+		GetFurnaceInputFlag = false;
 		MaxNumbers = 0;
 		MaxAlphas = 0;
 
@@ -890,6 +894,7 @@ namespace Furnaces {
 
 		if ( NumFurnaces > 0 ) {
 			Furnace.allocate( NumFurnaces );
+			UniqueFurnaceNames.reserve( NumFurnaces );
 		}
 		CheckEquipName.dimension( NumFurnaces, true );
 
@@ -923,13 +928,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -1441,13 +1440,7 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, GetObjectNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -2585,13 +2578,8 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+
 			Furnace( FurnaceNum ).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -3490,13 +3478,8 @@ namespace Furnaces {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HeatPumpNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFurnaceNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+
 			Furnace( FurnaceNum ).FurnaceType_Num = UnitarySys_HeatPump_WaterToAir;
 			Furnace( FurnaceNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {

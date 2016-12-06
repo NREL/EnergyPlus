@@ -905,7 +905,6 @@ namespace EnergyPlus {
 		CondenserLoopTowers::ReportTowers( true, 1 );
 
 		// test that tower outlet temperature = set point temperature
-
 		int inletNodeIndex = 0;
 		int outletNodeIndex = 0;
 		auto inletNode = std::find( DataLoopNode::NodeID.begin(), DataLoopNode::NodeID.end(), "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE" );

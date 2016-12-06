@@ -336,8 +336,6 @@ namespace SteamBaseboardRadiator {
 		int SurfNum; // Surface number Do loop counter
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool SteamMessageNeeded;
 
@@ -354,22 +352,12 @@ namespace SteamBaseboardRadiator {
 		for ( BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum ) {
 
 			InputProcessor::GetObjectItem( cCMO_BBRadiator_Steam, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
+			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCMO_BBRadiator_Steam, ErrorsFound);
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames.allocate( NumNumbers );
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
 
-			IsNotOK = false;
-			IsBlank = false;
-			InputProcessor::VerifyName( cAlphaArgs( 1 ), SteamBaseboard, &SteamBaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Steam + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
-			VerifyUniqueBaseboardName( cCMO_BBRadiator_Steam, cAlphaArgs( 1 ), errFlag, cCMO_BBRadiator_Steam + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			VerifyUniqueBaseboardName( cCMO_BBRadiator_Steam, cAlphaArgs( 1 ), ErrorsFound, cCMO_BBRadiator_Steam + " Name" );
 
 			SteamBaseboard( BaseboardNum ).EquipID = cAlphaArgs( 1 ); // Name of the baseboard
 			SteamBaseboard( BaseboardNum ).EquipType = TypeOf_Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
