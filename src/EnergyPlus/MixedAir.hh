@@ -354,7 +354,8 @@ namespace MixedAir {
 
 		void
 		CalcOAController(
-			int const AirLoopNum
+			int const AirLoopNum,
+			bool const FirstHVACIteration
 		);
 
 		void
@@ -362,7 +363,8 @@ namespace MixedAir {
 			int const AirLoopNum,
 			Real64 const OutAirMinFrac,
 			Real64 & OASignal,
-			bool & HighHumidityOperationFlag
+			bool & HighHumidityOperationFlag,
+			bool const FirstHVACIteration
 		);
 
 		void

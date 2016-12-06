@@ -190,6 +190,7 @@ namespace DataAirLoop {
 		// Members
 		std::string OACtrlName; // name of OA controller
 		int OACtrlNum; // index of OA controller
+		int OASysNum; // index of OA System
 		bool CyclingFan; // TRUE if currently the air loop supply fan is cycling
 		bool AnyContFan; // TRUE if at any time supply fan is continuous
 		int CycFanSchedPtr; // index of schedule indicating whether fan is cycling or continuous in a unitary system
@@ -225,6 +226,7 @@ namespace DataAirLoop {
 		// Default Constructor
 		AirLoopControlData() :
 			OACtrlNum( 0 ),
+			OASysNum( 0 ),
 			CyclingFan( false ),
 			AnyContFan( false ),
 			CycFanSchedPtr( 0 ),
