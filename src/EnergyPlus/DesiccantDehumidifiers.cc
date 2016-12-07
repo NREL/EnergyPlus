@@ -82,6 +82,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
 #include <InputProcessor.hh>
@@ -226,26 +227,6 @@ namespace DesiccantDehumidifiers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manage the simulation of an air dehumidifier
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// NA
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DesicDehumNum; // index of solid desiccant unit being simulated
 		Real64 HumRatNeeded; // process air leaving humidity ratio set by controller [kg water/kg air]
@@ -322,15 +303,7 @@ namespace DesiccantDehumidifiers {
 		// METHODOLOGY EMPLOYED:
 		// Uses InputProcessor "Get" routines to obtain data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
@@ -366,19 +339,9 @@ namespace DesiccantDehumidifiers {
 		using SteamCoils::SetSteamCoilData;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetDesiccantDehumidifierInput: " ); // include trailing blank space
 		static std::string const dehumidifierDesiccantNoFans( "Dehumidifier:Desiccant:NoFans" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DesicDehumIndex; // Loop index
@@ -452,7 +415,7 @@ namespace DesiccantDehumidifiers {
 			InputProcessor::GetObjectItem( CurrentModuleObject, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			DesicDehumNum = DesicDehumIndex;
 
-			InputProcessor::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Solid;
@@ -737,7 +700,7 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Generic;
 			InputProcessor::GetObjectItem( DesicDehum( DesicDehumNum ).DehumType, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFoundGeneric );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFoundGeneric );
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 
 			ErrorsFound2 = false;

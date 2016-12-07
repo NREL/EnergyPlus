@@ -81,6 +81,7 @@ extern "C" {
 #include <DataSystemVariables.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <RuntimeLanguageProcessor.hh>
@@ -247,10 +248,6 @@ namespace ExternalInterface {
 		// Uses InputProcessor "Get" routines to obtain data.
 
 		// Using/Aliasing
-
-
-
-
 		using DataIPShortCuts::cCurrentModuleObject;
 		using DataIPShortCuts::cAlphaArgs;
 		using DataIPShortCuts::rNumericArgs;
@@ -453,8 +450,6 @@ namespace ExternalInterface {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine parses the semicolon separated string xmlStr
 		// and assigns each element to ele
-
-		// Using/Aliasing
 
 		// SUBROUTINE VARIABLE DEFINITIONS:
 		int i; // Counter
@@ -1025,11 +1020,6 @@ namespace ExternalInterface {
 		// This routine initializes the input and outputs variables used for the co-simulation with FMUs.
 
 		// Using/Aliasing
-
-
-
-
-
 		using ScheduleManager::GetDayScheduleIndex;
 		using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
 		using RuntimeLanguageProcessor::FindEMSVariable;
@@ -1316,7 +1306,7 @@ namespace ExternalInterface {
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).VarKey = cAlphaArgs( 1 );
 							FMU( i ).Instance( j ).eplusOutputVariable( k ).Name = cAlphaArgs( 2 );
 							// verify whether we have duplicate FMU input variables in the idf
-							InputProcessor::VerifyUniqueInterObjectName( UniqueFMUInputVarNames, FMU( i ).Instance( j ).fmuInputVariable( k ).Name, cCurrentModuleObject, FMU( i ).Instance( j ).Name, ErrorsFound );
+							GlobalNames::VerifyUniqueInterObjectName( UniqueFMUInputVarNames, FMU( i ).Instance( j ).fmuInputVariable( k ).Name, cCurrentModuleObject, FMU( i ).Instance( j ).Name, ErrorsFound );
 //							InputProcessor::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name, FMU( i ).Instance( j ).checkfmuInputVariable, NumFMUInputVariables, IsNotOK, IsBlank, "The FMU input variable \"" + FMU( i ).Instance( j ).fmuInputVariable( k ).Name + "\" of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" has duplicates. Please check the input file again and delete duplicated entries." );
 							if ( ErrorsFound ) {
 								StopExternalInterfaceIfError();
@@ -1731,10 +1721,6 @@ namespace ExternalInterface {
 		using RuntimeLanguageProcessor::FindEMSVariable;
 		using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
 		using EMSManager::ManageEMS;
-
-
-
-
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
@@ -1991,8 +1977,6 @@ namespace ExternalInterface {
 		// Use GetObjectItem from the Input Processor
 
 		// Using/Aliasing
-
-
 		using DataIPShortCuts::cCurrentModuleObject;
 		using DataIPShortCuts::cAlphaArgs;
 		using DataIPShortCuts::rNumericArgs;
@@ -2181,8 +2165,6 @@ namespace ExternalInterface {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Gets the sensor key index and type for the specified variable key and name
 
-		// Using/Aliasing
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
 		int numKeys( 0 ); // Number of keys found
@@ -2232,8 +2214,6 @@ namespace ExternalInterface {
 		// This subroutine writes a warning if ExternalInterface objects are used in the
 		// idf file, but the ExternalInterface link is not specified.
 
-		// Using/Aliasing
-
 		int const NumObjects = InputProcessor::GetNumObjectsFound( ObjectWord );
 		if ( NumObjects > 0 ) {
 			ShowWarningError( "IDF file contains object \"" + ObjectWord + "\"," );
@@ -2255,8 +2235,6 @@ namespace ExternalInterface {
 		// the ExternalInterface object in the idf file
 
 		// Using/Aliasing
-
-
 		using DataIPShortCuts::cCurrentModuleObject;
 		using DataIPShortCuts::cAlphaArgs;
 		using DataIPShortCuts::rNumericArgs;

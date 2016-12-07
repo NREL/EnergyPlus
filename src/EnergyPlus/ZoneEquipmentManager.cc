@@ -880,8 +880,6 @@ namespace ZoneEquipmentManager {
 		// REFERENCES:
 		// Consult the "DOAS Effect On Zone Sizing" new feature proposal and design documents
 
-		// Using/Aliasing
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcDOASSupCondsForSizing" );
 
@@ -2920,12 +2918,12 @@ namespace ZoneEquipmentManager {
 
 				// set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
 				// minimum flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, 
-					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, 
+				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow,
+					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2,
 					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
 				// set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
 				// max heating flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, 
+				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow,
 					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) *
 					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
 				// Determine the design cooling supply air temperature if the supply air temperature difference is specified by user.
@@ -3132,6 +3130,7 @@ namespace ZoneEquipmentManager {
 			// Air loop system availability manager status only applies to PIU and exhaust fans
 			// Reset fan SAM operation flags for zone fans.
 			TurnFansOn = false;
+			TurnZoneFansOnlyOn = false;
 			TurnFansOff = false;
 
 			for ( EquipTypeNum = 1; EquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++EquipTypeNum ) {
@@ -3203,6 +3202,10 @@ namespace ZoneEquipmentManager {
 					if ( ZoneEquipAvail( ControlledZoneNum ) == CycleOn || ZoneEquipAvail( ControlledZoneNum ) == CycleOnZoneFansOnly ) {
 						TurnFansOn = true;
 					}
+					if ( ZoneEquipAvail( ControlledZoneNum ) == CycleOnZoneFansOnly ) {
+						// Currently used only by parallel powered induction unit
+						TurnZoneFansOnlyOn = true;
+					}
 					if ( ZoneEquipAvail( ControlledZoneNum ) == ForceOff ) {
 						TurnFansOff = true;
 					}
@@ -3211,6 +3214,7 @@ namespace ZoneEquipmentManager {
 
 					//            reset status flags for other zone equipment
 					TurnFansOn = false;
+					TurnZoneFansOnlyOn = false;
 					TurnFansOff = false;
 
 					NonAirSystemResponse( ActualZoneNum ) += NonAirSysOutput;
@@ -3280,10 +3284,10 @@ namespace ZoneEquipmentManager {
 
 				} else if ( SELECT_CASE_var == CoolingPanel_Num ) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 					SimCoolingPanel( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
-					
+
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
 					LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
-					
+
 				} else if ( SELECT_CASE_var == HiTempRadiant_Num ) { // 'ZoneHVAC:HighTemperatureRadiant'
 					SimHighTempRadiantSystem( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 					LatOutputProvided = 0.0; // This baseboard currently sends its latent heat gain directly to predictor/corrector
@@ -3739,9 +3743,6 @@ namespace ZoneEquipmentManager {
 		// METHODOLOGY EMPLOYED:
 		// Mass continuity equation.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataAirLoop::AirLoopFlow;
@@ -3752,7 +3753,6 @@ namespace ZoneEquipmentManager {
 		using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 		using DataGlobals::isPulseZoneSizing;
 		using DataGlobals::DoingSizing;
-
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::MassConservation;
 		using DataHeatBalance::Infiltration;
@@ -3769,19 +3769,9 @@ namespace ZoneEquipmentManager {
 		using DataHVACGlobals::SmallMassFlow;
 		using ScheduleManager::GetCurrentScheduleValue;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const IterMax( 25 );
 		Real64 const ConvergenceTolerance( 0.000010 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -4381,12 +4371,6 @@ namespace ZoneEquipmentManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates the air component of the heat balance.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutHumRat;
@@ -4417,16 +4401,12 @@ namespace ZoneEquipmentManager {
 		using DataContaminantBalance::MixingMassFlowCO2;
 		using DataContaminantBalance::ZoneAirGC;
 		using DataContaminantBalance::MixingMassFlowGC;
-
 		using DataHeatBalance::Ventilation;
 		using DataGlobals::SecInHour;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::HourOfDay;
 		using DataHVACGlobals::TimeStepSys;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StdGravity( 9.80665 ); // The acceleration of gravity at the sea level (m/s2)
@@ -4435,12 +4415,6 @@ namespace ZoneEquipmentManager {
 		static std::string const RoutineNameRefrigerationDoorMixing( "CalcAirFlowSimple:RefrigerationDoorMixing" );
 		static std::string const RoutineNameInfiltration( "CalcAirFlowSimple:Infiltration" );
 		static std::string const RoutineNameZoneAirBalance( "CalcAirFlowSimple:ZoneAirBalance" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MCP;
@@ -5492,19 +5466,8 @@ namespace ZoneEquipmentManager {
 		// This subroutine does the autosizing calculations for the Sizing:Zone
 		// DOAS input.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// See IO Ref for suggested values
-
-		// Using/Aliasing
-
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// na
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ZoneSizIndex;

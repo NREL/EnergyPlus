@@ -57,8 +57,8 @@
 // in binary and source code form.
 
 // C++ Headers
-#include<memory>
-#include<vector>
+#include <memory>
+#include <vector>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -105,8 +105,6 @@ namespace GroundTemperatureManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Called by objects requireing ground temperature models. Determines type and calls appropriate factory method.
-
-		// USE STATEMENTS:
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:

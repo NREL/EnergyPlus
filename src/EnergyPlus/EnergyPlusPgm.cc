@@ -236,7 +236,6 @@ EnergyPlusPgm( std::string const & filepath )
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
-	using json = nlohmann::json;
 
 	// PROGRAM INFORMATION:
 	//       AUTHOR         Linda K. Lawrie, et al
@@ -460,7 +459,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 		ShowPsychrometricSummary();
 
-		// ReportOrphanRecordObjects();
+		InputProcessor::ReportOrphanRecordObjects();
 		ReportOrphanFluids();
 		ReportOrphanSchedules();
 
@@ -477,8 +476,8 @@ EnergyPlusPgm( std::string const & filepath )
 				}
 			}
 
-			std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
-			std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+			std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
+			std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
 
 			int fileUnitNumber;
 			int iostatus;

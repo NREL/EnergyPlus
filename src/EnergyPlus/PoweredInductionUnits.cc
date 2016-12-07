@@ -81,6 +81,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessor.hh>
 #include <MixerComponent.hh>
@@ -136,8 +137,6 @@ namespace PoweredInductionUnits {
 	using DataHVACGlobals::PlenumInducedMassFlow;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -196,28 +195,9 @@ namespace PoweredInductionUnits {
 		// Manages the simulation of a fan powered induction terminal unit.
 		// Called from SimZoneAirLoopEquipmentin module ZoneAirLoopEquipmentManager.
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataSizing::TermUnitPIU;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PIUNum; // index of powered induction unit being simulated
@@ -300,14 +280,7 @@ namespace PoweredInductionUnits {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using FluidProperties::FindRefrigerant;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -320,19 +293,6 @@ namespace PoweredInductionUnits {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using WaterCoils::GetCoilWaterInletNode;
 		using SteamCoils::GetCoilSteamInletNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PIUIndex; // loop index
@@ -368,7 +328,7 @@ namespace PoweredInductionUnits {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex;
-			InputProcessor::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PIU( PIUNum ).Name = cAlphaArgs( 1 );
 			PIU( PIUNum ).UnitType = cCurrentModuleObject;
 			PIU( PIUNum ).UnitType_Num = SingleDuct_SeriesPIU_Reheat;
@@ -479,7 +439,7 @@ namespace PoweredInductionUnits {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PIUIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			PIUNum = PIUIndex + NumSeriesPIUs;
-			InputProcessor::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PiuUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PIU( PIUNum ).Name = cAlphaArgs( 1 );
 			PIU( PIUNum ).UnitType = cCurrentModuleObject;
 			PIU( PIUNum ).UnitType_Num = SingleDuct_ParallelPIU_Reheat;
@@ -833,7 +793,7 @@ namespace PoweredInductionUnits {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-				using WaterCoils::SetCoilDesFlow;
+		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
 		using SteamCoils::GetCoilSteamInletNode;
@@ -1593,14 +1553,36 @@ namespace PoweredInductionUnits {
 		// Set the mass flow rates
 		if ( UnitOn ) {
 			// unit is on
+			// Special controls if FanOnFlowFrac = 0.0
+			bool ReheatRequired = false;
+			if (PIU(PIUNum).FanOnFlowFrac <= 0.0) {
+				// Calculate if reheat is needed
+				Real64 qMinPrimary = PriAirMassFlowMin * ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
+				if (  qMinPrimary < QToHeatSetPt ) ReheatRequired = true;
+			}
+
 			if ( ! PriOn ) {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				// PIU fan off if FanOnFlowFrac is 0.0 and there is no heating load, also reset fan flag if fan should be off
+				if ( ( QZnReq <= SmallLoad ) && ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) ) {
+					SecAirMassFlow = 0.0;
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				}
 			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
 				// in deadband or very small load: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
-				SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
+				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+					SecAirMassFlow = 0.0;
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+				}
 			} else if ( QZnReq > SmallLoad ) {
 				// heating: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
@@ -1619,8 +1601,12 @@ namespace PoweredInductionUnits {
 				PriAirMassFlow = QZnReq / ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
 				PriAirMassFlow = min( max( PriAirMassFlow, PriAirMassFlowMin ), PriAirMassFlowMax );
 				// check for fan on or off
-				if ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) {
+				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && ( PIU( PIUNum ).FanOnFlowFrac > 0.0 ) ) {
 					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+					// if FanOnFlowFrac is 0, then fan does not run for cooling load unless reheat is required, also reset fan flag if fan should be off
+					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
 				} else {
 					// fan is on; recalc primary air flow
 					// CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) +
@@ -1639,7 +1625,7 @@ namespace PoweredInductionUnits {
 		Node( PriNode ).MassFlowRate = PriAirMassFlow;
 		Node( SecNode ).MassFlowRate = SecAirMassFlow;
 		Node( SecNode ).MassFlowRateMaxAvail = SecAirMassFlow;
-		//now that inlet airflows have been set, the terminal bos components can be simulated.
+		//now that inlet airflows have been set, the terminal box components can be simulated.
 		// fire the fan
 		SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index );
 		// fire the mixer
@@ -1761,28 +1747,8 @@ namespace PoweredInductionUnits {
 		// Given a mixer name, this routine determines if that mixer is found on
 		// PIUnits.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		bool YesNo; // True if found
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ItemNum;
@@ -1815,26 +1781,6 @@ namespace PoweredInductionUnits {
 		// PURPOSE OF THIS FUNCTION:
 		// Marks a PIU air terminal unit as obtaining its induced air from
 		// a plenum.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PIUIndex;

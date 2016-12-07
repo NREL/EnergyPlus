@@ -70,11 +70,10 @@
 #include <DataSizing.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ScheduleManager.hh>
-
-
 
 namespace EnergyPlus {
 
@@ -172,7 +171,7 @@ namespace DataZoneEquipment {
 
 	// Object Data
 	Array1D< EquipConfiguration > ZoneEquipConfig;
-	std::unordered_set< std::string > ZoneEquipList_set;
+	std::unordered_set< std::string > UniqueZoneEquipListNames;
 	Array1D< EquipList > ZoneEquipList;
 	Array1D< ControlList > HeatingControlList;
 	Array1D< ControlList > CoolingControlList;
@@ -204,7 +203,7 @@ namespace DataZoneEquipment {
 		CoolingControlList.deallocate();
 		SupplyAirPath.deallocate();
 		ReturnAirPath.deallocate();
-		ZoneEquipList_set.clear();
+		UniqueZoneEquipListNames.clear();
 	}
 
 	void
@@ -263,21 +262,7 @@ namespace DataZoneEquipment {
 		// Get all the system related equipment which may be attached to
 		// a zone
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
-
-
-
 		using DataHeatBalance::Zone;
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::GetNodeNums;
@@ -293,17 +278,8 @@ namespace DataZoneEquipment {
 		using DataGlobals::ScheduleAlwaysOn;
 		using namespace ScheduleManager;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneEquipmentData1: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -414,7 +390,7 @@ namespace DataZoneEquipment {
 		// be the same as the number of zones in the building
 		ZoneEquipList.allocate( NumOfZones );
 		ZoneEquipAvail.dimension( NumOfZones, NoAction );
-		ZoneEquipList_set.reserve( static_cast<unsigned> (NumOfZones) );
+		UniqueZoneEquipListNames.reserve( NumOfZones );
 
 		if ( NumOfZoneEquipLists != NumOfControlledZones ) {
 			ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );
@@ -459,7 +435,7 @@ namespace DataZoneEquipment {
 			ZoneEquipConfig( ControlledZoneNum ).ZoneName = AlphArray( 1 ); // for x-referencing with the geometry data
 
 			IsNotOK = false;
-			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), ZoneEquipList_set, IsNotOK );
+			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), UniqueZoneEquipListNames, IsNotOK );
 			if ( IsNotOK ) {
 				ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
 				GetZoneEquipmentDataErrorsFound = true;
@@ -623,7 +599,7 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" ) { // Simple Cooling Panel
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = CoolingPanel_Num;
-					
+
 					} else if ( SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT" ) { // High Temperature Radiators
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HiTempRadiant_Num;
 
@@ -987,28 +963,8 @@ namespace DataZoneEquipment {
 		// PURPOSE OF THIS FUNCTION:
 		// Provides a way to check if a component name is listed on a zone equipment list.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		bool IsOnList; // True if item is on a list, false if not.
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -1054,31 +1010,9 @@ namespace DataZoneEquipment {
 		// This function returns the index into the Controlled Zone Equipment structure
 		// of the indicated zone.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int ControlledZoneIndex; // Index into Controlled Zone structure
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( ! ZoneEquipInputsFilled ) {
 			GetZoneEquipmentData1();
 			ZoneEquipInputsFilled = true;
@@ -1104,28 +1038,8 @@ namespace DataZoneEquipment {
 		// This function returns the zone number for the indicated
 		// zone node num.  Returns 0 if did not find zone node in any Zone
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int ControlledZoneIndex; // Index into Controlled Zone structure
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool FoundIt;
@@ -1166,28 +1080,8 @@ namespace DataZoneEquipment {
 		// This function returns the system node number for the indicated
 		// zone.  Returns 0 if the Zone is not a controlled zone.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int SystemZoneNodeNumber; // System node number for controlled zone
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlledZoneIndex;
@@ -1223,28 +1117,8 @@ namespace DataZoneEquipment {
 		// This function returns the return air node number for the indicated
 		// zone.  Returns 0 if the Zone is not a controlled zone.
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int ReturnAirNodeNumber; // Return Air node number for controlled zone
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlledZoneIndex;

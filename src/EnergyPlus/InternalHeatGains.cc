@@ -262,16 +262,13 @@ namespace InternalHeatGains {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-				using namespace ScheduleManager;
+		using namespace ScheduleManager;
 		using General::RoundSigDigits;
 		using General::CheckCreatedZoneItemName;
 		using namespace OutputReportPredefined;
 		using namespace DataLoopNode;
 		using CurveManager::GetCurveIndex;
 		using NodeInputManager::GetOnlySingleNode;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
@@ -407,6 +404,7 @@ namespace InternalHeatGains {
 		for ( Item = 1; Item <= NumPeopleStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
 
 			PeopleObjects( Item ).Name = AlphaName( 1 );
 
@@ -949,6 +947,7 @@ namespace InternalHeatGains {
 		for ( Item = 1; Item <= NumLightsStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
 
 			LightsObjects( Item ).Name = AlphaName( 1 );
 
@@ -1210,6 +1209,7 @@ namespace InternalHeatGains {
 		for ( Item = 1; Item <= NumZoneElectricStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
 
 			ZoneElectricObjects( Item ).Name = AlphaName( 1 );
 
@@ -1414,6 +1414,7 @@ namespace InternalHeatGains {
 		for ( Item = 1; Item <= NumZoneGasStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
 
 			ZoneGasObjects( Item ).Name = AlphaName( 1 );
 
@@ -1639,6 +1640,7 @@ namespace InternalHeatGains {
 		for ( Item = 1; Item <= NumHotWaterEqStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
 
 			HotWaterEqObjects( Item ).Name = AlphaName( 1 );
 
@@ -1843,6 +1845,7 @@ namespace InternalHeatGains {
 		for ( Item = 1; Item <= NumSteamEqStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
 
 			SteamEqObjects( Item ).Name = AlphaName( 1 );
 
@@ -2047,6 +2050,7 @@ namespace InternalHeatGains {
 		for ( Item = 1; Item <= NumOtherEqStatements; ++Item ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
 
 			OtherEqObjects( Item ).Name = AlphaName( 1 );
 

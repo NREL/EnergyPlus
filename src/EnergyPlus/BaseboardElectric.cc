@@ -162,7 +162,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
 
@@ -242,11 +241,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-
-
-
-
-
 		using GlobalNames::VerifyUniqueBaseboardName;
 		using namespace DataIPShortCuts;
 		using General::TrimSigDigits;
@@ -310,7 +304,9 @@ namespace BaseboardElectric {
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = "";
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = cNumericFieldNames;
 
-				InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;

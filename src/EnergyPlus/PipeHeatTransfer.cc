@@ -80,6 +80,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
@@ -251,11 +252,6 @@ namespace PipeHeatTransfer {
 		// from the user input file.  This will contain all of the information
 		// needed to define and simulate the surface.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
 		using DataGlobals::Pi;
@@ -263,11 +259,6 @@ namespace PipeHeatTransfer {
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::Material;
 		using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -276,21 +267,11 @@ namespace PipeHeatTransfer {
 		using ScheduleManager::GetScheduleIndex;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const NumPipeSections( 20 );
 		int const NumberOfDepthNodes( 8 ); // Number of nodes in the cartesian grid-Should be an even # for now
 		Real64 const SecondsInHour( SecInHour );
 		Real64 const HoursInDay( 24.0 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input,
@@ -328,7 +309,7 @@ namespace PipeHeatTransfer {
 			// get the object name
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			InputProcessor::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeInterior;
 
@@ -433,7 +414,7 @@ namespace PipeHeatTransfer {
 			// get the object name
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			InputProcessor::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeExterior;
 
@@ -517,7 +498,7 @@ namespace PipeHeatTransfer {
 			// get the object name
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			InputProcessor::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeUnderground;
 
@@ -803,11 +784,6 @@ namespace PipeHeatTransfer {
 		// METHODOLOGY EMPLOYED:
 		// Check flags and update data structure
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataGlobals::BeginSimFlag;
 		using DataGlobals::BeginEnvrnFlag;
@@ -824,24 +800,14 @@ namespace PipeHeatTransfer {
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
 		using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
-
 		using ScheduleManager::GetCurrentScheduleValue;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPipesHeatTransfer" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

@@ -212,89 +212,92 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
  ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99%, MaxDB=-16.6°C
- SizingPeriod:DesignDay,
-  Chicago Ohare Intl Ap Ann Htg 99% Condns DB,     !- Name
-          1,      !- Month
-         21,      !- Day of Month
-  WinterDesignDay,!- Day Type
-      -16.6,      !- Maximum Dry-Bulb Temperature {C}
-        0.0,      !- Daily Dry-Bulb Temperature Range {C}
- DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-    Wetbulb,      !- Humidity Condition Type
-      -16.6,      !- Wetbulb at Maximum Dry-Bulb {C}
-           ,      !- Humidity Indicating Day Schedule Name
-           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-     98934.,      !- Barometric Pressure {Pa}
-        4.9,      !- Wind Speed {m/s} design conditions vs. traditional 6.71 m/s (15 mph)
-        270,      !- Wind Direction {Degrees; N=0, S=180}
-         No,      !- Rain {Yes/No}
-         No,      !- Snow on ground {Yes/No}
-         No,      !- Daylight Savings Time Indicator
-  ASHRAEClearSky, !- Solar Model Indicator
-           ,      !- Beam Solar Day Schedule Name
-           ,      !- Diffuse Solar Day Schedule Name
-           ,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-           ,      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
-       0.00;      !- Clearness {0.0 to 1.1}
+
+  SizingPeriod:DesignDay,
+    Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -16.6,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -16.6,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    98934.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
 
  ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
- SizingPeriod:DesignDay,
-  Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,     !- Name
-          8,      !- Month
-         21,      !- Day of Month
-  SummerDesignDay,!- Day Type
-       31.6,      !- Maximum Dry-Bulb Temperature {C}
-       10.5,      !- Daily Dry-Bulb Temperature Range {C}
- DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-    Wetbulb,      !- Humidity Condition Type
-         23,      !- Wetbulb at Maximum Dry-Bulb {C}
-           ,      !- Humidity Indicating Day Schedule Name
-           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-     98934.,      !- Barometric Pressure {Pa}
-        5.2,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
-        230,      !- Wind Direction {Degrees; N=0, S=180}
-         No,      !- Rain {Yes/No}
-         No,      !- Snow on ground {Yes/No}
-         No,      !- Daylight Savings Time Indicator
-       ASHRAETau, !- Solar Model Indicator
-           ,      !- Beam Solar Day Schedule Name
-           ,      !- Diffuse Solar Day Schedule Name
-      0.455,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-      2.050;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
-    
+
+  SizingPeriod:DesignDay,
+    Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
+    8,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.6,                    !- Maximum Dry-Bulb Temperature {C}
+    10.5,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23,                      !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    98934.,                  !- Barometric Pressure {Pa}
+    5.2,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.455,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    2.050;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+
  ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
- SizingPeriod:DesignDay,
-  Chicago Ohare Intl Ap Ann Clg .4% Condns WB=>MDB,     !- Name
-          7,      !- Month
-         21,      !- Day of Month
-  SummerDesignDay,!- Day Type
-       31.2,      !- Maximum Dry-Bulb Temperature {C}
-       10.5,      !- Daily Dry-Bulb Temperature Range {C}
- DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
-           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
-    Wetbulb,      !- Humidity Condition Type
-       25.5,      !- Wetbulb at Maximum Dry-Bulb {C}
-           ,      !- Humidity Indicating Day Schedule Name
-           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
-           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
-     98934.,      !- Barometric Pressure {Pa}
-        5.2,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
-        230,      !- Wind Direction {Degrees; N=0, S=180}
-         No,      !- Rain {Yes/No}
-         No,      !- Snow on ground {Yes/No}
-         No,      !- Daylight Savings Time Indicator
-       ASHRAETau, !- Solar Model Indicator
-           ,      !- Beam Solar Day Schedule Name
-           ,      !- Diffuse Solar Day Schedule Name
-      0.455,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
-      2.050;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+
+  SizingPeriod:DesignDay,
+    Chicago Ohare Intl Ap Ann Clg .4% Condns WB=>MDB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.2,                    !- Maximum Dry-Bulb Temperature {C}
+    10.5,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    25.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    98934.,                  !- Barometric Pressure {Pa}
+    5.2,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.455,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    2.050;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
@@ -2104,17 +2107,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2125,7 +2128,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    Bypass;                  !- Central Cooling Capacity Control Method    
+    Bypass;                  !- Central Cooling Capacity Control Method
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -3048,16 +3051,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -3288,16 +3291,16 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3511,16 +3514,16 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 

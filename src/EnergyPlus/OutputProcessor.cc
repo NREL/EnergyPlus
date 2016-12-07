@@ -65,6 +65,7 @@
 #include <fstream>
 #include <ostream>
 #include <string>
+#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -84,6 +85,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -521,24 +523,6 @@ namespace OutputProcessor {
 		// Indicate that the TimeStep passed in is a target for the pointer
 		// attributes in the derived types.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// for the pointer in the derived type.
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string cValue;
 		int Index;
@@ -592,23 +576,6 @@ namespace OutputProcessor {
 		// instances (from input) may or may not have keys, but only one instance of a reporting
 		// frequency per variable is allowed.  ReportList will be populated with ReqRepVars indices
 		// of those extra things from input that satisfy this condition.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true );
@@ -683,23 +650,6 @@ namespace OutputProcessor {
 		// Go through the ReqRepVars list and add those
 		// that match (and dont duplicate ones already in the list).
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int Loop1;
@@ -758,23 +708,6 @@ namespace OutputProcessor {
 		// METHODOLOGY EMPLOYED:
 		// Go through the ReqRepVars list and add those
 		// that match (and dont duplicate ones already in the list).
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -843,31 +776,12 @@ namespace OutputProcessor {
 		//        \type object-list
 		//        \object-list ScheduleNames
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
-		//using namespace DataIPShortCuts;
 		using DataGlobals::OutputFileInits;
-				using ScheduleManager::GetScheduleIndex;
+		using ScheduleManager::GetScheduleIndex;
 		using DataSystemVariables::cMinReportFrequency;
 		using DataSystemVariables::MinReportFrequency;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -958,9 +872,6 @@ namespace OutputProcessor {
 		// This subroutine looks at the passed in report frequency string and
 		// determines the reporting frequency.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		//       \field Reporting Frequency
 		//       \type choice
@@ -979,11 +890,7 @@ namespace OutputProcessor {
 		//       \note RunPeriod, Environment, and Annual are synonymous
 
 		// Using/Aliasing
-
 		using DataSystemVariables::MinReportFrequency;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const PossibleFreq( {-1,6}, { "deta", "time", "hour", "dail", "mont", "runp", "envi", "annu" } );
@@ -991,13 +898,7 @@ namespace OutputProcessor {
 		static Array1D_string const ExactFreqString( {-1,6}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Environment", "Annual" } );
 
 		static Array1D_int const FreqValues( {-1,6}, { -1, 0, 1, 2, 3, 4, 4, 4 } );
-		// note: runperiod, environment, and annual are synonomous
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		// note: runperiod, environment, and annual are synonymous
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1183,26 +1084,8 @@ namespace OutputProcessor {
 		// METHODOLOGY EMPLOYED:
 		// Look it up in a list of valid index types.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
 		// Return value
 		int ValidateIndexType;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static Array1D_string ZoneIndexTypes( 3 );
@@ -1308,26 +1191,8 @@ namespace OutputProcessor {
 		// METHODOLOGY EMPLOYED:
 		// Look it up in a list of valid variable types.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
 		// Return value
 		int ValidateVariableType;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static Array1D_string StateVariables( 3 );
@@ -1664,18 +1529,41 @@ namespace OutputProcessor {
 		cCurrentModuleObject = "Meter:Custom";
 		NumCustomMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
 
+        //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
+		std::unordered_set< std::string > namesOfMeterCustom;
+		namesOfMeterCustom.reserve( NumCustomMeters );
+
+		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
+			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			namesOfMeterCustom.emplace( InputProcessor::MakeUPPERCase( cAlphaArgs( 1 ) ) );
+		}
+
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			InputProcessor::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );
 			VarsOnCustomMeter = 0;
 			MaxVarsOnCustomMeter = 1000;
 			NumVarsOnCustomMeter = 0;
+			// check if any fields reference another Meter:Custom
+			int found = 0;
+			for ( fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2 ) {
+				if ( namesOfMeterCustom.find( InputProcessor::MakeUPPERCase( cAlphaArgs( fldIndex ) ) ) != namesOfMeterCustom.end() ) {
+					found = fldIndex;
+					break;
+				}
+			}
+			if ( found != 0 ) {
+				ShowWarningError ( cCurrentModuleObject + "=\"" + cAlphaArgs ( 1 ) + "\", contains a reference to another " + cCurrentModuleObject + " in field: " + cAlphaFieldNames ( found ) + "=\"" + cAlphaArgs( found ) + "\"." );
+				continue;
+			}
+
 			for ( fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2 ) {
 				if ( cAlphaArgs( fldIndex ) == "*" || lAlphaFieldBlanks( fldIndex ) ) {
 					KeyIsStar = true;
@@ -1803,7 +1691,7 @@ namespace OutputProcessor {
 			}
 			if ( NumVarsOnCustomMeter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", no items assigned " );
-				ShowContinueError( "...will not be shown with the Meter results" );
+				ShowContinueError( "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom." );
 			}
 
 		}
@@ -1816,8 +1704,9 @@ namespace OutputProcessor {
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
-			InputProcessor::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
-			if ( ErrorsFound ) continue;
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueMeterNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound ) ) {
+				continue;
+			}
 			if ( allocated( VarsOnCustomMeter ) ) VarsOnCustomMeter.deallocate();
 			VarsOnCustomMeter.allocate( 1000 );
 			VarsOnCustomMeter = 0;
@@ -2037,29 +1926,6 @@ namespace OutputProcessor {
 		// This routine compares the user input resource type with valid ones and returns
 		// the standard resource type.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		ErrorsFound = false;
 
 		// Basic ResourceType for Meters
@@ -2236,27 +2102,6 @@ namespace OutputProcessor {
 		// already been reached, a reallocation procedure begins.  This action needs to be done at the
 		// start of the simulation, primarily before any output is stored.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		// Make sure this isn't already in the list of meter names
 		int Found;
 		if ( NumEnergyMeters > 0 ) {
@@ -2374,27 +2219,6 @@ namespace OutputProcessor {
 		// sets up the meter pointer arrays, and returns a index value to this array which
 		// is stored with the variable.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( InputProcessor::SameString( Group, "Building" ) ) {
@@ -2486,26 +2310,6 @@ namespace OutputProcessor {
 		// sets up the meter pointer arrays, and returns a index value to this array which
 		// is stored with the variable.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( MeterArrayPtr == 0 ) {
@@ -2545,28 +2349,6 @@ namespace OutputProcessor {
 		// This subroutine uses the keys for the Energy Meters given to the SetupOutputVariable routines
 		// and makes sure they are "standard" as well as creating meters which need to be added as this
 		// is the first use of that kind of meter designation.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found; // For checking whether meter is already defined
@@ -2684,10 +2466,10 @@ namespace OutputProcessor {
 
 		} else if ( endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS" ) {
 			EndUse = "Baseboard";
-			
+
 		} else if ( endUseMeter == "COOLINGPANEL" || endUseMeter == "COOLINGPANELS" ) {
 			EndUse = "CoolingPanel";
-			
+
 		} else if ( endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION" ) {
 			EndUse = "HeatRejection";
 
@@ -2830,9 +2612,6 @@ namespace OutputProcessor {
 		// In order to set up tabular reports for IP units, need to search on same strings
 		// that tabular reports does for IP conversion.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// OutputReportTabular looks for:
 		// CONSUMP - not used in meters
@@ -2840,23 +2619,6 @@ namespace OutputProcessor {
 		// GAS - Gas (therm)
 		// COOL - Cooling (ton)
 		// and we need to add WATER (for m3/gal, etc)
-
-		// Using/Aliasing
-
-
-		//  USE DataGlobals, ONLY: outputfiledebug
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string UC_ResourceType;
@@ -3911,26 +3673,6 @@ namespace OutputProcessor {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages the list of subcategories for each end-use category.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EndUseNum;
@@ -5055,29 +4797,11 @@ SetupOutputVariable(
 	// METHODOLOGY EMPLOYED:
 	// Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace OutputProcessor;
 	using DataOutputs::FindItemInVariableList;
-
-
-
 	using General::TrimSigDigits;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int CV;
@@ -5324,29 +5048,11 @@ SetupOutputVariable(
 	// METHODOLOGY EMPLOYED:
 	// Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace OutputProcessor;
-
-
-
 	using General::TrimSigDigits;
 	using DataOutputs::FindItemInVariableList;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int CV;
@@ -6214,29 +5920,10 @@ UpdateMeterReporting()
 	//        \key annual
 	//        \note runperiod, environment, and annual are synonymous
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataIPShortCuts;
 	using namespace DataPrecisionGlobals;
-		using namespace OutputProcessor;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-	// na
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
+	using namespace OutputProcessor;
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
@@ -6650,33 +6337,13 @@ GetMeterIndex( std::string const & MeterName )
 	// for the meter name.  If none active for this run, a zero is returned.  This is used later to
 	// obtain a meter "value".
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace OutputProcessor;
-
-
 	using SortAndStringUtilities::SetupAndSort;
 
 	// Return value
 	int MeterIndex;
-
-	// Locals
-	// FUNCTION ARGUMENT DEFINITIONS:
-
-	// FUNCTION PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
 	// Valid Meter names because matching case insensitive
@@ -7051,10 +6718,11 @@ GetInternalVariableValue(
 		resultVal = 0.0;
 	} else if ( varType == 1 ) { // Integer
 		if ( keyVarIndex > NumOfIVariable ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index beyond range of array." );
+			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of integer variables = " + General::TrimSigDigits( NumOfIVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
 		IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
@@ -7062,10 +6730,11 @@ GetInternalVariableValue(
 		resultVal = double( IVar().Which );
 	} else if ( varType == 2 ) { // real
 		if ( keyVarIndex > NumOfRVariable ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Real variable passed index beyond range of array." );
+			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of real variables = " + General::TrimSigDigits( NumOfRVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
 		RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
@@ -7219,7 +6888,7 @@ GetNumMeteredVariables(
 		if ( ComponentName != RVariableTypes( Loop ).KeyNameOnlyUC ) continue;
 		RVar >>= RVariableTypes( Loop ).VarPtr;
 		if ( RVar().MeterArrayPtr == 0 ) continue;
-		++NumVariables;
+		if ( VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters > 0 ) ++NumVariables;
 	}
 
 	return NumVariables;
@@ -7253,31 +6922,10 @@ GetMeteredVariables(
 	// This routine gets the variable names and other associated information
 	// for metered variables associated with the given ComponentType/Name.
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-
 	using namespace DataGlobalConstants;
 	using namespace OutputProcessor;
-
-	// Argument array dimensioning
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
@@ -7387,29 +7035,12 @@ GetVariableKeyCountandType(
 	//       1 = zone time step
 	//       2 = HVAC time step
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-
-
 	using namespace OutputProcessor;
 	using ScheduleManager::GetScheduleIndex;
 	using ScheduleManager::GetScheduleType;
 	using SortAndStringUtilities::SetupAndSort;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	static Array1D_int keyVarIndexes; // Array index for specific key name
@@ -7586,28 +7217,10 @@ GetVariableKeys(
 	// and build list of keynames and indexes.  The indexes are the array index
 	// in the data array for the
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-
 	using namespace OutputProcessor;
 	using ScheduleManager::GetScheduleIndex;
-
-	// Argument array dimensioning
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop; // Loop counters
@@ -7805,26 +7418,13 @@ InitPollutionMeterReporting( std::string const & ReportFreqName )
 	//       Pollutant:Nuclear High
 	//       Pollutant:Nuclear Low
 	//       Pollutant:Carbon Equivalent
-	// REFERENCES:
-	// na
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-
 	using namespace OutputProcessor;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	//             Now for the Pollution Meters
 	static Array1D_string const PollutionMeters( {1,29}, { "Electricity:Facility", "Diesel:Facility", "DistrictCooling:Facility", "DistrictHeating:Facility", "Gas:Facility", "GASOLINE:Facility", "COAL:Facility", "FuelOil#1:Facility", "FuelOil#2:Facility", "Propane:Facility", "ElectricityProduced:Facility", "Steam:Facility", "CO2:Facility", "CO:Facility", "CH4:Facility", "NOx:Facility", "N2O:Facility", "SO2:Facility", "PM:Facility", "PM10:Facility", "PM2.5:Facility", "NH3:Facility", "NMVOC:Facility", "Hg:Facility", "Pb:Facility", "WaterEnvironmentalFactors:Facility", "Nuclear High:Facility", "Nuclear Low:Facility", "Carbon Equivalent:Facility" } );
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
@@ -7911,31 +7511,12 @@ ProduceRDDMDD()
 	// PURPOSE OF THIS SUBROUTINE:
 	// provide a single call for writing out the Report Data Dictionary and Meter Data Dictionary.
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using DataStringGlobals::VerString;
 	using DataStringGlobals::IDDVerString;
-
-
 	using namespace OutputProcessor;
 	using SortAndStringUtilities::SetupAndSort;
 	using General::ScanForReports;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-	// na
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	std::string VarOption1;

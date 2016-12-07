@@ -84,6 +84,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ReportSizingManager.hh>
@@ -390,29 +391,13 @@ namespace PlantCondLoopOperation {
 		//    PlantEquipmentOperationSchemes
 		//    CondenserEquipmentOperationSchemes
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetScheduleIndex;
-
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPlantOperationInput: " ); // include trailing blank space
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopNum; // Loop counter (Plant or Cond)
 		int OpNum; // Scheme counter
@@ -425,7 +410,6 @@ namespace PlantCondLoopOperation {
 		std::string PlantOpSchemeName; // Name of the plant or condenser operating scheme
 		std::string CurrentModuleObject; // for ease in renaming
 		std::string PlantLoopObject; // for ease in renaming
-		Array1D_string OpSchemeNames; // Used to verify unique op scheme names
 		bool ErrorsFound; // Passed in from OpSchemeInput
 
 		ErrorsFound = false;
@@ -442,17 +426,15 @@ namespace PlantCondLoopOperation {
 		NumPlantOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
 		for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
 		}
+
 		CurrentModuleObject = "CondenserEquipmentOperationSchemes";
 		NumCondOpSchemes = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-
-
-			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
-				InputProcessor::GetObjectItem(CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
-				                              IOStat);
-				if ( InputProcessor::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound) ) continue;
-			}
+		for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
+			InputProcessor::GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) continue;
+		}
 
 		//Load the Plant data structure
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
@@ -552,30 +534,15 @@ namespace PlantCondLoopOperation {
 		// following keywords is reflected exactly in this subroutine:
 		//    PlantEquipmentOperation:*
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
 		using namespace DataSizing;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOperationSchemeInput: " ); // include trailing blank space
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SchemeNum;
 		int Num;
@@ -676,13 +643,17 @@ namespace PlantCondLoopOperation {
 			}
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 		}
 
 		//**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
 		PELists = InputProcessor::GetNumObjectsFound( "PlantEquipmentList" );
 		CELists = InputProcessor::GetNumObjectsFound( "CondenserEquipmentList" );
 		NumSchemeLists = PELists + CELists;
+		UniqueNames.clear();
+		UniqueNames.reserve( NumSchemeLists );
 		Count = 0;
 		for ( Num = 1; Num <= NumSchemeLists; ++Num ) {
 			if ( Num <= PELists ) {
@@ -693,7 +664,9 @@ namespace PlantCondLoopOperation {
 				Count = Num - PELists;
 			}
 			InputProcessor::GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
+			if ( GlobalNames::VerifyUniqueInterObjectName( UniqueNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 		}
 
 		//**********GET INPUT AND LOAD PLANT DATA STRUCTURE*********
@@ -808,26 +781,13 @@ namespace PlantCondLoopOperation {
 		//       PlantEquipmentOperation:OutdoorRelativeHumidity
 		//       PlantEquipmentOperation:Uncontrolled
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
 		int NumNums;
@@ -996,23 +956,13 @@ namespace PlantCondLoopOperation {
 		// Based on subroutine FindRangeBasedOrUncontrolledInput from Dan Fisher, July 2010
 
 		// Using/Aliasing
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
 		int NumNums;
@@ -1117,23 +1067,9 @@ namespace PlantCondLoopOperation {
 		// METHODOLOGY EMPLOYED:
 		// calls the Input Processor to retrieve data from input file.
 
-		// REFERENCES:
-		// na
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		bool FoundIntendedList;
@@ -1301,11 +1237,7 @@ namespace PlantCondLoopOperation {
 		//    PlantEquipmentOperation:ComponentSetPoint
 		//    PlantEquipmentOperation:ThermalEnergyStorage
 
-		// REFERENCES:
-		// na
 		// Using/Aliasing
-
-
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataSizing;
@@ -1328,10 +1260,6 @@ namespace PlantCondLoopOperation {
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
 		static gio::Fmt fmtLD( "*" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
 		int NumNums;
@@ -1598,32 +1526,14 @@ namespace PlantCondLoopOperation {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
 		using namespace DataPlant;
-
-
-
 		using DataRuntimeLanguage::EMSProgramCallManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -1724,26 +1634,12 @@ namespace PlantCondLoopOperation {
 		// structure to facilitate a new load management routine that calls
 		// ManageLoadDistribution for every component.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-		// REFERENCES:
-		// na
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::emsCallFromUserDefinedComponentModel;
 		using EMSManager::ManageEMS;
-
-
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopPtr;
@@ -3205,19 +3101,6 @@ namespace PlantCondLoopOperation {
 
 		// METHODOLOGY EMPLOYED:
 		// Call the setupAcuator routine
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS
-		// na
-
-		// SUBROUTINE VARIABLE DEFINITIONS
 
 		// Locals
 		std::string ActuatorType;

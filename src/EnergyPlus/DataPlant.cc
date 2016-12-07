@@ -316,7 +316,7 @@ namespace DataPlant {
 	// int const TypeOf_HPWrappedCondenser ?? 92 ??
 	int const TypeOf_FourPipeBeamAirTerminal( 93 );
 	int const TypeOf_CoolingPanel_Simple( 94 );
-	
+
 	// Parameters for General Equipment Types
 	int const NumGeneralEquipTypes( 23 );
 	Array1D_string const GeneralEquipTypes( NumGeneralEquipTypes, { "BOILER", "CHILLER", "COOLINGTOWER", "GENERATOR", "HEATEXCHANGER", "HEATPUMP", "PIPE", "PUMP", "DISTRICT", "THERMALSTORAGE", "TEMPERINGVALVE", "WATERHEATER", "WATERUSE", "DEMANDCOIL", "SOLARCOLLECTOR", "LOADPROFILE", "FLUIDCOOLER", "EVAPORATIVEFLUIDCOOLER", "GROUNDHEATEXCHANGER", "ZONEHVACDEMAND", "REFRIGERATION", "PLANTCOMPONENT", "CENTRALHEATPUMPSYSTEM" } );
@@ -505,25 +505,11 @@ namespace DataPlant {
 		//  when distributing loads to components
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
-		// REFERENCES:
-		// na
+
 		// Using/Aliasing
 		using namespace DataGlobals;
-
 		using General::RoundSigDigits;
 		using BranchInputManager::AuditBranches;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopCtr;
@@ -894,26 +880,6 @@ namespace DataPlant {
 		// This routine will display (with continue error messages) the branch/component
 		// structure of the given loop.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string DemandSupply;
 		int LSN; // LoopSide counter
@@ -966,11 +932,7 @@ namespace DataPlant {
 		// output nodes match the desired input & output nodes. This plant loop index is then used
 		// to search the Plant Sizing array for the matching Plant Sizing object.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataSizing::NumPltSizInput;
 		using DataSizing::PlantSizData;
 		using DataSizing::PlantSizingData;
@@ -978,18 +940,6 @@ namespace DataPlant {
 
 		// Return value
 		int MyPltSizNum; // returned plant sizing index
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 

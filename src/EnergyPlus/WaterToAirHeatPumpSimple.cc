@@ -224,8 +224,6 @@ namespace WaterToAirHeatPumpSimple {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Simple Water to Air Heat Pump component simulation.
 
-		// METHODOLOGY EMPLOYED:
-
 		// REFERENCES:
 		// (1) Lash.T.A.,1992.Simulation and Analysis of a Water Loop Heat Pump System.
 		// M.S. Thesis, University of Illinois at Urbana Champaign.
@@ -237,24 +235,11 @@ namespace WaterToAirHeatPumpSimple {
 		// Oklahoma State University. (downloadable from www.hvac.okstate.edu)
 
 		// Using/Aliasing
-
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// percent on-time (on-time/cycle time)
 		// shut off after compressor cycle off  [s]
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HPNum; // The WatertoAirHP that you are currently loading input into
@@ -337,23 +322,13 @@ namespace WaterToAirHeatPumpSimple {
 		// Oklahoma State University. (downloadable from www.hvac.okstate.edu)
 
 		// Using/Aliasing
-				using namespace NodeInputManager;
+		using namespace NodeInputManager;
 		using BranchNodeConnections::TestCompSet;
 		using GlobalNames::VerifyUniqueCoilName;
 		using namespace OutputReportPredefined;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSimpleWatertoAirHPInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HPNum; // The Water to Air HP that you are currently loading input into
@@ -2478,30 +2453,11 @@ namespace WaterToAirHeatPumpSimple {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
 
-
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2555,30 +2511,8 @@ namespace WaterToAirHeatPumpSimple {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		//  USE FluidProperties, ONLY: FindGlycol
-		// Using/Aliasing
-
 		// Return value
 		Real64 CoilAirFlowRate; // returned air volume flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2764,32 +2698,9 @@ namespace WaterToAirHeatPumpSimple {
 		// This routine was designed to "push" information from a parent object to
 		// this WSHP coil object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-
-
 		using FluidProperties::FindGlycol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered

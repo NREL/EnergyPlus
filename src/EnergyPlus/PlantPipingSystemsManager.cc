@@ -85,6 +85,7 @@
 #include <DataSurfaces.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -142,7 +143,7 @@ namespace PlantPipingSystemsManager {
 	// MODULE VARIABLE DECLARATIONS:
 	Array1D_int NeighborFieldCells;
 	Array1D_int NeighborBoundaryCells;
-	std::unordered_set< std::string > GroundDomainUniqueNames;
+	std::unordered_map< std::string, std::string > GroundDomainUniqueNames;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// ************************************* !
@@ -200,21 +201,9 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
 		using DataGlobals::AnySlabsInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int numSlabsCheck;
@@ -242,23 +231,9 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
 		using DataGlobals::AnyBasementsInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int const numBasementsCheck( InputProcessor::GetNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
 
@@ -284,18 +259,8 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SimPipingSystems" );
@@ -513,30 +478,11 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetPipingSystemsAndGroundDomainsInput" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -695,24 +641,11 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS FUNCTION:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using namespace DataIPShortCuts;
 
 		// Return value
 		int Total;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int HorizontalCtr;
@@ -759,24 +692,11 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
 		using General::TrimSigDigits;
 		using namespace GroundTemperatureManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadGeneralDomainInputs" );
@@ -998,26 +918,13 @@ namespace PlantPipingSystemsManager {
 			// PURPOSE OF THIS SUBROUTINE:
 			// <description>
 
-			// METHODOLOGY EMPLOYED:
-			// <description>
-
-			// REFERENCES:
-			// na
-
 			// Using/Aliasing
-
-
-
-
 			using namespace DataIPShortCuts;
 			using DataSurfaces::OSCM;
 			using General::TrimSigDigits;
 			using DataHeatBalance::Material;
 			using DataHeatBalance::TotMaterials;
 			using namespace GroundTemperatureManager;
-
-			// Locals
-			// SUBROUTINE ARGUMENT DEFINITIONS:
 
 			// SUBROUTINE PARAMETER DEFINITIONS:
 			static std::string const RoutineName( "ReadZoneCoupledDomainInputs" );
@@ -1094,7 +1001,7 @@ namespace PlantPipingSystemsManager {
 
 				// Get the name, validate
 				Domain( ZoneCoupledDomainCtr ).ObjName = cAlphaArgs( 1 );
-				GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 1 ), ObjName_ZoneCoupled_Slab, cAlphaFieldNames( 1 ), GroundDomainUniqueNames, ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( GroundDomainUniqueNames, cAlphaArgs( 1 ), ObjName_ZoneCoupled_Slab, cAlphaFieldNames( 1 ), ErrorsFound );
 
 				// Read in the rest of the inputs into the local type for clarity during transition
 				Domain( ZoneCoupledDomainCtr ).OSCMName = cAlphaArgs( 4 );
@@ -1345,27 +1252,12 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
 		using General::TrimSigDigits;
 		using DataHeatBalance::Material;
 		using DataHeatBalance::TotMaterials;
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadBasementInputs" );
@@ -1427,7 +1319,7 @@ namespace PlantPipingSystemsManager {
 
 			// Get the name, validate
 			Domain( BasementCtr ).ObjName = cAlphaArgs( 1 );
-			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 1 ), ObjName_ZoneCoupled_Basement, cAlphaFieldNames( 1 ), GroundDomainUniqueNames, ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( GroundDomainUniqueNames, cAlphaArgs( 1 ), ObjName_ZoneCoupled_Basement, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			// Read in the some of the inputs into the local type for clarity during transition
 			Domain( BasementCtr ).Depth = rNumericArgs( 1 );
@@ -1694,22 +1586,11 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		using namespace DataIPShortCuts;
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadPipeCircuitInputs" );
@@ -1812,19 +1693,8 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadPipeSegmentInputs" );
@@ -1889,23 +1759,12 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		using namespace DataIPShortCuts;
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using namespace GroundTemperatureManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadHorizontalTrenchInputs" );
@@ -2154,26 +2013,6 @@ namespace PlantPipingSystemsManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PipeCircuitCounter;
 		int SegmentCtr;
@@ -2233,26 +2072,6 @@ namespace PlantPipingSystemsManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2479,17 +2298,6 @@ namespace PlantPipingSystemsManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		ShowSevereError( RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + FieldEntry + "\", Condition: " + Condition );
 
@@ -7067,19 +6875,8 @@ namespace PlantPipingSystemsManager {
 			// PURPOSE OF THIS FUNCTION:
 			// <description>
 
-			// METHODOLOGY EMPLOYED:
-			// <description>
-
-			// REFERENCES:
-			// na
-
-			// Using/Aliasing
-
 			// Return value
 			Real64 RetVal;
-
-			// Locals
-			// FUNCTION ARGUMENT DEFINITIONS:
 
 			// FUNCTION LOCAL VARIABLE DECLARATIONS:
 			Real64 Numerator;
@@ -7634,17 +7431,6 @@ namespace PlantPipingSystemsManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 CircuitCrossTemp;

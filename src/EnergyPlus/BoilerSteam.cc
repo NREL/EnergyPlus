@@ -196,7 +196,6 @@ namespace BoilerSteam {
 		// REFERENCES: na
 
 		// Using/Aliasing
-
 		using namespace FluidProperties;
 
 		// Locals
@@ -278,10 +277,6 @@ namespace BoilerSteam {
 
 		// Using/Aliasing
 		using namespace DataGlobalConstants;
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;

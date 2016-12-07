@@ -1,7 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <algorithm>
 #include <istream>
 #include <iostream>
+#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
@@ -18,21 +77,38 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
+#include <FileSystem.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
 
-using json = nlohmann::json;
+typedef std::unordered_map < std::string, std::string > UnorderedObjectTypeMap;
+typedef std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > UnorderedObjectCacheMap;
+typedef std::map < const json::object_t * const, std::pair < std::string, std::string > > UnorderedUnusedObjectMap;
 
-json EnergyPlus::InputProcessor::jdf = json();
-json EnergyPlus::InputProcessor::schema = json();
-IdfParser EnergyPlus::InputProcessor::idf_parser = IdfParser();
-State EnergyPlus::InputProcessor::state = State();
-char EnergyPlus::InputProcessor::s[] = { 0 };
-std::ostream * EnergyPlus::InputProcessor::echo_stream = nullptr;
-std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > >
-		EnergyPlus::InputProcessor::jdd_jdf_cache_map =
-		std::unordered_map < std::string, std::pair < json::const_iterator, std::vector <json::const_iterator> > > ();
-std::unordered_set < std::string > EnergyPlus::InputProcessor::SurfaceTmp_set = std::unordered_set < std::string > ();
+namespace EnergyPlus {
+	// initialization of class static variables
+	json InputProcessor::jdf = json();
+	json InputProcessor::schema = json();
+	IdfParser InputProcessor::idf_parser = IdfParser();
+	State InputProcessor::state = State();
+	char InputProcessor::s[] = { 0 };
+	std::ostream * InputProcessor::echo_stream = nullptr;
+
+	UnorderedObjectTypeMap InputProcessor::case_insensitive_object_map = UnorderedObjectTypeMap();
+	UnorderedObjectCacheMap InputProcessor::jdd_jdf_cache_map = UnorderedObjectCacheMap();
+	UnorderedUnusedObjectMap InputProcessor::unused_inputs = UnorderedUnusedObjectMap();
+}
+
+bool icompare( std::string const & s1, std::string const & s2 ) {
+	return s1.length() == s2.length() &&
+		std::equal(
+			s1.begin(),
+			s1.end(),
+			s2.begin(),
+			[ ]( unsigned char c1, unsigned char c2 ) { return ::tolower( c1 ) == ::tolower( c2 );}
+		);
+}
+
 
 json IdfParser::decode( std::string const & idf, json const & schema ) {
 	bool success = true;
@@ -63,14 +139,14 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 		for ( auto obj_in = obj.value().begin(); obj_in != obj.value().end(); ++obj_in ) {
 			encoded += obj.key();
 			int skipped_fields = 0;
-			for ( int i = 0; i < legacy_idd.size(); i++ ) {
+			for ( size_t i = 0; i < legacy_idd.size(); i++ ) {
 				std::string entry = legacy_idd[ i ];
 				if ( obj_in.value().find( entry ) == obj_in.value().end() ) {
 					if ( entry == "name" ) encoded += end_of_field + obj_in.key();
 					else skipped_fields++;
 					continue;
 				}
-				for ( int j = 0; j < skipped_fields; j++ ) encoded += ",\n  ";
+				for ( int j = 0; j < skipped_fields; j++ ) encoded += "," + EnergyPlus::DataStringGlobals::NL + "  ";
 				skipped_fields = 0;
 				encoded += end_of_field;
 				auto const & val = obj_in.value()[ entry ];
@@ -117,7 +193,7 @@ std::string IdfParser::encode( json const & root, json const & schema ) {
 json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
 	json root;
 	Token token;
-    auto const & schema_properties = schema[ "properties" ];
+	auto const & schema_properties = schema[ "properties" ];
 
 	while ( true ) {
 		token = look_ahead( idf, index );
@@ -130,10 +206,10 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			eat_comment( idf, index );
 		} else {
 			std::string obj_name = parse_string( idf, index, success );
-			for ( char & c : obj_name ) c = ( char ) toupper( c );
-			auto tmp_umit = case_insensitive_keys.find( obj_name );
-			if ( tmp_umit != case_insensitive_keys.end() ) {
-				obj_name = tmp_umit->second;
+
+			auto const converted = EnergyPlus::InputProcessor::ConvertInsensitiveObjectType( obj_name );
+			if ( converted.first ) {
+				obj_name = converted.second;
 			} else {
 				print_out_line_error( idf, false );
 				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
@@ -147,15 +223,15 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			u64toa( root[ obj_name ].size() + 1, s );
 			std::string name = obj_name + " " + s;
 			if ( !obj.is_null() ) {
-                auto const & name_iter = obj.find( "name" );
+				auto const & name_iter = obj.find( "name" );
 				if ( name_iter != obj.end() ) {
 					name = name_iter.value();
 					obj.erase( name_iter );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
+						// hacky but needed to warn if there are duplicate names in parsed IDF
 						if ( obj_name != "RunPeriod" ) {
-							EnergyPlus::ShowWarningMessage("Duplicate names!! name: " + name);
+							EnergyPlus::ShowWarningMessage("Duplicate name found. name: \"" + name + "\"");
 						}
-						// name = name + " " + s;
 					}
 				}
 			}
@@ -168,7 +244,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 }
 
 json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
-                              json const & legacy_idd, json const & schema_obj_loc ) {
+							  json const & legacy_idd, json const & schema_obj_loc ) {
 	json root = json::object();
 	json extensible = json::object();
 	json array_of_extensions = json::array();
@@ -178,7 +254,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	success = true;
 	bool was_value_parsed = false;
 	auto const & legacy_idd_fields_array = legacy_idd[ "fields" ];
-    auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
+	auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
 
 	auto const & schema_patternProperties = schema_obj_loc[ "patternProperties" ];
 	auto const & schema_dot_star = schema_patternProperties[ ".*" ];
@@ -193,7 +269,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 
 	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
 
-    index += 1;
+	index += 1;
 
 	while ( true ) {
 		token = look_ahead( idf, index );
@@ -207,13 +283,13 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 				int ext_size = 0;
 				if ( legacy_idd_index < legacy_idd_fields_array.size() ) {
 					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-                    root[ field_name ] = "";
+					root[ field_name ] = "";
 				} else {
-                    auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
+					auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
 					ext_size = static_cast<int>( legacy_idd_extensibles_array.size() );
 					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
 					extensible_index++;
-                    extensible[ field_name ] = "";
+					extensible[ field_name ] = "";
 				}
 				if ( ext_size && extensible_index % ext_size == 0 ) {
 					array_of_extensions.push_back( extensible );
@@ -224,13 +300,13 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			was_value_parsed = false;
 			next_token( idf, index );
 			if ( token == Token::SEMICOLON ) {
-				int min_fields = 0;
+				size_t min_fields = 0;
 				if ( found_min_fields != schema_obj_loc.end() ) {
 					min_fields = found_min_fields.value();
 				}
-                for (; legacy_idd_index < min_fields; legacy_idd_index++) {
+				for (; legacy_idd_index < min_fields; legacy_idd_index++) {
 					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-                    root[ field_name ] = "";
+					root[ field_name ] = "";
 				}
 				if ( extensible.size() ) {
 					array_of_extensions.push_back( extensible );
@@ -327,7 +403,7 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 	}
 	json val;
 	if ( is_double ) {
-        try {
+		try {
 			auto const double_val = stod(num_str, nullptr );
 			val = double_val;
 		} catch ( std::exception e ) {
@@ -349,11 +425,20 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 
 json IdfParser::parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
 	auto const & field_type = field_loc.find("type");
-    if ( field_type != field_loc.end() ) {
+	if ( field_type != field_loc.end() ) {
 		if ( field_type.value() == "number" || field_type.value() == "integer" ) {
 			return parse_number( idf, index, success );
 		} else {
-			return parse_string( idf, index, success );
+			auto const parsed_string = parse_string( idf, index, success );
+			auto const & enum_it = field_loc.find( "enum" );
+			if ( enum_it == field_loc.end() ) return parsed_string;
+			for ( auto const & s : enum_it.value() ) {
+				auto const & str = s.get < std::string >();
+				if ( icompare( str, parsed_string ) ) {
+					return str;
+				}
+			}
+			return parsed_string;
 		}
 	} else {
 		switch (look_ahead(idf, index)) {
@@ -362,12 +447,20 @@ json IdfParser::parse_value( std::string const & idf, size_t & index, bool & suc
 				auto const & enum_it = field_loc.find( "enum" );
 				if (enum_it != field_loc.end()) {
 					for ( auto const & s : enum_it.value() ) {
-						if ( icompare( s, parsed_string ) ) {
-							return s;
+						auto const & str = s.get < std::string >();
+						if ( icompare( str, parsed_string ) ) {
+							return str;
 						}
 					}
 				} else if ( icompare( parsed_string, "Autosize" ) || icompare( parsed_string, "Autocalculate" ) ) {
-					return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
+					auto const & default_it = field_loc.find( "default" );
+					// The following is hacky because it abuses knowing the consistent generated structure
+					// in the future this might not hold true for the array indexes.
+					if ( default_it != field_loc.end() ) {
+						return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 1 ];
+					} else {
+						return field_loc[ "anyOf" ][ 1 ][ "enum" ][ 0 ];
+					}
 				}
 				return parsed_string;
 			}
@@ -472,10 +565,10 @@ void IdfParser::print_out_line_error( std::string const & idf, bool obj_found ) 
 	std::string line;
 	if ( obj_found ) EnergyPlus::ShowWarningError( "error: \"extra field(s)\" " );
 	else EnergyPlus::ShowWarningError( "error: \"obj not found in schema\" " );
-    EnergyPlus::ShowWarningError( "at line number " + std::to_string( cur_line_num )
+	EnergyPlus::ShowWarningError( "at line number " + std::to_string( cur_line_num )
 								  + " (index " + std::to_string(index_into_cur_line)  + ")\nLine:\n" );
 	while ( idf[ beginning_of_line_index++ ] != '\n' ) line += idf[ beginning_of_line_index ];
-    EnergyPlus::ShowWarningError( line );
+	EnergyPlus::ShowWarningError( line );
 }
 
 void IdfParser::eat_whitespace( std::string const & idf, size_t & index ) {
@@ -556,6 +649,36 @@ void State::initialize( json const * parsed_schema ) {
 	stack.push_back( schema );
 	json const & loc = stack.back()->at( "required" );
 	for ( auto & s : loc ) root_required.emplace( s.get < std::string >(), false );
+}
+
+void State::add_error( ErrorType err, double val, unsigned line_num, unsigned line_index ) {
+	std::string str = "Out of Range: Value \"" + std::to_string( val ) + "\" parsed at line " +
+					  std::to_string( line_num ) + " (index " + std::to_string( line_index ) + ")";
+	if ( err == ErrorType::Maximum ) {
+		errors.push_back( str + " exceeds maximum" );
+	} else if ( err == ErrorType::ExclusiveMaximum ) {
+		errors.push_back( str + " exceeds or equals exclusive maximum" );
+	} else if ( err == ErrorType::Minimum ) {
+		errors.push_back( str + " is less than the minimum" );
+	} else if ( err == ErrorType::ExclusiveMinimum ) {
+		errors.push_back( str + " is less than or equal to the exclusive minimum" );
+	}
+}
+
+int State::print_errors() {
+	if ( warnings.size() ) EnergyPlus::ShowWarningError("Number of validation warnings: " + std::to_string(warnings.size()));
+	for ( auto const & s : warnings ) EnergyPlus::ShowContinueError( s );
+	if ( errors.size() ) EnergyPlus::ShowSevereError("Number of validation errors: " + std::to_string(errors.size()));
+	for ( auto const & s : errors ) EnergyPlus::ShowContinueError( s );
+	return static_cast<int> ( errors.size() );
+}
+
+std::vector < std::string > const & State::validation_errors() {
+	return errors;
+}
+
+std::vector < std::string > const & State::validation_warnings() {
+	return warnings;
 }
 
 void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_num, unsigned line_index ) {
@@ -678,13 +801,13 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 			} else { // must be at the very end of an object now
 				const auto * loc = stack.back();
 				if ( loc->find( "minProperties" ) != loc->end() &&
-				     cur_obj_count < loc->at( "minProperties" ).get < unsigned >() ) {
+					 cur_obj_count < loc->at( "minProperties" ).get < unsigned >() ) {
 					u64toa( line_num, s );
 					errors.push_back(
 					"minProperties for object \"" + cur_obj_name + "\" at line " + s + " was not met" );
 				}
 				if ( loc->find( "maxProperties" ) != loc->end() &&
-				     cur_obj_count > loc->at( "maxProperties" ).get < unsigned >() ) {
+					 cur_obj_count > loc->at( "maxProperties" ).get < unsigned >() ) {
 					u64toa( line_num, s );
 					errors.push_back(
 					"maxProperties for object \"" + cur_obj_name + "\" at line " + s + " was exceeded" );
@@ -692,9 +815,9 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 				obj_required.clear();
 				extensible_required.clear();
 				need_new_object_name = true;
-                stack.pop_back();
+				stack.pop_back();
 			}
-            stack.pop_back();
+			stack.pop_back();
 			last_seen_event = event;
 			break;
 		}
@@ -708,11 +831,11 @@ void State::traverse( json::parse_event_t & event, json & parsed, unsigned line_
 	}
 }
 
-void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
+void State::validate( json & parsed, unsigned line_num, unsigned EP_UNUSED( line_index ) ) {
 	auto const * loc = stack.back();
 
 	if ( loc->find( "enum" ) != loc->end() ) {
-		int i;
+		size_t i;
 		auto const & enum_array = loc->at( "enum" );
 		auto const enum_array_size = enum_array.size();
 		if ( parsed.is_string() ) {
@@ -724,7 +847,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 			if ( i == enum_array_size ) {
 				u64toa( line_num, s );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-				                  + ": \"" + parsed_string + "\" was not found in the enum" );
+								  + ": \"" + parsed_string + "\" was not found in the enum" );
 			}
 		} else {
 			int const parsed_int = parsed.get < int >();
@@ -736,7 +859,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 				i64toa( parsed_int, s );
 				u64toa( line_num, s2 );
 				errors.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-				                  + ": \"" + s2 + "\" was not found in the enum" );
+								  + ": \"" + s2 + "\" was not found in the enum" );
 			}
 		}
 	} else if ( parsed.is_number() ) {
@@ -749,18 +872,18 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 		if ( found_min != loc->end() ) {
 			double const min_val = found_min->get < double >();
 			if ( loc->find( "exclusiveMinimum" ) != loc->end() && val <= min_val ) {
-				add_error( "exmin", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::ExclusiveMinimum, val, line_num, prev_line_index + prev_key_len );
 			} else if ( val < min_val ) {
-				add_error( "min", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::Minimum, val, line_num, prev_line_index + prev_key_len );
 			}
 		}
 		auto const found_max = loc->find( "maximum" );
 		if ( found_max != loc->end() ) {
 			double const max_val = found_max->get < double >();
 			if ( loc->find( "exclusiveMaximum" ) != loc->end() && val >= max_val ) {
-				add_error( "exmax", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::ExclusiveMaximum, val, line_num, prev_line_index + prev_key_len );
 			} else if ( val > max_val ) {
-				add_error( "max", val, line_num, prev_line_index + prev_key_len );
+				add_error( State::ErrorType::Maximum, val, line_num, prev_line_index + prev_key_len );
 			}
 		}
 		auto const found_type = loc->find( "type" );
@@ -768,13 +891,13 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 			dtoa( val, s );
 			u64toa( line_num, s2 );
 			warnings.push_back( "In object \"" + cur_obj_name + "\" at line " + s
-			                    + ", type == " + loc->at( "type" ).get < std::string >()
-			                    + " but parsed value = " + s2 );
+								+ ", type == " + loc->at( "type" ).get < std::string >()
+								+ " but parsed value = " + s2 );
 		}
 	} else if ( parsed.is_string() ) {
 		auto const found_anyOf = loc->find( "anyOf" );
 		if ( found_anyOf != loc->end() ) {
-			int i;
+			size_t i;
 			for ( i = 0; i < found_anyOf->size(); i++ ) {
 				auto const & any_of_check = found_anyOf->at( i );
 				auto const found_type = any_of_check.find( "type" );
@@ -783,7 +906,7 @@ void State::validate( json & parsed, unsigned line_num, unsigned line_index ) {
 			if ( i == found_anyOf->size() ) {
 				u64toa( line_num, s );
 				warnings.push_back( "type == string was not found in anyOf in object \"" + cur_obj_name
-				                    + "\" at line " + s );
+									+ "\" at line " + s );
 			}
 			return;
 		}
@@ -854,13 +977,29 @@ namespace EnergyPlus {
 // Needed for unit tests, should not be normally called.
 	void
 	InputProcessor::clear_state() {
-		state.errors.clear();
-		state.warnings.clear();
+		state = State();
+		idf_parser = IdfParser();
 		jdf.clear();
 		jdd_jdf_cache_map.clear();
-        SurfaceTmp_set.clear();
 		EchoInputFile = 0;
 		echo_stream = nullptr;
+	}
+
+	std::vector < std::string > const & InputProcessor::validation_errors() {
+		return state.validation_errors();
+	}
+
+	std::vector < std::string > const & InputProcessor::validation_warnings() {
+		return state.validation_warnings();
+	}
+
+	std::pair< bool, std::string >
+	InputProcessor::ConvertInsensitiveObjectType( std::string const & objectType ) {
+		auto tmp_umit = EnergyPlus::InputProcessor::case_insensitive_object_map.find( MakeUPPERCase( objectType ) );
+		if ( tmp_umit != EnergyPlus::InputProcessor::case_insensitive_object_map.end() ) {
+			return std::make_pair( true, tmp_umit->second );
+		}
+		return std::make_pair( false, "" );
 	}
 
 	void
@@ -918,7 +1057,8 @@ namespace EnergyPlus {
 	}
 
 	void
-	InputProcessor::InitializeCacheMap() {
+	InputProcessor::InitializeMaps() {
+		unused_inputs.clear();
 		jdd_jdf_cache_map.clear();
 		jdd_jdf_cache_map.reserve( jdf.size() );
 		auto const & schema_properties = schema.at( "properties" );
@@ -929,6 +1069,8 @@ namespace EnergyPlus {
 			jdf_obj_iterators_vec.reserve( objects.size() );
 			for ( auto jdf_obj_iter = objects.begin(); jdf_obj_iter != objects.end(); ++jdf_obj_iter ) {
 				jdf_obj_iterators_vec.emplace_back( jdf_obj_iter );
+				auto const * const obj_ptr = jdf_obj_iter.value().get_ptr< const json::object_t * const >();
+				unused_inputs.emplace( obj_ptr, std::make_pair( jdf_iter.key(), jdf_obj_iter.key() ) );
 			}
 			auto const & schema_iter = schema_properties.find( jdf_iter.key() );
 			jdd_jdf_cache_map.emplace( schema_iter.key(), std::make_pair( schema_iter, std::move( jdf_obj_iterators_vec ) ) );
@@ -939,42 +1081,77 @@ namespace EnergyPlus {
 	InputProcessor::ProcessInput() {
 		std::ifstream jdd_stream( inputJddFileName , std::ifstream::in);
 		if ( !jdd_stream.is_open() ) {
-            ShowSevereError( "jdd file path " + inputJddFileName + " not found" );
+			ShowFatalError( "JDD file path " + inputJddFileName + " not found" );
 			return;
 		}
 		InputProcessor::schema = json::parse(jdd_stream);
-		std::ifstream idf_stream( inputIdfFileName , std::ifstream::in | std::ios::ate);
-		if ( !idf_stream.is_open() ) {
-			ShowSevereError( "idf file path " + inputIdfFileName + " not found" );
+
+		const json & loc = InputProcessor::schema[ "properties" ];
+		case_insensitive_object_map.reserve( loc.size() );
+		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
+			std::string key = it.key();
+			for ( char & c : key ) c = toupper( c );
+			case_insensitive_object_map.emplace( std::move( key ), it.key() );
+		}
+
+		std::ifstream input_stream( inputFileName , std::ifstream::in | std::ios::ate);
+		if ( !input_stream.is_open() ) {
+			ShowFatalError( "Input file path " + inputFileName + " not found" );
 			return;
 		}
-		std::ifstream::pos_type size = idf_stream.tellg();
+
+		// TODO: Check which file read approach works properly on windows
+		// std::string lines;
+		// std::string line;
+		// while (std::getline(infile, line))
+		// {
+		// 	lines.append(line + NL);
+		// }
+		std::ifstream::pos_type size = input_stream.tellg();
 		char *memblock = new char[(size_t) size + 1];
-		idf_stream.seekg(0, std::ios::beg);
-		idf_stream.read(memblock, size);
+		input_stream.seekg(0, std::ios::beg);
+		input_stream.read(memblock, size);
 		memblock[size] = '\0';
-		idf_stream.close();
+		input_stream.close();
 		std::string input_file = memblock;
 		delete[] memblock;
-		InputProcessor::idf_parser.initialize(InputProcessor::schema);
-		json const user_input = InputProcessor::idf_parser.decode(input_file, InputProcessor::schema);
-		auto const user_input_dump = user_input.dump();
+
+		if ( ! DataGlobals::isJDF ) {
+			json const input_file_json = InputProcessor::idf_parser.decode( input_file, InputProcessor::schema );
+			if ( DataGlobals::outputJDFConversion ) {
+				input_file = input_file_json.dump( 4 );
+				std::string convertedIDF( outputDirPathName + inputFileNameOnly + ".jdf" );
+				FileSystem::makeNativePath( convertedIDF );
+				std::ofstream convertedFS( convertedIDF, std::ofstream::out );
+				convertedFS << input_file << std::endl;
+			} else {
+				input_file = input_file_json.dump( 4 );
+			}
+		}
 
 		InputProcessor::state.initialize( & InputProcessor::schema );
 
-		json::parser_callback_t cb = [](int depth, json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index) -> bool {
-			InputProcessor::state.traverse(event, parsed, line_num, line_index);
+		json::parser_callback_t cb = []( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed, unsigned line_num, unsigned line_index ) -> bool {
+			InputProcessor::state.traverse( event, parsed, line_num, line_index );
 			return true;
 		};
-		InputProcessor::jdf = json::parse(user_input_dump, cb);
-//		InputProcessor::state.print_errors();
-//		std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
-//		std::ofstream ofs("encoded_json.idf", std::ofstream::out);
-//		ofs << encoded << std::endl;
-//		std::ofstream ofs("json_dump.json", std::ofstream::out);
-//		ofs << InputProcessor::jdf.dump(4) << std::endl;
 
-		InitializeCacheMap();
+		InputProcessor::jdf = json::parse( input_file, cb );
+
+		if ( DataGlobals::isJDF && DataGlobals::outputJDFConversion ) {
+			std::string const encoded = InputProcessor::idf_parser.encode( InputProcessor::jdf, InputProcessor::schema );
+			std::string convertedJDF( outputDirPathName + inputFileNameOnly + ".idf" );
+			FileSystem::makeNativePath( convertedJDF );
+			std::ofstream convertedFS( convertedJDF, std::ofstream::out );
+			convertedFS << encoded << std::endl;
+		}
+
+		auto const num_errors = InputProcessor::state.print_errors();
+		if ( num_errors ) {
+			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+		}
+
+		InitializeMaps();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -990,7 +1167,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::GetNumSectionsFound( std::string const & SectionWord ) {
+	InputProcessor::GetNumSectionsFound( std::string const & SectionWord ) {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This function returns the number of a particular section (in input data file)
 		// found in the current run.  If it can't find the section in list
@@ -999,20 +1176,14 @@ namespace EnergyPlus {
 		// METHODOLOGY EMPLOYED:
 		// Look up section in list of sections.  If there, return the
 		// number of sections of that kind found in the current input.  If not, return -1.
-		auto const & SectionWord_iter = jdf.find( "SectionWord" );
+		auto const & SectionWord_iter = jdf.find( SectionWord );
 		if ( SectionWord_iter == jdf.end() ) return -1;
 		return static_cast <int> ( SectionWord_iter.value().size() );
-
-//		if ( jdf.find( "SectionWord" ) == jdf.end() ) return -1;
-//		int num_sections_found = 0;
-//		json obj = jdf[ "SectionWord" ];
-//		for ( auto it = obj.begin(); it != obj.end(); ++it ) num_sections_found++;
-//		return num_sections_found;
 	}
 
 
 	int
-	EnergyPlus::InputProcessor::GetNumObjectsFound( std::string const & ObjectWord ) {
+	InputProcessor::GetNumObjectsFound( std::string const & ObjectWord ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -1032,19 +1203,27 @@ namespace EnergyPlus {
 		auto const & find_obj = jdf.find( ObjectWord );
 
 		if ( find_obj == jdf.end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
-			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end()
+				 || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return 0;
 			}
-			return static_cast<int>(jdf[ tmp_umit->second ].size());
+			return static_cast< int >( jdf[ tmp_umit->second ].size() );
 		} else {
-			return static_cast<int>(find_obj.value().size());
+			return static_cast< int >( find_obj.value().size() );
 		}
+
+		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
+				ShowWarningError( "Requested Object not found in Definitions: " + ObjectWord );
+			}
+		}
+		return 0;
 	}
 
 	void
-	EnergyPlus::InputProcessor::GetObjectItem(
+	InputProcessor::GetObjectItem(
 		std::string const & Object,
 		int const Number,
 		Array1S_string Alphas,
@@ -1068,9 +1247,9 @@ namespace EnergyPlus {
 
 		auto find_iterators = jdd_jdf_cache_map.find( Object );
 		if ( find_iterators == jdd_jdf_cache_map.end() ) {
-			auto const tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( Object ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end()
-			     || jdf.find( tmp_umit->second ) == jdf.end() ) {
+			auto const tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( Object ) );
+			if ( tmp_umit == case_insensitive_object_map.end()
+				 || jdf.find( tmp_umit->second ) == jdf.end() ) {
 				return;
 			}
 			find_iterators = jdd_jdf_cache_map.find( tmp_umit->second );
@@ -1089,7 +1268,13 @@ namespace EnergyPlus {
 		auto const & jdd_it = find_iterators->second.first;
 		auto const & jdd_it_val = jdd_it.value();
 
-        // Locations in JSON schema relating to normal fields
+		auto const * const obj_ptr = jdf_it.value().get_ptr< const json::object_t * const >();
+		auto const find_unused = unused_inputs.find( obj_ptr );
+		if ( find_unused != unused_inputs.end() ) {
+			unused_inputs.erase( find_unused );
+		}
+
+		// Locations in JSON schema relating to normal fields
 		auto const & schema_obj_props = jdd_it_val[ "patternProperties" ][ ".*" ][ "properties" ];
 
 		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
@@ -1100,18 +1285,17 @@ namespace EnergyPlus {
 		auto key = legacy_idd.find("extension");
 		if (key != legacy_idd.end() ) extension_key = key.value();
 
-
 		Alphas = "";
 		Numbers = 0;
 
 		auto const & obj = jdf_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
-		for ( int i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
+		for ( size_t i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_alphas_fields[ i ];
 			if ( field == "name" && schema_name_field != jdd_it_val.end() ) {
 				auto const & name_iter = schema_name_field.value();
-                if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
+				if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
 					Alphas( i + 1 ) = obj.key();
 				} else {
 					Alphas( i + 1 ) = MakeUPPERCase( obj.key() );
@@ -1128,7 +1312,7 @@ namespace EnergyPlus {
 					auto const & schema_field_obj = schema_obj_props[ field ];
 					auto const & find_default = schema_field_obj.find( "default" );
 					if ( it.value().get < std::string >().empty() &&
-					     find_default != schema_field_obj.end() ) {
+						 find_default != schema_field_obj.end() ) {
 						auto const & default_val = find_default.value();
 						if ( default_val.is_string() ) {
 							val = default_val.get < std::string >();
@@ -1141,13 +1325,13 @@ namespace EnergyPlus {
 						val = it.value().get < std::string >();
 						if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = val.empty();
 					}
-                    if ( schema_field_obj.find("retaincase") != schema_field_obj.end() ) {
-                        Alphas( i + 1 ) = val;
-                    } else {
+					if ( schema_field_obj.find("retaincase") != schema_field_obj.end() ) {
+						Alphas( i + 1 ) = val;
+					} else {
 						Alphas( i + 1 ) = MakeUPPERCase( val );
 					}
 				} else {
-                    if ( it.value().is_number_integer() ) {
+					if ( it.value().is_number_integer() ) {
 						i64toa( it.value().get < int >(), s );
 					} else {
 						dtoa( it.value().get < double >(), s );
@@ -1173,7 +1357,7 @@ namespace EnergyPlus {
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
 
-				for ( auto i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
+				for ( size_t i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
 					std::string const & field_name = legacy_idd_alphas_extensions[ i ];
 					auto const & jdf_obj_field_iter = jdf_extension_obj.find( field_name );
 
@@ -1182,7 +1366,7 @@ namespace EnergyPlus {
 						if ( jdf_field_val.is_string() ) {
 							auto const & schema_field = schema_extension_fields[ field_name ];
 							std::string val = jdf_field_val;
-                            auto const & tmp_find_default_iter = schema_field.find( "default" );
+							auto const & tmp_find_default_iter = schema_field.find( "default" );
 							if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
 								auto const & field_default_val = tmp_find_default_iter.value();
 								if ( field_default_val.is_string() ) {
@@ -1225,7 +1409,7 @@ namespace EnergyPlus {
 		}
 
 		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
-		for ( int i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
+		for ( size_t i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_numerics_fields[ i ];
 			auto it = obj.value().find( field );
 			if ( it != obj.value().end() ) {
@@ -1235,7 +1419,7 @@ namespace EnergyPlus {
 				} else {
 					if ( it.value().get < std::string >().empty() ) {
 						auto const & schema_obj = schema_obj_props[ field ];
-                        auto const & schema_default_iter = schema_obj.find( "default" );
+						auto const & schema_default_iter = schema_obj.find( "default" );
 						if ( schema_default_iter != schema_obj.end() ) {
 							auto const & schema_default_val = schema_default_iter.value();
 							if ( schema_default_val.is_string() ) Numbers( i + 1 ) = -99999;
@@ -1267,9 +1451,9 @@ namespace EnergyPlus {
 			for ( auto it = jdf_extensions_array.begin(); it != jdf_extensions_array.end(); ++it ) {
 				auto const & jdf_extension_obj = it.value();
 
-				for ( auto i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
+				for ( size_t i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
 					std::string const & field = legacy_idd_numerics_extensions[ i ];
-                    auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
+					auto const & jdf_extension_field_iter = jdf_extension_obj.find( field );
 
 					if ( jdf_extension_field_iter != jdf_extension_obj.end() ) {
 						auto const & val = jdf_extension_field_iter.value();
@@ -1333,7 +1517,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::GetObjectItemNum(
+	InputProcessor::GetObjectItemNum(
 	std::string const & ObjType, // Object Type (ref: IDD Objects)
 	std::string const & ObjName // Name of the object type
 	) {
@@ -1341,21 +1525,22 @@ namespace EnergyPlus {
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
 		json * obj;
-
-		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjType ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+		auto obj_iter = jdf.find( ObjType );
+		if ( obj_iter == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
 		} else {
-			obj = &jdf[ ObjType ];
+			obj = &( obj_iter.value() );
 		}
 
 		int object_item_num = 1;
 		bool found = false;
+		auto const upperObjName = MakeUPPERCase( ObjName );
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
-			if ( MakeUPPERCase( it.key() ) == MakeUPPERCase( ObjName ) ) {
+			if ( MakeUPPERCase( it.key() ) == upperObjName ) {
 				found = true;
 				break;
 			}
@@ -1371,7 +1556,7 @@ namespace EnergyPlus {
 
 
 	int
-	EnergyPlus::InputProcessor::GetObjectItemNum(
+	InputProcessor::GetObjectItemNum(
 			std::string const & ObjType, // Object Type (ref: IDD Objects)
 			std::string const & NameTypeVal, // Object "name" field type ( used as search key )
 			std::string const & ObjName // Name of the object type
@@ -1380,25 +1565,24 @@ namespace EnergyPlus {
 		// Get the occurrence number of an object of type ObjType and name ObjName
 
 		json * obj;
-
-		if ( jdf.find( ObjType ) == jdf.end() || jdf[ ObjType ].find( ObjName ) == jdf[ ObjType ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjType ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+		auto obj_iter = jdf.find( ObjType );
+		if ( jdf.find( ObjType ) == jdf.end() || obj_iter.value().find( ObjName ) == obj_iter.value().end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjType ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				return -1;
 			}
 			obj = &jdf[ tmp_umit->second ];
 		} else {
-			obj = &jdf[ ObjType ];
+			obj = &( obj_iter.value() );
 		}
 
 		int object_item_num = 1;
 		bool found = false;
-
-
+		auto const upperObjName = MakeUPPERCase( ObjName );
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
 			auto it2 = it.value().find(NameTypeVal);
 
-			if ( (it2 != it.value().end()) && (MakeUPPERCase( it2.value() ) == MakeUPPERCase( ObjName )) ) {
+			if ( ( it2 != it.value().end() ) && ( MakeUPPERCase( it2.value() ) == upperObjName ) ) {
 				found = true;
 				break;
 			}
@@ -1414,7 +1598,7 @@ namespace EnergyPlus {
 	}
 
 	Real64
-	EnergyPlus::InputProcessor::ProcessNumber(
+	InputProcessor::ProcessNumber(
 		std::string const & String,
 		bool & ErrorFlag
 	) {
@@ -1472,7 +1656,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItemInList(
+	InputProcessor::FindItemInList(
 		std::string const & String,
 		Array1_string const & ListOfItems,
 		int const NumItems
@@ -1500,7 +1684,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItemInList(
+	InputProcessor::FindItemInList(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
@@ -1529,7 +1713,7 @@ namespace EnergyPlus {
 
 
 	int
-	EnergyPlus::InputProcessor::FindItemInSortedList(
+	InputProcessor::FindItemInSortedList(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
@@ -1569,7 +1753,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItem(
+	InputProcessor::FindItem(
 		std::string const & String,
 		Array1D_string const & ListOfItems,
 		int const NumItems
@@ -1598,7 +1782,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	EnergyPlus::InputProcessor::FindItem(
+	InputProcessor::FindItem(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
@@ -1627,7 +1811,7 @@ namespace EnergyPlus {
 	}
 
 	std::string
-	EnergyPlus::InputProcessor::MakeUPPERCase( std::string const & InputString ) {
+	InputProcessor::MakeUPPERCase( std::string const & InputString ) {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda K. Lawrie
@@ -1649,7 +1833,7 @@ namespace EnergyPlus {
 		for ( std::string::size_type i = 0, e = len( InputString ); i < e; ++i ) {
 			int const curCharVal = int( InputString[ i ] );
 			if ( ( 97 <= curCharVal && curCharVal <= 122 ) ||
-			     ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
+				 ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
 				ResultString[ i ] = char( curCharVal - 32 );
 			}
 		}
@@ -1658,53 +1842,8 @@ namespace EnergyPlus {
 
 	}
 
-    void
-    InputProcessor::VerifyUniqueInterObjectName(
-            std::unordered_map< std::string, std::string > & names,
-			std::string & object_name,
-            std::string const & object_type,
-            std::string const & field_name,
-			bool & ErrorsFound
-    ) {
-	    if ( object_name.empty() ) {
-		    ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
-		    ErrorsFound = true;
-		    object_name = "xxxxx";
-		    return;
-	    }
-		auto const & names_iter = names.find( object_name );
-        if ( names_iter == names.end() ) {
-			names.emplace( object_name, object_type );
-		} else {
-			ErrorsFound = true;
-			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
-		}
-    }
-
 	void
-	InputProcessor::VerifyUniqueInterObjectName(
-			std::unordered_map< std::string, std::string > & names,
-			std::string & object_name,
-			std::string const & object_type,
-			bool & ErrorsFound
-	) {
-		if ( object_name.empty() ) {
-			ShowSevereError("E+ object type " + object_name + " has a blank field");
-			ErrorsFound = true;
-			object_name = "xxxxx";
-			return;
-		}
-		auto const & names_iter = names.find( object_name );
-		if ( names_iter == names.end() ) {
-			names.emplace( object_name, object_type );
-		} else {
-			ErrorsFound = true;
-			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
-		}
-	}
-
-	void
-	EnergyPlus::InputProcessor::VerifyName(
+	InputProcessor::VerifyName(
 		std::string const & NameToVerify,
 		Array1D_string const & NamesList,
 		int const NumOfNames,
@@ -1747,7 +1886,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::VerifyName(
+	InputProcessor::VerifyName(
 		std::string const & NameToVerify,
 		Array1S_string const NamesList,
 		int const NumOfNames,
@@ -1790,10 +1929,10 @@ namespace EnergyPlus {
 	}
 
 	bool
-	EnergyPlus::InputProcessor::IsNameEmpty(
-			std::string & NameToVerify,
-			std::string const & StringToDisplay,
-			bool & ErrorFound
+	EnergyPlus::InputProcessor::IsNameEmpty (
+		std::string & NameToVerify,
+		std::string const & StringToDisplay,
+		bool & ErrorFound
 	){
 		if ( NameToVerify.empty() ) {
 			ShowSevereError(StringToDisplay + " Name, cannot be blank");
@@ -1805,7 +1944,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::RangeCheck(
+	InputProcessor::RangeCheck(
 		bool & ErrorsFound, // Set to true if error detected
 		std::string const & WhatFieldString, // Descriptive field for string
 		std::string const & WhatObjectString, // Descriptive field for object, Zone Name, etc.
@@ -1883,58 +2022,6 @@ namespace EnergyPlus {
 		}
 	}
 
-//void
-//EnergyPlus::InputProcessor::TurnOnReportRangeCheckErrors()
-//{
-//
-//	// SUBROUTINE INFORMATION:
-//	//       AUTHOR         Linda Lawrie
-//	//       DATE WRITTEN   July 2000
-//	//       MODIFIED       na
-//	//       RE-ENGINEERED  na
-//
-//	// PURPOSE OF THIS SUBROUTINE:
-//	// This subroutine turns on the logical to report range check errors
-//	// directly out of the InputProcessor.
-//	ReportRangeCheckErrors = true;
-//
-//}
-
-//void
-//EnergyPlus::InputProcessor::TurnOffReportRangeCheckErrors()
-//{
-//
-//	// SUBROUTINE INFORMATION:
-//	//       AUTHOR         Linda Lawrie
-//	//       DATE WRITTEN   July 20000
-//	//       MODIFIED       na
-//	//       RE-ENGINEERED  na
-//
-//	// PURPOSE OF THIS SUBROUTINE:
-//	// This subroutine turns off the logical to report range check errors
-//	// directly out of the InputProcessor.
-//
-//	ReportRangeCheckErrors = false;
-//
-//}
-
-	int
-	EnergyPlus::InputProcessor::GetNumRangeCheckErrorsFound() {
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function returns the number of OutOfRange errors found during
-		// input processing.
-//		return NumOutOfRangeErrorsFound;
-		// TODO: Fix this
-		return 0;
-	}
-
 	void
 	InputProcessor::GetMaxSchemaArgs(
 		int & NumArgs,
@@ -1990,7 +2077,7 @@ namespace EnergyPlus {
 	}
 
 	void
-	EnergyPlus::InputProcessor::GetObjectDefMaxArgs(
+	InputProcessor::GetObjectDefMaxArgs(
 		std::string const & ObjectWord, // Object for definition
 		int & NumArgs, // How many arguments (max) this Object can have
 		int & NumAlpha, // How many Alpha arguments (max) this Object can have
@@ -2007,8 +2094,8 @@ namespace EnergyPlus {
 		std::string extension_key;
 		json * object;
 		if ( schema[ "properties" ].find( ObjectWord ) == schema[ "properties" ].end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
@@ -2021,8 +2108,8 @@ namespace EnergyPlus {
 
 		json * objects;
 		if ( jdf.find( ObjectWord ) == jdf.end() ) {
-			auto tmp_umit = InputProcessor::idf_parser.case_insensitive_keys.find( MakeUPPERCase( ObjectWord ) );
-			if ( tmp_umit == InputProcessor::idf_parser.case_insensitive_keys.end() ) {
+			auto tmp_umit = case_insensitive_object_map.find( MakeUPPERCase( ObjectWord ) );
+			if ( tmp_umit == case_insensitive_object_map.end() ) {
 				ShowSevereError(
 				"GetObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects." );
 				return;
@@ -2064,134 +2151,84 @@ namespace EnergyPlus {
 		NumArgs = NumAlpha + NumNumeric;
 	}
 
-// void
-// EnergyPlus::InputProcessor::ReportOrphanRecordObjects()
-// {
+	void
+	InputProcessor::ReportOrphanRecordObjects()
+	{
 
-// 	// SUBROUTINE INFORMATION:
-// 	//       AUTHOR         Linda Lawrie
-// 	//       DATE WRITTEN   August 2002
-// 	//       MODIFIED       na
-// 	//       RE-ENGINEERED  na
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   August 2002
+		//       MODIFIED       na
+		//       RE-ENGINEERED  Mark Adams, Oct 2016
 
-// 	// PURPOSE OF THIS SUBROUTINE:
-// 	// This subroutine reports "orphan" objects that are in the IDF but were
-// 	// not "gotten" during the simulation.
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine reports "orphan" objects that are in the input but were
+		// not "gotten" during the simulation.
 
-// 	// METHODOLOGY EMPLOYED:
-// 	// Uses internal (to InputProcessor) IDFRecordsGotten array, cross-matched with Object
-// 	// names -- puts those into array to be printed (not adding dups).
-// 	int Count;
-// 	int Found;
-// 	int ObjFound;
-// 	int NumOrphObjNames;
-// 	bool potentialOrphanedSpecialObjects( false );
+		std::unordered_set< std::string > unused_object_types;
+		unused_object_types.reserve( unused_inputs.size() );
 
-// 	Array1D_string OrphanObjectNames( NumIDFRecords );
-// 	Array1D_string OrphanNames( NumIDFRecords );
-// 	NumOrphObjNames = 0;
+		if ( unused_inputs.size() && DisplayUnusedObjects ) {
+			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the input" );
+			ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
+			if ( ! DisplayAllWarnings ) {
+				ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all." );
+			} else {
+				ShowContinueError( " Each unused object is shown." );
+			}
+			ShowContinueError( " See InputOutputReference document for more details." );
+		}
 
-// 	for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
-// 		if ( IDFRecordsGotten( Count ) ) continue;
-// 		//  This one not gotten
-// 		Found = FindItemInList( IDFRecords( Count ).Name, OrphanObjectNames, NumOrphObjNames );
-// 		if ( Found == 0 ) {
-// 			if ( SortedIDD ) {
-// 				ObjFound = FindItemInSortedList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 				if ( ObjFound != 0 ) ObjFound = iListOfObjects( ObjFound );
-// 			} else {
-// 				ObjFound = FindItemInList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 			}
-// 			if ( ObjFound > 0 ) {
-// 				if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
-// 				++NumOrphObjNames;
-// 				OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
-// 				// To avoid looking up potential things later when they *definitely* aren't there, we'll trap for specific flags here first
-// 				//  and set the potential flag.  If the potential flag is false, nothing else is looked up later to save time
-// 				if ( ( ! potentialOrphanedSpecialObjects ) && ( ! OrphanObjectNames( NumOrphObjNames ).empty() )  && ( OrphanObjectNames( NumOrphObjNames )[ 0 ] == 'Z' ) ) {
-// 					potentialOrphanedSpecialObjects = true;
-// 				}
-// 				if ( ObjectDef( ObjFound ).NameAlpha1 ) {
-// 					OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
-// 				}
-// 			} else {
-// 				ShowWarningError( "object not found=" + IDFRecords( Count ).Name );
-// 			}
-// 		} else if ( DisplayAllWarnings ) {
-// 			if ( SortedIDD ) {
-// 				ObjFound = FindItemInSortedList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 				if ( ObjFound != 0 ) ObjFound = iListOfObjects( ObjFound );
-// 			} else {
-// 				ObjFound = FindItemInList( IDFRecords( Count ).Name, ListOfObjects, NumObjectDefs );
-// 			}
-// 			if ( ObjFound > 0 ) {
-// 				if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
-// 				++NumOrphObjNames;
-// 				OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
-// 				if ( ObjectDef( ObjFound ).NameAlpha1 ) {
-// 					OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
-// 				}
-// 			} else {
-// 				ShowWarningError( "ReportOrphanRecordObjects: object not found=" + IDFRecords( Count ).Name );
-// 			}
-// 		}
-// 	}
+		bool first_iteration = true;
+		for ( auto it = unused_inputs.begin(); it != unused_inputs.end(); ++it ) {
+			auto const & object_type = it->second.first;
+			auto const & name = it->second.second;
 
-// 	// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
-// 	// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if
-// 	// for now, the list includes:
-// 	//  - objects that start with "ZONEHVAC:"
-// 	if ( potentialOrphanedSpecialObjects ) {
-// 		for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-// 			if ( has_prefix( OrphanObjectNames( Count ), "ZONEHVAC:" ) ) {
-// 				ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the idf, and was not used." );
-// 				ShowContinueError( " -- Object type: " + OrphanObjectNames( Count ) );
-// 				ShowContinueError( " -- Object name: " + OrphanNames( Count ) );
-// 			}
-// 		}
-// 	}
+			// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
+			if ( has_prefix( object_type, "ZoneHVAC:" ) ) {
+				ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used." );
+				ShowContinueError( " -- Object type: " + object_type );
+				ShowContinueError( " -- Object name: " + name );
+			}
 
-// 	if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
-// 		gio::write( EchoInputFile, fmtLD ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
-// 		for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-// 			if ( ! OrphanNames( Count ).empty() ) {
-// 				gio::write( EchoInputFile, fmtA ) << ' ' + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
-// 			} else {
-// 				gio::write( EchoInputFile, fmtLD ) << OrphanObjectNames( Count );
-// 			}
-// 		}
-// 		ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the idf" );
-// 		ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
-// 		if ( ! DisplayAllWarnings ) {
-// 			ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings to see all." );
-// 		} else {
-// 			ShowContinueError( " Each unused object is shown." );
-// 		}
-// 		ShowContinueError( " See InputOutputReference document for more details." );
-// 		if ( ! OrphanNames( 1 ).empty() ) {
-// 			ShowMessage( "Object=" + OrphanObjectNames( 1 ) + '=' + OrphanNames( 1 ) );
-// 		} else {
-// 			ShowMessage( "Object=" + OrphanObjectNames( 1 ) );
-// 		}
-// 		for ( Count = 2; Count <= NumOrphObjNames; ++Count ) {
-// 			if ( ! OrphanNames( Count ).empty() ) {
-// 				ShowContinueError( "Object=" + OrphanObjectNames( Count ) + '=' + OrphanNames( Count ) );
-// 			} else {
-// 				ShowContinueError( "Object=" + OrphanObjectNames( Count ) );
-// 			}
-// 		}
-// 	} else if ( NumOrphObjNames > 0 ) {
-// 		ShowMessage( "There are " + IPTrimSigDigits( NumOrphObjNames ) + " unused objects in input." );
-// 		ShowMessage( "Use Output:Diagnostics,DisplayUnusedObjects; to see them." );
-// 	}
+			if ( ! DisplayUnusedObjects ) continue;
 
-// 	OrphanObjectNames.deallocate();
-// 	OrphanNames.deallocate();
+			if ( ! DisplayAllWarnings ) {
+				auto found_type = unused_object_types.find( object_type );
+				if ( found_type != unused_object_types.end() ) {
+					// only show first unused named object of an object class
+					continue;
+				} else {
+					unused_object_types.emplace( object_type );
+				}
+			}
 
-// }
+			if ( first_iteration ) {
+				if ( ! name.empty() ) {
+					ShowMessage( "Object=" + object_type + '=' + name );
+				} else {
+					ShowMessage( "Object=" + object_type );
+				}
+				first_iteration = false;
+			} else {
+				if ( ! name.empty() ) {
+					ShowContinueError( "Object=" + object_type + '=' + name );
+				} else {
+					ShowContinueError( "Object=" + object_type );
+				}
+			}
+		}
+
+		if ( unused_inputs.size() && ! DisplayUnusedObjects ) {
+			u64toa( unused_inputs.size(), s );
+			ShowMessage( "There are " + std::string( s ) + " unused objects in input." );
+			ShowMessage( "Use Output:Diagnostics,DisplayUnusedObjects; to see them." );
+		}
+
+	}
 
 	void
-	EnergyPlus::InputProcessor::PreProcessorCheck( bool & PreP_Fatal ) // True if a preprocessor flags a fatal error
+	InputProcessor::PreProcessorCheck( bool & PreP_Fatal ) // True if a preprocessor flags a fatal error
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2248,8 +2285,8 @@ namespace EnergyPlus {
 			cAlphaArgs( { 1, NumAlphas } ) = BlankString;
 			for ( CountP = 1; CountP <= NumPrePM; ++CountP ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs,
-				                               NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
-				                               cAlphaFieldNames, cNumericFieldNames );
+											   NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
+											   cAlphaFieldNames, cNumericFieldNames );
 				if ( cAlphaArgs( 1 ).empty() ) cAlphaArgs( 1 ) = "Unknown";
 				if ( NumAlphas > 3 ) {
 					Multiples = "s";
@@ -2261,10 +2298,10 @@ namespace EnergyPlus {
 					auto const errorType( uppercased( cAlphaArgs( 2 ) ) );
 					if ( errorType == "INFORMATION" ) {
 						ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
-						             "\" has the following Information message" + Multiples + ':' );
+									 "\" has the following Information message" + Multiples + ':' );
 					} else if ( errorType == "WARNING" ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
-						                  "\" has the following Warning condition" + Multiples + ':' );
+										  "\" has the following Warning condition" + Multiples + ':' );
 					} else if ( errorType == "SEVERE" ) {
 						ShowSevereError(
 						cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) +
@@ -2286,7 +2323,7 @@ namespace EnergyPlus {
 				CountM = 3;
 				if ( CountM > NumAlphas ) {
 					ShowContinueError( cCurrentModuleObject + " was blank.  Check " + cAlphaArgs( 1 ) +
-					                   " audit trail or error file for possible reasons." );
+									   " audit trail or error file for possible reasons." );
 				}
 				while ( CountM <= NumAlphas ) {
 					if ( len( cAlphaArgs( CountM ) ) == MaxNameLength ) {
@@ -2301,61 +2338,6 @@ namespace EnergyPlus {
 		}
 
 	}
-
-	// void
-	// EnergyPlus::InputProcessor::CompactObjectsCheck()
-	// {
-
-	// // SUBROUTINE INFORMATION:
-	// //       AUTHOR         Linda Lawrie
-	// //       DATE WRITTEN   December 2005
-	// //       MODIFIED       na
-	// //       RE-ENGINEERED  na
-
-	// // PURPOSE OF THIS SUBROUTINE:
-	// // Check to see if Compact Objects (i.e. CompactHVAC and its ilk) exist in the
-	// // input file.  If so, expandobjects was not run and there's a possible problem.
-	// 	bool CompactObjectsFound;
-
-	// 	CompactObjectsFound = false;
-
-	// 	for ( int i = IDFRecords.l(), e = IDFRecords.u(); i <= e; ++i ) {
-	// 		auto const & Name( IDFRecords( i ).Name );
-	// 		if ( ( has_prefix( Name, "HVACTEMPLATE:" ) ) || ( has_prefix( Name, "HVACTemplate:" ) ) ) {
-	// 			ShowSevereError( "HVACTemplate objects are found in the IDF File." );
-	// 			CompactObjectsFound = true;
-	// 			break;
-	// 		}
-	// 	}
-
-	// 	if ( CompactObjectsFound ) {
-	// 		ShowFatalError( "Program Terminates: The ExpandObjects program has not been run or is not in your EnergyPlus.exe folder." );
-	// 	}
-
-	// }
-
-	// void
-	// EnergyPlus::InputProcessor::ParametricObjectsCheck()
-	// {
-
-	// // SUBROUTINE INFORMATION:
-	// //       AUTHOR         Jason Glazer (based on CompactObjectsCheck by Linda Lawrie)
-	// //       DATE WRITTEN   September 2009
-	// //       MODIFIED
-	// //       RE-ENGINEERED  na
-
-	// // PURPOSE OF THIS SUBROUTINE:
-	// // Check to see if Parametric Objects exist in the input file.
-
-	// 	for ( int i = IDFRecords.l(), e = IDFRecords.u(); i <= e; ++i ) {
-	// 		auto const & Name( IDFRecords( i ).Name );
-	// 		if ( has_prefixi( Name, "Parametric:" ) ) {
-	// 			ShowSevereError( "Parametric objects are found in the IDF File." );
-	// 			ShowFatalError( "Program Terminates: The ParametricPreprocessor program has not been run." );
-	// 			break;
-	// 		}
-	// 	}
-	// }
 
 	void
 	InputProcessor::PreScanReportingVariables() {
@@ -2413,7 +2395,7 @@ namespace EnergyPlus {
 				json const & fields = obj.value();
 				if ( !fields.at( "key_value" ).empty() ) {
 					InputProcessor::AddRecordToOutputVariableStructure( fields.at( "key_value" ),
-					                                                    fields.at( "variable_name" ) );
+																		fields.at( "variable_name" ) );
 				} else {
 					InputProcessor::AddRecordToOutputVariableStructure( "*", fields.at( "variable_name" ) );
 				}
@@ -2428,13 +2410,12 @@ namespace EnergyPlus {
 			if (key != legacy_idd.end()) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-
 				//TODO: Might be incorrect
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
-						                                                    extensions.at(
-						                                                    "output_variable_or_meter_name" ) );
+																			extensions.at(
+																			"output_variable_or_meter_name" ) );
 					} else {
 						InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
 						"output_variable_or_meter_name" ) );
@@ -2451,13 +2432,12 @@ namespace EnergyPlus {
 			if (key != legacy_idd.end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-
 				//TODO: Might be incorrect
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					if ( !obj.key().empty() ) {
 						InputProcessor::AddRecordToOutputVariableStructure( extensions.at( "key_name" ),
-						                                                    extensions.at(
-						                                                    "output_variable_or_meter_name" ) );
+																			extensions.at(
+																			"output_variable_or_meter_name" ) );
 					} else {
 						InputProcessor::AddRecordToOutputVariableStructure( "*", extensions.at(
 						"output_variable_or_meter_name" ) );
@@ -2486,7 +2466,6 @@ namespace EnergyPlus {
 		if ( jdf_objects != jdf.end() ) {
 			auto const & jdf_object = jdf_objects.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
-				// TODO: Might be wrong...
 				InputProcessor::AddRecordToOutputVariableStructure( "*", obj.key() );
 			}
 		}
@@ -2512,11 +2491,10 @@ namespace EnergyPlus {
 			if (key != legacy_idd.end() ) extension_key = key.value();
 			for ( auto obj = jdf_object.begin(); obj != jdf_object.end(); ++obj ) {
 				json const & fields = obj.value();
-
 				//TODO: Might be incorrect
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					InputProcessor::AddRecordToOutputVariableStructure( "*",
-					                                                    extensions.at( "variable_or_meter_name" ) );
+																		extensions.at( "variable_or_meter_name" ) );
 				}
 			}
 		}
@@ -2547,8 +2525,8 @@ namespace EnergyPlus {
 				for ( auto const & extensions : fields[ extension_key ] ) {
 					auto const report_name = MakeUPPERCase( extensions.at( "report_name" ) );
 					if ( report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY" ) {
-						for ( Loop1 = 1; Loop1 <= NumMonthlyReports; ++Loop1 ) {
-							InputProcessor::AddVariablesForMonthlyReport( MonthlyNamedReports( Loop1 ) );
+						for ( int i = 1; i <= NumMonthlyReports; ++i ) {
+							InputProcessor::AddVariablesForMonthlyReport( MonthlyNamedReports( i ) );
 						}
 					} else {
 						InputProcessor::AddVariablesForMonthlyReport( report_name );
@@ -2636,12 +2614,12 @@ namespace EnergyPlus {
 
 		} else if ( reportName == "COMFORTREPORTSIMPLE55MONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MEAN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
+												"ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
 
 		} else if ( reportName == "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY" );
@@ -2716,26 +2694,26 @@ namespace EnergyPlus {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
 
 		} else if ( reportName == "WINDOWENERGYZONESUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
+												"ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
+												"ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 
 		} else if ( reportName == "AVERAGEOUTDOORCONDITIONSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
@@ -2832,15 +2810,15 @@ namespace EnergyPlus {
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
+												"DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 
 		} else if ( reportName == "COILREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "HEATING COIL HEATING ENERGY" );
@@ -2914,12 +2892,12 @@ namespace EnergyPlus {
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
+												"ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*",
-			                                    "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" );
+												"ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR" );
 

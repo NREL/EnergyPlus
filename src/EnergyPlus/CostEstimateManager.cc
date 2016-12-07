@@ -193,28 +193,8 @@ namespace CostEstimateManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Get Cost Estimation object input.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -328,17 +308,10 @@ namespace CostEstimateManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the Cost Estimate based on inputs.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Zone;
-
 		using DXCoils::DXCoil;
 		using PlantChillers::ElectricChiller;
 		using PlantChillers::ElectricChillerSpecs;
@@ -346,18 +319,6 @@ namespace CostEstimateManager {
 		using DataPhotovoltaics::iSimplePVModel;
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // do-loop counter for line items
@@ -595,19 +556,12 @@ namespace CostEstimateManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the Cost Estimate based on inputs.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Lights;
 		using DataHeatBalance::Zone;
-
 		using DXCoils::DXCoil;
 		using DXCoils::NumDXCoils;
 		using PlantChillers::ElectricChiller;
@@ -617,19 +571,6 @@ namespace CostEstimateManager {
 		using namespace DataDaylighting;
 		using HeatingCoils::HeatingCoil;
 		using HeatingCoils::NumHeatingCoils;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // do-loop counter for line items

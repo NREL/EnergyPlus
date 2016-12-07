@@ -580,14 +580,6 @@ namespace SetPointManager {
 		// Use the Get routines from the InputProcessor module.
 
 		// Using/Aliasing
-
-
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::GetNodeNums;
 		using DataHeatBalance::Zone;
@@ -2898,19 +2890,6 @@ namespace SetPointManager {
 		// Then check SPM 2 nodes with SPM 3. Check E with I-L, F with I-L, etc.
 		// 3) For SET POINT MANAGER:RETURN AIR BYPASS FLOW
 		//    check for duplicate air loop names.
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -3046,39 +3025,21 @@ namespace SetPointManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneControls::HumidityControlZone;
 		using DataZoneControls::NumHumidityControlZones;
-
 		using DataAirSystems::PrimaryAirSystem;
 		using DataHeatBalance::Zone;
 		using DataHVACGlobals::NumPlantLoops;
 		using DataHVACGlobals::NumCondLoops;
 		using namespace DataPlant;
-
 		using DataEnvironment::GroundTemp_Deep;
 		using DataEnvironment::GroundTemp;
 		using DataEnvironment::GroundTemp_Surface;
 		using DataEnvironment::GroundTempFC;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// NA
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -7883,28 +7844,8 @@ namespace SetPointManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Determine if ideal condenser entering set point manager is used in model and set flag
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataGlobals::AnyIdealCondEntSetPointInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

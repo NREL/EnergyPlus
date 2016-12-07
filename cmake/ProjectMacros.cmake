@@ -217,10 +217,12 @@ function(install_and_fixup_exe_target TARGET_NAME INSTALL_PATH)
   install( TARGETS ${TARGET_NAME} DESTINATION ${INSTALL_PATH} )
   #Warning this is only ok because we are counting on static linked executables on windows.
   if(NOT WIN32)
-    install(CODE "
-      include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
-      fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
-    ")
+    if(NOT EXISTS "/etc/redhat-release")
+      install(CODE "
+        include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
+        fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
+      ")
+    endif()
   endif()
 endfunction()
 

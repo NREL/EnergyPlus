@@ -77,6 +77,7 @@
 #include <DataSurfaces.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -189,13 +190,9 @@ namespace SolarCollectors {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using DataPlant::TypeOf_SolarCollectorFlatPlate;
 		using DataPlant::TypeOf_SolarCollectorICS;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CollectorNum;
@@ -363,7 +360,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleParamObject, ParametersNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
-				InputProcessor::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				Parameters( ParametersNum ).Name = cAlphaArgs( 1 );
 
 				// NOTE:  This values serves mainly as a reference.  The area of the associated surface object is used in all calculations.
@@ -437,7 +434,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleObject, CollectorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 				// Collector name
-				InputProcessor::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
 				Collector( CollectorNum ).Name = cAlphaArgs( 1 );
 				Collector( CollectorNum ).TypeNum = TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
 
@@ -529,7 +526,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleParamObject, ICSParamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector module parameters name
-				InputProcessor::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueParametersNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				Parameters( ParametersNum ).Name = cAlphaArgs( 1 );
 				// NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
 				//        added
@@ -611,7 +608,7 @@ namespace SolarCollectors {
 				InputProcessor::GetObjectItem( CurrentModuleObject, ICSUnitsNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				// Collector name
-				InputProcessor::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueCollectorNames, cAlphaArgs( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				Collector( CollectorNum ).Name = cAlphaArgs( 1 );
 				Collector( CollectorNum ).TypeNum = TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
 
@@ -2243,23 +2240,10 @@ namespace SolarCollectors {
 		// mine  ExtVentedCavity derived type that has the surface.
 		// Adapated from Photovoltaics module, originally developed by Brent G. (2004)
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataSurfaces::Surface;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CavNum; // temporary
@@ -2312,25 +2296,8 @@ namespace SolarCollectors {
 		// METHODOLOGY EMPLOYED:
 		// access derived type
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataSurfaces::ExtVentedCavity;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		TsColl = ExtVentedCavity( VentModNum ).Tbaffle;

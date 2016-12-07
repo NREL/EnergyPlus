@@ -149,6 +149,7 @@
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -225,7 +226,7 @@
 #include <fstream>
 #include <algorithm>
 
-json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int depth, json::parse_event_t event, json &parsed,
+json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
 									   unsigned line_num, unsigned line_index) -> bool {
 	EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
 	return true;
@@ -240,12 +241,18 @@ namespace EnergyPlus {
 			std::cout << "JSON Schema not found" << std::endl;
 			return;
 		}
-		InputProcessor::idf_parser.initialize(InputProcessor::schema);
+
+		const json & loc = InputProcessor::schema[ "properties" ];
+		InputProcessor::case_insensitive_object_map.reserve( loc.size() );
+		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
+			std::string key = it.key();
+			for ( char & c : key ) c = toupper( c );
+			InputProcessor::case_insensitive_object_map.emplace( std::move( key ), it.key() );
+		}
 	}
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
-		InputProcessor::state.initialize(&InputProcessor::schema);
 
 		show_message();
 
@@ -253,13 +260,11 @@ namespace EnergyPlus {
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->m_delightin_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
-		DataGlobals::delightin_stream = this->m_delightin_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
@@ -270,6 +275,8 @@ namespace EnergyPlus {
 		UtilityRoutines::outputErrorHeader = false;
 
 		Psychrometrics::InitializePsychRoutines();
+
+		InputProcessor::state.initialize( & InputProcessor::schema );
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -375,6 +382,7 @@ namespace EnergyPlus {
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
 		HVACDXSystem::clear_state();
+		HVACHXAssistedCoolingCoil::clear_state();
 		HVACManager::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
@@ -504,15 +512,6 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_delightin_stream( std::string const & expected_string, bool reset_stream ) {
-		auto const stream_str = this->m_delightin_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if (reset_stream) this->m_delightin_stream->str(std::string());
-		return are_equal;
-	}
-
-
 	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
 	{
 		auto const has_output = this->eso_stream->str().size() > 0;
@@ -556,14 +555,7 @@ namespace EnergyPlus {
 	}
 
 
-	bool EnergyPlusFixture::has_delightin_output( bool reset_stream )
-	{
-		auto const has_output = this->m_delightin_stream->str().size() > 0;
-		if ( reset_stream ) this->m_delightin_stream->str( std::string() );
-		return has_output;
-	}
-
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
 		InputProcessor::jdf = InputProcessor::idf_parser.decode(idf_snippet, InputProcessor::schema);
 
 		if (InputProcessor::jdf.find("Building") == InputProcessor::jdf.end()) {
@@ -596,10 +588,6 @@ namespace EnergyPlus {
 					}
 			};
 		}
-		InputProcessor::InitializeCacheMap();
-		InputProcessor::InitFiles();
-		SimulationManager::PostIPProcessing();
-		InputProcessor::state.print_errors();
 
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
@@ -612,6 +600,11 @@ namespace EnergyPlus {
 		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
+
+		InputProcessor::InitializeMaps();
+		InputProcessor::InitFiles();
+		SimulationManager::PostIPProcessing();
+		InputProcessor::state.print_errors();
 
 		return true;
 	}
@@ -653,13 +646,13 @@ namespace EnergyPlus {
 	}
 
 	bool EnergyPlusFixture::compare_idf(
-		std::string const & name,
-		int const num_alphas,
-		int const num_numbers,
-		std::vector< std::string > const & alphas,
-		std::vector< bool > const & alphas_blank,
-		std::vector< Real64 > const & numbers,
-		std::vector< bool > const & numbers_blank
+		std::string const & EP_UNUSED( name ),
+		int const EP_UNUSED( num_alphas ),
+		int const EP_UNUSED( num_numbers ),
+		std::vector< std::string > const & EP_UNUSED( alphas ),
+		std::vector< bool > const & EP_UNUSED( alphas_blank ),
+		std::vector< Real64 > const & EP_UNUSED( numbers ),
+		std::vector< bool > const & EP_UNUSED( numbers_blank )
 	)
 	{
 		// using namespace InputProcessor;

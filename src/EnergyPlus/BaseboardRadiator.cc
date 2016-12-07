@@ -192,7 +192,6 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
-
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetActuatedBranchFlowRate;
@@ -294,10 +293,6 @@ namespace BaseboardRadiator {
 		// na
 
 		// Using/Aliasing
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using namespace DataLoopNode;
@@ -354,7 +349,9 @@ namespace BaseboardRadiator {
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
-				InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 				if ( errFlag ) {
 					ErrorsFound = true;
@@ -681,6 +678,8 @@ namespace BaseboardRadiator {
 
 		if ( PltSizHeatNum > 0 ) {
 
+			DataScalableCapSizingON = false;
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {
@@ -730,6 +729,7 @@ namespace BaseboardRadiator {
 						}
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0;
 					}
@@ -820,6 +820,7 @@ namespace BaseboardRadiator {
 						}
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
 					} else {
 						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 					}
@@ -1231,7 +1232,6 @@ namespace BaseboardRadiator {
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;
-
 		using General::TrimSigDigits;
 		using DataGlobals::KickOffSimulation;
 

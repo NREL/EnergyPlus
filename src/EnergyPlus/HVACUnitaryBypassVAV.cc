@@ -454,9 +454,6 @@ namespace HVACUnitaryBypassVAV {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::GetFanType;
 		using Fans::GetFanIndex;
@@ -474,10 +471,6 @@ namespace HVACUnitaryBypassVAV {
 		using DataAirLoop::AirToZoneNodeInfo;
 		using HeatingCoils::GetCoilInletNode;
 		using HeatingCoils::GetCoilOutletNode;
-
-
-
-
 		using DataAirSystems::PrimaryAirSystem;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleIndex;
@@ -496,7 +489,6 @@ namespace HVACUnitaryBypassVAV {
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
 		auto & GetHXDXCoilInletNode( HVACHXAssistedCoolingCoil::GetCoilInletNode );
 		auto & GetHXDXCoilOutletNode( HVACHXAssistedCoolingCoil::GetCoilOutletNode );
-
 		auto & GetSteamCoilAirInletNode( SteamCoils::GetCoilAirInletNode );
 		using SteamCoils::GetSteamCoilIndex;
 		using SteamCoils::GetCoilAirOutletNode;
@@ -509,18 +501,8 @@ namespace HVACUnitaryBypassVAV {
 		auto & GetWaterCoilOutletNode( WaterCoils::GetCoilOutletNode );
 		using FluidProperties::GetSatDensityRefrig;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const getUnitaryHeatCoolVAVChangeoverBypass( "GetUnitaryHeatCool:VAVChangeoverBypass" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CBVAVIndex; // Loop index
@@ -1714,27 +1696,9 @@ namespace HVACUnitaryBypassVAV {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-				using ReportSizingManager::ReportSizingOutput;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		using ReportSizingManager::ReportSizingOutput;
 
 		if ( CBVAV( CBVAVNum ).MaxCoolAirVolFlow == AutoSize ) {
 

@@ -137,8 +137,6 @@ namespace PurchasedAirManager {
 	using DataEnvironment::OutHumRat;
 	using DataEnvironment::OutEnthalpy;
 	using DataEnvironment::StdRhoAir;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbW;
@@ -236,26 +234,8 @@ namespace PurchasedAirManager {
 		// It is called from SimZoneEquipment in the ZoneEquipmentManager
 		// at the system time step.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -313,18 +293,7 @@ namespace PurchasedAirManager {
 		// Get the input data for the Purchased Air objects.
 		// Set up output variables.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::InitUniqueNodeCheck;
 		using NodeInputManager::CheckUniqueNodes;
@@ -336,19 +305,6 @@ namespace PurchasedAirManager {
 		using DataContaminantBalance::Contaminant;
 		using DataSizing::ZoneHVACSizing;
 		using DataZoneEquipment::ZoneEquipConfig;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PurchAirNum;
@@ -1037,12 +993,9 @@ namespace PurchasedAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-				using ReportSizingManager::RequestSizing;
+		using ReportSizingManager::RequestSizing;
 		using ReportSizingManager::ReportSizingOutput;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::RhoH2O;
@@ -1056,17 +1009,8 @@ namespace PurchasedAirManager {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizePurchasedAir: "); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool IsAutoSize; // Indicator to autosize

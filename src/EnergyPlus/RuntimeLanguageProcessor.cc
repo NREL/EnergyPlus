@@ -81,6 +81,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -909,9 +910,6 @@ namespace RuntimeLanguageProcessor {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Runs a stack with the interpreter.
-
-		// METHODOLOGY EMPLOYED:
-		// Using/Aliasing
 
 		// Return value
 		ErlValueType ReturnValue;
@@ -1812,19 +1810,8 @@ namespace RuntimeLanguageProcessor {
 		// METHODOLOGY EMPLOYED:
 		// Uses recursion to handle tokens with compound expressions
 
-		// Using/Aliasing
-
 		// Return value
 		int ExpressionNum;
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Pos;
@@ -2102,7 +2089,7 @@ namespace RuntimeLanguageProcessor {
 	}
 
 	ErlValueType
-	EvaluateExpression( 
+	EvaluateExpression(
 		int const ExpressionNum,
 		bool & seriousErrorFound
 	)
@@ -2188,7 +2175,7 @@ namespace RuntimeLanguageProcessor {
 							}
 						}
 					}
-					
+
 				}
 			}
 
@@ -2289,7 +2276,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == OperatorRaiseToPower ) {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					TestValue = std::pow( Operand( 1 ).Number, Operand( 2 ).Number );
-					if ( std::isnan( TestValue ) ) { 
+					if ( std::isnan( TestValue ) ) {
 						// throw Error
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
@@ -2662,7 +2649,6 @@ namespace RuntimeLanguageProcessor {
 
 		// Using/Aliasing
 		using DataGlobals::TimeStepZone;
-
 		using General::TrimSigDigits;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
@@ -2980,7 +2966,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:Program";
 				for ( StackNum = 1; StackNum <= NumErlPrograms; ++StackNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Programs", errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -3000,7 +2986,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
 				for ( StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, StackNum - NumErlPrograms, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( ErlStackUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					ValidateEMSProgramName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), "Subroutines", errFlag, ErrorsFound );
 					if ( ! errFlag ) {
@@ -3041,7 +3027,7 @@ namespace RuntimeLanguageProcessor {
 						// register the trend pointer in ErlVariable.
 						ErlVariable( VariableNum ).Value.TrendVariable = true;
 						ErlVariable( VariableNum ).Value.TrendVarPointer = TrendNum;
-						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this, 
+						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this,
 					}
 
 					NumTrendSteps = std::floor( rNumericArgs( 1 ) );
@@ -3104,7 +3090,7 @@ namespace RuntimeLanguageProcessor {
 				cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
 				for ( RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum ) {
 					InputProcessor::GetObjectItem( cCurrentModuleObject, RuntimeReportVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
 					if ( lbracket == std::string::npos ) {
@@ -3238,7 +3224,7 @@ namespace RuntimeLanguageProcessor {
 					RuntimeReportVarNum = NumEMSOutputVariables + loop;
 					InputProcessor::GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( RuntimeReportVarUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					lbracket = index( cAlphaArgs( 1 ), '[' );
 					if ( lbracket == std::string::npos ) {
@@ -3754,15 +3740,8 @@ namespace RuntimeLanguageProcessor {
 
 		// PURPOSE OF THIS FUNCTION:
 
-		// METHODOLOGY EMPLOYED:
-
-		// Using/Aliasing
-
 		// Return value
 		int VariableNum;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool Found;
@@ -3814,19 +3793,6 @@ namespace RuntimeLanguageProcessor {
 
 		// PURPOSE OF THIS FUNCTION:
 		// Creates new variable if it doesn't exist.  If exists, returns existing variable number.
-
-		// METHODOLOGY EMPLOYED:
-
-		// Using/Aliasing
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
 
 		// FLOW:
 		int VariableNum = FindEMSVariable( VariableName, StackNum );

@@ -905,9 +905,20 @@ namespace EnergyPlus {
 		CondenserLoopTowers::ReportTowers( true, 1 );
 
 		// test that tower outlet temperature = set point temperature
-		// TEST CASE IS NOT VALID BECAUSE OF THE NEW ORDER OF DATA OBJECTS
-		EXPECT_GT( DataLoopNode::Node(9).Temp, 30.0); // inlet node temperature
-		EXPECT_DOUBLE_EQ( 30, DataLoopNode::Node(10).Temp ); // outlet node temperature
+		int inletNodeIndex = 0;
+		int outletNodeIndex = 0;
+		auto inletNode = std::find( DataLoopNode::NodeID.begin(), DataLoopNode::NodeID.end(), "TOWERWATERSYS PUMP-TOWERWATERSYS COOLTOWERNODE" );
+		ASSERT_TRUE( inletNode != DataLoopNode::NodeID.end() );
+		if ( inletNode != DataLoopNode::NodeID.end() ) {
+			inletNodeIndex = std::distance( DataLoopNode::NodeID.begin(), inletNode );
+		}
+		auto outletNode = std::find( DataLoopNode::NodeID.begin(), DataLoopNode::NodeID.end(), "TOWERWATERSYS SUPPLY EQUIPMENT OUTLET NODE" );
+		ASSERT_TRUE( outletNode != DataLoopNode::NodeID.end() );
+		if ( outletNode != DataLoopNode::NodeID.end() ) {
+			outletNodeIndex = std::distance( DataLoopNode::NodeID.begin(), outletNode );
+		}
+		EXPECT_GT( DataLoopNode::Node( inletNodeIndex ).Temp, 30.0 ); // inlet node temperature
+		EXPECT_DOUBLE_EQ( 30.0, DataLoopNode::Node( outletNodeIndex ).Temp ); // outlet node temperature
 
 		// input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
 		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedTowerUAWasAutoSized );

@@ -186,11 +186,6 @@ namespace PlantCentralGSHP {
 	{
 
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
@@ -606,16 +601,7 @@ namespace PlantCentralGSHP {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the Wrapper model.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -629,9 +615,6 @@ namespace PlantCentralGSHP {
 
 		// Locals
 		static int NumChillerHeaters( 0 ); // total number of chiller heater (without identical multiplier)
-
-		// PARAMETERS
-		// na
 
 		// LOCAL VARIABLES
 		static std::string CompName; // component name
@@ -673,7 +656,9 @@ namespace PlantCentralGSHP {
 
 			// intialize nth chiller heater index (including identical units) for current wrapper
 			NumChHtrPerWrapper = 0;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 
 			if ( cAlphaArgs( 2 ) == "SMARTMIXING" ) {
 				Wrapper( WrapperNum ).ControlMode = SmartMixing;
@@ -896,15 +881,7 @@ namespace PlantCentralGSHP {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -916,10 +893,6 @@ namespace PlantCentralGSHP {
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using DataSizing::AutoSize;
-
-		// Locals
-		// PARAMETERS
-		// na
 
 		// LOCAL VARIABLES
 		std::string StringVar; // Used for EIRFPLR warning messages
@@ -1252,7 +1225,6 @@ namespace PlantCentralGSHP {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using CurveManager::GetCurveMinMaxValues;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;

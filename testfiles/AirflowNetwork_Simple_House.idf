@@ -1287,7 +1287,7 @@
     DX Cooling Coil System 1,!- Component 2 Name
     Cooling Coil Air Inlet Node,  !- Component 2 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     Main Heating Coil 1,     !- Component 3 Name
     Heating Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Air Loop Outlet Node;    !- Component 3 Outlet Node Name
@@ -1595,7 +1595,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Main Heating Coil 1,     !- Coil Name
-    Coil:Heating:Fuel,        !- Coil Object Type
+    Coil:Heating:Fuel,       !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.000;                   !- Air Path Hydraulic Diameter {m}
 

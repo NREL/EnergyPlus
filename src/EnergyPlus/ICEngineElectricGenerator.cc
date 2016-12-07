@@ -142,24 +142,8 @@ namespace ICEngineElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -268,32 +252,9 @@ namespace ICEngineElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Generator_ICEngine;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN)          :: FlowLock !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetICEInput ) {
 			GetICEngineGeneratorInput();
@@ -336,12 +297,7 @@ namespace ICEngineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
@@ -349,9 +305,6 @@ namespace ICEngineElectricGenerator {
 		using BranchNodeConnections::TestCompSet;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// PARAMETERS
 
 		//LOCAL VARIABLES
 		int GeneratorNum; // Generator counter

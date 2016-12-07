@@ -178,28 +178,8 @@ namespace Photovoltaics {
 		// This subroutine is in charge of all the rest of the subroutines contained
 		// in this module. provides common entry point for all the models
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-		//unused0909  USE DataEnvironment, ONLY : EnvironmentName, DayOfYear
-		//unused0909  USE DataGlobals, ONLY: BeginEnvrnFlag, EndEnvrnFlag
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na)
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PVnum; // index of unit in PV array for Equivalent one-diode model
@@ -335,36 +315,14 @@ namespace Photovoltaics {
 		// METHODOLOGY EMPLOYED:
 		// subroutine structure taken from Beta2 BaseboardRadiator.cc
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using namespace DataIPShortCuts;
 		using DataGlobals::KelvinConv;
-		//unused0909  USE DataEnvironment, ONLY: Longitude, TimeZoneMeridian
 		using DataSurfaces::Surface;
 		using namespace DataHeatBalance;
 		using ScheduleManager::GetScheduleIndex;
 		using TranspiredCollector::GetTranspiredCollectorIndex;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PVnum; // working variable for do loop through pv arrays
@@ -522,7 +480,9 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVSimplePerfObjectName;
 			for ( ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				tmpSimpleModuleParams( ModNum ).Name = cAlphaArgs( 1 );
 				tmpSimpleModuleParams( ModNum ).ActiveFraction = rNumericArgs( 1 );
 
@@ -560,7 +520,9 @@ namespace Photovoltaics {
 			cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
 			for ( ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum ) {
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 				tmpTNRSYSModuleParams( ModNum ).Name = cAlphaArgs( 1 );
 				if ( InputProcessor::SameString( cAlphaArgs( 2 ), "CrystallineSilicon" ) ) {
 					tmpTNRSYSModuleParams( ModNum ).CellType = CrystallineSiPVCells;
@@ -608,7 +570,9 @@ namespace Photovoltaics {
 			for ( ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum ) {
 
 				InputProcessor::GetObjectItem( cCurrentModuleObject, ModNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+					continue;
+				}
 
 				tmpSNLModuleParams( ModNum ).name = cAlphaArgs( 1 );
 				tmpSNLModuleParams( ModNum ).Acoll = rNumericArgs( 1 );
@@ -2666,23 +2630,10 @@ namespace Photovoltaics {
 		// mine Surface derived type for correct index/number of surface
 		// mine  ExtVentedCavity derived type that has the surface.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataSurfaces::Surface;
 		using DataSurfaces::ExtVentedCavity;
 		using DataSurfaces::TotExtVentCav;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CavNum; // temporary

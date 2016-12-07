@@ -221,27 +221,10 @@ namespace ChillerReformulatedEIR {
 		//  models, initializes simulation variables, calls the appropriate model and sets
 		//  up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Chiller_ElectricReformEIR;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EIRChillNum;
@@ -319,15 +302,7 @@ namespace ChillerReformulatedEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the Reformulated Electric EIR Chiller model
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -1404,11 +1379,6 @@ namespace ChillerReformulatedEIR {
 		using CurveManager::GetCurveMinMaxValues;
 		using General::SolveRegulaFalsi;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
 		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRegulaFalsi
 		int const MaxIter( 500 ); // Iteration control for SolveRegulaFalsi
 
@@ -1649,27 +1619,10 @@ namespace ChillerReformulatedEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Reporting
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapInletNode; // Evaporator inlet node number

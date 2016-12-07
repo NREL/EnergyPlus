@@ -208,32 +208,13 @@ namespace ThermalChimney {
 		// This subroutine obtains input data for ThermalChimney units and
 		// stores it in the ThermalChimney data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//    CHARACTER(len=MaxNameLength), DIMENSION(23) :: AlphaName
@@ -266,7 +247,9 @@ namespace ThermalChimney {
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			if ( InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
+				continue;
+			}
 
 			// First Alpha is Thermal Chimney Name
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );

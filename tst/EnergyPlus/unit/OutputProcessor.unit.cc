@@ -3355,6 +3355,108 @@ namespace EnergyPlus {
 			} ) );
 
 		}
+		TEST_F (EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
+		{
+			std::string const idf_objects = delimited_string ({
+				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+				"Output:Variable,*,Boiler Gas Rate,detailed;",
+				"Output:Variable,*,Boiler Heating Rate,detailed;",
+				"Output:Meter,Electricity:Facility,timestep;",
+			});
+
+			ASSERT_TRUE( process_idf( idf_objects ) );
+
+			DataGlobals::DayOfSim = 365;
+			DataGlobals::DayOfSimChr = "365";
+			DataEnvironment::Month = 12;
+			DataEnvironment::DayOfMonth = 31;
+			DataEnvironment::DSTIndicator = 0;
+			DataEnvironment::DayOfWeek = 3;
+			DataEnvironment::HolidayIndex = 0;
+			DataGlobals::HourOfDay = 24;
+			DataGlobals::NumOfDayInEnvrn = 365;
+			DataGlobals::MinutesPerTimeStep = 10;
+
+			if ( DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour ) {
+				DataGlobals::EndHourFlag = true;
+				if ( DataGlobals::HourOfDay == 24 ) {
+					DataGlobals::EndDayFlag = true;
+					if ( (!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn) ) {
+						DataGlobals::EndEnvrnFlag = true;
+					}
+				}
+			}
+
+			if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth (DataEnvironment::Month) ) {
+				DataEnvironment::EndMonthFlag = true;
+			}
+
+			TimeValue.allocate (2);
+
+			auto timeStep = 1.0 / 6;
+
+			SetupTimePointers ("Zone", timeStep);
+			SetupTimePointers ("HVAC", timeStep);
+
+			TimeValue (1).CurMinute = 50;
+			TimeValue (2).CurMinute = 50;
+
+			GetReportVariableInput ();
+			SetupOutputVariable ("Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+			Real64 light_consumption = 999;
+			SetupOutputVariable ("Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
+			UpdateMeterReporting ();
+			UpdateDataandReport (DataGlobals::ZoneTSReporting);
+
+			GenOutputVariablesAuditReport();
+
+			std::string errMsg = delimited_string ({
+				"   ** Warning ** The following Report Variables were requested but not generated",
+				"   **   ~~~   ** because IDF did not contain these elements or misspelled variable name -- check .rdd file",
+				"   ************* Key=*, VarName=BOILER GAS RATE, Frequency=Detailed",
+				"   ************* Key=*, VarName=BOILER HEATING RATE, Frequency=Detailed",
+			});
+
+			compare_err_stream(errMsg);
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_DuplicateMeterCustom )
+		{
+			std::string const idf_objects = delimited_string({
+				"Version,8.6;",
+				"Meter:Custom,",
+				"CustomMeter1,               !- Name",
+				"Generic,                    !- Fuel Type",
+				",                           !- Key Name 1",
+				"DistrictHeating:Facility;   !- Variable or Meter 1 Name",
+				"Meter:Custom,",
+				"CustomMeter2,               !- Name",
+				"Generic,                    !- Fuel Type",
+				",                           !- Key Name 1",
+				"CustomMeter1;               !- Variable or Meter 1 Name",
+				"Output:Meter,CustomMeter1,Hourly;",
+				"Output:Meter,CustomMeter2,Hourly;"
+			});
+
+			ASSERT_TRUE( process_idf( idf_objects ) );
+
+			bool errors_found = false;
+
+			GetCustomMeterInput( errors_found );
+
+			EXPECT_FALSE( errors_found );
+
+			std::string errMsg = delimited_string ({
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid output_variable_or_meter_name=\"DISTRICTHEATING:FACILITY\".",
+				"   **   ~~~   ** ...will not be shown with the Meter results.",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
+				"   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: output_variable_or_meter_name=\"CUSTOMMETER1\"."
+			});
+
+			compare_err_stream(errMsg);
+		}
 
 	}
 

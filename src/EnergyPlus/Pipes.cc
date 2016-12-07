@@ -68,6 +68,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -193,30 +194,10 @@ namespace Pipes {
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
-		//USE DataPlant, ONLY: LoopData
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PipeNum;
@@ -240,7 +221,7 @@ namespace Pipes {
 		for ( PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum ) {
 			PipeNum = PipeWaterNum;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			InputProcessor::VerifyUniqueInterObjectName( LocalPipeUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( LocalPipeUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_Pipe;
 
@@ -255,7 +236,7 @@ namespace Pipes {
 		for ( PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum ) {
 			++PipeNum;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
-			InputProcessor::VerifyUniqueInterObjectName( LocalPipeUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( LocalPipeUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_PipeSteam;
 			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );

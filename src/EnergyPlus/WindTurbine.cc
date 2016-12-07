@@ -163,28 +163,8 @@ namespace WindTurbine {
 		// This subroutine manages the simulation of wind turbine component.
 		// This drivers manages the calls to all of the other drivers and simulation algorithms.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true );
@@ -284,24 +264,9 @@ namespace WindTurbine {
 		// This subroutine gets input data for wind turbine components
 		// and stores it in the wind turbine data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "Generator:WindTurbine" );
@@ -310,12 +275,6 @@ namespace WindTurbine {
 		Real64 const DefaultPC( 0.25 ); // Default power coefficient
 		Real64 const MaxPowerCoeff( 0.59 ); // Maximum power coefficient
 		Real64 const DefaultH( 50.0 ); // Default of height for local wind speed
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // If errors detected in input

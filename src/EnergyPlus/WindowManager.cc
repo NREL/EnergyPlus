@@ -4233,26 +4233,9 @@ namespace WindowManager {
 		// Based on ISO/DIS 15099, "Thermal Performance of Windows, Doors and Shading Devices --
 		// Detailed Calculations," 1/12/2000, Chapter 7, "Shading Devices."
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Argument array dimensioning
 		TGapNew.dim( 2 );
 		hcv.dim( 2 );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ConstrNumSh; // Shaded construction number
@@ -7539,15 +7522,6 @@ namespace WindowManager {
 		// "Solar-Thermal Window Blind Model for DOE-2," H. Simmler, U. Fischer and
 		// F. Winkelmann, Lawrence Berkeley National Laboratory, Jan. 1996.
 
-		// USE STATEMENTS:na
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:na
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		Array1D< Real64 > bld_pr( 15 ); // Slat properties
@@ -8862,27 +8836,6 @@ Label99999: ;
 
 		// METHODOLOGY EMPLOYED:
 		// Overwriting the default values
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-				//USE DataGlobals ,    ONLY: AnyEnergyManagementSystemInModel
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // If errors detected in input

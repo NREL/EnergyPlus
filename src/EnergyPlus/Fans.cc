@@ -77,6 +77,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -143,8 +144,6 @@ namespace Fans {
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyTdbFnHW;
 	using Psychrometrics::PsyCpAirFnWTdb;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
 	// Data
@@ -224,26 +223,8 @@ namespace Fans {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Fan component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanNum; // current fan number
@@ -337,30 +318,12 @@ namespace Fans {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using NodeInputManager::GetOnlySingleNode;
+		using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
 		using BranchNodeConnections::TestCompSet;
-
-		//    USE DataIPShortCuts
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::ScheduleAlwaysOn;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanNum; // The fan that you are currently loading input into
@@ -460,7 +423,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -508,7 +471,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -575,7 +538,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -689,7 +652,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 );
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 			Fan( FanNum ).AvailSchedName = cAlphaArgs( 2 );
@@ -793,7 +756,7 @@ namespace Fans {
 			FanNumericFields( FanNum ).FieldNames = "";
 			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
 
-			InputProcessor::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueFanNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Fan( FanNum ).FanName = cAlphaArgs( 1 ); // Fan name
 			Fan( FanNum ).FanType = cCurrentModuleObject;
 
@@ -2549,28 +2512,6 @@ namespace Fans {
 		// This subroutine sets an index for a given fan -- issues error message if that fan
 		// is not legal fan.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( GetFanInputFlag ) { //First time subroutine has been entered
 			GetFanInput();
 			GetFanInputFlag = false;
@@ -2705,26 +2646,6 @@ namespace Fans {
 		// This subroutine sets an integer type for a given fan -- issues error message if that fan
 		// is not a legal fan.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanIndex;
 
@@ -2770,28 +2691,8 @@ namespace Fans {
 		// incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		Real64 DesignVolumeFlowRate; // returned flow rate of matched fan
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichFan;
@@ -2839,28 +2740,8 @@ namespace Fans {
 		// incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int NodeNumber; // returned outlet node of matched fan
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichFan;
@@ -2903,28 +2784,8 @@ namespace Fans {
 		// incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int NodeNumber; // returned outlet node of matched fan
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichFan;
@@ -2967,28 +2828,8 @@ namespace Fans {
 		// incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int FanAvailSchPtr; // returned availability schedule pointer of matched fan
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichFan;
@@ -3031,28 +2872,8 @@ namespace Fans {
 		// incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
 		// as zero. If optional index argument is passed along with fan type and name, the index is set.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int FanSpeedRatioCurveIndex; // index to fan speed ratio curve object
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichFan;
@@ -3181,8 +3002,6 @@ namespace Fans {
 		//              Qdot,air = cp,air*rho,air*Vdot*deltaT
 
 		// REFERENCES: EnergyPlus Engineering Reference
-
-		// Using/Aliasing
 
 		// Return value
 		Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]

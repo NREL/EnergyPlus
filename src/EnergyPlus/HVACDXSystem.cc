@@ -126,8 +126,6 @@ namespace HVACDXSystem {
 	using namespace DataLoopNode;
 	using namespace DataGlobals;
 	using namespace DataHVACGlobals;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 
 	// Data
@@ -209,38 +207,15 @@ namespace HVACDXSystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages DXCoolingSystem component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DXCoils::SimDXCoil;
 		using DXCoils::SimDXCoilMultiSpeed;
 		using DXCoils::SimDXCoilMultiMode;
 		using General::TrimSigDigits;
 		using DataAirLoop::AirLoopControlInfo;
-
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using PackagedThermalStorageCoil::SimTESCoil;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DEFINITIONS:
-		// na
-
-		// FLOW:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of DXSystem:Airloop object
@@ -367,10 +342,8 @@ namespace HVACDXSystem {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-
 		// Using/Aliasing
-				using NodeInputManager::GetOnlySingleNode;
+		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -381,19 +354,6 @@ namespace HVACDXSystem {
 		using DXCoils::SetCoilSystemCoolingData;
 		using DXCoils::SetDXCoilTypeData;
 		using DXCoils::GetDXCoilIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXSystemNum; // The DXCoolingSystem that you are currently loading input into
@@ -856,14 +816,10 @@ namespace HVACDXSystem {
 		// METHODOLOGY EMPLOYED:
 		//  Data is moved from the System data structure to the System outlet nodes.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using namespace ScheduleManager;
 		using DataEnvironment::OutBaroPress;
 		using DataHVACGlobals::TempControlTol;
-
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::SolveRegulaFalsi;
@@ -881,19 +837,10 @@ namespace HVACDXSystem {
 		using PackagedThermalStorageCoil::SimTESCoil;
 		using PackagedThermalStorageCoil::ControlTESIceStorageTankCoil;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations for solver
 		Real64 const Acc( 1.e-3 ); // Accuracy of solver result
 		Real64 const HumRatAcc( 1.e-6 ); // Accuracy of solver result
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CompName; // Name of the DX cooling coil
@@ -2841,24 +2788,9 @@ namespace HVACDXSystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// After making sure get input is done, checks if the Coil System DX coil is in the
 		// OA System.  If exists then the DX cooling coil is 100% DOAS DX coil.
-		// METHODOLOGY EMPLOYED:
-		// na
-		// REFERENCES:
-		// na
+
 		// Using/Aliasing
-
 		using DXCoils::SetDXCoilTypeData;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoolSysNum;
@@ -2896,24 +2828,9 @@ namespace HVACDXSystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// After making sure get input is done, checks if the Coil System DX coil is in the
 		// OA System.  If exists then the DX cooling coil is 100% DOAS DX coil.
-		// METHODOLOGY EMPLOYED:
-		// na
-		// REFERENCES:
-		// na
+
 		// Using/Aliasing
-
 		using DXCoils::SetDXCoilTypeData;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DXCoolSysNum;

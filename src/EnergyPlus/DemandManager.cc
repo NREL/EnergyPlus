@@ -71,6 +71,7 @@
 #include <MixedAir.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <ScheduleManager.hh>
@@ -423,18 +424,9 @@ namespace DemandManager {
 
 		// Using/Aliasing
 		using DataGlobals::MinutesPerTimeStep;
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using OutputProcessor::EnergyMeters;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ListNum;
@@ -463,8 +455,8 @@ namespace DemandManager {
 			for ( ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				InputProcessor::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
-				// unique_string_blank_key_check
 				DemandManagerList( ListNum ).Name = AlphArray( 1 );
 
 				DemandManagerList( ListNum ).Meter = GetMeterIndex( AlphArray( 2 ) );
@@ -621,11 +613,6 @@ namespace DemandManager {
 
 		// Using/Aliasing
 		using DataGlobals::MinutesPerTimeStep;
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using DataHeatBalance::Lights;
@@ -637,10 +624,6 @@ namespace DemandManager {
 		using DataZoneControls::TStatObjects;
 		using General::RoundSigDigits;
 		using MixedAir::GetOAController;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumDemandMgrExtLights;
@@ -723,7 +706,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeExtLights;
@@ -821,7 +804,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeLights;
@@ -939,7 +922,7 @@ namespace DemandManager {
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeElecEquip;
@@ -1058,7 +1041,7 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeThermostats;
@@ -1183,7 +1166,7 @@ namespace DemandManager {
 
 				InputProcessor::GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				InputProcessor::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeVentilation;

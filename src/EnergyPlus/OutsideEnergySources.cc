@@ -76,6 +76,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -170,26 +171,6 @@ namespace OutsideEnergySources {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manage the simulation of district (aka purchased) energy.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		/////////// hoisted into namespace SimOutsideEnergyGetInputFlag ////////////
 		// static bool GetInputFlag( true ); // Get input once and once only
@@ -266,9 +247,6 @@ namespace OutsideEnergySources {
 		// METHODOLOGY EMPLOYED: to be determined...
 
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -276,19 +254,6 @@ namespace OutsideEnergySources {
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataSizing::AutoSize;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EnergySourceNum;
@@ -321,7 +286,7 @@ namespace OutsideEnergySources {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				InputProcessor::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";
@@ -378,7 +343,7 @@ namespace OutsideEnergySources {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				InputProcessor::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";

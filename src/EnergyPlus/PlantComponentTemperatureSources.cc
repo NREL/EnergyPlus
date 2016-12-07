@@ -147,25 +147,8 @@ namespace PlantComponentTemperatureSources {
 		//  gets the input for the models, initializes simulation variables, call
 		//  the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
 		using DataGlobals::BigNumber;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SourceNum; // HX number pointer
@@ -239,25 +222,12 @@ namespace PlantComponentTemperatureSources {
 		//  A5 ; \field Source Temperature Schedule Name
 
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataSizing::AutoSize;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SourceNum;

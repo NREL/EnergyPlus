@@ -388,22 +388,21 @@
 !  FW Wide Island Display with Solid Walls for Ice Cream,
 !  FW Wide Island Display with Solid Walls for Medium Temperature;
 !Example CaseAndWalkInList object
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Refrigeration:CaseAndWalkInList,
     NameofCaseList,          !- Name
-    A_Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Case or WalkIn 1a Name
-    B_Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Case or WalkIn 1b Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 1,  !- Case or WalkIn 1a Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 2,  !- Case or WalkIn 1b Name
     Multi-Deck Deli back,    !- Case or WalkIn 2 Name
-    A_Single Deck Club Case Merchandiser,  !- Case or WalkIn 3 Name
-    B_Single Deck Club Case Merchandiser,  !- Case or WalkIn 4 Name
-    A_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Case or WalkIn 5a Name
-    B_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Case or WalkIn 5b Name
-    C_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Case or WalkIn 5b Name
-    D_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Case or WalkIn 5b Name
-    A_Multi Deck Frozen Food Merchandiser,  !- Case or WalkIn 6a Name
-    B_Multi Deck Frozen Food Merchandiser,  !- Case or WalkIn 6b Name
+    Single Deck Club Case Merchandiser 1,  !- Case or WalkIn 3 Name
+    Single Deck Club Case Merchandiser 2,  !- Case or WalkIn 4 Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 1,  !- Case or WalkIn 5a Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 2,  !- Case or WalkIn 5b Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 3,  !- Case or WalkIn 5b Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 4,  !- Case or WalkIn 5b Name
+    Multi Deck Frozen Food Merchandiser 1,  !- Case or WalkIn 6a Name
+    Multi Deck Frozen Food Merchandiser 2,  !- Case or WalkIn 6b Name
     Wide Island Multi-Deck Deli/Meat Merchandiser,  !- Case or WalkIn 7 Name
     International Style Service Deli/Meat/Seafood Merchandiser;  !- Case or WalkIn 8 Name
 
@@ -414,7 +413,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    A_Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -543,7 +542,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    A_Single Deck Club Case Merchandiser,  !- Name
+    Single Deck Club Case Merchandiser 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -630,7 +629,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    B_Single Deck Club Case Merchandiser ,  !- Name
+    Single Deck Club Case Merchandiser 2 ,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -673,7 +672,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    A_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -716,7 +715,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    B_Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 2,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -759,7 +758,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    A_Multi Deck Frozen Food Merchandiser,  !- Name
+    Multi Deck Frozen Food Merchandiser 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -802,7 +801,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    B_Multi Deck Frozen Food Merchandiser,  !- Name
+    Multi Deck Frozen Food Merchandiser 2,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -845,7 +844,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    B_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 2,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -1060,7 +1059,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    C_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 3,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -1189,7 +1188,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    D_Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 4,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10520,7 +10519,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Convertible Island End. Low Profile Multi-Deck,   !- Name
+    Convertible Island End. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10563,7 +10562,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10606,7 +10605,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Convertible Island. Low Profile Multi-Deck,   !- Name
+    Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10649,7 +10648,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10692,7 +10691,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10735,7 +10734,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10778,7 +10777,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Unitized Convertible Island. Low Profile Multi-Deck,   !- Name
+    Unitized Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -10821,7 +10820,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Convertible Island. Low Profile Multi-Deck,   !- Name
+    Convertible Island. Low Profile Multi-Deck,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}

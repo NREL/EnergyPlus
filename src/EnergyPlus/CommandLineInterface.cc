@@ -152,15 +152,17 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Display help information", "-h", "--help");
 
-	opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
-
 	opt.add("Energy+.jdd", 0, 1, 0, "JSON input data dictionary path (default: Energy+.jdd in executable directory)", "-j", "--jdd");
+
+	opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
 
 	opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
 
 	opt.add("", 0, 1, 0, "Prefix for output file names (default: eplus)", "-p", "--output-prefix");
 
 	opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
+
+	opt.add("", 0, 0, 0, "Output IDF->JDF or JDF->IDF, dependent on input file type", "-c", "--convert");
 
 	opt.add("L", 0, 1, 0, "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: Dash (e.g., eplus-table.csv)", "-s", "--output-suffix");
 
@@ -190,15 +192,15 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-w")->getString(inputWeatherFileName);
 
-	opt.get("-i")->getString(inputIddFileName);
-
 	opt.get("-j")->getString(inputJddFileName);
 
-	if (!opt.isSet("-i") && !legacyMode)
-		inputIddFileName = exeDirectory + inputIddFileName;
+	opt.get("-i")->getString(inputIddFileName);
 
 	if (!opt.isSet("-j") && !legacyMode)
 		inputJddFileName = exeDirectory + inputJddFileName;
+
+	if (!opt.isSet("-i") && !legacyMode)
+		inputIddFileName = exeDirectory + inputIddFileName;
 
 	std::string dirPathName;
 
@@ -209,6 +211,8 @@ ProcessArgs(int argc, const char * argv[])
 	DDOnlySimulation = opt.isSet("-D");
 
 	AnnualSimulation = opt.isSet("-a");
+
+	outputJDFConversion = opt.isSet("-c");
 
 	// Process standard arguments
 	if (opt.isSet("-h")) {
@@ -224,16 +228,16 @@ ProcessArgs(int argc, const char * argv[])
 	if (opt.lastArgs.size() == 1) {
 		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
 			std::string const & arg( *opt.lastArgs[i] );
-			inputIdfFileName = arg;
+			inputFileName = arg;
 		}
 	}
-	if (opt.lastArgs.size() == 0) inputIdfFileName = "in.idf";
+	if (opt.lastArgs.size() == 0) inputFileName = "in.idf";
 
 	// Convert all paths to native paths
-	makeNativePath(inputIdfFileName);
+	makeNativePath(inputFileName);
 	makeNativePath(inputWeatherFileName);
-	makeNativePath(inputIddFileName);
 	makeNativePath(inputJddFileName);
+	makeNativePath(inputIddFileName);
 	makeNativePath(dirPathName);
 
 	std::vector<std::string> badOptions;
@@ -260,8 +264,20 @@ ProcessArgs(int argc, const char * argv[])
 		}
 	}
 
-	idfFileNameOnly = removeFileExtension(getFileName(inputIdfFileName));
-	idfDirPathName = getParentDirectoryPath(inputIdfFileName);
+	inputFileNameOnly = removeFileExtension(getFileName(inputFileName));
+	inputDirPathName = getParentDirectoryPath(inputFileName);
+
+	auto inputFileExt = getFileExtension( inputFileName );
+	std::transform( inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper );
+
+	if ( inputFileExt == "JDF" ) {
+		isJDF = true;
+	} else if ( inputFileExt == "IDF" ) {
+		isJDF = false;
+	} else {
+		DisplayString("ERROR: Input file must have IDF or JDF extension.");
+		exit(EXIT_FAILURE);
+	}
 
 	std::string weatherFilePathWithoutExtension = removeFileExtension(inputWeatherFileName);
 
@@ -281,6 +297,8 @@ ProcessArgs(int argc, const char * argv[])
 		// Create directory if it doesn't already exist
 		makeDirectory(dirPathName);
 	}
+
+	outputDirPathName = dirPathName;
 
 	// File naming scheme
 	std::string outputFilePrefix;
@@ -405,7 +423,7 @@ ProcessArgs(int argc, const char * argv[])
 	EnergyPlusIniFileName = "Energy+.ini";
 	inStatFileName = weatherFilePathWithoutExtension + ".stat";
 	TarcogIterationsFileName = "TarcogIterations.dbg";
-	eplusADSFileName = idfDirPathName+"eplusADS.inp";
+	eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
 	// Readvars files
 	outputCsvFileName = outputFilePrefix + normalSuffix + ".csv";
@@ -488,18 +506,12 @@ ProcessArgs(int argc, const char * argv[])
 
 		gio::close( LFN );
 
-		inputIddFileName = ProgramPath + "Energy+.idd";
 		inputJddFileName = ProgramPath + "Energy+.jdd";
+
+		inputIddFileName = ProgramPath + "Energy+.idd";
 	}
 
 	// Check if specified files exist
-	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
-	if ( ! FileExists ) {
-		DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
-		DisplayString(errorFollowUp);
-		exit(EXIT_FAILURE);
-	}
-
 	{ IOFlags flags; gio::inquire( inputJddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
 		DisplayString("ERROR: Could not find JSON input data dictionary: " + getAbsolutePath(inputJddFileName) + "." );
@@ -507,9 +519,16 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	{ IOFlags flags; gio::inquire( inputIdfFileName, flags ); FileExists = flags.exists(); }
+	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputIdfFileName) + "." );
+		DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
+		DisplayString(errorFollowUp);
+		exit(EXIT_FAILURE);
+	}
+
+	{ IOFlags flags; gio::inquire( inputFileName, flags ); FileExists = flags.exists(); }
+	if ( ! FileExists ) {
+		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + "." );
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
@@ -530,6 +549,8 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	//TODO: might be able to convert JDF->IDF, run preprocessors, then go back IDF->JDF
+
 	// Preprocessors (These will likely move to a new file)
 	if (runEPMacro) {
 		std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
@@ -540,15 +561,15 @@ ProcessArgs(int argc, const char * argv[])
 		}
 		std::string epMacroCommand = "\"" + epMacroPath + "\"";
 		bool inputFileNamedIn =
-				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.imf"));
+				(getAbsolutePath(inputFileName) == getAbsolutePath("in.imf"));
 
-		if (!inputFileNamedIn) linkFile(inputIdfFileName.c_str(), "in.imf");
+		if (!inputFileNamedIn) linkFile(inputFileName.c_str(), "in.imf");
 		DisplayString("Running EPMacro...");
 		systemCall(epMacroCommand);
 		if (!inputFileNamedIn) removeFile("in.imf");
 		moveFile("audit.out",outputEpmdetFileName);
 		moveFile("out.idf",outputEpmidfFileName);
-	   inputIdfFileName = outputEpmidfFileName;
+		inputFileName = outputEpmidfFileName;
 	}
 
 	if (runExpandObjects) {
@@ -560,20 +581,15 @@ ProcessArgs(int argc, const char * argv[])
 		}
 		std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
 		bool inputFileNamedIn =
-				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.idf"));
+				(getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
 
 		bool iddFileNamedEnergy =
 				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 
-		bool jddFileNamedEnergy =
-				(getAbsolutePath(inputJddFileName) == getAbsolutePath("Energy+.jdd"));
-
 		if (!inputFileNamedIn)
-			linkFile(inputIdfFileName.c_str(), "in.idf");
+			linkFile(inputFileName.c_str(), "in.idf");
 		if (!iddFileNamedEnergy)
 			linkFile(inputIddFileName,"Energy+.idd");
-		if (!jddFileNamedEnergy)
-			linkFile(inputJddFileName,"Energy+.jdd");
 		systemCall(expandObjectsCommand);
 		if (!inputFileNamedIn)
 			removeFile("in.idf");
@@ -583,7 +599,7 @@ ProcessArgs(int argc, const char * argv[])
 		{ IOFlags flags; gio::inquire( "expanded.idf", flags ); FileExists = flags.exists(); }
 		if (FileExists) {
 			moveFile("expanded.idf", outputExpidfFileName);
-		    inputIdfFileName = outputExpidfFileName;
+		    inputFileName = outputExpidfFileName;
 		}
 	}
 

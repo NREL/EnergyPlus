@@ -624,11 +624,11 @@
     Simple Electric Load Center,  !- Name
     PV list,                 !- Generator List Name
     Baseload,                !- Generator Operation Scheme Type
-    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Track Schedule Name Scheme Schedule Name
-    ,                        !- Track Meter Scheme Meter Name
+    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
+    ,                        !- Generator Track Schedule Name Scheme Schedule Name
+    ,                        !- Generator Track Meter Scheme Meter Name
     DirectCurrentWithInverter,  !- Electrical Buss Type
-    Simple Ideal Inverter;   !- Inverter Object Name
+    Simple Ideal Inverter;   !- Inverter Name
 
   ElectricLoadCenter:Inverter:Simple,
     Simple Ideal Inverter,   !- Name

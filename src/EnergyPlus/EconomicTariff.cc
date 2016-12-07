@@ -94,7 +94,7 @@ namespace EconomicTariff {
 	//    Compute utility bills for a building based on energy
 	//    use estimate.
 	using namespace DataPrecisionGlobals;
-		using ScheduleManager::GetScheduleIndex;
+	using ScheduleManager::GetScheduleIndex;
 
 	//ECONOMCIS:TARIFF enumerated lists
 

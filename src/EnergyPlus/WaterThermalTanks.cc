@@ -417,16 +417,12 @@ namespace WaterThermalTanks {
 
 		// Using/Aliasing
 		using DataGlobals::KickOffSimulation;
-
 		using DataSizing::DataNonZoneNonAirloopValue;
 		using IntegratedHeatPump::IntegratedHeatPumps;
 		using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
 		using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
 		using IntegratedHeatPump::GetCurWorkMode;
 		using IntegratedHeatPump::IHPOperationMode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyOneTimeFlagWH; // first pass log
@@ -665,6 +661,10 @@ namespace WaterThermalTanks {
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankType = CompType;
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankName = CompName;
 				IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).WHtankID = CompIndex;
+				if ( present( LoopNum ) ) {
+					IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).LoopNum = LoopNum;
+					IntegratedHeatPumps( HPWaterHeater( CompNum ).DXCoilNum ).LoopSideNum = LoopSideNum;
+				}
 
 
 				IHPMode = GetCurWorkMode( HPWaterHeater( CompNum ).DXCoilNum );
@@ -806,12 +806,8 @@ namespace WaterThermalTanks {
 		// The necessary control flags and dummy variables are set and passed into SimWaterHeater.
 
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using DataGlobals::DoingSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool LocalRunFlag; // local variables of similar name as others used in Sim modules
@@ -2365,7 +2361,7 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterHeaterMixed; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
@@ -2797,7 +2793,7 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - NumWaterHeaterMixed, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
@@ -2886,8 +2882,16 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 = rNumericArgs( 7 );
 
+					// adjust tank height used in these calculations for testing heater height
+					Real64 tankHeightForTesting = 0.0;
+					if ( WaterThermalTank( WaterThermalTankNum ).Shape == TankShapeHorizCylinder ) {
+						tankHeightForTesting = 2.0 * sqrt( ( WaterThermalTank( WaterThermalTankNum ).Volume / WaterThermalTank( WaterThermalTankNum ).Height ) / DataGlobals::Pi );
+					} else {
+						tankHeightForTesting = WaterThermalTank( WaterThermalTankNum ).Height;
+					}
+
 					//Test if Heater height is within range
-					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > tankHeightForTesting ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 1 is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 7 ) + " = " + RoundSigDigits( rNumericArgs( 7 ), 4 ) );
@@ -2915,7 +2919,7 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 = rNumericArgs( 10 );
 
 					//Test if Heater height is within range
-					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( !WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > tankHeightForTesting ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 2 is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 10 ) + " = " + RoundSigDigits( rNumericArgs( 10 ), 4 ) );
@@ -3339,7 +3343,7 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + NumWaterHeaterStratified + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
@@ -3551,7 +3555,7 @@ namespace WaterThermalTanks {
 				for ( WaterThermalTankNum = NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + 1; WaterThermalTankNum <= NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + NumChilledWaterStratified; ++WaterThermalTankNum ) {
 
 					InputProcessor::GetObjectItem( cCurrentModuleObject, WaterThermalTankNum - ( NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed ), cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueWaterThermalTankNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					WaterThermalTank( WaterThermalTankNum ).Name = cAlphaArgs( 1 );
 					WaterThermalTank( WaterThermalTankNum ).Type = cCurrentModuleObject;
@@ -4935,7 +4939,6 @@ namespace WaterThermalTanks {
 		using DataSizing::CurZoneEqNum;
 		using DataSizing::ZoneEqSizing;
 		using DataSizing::DataNonZoneNonAirloopValue;
-
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -4950,9 +4953,6 @@ namespace WaterThermalTanks {
 		using Fans::GetFanVolFlow;
 		using IntegratedHeatPump::SizeIHP;
 		using IntegratedHeatPump::IntegratedHeatPumps;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UseInletNode; // Water heater use inlet node number
@@ -5540,7 +5540,7 @@ namespace WaterThermalTanks {
 				SizeIHP( HPWaterHeater( HPNum ).DXCoilNum );//
 				//SimIHP(BlankString, HPWaterHeater(HPNum).DXCoilNum,
 				//	0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
-				VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCDWHCoolCoilIndex;
+				VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCWHCoilIndex;
 				HPWaterHeater( HPNum ).NumofSpeed = VarSpeedCoil( VSCoilID ).NumOfSpeeds;
 
 			}
@@ -5558,7 +5558,7 @@ namespace WaterThermalTanks {
 
 			if ( HPWaterHeater( HPNum ).NumofSpeed > 0 ) {
 
-				if ( HPWaterHeater( HPNum ).bIsIHP ) VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCDWHCoolCoilIndex;
+				if ( HPWaterHeater( HPNum ).bIsIHP ) VSCoilID = IntegratedHeatPumps( HPWaterHeater( HPNum ).DXCoilNum ).SCWHCoilIndex;
 				else VSCoilID = HPWaterHeater( HPNum ).DXCoilNum;
 
 				// scale air flow rates
@@ -6564,6 +6564,7 @@ namespace WaterThermalTanks {
 		Real64 Qunmet; // The difference between Qneeded and Qheater (W)
 		Real64 Qvent; // Heating rate due to venting because tank exceeded max temperature limit (W)
 		Real64 Qfuel; // Heating rate for fuel consumed (W)
+		Real64 Qusl; // Quse + Qsource + Qloss
 		Real64 UseInletTemp; // Use side inlet temperature (C)
 		Real64 UseMassFlowRate; // Use side flow rate, including effectiveness factor (kg/s)
 		Real64 SourceInletTemp; // Source side inlet temperature (C)
@@ -6650,6 +6651,7 @@ namespace WaterThermalTanks {
 		} else {
 			Cp = GetSpecificHeatGlycol( fluidNameWater, Tank.TankTemp, DummyWaterIndex, RoutineName );
 		}
+		Real64 const dt_Cp( dt / Cp );
 
 		TempUp = 0.0;
 		TempDn = 0.0;
@@ -6675,7 +6677,9 @@ namespace WaterThermalTanks {
 		if ( Tank.InletMode == InletModeFixed ) CalcNodeMassFlows( WaterThermalTankNum, InletModeFixed );
 
 		TimeRemaining = SecInTimeStep;
-		while ( TimeRemaining > 0.0 ) {
+		Real64 & tank_node1_newTemp( Tank.Node( 1 ).NewTemp );
+		Real64 const & tank_useOutletStratNode_temp( Tank.Node( Tank.UseOutletStratNode ).Temp );
+		while ( TimeRemaining > 0.0 ) { //? Might be good to use a check that is tolerant to some epsilon * dt to avoid an extra pass due to roundoff when subtracting dt (if dt is ever not a value with an exact floating point representation)
 
 			if ( Tank.InletMode == InletModeSeeking ) CalcNodeMassFlows( WaterThermalTankNum, InletModeSeeking );
 
@@ -6683,8 +6687,7 @@ namespace WaterThermalTanks {
 
 				// Control the first heater element (master)
 				if ( Tank.MaxCapacity > 0.0 ) {
-					NodeNum = Tank.HeaterNode1;
-					NodeTemp = Tank.Node( NodeNum ).Temp;
+					NodeTemp = Tank.Node( Tank.HeaterNode1 ).Temp;
 
 					if ( Tank.HeaterOn1 ) {
 						if ( NodeTemp >= SetPointTemp1 ) {
@@ -6712,8 +6715,7 @@ namespace WaterThermalTanks {
 						Tank.HeaterOn2 = false;
 
 					} else {
-						NodeNum = Tank.HeaterNode2;
-						NodeTemp = Tank.Node( NodeNum ).Temp;
+						NodeTemp = Tank.Node( Tank.HeaterNode2 ).Temp;
 
 						if ( Tank.HeaterOn2 ) {
 							if ( NodeTemp >= SetPointTemp2 ) {
@@ -6741,11 +6743,12 @@ namespace WaterThermalTanks {
 				Qheater2 = 0.0;
 
 			}
+			Real64 const Qheaters( Qheater1 + Qheater2 );
 
 			if ( Tank.HeaterOn1 || Tank.HeaterOn2 ) {
 				Runtime += dt;
 
-				Qfuel = ( Qheater1 + Qheater2 ) / Tank.Efficiency;
+				Qfuel = Qheaters / Tank.Efficiency;
 				Qoncycfuel = Tank.OnCycParaLoad;
 				Qoffcycfuel = 0.0;
 			} else {
@@ -6755,12 +6758,13 @@ namespace WaterThermalTanks {
 			}
 
 			// Loop through all nodes and simulate heat balance
-			for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
-				NodeMass = Tank.Node( NodeNum ).Mass;
-				NodeTemp = Tank.Node( NodeNum ).Temp;
+			for ( int NodeNum = 1, nTankNodes = Tank.Nodes; NodeNum <= nTankNodes; ++NodeNum ) {
+				auto & tank_node( Tank.Node( NodeNum ) );
+				NodeMass = tank_node.Mass;
+				NodeTemp = tank_node.Temp;
 
-				UseMassFlowRate = Tank.Node( NodeNum ).UseMassFlowRate * Tank.UseEffectiveness;
-				SourceMassFlowRate = Tank.Node( NodeNum ).SourceMassFlowRate * Tank.SourceEffectiveness;
+				UseMassFlowRate = tank_node.UseMassFlowRate * Tank.UseEffectiveness;
+				SourceMassFlowRate = tank_node.SourceMassFlowRate * Tank.SourceEffectiveness;
 
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
@@ -6774,11 +6778,11 @@ namespace WaterThermalTanks {
 						}
 					} else {
 						assert( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped );
-						Qsource = Qheatpump * Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac;
+						Qsource = Qheatpump * tank_node.HPWHWrappedCondenserHeatingFrac;
 					}
 				} else {
 					// Constant temperature source side flow
-					Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - Tank.Node( NodeNum ).Temp );
+					Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
 				}
 
 				InvMixUp = 0.0;
@@ -6786,64 +6790,67 @@ namespace WaterThermalTanks {
 					TempUp = Tank.Node( NodeNum - 1 ).Temp;
 					if ( TempUp < NodeTemp ) InvMixUp = Tank.InversionMixingRate;
 				}
+//BUG? When NodeNum==1 TempUp is 0.0   Shouldn't it be NodeTemp to void the vertical conduction? !!!!!!!!!!!!!!!!!
+				Real64 const delTempUp( TempUp - NodeTemp );
 
 				InvMixDn = 0.0;
-				if ( NodeNum < Tank.Nodes ) {
+				if ( NodeNum < nTankNodes ) {
 					TempDn = Tank.Node( NodeNum + 1 ).Temp;
 					if ( TempDn > NodeTemp ) InvMixDn = Tank.InversionMixingRate;
 				}
+				Real64 const delTempDn( TempDn - NodeTemp );
 
 				// Heat transfer due to vertical conduction between nodes
-				Qcond = Tank.Node( NodeNum ).CondCoeffUp * ( TempUp - NodeTemp ) + Tank.Node( NodeNum ).CondCoeffDn * ( TempDn - NodeTemp );
+				Qcond = tank_node.CondCoeffUp * delTempUp + tank_node.CondCoeffDn * delTempDn;
 
 				// Heat transfer due to fluid flow between inlet and outlet nodes
-				Qflow = Tank.Node( NodeNum ).MassFlowFromUpper * Cp * ( TempUp - NodeTemp ) + Tank.Node( NodeNum ).MassFlowFromLower * Cp * ( TempDn - NodeTemp );
+				Qflow = Cp * ( tank_node.MassFlowFromUpper * delTempUp + tank_node.MassFlowFromLower * delTempDn );
 
 				// Heat transfer due to temperature inversion mixing between nodes
-				Qmix = InvMixUp * Cp * ( TempUp - NodeTemp ) + InvMixDn * Cp * ( TempDn - NodeTemp );
+				Qmix = Cp * ( InvMixUp * delTempUp + InvMixDn * delTempDn );
 
 				if ( Tank.HeaterOn1 || Tank.HeaterOn2 ) {
-					LossCoeff = Tank.Node( NodeNum ).OnCycLossCoeff;
+					LossCoeff = tank_node.OnCycLossCoeff;
 					Qloss = LossCoeff * ( AmbientTemp - NodeTemp );
-					Qlosszone = Qloss * Tank.SkinLossFracToZone;
-					Qoncycheat = Tank.Node( NodeNum ).OnCycParaLoad * Tank.OnCycParaFracToTank;
+					Qheat = Qoncycheat = tank_node.OnCycParaLoad * Tank.OnCycParaFracToTank;
+					Qusl = Quse + Qsource + Qloss;
 
-					Qneeded = max( -Quse - Qsource - Qloss - Qoncycheat, 0.0 );
+					Qneeded = max( -Qusl - Qoncycheat, 0.0 );
 
-					Qheat = Qoncycheat;
-					if ( NodeNum == Tank.HeaterNode1 ) Qheat += Qheater1;
-					if ( NodeNum == Tank.HeaterNode2 ) Qheat += Qheater2;
+					if ( NodeNum == Tank.HeaterNode1 ) {
+						Qheat += Qheater1;
+					} else if ( NodeNum == Tank.HeaterNode2 ) {
+						Qheat += Qheater2;
+					}
 				} else {
-					LossCoeff = Tank.Node( NodeNum ).OffCycLossCoeff;
+					LossCoeff = tank_node.OffCycLossCoeff;
 					Qloss = LossCoeff * ( AmbientTemp - NodeTemp );
-					Qlosszone = Qloss * Tank.SkinLossFracToZone;
-					Qoffcycheat = Tank.Node( NodeNum ).OffCycParaLoad * Tank.OffCycParaFracToTank;
+					Qheat = Qoffcycheat = tank_node.OffCycParaLoad * Tank.OffCycParaFracToTank;
+					Qusl = Quse + Qsource + Qloss;
 
-					Qneeded = max( -Quse - Qsource - Qloss - Qoffcycheat, 0.0 );
-					Qheat = Qoffcycheat;
+					Qneeded = max( -Qusl - Qoffcycheat, 0.0 );
 				}
 
-				Qunmet = max( Qneeded - Qheater1 - Qheater2, 0.0 );
+				Qunmet = max( Qneeded - Qheaters, 0.0 );
 
 				// Calculate node heat balance
-				Tank.Node( NodeNum ).NewTemp = NodeTemp + ( Quse + Qsource + Qcond + Qflow + Qmix + Qloss + Qheat ) * dt / ( NodeMass * Cp );
+				tank_node.NewTemp = NodeTemp + ( Qusl + Qcond + Qflow + Qmix + Qheat ) * dt_Cp / NodeMass;
 
 				if ( !Tank.IsChilledWaterTank ) {
-					if ( ( NodeNum == 1 ) && ( Tank.Node( 1 ).NewTemp > MaxTemp ) ) {
-						Event += NodeMass * Cp * ( MaxTemp - Tank.Node( 1 ).NewTemp );
-						Tank.Node( 1 ).NewTemp = MaxTemp;
+					if ( ( NodeNum == 1 ) && ( tank_node1_newTemp > MaxTemp ) ) {
+						Event += NodeMass * ( MaxTemp - tank_node1_newTemp );
+						tank_node1_newTemp = MaxTemp;
 					}
 				}
 
-				Esource += Qsource * dt;
-				Eloss += Qloss * dt;
-				Elosszone += Qlosszone * dt;
-				Eneeded += Qneeded * dt;
-				Eunmet += Qunmet * dt;
+				Esource += Qsource;
+				Eloss += Qloss;
+				Eneeded += Qneeded;
+				Eunmet += Qunmet;
 
 			} // NodeNum
 
-			Euse += UseMassFlowRate * Cp * ( UseInletTemp - Tank.Node( Tank.UseOutletStratNode ).Temp ) * dt;
+			Euse += Tank.UseMassFlowRate * ( UseInletTemp - tank_useOutletStratNode_temp );
 
 			// Calculation for standard ratings
 			if ( !Tank.FirstRecoveryDone ) {
@@ -6860,6 +6867,15 @@ namespace WaterThermalTanks {
 			TimeRemaining -= dt;
 
 		} // TimeRemaining > 0.0
+
+		// Finalize accumulated values
+		Event *= Cp;
+		Esource *= dt;
+		Eloss *= dt;
+		Elosszone = Eloss * Tank.SkinLossFracToZone;
+		Eneeded *= dt;
+		Eunmet *= dt;
+		Euse *= Cp * dt;
 
 		Eheater1 = Tank.MaxCapacity * Runtime1;
 		Eheater2 = Tank.MaxCapacity2 * Runtime2;
@@ -8686,15 +8702,8 @@ namespace WaterThermalTanks {
 		//  Calls CalcWaterThermalTankMixed to get tank temperature at the given part load ratio (source water mass flow rate)
 		//  and calculates the residual as defined above
 
-		// REFERENCES:
-
-		// USE STATEMENTS:
-		// Using/Aliasing
-
 		// Return value
 		Real64 PLRResidualMixedTank;
-
-		// Argument array dimensioning
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8702,15 +8711,6 @@ namespace WaterThermalTanks {
 		// par(3) = water heater num
 		// par(4) = FirstHVACIteration
 		// par(5) = MdotWater
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		//  na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WaterThermalTankNum; // index of water heater
@@ -9433,7 +9433,6 @@ namespace WaterThermalTanks {
 		// BA benchmark report for residential design mode
 
 		// Using/Aliasing
-
 		using DataHeatBalance::Zone;
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -9446,18 +9445,10 @@ namespace WaterThermalTanks {
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeTankForDemandSide" );
 		Real64 const GalTocubicMeters( 0.0037854 );
 		Real64 const kBtuPerHrToWatts( 293.1 );
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tstart; // initial tank temp for sizing.
@@ -10174,33 +10165,20 @@ namespace WaterThermalTanks {
 		// METHODOLOGY EMPLOYED:
 		// same as for plant connected water heaters, only draws are scheduled.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSizing::AutoSize;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using ScheduleManager::GetScheduleMaxValue;
-
 		using DataHeatBalance::Zone;
 		using SolarCollectors::Collector;
 		using SolarCollectors::NumOfCollectors;
 		using DataSurfaces::Surface;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const GalTocubicMeters( 0.0037854 );
 		Real64 const kBtuPerHrToWatts( 293.1 );
 		static std::string const RoutineName( "SizeStandAloneWaterHeater" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 tmpTankVolume; // local temporary for tank volume m3
@@ -10617,7 +10595,6 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::CycFanCycCoil;
 		using namespace OutputReportPredefined;
 		using General::TrimSigDigits;
-
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using VariableSpeedCoils::VSHPWHHeatingCapacity;
@@ -10626,10 +10603,6 @@ namespace WaterThermalTanks {
 
 		// Locals
 		Real64 MdotAir; // air mass flow rate through HP water heater evaporator (kg/s)
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TotalDrawMass; // Total mass of hot water drawn during the test (kg), equivalent to 64.3 gallons

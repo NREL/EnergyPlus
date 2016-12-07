@@ -62,7 +62,7 @@ option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
-option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" OFF )
+option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
 option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
@@ -131,12 +131,13 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
+INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/jsoncpp)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/doj)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/nlohmann)
-INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
+INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus )  # so that any source can #include <ConfiguredFunctions.hh>
+
+#### Create interface for JSON for Modern C++ so we can include it in targets
+add_library( ModernJSON INTERFACE )
+target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
@@ -156,7 +157,6 @@ ADD_SUBDIRECTORY(third_party/DElight)
 IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
-ADD_SUBDIRECTORY(third_party/jsoncpp)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
@@ -165,7 +165,6 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
-  ADD_SUBDIRECTORY(tst/jsoncpp/unit)
 
   option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
 

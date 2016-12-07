@@ -1548,27 +1548,8 @@ namespace General {
 		// This subroutine will process a date from a string and determine
 		// the proper month and day for that date string.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using namespace DataStringGlobals;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FstNum;
@@ -1642,15 +1623,6 @@ namespace General {
 		// Delete everything that is extraneous to the date information needed.  Process what
 		// is left.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static int const NumSingleChars( 3 );
 		static Array1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
@@ -1659,12 +1631,6 @@ namespace General {
 		static Array1D_string const Months( 12, { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
 		static Array1D_string const Weekdays( 7, { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
 		static std::string const Numbers( "0123456789" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentString;
@@ -1856,25 +1822,8 @@ namespace General {
 		// This subroutine validates a potential Day, Month values, produces an error
 		// message when not valid, and sets error flag.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_int const EndMonthDay( 12, { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool InternalError;
@@ -3059,17 +3008,8 @@ namespace General {
 		// First time routine is called, all the viable combinations/settings for the reports are
 		// stored in SAVEd variables.  Later callings will retrieve those.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
-
-
 		using DataRuntimeLanguage::OutputFullEMSTrace;
 		using DataRuntimeLanguage::OutputEMSErrors;
 		using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
@@ -3077,18 +3017,6 @@ namespace General {
 		using DataRuntimeLanguage::OutputEMSInternalVarsFull;
 		using DataRuntimeLanguage::OutputEMSInternalVarsSmall;
 		using DataGlobals::ShowDecayCurvesInEIO;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumReports;

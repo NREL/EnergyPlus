@@ -191,31 +191,12 @@ namespace WaterToAirHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Water to Air Heat Pump component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using FluidProperties::FindGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		//shut off after compressor cycle off  [s]
 		//cycling fan/cycling compressor
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HPNum; // The WatertoAirHP that you are currently loading input into
@@ -286,11 +267,8 @@ namespace WaterToAirHeatPump {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using namespace NodeInputManager;
+		using namespace NodeInputManager;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::CheckFluidPropertyName;
 		using FluidProperties::FindGlycol;
@@ -298,18 +276,8 @@ namespace WaterToAirHeatPump {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace OutputReportPredefined;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetWatertoAirHPInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HPNum; // The Water to Air HP that you are currently loading input into
@@ -881,12 +849,8 @@ namespace WaterToAirHeatPump {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Simulates a parameter estimation based water to air heat pump model
 
-		// USE STATEMENTS:
-		// na
-
 		// Using/Aliasing
 		using namespace FluidProperties;
-		//  USE DataZoneEnergyDemands
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveIndex;
 		using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
@@ -897,11 +861,7 @@ namespace WaterToAirHeatPump {
 		using Psychrometrics::PsyTsatFnHPb;
 		using General::RoundSigDigits;
 		using General::SolveRegulaFalsi;
-
 		using DataPlant::PlantLoop;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const CpWater( 4210.0 ); // Specific heat of water J/kg_C
@@ -923,12 +883,6 @@ namespace WaterToAirHeatPump {
 		static std::string const RoutineNameCompressInletTemp( "CalcWatertoAirHPCooling:CompressInletTemp" );
 		static std::string const RoutineNameSuctionPr( "CalcWatertoAirHPCooling:SuctionPr" );
 		static std::string const RoutineNameCompSuctionTemp( "CalcWatertoAirHPCooling:CompSuctionTemp");
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//      INTEGER                :: NumIteration1            ! Number of Iteration1
@@ -2382,30 +2336,11 @@ namespace WaterToAirHeatPump {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
 
-
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;

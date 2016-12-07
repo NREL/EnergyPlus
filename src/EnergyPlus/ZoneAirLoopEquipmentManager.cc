@@ -120,8 +120,6 @@ namespace ZoneAirLoopEquipmentManager {
 	using DataHVACGlobals::FirstTimeStepSysFlag;
 	using namespace DataDefineEquip;
 
-	// Use statements for access to subroutines in other modules
-
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	bool MyOneTimeFlag( true );
@@ -535,30 +533,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is left for Module format consistency -- not needed in this module.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// using DataSizing::FinalZoneSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Do the Begin Simulation initializations
 		if ( InitAirDistUnitsFlag ) {

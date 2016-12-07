@@ -579,7 +579,7 @@ namespace FourPipeBeam {
 		// Using
 		using DataEnvironment::StdRhoAir;
 		using namespace DataSizing;
-				using PlantUtilities::RegisterPlantCompDesignFlow;
+		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;

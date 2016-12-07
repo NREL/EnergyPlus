@@ -354,6 +354,10 @@ namespace OutputReportPredefined {
 	extern int pdchDCVventMechName;
 	extern int pdchDCVperPerson;
 	extern int pdchDCVperArea;
+	extern int pdchDCVperZone;
+	extern int pdchDCVperACH;
+	extern int pdchDCVMethod;
+	extern int pdchDCVOASchName;
 
 	//added for new DCV
 	extern int pdchDCVZoneADEffCooling;

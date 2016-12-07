@@ -265,18 +265,6 @@ namespace HeatBalanceHAMTManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// gets input for the HAMT model
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const cHAMTObject1( "MaterialProperty:HeatAndMoistureTransfer:Settings" );
 		static std::string const cHAMTObject2( "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm" );
@@ -285,12 +273,6 @@ namespace HeatBalanceHAMTManager {
 		static std::string const cHAMTObject5( "MaterialProperty:HeatAndMoistureTransfer:Diffusion" );
 		static std::string const cHAMTObject6( "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity" );
 		static std::string const cHAMTObject7( "SurfaceProperties:VaporCoefficients" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

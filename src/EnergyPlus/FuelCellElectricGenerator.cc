@@ -157,24 +157,8 @@ namespace FuelCellElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -232,16 +216,8 @@ namespace FuelCellElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataGenerators;
-
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using NodeInputManager::GetOnlySingleNode;
@@ -252,9 +228,6 @@ namespace FuelCellElectricGenerator {
 		using General::RoundSigDigits;
 		using DataGlobals::DisplayAdvancedReportVariables;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// PARAMETERS
 
 		//LOCAL VARIABLES
 		int GeneratorNum; // Generator counter
@@ -3607,35 +3580,10 @@ namespace FuelCellElectricGenerator {
 		// makes sure input are gotten and setup from Plant loop perspective.
 		// does not (re)simulate entire FuelCell model
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
-
 		using DataPlant::TypeOf_Generator_FCExhaust;
 		using DataPlant::TypeOf_Generator_FCStackCooler;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// INTEGER, INTENT(IN)          :: FlowLock !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetFuelCellInput ) {
 
@@ -3890,25 +3838,6 @@ namespace FuelCellElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// This routine adds up the various skin losses and then
 		//  sets the values in the ZoneIntGain structure
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused  INTEGER :: thisZone ! index in Zone structure array

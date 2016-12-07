@@ -128,7 +128,6 @@ namespace HVACCooledBeam {
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -183,27 +182,8 @@ namespace HVACCooledBeam {
 		// Manages the simulation of a cooled beam unit.
 		// Called from SimZoneAirLoopEquipment in module ZoneAirLoopEquipmentManager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CBNum; // index of cooled beam unit being simulated
@@ -268,15 +248,7 @@ namespace HVACCooledBeam {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
@@ -287,21 +259,8 @@ namespace HVACCooledBeam {
 		using WaterCoils::GetCoilWaterInletNode;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetCoolBeams " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		int CBIndex; // loop index
 		int CBNum; // current fan coil number
@@ -478,7 +437,6 @@ namespace HVACCooledBeam {
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataDefineEquip::AirDistUnit;
-
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CooledBeamAirTerminal;
@@ -630,7 +588,7 @@ namespace HVACCooledBeam {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-				using DataGlobals::AutoCalculate;
+		using DataGlobals::AutoCalculate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using FluidProperties::GetDensityGlycol;

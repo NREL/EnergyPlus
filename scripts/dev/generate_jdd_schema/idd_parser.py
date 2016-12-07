@@ -366,6 +366,10 @@ def parse_field(data, token):
             default = parse_number(data)
             if default is None:
                 default = parse_line(data)
+                if default.lower() == 'autocalculate':
+                    default = 'Autocalculate'
+                elif default.lower() == 'autosize':
+                    default = 'Autosize'
             if 'default' in root:
                 raise RuntimeError("cannot have two defaults at " + default)
             else:
@@ -449,10 +453,14 @@ def parse_field(data, token):
             eat_comment(data)
 
         elif token == TOKEN_A or token == TOKEN_N or token == TOKEN_END or token == TOKEN_STRING:
+            has_default = 'default' in root
             if is_autocalculatable:
-                create_any_of(root, TOKEN_AUTOCALCULATABLE)
+                create_any_of(root, TOKEN_AUTOCALCULATABLE, has_default)
             elif is_autosizable:
-                create_any_of(root, TOKEN_AUTOSIZABLE)
+                create_any_of(root, TOKEN_AUTOSIZABLE, has_default)
+            if 'enum' in root and has_default:
+                root['enum'].insert(0, '')
+                root['enum'].sort()
             return root
 
 
@@ -483,7 +491,7 @@ def parse_extensibles(items, field_data, field_name):
     items['properties'][field_name] = field_data
 
 
-def create_any_of(root, token):
+def create_any_of(root, token, has_default):
     root['anyOf'] = [{}, {}]
 
     if 'type' in root:
@@ -499,10 +507,14 @@ def create_any_of(root, token):
     if 'exclusiveMaximum' in root:
         root['anyOf'][0]['exclusiveMaximum'] = root.pop('exclusiveMaximum')
 
+    enum_list = []
+    if has_default:
+        enum_list.append('')
     if token == TOKEN_AUTOCALCULATABLE:
-        root['anyOf'][1] = {'type': 'string', 'enum': ['Autocalculate']}
+        enum_list.append('Autocalculate')
     else:
-        root['anyOf'][1] = {'type': 'string', 'enum': ['Autosize']}
+        enum_list.append('Autosize')
+    root['anyOf'][1] = {'type': 'string', 'enum': enum_list}
 
 
 def look_ahead(data):

@@ -551,34 +551,15 @@ namespace SolarShading {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the Shadowing Calculation object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
 		using DataSystemVariables::SutherlandHodgman;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumItems;
@@ -9679,31 +9660,17 @@ namespace SolarShading {
 		// 3. surface absorptances, reflectances, and transmittances
 		// determined here using revised code from SUBROUTINE InitIntSolarDistribution
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using General::InterpSw;
 		using General::InterpSlatAng;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using namespace DataViewFactorInformation;
-
 		using DataHeatBalSurface::InitialDifSolInAbs;
 		using DataHeatBalSurface::InitialDifSolInTrans;
 		using DataHeatBalance::InitialDifSolwinAbs;
 		using DataHeatBalance::InitialZoneDifSolReflW;
-
 		using WindowEquivalentLayer::CalcEQLOpticalProperty;
 		using namespace DataWindowEquivalentLayer;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // DO loop counter for zones
@@ -10292,30 +10259,15 @@ namespace SolarShading {
 		// 3. surface absorptances, reflectances, and transmittances
 		// determined here using revised code from SUBROUTINE InitIntSolarDistribution
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using General::InterpSw;
 		using General::InterpSlatAng;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using namespace DataViewFactorInformation;
-
 		using DataHeatBalSurface::InitialDifSolInAbs;
 		using DataHeatBalSurface::InitialDifSolInTrans;
 		using DataHeatBalance::InitialDifSolwinAbs;
 		using DataHeatBalance::InitialZoneDifSolReflW;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AdjZoneNum; // Index for adjacent zones

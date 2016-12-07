@@ -147,8 +147,6 @@ namespace WindowAC {
 	using DataHVACGlobals::DrawThru;
 	using DataHVACGlobals::BlowThru;
 	using DataHVACGlobals::SingleHeatingSetPoint;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -888,12 +886,9 @@ namespace WindowAC {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-				using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::SystemAirflowSizing;
@@ -901,17 +896,8 @@ namespace WindowAC {
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MaxAirVolFlowDes; // Autosized maximum air flow for reporting
@@ -942,6 +928,7 @@ namespace WindowAC {
 		DataScalableSizingON = false;
 		ZoneHeatingOnlyFan = false;
 		ZoneCoolingOnlyFan = true;
+		DataScalableCapSizingON = false;
 		CompType = "ZoneHVAC:WindowAirConditioner";
 		CompName = WindAC( WindACNum ).Name;
 		DataZoneNumber = WindAC( WindACNum ).ZonePtr;
@@ -1049,6 +1036,8 @@ namespace WindowAC {
 			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = WindAC( WindACNum ).OutAirVolFlow;
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = WindAC( WindACNum ).MaxAirVolFlow;
 		}
+
+		DataScalableCapSizingON = false;
 
 	}
 

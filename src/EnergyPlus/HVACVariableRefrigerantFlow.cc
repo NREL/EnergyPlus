@@ -88,6 +88,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <InputProcessor.hh>
@@ -1254,24 +1255,8 @@ namespace HVACVariableRefrigerantFlow {
 		// METHODOLOGY EMPLOYED:
 		// Calls "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetVRFInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorsFound( false ); // If errors detected in input
@@ -1514,7 +1499,7 @@ namespace HVACVariableRefrigerantFlow {
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow";
 		for ( VRFNum = 1; VRFNum <= NumVRFCond_SysCurve; ++VRFNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
 			VRF( VRFNum ).VRFSystemTypeNum = VRF_HeatPump;
@@ -2226,7 +2211,7 @@ namespace HVACVariableRefrigerantFlow {
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl";
 		for ( VRFNum = NumVRFCond_SysCurve + 1; VRFNum <= NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP; ++VRFNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
 			VRF( VRFNum ).VRFSystemTypeNum = VRF_HeatPump;
@@ -2567,7 +2552,7 @@ namespace HVACVariableRefrigerantFlow {
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR";
 		for ( VRFNum = NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + 1; VRFNum <= NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + NumVRFCond_FluidTCtrl_HR; ++VRFNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
 
@@ -5667,6 +5652,8 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 
+		DataScalableCapSizingON = false;
+
 	}
 
 	void
@@ -7397,12 +7384,6 @@ namespace HVACVariableRefrigerantFlow {
 		//       There are two options to calculate the IU Te/Tc: (1) HighSensible method analyzes the conditions of each IU
 		//       and then decide and Te/Tc that can satisfy all the zones (2) TeTcConstant method uses fixed values provided
 		//       by the user.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
 
 		// Followings for FluidTCtrl Only
 		Array1D< Real64 >  EvapTemp;
@@ -9470,26 +9451,13 @@ namespace HVACVariableRefrigerantFlow {
 		// 		Call VRFOU_CompCap to calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational
 		// 		conditions, and then call VRFOU_TeTc to obtain Tsuction_new based on OU evaporator air-side calculations
 
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		Real64 TeResidual;
-
-		// Argument array dimensioning
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9500,15 +9468,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 h_comp_in     = Par( 5 ) ; // enthalpy of refrigerant at compressor inlet [kJ/kg]
 		Real64 Q_c_TU_PL     = Par( 6 ) ; // IU evaporator load, including piping loss [W]
 		Real64 m_air_evap_rated = Par( 7 ) ;  // Rated OU evaporator air mass flow rate [kg/s]
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		//  na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 Ncomp_temp; // compressor power [W]

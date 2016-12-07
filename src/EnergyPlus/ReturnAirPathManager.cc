@@ -180,17 +180,7 @@ namespace ReturnAirPathManager {
 
 		// PURPOSE OF THIS SUBROUTINE: This subroutine
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using namespace DataLoopNode;

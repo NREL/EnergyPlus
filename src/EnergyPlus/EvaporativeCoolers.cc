@@ -85,6 +85,7 @@
 #include <Fans.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -209,27 +210,8 @@ namespace EvaporativeCoolers {
 		// It is called from the SimAirLoopComponent
 		// at the system time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapCoolNum; // The EvapCooler that you are currently loading input into
@@ -307,31 +289,13 @@ namespace EvaporativeCoolers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankDemandComponent;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using CurveManager::GetCurveIndex;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapCoolNum; // The EvapCooler that you are currently loading input into
@@ -369,7 +333,7 @@ namespace EvaporativeCoolers {
 
 		for ( EvapCoolNum = 1; EvapCoolNum <= NumDirectEvapCool; ++EvapCoolNum ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, EvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerDirectCELDEKPAD;
 
@@ -420,7 +384,7 @@ namespace EvaporativeCoolers {
 			EvapCoolNum = NumDirectEvapCool + IndEvapCoolNum;
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectCELDEKPAD; //'EvaporativeCooler:Indirect:CelDekPad'
 
@@ -490,7 +454,7 @@ namespace EvaporativeCoolers {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + IndEvapCoolNum;
 
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectWETCOIL; //'EvaporativeCooler:Indirect:WetCoil'
 
@@ -556,7 +520,7 @@ namespace EvaporativeCoolers {
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectRDDSpecial; //'EvaporativeCooler:Indirect:ResearchSpecial'
 
@@ -658,7 +622,7 @@ namespace EvaporativeCoolers {
 		for ( DirectEvapCoolNum = 1; DirectEvapCoolNum <= NumDirectResearchSpecialEvapCool; ++DirectEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + DirectEvapCoolNum;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, DirectEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerDirectResearchSpecial;
 
@@ -939,31 +903,12 @@ namespace EvaporativeCoolers {
 		// Size calculations for Evap coolers
 		//  currently just for secondary side of Research Special Indirect evap cooler
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataAirSystems::PrimaryAirSystem;
-
 		using ReportSizingManager::ReportSizingOutput;
 		using Fans::SetFanData;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool CoolerOnOApath( false );
@@ -2612,21 +2557,6 @@ namespace EvaporativeCoolers {
 			// Uses regula falsi to minimize setpoint temperature residual to by varying the
 			// secondary air flow rate.
 
-			// REFERENCES:
-			//
-
-			// Using/Aliasing
-			// na
-
-			// SUBROUTINE PARAMETER DEFINITIONS:
-			//na
-
-			// INTERFACE BLOCK SPECIFICATIONS
-			// na
-
-			// DERIVED TYPE DEFINITIONS
-			// na
-
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int EvapCoolIndex; // evaporative cooler index
 			int DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
@@ -3289,27 +3219,8 @@ namespace EvaporativeCoolers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// public simulation routine for managing zone hvac evaporative cooler unit
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
@@ -3360,12 +3271,6 @@ namespace EvaporativeCoolers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// get input for zone evap cooler unit
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::GetFanType;
 		using Fans::GetFanIndex;
@@ -3374,11 +3279,6 @@ namespace EvaporativeCoolers {
 		using Fans::GetFanOutletNode;
 		using Fans::GetFanAvailSchPtr;
 		using General::TrimSigDigits;
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleOnOff;
@@ -3387,18 +3287,8 @@ namespace EvaporativeCoolers {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataGlobals::NumOfZones;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetInputZoneEvaporativeCoolerUnit: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentModuleObject; // Object type for getting and error messages
@@ -3454,7 +3344,8 @@ namespace EvaporativeCoolers {
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = "";
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = cNumericFields;
 
-				InputProcessor::VerifyUniqueInterObjectName( UniqueEvapCondNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+				InputProcessor::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound );
+
 				ZoneEvapUnit( UnitLoop ).Name = Alphas( 1 );
 				if ( lAlphaBlanks( 2 ) ) {
 					ZoneEvapUnit( UnitLoop ).AvailSchedIndex = ScheduleAlwaysOn;

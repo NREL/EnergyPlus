@@ -86,6 +86,74 @@ namespace EnergyPlus {
 		bool process_idd( std::string const & idd, bool & errors_found ) {
 			return EnergyPlusFixture::process_idd( idd, errors_found );
 		}
+
+		std::vector < std::string > const & validation_errors() {
+			return InputProcessor::validation_errors();
+		}
+
+		std::vector < std::string > const & validation_warnings() {
+			return InputProcessor::validation_warnings();
+		}
+
+		std::string encodeIDF() {
+			return InputProcessor::idf_parser.encode(InputProcessor::jdf, InputProcessor::schema);
+		}
+
+		json & getJDF() {
+			return InputProcessor::jdf;
+		}
+
+		void eat_whitespace( std::string const & idf, size_t & index ) {
+			IdfParser idfParser;
+			idfParser.eat_whitespace( idf, index );
+		}
+
+		void eat_comment( std::string const & idf, size_t & index ) {
+			IdfParser idfParser;
+			idfParser.eat_comment( idf, index );
+		}
+
+		std::string parse_string( std::string const & idf, size_t & index, bool & success) {
+			IdfParser idfParser;
+			return idfParser.parse_string( idf, index, success );
+		}
+
+		json parse_value( std::string const & idf, size_t & index, bool & success ) {
+			IdfParser idfParser;
+			return idfParser.parse_value( idf, index, success, InputProcessor::schema["properties"] );
+		}
+
+		json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {
+			IdfParser idfParser;
+			return idfParser.parse_value( idf, index, success, field_loc );
+		}
+
+		json parse_number( std::string const & idf, size_t & index, bool & success ) {
+			IdfParser idfParser;
+			return idfParser.parse_number( idf, index, success );
+		}
+
+		IdfParser::Token look_ahead( std::string const & idf, size_t index)
+		{
+			IdfParser idfParser;
+			return idfParser.look_ahead( idf, index );
+		}
+
+		IdfParser::Token next_token( std::string const & idf, size_t & index)
+		{
+			IdfParser idfParser;
+			return idfParser.next_token( idf, index );
+		}
+
+		json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
+			IdfParser idfParser;
+			return idfParser.parse_idf( idf, index, success, schema );
+		}
+
+		json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc, json const & obj_loc ) {
+			IdfParser idfParser;
+			return idfParser.parse_object( idf, index, success, schema_loc, obj_loc );
+		}
 	};
 
 }

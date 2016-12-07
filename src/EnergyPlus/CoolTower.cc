@@ -208,25 +208,10 @@ namespace CoolTower {
 		// This subroutine gets input data for cooltower components
 		// and stores it in the Cooltower data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using WaterManager::SetupTankDemandComponent;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "ZoneCoolTower:Shower" );

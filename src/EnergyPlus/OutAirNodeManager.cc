@@ -190,21 +190,12 @@ namespace OutAirNodeManager {
 		// METHODOLOGY EMPLOYED:
 		// Use the Get routines from the InputProcessor module.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-				using namespace NodeInputManager;
+		using namespace NodeInputManager;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOutAirNodesInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumOutAirInletNodeLists;

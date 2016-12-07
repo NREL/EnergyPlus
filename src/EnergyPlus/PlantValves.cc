@@ -151,26 +151,6 @@ namespace PlantValves {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Simulation manager for Plant valves
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int EqNum;
@@ -233,27 +213,10 @@ namespace PlantValves {
 		// METHODOLOGY EMPLOYED:
 		// usual method using InputProcessor
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -322,11 +285,6 @@ namespace PlantValves {
 		// PURPOSE OF THIS SUBROUTINE:
 		// intialize data for valve modeling
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataLoopNode::Node;
@@ -335,20 +293,8 @@ namespace PlantValves {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::GenEquipTypes_Pump;
 		using DataBranchAirLoopPlant::ControlType_Active;
-
 		using DataHVACGlobals::NumPlantLoops;
 		using PlantUtilities::InitComponentNodes;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode; // local working variable for inlet node number

@@ -63,6 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -190,18 +191,8 @@ namespace ExteriorEnergyUse {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the Exterior Lights and Equipment.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleMinValue;
 		using ScheduleManager::GetScheduleMaxValue;
@@ -210,18 +201,8 @@ namespace ExteriorEnergyUse {
 		using namespace OutputReportPredefined;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetExteriorEnergyUseInput: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -325,8 +306,8 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
@@ -391,8 +372,8 @@ namespace ExteriorEnergyUse {
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
@@ -463,25 +444,8 @@ namespace ExteriorEnergyUse {
 		// This subroutine compares the input Fuel Type value against the
 		// valid values and sets the correct in the returned FuelTypeNumber.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ValidateFuelType: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

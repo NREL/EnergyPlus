@@ -285,34 +285,12 @@ namespace CrossVentMgr {
 		// initial calculations and averages the final result comparing the position of the surface with
 		// the interface subzone height.
 
-		// METHODOLOGY EMPLOYED:
-		// -
-		// -
-		// -
-		// -
-
-		// REFERENCES:
-		// -
-		// -
-
 		// Using/Aliasing
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-				using ScheduleManager::GetScheduleIndex; // , GetDayScheduleValues
+		using ScheduleManager::GetScheduleIndex; // , GetDayScheduleValues
 		using DataGlobals::BeginEnvrnFlag;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Ctd; // DO loop counter for surfaces

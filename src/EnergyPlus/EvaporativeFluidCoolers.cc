@@ -81,6 +81,7 @@
 #include <DataWater.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -111,7 +112,7 @@ namespace EvaporativeFluidCoolers {
 
 	// METHODOLOGY EMPLOYED:
 	// Based on cooling tower by Shirey, Raustad: Dec 2000; Shirey, Sept 2002
-	
+
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::KelvinConv;
@@ -127,8 +128,6 @@ namespace EvaporativeFluidCoolers {
 	using General::TrimSigDigits;
 	using DataPlant::PlantLoop;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbRhPb;
@@ -238,20 +237,6 @@ namespace EvaporativeFluidCoolers {
 
 		// REFERENCES:
 		// Based on SimTowers subroutine by Fred Buhl, May 2002
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapFluidCoolerNum; // Pointer to EvapFluidCooler
@@ -363,12 +348,6 @@ namespace EvaporativeFluidCoolers {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace DataLoopNode;
-		//  USE DataPlant,          ONLY: PlantLoop
-
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -382,19 +361,6 @@ namespace EvaporativeFluidCoolers {
 		using FluidProperties::GetGlycolNameByIndex;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutRelHumValue;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapFluidCoolerNum; // Evaporative fluid cooler number,
@@ -435,7 +401,7 @@ namespace EvaporativeFluidCoolers {
 		for ( SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers; ++SingleSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
@@ -648,7 +614,7 @@ namespace EvaporativeFluidCoolers {
 			EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			InputProcessor::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
@@ -1062,8 +1028,6 @@ namespace EvaporativeFluidCoolers {
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using Psychrometrics::PsyTwbFnTdbWPb;
-
-		//  USE FluidProperties, ONLY : GetDensityGlycol
 		using DataPlant::TypeOf_EvapFluidCooler_SingleSpd;
 		using DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -1072,17 +1036,8 @@ namespace EvaporativeFluidCoolers {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitEvapFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
@@ -1215,24 +1170,14 @@ namespace EvaporativeFluidCoolers {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const CalledFrom( "SizeEvapFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizCondNum; // Plant Sizing index for condenser loop

@@ -674,33 +674,11 @@ namespace UFADManager {
 		// initial calculations and averages the final result comparing the position of the surface with
 		// the interface subzone height.
 
-		// METHODOLOGY EMPLOYED:
-		// -
-		// -
-		// -
-		// -
-
-		// REFERENCES:
-		// -
-		// -
-
 		// Using/Aliasing
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-				using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
+		using ScheduleManager::GetScheduleIndex;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Ctd; // DO loop counter for surfaces

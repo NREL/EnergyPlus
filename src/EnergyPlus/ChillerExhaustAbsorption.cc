@@ -195,12 +195,7 @@ namespace ChillerExhaustAbsorption {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
 		using CurveManager::CurveValue;
 		using DataPlant::TypeOf_Chiller_ExhFiredAbsorption;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
@@ -209,14 +204,6 @@ namespace ChillerExhaustAbsorption {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// used to determine if heating side or cooling
 		// side of chiller-heater is being called
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -340,13 +327,7 @@ namespace ChillerExhaustAbsorption {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -356,9 +337,6 @@ namespace ChillerExhaustAbsorption {
 		using MicroturbineElectricGenerator::GetMTGeneratorExhaustNode;
 		using DataSizing::AutoSize;
 
-		// Locals
-		// PARAMETERS
-
 		//LOCAL VARIABLES
 		int AbsorberNum; // Absorber counter
 		int NumAlphas; // Number of elements in the alpha array
@@ -366,7 +344,6 @@ namespace ChillerExhaustAbsorption {
 		int IOStat; // IO Status when calling get input subroutine
 		int MTExhaustNodeNum; // Exhaust node number passed from MicroTurbine
 		std::string ChillerName;
-		bool errFlag;
 		bool Okay;
 
 		//FLOW
@@ -1846,22 +1823,8 @@ namespace ChillerExhaustAbsorption {
 		// PURPOSE OF THIS SUBROUTINE:
 		// reporting
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int lChillReturnNodeNum; // Node number on the inlet side of the plant
@@ -1947,22 +1910,8 @@ namespace ChillerExhaustAbsorption {
 		// PURPOSE OF THIS SUBROUTINE:
 		// reporting
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int lHeatReturnNodeNum; // absorber steam inlet node number, water side

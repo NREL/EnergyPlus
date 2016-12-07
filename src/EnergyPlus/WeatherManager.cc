@@ -83,6 +83,7 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -127,7 +128,6 @@ namespace WeatherManager {
 	using namespace DataReportingFlags;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
-
 	using General::ProcessDateString; // , ValidateMonthDay
 	using General::RoundSigDigits;
 	using namespace Psychrometrics;
@@ -648,25 +648,15 @@ namespace WeatherManager {
 		// if another environment is available in the "run list" or if the end has been
 		// reached.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::InvJulianDay;
 		using General::JulianDay;
 		using General::BetweenDates;
 		using namespace DataSystemVariables;
-
 		using DataHeatBalance::AdaptiveComfortRequested_ASH55;
 		using DataHeatBalance::AdaptiveComfortRequested_CEN15251;
 		using ThermalComfort::CalcThermalComfortAdaptiveASH55;
 		using ThermalComfort::CalcThermalComfortAdaptiveCEN15251;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetNextEnvironment: " );
@@ -679,12 +669,6 @@ namespace WeatherManager {
 		static gio::Fmt DateFormatwithYear( "(I2.2,'/',I2.2,'/',I4.4)" );
 		static Array1D_string const SpecialDayNames( 5, { "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 		static Array1D_string const ValidDayNames( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
@@ -2246,23 +2230,12 @@ namespace WeatherManager {
 		// Using/Aliasing
 		using General::JulianDay;
 		using ScheduleManager::UpdateScheduleValues;
-
 		using namespace GroundTemperatureManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char time_stamp[ 10 ];
 		static char day_stamp[ 6 ];
 		static std::string const RoutineName( "SetCurrentWeather" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int NextHour;
@@ -2498,28 +2471,15 @@ namespace WeatherManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine reads the appropriate day of EPW weather data.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::JulianDay;
 		using General::RoundSigDigits;
 		using ScheduleManager::GetScheduleValuesForDay;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtLD( "*" );
 		static gio::Fmt YMDHFmt( "(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)" );
 		static gio::Fmt YMDHFmt1( "(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
 
 		// DERIVED TYPE DEFINITIONS:
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3632,11 +3592,7 @@ Label902: ;
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::JulianDay;
-
 		using ScheduleManager::GetSingleDayScheduleValues;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const GlobalSolarConstant( 1367.0 );
@@ -3659,11 +3615,6 @@ Label902: ;
 		static std::string const RoutineNamePsyWFnTdbH( "SetUpDesignDay:PsyWFnTdbH" );
 		static std::string const WeatherManager( "WeatherManager" );
 		static std::string const RoutineNameLong( "WeatherManager.cc subroutine SetUpDesignDay" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Hour;
@@ -4681,22 +4632,8 @@ Label902: ;
 		// METHODOLOGY EMPLOYED:
 		// List directed reads, as possible.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const Header( 8, { "LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string Line;
@@ -5240,28 +5177,8 @@ Label9999: ;
 		// It controls the assignment of weather related global variables as
 		// well as the reads and writes for retrieving weather information.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		using namespace DataSystemVariables;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Env; // Environment Loop Counter
@@ -5381,33 +5298,11 @@ Label9999: ;
 		// This subroutine gets the run period info from User input and the
 		//  simulation dates
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using General::JulianDay;
 		using General::TrimSigDigits;
 		using namespace DataSystemVariables;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlpha; // Number of alphas being input
@@ -5441,7 +5336,7 @@ Label9999: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				InputProcessor::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			}
 
 			++Count;
@@ -5615,7 +5510,7 @@ Label9999: ;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Ptr, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				InputProcessor::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
+				GlobalNames::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			}
 			++Count;
 			Loop = RP + Ptr;
@@ -5793,34 +5688,14 @@ Label9999: ;
 		// This subroutine gets the run period design info from User input and the
 		//  simulation dates
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
-
 		using General::JulianDay;
 		using General::TrimSigDigits;
 		using namespace DataSystemVariables;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Number of alphas being input
@@ -5846,7 +5721,7 @@ Label9999: ;
 		cCurrentModuleObject = "SizingPeriod:WeatherFileDays";
 		for ( Loop = 1; Loop <= RPD1; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			++Count;
 			RunPeriodDesignInput( Count ).Title = cAlphaArgs( 1 );
 			RunPeriodDesignInput( Count ).PeriodType = "User Selected WeatherFile RunPeriod (Design)";
@@ -5926,7 +5801,7 @@ Label9999: ;
 		cCurrentModuleObject = "SizingPeriod:WeatherFileConditionType";
 		for ( Loop = 1; Loop <= RPD2; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			++Count;
 			RunPeriodDesignInput( Count ).Title = cAlphaArgs( 1 );
 			RunPeriodDesignInput( Count ).PeriodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs( 2 );
@@ -6056,28 +5931,12 @@ Label9999: ;
 		//        \key CustomDay1
 		//        \key CustomDay2
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const ValidDayTypes( 5, { "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string AlphArray( 3 );
@@ -6255,24 +6114,8 @@ Label9999: ;
 		//      \memo <Weekday> can be Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
 		//      \memo <Nth> can be 1 or 1st, 2 or 2nd, etc. up to 5(?)
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumFound;
@@ -6358,11 +6201,6 @@ Label9999: ;
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
-
 		using General::RoundSigDigits;
 		using General::FindNumberInList;
 		using ScheduleManager::GetDayScheduleIndex;
@@ -6370,9 +6208,6 @@ Label9999: ;
 		using ScheduleManager::CheckDayScheduleValueMinMax;
 		using namespace DataSystemVariables;
 		using namespace OutputReportPredefined;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
@@ -6382,12 +6217,6 @@ Label9999: ;
 		//                   .84d0,.71d0,.56d0,.39d0,.23d0, .11d0,.03d0,.00d0,.03d0,.10d0,.21d0,.34d0,.47d0,.58d0,.68d0,.76d0,.82d0 /)
 		// Below are the 2009 fractions, HOF, Chap 14, Table 6
 		static Array1D< Real64 > const DefaultTempRangeMult( 24, { 0.88, 0.92, 0.95, 0.98, 1.0, 0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13, 0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82 } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EnvrnNum; // Environment Loop to pass to Design Day Setup Routine
@@ -7026,27 +6855,8 @@ Label9999: ;
 		// This subroutine gets the location info from the IDF file; latitude,
 		//  longitude and time zone number.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LocNumAlpha; // Number of alpha names being passed
@@ -7117,27 +6927,13 @@ Label9999: ;
 		//        \object-list ScheduleNames
 
 		// Using/Aliasing
-
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetDayScheduleIndex;
 		using namespace DataIPShortCuts;
 		using General::FindNumberInList;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetWeatherProperties:" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item;
@@ -7286,31 +7082,9 @@ Label9999: ;
 		// This file reads the Ground Temps from the input file and puts them
 		//  in a new variable.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
 		using namespace GroundTemperatureManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Formats
 		static gio::Fmt Format_720( "(' ',A,12(', ',F6.2))" );
@@ -7355,27 +7129,8 @@ Label9999: ;
 		// This file reads the Ground Reflectances from the input file (optional) and
 		// places them in the monthly array.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -7436,27 +7191,8 @@ Label9999: ;
 		// This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
 		// places them in the variables.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -7519,18 +7255,9 @@ Label9999: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// Reads the input data for the WATER MAINS TEMPERATURES object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumObjects;
@@ -7665,17 +7392,9 @@ Label9999: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// Reads the input data for the WEATHER STATION object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumObjects;
@@ -8003,28 +7722,11 @@ Label9999: ;
 		// File is positioned to the correct line, then backspaced.  This routine
 		// reads in the line and processes as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using General::JulianDay;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtLD( "*" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string Title;
@@ -8692,23 +8394,8 @@ Label9999: ;
 		// METHODOLOGY EMPLOYED:
 		// List directed reads, as possible.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const Header( "DATA PERIODS" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string::size_type Pos;

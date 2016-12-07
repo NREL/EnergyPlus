@@ -84,6 +84,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -225,7 +226,6 @@ namespace RefrigeratedCase {
 	using DataHeatBalance::RefrigCondenserTypeEvap;
 	using DataHeatBalance::RefrigCondenserTypeWater;
 	using DataHeatBalance::RefrigCondenserTypeCascade;
-
 	using DataHVACGlobals::TimeStepSys; // used when operating for warehouse coil
 	using namespace DataGlobals; // includes LOGICAL :: BeginTimeStepFlag =.FALSE.
 	// True at the start of each time step, False after first subtime step of time step
@@ -611,9 +611,6 @@ namespace RefrigeratedCase {
 		// METHODOLOGY EMPLOYED:
 		// GetObjectItem is called to read refrigerated case information
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using CurveManager::GetCurveIndex;
@@ -623,34 +620,18 @@ namespace RefrigeratedCase {
 		using DataHeatBalance::Zone; // , &
 		using DataHeatBalance::NumRefrigeratedRacks;
 		using DataHeatBalance::NumRefrigSystems;
-		//unused                               IntGainTypeOf_RefrigerationCompressorRack, &
-		//unused                               IntGainTypeOf_RefrigerationCase
 		using DataZoneEquipment::GetSystemNodeNumberForZone;
 		using DataZoneEquipment::GetReturnAirNodeForZone;
 		using DataEnvironment::StdBaroPress;
 		using General::RoundSigDigits;
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using Psychrometrics::PsyWFnTdbRhPb;
 		using Psychrometrics::PsyTdpFnWPb;
-		// USE ScheduleManager,   ONLY: CheckScheduleValueMinMax
 		using WaterManager::SetupTankDemandComponent;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-
-		//USE FluidProperties,   ONLY: GetDensityGlycol, GetSpecificHeatGlycol
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const TrackMessage( "from refrigerated case" );
@@ -687,11 +668,6 @@ namespace RefrigeratedCase {
 		Real64 const PumpImpellerEfficiency( 0.78 ); // same as used in pump auto-sizing, dimensionless
 		Real64 const PumpMotorEfficiency( 0.85 ); // suggested as average value in ITT/Gould pump references,
 		//     dimensionless
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string Alphas; // Alpha items for object
@@ -2966,7 +2942,7 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
 				for ( CondNum = 1; CondNum <= NumSimulationCondAir; ++CondNum ) {
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 					Condenser( CondNum ).CapCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -3069,7 +3045,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3262,7 +3238,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3390,7 +3366,7 @@ namespace RefrigeratedCase {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater;
 					InputProcessor::GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					InputProcessor::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -7789,14 +7765,10 @@ namespace RefrigeratedCase {
 		using PlantUtilities::SetComponentFlowRate;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-
 		using General::TrimSigDigits;
 		using DataPlant::TypeOf_RefrigSystemWaterCondenser;
 		using DataPlant::TypeOf_RefrigerationWaterCoolRack;
 		using DataPlant::PlantLoop;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "SimRefrigCondenser" );
@@ -10476,29 +10448,6 @@ namespace RefrigeratedCase {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine sets an index for a given refrigerated rack or refrigeration condenser
 		//  -- issues error message if the rack or condenser is not found.
-		// METHODOLOGY EMPLOYED:
-		// na
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		//USE DataGlobals,    ONLY: ShowSevereError
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		CheckRefrigerationInput();
 
@@ -11916,13 +11865,9 @@ namespace RefrigeratedCase {
 
 		// Using/Aliasing
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
 		using DataHeatBalFanSys::TempControlType;
 		using DataHVACGlobals::SingleHeatingSetPoint;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ChillerSetID;

@@ -71,6 +71,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatRecovery.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -132,6 +133,7 @@ namespace HVACHXAssistedCoolingCoil {
 	// PUBLIC so others can access this information
 	bool GetCoilsInputFlag( true ); // Flag to allow input data to be retrieved from idf on first call to this subroutine
 	Array1D_bool CheckEquipName;
+	std::unordered_map< std::string, std::string > UniqueHXAssistedCoilNames;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -161,6 +163,18 @@ namespace HVACHXAssistedCoolingCoil {
 	// Functions
 
 	void
+	clear_state()
+	{
+		UniqueHXAssistedCoilNames.clear();
+		HXAssistedCoil.deallocate();
+		TotalNumHXAssistedCoils = 0;
+		HXAssistedCoilOutletTemp.deallocate();
+		HXAssistedCoilOutletHumRat.deallocate();
+		GetCoilsInputFlag = true;
+		CheckEquipName.deallocate();
+	}
+
+	void
 	SimHXAssistedCoolingCoil(
 		std::string const & HXAssistedCoilName, // Name of HXAssistedCoolingCoil
 		bool const FirstHVACIteration, // FirstHVACIteration flag
@@ -185,28 +199,12 @@ namespace HVACHXAssistedCoolingCoil {
 		//  This subroutine manages the simulation of the
 		//  cooling coil/heat exchanger combination.
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// (not used for Coil:Water:DetailedFlatCooling)
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HXAssistedCoilNum; // Index for HXAssistedCoolingCoil
@@ -298,14 +296,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// METHODOLOGY EMPLOYED:
 		//  Uses "Get" routines to read in data.
 
-		// REFERENCES:
-
 		// Using/Aliasing
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
@@ -319,18 +310,8 @@ namespace HVACHXAssistedCoolingCoil {
 		using HeatRecovery::GetSecondaryInletNode;
 		using HeatRecovery::GetSecondaryOutletNode;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetHXAssistedCoolingCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HXAssistedCoilNum; // Index number of the HXAssistedCoolingCoil for which input data is being read from the idf
@@ -368,6 +349,7 @@ namespace HVACHXAssistedCoolingCoil {
 			HXAssistedCoilOutletTemp.allocate( TotalNumHXAssistedCoils );
 			HXAssistedCoilOutletHumRat.allocate( TotalNumHXAssistedCoils );
 			CheckEquipName.dimension( TotalNumHXAssistedCoils, true );
+			UniqueHXAssistedCoilNames.reserve( TotalNumHXAssistedCoils );
 		}
 
 		InputProcessor::GetObjectDefMaxArgs( "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums );
@@ -389,7 +371,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		for ( HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum ) {
 			InputProcessor::GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueHXAssistedCoilNames, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
 			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType = AlphArray( 2 );
@@ -504,7 +486,7 @@ namespace HVACHXAssistedCoolingCoil {
 		for ( HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+			GlobalNames::VerifyUniqueInterObjectName( UniqueHXAssistedCoilNames, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
 			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 
@@ -815,29 +797,6 @@ namespace HVACHXAssistedCoolingCoil {
 		// This subroutine sets an index for a given HX Assisted Cooling Coil -- issues error message if that
 		// HX is not a legal HX Assisted Cooling Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data
 			// Get the HXAssistedCoolingCoil input
@@ -881,27 +840,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// This routine provides a method for outside routines to check if
 		// the hx assisted cooling coil is scheduled to be on.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HXAssistedCoilNum;
@@ -959,32 +899,12 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		auto & GetDXCoilCapacity( DXCoils::GetCoilCapacity );
 		using WaterCoils::GetWaterCoilCapacity;
 
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1058,28 +978,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// This function looks up the HX coil type and returns it (CoilDX_CoolingHXAssisted, CoilWater_CoolingHXAssisted)
 		// If incorrect coil type or name is given, ErrorsFound is returned as true.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int TypeNum; // returned integerized type of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1139,28 +1039,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int TypeNum; // returned integerized type of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1218,28 +1098,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1288,30 +1148,11 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		auto & GetWaterCoilWaterInletNode( WaterCoils::GetCoilWaterInletNode );
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1368,28 +1209,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1438,28 +1259,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
 		// is returned as blank
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		std::string DXCoilType; // returned type of cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1508,28 +1309,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
 		// is returned as blank
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		std::string DXCoilName; // returned name of cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1579,28 +1360,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
 		// is returned as blank
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int DXCoilIndex; // returned index of DX cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1650,28 +1411,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the cooling
 		// coil type is returned as blank.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		std::string CoolingCoilType; // returned type of cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1720,26 +1461,6 @@ namespace HVACHXAssistedCoolingCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Need to get child coil type and name.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
 
@@ -1787,31 +1508,11 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		auto & GetWaterCoilMaxFlowRate( WaterCoils::GetCoilMaxWaterFlowRate );
 
 		// Return value
 		Real64 MaxWaterFlowRate; // returned max water flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1876,31 +1577,11 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
 		using HeatRecovery::GetSupplyAirFlowRate;
 
 		// Return value
 		Real64 MaxAirFlowRate; // returned max air flow rate of matched HX
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1955,29 +1636,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given heat exchanger name and type and returns true or false.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-
 		// Return value
 		bool Found; // set to true if found
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;

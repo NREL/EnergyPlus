@@ -115,13 +115,8 @@ namespace NonZoneEquipmentManager {
 		// the NonZoneEquipmentManager, it does not yet have a list of non-zone equipment, so it must make
 		// one here before it knows what to call for simulation.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using DataGlobals::ZoneSizingCalc;
-
 		using WaterThermalTanks::SimulateWaterHeaterStandAlone;
 		using WaterUse::SimulateWaterUse;
 

@@ -80,6 +80,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HVACManager.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -131,7 +132,7 @@ namespace HeatBalanceAirManager {
 
 	// Data
 	std::unordered_set< std::string > UniqueZoneNames;
-	std::unordered_map< std::string, std::string > Infiltration_map;
+	std::unordered_map< std::string, std::string > UniqueInfiltrationNames;
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
@@ -163,7 +164,7 @@ namespace HeatBalanceAirManager {
 	{
 		ManageAirHeatBalanceGetInputFlag =  true;
 		UniqueZoneNames.clear();
-		Infiltration_map.clear();
+		UniqueInfiltrationNames.clear();
 	}
 
 
@@ -299,30 +300,11 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Modelled after 'Modual Example' in Guide for Module Developers
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// Formats
 		static gio::Fmt Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -350,32 +332,12 @@ namespace HeatBalanceAirManager {
 			// PURPOSE OF THIS SUBROUTINE :
 			// This subroutine sets the zone mass conservation flag to true.
 
-			// METHODOLOGY EMPLOYED :
-			// na
-
-			// REFERENCES :
-			// na
-
 			// Using/Aliasing
 			using DataHeatBalance::TotMixing;
 			using DataHeatBalance::Mixing;
 			using DataHeatBalance::ZoneAirMassFlow;
 			using DataHeatBalFanSys::MixingMassFlowZone;
 			using DataHeatBalFanSys::ZoneMassBalanceFlag;
-
-
-			// locals
-			// SUBROUTINE ARGUMENT DEFINITIONS :
-			// na
-
-			// SUBROUTINE PARAMETER DEFINITIONS :
-			// na
-
-			// INTERFACE BLOCK SPECIFICATIONS :
-			// na
-
-			// DERIVED TYPE DEFINITIONS :
-			// na
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS :
 			int Loop;
@@ -407,9 +369,6 @@ namespace HeatBalanceAirManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the "simple" air flow model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// IDD Statements
 		// INFILTRATION,A1 [Zone Name],A2 [SCHEDULE Name],N1 [Design level KW],
@@ -423,11 +382,6 @@ namespace HeatBalanceAirManager {
 		//     A3 [Source Zone Name], N2 [Delta Temperature delta C];
 
 		// Using/Aliasing
-
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleValuesForDay;
 		using ScheduleManager::CheckScheduleValueMinMax;
@@ -435,11 +389,8 @@ namespace HeatBalanceAirManager {
 		using ScheduleManager::GetScheduleName;
 		using General::RoundSigDigits;
 		using General::CheckCreatedZoneItemName;
-		//  USE DataIPShortCuts
 		using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 		using DataGlobals::NumOfZones;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
@@ -451,11 +402,6 @@ namespace HeatBalanceAirManager {
 		Real64 const RefDoorNone( 0.0 );
 		Real64 const RefDoorAirCurtain( 0.5 );
 		Real64 const RefDoorStripCurtain( 0.9 );
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array2D< Real64 > SVals1;
@@ -710,7 +656,7 @@ namespace HeatBalanceAirManager {
 		TotInfiltration = TotDesignFlowInfiltration + TotShermGrimsInfiltration + TotAIM2Infiltration;
 
 		Infiltration.allocate( TotInfiltration );
-		Infiltration_map.reserve( static_cast< unsigned > ( TotInfiltration ) );
+		UniqueInfiltrationNames.reserve( static_cast< unsigned > ( TotInfiltration ) );
 
 		if ( TotDesignFlowInfiltration > 0 ) {
 			Loop = 0;
@@ -871,7 +817,7 @@ namespace HeatBalanceAirManager {
 		for ( Loop = 1; Loop <= TotShermGrimsInfiltration; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -919,7 +865,7 @@ namespace HeatBalanceAirManager {
 		for ( Loop = 1; Loop <= TotAIM2Infiltration; ++Loop ) {
 			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			InputProcessor::VerifyUniqueInterObjectName( Infiltration_map, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
 			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
@@ -2762,13 +2708,7 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		//     Use input processer to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Zone;
@@ -2788,18 +2728,9 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
 		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
 		static gio::Fmt RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // States which alpha value to read from a

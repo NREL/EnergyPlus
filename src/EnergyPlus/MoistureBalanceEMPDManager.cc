@@ -194,31 +194,9 @@ namespace MoistureBalanceEMPDManager {
 		// This subroutine is the main driver for initializations within the
 		// heat balance using the EMPD model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
 		using DataSurfaces::HeatTransferModel_EMPD;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine

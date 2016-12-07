@@ -298,9 +298,6 @@ namespace ChillerGasAbsorption {
 		// This routine will get the input
 		// required by the Direct Fired Absorption chiller modelin the object ChillerHeater:Absorption:DirectFired
 
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -314,7 +311,6 @@ namespace ChillerGasAbsorption {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		std::string ChillerName;
-		bool errFlag;
 		bool Okay;
 
 		//FLOW

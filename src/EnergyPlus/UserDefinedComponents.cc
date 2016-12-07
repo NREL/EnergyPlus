@@ -177,27 +177,11 @@ namespace UserDefinedComponents {
 		// METHODOLOGY EMPLOYED:
 		// This routine to be called from PlantLoopEquipment.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using EMSManager::ManageEMS;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -304,32 +288,13 @@ namespace UserDefinedComponents {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using EMSManager::ManageEMS;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using Psychrometrics::PsyHFnTdbW;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 EnthInlet;
@@ -421,31 +386,13 @@ namespace UserDefinedComponents {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using EMSManager::ManageEMS;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using Psychrometrics::PsyHFnTdbW;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
@@ -537,31 +484,12 @@ namespace UserDefinedComponents {
 		// PURPOSE OF THIS SUBROUTINE:
 		// simulation call for generic air terminal
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
 		using EMSManager::ManageEMS;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
@@ -633,18 +561,7 @@ namespace UserDefinedComponents {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
-
 		using General::RoundSigDigits;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -658,18 +575,8 @@ namespace UserDefinedComponents {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using GlobalNames::VerifyUniqueCoilName;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtLD( "*" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false );
@@ -2051,29 +1958,6 @@ namespace UserDefinedComponents {
 		// This subroutine sets an index for a given user defined Cooling Coil -- issues error message if that
 		// coil is not a legal user defined Cooling Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		// Obtains and allocates TESCoil related parameters from input file
 		if ( GetInput ) { // First time subroutine has been called, get input data
 			GetUserDefinedComponents();
@@ -2111,26 +1995,6 @@ namespace UserDefinedComponents {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets a given user defined Cooling Coil's air inlet node -- issues error message if that
 		// coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
@@ -2175,26 +2039,6 @@ namespace UserDefinedComponents {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets a given user defined Cooling Coil's air outlet node -- issues error message if that
 		// coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;

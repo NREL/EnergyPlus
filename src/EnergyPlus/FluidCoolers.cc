@@ -80,6 +80,7 @@
 #include <DataSizing.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -124,8 +125,6 @@ namespace FluidCoolers {
 	using DataEnvironment::OutWetBulbTemp;
 	using DataPlant::PlantLoop;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbRhPb;
@@ -224,20 +223,6 @@ namespace FluidCoolers {
 
 		// REFERENCES:
 		// Based on SimTowers subroutine by Fred Buhl, May 2002; Richard Raustad, FSEC, Feb 2005
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// LOCAL VARIABLE DECLARATIONS:
 		int FluidCoolerNum;
@@ -345,19 +330,6 @@ namespace FluidCoolers {
 		using FluidProperties::CheckFluidPropertyName;
 		using FluidProperties::FindGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FluidCoolerNum; // Fluid cooler number, reference counter for SimpleFluidCooler data array
 		int NumSingleSpeedFluidCoolers; // Total number of single-speed Fluid Coolers
@@ -396,7 +368,7 @@ namespace FluidCoolers {
 		for ( SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = SingleSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, SingleSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
@@ -443,7 +415,7 @@ namespace FluidCoolers {
 		for ( TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber ) {
 			FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
 			InputProcessor::GetObjectItem( cCurrentModuleObject, TwoSpeedFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			SimpleFluidCooler( FluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType = cCurrentModuleObject;
@@ -875,7 +847,6 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-
 		using DataPlant::TypeOf_FluidCooler_SingleSpd;
 		using DataPlant::TypeOf_FluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
@@ -884,17 +855,8 @@ namespace FluidCoolers {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found

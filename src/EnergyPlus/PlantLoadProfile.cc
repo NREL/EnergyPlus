@@ -373,10 +373,6 @@ namespace PlantLoadProfile {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;

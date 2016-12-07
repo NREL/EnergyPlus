@@ -147,19 +147,7 @@ namespace GeneratorFuelSupply {
 		//       RE-ENGINEERED  this module extracted from older SOFC module for
 		//                      reuse with both Annex 42 models,
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
@@ -168,19 +156,6 @@ namespace GeneratorFuelSupply {
 		using DataLoopNode::NodeType_Air;
 		using DataLoopNode::ObjectIsNotParent;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER                     :: GeneratorNum !Generator counter
@@ -323,26 +298,6 @@ namespace GeneratorFuelSupply {
 
 		// METHODOLOGY EMPLOYED:
 		// Hardcoded data from NIST is filled into data structure one time only
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-		// Using/Aliasing
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumHardCodedConstituents; // number of gases included in data

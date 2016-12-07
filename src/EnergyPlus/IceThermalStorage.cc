@@ -244,12 +244,8 @@ namespace IceThermalStorage {
 
 		// PURPOSE OF THIS SUBROUTINE:
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
 
 		// Using/Aliasing
-
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataGlobals::BeginEnvrnFlag;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -270,11 +266,6 @@ namespace IceThermalStorage {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SimIceStorage" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool firstTime( true );
@@ -859,13 +850,8 @@ namespace IceThermalStorage {
 		//arrays associated with the type PlantLoopProps.
 
 		// METHODOLOGY EMPLOYED: to be determined...
-		// REFERENCES:
 
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using namespace ScheduleManager;
 		using BranchNodeConnections::TestCompSet;
@@ -874,15 +860,6 @@ namespace IceThermalStorage {
 
 		// Locals
 		int IceNum;
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Number of elements in the alpha array

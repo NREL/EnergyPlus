@@ -190,28 +190,11 @@ namespace HWBaseboardRadiator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine simulates the Baseboard Radiators.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
-
 		using General::TrimSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // Index of unit in baseboard array
@@ -300,21 +283,12 @@ namespace HWBaseboardRadiator {
 		// METHODOLOGY EMPLOYED:
 		// Standard input processor calls.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Water;
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::NodeConnectionType_Outlet;
 		using DataLoopNode::ObjectIsNotParent;
-		//unused0909    USE DataGlobals,           ONLY: NumOfZones
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using DataSurfaces::Surface;
@@ -328,10 +302,6 @@ namespace HWBaseboardRadiator {
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetHWBaseboardInput:" );
@@ -350,13 +320,6 @@ namespace HWBaseboardRadiator {
 		int const iHeatDesignCapacityNumericNum( 3 ); // get input index to HW baseboard heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 4 ); // get input index to HW baseboard heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 5 ); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
-
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
@@ -952,6 +915,7 @@ namespace HWBaseboardRadiator {
 					HWBaseboard( BaseboardNum ).RatedCapacity = TempSize;
 				}
 				RatedCapacityDes = TempSize;
+				DataScalableCapSizingON = false;
 			}
 		}
 
@@ -1634,9 +1598,6 @@ namespace HWBaseboardRadiator {
 		// METHODOLOGY EMPLOYED:
 		// check input, provide comp index, call utility routines
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using PlantUtilities::PullCompInterconnectTrigger;
 		using DataPlant::ccSimPlantEquipTypes;
@@ -1644,22 +1605,8 @@ namespace HWBaseboardRadiator {
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;
-
 		using General::TrimSigDigits;
 		using DataGlobals::KickOffSimulation;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

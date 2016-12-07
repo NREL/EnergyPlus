@@ -1259,14 +1259,7 @@ namespace GroundHeatExchangers {
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
-
-
-
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -1274,18 +1267,6 @@ namespace GroundHeatExchangers {
 		using General::RoundSigDigits;
 		using DataEnvironment::MaxNumberSimYears;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GLHENum;

@@ -136,8 +136,6 @@ namespace UnitHeater {
 	using DataHVACGlobals::cFanTypes;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbW;
@@ -216,26 +214,10 @@ namespace UnitHeater {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using DataSizing::ZoneHeatingOnlyFan;
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqUnitHeater;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitHeatNum; // index of unit heater being simulated
@@ -305,12 +287,6 @@ namespace UnitHeater {
 		// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 		// Using/Aliasing
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using Fans::GetFanType;
@@ -331,19 +307,6 @@ namespace UnitHeater {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataSizing::ZoneHVACSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -869,7 +832,7 @@ namespace UnitHeater {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-				using WaterCoils::SetCoilDesFlow;
+		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
 		using SteamCoils::GetCoilSteamInletNode;
@@ -1048,6 +1011,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								SizingString = "";
 								PrintFlag = false;
@@ -1145,6 +1109,7 @@ namespace UnitHeater {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							}

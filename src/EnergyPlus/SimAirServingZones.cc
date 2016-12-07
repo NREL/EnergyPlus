@@ -375,17 +375,7 @@ namespace SimAirServingZones {
 		//        \note Name of a Node or NodeList containing the outlet node(s) supplying air to the demand side.
 		//        \required-field
 
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-
-
-
-
-
-
-
-
 		using NodeInputManager::GetNodeNums;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchInputManager::GetBranchList;
@@ -414,17 +404,9 @@ namespace SimAirServingZones {
 		using WaterCoils::GetCoilWaterInletNode;
 		using General::RoundSigDigits;
 		using DataConvergParams::AirLoopConvergence;
-		//USE DataMixedAir, ONLY: OAMixer, OutsideAirSys, NumOAMixers, NumOASys
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: none
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetAirPathData: " );
-
-		// INTERFACE BLOCK DEFINITIONS: None
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DEFINITIONS
 		int NumNumbers; // number of numbers returned by GetObjectItem
@@ -1345,17 +1327,12 @@ namespace SimAirServingZones {
 		// (3) Other air system node data such as temperatures and humidity ratios are only
 		//     initialized at the start of an environment (run period or design day).
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::StdBaroPress;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
 		using SplitterComponent::SplitterCond;
 		using SplitterComponent::SplitterConditions;
-
-
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using ZonePlenum::ZoneSupPlenCond;
@@ -1368,17 +1345,6 @@ namespace SimAirServingZones {
 		using DataContaminantBalance::OutdoorGC;
 		using General::FindNumberInList;
 		using Fans::GetFanIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAllSupAirPathNodes; // total number of nodes in a supply air path including duplicates
@@ -3465,11 +3431,7 @@ namespace SimAirServingZones {
 		// Uses data from System Sizing input and the system to zone connection data
 		// calculated in InitAirLoops and stored in AirToZoneNodeInfo in DataLoopNode..
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::FindNumberInList;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using namespace OutputReportPredefined;
@@ -3477,19 +3439,6 @@ namespace SimAirServingZones {
 		using DataDefineEquip::AirDistUnit;
 		using DataDefineEquip::NumAirDistUnits;
 		using namespace DataSizing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirLoopNum; // primary air system index
@@ -6199,33 +6148,17 @@ namespace SimAirServingZones {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Modifies the design sizing flow rates for system scalable sizing method
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using ReportSizingManager::RequestSizing;
-
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using DataEnvironment::StdRhoAir;
 		using DataSizing::CalcSysSizing;
 		using DataSizing::FinalSysSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TempSize; // autosized value
@@ -6554,11 +6487,6 @@ namespace SimAirServingZones {
 		// METHODOLOGY EMPLOYED:
 		// Ventilation Rate Procedure for single pass system
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
 		Real64 AvailSAFlow( 0.0 ); // available zone supply air flow [m3/s]
@@ -6568,7 +6496,7 @@ namespace SimAirServingZones {
 			ZoneOAFrac = 1.0 + Xs - FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
 			// reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
 			AvailSAFlow = Voz/ZoneOAFrac;
-			// save ZoneOAFrac 
+			// save ZoneOAFrac
 			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
 			// save new (increased) minimum flow rate
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;

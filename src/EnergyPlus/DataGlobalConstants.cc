@@ -307,31 +307,8 @@ namespace DataGlobalConstants {
 		// PURPOSE OF THIS FUNCTION:
 		// Assists in assigning proper numeric resource types to data structures.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		int ResourceTypeNum;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		ResourceTypeNum = 0;
 
@@ -497,32 +474,8 @@ namespace DataGlobalConstants {
 		// PURPOSE OF THIS FUNCTION:
 		// Shows the resource type character string, given the resource type numeric.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		std::string ResourceTypeChar;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// na
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		{ auto const SELECT_CASE_var( ResourceTypeNum );
 

@@ -145,25 +145,8 @@ namespace CTElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -223,24 +206,6 @@ namespace CTElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN)          :: FlowLock !unused1208 !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( GetCTInput ) {
@@ -282,12 +247,7 @@ namespace CTElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using NodeInputManager::GetOnlySingleNode;
@@ -295,9 +255,6 @@ namespace CTElectricGenerator {
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// PARAMETERS
 
 		//LOCAL VARIABLES
 		int GeneratorNum; // Generator counter
@@ -539,36 +496,17 @@ namespace CTElectricGenerator {
 		// curve fit of performance data.  This model was originally
 		// developed by Dale Herron for the BLAST program
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
 		using DataEnvironment::OutDryBulbTemp;
 		using CurveManager::CurveValue;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat (J/kg-K)
 		Real64 const KJtoJ( 1000.0 ); // convert Kjoules to joules
 		static std::string const RoutineName( "CalcCTGeneratorModel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// INTERFACE
-
-		//  REAL(r64) FUNCTION CurveValue(CurveIndex,Var1,Var2)
-		//    INTEGER, INTENT (IN)        :: CurveIndex  ! index of curve in curve array
-		//    REAL(r64), INTENT (IN)           :: Var1        ! 1st independent variable
-		//    REAL(r64), INTENT (IN), OPTIONAL :: Var2        ! 2nd independent variable
-		//  END FUNCTION CurveValue
-		// END INTERFACE
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MinPartLoadRat; // min allowed operating frac full load
@@ -783,9 +721,6 @@ namespace CTElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
@@ -794,17 +729,8 @@ namespace CTElectricGenerator {
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitICEngineGenerators" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatRecInletNode; // inlet node number in heat recovery loop

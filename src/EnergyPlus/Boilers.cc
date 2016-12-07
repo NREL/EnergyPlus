@@ -204,21 +204,6 @@ namespace Boilers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subrountine controls the boiler component simulation
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInput( true ); // if TRUE read user input
 		int BoilerNum; // boiler counter/identifier
 
@@ -293,10 +278,6 @@ namespace Boilers {
 		// Using/Aliasing
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using namespace DataGlobalConstants;
-
-
-
-
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -875,7 +856,6 @@ namespace Boilers {
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::WarmupFlag;
-
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using CurveManager::CurveValue;

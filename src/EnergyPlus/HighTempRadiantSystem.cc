@@ -127,8 +127,6 @@ namespace HighTempRadiantSystem {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallLoad;
 
-	// Use statements for access to subroutines in other modules
-
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	std::string const cGas( "Gas" );
@@ -190,7 +188,7 @@ namespace HighTempRadiantSystem {
 		HighTempRadSysNumericFields.deallocate();
 	}
 
-	
+
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
@@ -214,24 +212,8 @@ namespace HighTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus manager subroutine layout
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -301,18 +283,9 @@ namespace HighTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
-
-
-
-
-
-
 		using ScheduleManager::GetScheduleIndex;
 		using General::TrimSigDigits;
 		using DataSizing::AutoSize;
@@ -320,10 +293,6 @@ namespace HighTempRadiantSystem {
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MaxCombustionEffic( 1.00 ); // Limit the combustion efficiency to perfection
@@ -337,12 +306,6 @@ namespace HighTempRadiantSystem {
 		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to High Temperature Radiant system heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to High Temperature Radiant system heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant, latent, and lost (must be <= 1)
@@ -867,6 +830,7 @@ namespace HighTempRadiantSystem {
 				}
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
+				DataScalableCapSizingON = false;
 			}
 
 		}

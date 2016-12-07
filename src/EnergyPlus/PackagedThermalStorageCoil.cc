@@ -198,27 +198,8 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TESCoilNum;
@@ -282,20 +263,8 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-
-
-
-
-
-
 		using WaterManager::SetupTankDemandComponent;
 		using WaterManager::SetupTankSupplyComponent;
 		using GlobalNames::VerifyUniqueCoilName;
@@ -310,18 +279,8 @@ namespace PackagedThermalStorageCoil {
 		using DataZoneEquipment::FindControlledZoneIndexFromSystemNodeNumberForZone;
 		using DataHeatBalance::IntGainTypeOf_PackagedTESCoilTank;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetTESCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int item; // do loop counter
@@ -4696,29 +4655,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine sets an index for a given TES Cooling Coil -- issues error message if that
 		// coil is not a legal TES Cooling Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		// Obtains and allocates TESCoil related parameters from input file
 		if ( GetTESInputFlag ) { // First time subroutine has been called, get input data
 			GetTESCoilInput();
@@ -4760,26 +4696,6 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets a given TES Cooling Coil's air inlet node -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
@@ -4825,26 +4741,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's air outlet node -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4888,26 +4784,6 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets a given TES Cooling Coil's cooling only capacity -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets capacity to 0, otherwise, returns cooling capacity.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
@@ -4960,26 +4836,6 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets a given TES Cooling Coil's evaporator air flow rate -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air flow to 0, otherwise, returns cooling air flow rate.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;

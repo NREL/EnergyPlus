@@ -87,6 +87,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -151,7 +152,6 @@ namespace LowTempRadiantSystem {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
-
 	using DataHeatBalance::Material;
 	using DataHeatBalance::TotMaterials;
 	using DataHeatBalance::MaxLayersInConstruct;
@@ -160,15 +160,12 @@ namespace LowTempRadiantSystem {
 	using DataHeatBalance::TotConstructs;
 	using DataHeatBalance::RegularMaterial;
 	using DataHeatBalance::Air;
-
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataSurfaces::HeatTransferModel_CTF;
 	using DataHeatBalFanSys::QRadSysSource; // Heat source/sink value & temperature for CondFD algo.
 	using DataHeatBalFanSys::TCondFDSourceNode;
 	using DataHVACGlobals::SmallLoad;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyTdpFnWPb;
 
 	// Data
@@ -301,24 +298,8 @@ namespace LowTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RadSysNum; // Radiant system number/index in local derived types
@@ -419,9 +400,6 @@ namespace LowTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -436,23 +414,10 @@ namespace LowTempRadiantSystem {
 		using DataSizing::FractionOfAutosizedCoolingCapacity;
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
-
-
-
-
-
-
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataLoopNode;
 		using namespace DataSurfaceLists;
-
-
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		//  REAL(r64),        PARAMETER :: FlowFractionTolerance = 0.0001 ! Smallest deviation from unity for the sum of all fractions
@@ -470,12 +435,6 @@ namespace LowTempRadiantSystem {
 		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to Low Temperature Radiant system electric heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to Low Temperature Radiant system electric heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to Low Temperature Radiant system electric heating capacity sizing as fraction of autozized heating capacity
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentModuleObject; // for ease in getting objects
@@ -577,7 +536,7 @@ namespace LowTempRadiantSystem {
 			HydronicRadiantSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HydronicRadiantSysNumericFields( Item ).FieldNames = "";
 			HydronicRadiantSysNumericFields( Item ).FieldNames = cNumericFields;
-			InputProcessor::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
@@ -908,7 +867,7 @@ namespace LowTempRadiantSystem {
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
 
 			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = ConstantFlowSystem;
@@ -1157,7 +1116,7 @@ namespace LowTempRadiantSystem {
 			ElecRadSysNumericFields( Item ).FieldNames = "";
 			ElecRadSysNumericFields( Item ).FieldNames = cNumericFields;
 
-			InputProcessor::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = ElectricSystem;
@@ -1558,7 +1517,7 @@ namespace LowTempRadiantSystem {
 		// FLOW:
 
 		InitErrorsFound = false;
-		
+
 		if ( MyOneTimeFlag ) {
 			MyEnvrnFlagHydr.allocate( NumOfHydrLowTempRadSys );
 			MyEnvrnFlagCFlo.allocate( NumOfCFloLowTempRadSys );

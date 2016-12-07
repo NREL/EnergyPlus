@@ -197,18 +197,19 @@ namespace EnergyPlus {
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
+						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex,
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, PartLoadFrac,
-						                       SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, PartLoadFrac,
+											   SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
 
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
-						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
+
 
 						IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop = airMassFlowRate;
 					}
@@ -236,15 +237,14 @@ namespace EnergyPlus {
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
-
-						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, PartLoadFrac,
-						                       SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
-
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).DWHCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
+
+						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHCoilIndex,
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, PartLoadFrac,
+											   SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat);
 
 						IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop = airMassFlowRate;
 					}
@@ -308,12 +308,14 @@ namespace EnergyPlus {
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
 
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, PartLoadFrac,
-						                       SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, PartLoadFrac,
+											   SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
+
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
+
 
 						IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop = airMassFlowRate;
 					}
@@ -345,9 +347,9 @@ namespace EnergyPlus {
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
 
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCWHCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, PartLoadFrac,
-						                       SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, PartLoadFrac,
+											   SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
 
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHCoilIndex,
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
@@ -378,18 +380,19 @@ namespace EnergyPlus {
 						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
 						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
 
+
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHWHCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, PartLoadFrac,
-						                       SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, PartLoadFrac,
+											   SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat);
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SCDWHCoolCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, PartLoadFrac,
-						                       SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat );
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, PartLoadFrac,
+											   SpeedNum, SpeedRatio, SensLoad, LatentLoad, OnOffAirFlowRat);
 
 						SimVariableSpeedCoils( BlankString, IntegratedHeatPumps( DXCoilNum ).SHCoilIndex,
-						                       CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-						                       CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
+											   CyclingScheme, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
+											   CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat );
 
 						IntegratedHeatPumps( DXCoilNum ).AirFlowSavInAirLoop = airMassFlowRate;
 					}
@@ -1070,21 +1073,21 @@ namespace EnergyPlus {
 //				                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
 //				                     "System", "Average",
 //				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Air Loop Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Condenser Water Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalCoolingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Heating Coil Total Air Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalSpaceHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Water Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalWaterHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Electric Power [W]", IntegratedHeatPumps( DXCoilNum ).TotalPower, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Latent Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalLatentLoad, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Source Energy Rate [W]", IntegratedHeatPumps( DXCoilNum ).Qsource, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total COP []", IntegratedHeatPumps( DXCoilNum ).TotalCOP, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Electric Energy [J]", IntegratedHeatPumps( DXCoilNum ).Energy, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalCooling, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Air Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Water Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalWaterHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Latent Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLatent, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Total Source Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergySource, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Loop Mass Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Condenser Water Mass Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalCoolingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalSpaceHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Water Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalWaterHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Electric Power [W]", IntegratedHeatPumps( DXCoilNum ).TotalPower, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalLatentLoad, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Rate [W]", IntegratedHeatPumps( DXCoilNum ).Qsource, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump COP []", IntegratedHeatPumps( DXCoilNum ).TotalCOP, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Electric Energy [J]", IntegratedHeatPumps( DXCoilNum ).Energy, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalCooling, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Water Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalWaterHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLatent, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergySource, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 			}
 
 		}
@@ -1416,7 +1419,6 @@ namespace EnergyPlus {
 			// it should be called by an air loop parent object, when FirstHVACIteration == true
 
 			// Using/Aliasing
-
 			using DataHVACGlobals::SmallLoad;
 			using DataEnvironment::OutDryBulbTemp;
 			using WaterThermalTanks::SimWaterThermalTank;
@@ -1462,8 +1464,8 @@ namespace EnergyPlus {
 					IntegratedHeatPumps( DXCoilNum ).WHtankType, IntegratedHeatPumps( DXCoilNum ).WHtankName,
 					IntegratedHeatPumps( DXCoilNum ).WHtankID,
 					false, false,
-					MyLoad, MaxCap, MinCap, OptCap, true // TRUE if First iteration of simulation
-				);
+					MyLoad, MaxCap, MinCap, OptCap, true, IntegratedHeatPumps( DXCoilNum ).LoopNum,
+					IntegratedHeatPumps( DXCoilNum ).LoopSideNum );
 			}
 			IntegratedHeatPumps( DXCoilNum ).CheckWHCall = false;//clear checking flag
 
@@ -1772,8 +1774,6 @@ namespace EnergyPlus {
 			// This function looks up the given coil and returns the outlet node.  If
 			// incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
 			// as zero.
-
-			// Using/Aliasing
 
 			// Return value
 			int NodeNumber(0); // returned outlet node of matched coil
