@@ -89,6 +89,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -518,7 +519,7 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).DXCoilName = Alphas( 10 );
 
-			if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 				WindAC( WindACNum ).DXCoilType = Alphas( 9 );
 				CoilNodeErrFlag = false;
 				if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
@@ -527,6 +528,10 @@ namespace WindowAC {
 				} else if ( SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingHXAssisted;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXHXAsstdCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
+				} else if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
+					WindAC( WindACNum ).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+					WindAC( WindACNum ).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
+					WindAC( WindACNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( WindAC( WindACNum ).DXCoilName, ErrorsFound );
 				}
 				if ( CoilNodeErrFlag ) {
 					ShowContinueError( " that was specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
@@ -1342,6 +1347,16 @@ namespace WindowAC {
 
 		if ( WindAC( WindACNum ).DXCoilType_Num == CoilDX_CoolingHXAssisted ) {
 			SimHXAssistedCoolingCoil( WindAC( WindACNum ).DXCoilName, FirstHVACIteration, On, PartLoadFrac, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, HXUnitOn );
+		} else if ( WindAC( WindACNum ).DXCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+			Real64 QZnReq( -1.0 ); // Zone load (W), input to variable-speed DX coil
+			Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
+			Real64 MaxONOFFCyclesperHour( 4.0 ); // Maximum cycling rate of heat pump [cycles/hr]
+			Real64 HPTimeConstant( 0.0 ); // Heat pump time constant [s]
+			Real64 FanDelayTime( 0.0 ); // Fan delay time, time delay for the HP's fan to
+			Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
+
+			VariableSpeedCoils::SimVariableSpeedCoils( WindAC( WindACNum ).DXCoilName, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadFrac, WindAC( WindACNum ).DXCoilNumOfSpeeds, 1.0, QZnReq, QLatReq, OnOffAirFlowRatio );
+		
 		} else {
 			SimDXCoil( WindAC( WindACNum ).DXCoilName, On, FirstHVACIteration, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, PartLoadFrac );
 		}
