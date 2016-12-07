@@ -683,7 +683,24 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 
 \subsubsection{Field: Equivalent Rectangle Method }\label{equivalent-rectangle-method}
 
-This field is applied to a non-rectangular window or door. The equivalent rectangular surface has the same area as the non-rectangular one. The valid choices are: PolygonHeight, BaseSurfaceAspectRatio, and UserDefinedAspectRatio, with the default of PolygonHeight. When PolygonHeight is entered, the equivalent width is equal to the area divided by the PolygonHeight for a non-horizontal surface. When a surface is horizontal with the same height for all vertices, the model will automatically switch a choice to BaseSurfaceAspectRatio if a bsae surface is rectangular, or UserDefinedAspectRatio with the dfault value if a base surface is non-rectangular.  When BaseSurfaceAspectRatio is entered for a rectangular base surface, the equivalent height is equal to Square Root of Area divided by the base surface aspect ratio. The equivalent width is equal to the equivalent height * base surface aspect ratio. When a base surface is non-rectangular, the model will automatically switch a choice to PolygonHeight for a non-horizontal base surface, and UserDefinedAspectRatio with the dfault value if a base surface is horizontal. When UserDefinedAspectRatio is entered, the equivalent height is equal to Square Root of Area divided by UserDefinedAspectRatio. The equivalent width is equal to the equivalent height * user defined aspect ratio.
+This field is applied to a non-rectangular window or door. The equivalent 
+rectangular surface has the same area as the non-rectangular one. The valid
+choices are: PolygonHeight, BaseSurfaceAspectRatio, and UserDefinedAspectRatio,
+with the default of PolygonHeight. When PolygonHeight is entered, the equivalent
+width is equal to the area divided by the PolygonHeight for a non-horizontal
+surface. When a surface is horizontal with the same height for all vertices,
+the model will automatically switch a choice to BaseSurfaceAspectRatio if a
+base surface is rectangular, or UserDefinedAspectRatio with the default value if
+a base surface is non-rectangular.  When BaseSurfaceAspectRatio is entered for
+a rectangular base surface, the equivalent height is equal to Square Root of
+Area divided by the base surface aspect ratio. The equivalent width is equal
+to the equivalent height times the base surface aspect ratio. When a base
+surface is non-rectangular, the model will automatically switch the choice to
+PolygonHeight for a non-horizontal base surface, and UserDefinedAspectRatio
+with the default value if a base surface is horizontal. When
+UserDefinedAspectRatio is entered, the equivalent height is equal to Square
+Root of Area divided by UserDefinedAspectRatio. The equivalent width is equal
+to the equivalent height times the user-defined aspect ratio.
 
  \subsubsection{Field: Equivalent Rectangle Aspect Ratio}\label{equivalent-rectangular-aspect-ratio}
 
