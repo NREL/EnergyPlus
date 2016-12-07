@@ -7,6 +7,9 @@
 !
 ! Highlights:              Natural ventilation through openable exterior windows and openable interior door.
 !                          The analytical solution is used to solve zone air heat and moisture balance equations.
+!                          A rectangular window was split into two triangular windows to demonstrate how the 
+!                          AirflowNetwrok model handles non-rectangular windows. Rectangular windows are recommended 
+!                          to be used in most cases.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the design days only.
@@ -759,9 +762,9 @@
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     3,                       !- Number of Vertices
-    1.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}
-    5.000000,0,1.0000000,  !- X,Y,Z ==> Vertex 3 {m}
-    5.000000,0,2.500000;  !- X,Y,Z ==> Vertex 4 {m}
+    5.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}
+    5.000000,0,2.5000000,  !- X,Y,Z ==> Vertex 3 {m}
+    1.000000,0,2.500000;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     DoorInSurface_3,         !- Name
