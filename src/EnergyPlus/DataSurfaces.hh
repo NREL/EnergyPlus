@@ -553,7 +553,9 @@ namespace DataSurfaces {
 		bool
 		operator ==( Surface2D const & a, Surface2D const & b )
 		{
-			return eq( a.vertices, b.vertices );
+			auto const & v1 = a.vertices;
+			auto const & v2 = b.vertices;
+			return eq( v1, v2 );		
 		}
 
 		// Inequality
@@ -1123,9 +1125,8 @@ namespace DataSurfaces {
 		Real64 VentingOpenFactorMultRep; // Window/door opening modulation multiplier on venting open factor, for reporting
 		Real64 InsideTempForVentingRep; // Inside air temp used to control window/door venting, for reporting (C)
 		Real64 VentingAvailabilityRep; // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
-		Real64 IllumFromWinAtRefPt1Rep; // Illuminance from window at reference point #1 [lux]
-		Real64 IllumFromWinAtRefPt2Rep; // Illuminance from window at reference point #2 [lux]
-		Real64 LumWinFromRefPt1Rep; // Window luminance as viewed from reference point #1 [cd/m2]
+		Array1D< Real64 > IllumFromWinAtRefPtRep; // Illuminance from window at reference point #1 [lux]
+		Array1D< Real64 > LumWinFromRefPtRep; // Window luminance as viewed from reference point #1 [cd/m2]
 		Real64 LumWinFromRefPt2Rep; // Window luminance as viewed from reference point #2 [cd/m2]
 		Real64 SkySolarInc; // Incident diffuse solar from sky; if CalcSolRefl is true, includes
 		// reflection of sky diffuse and beam solar from exterior obstructions [W/m2]
@@ -1305,10 +1306,6 @@ namespace DataSurfaces {
 			VentingOpenFactorMultRep( 0.0 ),
 			InsideTempForVentingRep( 0.0 ),
 			VentingAvailabilityRep( 0.0 ),
-			IllumFromWinAtRefPt1Rep( 0.0 ),
-			IllumFromWinAtRefPt2Rep( 0.0 ),
-			LumWinFromRefPt1Rep( 0.0 ),
-			LumWinFromRefPt2Rep( 0.0 ),
 			SkySolarInc( 0.0 ),
 			GndSolarInc( 0.0 ),
 			SkyGndSolarInc( 0.0 ),

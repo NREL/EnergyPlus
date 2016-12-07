@@ -41,7 +41,7 @@ Construction & ~ & X & ~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
 Coil:DX Coil:Cooling:DX: SingleSpeed & X & ~ & X & X & ~ & ~ & ~ & ~ & X \tabularnewline
 Chiller:Electric & X & ~ & X & X & ~ & ~ & ~ & ~ & ~ \tabularnewline
 ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
-Coil:Heating:Gas & X & ~ & X & X & ~ & ~ & ~ & ~ & X \tabularnewline
+Coil:Heating:Fuel & X & ~ & X & X & ~ & ~ & ~ & ~ & X \tabularnewline
 Daylighting:Controls & X & ~ & ~ & ~ & ~ & ~ & ~ & ~ & X \tabularnewline
 Shading:Zone:Detailed & ~ & X & ~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
 Lights & X & ~ & X & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
@@ -67,7 +67,7 @@ Chiller:Electric
 
 This choice of object type is used to calculate the cost of a central chiller. The object name entered in following field must correspond to a Chiller:Electric object name defined elsewhere in the input file. Cost can be entered in three different ways, (1) per each, (2) per kW total cooling capacity or (3) per kW total cooling capacity per COP (coefficient of performance). The program will determine which method to use by examining which input fields have non-zero values. It is an error to specify costs in more than one way. The per-each approach is most useful for discrete chillers. The per-kW approach is useful for autosizing chillers with the same COP. The per-kW-per-COP approach is convenient for modeling autosized chillers with differing COPs as long as a linear relationship is sufficient.
 
-\subparagraph{Coil:Heating:Gas}\label{coilheatinggas}
+\subparagraph{Coil:Heating:Fuel}\label{coilheatinggas}
 
 This choice of object type is used to calculate the cost of gas-fired heating equipment. Cost can be entered in three different ways, (1) per each, (2) per kW of heating capacity, or (3) per kW total cooling capacity per nominal efficiency (actually uses the per kW per COP field). The program will determine which method to use by examining which input fields have non-zero values. It is an error to specify costs in more than one way. The per-each approach is most useful for discrete packages. The per-kW approach is useful for autosizing heating coils with the same efficiency. The per-kW-per-Eff approach is convenient for modeling autosized heating coils with differing efficiencies as long as a linear relationship is sufficient.
 
@@ -111,7 +111,7 @@ This field is used to enter cost information on a per-kilowatt basis. The units 
 
 \paragraph{Field: Cost per Unit of Output Capacity per COP}\label{field-cost-per-unit-of-output-capacity-per-cop}
 
-This field is used to enter cost information on a per-kilowatt-per-COP basis. The units are dollars per kilowatt per non-dimensional COP (\$/kW-COP).~ Note that this field can be used for Coil:Heating:Gas cost modeling in which case the better terminology would be per-kilowatt-per-non-dimensional-efficiency.
+This field is used to enter cost information on a per-kilowatt-per-COP basis. The units are dollars per kilowatt per non-dimensional COP (\$/kW-COP).~ Note that this field can be used for Coil:Heating:Fuel cost modeling in which case the better terminology would be per-kilowatt-per-non-dimensional-efficiency.
 
 \paragraph{Field: Cost per Volume}\label{field-cost-per-volume}
 

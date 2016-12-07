@@ -1351,7 +1351,7 @@
     TRoo;                    !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:To:Variable,
-    yShadeEP,            !- Name
+    yShadeEP,                !- Name
     ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     yShade,                  !- FMU Variable Name

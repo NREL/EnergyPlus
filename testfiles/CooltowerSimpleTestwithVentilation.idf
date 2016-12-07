@@ -2295,5 +2295,5 @@
     AllSummary;              !- Report 1 Name
 
   Output:SQLite,
-    Simple;
+    Simple;                  !- Option Type
 

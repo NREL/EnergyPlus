@@ -5,6 +5,8 @@ Outdoor Air Controller Cleanup - Issue #4663
 
  - April 22, 2016
  - Revised April 28, 2016
+ - Revised July 28-30, 2016 (see dated notes below)
+ - Revised August 30, 2016 (back away from autosizing change for Controller:OutdoorAir Minimum Outdoor Air Flow Rate)
 
 ## Conference Calls and Other Discussion ##
 
@@ -115,21 +117,50 @@ The current combination of Controller:OutdoorAir plus Controller:MechanicalVenti
 
 ```
 
-## Proposed Changes ##
+## Proposed/Actual Changes ##
 
-1. No changes to `Controller:MechanicalVentilation` and `Controller:OutdoorAir` inputs.
+x 1. No changes to `Controller:MechanicalVentilation` and `Controller:OutdoorAir` inputs.
 
-2. In `Controller:MechanicalVentilation` make the zone names and design object names optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there. *This would be consistent with current docs and warning messages.*
+x 2. In `Controller:MechanicalVentilation` make the zone names and design object names optional.  If all of the zones have a Sizing:Zone object, then the designspec info will be taken from there. *This would be consistent with current docs and warning messages.*
 
-3. Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero if one of the advanced methods (VRP, DCV, IAQ) of control is selected.  *Or maybe autosize to the non-per-person flow?*
+3.  *July 28, 2016* Change the autosizing for `Controller:OutdoorAir` Minimum Outdoor Air Flow Rate to be zero **if a Controller:MechanicalVentilation object is specified.**
+~~if one of the advanced methods (VRP, DCV, IAQ) of control is selected.  *Or maybe autosize to the non-per-person flow?*~~
+*August 30, 2016* This change was removed, postponed for further review.
 
-4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
 
-5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Schedule Name" to "Outdoor Air Schedule Name" and use this schedule in `Controller:MechanicalVentilation`.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
+x 4. Make the `Controller:OutdoorAir` Maximum Fraction of Outdoor Air Schedule Name be king - OA fraction can never be greater than the current schedule value.
+    *July 29, 2016* **Order of Precedence for OA Flow Rate Limit Checks**
+    - Minimum Outdoor Air Flow Rate * Minimum Outdoor Air Schedule
+    - Apply economizer controls
+    - OA flow rate >= Controller:MechanicalVentilation OA flow rate
+    - OA flow rate >= System exhaust flow rate
+    - (OA flow rate)/(Current Mixed air flow rate) >= Minimum Fraction of Outdoor Air Schedule
+    - (OA flow rate)/(Current Mixed air flow rate) <= Maximum Fraction of Outdoor Air Schedule (even if this is smaller than Min Fraction  schedule)
+    - OA flow rate <= Maximum Outdoor Air Flow Rate
+    - Apply OA mass flow rate specified by demand limiting
+    - Apply OA mass flow rate specified by EMS
+    - OA flow rate <= Current mixed air flow rate (system flow rate) **previously this check was before demand limiting and EMS, but my understanding is that OA flow > Mixed air flow can cause problems further into the system simulation.**
+
+x 5. Rename `DesignSpecification:OutdoorAir` "Outdoor Air Flow Rate Fraction Schedule Name" to "Outdoor Air Schedule Name" and use this schedule in `Controller:MechanicalVentilation`.  Currently it is ignored. *The primary goal here is to address the original issue that setting this schedule to zero should shut off OA.  There is a question of how this would be applied for the CO2 and IAQP methods.*
+    - *July 30, 2016 Implementation notes*
+    - OARequirements (which holds DesignSpecification:OutdoorAir)
+    - OARequirements includes this variable: Real64 MaxOAFractionSchValue; // - Maximum value from OAFlow fraction schedule (used for sizing) which is set in SizingManager::ProcessInputOARequirements but it's never used. **Deleted**
+    - DataZoneEquipment::CalcDesignSpecificationOutdoorAir calculates an OA flow rate but has arguments to control whether the DSOA Schedule is to be applied or not.
+    - ZoneEquipmentManager:SetUpZoneSizingArrays calls CalcDesignSpecificationOutdoorAir with UseMinOASchFlag=false
+    - AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir, ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem call CalcDesignSpecificationOutdoorAir and always sets UseMinOASchFlag=true
+    - When DesignSpecification:OutdoorAir input is processed, the choice of method will silently zero out all other OA rate inputs if one of the exclusive OA methods, such as Flow/Person, is used.
+    - Controller:MechanicalVentilation does not use CalcDesignSpecificationOutdoorAir
+    - Controller:MecahnicalVentilation does not store grab either the outdoor air method, but it checks it during init and calc
+    - **New July 30, 2016** Add more columns to HVAC Sizing Summary table Demand Controlled Ventilation using Controller:MechanicalVentilation
+    - **FIXED** Schedule name was not correct in above report for air distribution effectiveness when not specified, now is blank.
+    
 
 6. Change "Time of Day Economizer Control Schedule" to apply to any type of economizer control, and add a new Economizer Control Type = TimeOfDay.
+*Not done, postponed for further review.*
 
-7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
+x 7. Refactor MixedAir::CalcOAController to make separate functions for each control type.  Current CalcOAController is over 1000 lines long.
+
+x 8. *August 30, 2016* Added new output variable "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate".
 
 ## Modified Objects ##
 

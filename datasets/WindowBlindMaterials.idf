@@ -2,7 +2,6 @@
 ! WindowBlindMaterials.idf
 !
 ! EnergyPlus Reference Data Set for Window Blinds
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   WindowMaterial:Blind,

@@ -1215,9 +1215,9 @@ This is the condensing temperature of the VRF system operating at heating mode. 
 
 This is the subcooling degrees of the VRF system operating at heating mode. This value is manipulated by each VRF terminal unit to adjust the heating capacity of the coil considering the load conditions of the zone. It affects the heating coil surface temperature and thus the heating capacity of the coil.
 
-\subsection{Coil:Heating:Gas}\label{coilheatinggas-000}
+\subsection{Coil:Heating:Fuel}\label{coilheatinggas-000}
 
-The gas heating coil is a simple capacity model with a user inputted gas burner efficiency. The default for the gas burner efficiency is 80\%. This coil will be simpler than shown in Figure~\ref{fig:example-air-loop-heating-cooling-coil} since it will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.
+The fuel heating coil is a simple capacity model with a user inputted gas burner efficiency. The default for the burner efficiency is 80\%. This coil will be simpler than shown in Figure~\ref{fig:example-air-loop-heating-cooling-coil} since it will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand.
 
 \subsubsection{Inputs}\label{inputs-10-006}
 
@@ -1229,7 +1229,11 @@ A unique identifying name for each coil.
 
 Schedule that defines when the coil is available. If the schedule s value is 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
 
-\paragraph{Field: Gas Burner Efficiency}\label{field-gas-burner-efficiency}
+\paragraph{Field: Fuel Type}\label{field-gas-burner-efficiency}
+
+This field designates the appropriate fuel type for the coil. Valid fuel types are: Gas, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, DistrictHeating, DistrictCooling, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. NaturalGas is the default.
+
+\paragraph{Field: Burner Efficiency}\label{field-gas-burner-efficiency}
 
 This is user inputted gas burner efficiency (decimal, not percent) and is defaulted to 80\%.
 
@@ -1239,11 +1243,11 @@ This is the maximum capacity of the coil (W). This controlled coil will only pro
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-6}
 
-The name of the air inlet to the gas coil, i.e.~Heating Coil Air Inlet Node.
+The name of the air inlet to the coil, i.e.~Heating Coil Air Inlet Node.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-6-000}
 
-The name of the air outlet from the gas coil, i.e.~Heating Coil Air Outlet Node.
+The name of the air outlet from the coil, i.e.~Heating Coil Air Outlet Node.
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name-4}
 
@@ -1251,11 +1255,11 @@ If the coil is used in the air loop simulation and is temperature controlled usi
 
 \paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-1}
 
-This is the parasitic electric load associated with the gas coil operation, such as an inducer fan, etc.. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
+This is the parasitic electric load associated with the coil operation, such as an inducer fan, etc.. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name}
 
-This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of gas consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil). For any simulation timestep, the nominal gas consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined. The part-load curve accounts for efficiency losses due to transient coil operation.
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of fuel consumption rate by the heating coil as a function of the part load ratio (PLR, sensible heating load/nominal capacity of the heating coil). For any simulation timestep, the nominal fuel consumption rate (heating load/burner efficiency) is divided by the part-load fraction (PLF) if a part-load curve has been defined. The part-load curve accounts for efficiency losses due to transient coil operation.
 
 The part-load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the heating coil runs continuously for the simulation timestep). For PLR values between 0 and 1 ( 0 \textless{} = PLR \textless{} 1), the following rules apply:
 
@@ -1269,9 +1273,9 @@ A typical part load fraction correlation for a conventional gas heating coil (e.
        PLF = 0.8 + 0.2(PLR)
 \end{lstlisting}
 
-\paragraph{Field: Parasitic Gas Load}\label{field-parasitic-gas-load}
+\paragraph{Field: Parasitic Fuel Load}\label{field-parasitic-gas-load}
 
-This numeric field is the parasitic gas load associated with the gas coil s operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the gas heating coil is not operating.
+This numeric field is the parasitic fuel load associated with the coil's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the heating coil is not operating.
 
 \subsubsection{Outputs}\label{outputs-9-002}
 
@@ -1283,7 +1287,7 @@ This numeric field is the parasitic gas load associated with the gas coil s oper
 \item
   HVAC,Sum,Heating Coil Gas Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Gas Rate {[}W{]}
+  HVAC,Average,Heating Coil <Fuel Type> Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Electric Energy {[}J{]}
 \item
@@ -1291,9 +1295,9 @@ This numeric field is the parasitic gas load associated with the gas coil s oper
 \item
   HVAC,Average,Heating Coil Runtime Fraction {[]}
 \item
-  HVAC,Sum,Heating Coil Ancillary Gas Energy {[}J{]}
+  HVAC,Sum,Heating Coil Ancillary <Fuel Type> Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Ancillary Gas Rate {[}W{]}
+  HVAC,Average,Heating Coil Ancillary <Fuel Type> Rate {[}W{]}
 \end{itemize}
 
 \paragraph{Heating Coil Air Heating Energy {[}J{]}}\label{heating-coil-air-heating-energy-j-2}
@@ -1304,11 +1308,11 @@ This field is the total heating output of the coil in Joules over the timestep b
 
 This field is the average heating rate output of the coil in Watts over the timestep being reported.
 
-\paragraph{Heating Coil Gas Energy {[}J{]}}\label{heating-coil-gas-energy-j}
+\paragraph{Heating Coil <Fuel Type> Energy {[}J{]}}\label{heating-coil-gas-energy-j}
 
-This field is the gas consumption of the heating coil in Joules over the timestep being reported, including the impacts of part-load performance if a part load fraction correlation is specified. This output is also added to a meter with Resource Type = Gas, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
+This field is the fuel consumption of the heating coil in Joules over the timestep being reported, including the impacts of part-load performance if a part load fraction correlation is specified. This output is also added to a meter with Resource Type = Gas, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Gas Rate {[}W{]}}\label{heating-coil-gas-rate-w}
+\paragraph{Heating Coil <Fuel Type> Rate {[}W{]}}\label{heating-coil-gas-rate-w}
 
 This field is the average gas consumption rate of the coil in Watts over the timestep being reported, including the impacts of part-load performance if a part load fraction correlation is specified.
 
@@ -1324,13 +1328,13 @@ This field is the average electric consumption rate of the heating coil auxiliar
 
 This field is the runtime fraction of the coil over the timestep being reported.
 
-\paragraph{Heating Coil Ancillary Gas Energy {[}J{]}}\label{heating-coil-ancillary-gas-energy-j}
+\paragraph{Heating Coil Ancillary <Fuel Type> Energy {[}J{]}}\label{heating-coil-ancillary-gas-energy-j}
 
-This field is the parasitic gas consumption of the heating coil in Joules over the timestep being reported (e.g., standing pilot light). The model assumes that the parasitic load is accumulated only for the portion of the simulation timestep where the gas heating coil is not operating. This output is also added to a meter with Resource Type = Gas, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
+This field is the parasitic fuel consumption of the heating coil in Joules over the timestep being reported (e.g., standing pilot light). The model assumes that the parasitic load is accumulated only for the portion of the simulation timestep where the gas heating coil is not operating. This output is also added to a meter with Resource Type = '<Fuel Type>', End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Ancillary Gas Rate {[}W{]}}\label{heating-coil-ancillary-gas-rate-w}
+\paragraph{Heating Coil Ancillary <Fuel Type> Rate {[}W{]}}\label{heating-coil-ancillary-gas-rate-w}
 
-This field is the average parasitic gas consumption rate of the heating coil (e.g., standing pilot light) in Watts over the timestep being reported. The model assumes that the parasitic load is present only for the portion of the simulation timestep where the gas heating coil is not operating.
+This field is the average parasitic gas consumption rate of the heating coil (e.g., standing pilot light) in Watts over the timestep being reported. The model assumes that the parasitic load is present only for the portion of the simulation timestep where the heating coil is not operating.
 
 \subsection{Coil:Heating:Gas:MultiStage}\label{coilheatinggasmultistage}
 
@@ -5130,6 +5134,234 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
 \subsubsection{Outputs}\label{outputs-21}
 
 No variables are reported for this compound object. However, outputs are provided by the cooling coil and heat exchanger that are specified.
+
+\subsection{CoilSystem:IntegratedHeatPump:AirSource}\label{ASIHPIO}
+
+CoilSystem:IntegratedHeatPump:AirSource is a collection of all the working modes in an air-source integrated heat pump, including space cooling (SC), space heating (SH), dedicated water heating (DWH), combined space cooling and water heating with full condensing(SCWH), combined space cooling and water heating with desuperheating (SCDWH), combined space heating and water heating with desuperheating (SHDWH). These working modes should also be referred to in other related air loop or water loop parent objects, for example, AirLoopHVAC:UnitarySystem and WaterHeater:HeatPump:PumpedCondenser, to represent the air side and water side node connections, and facilitate iterating the speed to match the space conditioning or water heating load. In addition, CoilSystem:IntegratedHeatPump:AirSource contains a series of criteria for selecting a working mode at the beginning of each timestep. 
+
+\subsubsection{Inputs}\label{inputs-ASIHP}
+
+\paragraph{Field: Name}\label{field-name-ASIHP}
+
+This alpha field defines a unique user-assigned name for an instance of an air-source integrated heat pump. 
+
+\paragraph{Field: Supply Water Monitoring Node Name}\label{Field-Supply-Water-Monitoring-Node-Name-ASIHP}
+
+This alpha field defines a water side node to monitor the supply water amount after the water heating operation of the integrated heat pump is turned on. 
+
+\paragraph{Field: Space Cooling Mode Coil Name}\label{Field-Space-Cooling-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the space cooling (SC) mode in an ASIHP, which must be given. The SC mode refers to the name of a Coil:Cooling:DX:VariableSpeed object, which contains all the performance curves and rated values to describe the space cooling operation. 
+
+\paragraph{Field: Space Heating Mode Coil Name}\label{Field-Space-Heating-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the space heating (SH) mode in the ASIHP, which must be given. The SH mode refers to the name of a Coil:Heating:DX:VariableSpeed object, which contains all the performance curves and rated values to describe the space heating operation. 
+
+\paragraph{Field: Water Heating Mode Coil Name}\label{Field-Water-Heating-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the dedicated water heating (DWH) mode in the ASIHP, which must be given. The DWH mode refers to the name of a Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with outdoor air source. 
+
+\paragraph{Field: SCWH Mode Coil Name}\label{Field-SCWH-Mode-Coil-Name-ASIHP}
+
+This alpha field defines the combined space cooling and water heating with full condensing (SCWH) in an ASIHP, which must be given. The SCWH mode refers to the name of a Coil:WaterHeating:--AirToWaterHeatPump:VariableSpeed object, which contains all the performance curves and rated values to describe the water heating operation with an indoor air source. The SCWH mode is connected to the same WaterHeater:HeatPump:--PumpedCondenser as the DWH mode, and the same air side node connections as the SC mode. 
+
+\paragraph{Field: SCDWH Mode Cooling Coil Name}\label{Field-SCDWH-Mode-Cooling-Coil-Name-ASIHP}
+
+This alpha field defines the cooling operation in the combined space cooling and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. These should be a different object from the SC mode. It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX:VariableSpeed object. That means the power consumption at each speed level of the SCDWH mode is accounted for by the cooling coil part.
+
+\paragraph{Field: SCDWH Mode Water Heating Coil Name}\label{Field-SCDWH-Mode-Water-Heating-Coil-Name-ASIHP}
+
+This alpha field defines the water heating operation in the combined space cooling and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted for by the cooling coil part.
+
+\paragraph{Field: SHDWH Mode Heating Coil Name}\label{Field-SHDWH-Mode-Heating-Coil-Name-ASIHP}
+
+This alpha field defines the heating operation in the combined space heating and water heating with desuperheating (SHDWH) mode in an ASIHP, which must be given. This should be a different object from the SH mode. It should be noted that the rated power and power correction curves are contained in the Coil:Heating:DX:VariableSpeed object. That means the power consumption at each speed level of the SHDWH mode is accounted for by the cooling coil part.
+
+\paragraph{Field: SHDWH Mode Water Heating Coil Name}\label{Field-SHDWH-Mode-Water-Heating-Coil-Name-ASIHP}
+
+This alpha field defines the water heating operation in the combined space heating and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:--VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted for by the heating coil part.
+
+\paragraph{Field: SCWH Mode Minimum Indoor Temperature to Allow  Overcooling}\label{Field-SCWH-Minimum-In-Overcooling-ASIHP}
+
+This numeric field defines an indoor air temperature [C] above which indoor overcooling is allowed in the cooling operation, i.e., allowing running the SCWH mode to cool down the indoor air below the thermostat setting temperature, and iterate the compressor speed to match the water heating load. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when allowing indoor overcooling by running the SCWH mode. 
+
+
+\paragraph{Field: SCWH Mode Minimum Outdoor Temperature to Allow Overcooling}\label{Field-SCWH-Minimum-Outdoor-ASIHP}
+
+This numeric field defines an ambient air temperature above which indoor overcooling is allowed in the cooling operation, i.e., allowing running the SCWH mode to cool down the indoor air below the thermostat setting temperature, and iterate the compressor speed to match the water heating load. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when allowing overcooling the indoor by running the SCWH mode. 
+
+\paragraph{Field: Minimum Indoor Temperature to Ignore Space Heating Call}\label{Field-Minimum-Indoor-IgnoreSH-ASIHP}
+
+This numeric field defines an indoor air temperature [C] above which the water heating request has the higher priority and the space heating call can be ignored. The ASIHP will run the DWH mode to match the water heating load regardless of space heating call. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when a space heating call can be ignored. 
+
+
+\paragraph{Field: Minimum Outdoor Temperature to Ignore Space Heating Call}\label{Field-Minimum-Outdoor-IgnoreSH-ASIHP}
+
+This numeric field defines an ambient air temperature [C] above which the water heating request has the higher priority and the space heating call can be ignored. The ASIHP will run the DWH mode to match the water heating load regardless of space heating call. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when a space heating call can be ignored. 
+
+
+\paragraph{Field: SCWH Mode Load Matching Type}\label{Field-SCWH-Matching-Type-ASIHP}
+
+This choice field specifies the control in the SCWH mode. The choices are CoolingLoad or WaterHeatingLoad. During the SCWH operation when both the space cooling and water heating calls exist, if the field is CoolingLoad, it means that the compressor speed is iterated to match the space cooling load, and the water heating energy is a byproduct.  If this field is WaterHeatingLoad, it means that the speed is altered to match the water heating load, and the space cooling energy is a byproduct. 
+
+
+
+\paragraph{Field: SCWH Mode Minimum Speed}\label{Field-SCWH-Minimum-Speed-ASIHP}
+
+This numeric field defines a minimum speed level for running the SCWH; i.e., the compressor speed will be altered between the minimum speed specified and top speed, responding to the simultaneous space cooling and water heating calls. If there is only a water heating call, this input will not be used. 
+
+\paragraph{Field: SCDWH Mode Maximum Heated Water Vol Before Switching to SCWH}\label{Field-SCDWH-Max-Water-ASIHP}
+
+This numeric field defines an accumulative, heated water volume [m3] before switching from SCDWH to SCWH mode. When there are simultaneous space cooling and water heating calls, the ASIHP will run SCDWH first to satisfy a small water heating load. If the water volume heated by the heat pump goes beyond the limit, it means that the SCDWH, which uses a desuperheater, cannot provide enough capacity for the water heating request, and thus the SCWH mode will be turned on. 
+
+
+
+\paragraph{Field: SCDWH Mode Minimum Speed}\label{Field-SCDWH-MinSped-ASIHP}
+
+This numeric field defines a minimum speed level for running the SCDWH; i.e., the compressor speed will be altered between the minimum speed specified and top speed to match the space cooling load, and the water heating energy is a byproduct. 
+
+\paragraph{Field: SHDWH Mode Time Limit Before Turning on Electric Water Heating Element}\label{Field-SHDWH-HeatElemement-ASIHP}
+
+This numeric field defines the running time [s] of the SHDWH mode before electric heating elements in the connected water tank are turned on if the water heating request cannot be satisfied on time. When there are simultaneous space heating and water heating calls, the ASIHP will run SHDWH mode first to satisfy a small water heating load. If the running time goes beyond the time limit, it means that the SHDWH mode, which uses a desuperheater, cannot provide enough capacity for the water heating request, and thus the electric elements in the water tank will be turned on to supplement the heating capacity.
+
+\paragraph{Field: SHDWH Mode Minimum Speed}\label{Field-SHDWH-Mode-Minimum-Speed-ASIHP}
+
+This numeric field defines a minimum speed level for running the SHDWH mode; i.e., the compressor speed will be altered between the minimum speed and top speed to match the space heating load. Consequently, the water heating capacity is the byproduct.
+
+
+
+\paragraph{An IDF example:}\label{FieldIDFExample-ASIHP}
+
+
+An IDF example showing how this object is:
+
+
+\begin{lstlisting}
+CoilSystem:IntegratedHeatPump:AirSource,
+  ASIHP1,        !- Name of an air-source integrated heat pump
+  TankoutNod,    !- Name of a water node for  monitoring the supply water flow amount
+  SCCoil1,       !- Coil object Name of space cooling mode 
+  SHCoil1,       !- Coil object Name of space heating mode 
+  DWHCoil1,      !- Coil object Name of dedicated water heating mode 
+  SCWHCoil1,     !- Coil object Name for SCWH mode
+  SCDWHCoil1     !- Coil object Name for cooling part of SCDWH mode
+  SCDWHCoil2     !- Coil object Name for WH part of SCDWH mode
+  SHDWHCoil1     !- Coil object Name for space heating part of SHDWH mode
+  SHDWHCoil2     !- Coil object Name for WH part of SHDWH mode
+  23.0,          !-{C},indoor temperature above which indoor overcooling is allowed
+  28.0,          !-{C},outdoor temperature above which indoor overcooling is allowed
+  20.0,          !-{C},indoor temperature above which water heating has the higher priority
+  16.0,          !-{C},outdoor temperature above which water heating has the higher priority
+  0,             !-0: match cooling load, 1: match water heating load in SCWH mode
+  2,             !- minimum speed level for SCWH mode
+  3.0,           !- {m3}, limit of heated water volume before switching from SCDWH to SCWH mode
+  2,             !- minimum speed level for SCDWH mode
+  600,           !- {s}, time limit before turning on electric element in SHDWH mode
+  5;             !- minimum speed level for SHDWH mode
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-011}
+
+The output variables that are available for this air source integrated heat pump are shown below:
+
+\begin{itemize}
+\item
+  HVAC, Average, Integrated Heat Pump Air Loop Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC, Average, Integrated Heat Pump Condenser Water Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC, Average, Integrated Heat Pump Air Total Cooling Rate {[}W{]}
+\item
+  HVAC, Average, Integrated Heat Pump Air Heating Rate {[}W{]}
+\item
+  HVAC, Average, Integrated Heat Pump Water Heating Rate {[}W{]}
+\item
+  HVAC, Average, Integrated Heat Pump Electric Power {[}W{]}
+\item
+  HVAC, Average, Integrated Heat Pump Air Latent Cooling Rate {[}W{]}
+\item
+  HVAC, Average, Integrated Heat Pump Source Heat Transfer Rate {[}W{]}
+ \item
+  HVAC, Average, Integrated Heat Pump COP {[}{]}
+ \item
+  HVAC, Sum, Integrated Heat Pump Electric Energy {[}J{]}
+ \item
+  HVAC, Sum, Integrated Heat Pump Air Total Cooling Energy {[}J{]}
+  \item
+  HVAC, Sum, Integrated Heat Pump Air Heating Energy {[}J{]}
+\item
+  HVAC, Sum, Integrated Heat Pump Water Heating Energy {[}J{]}
+ \item
+  HVAC, Sum, Integrated Heat Pump Air Latent Cooling Energy {[}J{]}
+ \item
+  HVAC, Sum, Integrated Heat Pump Source Heat Transfer Energy {[}J{]}
+
+\end{itemize}
+
+\paragraph{Integrated Heat Pump Air Loop Mass Flow Rate {[}kg/s{]}}\label{Out-Air-Loop-Flow-Rate-ASIHP}
+The output variable is the air mass flow rate in the indoor air loop, over the timestep being reported. 
+
+\paragraph{Integrated Heat Pump Condenser Water Mass Flow Rate {[}kg/s{]}}\label{Out-Cond-water-Flow-ASIHP}
+
+The output variable is the hot water mass flow rate through the condenser of the heat pump water heater, over the timestep being reported.
+
+\paragraph{Integrated Heat Pump Air Total Cooling Rate {[}W{]}}\label{Out-Cooling-Coil-Total-Cooling-Rate-ASIHP}
+
+The output variable is the average total cooling load provided by the integrated heat pump, which includes the sensible and latent load in watts over the timestep being reported.
+
+
+\paragraph{Integrated Heat Pump Air Heating Rate {[}W{]}}\label{Out-Heating-Total-Air-Heating-Rate-ASIHP}
+
+The output variable is the average total heating load provided by the integrated heat pump in watts over the timestep being reported.
+
+
+\paragraph{Integrated Heat Pump Water Heating Rate {[}W{]}}\label{Out-Total-Water-Heating-Rate-ASIHP}
+
+The output variable is the average total water heating load provided by the integrated heat pump in watts over the timestep being reported.
+
+\paragraph{Integrated Heat Pump Electric Power {[}W{]}}\label{Out-Total-Electric-Power-ASIHP}
+
+The output variable is the average total electric power consumed by the integrated heat pump in watts over the timestep being reported.
+
+
+\paragraph{Integrated Heat Pump Air Latent Cooling Rate {[}W{]}}\label{Out-Total-Latent-Cooling-Rate-ASIHP}
+
+The output variable is the average latent cooling load provided by the integrated heat pump in watts over the timestep being reported.
+
+\paragraph{Integrated Heat Pump Source Heat Transfer Rate {[}W{]}}\label{Out-Total-Source-Energy-Rate-ASIHP}
+
+The output variable is the average total source energy rate absorbed or discharged to the outdoor air by the integrated heat pump in watts over the timestep being reported.
+
+
+\paragraph{Integrated Heat Pump COP {[}{]}}\label{Out-Tot-COP-ASIHP}
+
+The output variable is the average total COP (using the total delivered load divided by the electric power) by the integrated heat pump in watts over the timestep being reported. The total delivered load includes all the incurred space cooling, water heating, and space heating loads.
+
+
+\paragraph{Integrated Heat Pump Electric Energy {[}J{]}}\label{Out-Total-Electric-Energy-ASIHP}
+
+The output variable is the electric consumption of the integrated heat pump in joules over the timestep being reported. 
+
+
+\paragraph{Integrated Heat Pump Air Total Cooling Energy {[}J{]}}\label{Out-Total-Cooling-Energy-ASIHP}
+The output variable is the total space cooling output of the integrated heat pump in joules over the timestep being reported. 
+
+
+\paragraph{Integrated Heat Pump Air Heating Energy {[}J{]}}\label{Out-Total-Air-Heating-Energy-ASIHP}
+
+The output variable is the total space heating output of the integrated heat pump in joules over the timestep being reported. 
+
+\paragraph{Integrated Heat Pump Water Heating Energy{[}J{]}}\label{Out-Total-WH-Energy-ASIHP}
+The output variable is the total water heating output of the integrated heat pump in joules over the timestep being reported. 
+
+
+\paragraph{Integrated Heat Pump Air Latent Cooling Energy {[}J{]}}\label{Out-Total-LatCooling-Energy-ASIHP}
+The output variable is the total latent cooling output of the integrated heat pump in joules over the timestep being reported.
+
+\paragraph{Integrated Heat Pump Source Heat Transfer Energy {[}J{]}}\label{Out-Total-Source-Energy-ASIHP}
+The output variable is the total source energy output of the integrated heat pump in joules, absorbed or discharged to the outdoor air, over the timestep being reported.
+
+
 
 \subsection{CoilSystem:Cooling:Water:HeatExchangerAssisted}\label{coilsystemcoolingwaterheatexchangerassisted}
 

@@ -526,3 +526,4 @@
     Through: 12/31,          !- Field 9
     For: Alldays,            !- Field 10
     Until: 24:00,1.00;       !- Field 11
+

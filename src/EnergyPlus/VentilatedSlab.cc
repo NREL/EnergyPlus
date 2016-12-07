@@ -870,7 +870,7 @@ namespace VentilatedSlab {
 				//             \type choice
 				//             \key Coil:Heating:Water
 				//             \key Coil:Heating:Electric
-				//             \key Coil:Heating:Gas
+				//             \key Coil:Heating:Fuel
 				//             \key Coil:Heating:Steam
 				//        A28, \field Heating Coil Name
 				//             \type object-list
@@ -898,7 +898,7 @@ namespace VentilatedSlab {
 						}
 					} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 						VentSlab( Item ).HCoilType = Heating_ElectricCoilType;
-					} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+					} else if ( SELECT_CASE_var == "COIL:HEATING:FUEL" ) {
 						VentSlab( Item ).HCoilType = Heating_GasCoilType;
 					} else {
 						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
@@ -1782,6 +1782,7 @@ namespace VentilatedSlab {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1875,6 +1876,7 @@ namespace VentilatedSlab {
 									PrintFlag = false;
 									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 									DesCoilLoad = TempSize;
+									DataScalableCapSizingON = false;
 								} else {
 									SizingString = "";
 									PrintFlag = false;
@@ -1976,6 +1978,7 @@ namespace VentilatedSlab {
 								PrintFlag = false;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
+								DataScalableCapSizingON = false;
 							} else {
 								SizingString = "";
 								PrintFlag = false;
@@ -2186,7 +2189,7 @@ namespace VentilatedSlab {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else {
 			}}
 
@@ -2212,7 +2215,7 @@ namespace VentilatedSlab {
 			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
 			} else {
 			}}
 

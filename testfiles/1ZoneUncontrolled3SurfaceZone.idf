@@ -262,7 +262,7 @@
     CounterClockWise,        !- Vertex Entry Direction
     World;                   !- Coordinate System
 
-  BuildingSurface:Detailed,  !- This surface is equivalent to four walls as in the base file
+  BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name

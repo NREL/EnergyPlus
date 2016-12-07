@@ -494,13 +494,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -519,13 +519,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU2 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU2 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -544,13 +544,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU4 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU4 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -569,13 +569,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU3 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU3 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -594,13 +594,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU5 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU5 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
