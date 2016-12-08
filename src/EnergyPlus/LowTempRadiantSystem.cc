@@ -1217,7 +1217,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).SurfacePtr.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfaceName.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfacePowerFrac.allocate( ElecRadSys( Item ).NumOfSurfaces );
-				for ( SurfNum = 1; SurfNum <= ElecRadSys( SurfListNum ).NumOfSurfaces; ++SurfNum ) {
+				for ( SurfNum = 1; SurfNum <= SurfList( SurfListNum ).NumOfSurfaces; ++SurfNum ) {
 					ElecRadSys( Item ).SurfacePtr( SurfNum ) = SurfList( SurfListNum ).SurfPtr( SurfNum );
 					ElecRadSys( Item ).SurfaceName( SurfNum ) = SurfList( SurfListNum ).SurfName( SurfNum );
 					ElecRadSys( Item ).SurfacePowerFrac( SurfNum ) = SurfList( SurfListNum ).SurfFlowFrac( SurfNum );

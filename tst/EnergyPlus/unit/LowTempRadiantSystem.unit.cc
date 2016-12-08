@@ -1365,3 +1365,102 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 
 }
 
+TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
+
+	int RadSysNum( 1 );
+
+	std::string const idf_objects = delimited_string( {
+
+		"  ZoneHVAC:LowTemperatureRadiant:Electric,",
+		"    West Zone Radiant Floor, !- Name",
+		"    RadiantSysAvailSched,    !- Availability Schedule Name",
+		"    West Zone,               !- Zone Name",
+		"    West Zone Surface Group, !- Surface Name or Radiant Surface Group Name",
+		"    heatingdesigncapacity,   !- Heating Design Capacity Method",
+		"    100,                     !- Heating Design Capacity{ W }",
+		"    ,                        !- Heating Design Capacity Per Floor Area{ W/m2 }",
+		"    1.0,                     !- Fraction of Autosized Heating Design Capacity",
+		"    MeanAirTemperature,      !- Temperature Control Type",
+		"    2.0,                     !- Heating Throttling Range {deltaC}",
+		"    Radiant Heating Setpoints;  !- Heating Control Temperature Schedule Name",
+
+		"  ZoneHVAC:LowTemperatureRadiant:Electric,",
+		"    East Zone Radiant Floor, !- Name",
+		"    RadiantSysAvailSched,    !- Availability Schedule Name",
+		"    East Zone,               !- Zone Name",
+		"    East Zone Surface Group, !- Surface Name or Radiant Surface Group Name",
+		"    heatingdesigncapacity,   !- Heating Design Capacity Method",
+		"    100,                     !- Heating Design Capacity{ W }",
+		"    ,                        !- Heating Design Capacity Per Floor Area{ W/m2 }",
+		"    1.0,                     !- Fraction of Autosized Heating Design Capacity",
+		"    MeanAirTemperature,      !- Temperature Control Type",
+		"    2.0,                     !- Heating Throttling Range {deltaC}",
+		"    Radiant Heating Setpoints;  !- Heating Control Temperature Schedule Name",
+
+		"  ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,",
+		"    East Zone Surface Group, !- Name",
+		"    Zn002:Flr001,             !- Surface 1 Name",
+		"     0.5,                     !- Flow Fraction for Surface 1",
+		"    Zn002:Flr002,             !- Surface 2 Name",
+		"     0.5;                     !- Flow Fraction for Surface 2",
+
+		"  ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,",
+		"    West Zone Surface Group, !- Name",
+		"    Zn001:Flr001,             !- Surface 1 Name",
+		"     0.5,                     !- Flow Fraction for Surface 1",
+		"    Zn001:Flr002,             !- Surface 2 Name",
+		"     0.5;                     !- Flow Fraction for Surface 2",
+
+		"  Schedule:Compact,",
+		"    RADIANTSYSAVAILSCHED,    !- Name",
+		"    FRACTION,                !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: Alldays,            !- Field 2",
+		"    Until: 24:00,1.00;       !- Field 3",
+
+		"  Schedule:Compact,",
+		"    Radiant Heating Setpoints,   !- Name",
+		"    TEMPERATURE,             !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: Alldays,            !- Field 2",
+		"    Until: 24:00,20.0;       !- Field 3",
+
+	} );
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	Zone.allocate( 2 );
+	Zone( 1 ).Name = "WEST ZONE";
+	Zone( 2 ).Name = "EAST ZONE";
+
+	DataSurfaces::TotSurfaces = 4;
+	Surface.allocate( 4 );
+	Surface( 1 ).Name = "ZN001:FLR001";
+	Surface( 1 ).ZoneName = "WEST ZONE";
+	Surface( 1 ).Zone = 1;
+	Surface( 2 ).Name = "ZN001:FLR002";
+	Surface( 2 ).ZoneName = "WEST ZONE";
+	Surface( 2 ).Zone = 1;
+	Surface( 3 ).Name = "ZN002:FLR001";
+	Surface( 3 ).ZoneName = "EAST ZONE";
+	Surface( 3 ).Zone = 2;
+	Surface( 4 ).Name = "ZN002:FLR002";
+	Surface( 4 ).ZoneName = "EAST ZONE";
+	Surface( 4 ).Zone = 2;
+
+	GetLowTempRadiantSystem();
+	EXPECT_EQ( 2, LowTempRadiantSystem::NumOfElecLowTempRadSys );
+	EXPECT_EQ( "WEST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum ).Name );
+	EXPECT_EQ( "EAST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum + 1 ).Name );
+	EXPECT_EQ( LowTempRadiantSystem::ElectricSystem, RadSysTypes( RadSysNum ).SystemType );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).ZoneName, "WEST ZONE" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfListName, "WEST ZONE SURFACE GROUP" );
+	// the 2nd surface list group holds data for 1st elec rad sys (#5958)
+	EXPECT_EQ( DataSurfaceLists::SurfList( 2 ).Name, "WEST ZONE SURFACE GROUP" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).NumOfSurfaces, 2 );
+	// surface ptr's are not set correctly when elec rad sys "index" (e.g., ElecRadSys(N)) is not the same as surface group "index"
+	// #5958 fixes this issue
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 1 ), 1 );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 2 ), 2 );
+
+}
+
