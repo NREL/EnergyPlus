@@ -613,7 +613,7 @@ namespace EnergyPlus {
 
 		//Case 5 - heating coil in outside air stream upstream of mixer #5697
 		// economizer active, NoLockout, BypassWhenOAFlowGreaterThanMinimum
-		// economizer should be at minimum due to cold outdoor temp, OA flow at minimum, HXbypass false
+		// economizer should open to meet mixed air set point temperature, HXbypass true
 		AirLoopNum = 5;
 		OAControllerNum = 5;
 		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = false;
@@ -622,7 +622,6 @@ namespace EnergyPlus {
 		Node( OAControllerNum * 4 - 3 ).MassFlowRate = OAController( OAControllerNum ).MixMassFlow; // set the mixed air node mass flow rate
 		Node( OAControllerNum * 4 - 2 ).Temp = OAController( OAControllerNum ).OATemp; // OA inlet (actuated) air nodes, dry air
 
-//		ManageOutsideAirSystem( "OA Sys 5", true, AirLoopNum, OAControllerNum );
 		OAController( OAControllerNum ).CalcOAController( AirLoopNum, true );
 
 		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
