@@ -37,7 +37,7 @@ The *AirTerminal:SingleDuct:Mixer* object provides the zoneHVAC equipment object
 
 **Connecting Unit Ventilator to DOA**
 
-- Currently supported outdoor air control types for unit ventilator are: FixedAmount, VariablePercent and FixedTemperature. These Outdoor Air Control Types require the minimum and maximum outdoor air flow rates and the corresponding schedule fields inputs to work. These outdoor air flow rates will not used when the unit ventilator is connected DOA. Therefore, the control features will not be available when the Unit Ventilator is connected with DOA.
+- Currently supported outdoor air control types for unit ventilator are: FixedAmount, VariablePercent and FixedTemperature. These Outdoor Air Control Types require the minimum and maximum outdoor air flow rates and the corresponding schedule input fields to work. The three outdoor air flow control types will be available when the unit ventilator is connected to DOA.
  
 - Input fields: *Outdoor Air Node Name*, *Exhaust Air Node Name*, and *Mixed Air Node Name* in **ZoneHVAC:UnitVentilator** object are the node names that are used for *built-in* outdoor air mixer. These three node names are not required if the UnitVentilator object is connected to DOA. Therefore, the required field restriction need to be removed. Eventually it is recommended to replace the "built-in" outdoor air mixer with a OutdoorAir:Mixer child object as it is done for other ZoneHVAC equipment.
 
@@ -81,35 +81,30 @@ The IDD entry for **ZoneHVAC:UnitVentilator** object follows.
         \key FixedAmount
         \key VariablePercent
         \key FixedTemperature
-		\note Not used when the unit ventilator is connected to DOA
    N2 , \field Minimum Outdoor Air Flow Rate
 
         \required-field
         \units m3/s
         \autosizable
         \minimum 0.0
-		\note Not used when the unit ventilator is connected to DOA
    A4 , \field Minimum Outdoor Air Schedule Name*
 
         \required-field
         \type object-list
         \object-list ScheduleNames
         \note schedule values multiply the minimum outdoor air flow rate
-		\note Not used when the unit ventilator is connected to DOA
    N3 , \field Maximum Outdoor Air Flow Rate
 
         \required-field
         \units m3/s
         \minimum 0
         \autosizable
-		\note Not used when the unit ventilator is connected to DOA
    A5 , \field Maximum Outdoor Air Fraction or Temperature Schedule Name
 
         \note that this depends on the control type as to whether it is a fraction or temperature
         \required-field
         \type object-list
         \object-list ScheduleNames
-		\note Not used when the unit ventilator is connected to DOA
    A6 , \field Air Inlet Node Name
 
         \required-field
@@ -307,7 +302,7 @@ N/A
 <required>
 
 ###Example File and Transition changes:
-New example files using both inlet and supply side OA mixing configurations will be provided for Unit Ventilator ZoneHVAC equipment. Transition is not required.
+New example file using both inlet and supply side OA mixing configurations will be provided for Unit Ventilator ZoneHVAC equipment. Transition is not required.
 
 ###Other documents:
 None.
