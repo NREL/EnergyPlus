@@ -4068,8 +4068,8 @@ namespace MixedAir {
 										 // Par(2) = return air node number
 										 // Par(3) = outside air node number
 										 // Par(4) = mixed air mass flow rate
-										 // Par(5) = FirstHVACIteration integerized
-										 // Par(6) = AirLoopNum integerized
+										 // Par(5) = FirstHVACIteration
+										 // Par(6) = AirLoopNum
 		int SolFla; // Flag of solver
 		int CompNum;
 		static std::string CompType; //Tuned Made static
