@@ -104,12 +104,14 @@ namespace HybridModel {
 					}
 
 					// Flags showing Hybrid Modeling settings
-					if (HybridModelZone(ZonePtr).InternalThermalMassCalc || HybridModelZone(ZonePtr).InfiltrationCalc){
+					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc || HybridModelZone( ZonePtr ).InfiltrationCalc ){
 						FlagHybridModel = true;
-						if (HybridModelZone(ZonePtr).InfiltrationCalc)
-							FlagHMInfiltration = true;
-						else
-							FlagHMInternalThermalMass = true;
+					}
+					if ( HybridModelZone( ZonePtr ).InfiltrationCalc ) {
+						FlagHMInfiltration = true;
+					}
+					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc ) {
+						FlagHMInternalThermalMass = true;
 					}
 
 					if ( FlagHybridModel ){

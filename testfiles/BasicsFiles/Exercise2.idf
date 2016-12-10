@@ -52,7 +52,9 @@
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    1,                       !- Temperature Capacity Multiplier
+    ,      					 !- Name
+	,                 		 !- Zone or ZoneList Name
+	1,                       !- Temperature Capacity Multiplier
     1,                       !- Humidity Capacity Multiplier
     1,                       !- Carbon Dioxide Capacity Multiplier
     1.0;                     !- Generic Contaminant Capacity Multiplier

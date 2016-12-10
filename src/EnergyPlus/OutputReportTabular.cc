@@ -179,6 +179,7 @@ namespace OutputReportTabular {
 	using namespace DataGlobalConstants;
 	using namespace OutputReportPredefined;
 	using namespace DataHeatBalance;
+	using namespace HybridModel;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -9328,7 +9329,7 @@ namespace OutputReportTabular {
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   June 2006
 		//       MODIFIED       Jan. 2010, Kyle Benne. Added SQLite output
-		//                      Aug. 2015, Sang Hoon Lee. Added a new column for hybrid modeling multiplier.
+		//                      Aug. 2015, Sang Hoon Lee. Added a new table for hybrid modeling multiplier output.
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -9891,6 +9892,39 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
+			//---- Hyrbid Model: Internal Thermal Mass Sub-Table
+			if ( FlagHMInternalThermalMass ){
+				rowHead.allocate( NumOfZones );
+				NumOfCol = 2;
+				columnHead.allocate( NumOfCol );
+				columnWidth.allocate( NumOfCol );
+				columnWidth = 14; //array assignment - same for all columns
+				tableBody.allocate( NumOfCol, NumOfZones );
+
+				columnHead( 1 ) = "Hybrid Modeling (Y/N)";
+				columnHead( 2 ) = "Temperature Capacitance Multiplier ";
+
+				rowHead = "";
+				tableBody = "";
+
+				for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+					rowHead( iZone ) = Zone( iZone ).Name;
+					if ( HybridModelZone( iZone ).InternalThermalMassCalc ) {
+						tableBody( 1, iZone ) = "Yes";
+					}
+					else {
+						tableBody( 1, iZone ) = "No";
+					}
+					tableBody( 2, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
+				}
+				
+				WriteSubtitle( "Hyrbid Model: Internal Thermal Mass" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Hyrbid Model: Internal Thermal Mass" );
+				}
+			}
+
 			Real64 const totExtGrossWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossWallArea_Multiplied ) );
 			Real64 const totExtGrossGroundWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied ) );
 			if ( totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0 ) {
@@ -9912,12 +9946,7 @@ namespace OutputReportTabular {
 			WriteTextLine( "PERFORMANCE", true );
 
 			rowHead.allocate( NumOfZones + 4 );
-			if( FlagHMInternalThermalMass ){
-			// Two additional columns just for the Hybrid Models_SHL2016Nov
-				NumOfCol = 14; 
-			} else {
-				NumOfCol = 12;
-			}
+			NumOfCol = 12;
 			columnHead.allocate( NumOfCol );
 			columnWidth.allocate( NumOfCol );
 			columnWidth = 14; //array assignment - same for all columns
@@ -9936,14 +9965,7 @@ namespace OutputReportTabular {
 			columnHead( 11 ) = "People " + m2_unitName.substr( 0, len( m2_unitName ) - 1 ) + " per person" + m2_unitName[ len( m2_unitName ) - 1 ];
 			columnHead( 12 ) = "Plug and Process " + Wm2_unitName;
 			
-			if( FlagHMInternalThermalMass ){
-			// Two additional columns just for the Hybrid Models_SHL2016Nov
-				columnHead( 13 ) = "Hybrid Modeling (Y/N)"; 
-				columnHead( 14 ) = "Temperature Capacitance Multiplier "; 
-			} 
-			
 			rowHead = "";
-
 			rowHead( NumOfZones + grandTotal ) = "Total";
 			rowHead( NumOfZones + condTotal ) = "Conditioned Total";
 			rowHead( NumOfZones + uncondTotal ) = "Unconditioned Total";
@@ -10029,21 +10051,6 @@ namespace OutputReportTabular {
 				if ( Zone( iZone ).FloorArea > 0 && usezoneFloorArea ) {
 					tableBody( 12, iZone ) = RealToStr( totPlugProcess * Wm2_unitConv / Zone( iZone ).FloorArea, 4 );
 				}
-
-				
-				if( FlagHMInternalThermalMass ){
-				// Two additional columns just for the Hybrid Models_SHL2016Nov
-					if ( Zone( iZone ).FlagHMInternalThermalMass ) {
-						tableBody( 13, iZone ) = "Yes";
-					} else {
-						tableBody( 13, iZone ) = "No";
-					}
-				
-					tableBody( 14, iZone ) = RealToStr( Zone( iZone ).ZoneVolCapMultpSensHMAverage, 2 );
-				} 
-			
-				// Hybrid Model Multiplier Added by Sang Hoon Lee August 2015
-				
 
 				//total rows for conditioned, unconditioned, and total
 				if ( usezoneFloorArea ) {

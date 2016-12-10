@@ -4122,8 +4122,8 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			//Hybrid modeling start: Added by Sang Hoon Lee May 2015
-			if ( FlagHybridModel && ( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc ) && ( !WarmupFlag ) && ( !DoingSizing ) ) {
-				
+			if ( HybridModelZone( ZoneNum ).InternalThermalMassCalc || HybridModelZone( ZoneNum ).InfiltrationCalc && !WarmupFlag && !DoingSizing ) {
+
 				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
 
 				// prepare start and end date for Hybrid Modeling
@@ -4157,7 +4157,7 @@ namespace ZoneTempPredictorCorrector {
 					ZT( ZoneNum ) = Zone( ZoneNum ).ZoneMeasuredTemperature;
 
 					// Hybrid Modeling-Infiltration calcualtion start
-					if ( HybridModelZone( ZoneNum ).InfiltrationCalc ){
+					if ( HybridModelZone( ZoneNum ).InfiltrationCalc && SumSysMCpT == 0 && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
 
 						// Calculate MCPI used for hybrid modeling included in TempIndCoef and TempDepCoef
 						double a = Zone( ZoneNum ).OutDryBulbTemp;
@@ -4173,7 +4173,7 @@ namespace ZoneTempPredictorCorrector {
 						double MCPIHM;
 						static std::string const RoutineNameInfiltration( "CalcAirFlowSimple:Infiltration" );
 
-						CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneNum ).OutDryBulbTemp );
+     					CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneNum ).OutDryBulbTemp );
 						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Zone( ZoneNum ).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration );
 						MCPIHM = ( AA - Zone( ZoneNum ).ZoneMeasuredTemperature * BB ) / ( Zone( ZoneNum ).ZoneMeasuredTemperature - a ); // MCPIHM calculation using Use3rdOrder method 
 						InfilVolumeOADensityHM = ( MCPIHM / CpAir / AirDensity ) * TimeStepZone * SecInHour;
@@ -4191,35 +4191,32 @@ namespace ZoneTempPredictorCorrector {
 					} // Hybrid model infiltration calcualtion end
 
 					// Hybrid modeling internal thermal mass calcualtion start
-					if ( HybridModelZone( ZoneNum ).InternalThermalMassCalc ){
+					if ( HybridModelZone( ZoneNum).InternalThermalMassCalc && SumSysMCpT == 0 && ZT( ZoneNum ) != PreviousMeasuredZT1( ZoneNum ) && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
 
-						if ( SumSysMCpT == 0 && ZT( ZoneNum ) != PreviousMeasuredZT1( ZoneNum ) && UseZoneTimeStepHistory ){ // HM calculation only when HVAC off
-							// Calculate air capacity using UseAnalyticalSolution
-							if ( TempDepCoef == 0.0 ) {
-								AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ); // Inverse equation
+						// Calculate air capacity using UseAnalyticalSolution
+						if ( TempDepCoef == 0.0 ) {
+							AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ); // Inverse equation
+						}
+						else {
+							Real64 AirCapHM_temp = ( TempIndCoef - TempDepCoef * PreviousMeasuredZT1( ZoneNum ) ) / ( TempIndCoef - TempDepCoef * ZT( ZoneNum ) );
+							if ( (AirCapHM_temp > 0 ) && ( AirCapHM_temp != 1 ) ){ // Avoide IND
+								AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
 							}
 							else {
-								Real64 AirCapHM_temp = ( TempIndCoef - TempDepCoef * PreviousMeasuredZT1( ZoneNum ) ) / ( TempIndCoef - TempDepCoef * ZT( ZoneNum ) );
-								if ( (AirCapHM_temp > 0 ) && ( AirCapHM_temp != 1 ) ){ // Avoide IND
-									AirCapHM = TempDepCoef / std::log( AirCapHM_temp ); // Inverse equation
-								}
-								else {
-									AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) );
-								}
-							}
-
-							// Calculate multiplier
-							if ( abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) > 0.05 ){ // Filter
-								MultpHM = AirCapHM / ( Zone( ZoneNum ).Volume * PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ) ) * ( TimeStepSys * SecInHour ); // Inverse equation
-								if ( ( MultpHM < 1.0 ) || ( MultpHM > 30.0 ) ){ // Temperature capacity multiplier greater than 1 and less than 30
-									MultpHM = 1.0; // Default value 1.0 
-								}
-							}
-							else {
-								MultpHM = 1.0; // Default value 1.0 
+								AirCapHM = TempIndCoef / ( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) );
 							}
 						}
 
+						// Calculate multiplier
+						if ( abs( ZT( ZoneNum ) - PreviousMeasuredZT1( ZoneNum ) ) > 0.05 ){ // Filter
+							MultpHM = AirCapHM / ( Zone( ZoneNum ).Volume * PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) ) ) * ( TimeStepZone * SecInHour ); // Inverse equation
+							if ( ( MultpHM < 1.0 ) || ( MultpHM > 30.0 ) ){ // Temperature capacity multiplier greater than 1 and less than 30
+								MultpHM = 1.0; // Default value 1.0 
+							}
+						}
+						else {
+							MultpHM = 1.0; // Default value 1.0 
+						}
 
 						// For timestep output
 						Zone(ZoneNum).ZoneVolCapMultpSensHM = MultpHM;

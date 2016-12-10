@@ -76,43 +76,47 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.7;
 
   Timestep,6;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL ===========
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
+	,                        !- MultiplierName
+	ZONE 1,                  !- Zone or ZoneList Name
 	,                       !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
 	,                        !- Carbon Dioxide Capacity Multiplier
-	,                        !- Generic Contaminant Capacity Multiplier
-	,                        !- MultiplierName
-	ZONE 1;                  !- Zone or ZoneList Name
+	;                        !- Generic Contaminant Capacity Multiplier
+
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
+	,                        !- MultiplierName
+	ZONE 2,                  !- Zone or ZoneList Name
     5,                       !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
 	,                        !- Carbon Dioxide Capacity Multiplier
-	,                        !- Generic Contaminant Capacity Multiplier
-	,                        !- MultiplierName
-	ZONE 2;                  !- Zone or ZoneList Name
+	;                        !- Generic Contaminant Capacity Multiplier
+
 	
 ZoneCapacitanceMultiplier:ResearchSpecial,
+	,                        !- MultiplierName
+	ZONE 3,                  !- Zone or ZoneList Name
     8,                       !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
 	,                        !- Carbon Dioxide Capacity Multiplier
-	,                        !- Generic Contaminant Capacity Multiplier
-	,                        !- MultiplierName
-	ZONE 3;                  !- Zone or ZoneList Name
+	;                        !- Generic Contaminant Capacity Multiplier
+
 	
 ZoneCapacitanceMultiplier:ResearchSpecial,
-    12,                      !- Temperature Capacity Multiplier
+    ,                        !- MultiplierName
+	ZONE 4,                  !- Zone or ZoneList Name
+	12,                      !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
 	,                        !- Carbon Dioxide Capacity Multiplier
-	,                        !- Generic Contaminant Capacity Multiplier
-	,                        !- MultiplierName
-	ZONE 4;                  !- Zone or ZoneList Name
+	;                        !- Generic Contaminant Capacity Multiplier
+
   
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION:DESIGNFLOWRATE ===========
   
@@ -240,7 +244,7 @@ HybridModel:Zone,
 Schedule:File,
     ZONE 1_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_4Zone_TemperatureData.csv,  !- File Name
+    HybridModel_TemperatureData.csv,  !- File Name
     2,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -251,7 +255,7 @@ Schedule:File,
 Schedule:File,
     ZONE 2_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_4Zone_TemperatureData.csv,  !- File Name
+    HybridModel_TemperatureData.csv,  !- File Name
     3,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -262,7 +266,7 @@ Schedule:File,
 Schedule:File,
     ZONE 3_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_4Zone_TemperatureData.csv,  !- File Name
+    HybridModel_TemperatureData.csv,  !- File Name
     4,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -273,7 +277,7 @@ Schedule:File,
 Schedule:File,
     ZONE 4_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    HybridModel_4Zone_TemperatureData.csv,  !- File Name
+    HybridModel_TemperatureData.csv,  !- File Name
     5,                       !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
@@ -281,7 +285,7 @@ Schedule:File,
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Output:Variable,*,Zone Infiltration OA Air Change Rate HM,Timestep;
+Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
 Output:Variable,*,Zone Mean Air Temperature,Timestep;
 Output:Table:SummaryReports,AllSummaryAndMonthly;
 

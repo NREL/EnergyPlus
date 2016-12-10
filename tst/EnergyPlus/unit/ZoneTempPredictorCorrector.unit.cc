@@ -134,7 +134,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	Zone( 1 ).Multiplier = 1.0;
 	Zone( 1 ).Volume = 1000.0;
 	Zone( 1 ).SystemZoneNodeNumber = 5;
-	ZoneVolCapMultpMoist = 1.0;
+	Zone( 1 ).ZoneVolCapMultpMoist = 1.0;
 	ZoneLatentGain.allocate( 1 );
 	ZoneLatentGain( 1 ) = 0.0;
 	SumLatentHTRadSys.allocate( 1 );

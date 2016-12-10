@@ -159,7 +159,7 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	int RoomAirNode;
 	TimeStepSys = 15.0 / 60.0;
 	OutBaroPress = 101325.0;
-	ZoneVolCapMultpSens = 1;
+	Zone( ZoneNum ).ZoneVolCapMultpSens = 1;
 
 	RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed = true;
 	RoomAirflowNetworkZoneInfo( ZoneNum ).ActualZoneID = ZoneNum;

@@ -169,7 +169,9 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    1.0,                     !- Temperature Capacity Multiplier
+    ,      					 !- Name
+	,                 		 !- Zone or ZoneList Name
+	1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier
     1.0,                     !- Carbon Dioxide Capacity Multiplier
     1.0;                     !- Generic Contaminant Capacity Multiplier
