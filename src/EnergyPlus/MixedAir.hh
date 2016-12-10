@@ -167,6 +167,7 @@ namespace MixedAir {
 
 	extern Array1D_bool MyOneTimeErrorFlag;
 	extern Array1D_bool MyOneTimeCheckUnitarySysFlag;
+	extern Array1D_bool initOASysFlag;
 	extern bool GetOASysInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAMixerInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAControllerInputFlag; // Flag set to make sure you get input once
@@ -542,6 +543,17 @@ namespace MixedAir {
 	);
 
 	void
+	SimOASysComponents(
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum,
+		bool & Sim,
+		bool & OAHeatCoil,
+		bool & OACoolCoil,
+		bool & OAHX
+		);
+
+	void
 	SimOAComponent(
 		std::string const & CompType, // the component type
 		std::string const & CompName, // the component Name
@@ -551,9 +563,9 @@ namespace MixedAir {
 		int const AirLoopNum, // air loop index for economizer lockout coordination
 		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
 		int const OASysNum, // index to outside air system
-		Optional_bool OAHeatingCoil = _, // TRUE indicates a heating coil has been found
-		Optional_bool OACoolingCoil = _, // TRUE indicates a cooling coil has been found
-		Optional_bool OAHX = _ // TRUE indicates a heat exchanger has been found
+		bool OAHeatingCoil, // TRUE indicates a heating coil has been found
+		bool OACoolingCoil, // TRUE indicates a cooling coil has been found
+		bool OAHX // TRUE indicates a heat exchanger has been found
 	);
 
 	void
@@ -609,8 +621,9 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const OASysNum, // unused1208
-		bool const FirstHVACIteration
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum
 	);
 
 	void
