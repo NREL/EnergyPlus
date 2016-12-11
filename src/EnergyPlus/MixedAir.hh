@@ -546,11 +546,7 @@ namespace MixedAir {
 	SimOASysComponents(
 		int const OASysNum,
 		bool const FirstHVACIteration,
-		int const AirLoopNum,
-		bool & Sim,
-		bool & OAHeatCoil,
-		bool & OACoolCoil,
-		bool & OAHX
+		int const AirLoopNum
 		);
 
 	void
@@ -563,9 +559,9 @@ namespace MixedAir {
 		int const AirLoopNum, // air loop index for economizer lockout coordination
 		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
 		int const OASysNum, // index to outside air system
-		bool OAHeatingCoil, // TRUE indicates a heating coil has been found
-		bool OACoolingCoil, // TRUE indicates a cooling coil has been found
-		bool OAHX // TRUE indicates a heat exchanger has been found
+		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
+		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
+		bool & OAHX // TRUE indicates a heat exchanger has been found
 	);
 
 	void
