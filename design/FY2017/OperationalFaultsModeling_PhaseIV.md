@@ -112,6 +112,127 @@ New objects will be created for the proposed fault types, namely:
 -	FaultModel:Fouling:Chiller
 -	FaultModel:Fouling:EvaporativeCooler
 
+FaultModel:Fouling:Boiler,
+   \memo This object describes the fouling fault of the boilers with water-based heat exchangers
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Boiler Object Type
+       \note Enter the type of a boiler object
+       \note The fault applies to the hot-water boilers
+       \required-field
+       \type choice
+       \key Boiler:HotWater
+   A5, \field Boiler Object Name
+       \note Enter the name of a Boiler object
+       \required-field
+       \type object-list
+       \object-list Chillers
+   N1; \field Reference Fouling Factor
+       \note The factor indicates the decrease of the nominal capacity
+       \note It is the ratio between the nominal capacity at fouling case and that at fault free case
+       \type real
+       \minimum> 0
+       \maximum<= 1
+       \default 1
+       \units dimensionless
+   
+FaultModel:Fouling:Chiller,
+   \memo This object describes the fouling fault of chillers with water-cooled condensers
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Chiller Object Type
+       \note Enter the type of a chiller object
+       \note The fault applies to the chillers with water-cooled condensers
+       \required-field
+       \type choice
+       \key Chiller:Electric
+       \key Chiller:Electric:EIR
+       \key Chiller:Electric:ReformulatedEIR
+       \key Chiller:ConstantCOP
+       \key Chiller:EngineDriven
+       \key Chiller:CombustionTurbine
+   A5, \field Chiller Object Name
+       \note Enter the name of a chiller object
+       \required-field
+       \type object-list
+       \object-list Chillers
+   N1; \field Reference Fouling Factor
+       \note The factor indicates the decrease of the nominal capacity
+       \note It is the ratio between the nominal capacity at fouling case and that at fault free case
+       \type real
+       \minimum> 0
+       \maximum<= 1
+       \default 1
+       \units dimensionless
+
+FaultModel:Fouling:EvaporativeCooler,
+   \memo This object describes the fouling fault of the wetted coil evaporative cooler 
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Evaporative Cooler Object Type
+       \note Enter the type of a Evaporative Cooler object
+       \note The fault applies to the wetted coil evaporative cooler 
+       \note The fault does not apply to direct evaporative coolers or the dry coil indirect evaporative coolers
+       \required-field
+       \type choice
+       \key EvaporativeCooler:Indirect:WetCoil
+   A5, \field Evaporative Cooler Object Name
+       \note Enter the name of aN Evaporative Cooler object
+       \required-field
+       \type object-list
+       \object-list Chillers
+   N1; \field Reference Fouling Factor
+       \note The factor indicates the decrease of the nominal capacity
+       \note It is the ratio between the nominal capacity at fouling case and that at fault free case
+       \type real
+       \minimum> 0
+       \maximum<= 1
+       \default 1
+       \units dimensionless
+
+## Model Implementation ##
+
+The proposed model implementation work will try to introduce more object oriented features to the fault modeling routines. Three new classes will be added in the EnergyPlus::FaultsManager namespace, namely: 
+-	(1) struct FaultPropertiesBoilerFouling : public FaultProperties, corresponding to the IDD object FaultModel:Fouling:Boiler
+-	(2) struct FaultPropertiesChillerFouling : public FaultProperties, corresponding to the IDD object FaultModel:Fouling:Chiller
+-	(3) struct FaultPropertiesEvaporativeCoolerFouling : public FaultProperties, corresponding to the IDD object FaultModel:Fouling:EvaporativeCooler
+These classes will be inherited from Class "FaultProperties" which is the base class for all the operational fault models. 
+The new added functions will be defined as member functions of the corresponding fault class.
+
+The new added fault classes will contain the information about the faults as well as the links to the affected objects. Take class "FaultPropertiesChillerFouling" for example, it uses member variables "ChillerType" and "ChillerName" to specify the chiller that is affected by the fouling. Three new member variables will be added to the existing chiller class (e.g., "ReformulatedEIRChillerSpecs" in EnergyPlus::ChillerReformulatedEIR):
+-	1) bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+-	2) int FaultyChillerFoulingIndex;  // Index of the fouling fault object corresponding to the chiller
+-	3) Real64 FaultyChillerFoulingFactor; // Fouling factor describing the decrease of nominal capacity
+These three variables will be initialized in the method EnergyPlus::FaultsManager::CheckAndReadFaults() which processes all the fault objects. Then these variables will be used in the chiller calculations to activate the fault calculations when the fault presents.
+
+The model implementations will try to minimize the modification of the codes outside of the fault routine. Take the FaultModel:Fouling:Chiller for example, all the massive calculations about the chiller fouling will be put in "FaultsManager.cc" instead of the chiller routines. This will be achieved by defining a member function within class "FaultPropertiesChillerSWT". The chiller routines will call this function whenever the fault presents. Such implementation design will minimize the modifications of the chiller routines, and thus benefit their systematic organization and potential future maintenance.
 
 ## Testing/Validation/Data Source(s) ##
 Comparing simulation results with and without faults will be performed verify the new fault models. 
