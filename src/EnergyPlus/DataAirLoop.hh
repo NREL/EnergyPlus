@@ -220,6 +220,7 @@ namespace DataAirLoop {
 		bool CoolingActiveFlag; // true whenever the air loop cooling coil is operating
 		bool HeatingActiveFlag; // true whenever the air loop heating coil is operating
 		bool OASysComponentsSimulated; // - true after OA components have been simulated
+		Real64 ZoneExhMassFlow; // zone exhaust flow rate not accounted for by zone inlet flow
 		bool AirLoopDCVFlag; // TRUE if the air loop has OA Controller specifying a Mechanical controller with DCV
 		// - internal flag only
 
@@ -256,6 +257,7 @@ namespace DataAirLoop {
 			CoolingActiveFlag( false ),
 			HeatingActiveFlag( false ),
 			OASysComponentsSimulated( false ),
+			ZoneExhMassFlow( 0.0 ),
 			AirLoopDCVFlag( true )
 		{}
 

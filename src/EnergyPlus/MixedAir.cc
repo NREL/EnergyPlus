@@ -3097,6 +3097,7 @@ namespace MixedAir {
 			if ( AirLoopNum > 0 ) {
 				//OAController(OAControllerNum)%ExhMassFlow = AirLoopFlow(AirLoopNum)%ZoneExhaust
 				thisOAController.ExhMassFlow = AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment;
+				AirLoopControlInfo( AirLoopNum ).ZoneExhMassFlow = thisOAController.ExhMassFlow;
 				if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet && ! FirstHVACIteration ) {
 					// if flow rate has been specified by a manager, set it to the specified value
 					thisOAController.MixMassFlow = AirLoopFlow( AirLoopNum ).ReqSupplyFrac * AirLoopFlow( AirLoopNum ).DesSupply;
@@ -4079,7 +4080,7 @@ namespace MixedAir {
 		static std::string const RoutineName("CalcOAEconomizer: ");
 		static std::string const CurrentModuleObject(CurrentModuleObjects(CMO_OAController));
 		int const MaxIte(500); // Maximum number of iterations
-		Real64 const Acc(0.0001); // Accuracy of result
+		Real64 const Acc(0.00001); // Accuracy of result
 		bool AirLoopEconoLockout; // Economizer lockout flag
 		bool AirLoopNightVent; // Night Ventilation flag for air loop
 		bool EconomizerOperationFlag; // TRUE if OA economizer is active
@@ -4095,10 +4096,7 @@ namespace MixedAir {
 		int SolFla; // Flag of solver
 		Real64 lowFlowResiduum; // result of low OA flow calculation (Tmixedair_sp - Tmixedair)
 		Real64 highFlowResiduum; // result of high OA flow calculation (Tmixedair_sp - Tmixedair)
-		Real64 lowFlowOA; // saved OA flow after calculation in case flow changes or is limited for some reason
-		Real64 highFlowOA; // saved OA flow after calculation in case flow changes or is limited for some reason
-		Real64 lowMixMassFlow; // saved mixed flow after calculation in case flow changes or is limited for some reason
-		Real64 highMixMassFlow; // saved mixed flow after calculation in case flow changes or is limited for some reason
+		Real64 minOAFrac;
 
 		if ( AirLoopNum > 0 ) {
 			// Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
@@ -4268,26 +4266,19 @@ namespace MixedAir {
 		// accurate result using a full mass, enthalpy and moisture balance and iteration.
 		if ( OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > VerySmallMassFlow && this->ControllerType_Num == ControllerOutsideAir && ! AirLoopNightVent ) {
 
-			Node( this->OANode ).MassFlowRate = OutAirMinFrac * Node( this->MixNode ).MassFlowRate;
-			Node( this->RelNode ).MassFlowRate = OutAirMinFrac * Node( this->MixNode ).MassFlowRate;
+			Node( this->OANode ).MassFlowRate = max( this->ExhMassFlow, OutAirMinFrac * Node( this->MixNode ).MassFlowRate );
+			Node( this->RelNode ).MassFlowRate = max( Node( this->OANode ).MassFlowRate - this->ExhMassFlow, 0.0 );
+			minOAFrac = Node( this->OANode ).MassFlowRate / this->MixMassFlow;
 			SimOASysComponents( AirLoopControlInfo( AirLoopNum ).OASysNum, FirstHVACIteration, AirLoopNum );
-
 			lowFlowResiduum = Node( this->MixNode ).TempSetPoint - Node( this->MixNode ).Temp;
-			lowFlowOA = Node( this->OANode ).MassFlowRate;
-			lowMixMassFlow = Node( this->MixNode ).MassFlowRate;
 
-			Node( this->OANode ).MassFlowRate = Node( this->MixNode ).MassFlowRate;
-			Node( this->RelNode ).MassFlowRate = Node( this->MixNode ).MassFlowRate;
+			Node( this->OANode ).MassFlowRate = max( this->ExhMassFlow, Node( this->MixNode ).MassFlowRate );
+			Node( this->RelNode ).MassFlowRate = max( Node( this->OANode ).MassFlowRate - this->ExhMassFlow, 0.0 );
 			SimOASysComponents( AirLoopControlInfo( AirLoopNum ).OASysNum, FirstHVACIteration, AirLoopNum );
-
 			highFlowResiduum = Node( this->MixNode ).TempSetPoint - Node( this->MixNode ).Temp;
-			highFlowOA = Node( this->OANode ).MassFlowRate;
-			highMixMassFlow = Node( this->MixNode ).MassFlowRate;
 
-			if ( ( sign( lowFlowResiduum ) == sign( highFlowResiduum ) ) && ( abs( lowFlowResiduum ) > abs( highFlowResiduum ) ) ) {
-				OASignal = ( highFlowOA / highMixMassFlow ); // if highFlow residual is closer set OASignal accordingly
-			} else if ( sign( lowFlowResiduum ) == sign( highFlowResiduum ) ) {
-				OASignal = ( lowFlowOA / lowMixMassFlow ); // if lowFlow residual is closer or equal to highFlow, set to lowFlow fraction
+			if( ( sign( lowFlowResiduum ) == sign( highFlowResiduum ) ) ) {
+				OASignal = OutAirSignal;
 			} else {
 				Par( 1 ) = this->MixNode;
 				Par( 2 ) = this->RelNode;
@@ -4297,8 +4288,8 @@ namespace MixedAir {
 				if( FirstHVACIteration ) Par( 5 ) = 1.0;
 				Par( 6 ) = double( AirLoopNum );
 
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
-				if ( SolFla == -2 ) { // if RegulaFalsi fails to find a solution, returns -2, set to existing OutAirSignal
+				SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, minOAFrac, 1.0, Par );
+				if ( SolFla < 0 ) { // if RegulaFalsi fails to find a solution, returns -2, set to existing OutAirSignal
 					OASignal = OutAirSignal;
 				}
 			}
@@ -4853,8 +4844,10 @@ namespace MixedAir {
 		int OANode; // outside air node number
 		Real64 MixMassFlowRate; // mixed air mass flow rare [kg/s]
 		Real64 OAMassFlowRate; // outside air mass flow rate [kg/s]
+		Real64 ExhMassFlow;
 		bool FirstHVACIteration;
 		int AirloopNum;
+		int OASysNum;
 
 		MixNode = int( Par( 1 ) );
 		RelNode = int( Par( 2 ) );
@@ -4862,12 +4855,14 @@ namespace MixedAir {
 		MixMassFlowRate = Par( 4 );
 		FirstHVACIteration = ( Par( 5 ) == 1.0 );
 		AirloopNum = int( Par( 6 ) );
+		OASysNum = AirLoopControlInfo( AirloopNum ).OASysNum;
+		ExhMassFlow = AirLoopControlInfo( AirloopNum ).ZoneExhMassFlow;
 
-		OAMassFlowRate = OASignal * MixMassFlowRate;
+		OAMassFlowRate = max( ExhMassFlow, OASignal * MixMassFlowRate );
 		Node( OANode ).MassFlowRate = OAMassFlowRate; // set OA node mass flow rate
-		Node( RelNode ).MassFlowRate = OAMassFlowRate; // set relief node mass flow rate to maintain mixer continuity calcs
+		Node( RelNode ).MassFlowRate = max( OAMassFlowRate - ExhMassFlow, 0.0 ); // set relief node mass flow rate to maintain mixer continuity calcs
 
-		SimOASysComponents( AirLoopControlInfo( AirloopNum ).OASysNum, FirstHVACIteration, AirloopNum );
+		SimOASysComponents( OASysNum, FirstHVACIteration, AirloopNum );
 
 		Residuum = Node( MixNode ).TempSetPoint - Node( MixNode ).Temp;
 
