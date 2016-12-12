@@ -5,6 +5,7 @@ Modeling HVAC Operational Faults – Phase IV
  **Lawrence Berkeley National Laboratory**
 
  - Original Date: Nov 7, 2016
+ - Updated Date: Dec 7, 2016
  
 
 ## Justification for New Feature ##
@@ -112,6 +113,7 @@ New objects will be created for the proposed fault types, namely:
 -	FaultModel:Fouling:Chiller
 -	FaultModel:Fouling:EvaporativeCooler
 
+```
 FaultModel:Fouling:Boiler,
    \memo This object describes the fouling fault of the boilers with water-based heat exchangers
    \min-fields 6
@@ -216,6 +218,7 @@ FaultModel:Fouling:EvaporativeCooler,
        \maximum<= 1
        \default 1
        \units dimensionless
+```
 
 ## Model Implementation ##
 
