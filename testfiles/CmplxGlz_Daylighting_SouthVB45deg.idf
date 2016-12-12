@@ -86266,7 +86266,7 @@
     SYS-1 Cooling Coil,      !- Component 2 Name
     SYS-1 Mixed Air Outlet,  !- Component 2 Inlet Node Name
     SYS-1 Cooling Coil Outlet,  !- Component 2 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 3 Object Type
+    Coil:Heating:Fuel,       !- Component 3 Object Type
     SYS-1 Heating Coil,      !- Component 3 Name
     SYS-1 Cooling Coil Outlet,  !- Component 3 Inlet Node Name
     SYS-1 Heating Coil Outlet,  !- Component 3 Outlet Node Name

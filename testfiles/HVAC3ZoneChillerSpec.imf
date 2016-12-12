@@ -1,7 +1,9 @@
 ! Plant Components
-
 !  Version,
 !    8.3;                    !- Version Identifier
+
+!  Version,
+!    8.6;                    !- Version Identifier
 
   DistrictCooling,
     Purchased Cooling,       !- Name

@@ -195,7 +195,7 @@
 
   PlantEquipmentList,
     DHW Plant Equipment,     !- Name
-    WaterHeater:HeatPump:PumpedCondenser,    !- Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,  !- Equipment 1 Object Type
     PlantHeatPumpWaterHeater;!- Equipment 1 Name
 
   SetpointManager:Scheduled,
@@ -243,22 +243,22 @@
     DHW Pump,                !- Name
     Water Heater Use Loop Inlet Node,  !- Inlet Node Name
     DHW Pump Outlet Node,    !- Outlet Node Name
-    AUTOSIZE,                !- Rated Flow Rate {m3/s}
-    0,                       !- Rated Pump Head {Pa}
-    AUTOSIZE,                !- Rated Power Consumption {W}
+    AUTOSIZE,                !- Design Maximum Flow Rate {m3/s}
+    0,                       !- Design Pump Head {Pa}
+    AUTOSIZE,                !- Design Power Consumption {W}
     1.0,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   Branch,
     Water Heater Use Branch, !- Name
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,  !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     Water Heater Use Inlet Node,  !- Component 1 Inlet Node Name
     Water Heater Use Outlet Node;  !- Component 1 Outlet Node Name
@@ -300,7 +300,7 @@
     ,                        !- Outlet Air Splitter Node Name
     ,                        !- Inlet Air Mixer Schedule Name
     ,                        !- Tank Element Control Logic
-    1.0;                     !- Control Sensor 1 Height In Stratified Tank
+    1.0;                     !- Control Sensor 1 Height In Stratified Tank {m}
 
   WaterHeater:Stratified,
     Water Heater Tank,       !- Name
@@ -356,12 +356,12 @@
     ,                        !- Indirect Water Heating Recovery Time {hr}
     6,                       !- Number of Nodes
     0.1,                     !- Additional Destratification Conductivity {W/m-K}
-    0.15,                    !- Node 1 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 2 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 3 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 4 Additional Loss Coefficient {W/m2-K}
-    ,                        !- Node 5 Additional Loss Coefficient {W/m2-K}
-    0.1;                     !- Node 6 Additional Loss Coefficient {W/m2-K}
+    0.15,                    !- Node 1 Additional Loss Coefficient {W/K}
+    ,                        !- Node 2 Additional Loss Coefficient {W/K}
+    ,                        !- Node 3 Additional Loss Coefficient {W/K}
+    ,                        !- Node 4 Additional Loss Coefficient {W/K}
+    ,                        !- Node 5 Additional Loss Coefficient {W/K}
+    0.1;                     !- Node 6 Additional Loss Coefficient {W/K}
 
   Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHPlantDXCoil,         !- Name

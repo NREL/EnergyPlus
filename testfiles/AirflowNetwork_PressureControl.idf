@@ -1732,7 +1732,7 @@
     DX Cooling Coil System 1,!- Component 3 Name
     Cooling Coil Air Inlet Node,  !- Component 3 Inlet Node Name
     Heating Coil Air Inlet Node,  !- Component 3 Outlet Node Name
-    Coil:Heating:Fuel,        !- Component 4 Object Type
+    Coil:Heating:Fuel,       !- Component 4 Object Type
     Main Heating Coil 1,     !- Component 4 Name
     Heating Coil Air Inlet Node,  !- Component 4 Inlet Node Name
     Air Loop Outlet Node;    !- Component 4 Outlet Node Name
@@ -2443,7 +2443,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     Main Heating Coil 1,     !- Coil Name
-    Coil:Heating:Fuel,        !- Coil Object Type
+    Coil:Heating:Fuel,       !- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2727,31 +2727,34 @@
   AirflowNetwork:ZoneControl:PressureController,
     PressureController,      !- Name
     NORTH ZONE,              !- Control Zone Name
-    AirflowNetwork:Distribution:Component:ReliefAirFlow, !- Control Object Type
+    AirflowNetwork:Distribution:Component:ReliefAirFlow,  !- Control Object Type
     Relief Fan,              !- Control Object Name
     ,                        !- Pressure Control Availability Schedule Name
-    Pressure Setpoint Schedule; !- Pressure Setpoint Schedule Name
+    Pressure Setpoint Schedule;  !- Pressure Setpoint Schedule Name
+
   Schedule:Compact,
     Pressure Setpoint Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,3.0,        !- Field 3
-    Through: 9/30,           !- Field 4
-    For: AllDays,            !- Field 5
-    Until: 24:00,6.5,        !- Field 6
-    Through: 12/31,          !- Field 7
-    For: AllDays,            !- Field 8
-    Until: 24:00,3.0;        !- Field 9
+    Through: 9/30,           !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,6.5,        !- Field 7
+    Through: 12/31,          !- Field 9
+    For: AllDays,            !- Field 10
+    Until: 24:00,3.0;        !- Field 11
 
   AirflowNetwork:Distribution:Component:OutdoorAirFlow,
     OA Fan,                  !- Name
-    0.001,                   !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
-    0.667;                   !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off {dimensionless}
+    0.001,                   !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}
+    0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}
+
   AirflowNetwork:Distribution:Component:ReliefAirFlow,
     Relief Fan,              !- Name
-    0.001,                   !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
-    0.667;                   !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off {dimensionless}
+    0.001,                   !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}
+    0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}
+
   AvailabilityManagerAssignmentList,
     Reheat System 1 Avail List,  !- Name
     AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
@@ -2881,7 +2884,7 @@
     Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.64,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 1,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
@@ -2893,7 +2896,7 @@
     Zone 2 Reheat Air Outlet Node,  !- Air Outlet Node Name
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     0.52,                    !- Maximum Air Flow Rate {m3/s}
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     Reheat Coil Zone 2,      !- Reheat Coil Name
     0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}

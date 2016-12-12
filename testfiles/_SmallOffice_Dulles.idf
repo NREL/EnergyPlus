@@ -2242,17 +2242,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2281,17 +2281,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2320,17 +2320,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2359,17 +2359,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -2882,19 +2882,19 @@
     OutletNode_AirLoop_SouthZone_1stFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     SouthZone_1stFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_SouthZone_1stFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_SouthZone_1stFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_SouthZone_1stFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_SouthZone_1stFloor;  !- Reheat Coil Name
 
   AirLoopHVAC:UnitaryHeatCool,
@@ -2904,19 +2904,19 @@
     OutletNode_AirLoop_NorthZone_1stFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     NorthZone_1stFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_NorthZone_1stFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_NorthZone_1stFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_NorthZone_1stFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_NorthZone_1stFloor;  !- Reheat Coil Name
 
   AirLoopHVAC:UnitaryHeatCool,
@@ -2926,19 +2926,19 @@
     OutletNode_AirLoop_SouthZone_2ndFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     SouthZone_2ndFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_SouthZone_2ndFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_SouthZone_2ndFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_SouthZone_2ndFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_SouthZone_2ndFloor;  !- Reheat Coil Name
 
   AirLoopHVAC:UnitaryHeatCool,
@@ -2948,19 +2948,19 @@
     OutletNode_AirLoop_NorthZone_2ndFloor,  !- Unitary System Air Outlet Node Name
     ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
     autosize,                !- Maximum Supply Air Temperature {C}
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     NorthZone_2ndFloor,      !- Controlling Zone or Thermostat Location
     Fan:ConstantVolume,      !- Supply Fan Object Type
     SupplyFan_NorthZone_2ndFloor,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_NorthZone_2ndFloor,  !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_NorthZone_2ndFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
-    Coil:Heating:Fuel,        !- Reheat Coil Object Type
+    Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_NorthZone_2ndFloor;  !- Reheat Coil Name
 
   AirTerminal:SingleDuct:Uncontrolled,

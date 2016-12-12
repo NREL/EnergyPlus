@@ -350,6 +350,7 @@ namespace DataHVACGlobals {
 	Real64 BalancedExhMassFlow( 0.0 ); // balanced zone exhaust (declared as so by user)  [kg/s]
 	Real64 PlenumInducedMassFlow( 0.0 ); // secondary air mass flow rate induced from a return plenum [kg/s]
 	bool TurnFansOn( false ); // If true overrides fan schedule and cycles fans on
+	bool TurnZoneFansOnlyOn(false); // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
 	bool TurnFansOff( false ); // If True overides fan schedule and TurnFansOn and forces fans off
 	bool ZoneCompTurnFansOn( false ); // If true overrides fan schedule and cycles fans on
 	bool ZoneCompTurnFansOff( false ); // If True overides fan schedule and TurnFansOn and forces fans off
@@ -547,6 +548,7 @@ namespace DataHVACGlobals {
 		BalancedExhMassFlow = 0.0;
 		PlenumInducedMassFlow = 0.0;
 		TurnFansOn = false;
+		TurnZoneFansOnlyOn = false;
 		TurnFansOff = false;
 		ZoneCompTurnFansOn = false;
 		ZoneCompTurnFansOff = false;
@@ -580,8 +582,12 @@ namespace DataHVACGlobals {
 		SimNonZoneEquipmentFlag = true;
 		ZoneMassBalanceHVACReSim = true;
 		ZoneComp.deallocate();
-		OptStartData = OptStartDataType();
 		CompSetPtEquip.deallocate();
+		OptStartData = OptStartDataType();
+		// unit test ZoneTempPredictorCorrector_ReportingTest fails without this next line. Next 2 lines are just to be thorough.
+		OptStartData.OptStartFlag.deallocate();
+		OptStartData.ActualZoneNum.deallocate();
+		OptStartData.OccStartTime.deallocate();
 	}
 
 } // DataHVACGlobals

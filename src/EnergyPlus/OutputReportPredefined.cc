@@ -363,6 +363,10 @@ namespace OutputReportPredefined {
 	int pdchDCVventMechName;
 	int pdchDCVperPerson;
 	int pdchDCVperArea;
+	int pdchDCVperZone;
+	int pdchDCVperACH;
+	int pdchDCVMethod;
+	int pdchDCVOASchName;
 
 	//added for new DCV
 	int pdchDCVZoneADEffCooling;
@@ -969,6 +973,10 @@ namespace OutputReportPredefined {
 		pdchDCVventMechName = 0;
 		pdchDCVperPerson = 0;
 		pdchDCVperArea = 0;
+		pdchDCVperZone = 0;
+		pdchDCVperACH = 0;
+		pdchDCVMethod = 0;
+		pdchDCVOASchName = 0;
 		pdchDCVZoneADEffCooling = 0;
 		pdchDCVZoneADEffHeating = 0;
 		pdchDCVZoneADEffSchName = 0;
@@ -1639,11 +1647,15 @@ namespace OutputReportPredefined {
 		pdchDCVventMechName = newPreDefColumn( pdstDemCntlVent, "Controller:MechanicalVentilation Name" );
 		pdchDCVperPerson = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Person [m3/s-person]" );
 		pdchDCVperArea = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Area [m3/s-m2]" );
+		pdchDCVperZone = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Per Zone [m3/s]" );
+		pdchDCVperACH = newPreDefColumn( pdstDemCntlVent, "Outdoor Air ACH [ach]" );
+		pdchDCVMethod = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Method" );
+		pdchDCVOASchName = newPreDefColumn( pdstDemCntlVent, "Outdoor Air Schedule Name" );
 
 		// added for new DCV
 		pdchDCVZoneADEffCooling = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness in Cooling Mode" );
 		pdchDCVZoneADEffHeating = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness in Heating Mode" );
-		pdchDCVZoneADEffSchName = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness Schedule" );
+		pdchDCVZoneADEffSchName = newPreDefColumn( pdstDemCntlVent, "Air Distribution Effectiveness Schedule Name" );
 
 		pdstSimpleComfort = newPreDefSubTable( pdrSystem, "Time Not Comfortable Based on Simple ASHRAE 55-2004" );
 		pdchSCwinterClothes = newPreDefColumn( pdstSimpleComfort, "Winter Clothes [hr]" );

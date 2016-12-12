@@ -12,7 +12,6 @@
 !
 ! Exhaust chiller Capacity and Part-Load Ratio curve
 ! Cooling Capacity function of temperature curve  - CoolCapfT
-
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Curve:Biquadratic,

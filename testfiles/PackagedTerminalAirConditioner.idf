@@ -1451,15 +1451,15 @@
     Zone1PTACAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone1PTACOAMixer,        !- Outdoor Air Mixer Name
-    0.4,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    0.4,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    0.028,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.028,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0.0186,                  !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    0.4,                     !- Cooling Supply Air Flow Rate {m3/s}
+    0.4,                     !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    0.028,                   !- Cooling Outdoor Air Flow Rate {m3/s}
+    0.028,                   !- Heating Outdoor Air Flow Rate {m3/s}
+    0.0186,                  !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1PTACFan,            !- Supply Air Fan Name
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Zone1PTACHeater,         !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone1PTACDXCoolCoil,     !- Cooling Coil Name
@@ -1473,12 +1473,12 @@
     Zone2PTACAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone2PTACOAMixer,        !- Outdoor Air Mixer Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone2PTACFan,            !- Supply Air Fan Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
@@ -1495,12 +1495,12 @@
     Zone3PTACAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone3PTACOAMixer,        !- Outdoor Air Mixer Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone3PTACFan,            !- Supply Air Fan Name
     Coil:Heating:Steam,      !- Heating Coil Object Type
@@ -1873,9 +1873,9 @@
     Steam Boiler Plant Steam Circ Pump,  !- Name
     Steam Boiler Plant Steam Supply Inlet Node,  !- Inlet Node Name
     Steam Boiler Plant Steam Pump Outlet Node,  !- Outlet Node Name
-    0.05,                    !- Rated Flow Rate {m3/s}
-    ,                        !- Rated Pump Head {Pa}
-    Autosize,                !- Rated Power Consumption {W}
+    0.05,                    !- Design Steam Volume Flow Rate {m3/s}
+    ,                        !- Design Pump Head {Pa}
+    Autosize,                !- Design Power Consumption {W}
     ,                        !- Motor Efficiency
     ,                        !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve

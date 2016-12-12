@@ -741,26 +741,9 @@ SimulationControl,
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 \end{lstlisting}
 
-\subsection{ProgramControl}\label{programcontrol}
-
-This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer. Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation. This multithreading may not be desirable when running more than one simulation at a time on the same computer (because it can actually run more slowly). This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed. When this object is used, its input for the number of threads will take precedent over the value of the environment variable \textbf{``EP\_OMP\_NUM\_THREADS''} which is an alternate method of controlling the program's threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is \textless{} = 30.
-
-\subsubsection{Inputs}\label{inputs-16-010}
-
-\paragraph{Field: Number of Threads Allowed}\label{field-number-of-threads-allowed}
-
-This field is used to specify a limit on the number of threads EnergyPlus will use. If a zero is entered then the program will set the number of threads to the maximum available on the computer. If the number entered is larger than the number of processors or cores, then the hardware limits will take precedent over this limit.
-
-An example IDF object that sets the program to use only one thread follows.
-
-\begin{lstlisting}
-ProgramControl,
-  1; !- Number of Threads Allowed
-\end{lstlisting}
-
 \subsection{Meter:Custom}\label{metercustom}
 
-A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar.
+A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar. A Meter:Custom cannot reference another Meter:Custom.
 
 \subsubsection{Inputs}\label{inputs-17-008}
 
@@ -811,7 +794,7 @@ A key name field is used when the following field specifies an output variable. 
 
 \paragraph{Field: Output Variable or Meter Name \#}\label{field-output-variable-or-meter-name}
 
-This field must be a valid output variable name or a valid meter name.
+This field must be a valid output variable name or a valid meter name. If a Meter:Custom references another Meter:Custom it will generate a warning and not product any output.
 
 \subsection{Meter:CustomDecrement}\label{metercustomdecrement}
 
