@@ -555,7 +555,7 @@ namespace DataSurfaces {
 		{
 			auto const & v1 = a.vertices;
 			auto const & v2 = b.vertices;
-			return eq( v1, v2 );		
+			return eq( v1, v2 );
 		}
 
 		// Inequality
@@ -734,7 +734,7 @@ namespace DataSurfaces {
 		bool IsPool; // true if this is a pool
 		int ICSPtr; // Index to ICS collector
 		// TH added 3/26/2010
-		bool MirroredSurf; // Ture if it is a mirrored surface
+		bool MirroredSurf; // True if it is a mirrored surface
 		// additional attributes for convection correlations
 		int IntConvClassification; // current classification for inside face air flow regime and surface orientation
 		int IntConvHcModelEq; // current convection model for inside face
@@ -758,6 +758,7 @@ namespace DataSurfaces {
 		// LG added 1/6/12
 		Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
 		// the surface diffusion model
+		Real64 RadEnergyFromAFNDucts; // Radiant energy from AirflowNetwork duct
 
 		// Default Constructor
 		SurfaceData() :
@@ -878,7 +879,8 @@ namespace DataSurfaces {
 			IntConvSurfGetsRadiantHeat( false ),
 			IntConvSurfHasActiveInIt( false ),
 			PartOfVentSlabOrRadiantSurface( false ),
-			GenericContam( 0.0 )
+			GenericContam( 0.0 ),
+			RadEnergyFromAFNDucts( 0.0 )
 		{}
 
 	public: // Methods

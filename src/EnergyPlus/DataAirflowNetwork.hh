@@ -95,8 +95,8 @@ namespace DataAirflowNetwork {
 	extern int const CompTypeNum_HEX; // Distribution system heat exchanger
 	extern int const CompTypeNum_HOP; // Horizontal opening component
 	extern int const CompTypeNum_RVD; // Reheat VAV terminal damper
-	extern int const CompTypeNum_OAF; // Distribution system OA 
-	extern int const CompTypeNum_REL; // Distribution system relief air 
+	extern int const CompTypeNum_OAF; // Distribution system OA
+	extern int const CompTypeNum_REL; // Distribution system relief air
 
 	// EPlus component Type
 	extern int const EPlusTypeNum_SCN; // Supply connection
@@ -402,7 +402,7 @@ namespace DataAirflowNetwork {
 		bool RAFNflag; // True if this surface is used in AirflowNetwork:IntraZone:Linkage
 		bool NonRectangular; // True if this surface is not rectangular
 		int EquivRecMethod; // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
-		Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3 
+		Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3
 
 		// Default Constructor
 		MultizoneSurfaceProp() :
@@ -1022,11 +1022,13 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string ZoneName; // Name of zone
 		int ZoneNum; // Zone Number
+		int viewFactorID; // ID of the duct view factor object
 
 		// Default Constructor
 		DisSysLinkageProp() :
 			AirflowNetworkLinkage(),
-			ZoneNum( 0 )
+			ZoneNum( 0 ),
+			viewFactorID( 0 )
 		{}
 
 	};
@@ -1256,6 +1258,7 @@ namespace DataAirflowNetwork {
 		Real64 LeakLat;
 		Real64 CondSen;
 		Real64 DiffLat;
+		Real64 RadGain;
 		Real64 TotalSen;
 		Real64 TotalLat;
 		Real64 SumMCp;
@@ -1272,6 +1275,7 @@ namespace DataAirflowNetwork {
 		Real64 SumMHrGC;
 		Real64 SumMMHrGC;
 		Real64 TotalGC;
+		Real64 DuctRadEnergy;
 
 		// Default Constructor
 		AirflowNetworkExchangeProp() :
@@ -1281,6 +1285,7 @@ namespace DataAirflowNetwork {
 			LeakLat( 0.0 ),
 			CondSen( 0.0 ),
 			DiffLat( 0.0 ),
+			RadGain( 0.0 ),
 			TotalSen( 0.0 ),
 			TotalLat( 0.0 ),
 			SumMCp( 0.0 ),
@@ -1296,7 +1301,8 @@ namespace DataAirflowNetwork {
 			TotalCO2( 0.0 ),
 			SumMHrGC( 0.0 ),
 			SumMMHrGC( 0.0 ),
-			TotalGC( 0.0 )
+			TotalGC( 0.0 ),
+			DuctRadEnergy( 0.0 )
 		{}
 
 	};
@@ -1336,6 +1342,10 @@ namespace DataAirflowNetwork {
 		Real64 DiffLatGainJ;
 		Real64 DiffLatLossW;
 		Real64 DiffLatLossJ;
+		Real64 RadGainW;
+		Real64 RadGainJ;
+		Real64 RadLossW;
+		Real64 RadLossJ;
 		Real64 TotalSenGainW;
 		Real64 TotalSenGainJ;
 		Real64 TotalSenLossW;
@@ -1379,6 +1389,10 @@ namespace DataAirflowNetwork {
 			DiffLatGainJ( 0.0 ),
 			DiffLatLossW( 0.0 ),
 			DiffLatLossJ( 0.0 ),
+			RadGainW( 0.0 ),
+			RadGainJ( 0.0 ),
+			RadLossW( 0.0 ),
+			RadLossJ( 0.0 ),
 			TotalSenGainW( 0.0 ),
 			TotalSenGainJ( 0.0 ),
 			TotalSenLossW( 0.0 ),
@@ -1389,6 +1403,34 @@ namespace DataAirflowNetwork {
 			TotalLatLossJ( 0.0 )
 		{}
 
+	};
+
+	struct LinkageSurfaceProp
+	{
+		// Members
+		std::string surfaceName;
+		int surfaceNum;
+		Real64 viewFactor;
+
+		// Default constructor
+		LinkageSurfaceProp() :
+			surfaceNum( 0 ),
+			viewFactor( 0.0 )
+		{}
+	};
+
+	struct AirflowNetworkLinkageViewFactorProp
+	{
+		// Members
+		std::string name;
+		Real64 surfaceExposureFraction;
+		Real64 surfaceEmittance;
+		Array1D< LinkageSurfaceProp > linkageSurfaceData;
+
+		AirflowNetworkLinkageViewFactorProp() :
+			surfaceExposureFraction( 0.0 ),
+			surfaceEmittance( 0.0 )
+		{}
 	};
 
 	// Object Data
@@ -1437,6 +1479,7 @@ namespace DataAirflowNetwork {
 	extern Array1D< PressureControllerProp > PressureControllerData;
 	extern Array1D< DisSysCompAirflowProp > DisSysCompOutdoorAirData;
 	extern Array1D< DisSysCompAirflowProp > DisSysCompReliefAirData;
+	extern Array1D< AirflowNetworkLinkageViewFactorProp > AirflowNetworkLinkageViewFactorData;
 
 	void
 	clear_state();

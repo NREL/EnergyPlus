@@ -116,6 +116,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int DisSysNumOfLeaks;
 	extern int DisSysNumOfELRs;
 	extern int DisSysNumOfDucts;
+	extern int DysSysNumOfDuctViewFactors;
 	extern int DisSysNumOfDampers;
 	extern int DisSysNumOfCVFs;
 	extern int DisSysNumOfDetFans;
@@ -217,6 +218,9 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const Vref, // Velocity at reference height
 		Real64 const Height // Node height for outdoor temperature calculation
 	);
+
+	void
+	CalcAirflowNetworkRadiation();
 
 	void
 	CalcAirflowNetworkHeatBalance();

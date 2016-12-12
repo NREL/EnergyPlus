@@ -229,7 +229,7 @@ namespace AirflowNetworkBalanceManager {
 	int const VentCtrNum_ZoneLevel( 7 ); // ZoneLevel control for a heat transfer subsurface
 	int const VentCtrNum_AdjTemp( 8 ); // Temperature venting control based on adjacent zone conditions
 	int const VentCtrNum_AdjEnth( 9 ); // Enthalpy venting control based on adjacent zone conditions
-	int const FeeeOperation( 0 ); // Free operatio
+	int const FeeeOperation( 0 ); // Free operation
 	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time
 	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time
 	int const ProbNoAction( 0 ); // No action from probability check
@@ -273,6 +273,7 @@ namespace AirflowNetworkBalanceManager {
 	int DisSysNumOfLeaks( 0 );
 	int DisSysNumOfELRs( 0 );
 	int DisSysNumOfDucts( 0 );
+	int DisSysNumOfDuctViewFactors( 0 );
 	int DisSysNumOfDampers( 0 );
 	int DisSysNumOfCVFs( 0 );
 	int DisSysNumOfDetFans( 0 );
@@ -339,6 +340,7 @@ namespace AirflowNetworkBalanceManager {
 		DisSysNumOfLeaks = 0;
 		DisSysNumOfELRs = 0;
 		DisSysNumOfDucts = 0;
+		DisSysNumOfDuctViewFactors = 0;
 		DisSysNumOfDampers = 0;
 		DisSysNumOfCVFs = 0;
 		DisSysNumOfDetFans = 0;
@@ -490,6 +492,7 @@ namespace AirflowNetworkBalanceManager {
 		CalcAirflowNetworkAirBalance();
 
 		if ( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
+			CalcAirflowNetworkRadiation();
 			CalcAirflowNetworkHeatBalance();
 			CalcAirflowNetworkMoisBalance();
 			if ( Contaminant.CO2Simulation ) CalcAirflowNetworkCO2Balance();
@@ -647,6 +650,9 @@ namespace AirflowNetworkBalanceManager {
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers );
+		MaxNums = max( MaxNums, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
+		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers );
@@ -1580,7 +1586,7 @@ namespace AirflowNetworkBalanceManager {
 				StringOut = StringOut + ", " + RoundSigDigits( MultizoneSurfaceData( i ).Height, 2 ) +"," + RoundSigDigits( MultizoneSurfaceData( i ).Width, 2 );
 				gio::write( OutputFileInits, fmtA ) << StringOut;
 			}
-		} 
+		}
 
 		// Validate adjacent temperature and Enthalpy control for an interior surface only
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
@@ -2845,14 +2851,14 @@ namespace AirflowNetworkBalanceManager {
 				}
 				DisSysCompDuctData( i ).Name = Alphas( 1 ); // Name of duct effective leakage ratio component
 				DisSysCompDuctData( i ).L = Numbers( 1 ); // Duct length [m]
-				DisSysCompDuctData( i ).D = Numbers( 2 ); // Hydrolic diameter [m]
+				DisSysCompDuctData( i ).D = Numbers( 2 ); // Hydraulic diameter [m]
 				DisSysCompDuctData( i ).A = Numbers( 3 ); // Cross section area [m2]
 				DisSysCompDuctData( i ).Rough = Numbers( 4 ); // Surface roughness [m]
 				DisSysCompDuctData( i ).TurDynCoef = Numbers( 5 ); // Turbulent dynamic loss coefficient
 				DisSysCompDuctData( i ).UThermal = Numbers( 6 ); // Overall heat transmittance [W/m2.K]
 				DisSysCompDuctData( i ).UMoisture = Numbers( 7 ); // Overall moisture transmittance [kg/m2]
 				DisSysCompDuctData( i ).MThermal = 0.0; // Thermal capacity [J/K]
-				DisSysCompDuctData( i ).MMoisture = 0.0; // Mositure capacity [kg]
+				DisSysCompDuctData( i ).MMoisture = 0.0; // Moisture capacity [kg]
 				DisSysCompDuctData( i ).LamDynCoef = 64.0; // Laminar dynamic loss coefficient
 				DisSysCompDuctData( i ).LamFriCoef = Numbers( 5 ); // Laminar friction loss coefficient
 				DisSysCompDuctData( i ).InitLamCoef = 128.0; // Coefficient of linear initialization
@@ -2865,6 +2871,40 @@ namespace AirflowNetworkBalanceManager {
 			if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {
 				ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required but not found." );
 				ErrorsFound = true;
+			}
+		}
+
+		// Read AirflowNetwork distribution system component: DuctViewFactors
+		CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
+		DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
+		if ( DisSysNumOfDuctViewFactors > 0 ) {
+			AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
+			for ( i = 1; i <= DisSysNumOfDucts; ++i ) {
+				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				}
+
+				auto & this_VF_object( AirflowNetworkLinkageViewFactorData(i) );
+
+				this_VF_object.name = Alphas( 1 ); // Name duct view factor component
+				this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction []
+				this_VF_object.surfaceEmittance = Numbers( 2 ); // Duct surface emittance
+
+				int numSurfaces = NumAlphas - 1;
+
+				this_VF_object.linkageSurfaceData.allocate(numSurfaces);
+
+				for (int surfNum = 0; surfNum < NumAlphas; ++surfNum)
+				{
+					this_VF_object.linkageSurfaceData( surfNum ).surfaceName = Alphas( i + 1 ); // Surface name
+					this_VF_object.linkageSurfaceData( surfNum ).surfaceNum = FindItemInList( Alphas( i + 1 ), Surface );
+					this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( i + 2 ); // Surface view factor
+				}
 			}
 		}
 
@@ -2942,7 +2982,7 @@ namespace AirflowNetworkBalanceManager {
 			i = GetNumObjectsFound( "AirTerminal:SingleDuct:Uncontrolled" );
 			if ( i > 0 ) {
 				ShowSevereError( RoutineName + "Invalid terminal type for a VAV system = AirTerminal:SingleDuct:Uncontrolled" );
-				ShowContinueError( "A VAV system requires all ternimal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
+				ShowContinueError( "A VAV system requires all terminal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
 				ErrorsFound = true;
 			}
 		}
@@ -3156,7 +3196,7 @@ namespace AirflowNetworkBalanceManager {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 				}
-				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name 
+				PressureControllerData( i ).Name = Alphas( 1 ); // Object Name
 				PressureControllerData( i ).ZoneName = Alphas( 2 ); // Zone name
 				PressureControllerData( i ).ZoneNum = FindItemInList( Alphas( 2 ), Zone );
 				PressureControllerData( i ).AFNNodeNum = FindItemInList( Alphas( 2 ), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones );
@@ -4010,14 +4050,14 @@ namespace AirflowNetworkBalanceManager {
 
 				if ( DisSysCompHXData( i ).CoilParentExists && count != 2 ) {
 					ShowSevereError( RoutineName + "The inputs of component name field as a heat exchanger in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct" );
-					ShowContinueError( "The entered name of heat enchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
-					ShowContinueError( "The correct apperance number is 2. The entered apperance number is " + RoundSigDigits( count ) );
+					ShowContinueError( "The entered name of heat exchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
+					ShowContinueError( "The correct appearance number is 2. The entered appearance number is " + RoundSigDigits( count ) );
 					ErrorsFound = true;
 				}
 				if ( ( ! DisSysCompHXData( i ).CoilParentExists ) && count != 1 ) {
 					ShowSevereError( RoutineName + "The inputs of component name field as a heat exchanger in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct" );
-					ShowContinueError( "The entered name of heat enchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
-					ShowContinueError( "The correct apperance number is 1. The entered apperance number is " + RoundSigDigits( count ) );
+					ShowContinueError( "The entered name of heat exchanger is " + DisSysCompHXData( i ).Name + " in AirflowNetwork:Distribution:Component:HeatExchanger objects" );
+					ShowContinueError( "The correct appearance number is 1. The entered appearance number is " + RoundSigDigits( count ) );
 					ErrorsFound = true;
 				}
 			}
@@ -4422,6 +4462,11 @@ namespace AirflowNetworkBalanceManager {
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).DiffLatGainJ, "System", "Sum", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).DiffLatLossW, "System", "Average", Zone( i ).Name );
 			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).DiffLatLossJ, "System", "Sum", Zone( i ).Name );
+			// Radiation lossed due to forced air systems
+			SetupOutputVariable( "AFN Zone Duct Radiation Heat Gain Rate [W]", AirflowNetworkReportData( i ).RadGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).RadGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Heat Loss Rate [W]", AirflowNetworkReportData( i ).RadLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).RadLossJ, "System", "Sum", Zone( i ).Name );
 			// Total losses due to force air systems
 			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Rate [W]", AirflowNetworkReportData( i ).TotalSenGainW, "System", "Average", Zone( i ).Name );
 			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).TotalSenGainJ, "System", "Sum", Zone( i ).Name );
@@ -4713,7 +4758,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 			}
-		} else { // PressureCtrlRelief - Pressure control type is Relief Flow 
+		} else { // PressureCtrlRelief - Pressure control type is Relief Flow
 			MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
 			MaxReliefMassFlowrate = Node( DisSysCompReliefAirData( 1 ).OutletNode ).MassFlowRate;
 			if ( LoopFanOperationMode == CycFanCycComp && LoopOnOffFanPartLoadRatio > 0.0 ) {
@@ -5167,6 +5212,20 @@ namespace AirflowNetworkBalanceManager {
 		CalcWindPressure = CPV * 0.5 * RhoOut * Vref * Vref;
 
 		return CalcWindPressure;
+	}
+
+	void
+	CalcAirflowNetworkRadiation()
+	{
+		for ( int i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
+			int CompNum = AirflowNetworkLinkageData( i ).CompNum;
+			int CompTypeNum = AirflowNetworkCompData( CompNum ).CompTypeNum;
+			std::string CompName = AirflowNetworkCompData( CompNum ).EPlusName;
+			// Calculate duct radiation
+			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct element only
+				// Duct radiation calculations here
+			}
+		}
 	}
 
 	void
@@ -6330,6 +6389,10 @@ namespace AirflowNetworkBalanceManager {
 			e.DiffLatGainJ = 0.0;
 			e.DiffLatLossW = 0.0;
 			e.DiffLatLossJ = 0.0;
+			e.RadGainW = 0.0;
+			e.RadGainJ = 0.0;
+			e.RadLossW = 0.0;
+			e.RadLossJ = 0.0;
 			e.TotalSenGainW = 0.0;
 			e.TotalSenGainJ = 0.0;
 			e.TotalSenLossW = 0.0;
@@ -6451,7 +6514,13 @@ namespace AirflowNetworkBalanceManager {
 					AirflowNetworkReportData( i ).DiffLatLossW = -AirflowNetworkExchangeData( i ).DiffLat * Lam;
 					AirflowNetworkReportData( i ).DiffLatLossJ = -AirflowNetworkExchangeData( i ).DiffLat * Lam * ReportingConstant;
 				}
-
+				if ( AirflowNetworkExchangeData( i ).RadGain > 0.0 ) {
+					AirflowNetworkReportData( i ).RadGainW = AirflowNetworkExchangeData( i ).RadGain;
+					AirflowNetworkReportData( i ).RadGainJ = AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
+				} else {
+					AirflowNetworkReportData( i ).RadLossW = -AirflowNetworkExchangeData( i ).RadGain;
+					AirflowNetworkReportData( i ).RadLossJ = -AirflowNetworkExchangeData( i ).RadGain * ReportingConstant;
+				}
 				if ( AirflowNetworkExchangeData( i ).TotalSen > 0.0 ) {
 					AirflowNetworkReportData( i ).TotalSenGainW = AirflowNetworkExchangeData( i ).TotalSen;
 					AirflowNetworkReportData( i ).TotalSenGainJ = AirflowNetworkExchangeData( i ).TotalSen * ReportingConstant;
@@ -6865,7 +6934,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkLinkReport( i ).VolFLOW2 = 0.0;
 			}
 		}
-		
+
 		if ( !( AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) ) return;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1 ) {
@@ -7090,7 +7159,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Sum all the loads
 		for ( i = 1; i <= NumOfZones; ++i ) {
-			AirflowNetworkExchangeData( i ).TotalSen = AirflowNetworkExchangeData( i ).LeakSen + AirflowNetworkExchangeData( i ).CondSen;
+			AirflowNetworkExchangeData( i ).TotalSen = AirflowNetworkExchangeData( i ).LeakSen + AirflowNetworkExchangeData( i ).CondSen + AirflowNetworkExchangeData( i ).RadGain;
 			AirflowNetworkExchangeData( i ).TotalLat = AirflowNetworkExchangeData( i ).LeakLat + AirflowNetworkExchangeData( i ).DiffLat;
 		}
 
@@ -7103,6 +7172,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkExchangeData( i ).LeakLat *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).CondSen *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).DiffLat *= OnOffFanRunTimeFraction;
+				AirflowNetworkExchangeData( i ).RadGain *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).TotalSen *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).TotalLat *= OnOffFanRunTimeFraction;
 				AirflowNetworkExchangeData( i ).SumMCp *= OnOffFanRunTimeFraction;

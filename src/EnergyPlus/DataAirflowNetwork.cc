@@ -102,8 +102,9 @@ namespace DataAirflowNetwork {
 	int const CompTypeNum_HEX( 16 ); // Distribution system heat exchanger
 	int const CompTypeNum_HOP( 17 ); // Horizontal opening component
 	int const CompTypeNum_RVD( 18 ); // Reheat VAV terminal damper
-	int const CompTypeNum_OAF( 19 ); // Distribution system OA 
-	int const CompTypeNum_REL( 20 ); // Distribution system relief air 
+	int const CompTypeNum_OAF( 19 ); // Distribution system OA
+	int const CompTypeNum_REL( 20 ); // Distribution system relief air
+	int const CompTypeNum_DVF( 21 ); // Distribution system duct view factors
 
 	// EPlus component Type
 	int const EPlusTypeNum_SCN( 1 ); // Supply connection
@@ -111,7 +112,7 @@ namespace DataAirflowNetwork {
 	int const EPlusTypeNum_RHT( 3 ); // Reheat terminal
 	int const EPlusTypeNum_FAN( 4 ); // Fan
 	int const EPlusTypeNum_COI( 5 ); // Heating or cooling coil
-	int const EPlusTypeNum_HEX( 6 ); // Heat ecxchanger
+	int const EPlusTypeNum_HEX( 6 ); // Heat exchanger
 	int const EPlusTypeNum_RVD( 7 ); // Reheat VAV terminal damper
 
 	// EPlus node type
@@ -177,7 +178,7 @@ namespace DataAirflowNetwork {
 	int AirflowNetworkNumOfSurfaces( 0 ); // The number of surfaces for multizone calculation
 	int AirflowNetworkNumOfZones( 0 ); // The number of zones for multizone calculation
 
-	bool RollBackFlag( false ); // Roll back flag when system time steo down shifting
+	bool RollBackFlag( false ); // Roll back flag when system time step down shifting
 	Array1D< Real64 > ANZT; // Local zone air temperature for roll back use
 	Array1D< Real64 > ANZW; // Local zone air humidity ratio for roll back use
 	Array1D< Real64 > ANCO; // Local zone air CO2 for roll back use
@@ -220,7 +221,7 @@ namespace DataAirflowNetwork {
 	Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
 	Array1D< MultizoneCPValueProp > MultizoneCPValueData;
 	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
+	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modification factor
 	Array1D< DeltaCpProp > DeltaCp;
 	Array1D< DeltaCpProp > EPDeltaCP;
 	Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
@@ -241,6 +242,7 @@ namespace DataAirflowNetwork {
 	Array1D< PressureControllerProp > PressureControllerData;
 	Array1D< DisSysCompAirflowProp > DisSysCompOutdoorAirData;
 	Array1D< DisSysCompAirflowProp > DisSysCompReliefAirData;
+	Array1D< AirflowNetworkLinkageViewFactorProp > AirflowNetworkLinkageViewFactorData;
 
 	void
 	clear_state()
@@ -312,6 +314,7 @@ namespace DataAirflowNetwork {
 		DisSysCompTermUnitData.deallocate();
 		DisSysCompCPDData.deallocate();
 		AirflowNetworkReportData.deallocate();
+		AirflowNetworkLinkageViewFactorData.deallocate();
 	}
 
 } // DataAirflowNetwork

@@ -5040,7 +5040,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	//       RE-ENGINEERED  Mar 1998 (RKS)
 
 	// PURPOSE OF THIS SUBROUTINE:
-	// This subroutine performs a heat balance on the outside face of each
+	// This subroutine performs a heat balance on the inside face of each
 	// surface in the building.
 
 	// METHODOLOGY EMPLOYED:
@@ -5744,7 +5744,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			//Feb2012        CondFDRelaxFactor = CondFDRelaxFactor * 0.9d0
 			//Feb2012        IF (CondFDRelaxFactor < 0.2d0) CondFDRelaxFactor = 0.2d0
 
-			// resets relaxation factor to speed up iterations when under-relaxatation is not needed.
+			// resets relaxation factor to speed up iterations when under-relaxation is not needed.
 			if ( InsideSurfIterations <= 1 ) {
 				CondFDRelaxFactor = CondFDRelaxFactorInput;
 			}
