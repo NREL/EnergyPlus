@@ -1626,7 +1626,7 @@ namespace ZoneTempPredictorCorrector {
 			// Assign default multiplier values to all the other zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
 				if( ! Zone( ZoneNum ).FlagCustomizedZoneCap ){
-					Zone(ZoneNum).ZoneVolCapMultpSens = 1.0; // ZoneVolCapMultpSens;
+					Zone(ZoneNum).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
 					Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
 					Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
 					Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
