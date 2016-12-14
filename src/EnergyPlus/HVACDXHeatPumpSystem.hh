@@ -85,6 +85,7 @@ namespace HVACDXHeatPumpSystem {
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumDXHeatPumpSystems; // The Number of DXHeatPumpSystems found in the Input
 	extern bool EconomizerFlag; // holds air loop economizer status
+	extern bool GetInputFlag; // Flag to get input only once
 
 	// Make this type allocatable
 	extern Array1D_bool CheckEquipName;
@@ -126,6 +127,10 @@ namespace HVACDXHeatPumpSystem {
 		Real64 OAUnitSetTemp; // set
 		// variable-speed coil
 		int SpeedNum; // select speed number for variable-speed coil
+		// Fault model of coil SAT sensor
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		DXHeatPumpSystemStruct() :
@@ -145,7 +150,10 @@ namespace HVACDXHeatPumpSystem {
 			DXCoilSensPLRFail( 0 ),
 			DXCoilSensPLRFailIndex( 0 ),
 			OAUnitSetTemp( 0.0 ),
-			SpeedNum( 0 )
+			SpeedNum( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};

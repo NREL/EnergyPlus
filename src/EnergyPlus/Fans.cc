@@ -3287,7 +3287,6 @@ namespace Fans {
 
 		// Using/Aliasing
 		using namespace CurveManager;
-		using FaultsManager::CheckFaultyAirFilterFanCurve;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

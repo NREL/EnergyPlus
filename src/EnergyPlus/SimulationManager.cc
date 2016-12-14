@@ -371,8 +371,6 @@ namespace SimulationManager {
 		DoingSizing = true;
 		ManageSizing();
 
-		CheckAndReadFaults();
-
 		BeginFullSimFlag = true;
 		SimsDone = false;
 		if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
@@ -394,6 +392,9 @@ namespace SimulationManager {
 
 		ResetEnvironmentCounter();
 		SetupSimulation( ErrorsFound );
+
+		CheckAndReadFaults();
+
 		InitCurveReporting();
 
 		AskForConnectionsReport = true; // set to true now that input processing and sizing is done.

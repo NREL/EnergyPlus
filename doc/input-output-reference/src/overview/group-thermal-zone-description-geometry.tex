@@ -2125,6 +2125,8 @@ BuildingSurface:Detailed,Zn001:Wall001,  !- Base Surface Name
 
 This surface class is used for subsurfaces, which can be of five different types: Windows, Doors, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers. A subsurface (such as a window) of a base surface (such as a wall) inherits several of the properties (such as Outside Boundary Condition, Sun Exposure, etc.) of the base surface. Windows, GlassDoors, TubularDaylightDomes, and TubularDaylightDiffusers are considered to have one or more glass layers and so transmit solar radiation. Doors are considered to be opaque.
 
+The surface can be of 3 sides or 4 sides. A 4-sided but non-rectangular fenestration surface is allowed and will be transferred to an equivalent rectangular surface with the same area and aspect ratio for the convection calculations at window air gaps.
+
 \subsubsection{Inputs}\label{inputs-24-004}
 
 \paragraph{Field: Name}\label{field-name-20-004}
