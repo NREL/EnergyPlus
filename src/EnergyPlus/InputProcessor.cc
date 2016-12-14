@@ -1284,8 +1284,8 @@ namespace EnergyPlus {
 		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
 		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
 		auto const & schema_name_field = jdd_it_val.find( "name" );
-		auto key = legacy_idd.find("extension");
 
+		auto key = legacy_idd.find("extension");
 		std::string extension_key;
 		if ( key != legacy_idd.end() ) {
 			extension_key = key.value();
