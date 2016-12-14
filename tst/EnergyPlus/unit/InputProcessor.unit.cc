@@ -75,48 +75,48 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, decode_encode_1 ) {
 		auto const idf = delimited_string({
-				                                  "Building,",
-				                                  "  Ref Bldg Medium Office New2004_v1.3_5.0,",
-				                                  "  0.0,",
-				                                  "  City,",
-				                                  "  0.04,",
-				                                  "  0.2,",
-				                                  "  FullInteriorAndExterior,",
-				                                  "  25.0,",
-				                                  "  6.0;",
-				                                  "",
-				                                  "BuildingSurface:Detailed,",
-				                                  "  Zn009:Flr001,",
-				                                  "  Floor,",
-				                                  "  FLOOR38,",
-				                                  "  SCWINDOW,",
-				                                  "  Surface,",
-				                                  "  Zn009:Flr001,",
-				                                  "  NoSun,",
-				                                  "  NoWind,",
-				                                  "  1.0,",
-				                                  "  4.0,",
-				                                  "  10.0,",
-				                                  "  0.0,",
-				                                  "  0.0,",
-				                                  "  0.0,",
-				                                  "  0.0,",
-				                                  "  0.0,",
-				                                  "  0.0,",
-				                                  "  10.0,",
-				                                  "  0.0,",
-				                                  "  10.0,",
-				                                  "  10.0,",
-				                                  "  0.0;",
-				                                  "",
-				                                  "GlobalGeometryRules,",
-				                                  "  UpperLeftCorner,",
-				                                  "  Counterclockwise,",
-				                                  "  Relative,",
-				                                  "  Relative,",
-				                                  "  Relative;",
-				                                  ""
-		                                  });
+											"Building,",
+											"  Ref Bldg Medium Office New2004_v1.3_5.0,",
+											"  0.0,",
+											"  City,",
+											"  0.04,",
+											"  0.2,",
+											"  FullInteriorAndExterior,",
+											"  25.0,",
+											"  6.0;",
+											"",
+											"BuildingSurface:Detailed,",
+											"  Zn009:Flr001,",
+											"  Floor,",
+											"  FLOOR38,",
+											"  SCWINDOW,",
+											"  Surface,",
+											"  Zn009:Flr001,",
+											"  NoSun,",
+											"  NoWind,",
+											"  1.0,",
+											"  4.0,",
+											"  10.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  10.0,",
+											"  0.0,",
+											"  10.0,",
+											"  10.0,",
+											"  0.0;",
+											"",
+											"GlobalGeometryRules,",
+											"  UpperLeftCorner,",
+											"  Counterclockwise,",
+											"  Relative,",
+											"  Relative,",
+											"  Relative;",
+											""
+										  });
 		ASSERT_TRUE(process_idf(idf));
 		std::string encoded = encodeIDF();
 		EXPECT_EQ(idf, encoded);
@@ -125,57 +125,57 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, decode_encode_2 ) {
 		auto const idf(delimited_string({
-				                                "Zone,",
-				                                "  Core_mid,",
-				                                "  0.0,",
-				                                "  0.0,",
-				                                "  0.0,",
-				                                "  0.0,",
-				                                "  1.0,",
-				                                "  1.0,",
-				                                "  ,",
-				                                "  ,",
-				                                "  autocalculate,",
-				                                "  ,",
-				                                "  ,",
-				                                "  Yes;",
-		                                }));
+											"Zone,",
+											"  Core_mid,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  1.0,",
+											"  1.0,",
+											"  ,",
+											"  ,",
+											"  autocalculate,",
+											"  ,",
+											"  ,",
+											"  Yes;",
+										}));
 
 		auto const expected(delimited_string({
-				                                     "Building,",
-				                                     "  Bldg,",
-				                                     "  0.0,",
-				                                     "  Suburbs,",
-				                                     "  0.04,",
-				                                     "  0.4,",
-				                                     "  FullExterior,",
-				                                     "  25.0,",
-				                                     "  6.0;",
-				                                     "",
-				                                     "GlobalGeometryRules,",
-				                                     "  UpperLeftCorner,",
-				                                     "  Counterclockwise,",
-				                                     "  Relative,",
-				                                     "  Relative,",
-				                                     "  Relative;"
-						                                     "",
-				                                     "",
-				                                     "Zone,",
-				                                     "  Core_mid,",
-				                                     "  0.0,",
-				                                     "  0.0,",
-				                                     "  0.0,",
-				                                     "  0.0,",
-				                                     "  1.0,",
-				                                     "  1.0,",
-				                                     "  ,",
-				                                     "  ,",
-				                                     "  Autocalculate,",
-				                                     "  ,",
-				                                     "  ,",
-				                                     "  Yes;",
-				                                     ""
-		                                     }));
+												"Building,",
+												"  Bldg,",
+												"  0.0,",
+												"  Suburbs,",
+												"  0.04,",
+												"  0.4,",
+												"  FullExterior,",
+												"  25.0,",
+												"  6.0;",
+												"",
+												"GlobalGeometryRules,",
+												"  UpperLeftCorner,",
+												"  Counterclockwise,",
+												"  Relative,",
+												"  Relative,",
+												"  Relative;"
+												"",
+												"",
+												"Zone,",
+												"  Core_mid,",
+												"  0.0,",
+												"  0.0,",
+												"  0.0,",
+												"  0.0,",
+												"  1.0,",
+												"  1.0,",
+												"  ,",
+												"  ,",
+												"  Autocalculate,",
+												"  ,",
+												"  ,",
+												"  Yes;",
+												""
+											 }));
 
 		ASSERT_TRUE(process_idf(idf));
 		std::string encoded = encodeIDF();
@@ -184,34 +184,34 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, parse_empty_fields) {
 		std::string const idf( delimited_string( {
-				                                         "  Building,",
-				                                         "    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
-				                                         "    ,                  !- North Axis {deg}",
-				                                         "    ,                    !- Terrain",
-				                                         "    ,                  !- Loads Convergence Tolerance Value",
-				                                         "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
-				                                         "    , !- Solar Distribution",
-				                                         "    25,                      !- Maximum Number of Warmup Days",
-				                                         "    6;",
-		                                         } ) );
+													"  Building,",
+													"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+													"    ,                  !- North Axis {deg}",
+													"    ,                    !- Terrain",
+													"    ,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    , !- Solar Distribution",
+													"    25,                      !- Maximum Number of Warmup Days",
+													"    6;",
+												 } ) );
 
 		json expected = {
 				{
-						"Building",
+					"Building",
+					{
 						{
-								{
-										"Ref Bldg Medium Office New2004_v1.3_5.0",
-										{
-												{"north_axis", ""},
-												{"terrain", ""},
-												{"loads_convergence_tolerance_value", ""},
-												{"temperature_convergence_tolerance_value", 0.2000},
-												{"solar_distribution", ""},
-												{"maximum_number_of_warmup_days", 25},
-												{"minimum_number_of_warmup_days", 6}
-										}
-								}
+							"Ref Bldg Medium Office New2004_v1.3_5.0",
+							{
+								{"north_axis", ""},
+								{"terrain", ""},
+								{"loads_convergence_tolerance_value", ""},
+								{"temperature_convergence_tolerance_value", 0.2000},
+								{"solar_distribution", ""},
+								{"maximum_number_of_warmup_days", 25},
+								{"minimum_number_of_warmup_days", 6}
+							}
 						}
+					}
 				}
 		};
 
@@ -233,73 +233,73 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects ) {
 		std::string const idf( delimited_string( {
-				                                         "  Building,",
-				                                         "    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
-				                                         "    0.0000,                  !- North Axis {deg}",
-				                                         "    City,                    !- Terrain",
-				                                         "    0.0400123456789123,                  !- Loads Convergence Tolerance Value",
-				                                         "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
-				                                         "    FullInteriorAndExterior, !- Solar Distribution",
-				                                         "    25,                      !- Maximum Number of Warmup Days",
-				                                         "    6;",
-				                                         "",
-				                                         "  Building,",
-				                                         "    Another Building Name,  !- Name",
-				                                         "    0.0000,                  !- North Axis {deg}",
-				                                         "    City,                    !- Terrain",
-				                                         "    0.0400,                  !- Loads Convergence Tolerance Value",
-				                                         "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
-				                                         "    FullInteriorAndExterior, !- Solar Distribution",
-				                                         "    25,                      !- Maximum Number of Warmup Days",
-				                                         "    6;",
-		                                         } ) );
+													"  Building,",
+													"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400123456789123,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    25,                      !- Maximum Number of Warmup Days",
+													"    6;",
+													"",
+													"  Building,",
+													"    Another Building Name,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    25,                      !- Maximum Number of Warmup Days",
+													"    6;",
+												 } ) );
 
 		json expected =
 				{
+					{
+						"Building",
 						{
-								"Building",
+							{
+								"Ref Bldg Medium Office New2004_v1.3_5.0",
 								{
-										{
-												"Ref Bldg Medium Office New2004_v1.3_5.0",
-												{
-														{"north_axis", 0.0000},
-														{"terrain", "City"},
-														{"loads_convergence_tolerance_value", 0.0400123456789123},
-														{"temperature_convergence_tolerance_value", 0.2000},
-														{"solar_distribution", "FullInteriorAndExterior"},
-														{"maximum_number_of_warmup_days", 25},
-														{"minimum_number_of_warmup_days", 6}
-												},
-										},
-										{
-												"Another Building Name",
-												{
-														{"north_axis", 0.0000},
-														{"terrain", "City"},
-														{"loads_convergence_tolerance_value", 0.0400},
-														{"temperature_convergence_tolerance_value", 0.2000},
-														{"solar_distribution", "FullInteriorAndExterior"},
-														{"maximum_number_of_warmup_days", 25},
-														{"minimum_number_of_warmup_days", 6}
-												},
-										}
-								}
-						},
-						{
-								"GlobalGeometryRules",
+									{"north_axis", 0.0000},
+									{"terrain", "City"},
+									{"loads_convergence_tolerance_value", 0.0400123456789123},
+									{"temperature_convergence_tolerance_value", 0.2000},
+									{"solar_distribution", "FullInteriorAndExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								},
+							},
+							{
+								"Another Building Name",
 								{
-										{
-												"",
-												{
-														{"starting_vertex_position", "UpperLeftCorner"},
-														{"vertex_entry_direction", "Counterclockwise"},
-														{"coordinate_system", "Relative"},
-														{"daylighting_reference_point_coordinate_system", "Relative"},
-														{"rectangular_surface_coordinate_system", "Relative"}
-												}
-										}
-								}
+									{"north_axis", 0.0000},
+									{"terrain", "City"},
+									{"loads_convergence_tolerance_value", 0.0400},
+									{"temperature_convergence_tolerance_value", 0.2000},
+									{"solar_distribution", "FullInteriorAndExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								},
+							}
 						}
+					},
+					{
+						"GlobalGeometryRules",
+						{
+							{
+								"",
+								{
+									{"starting_vertex_position", "UpperLeftCorner"},
+									{"vertex_entry_direction", "Counterclockwise"},
+									{"coordinate_system", "Relative"},
+									{"daylighting_reference_point_coordinate_system", "Relative"},
+									{"rectangular_surface_coordinate_system", "Relative"}
+								}
+							}
+						}
+					}
 				};
 
 		ASSERT_TRUE(process_idf(idf));
@@ -324,99 +324,99 @@ namespace EnergyPlus {
 
 		std::string const idf(delimited_string(
 				{
-						"BuildingSurface:Detailed,",
-						"Zn009:Flr001,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    "",10,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    "",10.00000,"";  !- X,Y,Z ==> Vertex 4 {m}"
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    "",10,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    "",10.00000,"";  !- X,Y,Z ==> Vertex 4 {m}"
 				}));
 
 		json expected =
 				{
+					{
+						"BuildingSurface:Detailed",
 						{
-								"BuildingSurface:Detailed",
+							{"Zn009:Flr001",
 								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", ""},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", ""},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", ""},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", ""}
-																		}
-																}
-														}
-												}
-										}
-								}
-						},
-						{
-								"GlobalGeometryRules",
-								{
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
 										{
-										 "",
-												{
-														{"starting_vertex_position", "UpperLeftCorner"},
-														{"vertex_entry_direction", "Counterclockwise"},
-														{"coordinate_system", "Relative"},
-														{"daylighting_reference_point_coordinate_system", "Relative"},
-														{"rectangular_surface_coordinate_system", "Relative"}
-												}
+											{
+												{"vertex_x_coordinate", ""},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", ""},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", ""},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", ""}
+											}
 										}
+									}
 								}
-						},
-						{
-								"Building",
-								{
-										{
-										 "Bldg",
-												{
-														{"north_axis", 0.0},
-														{"terrain", "Suburbs"},
-														{"loads_convergence_tolerance_value", 0.04},
-														{"temperature_convergence_tolerance_value", 0.4000},
-														{"solar_distribution", "FullExterior"},
-														{"maximum_number_of_warmup_days", 25},
-														{"minimum_number_of_warmup_days", 6}
-												}
-										}
-								}
+							}
 						}
+					},
+					{
+						"GlobalGeometryRules",
+						{
+							{
+								"",
+								{
+									{"starting_vertex_position", "UpperLeftCorner"},
+									{"vertex_entry_direction", "Counterclockwise"},
+									{"coordinate_system", "Relative"},
+									{"daylighting_reference_point_coordinate_system", "Relative"},
+									{"rectangular_surface_coordinate_system", "Relative"}
+								}
+							}
+						}
+					},
+					{
+						"Building",
+						{
+							{
+								"Bldg",
+								{
+									{"north_axis", 0.0},
+									{"terrain", "Suburbs"},
+									{"loads_convergence_tolerance_value", 0.04},
+									{"temperature_convergence_tolerance_value", 0.4000},
+									{"solar_distribution", "FullExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								}
+							}
+						}
+					}
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
@@ -449,66 +449,66 @@ namespace EnergyPlus {
 
 		std::string const idf(delimited_string(
 				{
-						"BuildingSurface:Detailed,",
-						"Zn009:Flr001,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
 				}));
 
 		json expected =
 				{
-						{"BuildingSurface:Detailed",
+					{"BuildingSurface:Detailed",
+						{
+							{"Zn009:Flr001",
 								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
+										{
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											}
 										}
+									}
 								}
+							}
 						}
+					}
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
@@ -544,152 +544,152 @@ namespace EnergyPlus {
 
 		std::string const idf(delimited_string(
 				{
-						"BuildingSurface:Detailed,",
-						"Zn009:Flr001,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-						"",
-						"BuildingSurface:Detailed,",
-						"Some Surface Name,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"BuildingSurface:Detailed,",
+					"Some Surface Name,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
 				}));
 
 		json expected =
 				{
+					{
+						"BuildingSurface:Detailed",
 						{
-								"BuildingSurface:Detailed",
+							{"Zn009:Flr001",
 								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										},
-										{"Some Surface Name",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										}
-								}
-						},
-						{
-								"GlobalGeometryRules",
-								{
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
 										{
-										 "",
-												{
-														{"starting_vertex_position", "UpperLeftCorner"},
-														{"vertex_entry_direction", "Counterclockwise"},
-														{"coordinate_system", "Relative"},
-														{"daylighting_reference_point_coordinate_system", "Relative"},
-														{"rectangular_surface_coordinate_system", "Relative"}
-												}
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											}
 										}
+									}
 								}
-						},
-						{
-								"Building",
+							},
+							{"Some Surface Name",
 								{
-										{
-										 "Bldg",
-												{
-														{"north_axis", 0.0},
-														{"terrain", "Suburbs"},
-														{"loads_convergence_tolerance_value", 0.04},
-														{"temperature_convergence_tolerance_value", 0.4000},
-														{"solar_distribution", "FullExterior"},
-														{"maximum_number_of_warmup_days", 25},
-														{"minimum_number_of_warmup_days", 6}
-												}
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
+									{
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											}
 										}
+									}
 								}
+							}
 						}
+					},
+					{
+						"GlobalGeometryRules",
+						{
+							{
+								"",
+								{
+									{"starting_vertex_position", "UpperLeftCorner"},
+									{"vertex_entry_direction", "Counterclockwise"},
+									{"coordinate_system", "Relative"},
+									{"daylighting_reference_point_coordinate_system", "Relative"},
+									{"rectangular_surface_coordinate_system", "Relative"}
+								}
+							}
+						}
+					},
+					{
+						"Building",
+						{
+							{
+								"Bldg",
+								{
+									{"north_axis", 0.0},
+									{"terrain", "Suburbs"},
+									{"loads_convergence_tolerance_value", 0.04},
+									{"temperature_convergence_tolerance_value", 0.4000},
+									{"solar_distribution", "FullExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								}
+							}
+						}
+					}
 				};
 
 		ASSERT_TRUE( process_idf( idf ) );
@@ -725,47 +725,47 @@ namespace EnergyPlus {
 	TEST_F(InputProcessorFixture, validate_two_extensible_objects_and_one_non_extensible_object) {
 		std::string const idf(delimited_string(
 				{
-						"BuildingSurface:Detailed,",
-						"Zn009:Flr001,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-						"",
-						"BuildingSurface:Detailed,",
-						"Building Surface Name,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-						"",
-						"  Building,",
-						"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
-						"    0.0000,                  !- North Axis {deg}",
-						"    City,                    !- Terrain",
-						"    0.0400,                  !- Loads Convergence Tolerance Value",
-						"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
-						"    FullInteriorAndExterior, !- Solar Distribution",
-						"    25,                      !- Maximum Number of Warmup Days",
-						"    6;",
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"BuildingSurface:Detailed,",
+					"Building Surface Name,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"  Building,",
+					"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+					"    0.0000,                  !- North Axis {deg}",
+					"    City,                    !- Terrain",
+					"    0.0400,                  !- Loads Convergence Tolerance Value",
+					"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+					"    FullInteriorAndExterior, !- Solar Distribution",
+					"    25,                      !- Maximum Number of Warmup Days",
+					"    6;",
 				}));
 
 		ASSERT_TRUE( process_idf( idf ) );
@@ -777,39 +777,39 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, parse_idf ) {
 		std::string const idf(
-				delimited_string(
-						{
-								"  Building,",
-								"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
-								"    0.0000,                  !- North Axis {deg}",
-								"    City,                    !- Terrain",
-								"    0.0400,                  !- Loads Convergence Tolerance Value",
-								"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
-								"    FullInteriorAndExterior, !- Solar Distribution",
-								"    25,                      !- Maximum Number of Warmup Days",
-								"    6;",
-						}
-				)
+			delimited_string(
+				{
+					"  Building,",
+					"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+					"    0.0000,                  !- North Axis {deg}",
+					"    City,                    !- Terrain",
+					"    0.0400,                  !- Loads Convergence Tolerance Value",
+					"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+					"    FullInteriorAndExterior, !- Solar Distribution",
+					"    25,                      !- Maximum Number of Warmup Days",
+					"    6;",
+				}
+			)
 		);
 
 		json expected = {
+			{
+				"Building",
 				{
-						"Building",
+					{
+						"Ref Bldg Medium Office New2004_v1.3_5.0",
 						{
-								{
-										"Ref Bldg Medium Office New2004_v1.3_5.0",
-										{
-												{"north_axis", 0.0000},
-												{"terrain", "City"},
-												{"loads_convergence_tolerance_value", 0.0400},
-												{"temperature_convergence_tolerance_value", 0.2000},
-												{"solar_distribution", "FullInteriorAndExterior"},
-												{"maximum_number_of_warmup_days", 25},
-												{"minimum_number_of_warmup_days", 6}
-										},
-								}
-						}
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0400},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 25},
+							{"minimum_number_of_warmup_days", 6}
+						},
+					}
 				}
+			}
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
@@ -830,57 +830,57 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, parse_idf_two_objects ) {
 		std::string const idf( delimited_string( {
-				                                         "  Building,",
-				                                         "    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
-				                                         "    0.0000,                  !- North Axis {deg}",
-				                                         "    City,                    !- Terrain",
-				                                         "    0.0400,                  !- Loads Convergence Tolerance Value",
-				                                         "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
-				                                         "    FullInteriorAndExterior, !- Solar Distribution",
-				                                         "    20,                      !- Maximum Number of Warmup Days",
-				                                         "    6;",
-				                                         "",
-				                                         "  Building,",
-				                                         "    Random Building Name 3,  !- Name",
-				                                         "    0.0000,                  !- North Axis {deg}",
-				                                         "    City,                    !- Terrain",
-				                                         "    0.0400,                  !- Loads Convergence Tolerance Value",
-				                                         "    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
-				                                         "    FullInteriorAndExterior, !- Solar Distribution",
-				                                         "    20,                      !- Maximum Number of Warmup Days",
-				                                         "    6;",
-		                                         } ) );
+													"  Building,",
+													"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    20,                      !- Maximum Number of Warmup Days",
+													"    6;",
+													"",
+													"  Building,",
+													"    Random Building Name 3,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    20,                      !- Maximum Number of Warmup Days",
+													"    6;",
+												 } ) );
 
 		json expected = {
+			{
+				"Building",
 				{
-						"Building",
+					{
+						"Ref Bldg Medium Office New2004_v1.3_5.0",
 						{
-								{
-										"Ref Bldg Medium Office New2004_v1.3_5.0",
-										{
-												{"north_axis", 0.0000},
-												{"terrain", "City"},
-												{"loads_convergence_tolerance_value", 0.0400},
-												{"temperature_convergence_tolerance_value", 0.2000},
-												{"solar_distribution", "FullInteriorAndExterior"},
-												{"maximum_number_of_warmup_days", 20},
-												{"minimum_number_of_warmup_days", 6}
-										},
-								},
-								{
-										"Random Building Name 3",
-										{
-												{"north_axis", 0.0000},
-												{"terrain", "City"},
-												{"loads_convergence_tolerance_value", 0.0400},
-												{"temperature_convergence_tolerance_value", 0.2000},
-												{"solar_distribution", "FullInteriorAndExterior"},
-												{"maximum_number_of_warmup_days", 20},
-												{"minimum_number_of_warmup_days", 6}
-										}
-								}
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0400},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 20},
+							{"minimum_number_of_warmup_days", 6}
+						},
+					},
+					{
+						"Random Building Name 3",
+						{
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0400},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 20},
+							{"minimum_number_of_warmup_days", 6}
 						}
+					}
 				}
+			}
 		};
 
 		ASSERT_TRUE( process_idf( idf ) );
@@ -902,67 +902,67 @@ namespace EnergyPlus {
 	TEST_F(InputProcessorFixture, parse_idf_extensibles) {
 		std::string const idf(delimited_string(
 				{
-						"BuildingSurface:Detailed,",
-						"Zn009:Flr001,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
 				}));
 
 		json expected =
+		{
+			{"BuildingSurface:Detailed",
 				{
-						{"BuildingSurface:Detailed",
+					{"Zn009:Flr001",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
+							{
 								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										}
+									{"vertex_x_coordinate", 10},
+									{"vertex_y_coordinate", 0.0},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 0.0},
+									{"vertex_y_coordinate", 0.0},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 0.0},
+									{"vertex_y_coordinate", 10},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 10},
+									{"vertex_y_coordinate", 10},
+									{"vertex_z_coordinate", 0}
 								}
+								}
+							}
 						}
-				};
+					}
+				}
+			}
+		};
 
 		ASSERT_TRUE( process_idf( idf ) );
 		json & jdf = getJDF();
@@ -992,120 +992,120 @@ namespace EnergyPlus {
 	TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects) {
 		std::string const idf(delimited_string(
 				{
-						"BuildingSurface:Detailed,",
-						"Zn009:Flr001,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-						"",
-						"BuildingSurface:Detailed,",
-						"Building Surface Name,            !- Name",
-						"    Floor,                   !- Surface Type",
-						"    FLOOR38,                 !- Construction Name",
-						"    SCWINDOW,                !- Zone Name",
-						"    Surface,                 !- Outside Boundary Condition",
-						"    Zn009:Flr001,            !- Outside Boundary Condition Object",
-						"    NoSun,                   !- Sun Exposure",
-						"    NoWind,                  !- Wind Exposure",
-						"    1.000000,                !- View Factor to Ground",
-						"    4,                       !- Number of Vertices",
-						"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-						"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-						"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-						"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"BuildingSurface:Detailed,",
+					"Building Surface Name,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
 				}));
 
 		json expected =
+		{
+			{"BuildingSurface:Detailed",
 				{
-						{"BuildingSurface:Detailed",
+					{"Zn009:Flr001",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
 								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										},
-										{"Building Surface Name",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 0.0},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 0.0},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										}
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
 								}
+							}
 						}
-				};
+					},
+					{"Building Surface Name",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
+								{
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
 
 		ASSERT_TRUE( process_idf( idf ) );
 		json & jdf = getJDF();
@@ -1135,23 +1135,23 @@ namespace EnergyPlus {
 	TEST_F(InputProcessorFixture, validate_jdf_parametric_template) {
 		std::string const idf(delimited_string(
 				{
-						"Parametric:Logic,",
-						"Main,                    !- Name",
-						"PARAMETER $bldgArea,     !- Parametric Logic Line 1",
-						"PARAMETER $depth,        !- Parametric Logic Line 2",
-						"PARAMETER $width,        !- Parametric Logic Line 3",
-						"PARAMETER $height,       !- Parametric Logic Line 4",
-						"$bldgArea = 300.0,       !- Parametric Logic Line 5",
-						"$depth = SQRT($bldgArea / $aspectRatio),  !- Parametric Logic Line 6",
-						"$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
-						"$height = 4.0;           !- Parametric Logic Line 8"
-								"",
-						"HVACTemplate:Thermostat,",
-						"All Zones,               !- Name",
-						"Htg-SetP-Sch,            !- Heating Setpoint Schedule Name",
-						",                        !- Constant Heating Setpoint {C}",
-						"Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
-						";                        !- Constant Cooling Setpoint {C}"
+					"Parametric:Logic,",
+					"Main,                    !- Name",
+					"PARAMETER $bldgArea,     !- Parametric Logic Line 1",
+					"PARAMETER $depth,        !- Parametric Logic Line 2",
+					"PARAMETER $width,        !- Parametric Logic Line 3",
+					"PARAMETER $height,       !- Parametric Logic Line 4",
+					"$bldgArea = 300.0,       !- Parametric Logic Line 5",
+					"$depth = SQRT($bldgArea / $aspectRatio),  !- Parametric Logic Line 6",
+					"$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
+					"$height = 4.0;           !- Parametric Logic Line 8"
+					"",
+					"HVACTemplate:Thermostat,",
+					"All Zones,               !- Name",
+					"Htg-SetP-Sch,            !- Heating Setpoint Schedule Name",
+					",                        !- Constant Heating Setpoint {C}",
+					"Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
+					";                        !- Constant Cooling Setpoint {C}"
 				}));
 		ASSERT_TRUE( process_idf( idf ) );
 		json & jdf = getJDF();
@@ -1168,67 +1168,67 @@ namespace EnergyPlus {
 
 	TEST_F(InputProcessorFixture, non_existent_keys) {
 		json root =
+		{
+			{"BuildingSurface:Detailed",
 				{
-						{"BuildingSurface:Detailed",
-								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "FLOOR38"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"non_existent_field_1", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"non_existent_field_2", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										}
-								}
-						},
+					{"Zn009:Flr001",
 						{
-						 "GlobalGeometryRules",
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"non_existent_field_1", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"non_existent_field_2", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
 								{
-										{
-										 "",
-												{
-														{"starting_vertex_position", "UpperLeftCorner"},
-														{"vertex_entry_direction", "Counterclockwise"},
-														{"coordinate_system", "Relative"},
-														{"daylighting_reference_point_coordinate_system", "Relative"},
-														{"rectangular_surface_coordinate_system", "Relative"}
-												}
-										}
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
 								}
-						},
-						{
-						 "Building",
-								{
-										{
-										 "Bldg",
-												{
-														{"north_axis", 0.0},
-														{"terrain", "Suburbs"},
-														{"loads_convergence_tolerance_value", 0.04},
-														{"temperature_convergence_tolerance_value", 0.4000},
-														{"solar_distribution", "FullExterior"},
-														{"maximum_number_of_warmup_days", 25},
-														{"minimum_number_of_warmup_days", 6}
-												}
-										}
-								}
+							}
 						}
+					}
+				}
+			},
+			{
+				"GlobalGeometryRules",
+				{
+					{
+						"",
+						{
+							{"starting_vertex_position", "UpperLeftCorner"},
+							{"vertex_entry_direction", "Counterclockwise"},
+							{"coordinate_system", "Relative"},
+							{"daylighting_reference_point_coordinate_system", "Relative"},
+							{"rectangular_surface_coordinate_system", "Relative"}
+						}
+					}
+				}
+			},
+			{
+				"Building",
+				{
+					{
+						"Bldg",
+						{
+							{"north_axis", 0.0},
+							{"terrain", "Suburbs"},
+							{"loads_convergence_tolerance_value", 0.04},
+							{"temperature_convergence_tolerance_value", 0.4000},
+							{"solar_distribution", "FullExterior"},
+							{"maximum_number_of_warmup_days", 25},
+							{"minimum_number_of_warmup_days", 6}
+						}
+					}
+				}
+			}
 
-				};
+		};
 
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
 		auto const & errors = validation_errors();
@@ -1245,69 +1245,69 @@ namespace EnergyPlus {
 
 	TEST_F(InputProcessorFixture, required_fields_required_extensibles_and_missing_enum) {
 		json root =
+		{
+			{
+				"BuildingSurface:Detailed",
 				{
+					{"Zn009:Flr001",
 						{
-								"BuildingSurface:Detailed",
+							{"surface_type", "value that doesn't exist in the enum"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
 								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "value that doesn't exist in the enum"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", 1.000000},
-														{"number_of_vertices", 4},
-														{"vertices",
-																{
-																		{
-																				{"vertex_z_coordinate", 0}
-																		},
-																		{
-																				{"vertex_x_coordinate", 10},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										}
+									{
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
 								}
-						},
-						{
-								"GlobalGeometryRules",
-								{
-										{
-										 "",
-												{
-														{"starting_vertex_position", "UpperLeftCorner"},
-														{"vertex_entry_direction", "Counterclockwise"},
-														{"coordinate_system", "Relative"},
-														{"daylighting_reference_point_coordinate_system", "Relative"},
-														{"rectangular_surface_coordinate_system", "Relative"}
-												}
-										}
-								}
-						},
-						{
-								"Building",
-								{
-										{
-										 "Bldg",
-												{
-														{"north_axis", 0.0},
-														{"terrain", "Suburbs"},
-														{"loads_convergence_tolerance_value", 0.04},
-														{"temperature_convergence_tolerance_value", 0.4000},
-														{"solar_distribution", "FullExterior"},
-														{"maximum_number_of_warmup_days", 25},
-														{"minimum_number_of_warmup_days", 6}
-												}
-										}
-								}
+							}
 						}
-				};
+					}
+				}
+			},
+			{
+				"GlobalGeometryRules",
+				{
+					{
+						"",
+						{
+							{"starting_vertex_position", "UpperLeftCorner"},
+							{"vertex_entry_direction", "Counterclockwise"},
+							{"coordinate_system", "Relative"},
+							{"daylighting_reference_point_coordinate_system", "Relative"},
+							{"rectangular_surface_coordinate_system", "Relative"}
+						}
+					}
+				}
+			},
+			{
+				"Building",
+				{
+					{
+						"Bldg",
+						{
+							{"north_axis", 0.0},
+							{"terrain", "Suburbs"},
+							{"loads_convergence_tolerance_value", 0.04},
+							{"temperature_convergence_tolerance_value", 0.4000},
+							{"solar_distribution", "FullExterior"},
+							{"maximum_number_of_warmup_days", 25},
+							{"minimum_number_of_warmup_days", 6}
+						}
+					}
+				}
+			}
+		};
 
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
 		auto const & errors = validation_errors();
@@ -1315,10 +1315,10 @@ namespace EnergyPlus {
 		EXPECT_EQ(errors.size(), 4ul);
 		EXPECT_EQ(warnings.size(), 0ul);
 		if (errors.size() >= 4) {
-			EXPECT_NE(errors[1].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
-			EXPECT_NE(errors[2].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
-			EXPECT_NE(errors[0].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
-			EXPECT_NE(errors[0].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
+			EXPECT_NE(errors[0].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
 			EXPECT_NE(errors[3].find("Required field \"construction_name\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
 //            EXPECT_NE(errors[4].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
 //            EXPECT_NE(errors[5].find("Required object \"Building\" was not provided"), std::string::npos);
@@ -1328,65 +1328,65 @@ namespace EnergyPlus {
 
 	TEST_F(InputProcessorFixture, min_and_max_validation) {
 		json root =
+		{
+			{"BuildingSurface:Detailed",
 				{
-						{"BuildingSurface:Detailed",
-								{
-										{"Zn009:Flr001",
-												{
-														{"surface_type", "Floor"},
-														{"construction_name", "super_official_construction_name"},
-														{"zone_name", "SCWINDOW"},
-														{"outside_boundary_condition", "Surface"},
-														{"outside_boundary_condition_object", "Zn009:Flr001"},
-														{"sun_exposure", "NoSun"},
-														{"wind_exposure", "NoWind"},
-														{"view_factor_to_ground", -987.654321},
-														{"number_of_vertices", -98765.4321},
-														{"vertices",
-																{
-																		{
-																				{"vertex_x_coordinate", "definitely not a number"},
-																				{"vertex_y_coordinate", 10},
-																				{"vertex_z_coordinate", 0}
-																		}
-																}
-														}
-												}
-										}
-								}
-						},
-						{"Building",
-								{
-										{
-										 "Ref Bldg Medium Office New2004_v1.3_5.0",
-												{
-														{"north_axis", 0.0000},
-														{"terrain", "City"},
-														{"loads_convergence_tolerance_value", 0.0},
-														{"temperature_convergence_tolerance_value", 0.2000},
-														{"solar_distribution", "FullInteriorAndExterior"},
-														{"maximum_number_of_warmup_days", 20},
-														{"minimum_number_of_warmup_days", 0}
-												},
-										},
-								}
-						},
+					{"Zn009:Flr001",
 						{
-						 "GlobalGeometryRules",
+							{"surface_type", "Floor"},
+							{"construction_name", "super_official_construction_name"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", -987.654321},
+							{"number_of_vertices", -98765.4321},
+							{"vertices",
 								{
-										{
-										 "",
-												{
-														{"starting_vertex_position", "UpperLeftCorner"},
-														{"vertex_entry_direction", "Counterclockwise"},
-														{"coordinate_system", "Relative"},
-														{"daylighting_reference_point_coordinate_system", "Relative"},
-														{"rectangular_surface_coordinate_system", "Relative"}
-												}
-										}
+									{
+										{"vertex_x_coordinate", "definitely not a number"},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
 								}
+							}
+						}
+					}
+				}
+			},
+			{"Building",
+				{
+					{
+						"Ref Bldg Medium Office New2004_v1.3_5.0",
+						{
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 20},
+							{"minimum_number_of_warmup_days", 0}
 						},
-				};
+					},
+				}
+			},
+			{
+				"GlobalGeometryRules",
+				{
+					{
+						"",
+						{
+							{"starting_vertex_position", "UpperLeftCorner"},
+							{"vertex_entry_direction", "Counterclockwise"},
+							{"coordinate_system", "Relative"},
+							{"daylighting_reference_point_coordinate_system", "Relative"},
+							{"rectangular_surface_coordinate_system", "Relative"}
+						}
+					}
+				}
+			},
+		};
 		json::parse(root.dump(2), EnergyPlusFixture::call_back);
 		auto const & errors = validation_errors();
 		auto const & warnings = validation_warnings();
@@ -1397,10 +1397,10 @@ namespace EnergyPlus {
 			EXPECT_NE(errors[0].find("is less than or equal to the exclusive minimum"), std::string::npos);
 			EXPECT_NE(errors[1].find("Value \"0.000000\" parsed at line"), std::string::npos);
 			EXPECT_NE(errors[1].find("is less than or equal to the exclusive minimum"), std::string::npos);
-			EXPECT_NE(errors[3].find("In object \"BuildingSurface:Detailed\", at line"), std::string::npos);
-			EXPECT_NE(errors[3].find("type needs to be string"), std::string::npos);
-			EXPECT_NE(errors[2].find("Value \"-98765.432100\" parsed at line"), std::string::npos);
-			EXPECT_NE(errors[2].find("less than the minimum"), std::string::npos);
+			EXPECT_NE(errors[2].find("In object \"BuildingSurface:Detailed\", at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("type needs to be string"), std::string::npos);
+			EXPECT_NE(errors[3].find("Value \"-98765.432100\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[3].find("less than the minimum"), std::string::npos);
 			EXPECT_NE(errors[4].find("Value \"-987.654321\" parsed at line"), std::string::npos);
 			EXPECT_NE(errors[4].find("less than the minimum"), std::string::npos);
 //			EXPECT_NE(errors[5].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
@@ -1702,9 +1702,9 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_json1 )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 "Output:SQLite,SimpleAndTabular;",
-		                                                 });
+																 "Version,8.3;",
+																 "Output:SQLite,SimpleAndTabular;",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string const CurrentModuleObject = "Output:SQLite";
@@ -1743,20 +1743,20 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, getObjectItem_json2 ) {
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 "Humidifier:Steam:Gas,",
-				                                                 "  Main Gas Humidifier,     !- Name",
-				                                                 "  ,                        !- Availability Schedule Name",
-				                                                 "  autosize,                !- Rated Capacity {m3/s}",
-				                                                 "  autosize,                !- Rated Gas Use Rate {W}",
-				                                                 "  0.80,                    !- Thermal Efficiency {-}",
-				                                                 "  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
-				                                                 "  0,                       !- Rated Fan Power {W}",
-				                                                 "  0,                       !- Auxiliary Electric Power {W}",
-				                                                 "  Mixed Air Node 1,        !- Air Inlet Node Name",
-				                                                 "  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
-				                                                 "  ;                        !- Water Storage Tank Name",
-		                                                 });
+															"Version,8.3;",
+															"Humidifier:Steam:Gas,",
+															"  Main Gas Humidifier,     !- Name",
+															"  ,                        !- Availability Schedule Name",
+															"  autosize,                !- Rated Capacity {m3/s}",
+															"  autosize,                !- Rated Gas Use Rate {W}",
+															"  0.80,                    !- Thermal Efficiency {-}",
+															"  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
+															"  0,                       !- Rated Fan Power {W}",
+															"  0,                       !- Auxiliary Electric Power {W}",
+															"  Mixed Air Node 1,        !- Air Inlet Node Name",
+															"  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
+															"  ;                        !- Water Storage Tank Name",
+														 });
 		ASSERT_TRUE( process_idf ( idf_objects ) );
 		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
@@ -1791,23 +1791,23 @@ namespace EnergyPlus {
 
 	TEST_F( InputProcessorFixture, getObjectItem_json3 ) {
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 "  BuildingSurface:Detailed,",
-				                                                 "    Zn001:Wall001,           !- Name",
-				                                                 "    Wall,                    !- Surface Type",
-				                                                 "    R13WALL,                 !- Construction Name",
-				                                                 "    Main Zone,               !- Zone Name",
-				                                                 "    Outdoors,                !- Outside Boundary Condition",
-				                                                 "    ,                        !- Outside Boundary Condition Object",
-				                                                 "    SunExposed,              !- Sun Exposure",
-				                                                 "    WindExposed,             !- Wind Exposure",
-				                                                 "    0.5000000,               !- View Factor to Ground",
-				                                                 "    4,                       !- Number of Vertices",
-				                                                 "    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
-				                                                 "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-				                                                 "    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-				                                                 "    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
-		                                                 });
+															"Version,8.3;",
+															"  BuildingSurface:Detailed,",
+															"    Zn001:Wall001,           !- Name",
+															"    Wall,                    !- Surface Type",
+															"    R13WALL,                 !- Construction Name",
+															"    Main Zone,               !- Zone Name",
+															"    Outdoors,                !- Outside Boundary Condition",
+															"    ,                        !- Outside Boundary Condition Object",
+															"    SunExposed,              !- Sun Exposure",
+															"    WindExposed,             !- Wind Exposure",
+															"    0.5000000,               !- View Factor to Ground",
+															"    4,                       !- Number of Vertices",
+															"    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+															"    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+															"    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+															"    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		std::string const CurrentModuleObject = "BuildingSurface:Detailed";
@@ -1828,7 +1828,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields(NumAlphas);
 		Array1D_string cNumericFields(NumNumbers);
 		InputProcessor::GetObjectItem(CurrentModuleObject, numBuildingSurfaceDetailed, Alphas, NumAlphas, Numbers, NumNumbers,
-		                              IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+									  IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
 		EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" }), Alphas));
 		EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false }), lNumericBlanks));
@@ -1842,22 +1842,22 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "FenestrationSurface:Detailed,",
-				                                                 "Zn001:Wall001:Win001,    !- Name",
-				                                                 "Window,                  !- Surface Type",
-				                                                 "DoubleClear,             !- Construction Name",
-				                                                 "123456E,           !- Building Surface Name",
-				                                                 ",                        !- Outside Boundary Condition Object",
-				                                                 "0.5000000,               !- View Factor to Ground",
-				                                                 ",                        !- Shading Control Name",
-				                                                 ",                        !- Frame and Divider Name",
-				                                                 "1.0,                     !- Multiplier",
-				                                                 "4,                       !- Number of Vertices",
-				                                                 "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
-				                                                 "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
-				                                                 "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
-				                                                 "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
-		                                                 });
+				"FenestrationSurface:Detailed,",
+				"Zn001:Wall001:Win001,    !- Name",
+				"Window,                  !- Surface Type",
+				"DoubleClear,             !- Construction Name",
+				"123456E,           !- Building Surface Name",
+				",                        !- Outside Boundary Condition Object",
+				"0.5000000,               !- View Factor to Ground",
+				",                        !- Shading Control Name",
+				",                        !- Frame and Divider Name",
+				"1.0,                     !- Multiplier",
+				"4,                       !- Number of Vertices",
+				"0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+				"0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+				"5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+				"5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+		});
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
@@ -1884,14 +1884,14 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 7, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "",
-		                                                               "", "" } ), Alphas ) );
+																	 "", "" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 15, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( {0.5000000, 1.0 , 4, 0.548000 , 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5,
-		                                                         5.548, 0, 2.5 } ), Numbers ) );
+																 5.548, 0, 2.5 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
-		                                                        false, false, false, false, false } ), lNumericBlanks ) );
+																false, false, false, false, false } ), lNumericBlanks ) );
 
 		EXPECT_EQ( 1, IOStatus );
 	}
@@ -1899,22 +1899,22 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2 )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "FenestrationSurface:Detailed,",
-				                                                 "Zn001:Wall001:Win001,    !- Name",
-				                                                 "Window,                  !- Surface Type",
-				                                                 "DoubleClear,             !- Construction Name",
-				                                                 "E123,           !- Building Surface Name",
-				                                                 ",                        !- Outside Boundary Condition Object",
-				                                                 "0.5000000,               !- View Factor to Ground",
-				                                                 ",                        !- Shading Control Name",
-				                                                 ",                        !- Frame and Divider Name",
-				                                                 "1.0,                     !- Multiplier",
-				                                                 "4,                       !- Number of Vertices",
-				                                                 "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
-				                                                 "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
-				                                                 "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
-				                                                 "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
-		                                                 });
+															"FenestrationSurface:Detailed,",
+															"Zn001:Wall001:Win001,    !- Name",
+															"Window,                  !- Surface Type",
+															"DoubleClear,             !- Construction Name",
+															"E123,           !- Building Surface Name",
+															",                        !- Outside Boundary Condition Object",
+															"0.5000000,               !- View Factor to Ground",
+															",                        !- Shading Control Name",
+															",                        !- Frame and Divider Name",
+															"1.0,                     !- Multiplier",
+															"4,                       !- Number of Vertices",
+															"0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+															"0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+															"5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+															"5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+														 });
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
@@ -1941,14 +1941,14 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 7, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "",
-		                                                               "", "" } ), Alphas ) );
+																	   "", "" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 15, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( {0.5000000, 1.0 , 4, 0.548000 , 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5,
-		                                                         5.548, 0, 2.5 } ), Numbers ) );
+																 5.548, 0, 2.5 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
-		                                                        false, false, false, false, false } ), lNumericBlanks ) );
+																false, false, false, false, false } ), lNumericBlanks ) );
 
 		EXPECT_EQ( 1, IOStatus );
 	}
@@ -1956,25 +1956,25 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 " Curve:Biquadratic,",
-				                                                 "  HPACCOOLEIRFT Speed, !- Name",
-				                                                 "  0.632475E+00, !- Coefficient1 Constant",
-				                                                 "  -0.121321E-01, !- Coefficient2 x",
-				                                                 "  0.507773E-03, !- Coefficient3 x**2",
-				                                                 "  0.155377E-01, !- Coefficient4 y",
-				                                                 "  0.272840E-03, !- Coefficient5 y**2",
-				                                                 "  -0.679201E-03, !- Coefficient6 x*y",
-				                                                 "  12.77778, !- Minimum Value of x",
-				                                                 "  23.88889, !- Maximum Value of x",
-				                                                 "  23.88889, !- Minimum Value of y",
-				                                                 "  46.11111, !- Maximum Value of y",
-				                                                 "  , !- Minimum Curve Output",
-				                                                 "  , !- Maximum Curve Output",
-				                                                 "  , !- Input Unit Type for X",
-				                                                 "  Temperature, !- Input Unit Type for Y",
-				                                                 "  Dimensionless;           !- Output Unit Type",
-		                                                 });
+															"Version,8.3;",
+															" Curve:Biquadratic,",
+															"  HPACCOOLEIRFT Speed, !- Name",
+															"  0.632475E+00, !- Coefficient1 Constant",
+															"  -0.121321E-01, !- Coefficient2 x",
+															"  0.507773E-03, !- Coefficient3 x**2",
+															"  0.155377E-01, !- Coefficient4 y",
+															"  0.272840E-03, !- Coefficient5 y**2",
+															"  -0.679201E-03, !- Coefficient6 x*y",
+															"  12.77778, !- Minimum Value of x",
+															"  23.88889, !- Maximum Value of x",
+															"  23.88889, !- Minimum Value of y",
+															"  46.11111, !- Maximum Value of y",
+															"  , !- Minimum Curve Output",
+															"  , !- Maximum Curve Output",
+															"  , !- Input Unit Type for X",
+															"  Temperature, !- Input Unit Type for Y",
+															"  Dimensionless;           !- Output Unit Type",
+														 });
 		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
 		// expect Dimensionless to be inserted for Input Unit Type for X, blank field with a default. Expect true for it's alphaBlank value
 
@@ -2009,9 +2009,9 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 12, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "coefficient1_constant", "coefficient2_x", "coefficient3_x_2", "coefficient4_y", "coefficient5_y_2", "coefficient6_x_y",
-		                                                               "minimum_value_of_x", "maximum_value_of_x", "minimum_value_of_y", "maximum_value_of_y", "minimum_curve_output", "maximum_curve_output" } ), cNumericFields ) );
+																	   "minimum_value_of_x", "maximum_value_of_x", "minimum_value_of_y", "maximum_value_of_y", "minimum_curve_output", "maximum_curve_output" } ), cNumericFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.632475E+00, -0.121321E-01 , 0.507773E-03, 0.155377E-01 , 0.272840E-03,
-		                                                          -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0, } ), Numbers ) );
+																  -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0, } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, true, true } ), lNumericBlanks ) );
 
 		EXPECT_EQ( 1, IOStatus );
@@ -2021,20 +2021,20 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 " Curve:Biquadratic,",
-				                                                 "  HPACCOOLEIRFT Speed, !- Name",
-				                                                 "  0.632475E+00, !- Coefficient1 Constant",
-				                                                 "  -0.121321E-01, !- Coefficient2 x",
-				                                                 "  0.507773E-03, !- Coefficient3 x**2",
-				                                                 "  0.155377E-01, !- Coefficient4 y",
-				                                                 "  0.272840E-03, !- Coefficient5 y**2",
-				                                                 "  -0.679201E-03, !- Coefficient6 x*y",
-				                                                 "  12.77778, !- Minimum Value of x",
-				                                                 "  23.88889, !- Maximum Value of x",
-				                                                 "  23.88889, !- Minimum Value of y",
-				                                                 "  46.11111; !- Maximum Value of y",
-		                                                 });
+															"Version,8.3;",
+															" Curve:Biquadratic,",
+															"  HPACCOOLEIRFT Speed, !- Name",
+															"  0.632475E+00, !- Coefficient1 Constant",
+															"  -0.121321E-01, !- Coefficient2 x",
+															"  0.507773E-03, !- Coefficient3 x**2",
+															"  0.155377E-01, !- Coefficient4 y",
+															"  0.272840E-03, !- Coefficient5 y**2",
+															"  -0.679201E-03, !- Coefficient6 x*y",
+															"  12.77778, !- Minimum Value of x",
+															"  23.88889, !- Maximum Value of x",
+															"  23.88889, !- Minimum Value of y",
+															"  46.11111; !- Maximum Value of y",
+														 });
 		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
 		// expect "" to be inserted for the missing alpha fields due to the truncation, blank field with a default. Expect true for it's alphaBlank value
 
@@ -2069,9 +2069,9 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 10, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "coefficient1_constant", "coefficient2_x", "coefficient3_x_2", "coefficient4_y", "coefficient5_y_2", "coefficient6_x_y",
-		                                                               "minimum_value_of_x", "maximum_value_of_x", "minimum_value_of_y", "maximum_value_of_y", "minimum_curve_output", "maximum_curve_output" } ), cNumericFields ) );
+																	   "minimum_value_of_x", "maximum_value_of_x", "minimum_value_of_y", "maximum_value_of_y", "minimum_curve_output", "maximum_curve_output" } ), cNumericFields ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.632475E+00, -0.121321E-01 , 0.507773E-03, 0.155377E-01 , 0.272840E-03,
-		                                                          -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0 } ), Numbers ) );
+																  -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, true, true } ), lNumericBlanks ) );
 
 		EXPECT_EQ( 1, IOStatus );
@@ -2081,36 +2081,36 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 "Sizing:System,",
-				                                                 "  West Zone Air System,    !- AirLoop Name",
-				                                                 "  Sensible,                !- Type of Load to Size On",
-				                                                 "  autosize,                !- Design Outdoor Air Flow Rate {m3/s}",
-				                                                 "  0.4,                     !- Minimum System Air Flow Ratio",
-				                                                 "  7.0,                     !- Preheat Design Temperature {C}",
-				                                                 "  0.0085,                  !- Preheat Design Humidity Ratio {kgWater/kgDryAir}",
-				                                                 "  11.0,                    !- Precool Design Temperature {C}",
-				                                                 "  0.0085,                  !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
-				                                                 "  12.8,                    !- Central Cooling Design Supply Air Temperature {C}",
-				                                                 "  16.7,                    !- Central Heating Design Supply Air Temperature {C}",
-				                                                 "  NonCoincident,           !- Sizing Option",
-				                                                 "  Yes,                     !- 100% Outdoor Air in Cooling",
-				                                                 "  No,                      !- 100% Outdoor Air in Heating",
-				                                                 "  0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
-				                                                 "  0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
-				                                                 "  DesignDay,               !- Cooling Design Air Flow Method",
-				                                                 "  ,                        !- Cooling Design Air Flow Rate {m3/s}",
-				                                                 "  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}",
-				                                                 "  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
-				                                                 "  ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}",
-				                                                 "  DesignDay,               !- Heating Design Air Flow Method",
-				                                                 "  ,                        !- Heating Design Air Flow Rate {m3/s}",
-				                                                 "  ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}",
-				                                                 "  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}",
-				                                                 "  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
-				                                                 "  ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}",
-				                                                 "  ;                        !- System Outdoor Air Method",
-		                                                 });
+															"Version,8.3;",
+															"Sizing:System,",
+															"  West Zone Air System,    !- AirLoop Name",
+															"  Sensible,                !- Type of Load to Size On",
+															"  autosize,                !- Design Outdoor Air Flow Rate {m3/s}",
+															"  0.4,                     !- Minimum System Air Flow Ratio",
+															"  7.0,                     !- Preheat Design Temperature {C}",
+															"  0.0085,                  !- Preheat Design Humidity Ratio {kgWater/kgDryAir}",
+															"  11.0,                    !- Precool Design Temperature {C}",
+															"  0.0085,                  !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
+															"  12.8,                    !- Central Cooling Design Supply Air Temperature {C}",
+															"  16.7,                    !- Central Heating Design Supply Air Temperature {C}",
+															"  NonCoincident,           !- Sizing Option",
+															"  Yes,                     !- 100% Outdoor Air in Cooling",
+															"  No,                      !- 100% Outdoor Air in Heating",
+															"  0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+															"  0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+															"  DesignDay,               !- Cooling Design Air Flow Method",
+															"  ,                        !- Cooling Design Air Flow Rate {m3/s}",
+															"  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}",
+															"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
+															"  ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}",
+															"  DesignDay,               !- Heating Design Air Flow Method",
+															"  ,                        !- Heating Design Air Flow Rate {m3/s}",
+															"  ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}",
+															"  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}",
+															"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
+															"  ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}",
+															"  ;                        !- System Outdoor Air Method",
+														 });
 
 
 		ASSERT_TRUE( process_idf( idf_objects, false ) );
@@ -2138,7 +2138,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 11, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "WEST ZONE AIR SYSTEM", "SENSIBLE", "NONCOINCIDENT", "YES", "NO", "DESIGNDAY",
-		                                                               "DESIGNDAY", "ZONESUM", "COOLINGDESIGNCAPACITY", "HEATINGDESIGNCAPACITY", "ONOFF" } ), Alphas ) );
+																	   "DESIGNDAY", "ZONESUM", "COOLINGDESIGNCAPACITY", "HEATINGDESIGNCAPACITY", "ONOFF" } ), Alphas ) );
 		// The commented out compare containers is what the original input processor said that alpha blanks should be, even though the last 3 alpha fields are filled
 		// in with defaults. We think the last three fields really should be considered blank, i.e. true
 //        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, true, false, false, false } ), lAlphaBlanks ) );
@@ -2146,32 +2146,32 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 26, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8, 16.7, 0.0085, 0.0085,
-		                                                          0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		                                                          -99999, 0, 0, -99999, 0, 0 } ), Numbers ) );
+																  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+																  -99999, 0, 0, -99999, 0, 0 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
-		                                                        true, true, true, true, true, true, true, true, true, true,
-		                                                        true, true, true, true, true, true } ), lNumericBlanks ) );
+																true, true, true, true, true, true, true, true, true, true,
+																true, true, true, true, true, true } ), lNumericBlanks ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 
 	TEST_F( InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_autosize )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 "Humidifier:Steam:Gas,",
-				                                                 "  Main Gas Humidifier,     !- Name",
-				                                                 "  ,                        !- Availability Schedule Name",
-				                                                 "  ,                !- Rated Capacity {m3/s}",
-				                                                 "  autosize,                !- Rated Gas Use Rate {W}",
-				                                                 "  ,                    !- Thermal Efficiency {-}",
-				                                                 "  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
-				                                                 "  0,                       !- Rated Fan Power {W}",
-				                                                 "  ,                       !- Auxiliary Electric Power {W}",
-				                                                 "  Mixed Air Node 1,        !- Air Inlet Node Name",
-				                                                 "  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
-				                                                 "  ,                        !- Water Storage Tank Name",
-				                                                 "  ;                        !- InletWaterTemperatureOption",
-		                                                 });
+															"Version,8.3;",
+															"Humidifier:Steam:Gas,",
+															"  Main Gas Humidifier,     !- Name",
+															"  ,                        !- Availability Schedule Name",
+															"  ,                !- Rated Capacity {m3/s}",
+															"  autosize,                !- Rated Gas Use Rate {W}",
+															"  ,                    !- Thermal Efficiency {-}",
+															"  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
+															"  0,                       !- Rated Fan Power {W}",
+															"  ,                       !- Auxiliary Electric Power {W}",
+															"  Mixed Air Node 1,        !- Air Inlet Node Name",
+															"  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
+															"  ,                        !- Water Storage Tank Name",
+															"  ;                        !- InletWaterTemperatureOption",
+														 });
 
 		// Expect the alpha field Inlet Water Temp to be filled in with it's default value
 		// Expect Rated Capacity to be filled in with ZERO, not with the autosize value of -99999. Expect
@@ -2215,12 +2215,12 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_truncated_autosize_fields )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Version,8.3;",
-				                                                 "Humidifier:Steam:Gas,",
-				                                                 "  Main Gas Humidifier,     !- Name",
-				                                                 "  ,                        !- Availability Schedule Name",
-				                                                 "  autosize;                !- Rated Capacity {m3/s}",
-		                                                 });
+															"Version,8.3;",
+															"Humidifier:Steam:Gas,",
+															"  Main Gas Humidifier,     !- Name",
+															"  ,                        !- Availability Schedule Name",
+															"  autosize;                !- Rated Capacity {m3/s}",
+														 });
 
 		// Expect Rated Capacity to be filled in with the autosize value of -99999. Expect everything else to be empty string and 0
 
@@ -2262,47 +2262,47 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_unitary_system_input )
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "AirLoopHVAC:UnitarySystem,",
-				                                                 "  GasHeat DXAC Furnace 1, !- Name",
-				                                                 "  Load,                   !- Control Type",
-				                                                 "  East Zone,              !- Controlling Zone or Thermostat Location",
-				                                                 "  None,                   !- Dehumidification Control Type",
-				                                                 "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-				                                                 "  Zone Exhaust Node,         !- Air Inlet Node Name",
-				                                                 "  Zone 2 Inlet Node,   !- Air Outlet Node Name",
-				                                                 "  Fan:OnOff,              !- Supply Fan Object Type",
-				                                                 "  Supply Fan 1,           !- Supply Fan Name",
-				                                                 "  BlowThrough,            !- Fan Placement",
-				                                                 "  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-				                                                 "  Coil:Heating:Gas,       !- Heating Coil Object Type",
-				                                                 "  Furnace Heating Coil 1, !- Heating Coil Name",
-				                                                 "  ,                       !- DX Heating Coil Sizing Ratio",
-				                                                 "  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
-				                                                 "  Furnace ACDXCoil 1,     !- Cooling Coil Name",
-				                                                 "  ,                       !- Use DOAS DX Cooling Coil",
-				                                                 "  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
-				                                                 "  ,                       !- Latent Load Control",
-				                                                 "  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
-				                                                 "  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
-				                                                 "  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
-				                                                 "  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
-				                                                 "  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
-				                                                 "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
-				                                                 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
-				                                                 "  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation",
-				                                                 "  1.6,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }",
-				                                                 "  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
-				                                                 "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
-				                                                 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
-				                                                 "  SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
-				                                                 "  1.6,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
-				                                                 "  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
-				                                                 "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
-				                                                 "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
-				                                                 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
-				                                                 "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
-				                                                 "  80;                     !- Maximum Supply Air Temperature{ C }",
-		                                                 });
+															"AirLoopHVAC:UnitarySystem,",
+															"  GasHeat DXAC Furnace 1, !- Name",
+															"  Load,                   !- Control Type",
+															"  East Zone,              !- Controlling Zone or Thermostat Location",
+															"  None,                   !- Dehumidification Control Type",
+															"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+															"  Zone Exhaust Node,         !- Air Inlet Node Name",
+															"  Zone 2 Inlet Node,   !- Air Outlet Node Name",
+															"  Fan:OnOff,              !- Supply Fan Object Type",
+															"  Supply Fan 1,           !- Supply Fan Name",
+															"  BlowThrough,            !- Fan Placement",
+															"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
+															"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+															"  Furnace Heating Coil 1, !- Heating Coil Name",
+															"  ,                       !- DX Heating Coil Sizing Ratio",
+															"  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
+															"  Furnace ACDXCoil 1,     !- Cooling Coil Name",
+															"  ,                       !- Use DOAS DX Cooling Coil",
+															"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+															"  ,                       !- Latent Load Control",
+															"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+															"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
+															"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
+															"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+															"  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+															"  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+															"  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation",
+															"  1.6,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+															"  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+															"  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+															"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+															"  1.6,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+															"  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+															"  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+															"  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+															"  80;                     !- Maximum Supply Air Temperature{ C }",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2329,34 +2329,34 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 22, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "GASHEAT DXAC FURNACE 1", "LOAD", "EAST ZONE", "NONE", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "ZONE 2 INLET NODE",
-		                                                               "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:GAS", "FURNACE HEATING COIL 1",
-		                                                               "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:GAS",
-		                                                               "HUMIDISTAT REHEAT COIL 1", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "", "", "", "", ""} ), Alphas ) );
+																	   "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:GAS", "FURNACE HEATING COIL 1",
+																	   "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:GAS",
+																	   "HUMIDISTAT REHEAT COIL 1", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "", "", "", "", ""} ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
-		                                                        false, false, false, false, false, true, true, false, false, false,
-		                                                        false, false, true, true, true, true, true } ), lAlphaBlanks ) );
+																false, false, false, false, false, true, true, false, false, false,
+																false, false, true, true, true, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 17, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true, false, true, true, true, false, true, true, true,
-		                                                        false, true, true, true, true, true, false, true, true, true,
-		                                                        true, true, true, true, true, true } ), lNumericBlanks ) );
+																false, true, true, true, true, true, false, true, true, true,
+																true, true, true, true, true, true } ), lNumericBlanks ) );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0,
-		                                                          1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0,
-		                                                          0, 0, 0, 0, 0, 0 } ), Numbers ) );
+																  1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0,
+																  0, 0, 0, 0, 0, 0 } ), Numbers ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 
 	TEST_F( InputProcessorFixture, getObjectItem_test_numbers_as_strings)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "  ZoneHVAC:EquipmentConnections,",
-				                                                 "    401,                     !- Zone Name",
-				                                                 "    Z401 terminal list,      !- Zone Conditioning Equipment List Name",
-				                                                 "    Z401 zone inlet,         !- Zone Air Inlet Node or NodeList Name",
-				                                                 "    ,                        !- Zone Air Exhaust Node or NodeList Name",
-				                                                 "    Z401 air node,           !- Zone Air Node Name",
-				                                                 "    Z401 outlet node;        !- Zone Return Air Node Name",
-		                                                 });
+															"  ZoneHVAC:EquipmentConnections,",
+															"    401,                     !- Zone Name",
+															"    Z401 terminal list,      !- Zone Conditioning Equipment List Name",
+															"    Z401 zone inlet,         !- Zone Air Inlet Node or NodeList Name",
+															"    ,                        !- Zone Air Exhaust Node or NodeList Name",
+															"    Z401 air node,           !- Zone Air Node Name",
+															"    Z401 outlet node;        !- Zone Return Air Node Name",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2383,7 +2383,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 6, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "401", "Z401 TERMINAL LIST", "Z401 ZONE INLET", "",
-		                                                               "Z401 AIR NODE", "Z401 OUTLET NODE", "", "" } ), Alphas ) );
+																	   "Z401 AIR NODE", "Z401 OUTLET NODE", "", "" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, true, false, false, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 0, NumNumbers );
@@ -2395,17 +2395,17 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_test_zone_input)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Zone,",
-				                                                 "  EAST ZONE,              !- Name",
-				                                                 "  0,                      !- Direction of Relative North{ deg }",
-				                                                 "  0,                      !- X Origin{ m }",
-				                                                 "  0,                      !- Y Origin{ m }",
-				                                                 "  0,                      !- Z Origin{ m }",
-				                                                 "  1,                      !- Type",
-				                                                 "  1,                      !- Multiplier",
-				                                                 "  autocalculate,          !- Ceiling Height{ m }",
-				                                                 "  autocalculate;          !- Volume{ m3 }",
-		                                                 });
+															"Zone,",
+															"  EAST ZONE,              !- Name",
+															"  0,                      !- Direction of Relative North{ deg }",
+															"  0,                      !- X Origin{ m }",
+															"  0,                      !- Y Origin{ m }",
+															"  0,                      !- Z Origin{ m }",
+															"  1,                      !- Type",
+															"  1,                      !- Multiplier",
+															"  autocalculate,          !- Ceiling Height{ m }",
+															"  autocalculate;          !- Volume{ m3 }",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2443,21 +2443,21 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_zone_HVAC_input)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "ZoneHVAC:EquipmentConnections,",
-				                                                 "EAST ZONE,                 !- Zone Name",
-				                                                 "  Zone2Equipment,          !- Zone Conditioning Equipment List Name",
-				                                                 "  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name",
-				                                                 "  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name",
-				                                                 "  Zone 2 Node,             !- Zone Air Node Name",
-				                                                 "  Zone 2 Outlet Node;      !- Zone Return Air Node Name",
-				                                                 "  ",
-				                                                 "ZoneHVAC:EquipmentList,",
-				                                                 "  Zone2Equipment,          !- Name",
-				                                                 "  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
-				                                                 "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
-				                                                 "  1,                       !- Zone Equipment 1 Cooling Sequence",
-				                                                 "  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-		                                                 });
+															"ZoneHVAC:EquipmentConnections,",
+															"EAST ZONE,                 !- Zone Name",
+															"  Zone2Equipment,          !- Zone Conditioning Equipment List Name",
+															"  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name",
+															"  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name",
+															"  Zone 2 Node,             !- Zone Air Node Name",
+															"  Zone 2 Outlet Node;      !- Zone Return Air Node Name",
+															"  ",
+															"ZoneHVAC:EquipmentList,",
+															"  Zone2Equipment,          !- Name",
+															"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+															"  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
+															"  1,                       !- Zone Equipment 1 Cooling Sequence",
+															"  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2484,7 +2484,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 6, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "EAST ZONE", "ZONE2EQUIPMENT", "ZONE 2 INLET NODE", "ZONE EXHAUST NODE",
-		                                                               "ZONE 2 NODE", "ZONE 2 OUTLET NODE", "", ""} ), Alphas ) );
+																	   "ZONE 2 NODE", "ZONE 2 OUTLET NODE", "", ""} ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 0, NumNumbers );
@@ -2524,32 +2524,32 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_coil_heating_fuel)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Coil:Heating:Fuel,",
-				                                                 "  name number one, ! A1 , \field Name",
-				                                                 "  schedule_name1, ! A2 , \field Availability Schedule Name",
-				                                                 "  Gas, ! A3 , \field Fuel Type",
-				                                                 "  0.45, ! N1 , \field Burner Efficiency",
-				                                                 "  0.1, ! N2 , \field Nominal Capacity",
-				                                                 "  this_is_an_air_inlet_name, ! A4 , \field Air Inlet Node Name",
-				                                                 "  this_is_outlet, ! A5 , \field Air Outlet Node Name",
-				                                                 "  other_name, ! A6 , \field Temperature Setpoint Node Name",
-				                                                 "  0.3, ! field Parasitic Electric Load",
-				                                                 "  curve_blah_name, ! Part Load Fraction Correlation Curve Name",
-				                                                 "  0.344; ! field Parasitic Fuel Load",
-				                                                 " ",
-				                                                 "Coil:Heating:Fuel,",
-				                                                 "  the second name, ! A1 , \field Name",
-				                                                 "  schedule_name2, ! A2 , \field Availability Schedule Name",
-				                                                 "  Gas, ! A3 , \field Fuel Type",
-				                                                 "  0.55, ! N1 , \field Burner Efficiency",
-				                                                 "  0.2, ! N2 , \field Nominal Capacity",
-				                                                 "  this_is_an_air_inlet_name2, ! A4 , \field Air Inlet Node Name",
-				                                                 "  this_is_outlet2, ! A5 , \field Air Outlet Node Name",
-				                                                 "  other_name2, ! A6 , \field Temperature Setpoint Node Name",
-				                                                 "  0.4, ! field Parasitic Electric Load",
-				                                                 "  curve_blah_name2, ! Part Load Fraction Correlation Curve Name",
-				                                                 "  0.444; ! field Parasitic Fuel Load",
-		                                                 });
+				"Coil:Heating:Fuel,",
+				"  name number one, ! A1 , \field Name",
+				"  schedule_name1, ! A2 , \field Availability Schedule Name",
+				"  Gas, ! A3 , \field Fuel Type",
+				"  0.45, ! N1 , \field Burner Efficiency",
+				"  0.1, ! N2 , \field Nominal Capacity",
+				"  this_is_an_air_inlet_name, ! A4 , \field Air Inlet Node Name",
+				"  this_is_outlet, ! A5 , \field Air Outlet Node Name",
+				"  other_name, ! A6 , \field Temperature Setpoint Node Name",
+				"  0.3, ! field Parasitic Electric Load",
+				"  curve_blah_name, ! Part Load Fraction Correlation Curve Name",
+				"  0.344; ! field Parasitic Fuel Load",
+				" ",
+				"Coil:Heating:Fuel,",
+				"  the second name, ! A1 , \field Name",
+				"  schedule_name2, ! A2 , \field Availability Schedule Name",
+				"  Gas, ! A3 , \field Fuel Type",
+				"  0.55, ! N1 , \field Burner Efficiency",
+				"  0.2, ! N2 , \field Nominal Capacity",
+				"  this_is_an_air_inlet_name2, ! A4 , \field Air Inlet Node Name",
+				"  this_is_outlet2, ! A5 , \field Air Outlet Node Name",
+				"  other_name2, ! A6 , \field Temperature Setpoint Node Name",
+				"  0.4, ! field Parasitic Electric Load",
+				"  curve_blah_name2, ! Part Load Fraction Correlation Curve Name",
+				"  0.444; ! field Parasitic Fuel Load",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2611,23 +2611,23 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_schedule_objects)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "ScheduleTypeLimits,",
-				                                                 "  Any Number;             !- Name",
-				                                                 "  ",
-				                                                 "Schedule:Compact,",
-				                                                 "  FanAndCoilAvailSched,   !- Name",
-				                                                 "  Any Number,             !- Schedule Type Limits Name",
-				                                                 "  Through: 12/31,         !- Field 1",
-				                                                 "  For: AllDays,           !- Field 2",
-				                                                 "  Until: 24:00, 1.0;      !- Field 3",
-				                                                 "  ",
-				                                                 "Schedule:Compact,",
-				                                                 "  ContinuousFanSchedule,  !- Name",
-				                                                 "  Any Number,             !- Schedule Type Limits Name",
-				                                                 "  Through: 12/31,         !- Field 1",
-				                                                 "  For: AllDays,           !- Field 2",
-				                                                 "  Until: 24:00, 1.0;      !- Field 3",
-		                                                 });
+															"ScheduleTypeLimits,",
+															"  Any Number;             !- Name",
+															"  ",
+															"Schedule:Compact,",
+															"  FanAndCoilAvailSched,   !- Name",
+															"  Any Number,             !- Schedule Type Limits Name",
+															"  Through: 12/31,         !- Field 1",
+															"  For: AllDays,           !- Field 2",
+															"  Until: 24:00, 1.0;      !- Field 3",
+															"  ",
+															"Schedule:Compact,",
+															"  ContinuousFanSchedule,  !- Name",
+															"  Any Number,             !- Schedule Type Limits Name",
+															"  Through: 12/31,         !- Field 1",
+															"  For: AllDays,           !- Field 2",
+															"  Until: 24:00, 1.0;      !- Field 3",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2696,18 +2696,18 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_fan_on_off)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Fan:OnOff,",
-				                                                 "  Supply Fan 1,           !- Name",
-				                                                 "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-				                                                 "  0.7,                    !- Fan Total Efficiency",
-				                                                 "  600.0,                  !- Pressure Rise{ Pa }",
-				                                                 "  1.6,                    !- Maximum Flow Rate{ m3 / s }",
-				                                                 "  0.9,                    !- Motor Efficiency",
-				                                                 "  1.0,                    !- Motor In Airstream Fraction",
-				                                                 "  Zone Exhaust Node,      !- Air Inlet Node Name",
-				                                                 "  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
-				                                                 "  ",
-		                                                 });
+															"Fan:OnOff,",
+															"  Supply Fan 1,           !- Name",
+															"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+															"  0.7,                    !- Fan Total Efficiency",
+															"  600.0,                  !- Pressure Rise{ Pa }",
+															"  1.6,                    !- Maximum Flow Rate{ m3 / s }",
+															"  0.9,                    !- Motor Efficiency",
+															"  1.0,                    !- Motor In Airstream Fraction",
+															"  Zone Exhaust Node,      !- Air Inlet Node Name",
+															"  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+															"  ",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2734,7 +2734,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 4, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE",
-		                                                               "", "", "" } ), Alphas ) );
+																	   "", "", "" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 5, NumNumbers );
@@ -2746,30 +2746,30 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_curve_quadratic)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Curve:Quadratic,",
-				                                                 "  CoolCapFFF,       !- Name",
-				                                                 "  0.8,                    !- Coefficient1 Constant",
-				                                                 "  0.2,                    !- Coefficient2 x",
-				                                                 "  0.0,                    !- Coefficient3 x**2",
-				                                                 "  0.5,                    !- Minimum Value of x",
-				                                                 "  1.5;                    !- Maximum Value of x",
-				                                                 "  ",
-				                                                 "Curve:Quadratic,",
-				                                                 "  COOLEIRFFF,           !- Name",
-				                                                 "  1.1552,                 !- Coefficient1 Constant",
-				                                                 "  -0.1808,                !- Coefficient2 x",
-				                                                 "  0.0256,                 !- Coefficient3 x**2",
-				                                                 "  0.5,                    !- Minimum Value of x",
-				                                                 "  1.5;                    !- Maximum Value of x",
-				                                                 "  ",
-				                                                 "Curve:Quadratic,",
-				                                                 "  PLFFPLR,          !- Name",
-				                                                 "  0.85,                   !- Coefficient1 Constant",
-				                                                 "  0.15,                   !- Coefficient2 x",
-				                                                 "  0.0,                    !- Coefficient3 x**2",
-				                                                 "  0.0,                    !- Minimum Value of x",
-				                                                 "  1.0;                    !- Maximum Value of x",
-		                                                 });
+															"Curve:Quadratic,",
+															"  CoolCapFFF,       !- Name",
+															"  0.8,                    !- Coefficient1 Constant",
+															"  0.2,                    !- Coefficient2 x",
+															"  0.0,                    !- Coefficient3 x**2",
+															"  0.5,                    !- Minimum Value of x",
+															"  1.5;                    !- Maximum Value of x",
+															"  ",
+															"Curve:Quadratic,",
+															"  COOLEIRFFF,           !- Name",
+															"  1.1552,                 !- Coefficient1 Constant",
+															"  -0.1808,                !- Coefficient2 x",
+															"  0.0256,                 !- Coefficient3 x**2",
+															"  0.5,                    !- Minimum Value of x",
+															"  1.5;                    !- Maximum Value of x",
+															"  ",
+															"Curve:Quadratic,",
+															"  PLFFPLR,          !- Name",
+															"  0.85,                   !- Coefficient1 Constant",
+															"  0.15,                   !- Coefficient2 x",
+															"  0.0,                    !- Coefficient3 x**2",
+															"  0.0,                    !- Minimum Value of x",
+															"  1.0;                    !- Maximum Value of x",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -2853,128 +2853,128 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Coil:Cooling:DX:VariableSpeed,",
-				                                                 "  Furnace ACDXCoil 1, !- Name",
-				                                                 "  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
-				                                                 "  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
-				                                                 "  10.0, !- Number of Speeds{ dimensionless }",
-				                                                 "  10.0, !- Nominal Speed Level{ dimensionless }",
-				                                                 "  32000.0, !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level{ w }",
-				                                                 "  1.6, !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }",
-				                                                 "  0.0, !- Nominal Time for Condensate to Begin Leaving the Coil{ s }",
-				                                                 "  0.0, !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }",
-				                                                 "  PLFFPLR, !- Energy Part Load Fraction Curve Name",
-				                                                 "  , !- Condenser Air Inlet Node Name",
-				                                                 "  AirCooled, !- Condenser Type",
-				                                                 "  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
-				                                                 "  200.0, !- Crankcase Heater Capacity{ W }",
-				                                                 "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
-				                                                 "  , !- Supply Water Storage Tank Name",
-				                                                 "  , !- Condensate Collection Water Storage Tank Name",
-				                                                 "  , !- Basin Heater Capacity{ W / K }",
-				                                                 "  , !- Basin Heater Setpoint Temperature{ C }",
-				                                                 "  , !- Basin Heater Operating Schedule Name",
-				                                                 "  1524.1, !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  1877.9, !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  2226.6, !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  2911.3, !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  3581.7, !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  4239.5, !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  4885.7, !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  5520.7, !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  6144.8, !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF, !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-				                                                 "  6758.0, !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity{ w }",
-				                                                 "  0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
-				                                                 "  4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }",
-				                                                 "  0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }",
-				                                                 "  0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }",
-				                                                 "  , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
-				                                                 "  CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name",
-				                                                 "  CoolCapFFF, !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
-				                                                 "  COOLEIRFT, !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
-				                                                 "  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-		                                                 });
+															"Coil:Cooling:DX:VariableSpeed,",
+															"  Furnace ACDXCoil 1, !- Name",
+															"  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+															"  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+															"  10.0, !- Number of Speeds{ dimensionless }",
+															"  10.0, !- Nominal Speed Level{ dimensionless }",
+															"  32000.0, !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level{ w }",
+															"  1.6, !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }",
+															"  0.0, !- Nominal Time for Condensate to Begin Leaving the Coil{ s }",
+															"  0.0, !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }",
+															"  PLFFPLR, !- Energy Part Load Fraction Curve Name",
+															"  , !- Condenser Air Inlet Node Name",
+															"  AirCooled, !- Condenser Type",
+															"  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
+															"  200.0, !- Crankcase Heater Capacity{ W }",
+															"  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+															"  , !- Supply Water Storage Tank Name",
+															"  , !- Condensate Collection Water Storage Tank Name",
+															"  , !- Basin Heater Capacity{ W / K }",
+															"  , !- Basin Heater Setpoint Temperature{ C }",
+															"  , !- Basin Heater Operating Schedule Name",
+															"  1524.1, !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  1877.9, !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  2226.6, !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  2911.3, !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  3581.7, !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  4239.5, !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  4885.7, !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }",
+															"  , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  5520.7, !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  6144.8, !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  6758.0, !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -3001,82 +3001,82 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 49, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FURNACE ACDXCOIL 1", "DX COOLING COIL AIR INLET NODE", "HEATING COIL AIR INLET NODE", "PLFFPLR", "",
-		                                                               "AIRCOOLED", "", "", "", "COOLCAPFT",
-		                                                               "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
-		                                                               "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
-		                                                               "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
-		                                                               "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT",
-		                                                               "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
-		                                                               "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
-		                                                               "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
-		                                                               "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF" } ), Alphas ) );
+																	   "AIRCOOLED", "", "", "", "COOLCAPFT",
+																	   "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
+																	   "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
+																	   "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
+																	   "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT",
+																	   "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
+																	   "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
+																	   "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
+																	   "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, false, true, true, true, false,
-		                                                        false, false, false, false, false, false, false, false, false, false,
-		                                                        false, false, false, false, false, false, false, false, false, false,
-		                                                        false, false, false, false, false, false, false, false, false, false,
-		                                                        false, false, false, false, false, false, false, false, false } ), lAlphaBlanks ) );
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 71, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 10.0, 10.0, 32000, 1.6, 0, 0, 0, 200, 10.0, 0,
-		                                                          2, 1524.1, .75, 4, 0.1359072, 0.26, 0, 1877.9, 0.75, 4.0,
-		                                                          0.151008, 0.30, 0, 2226.6, .75, 4.0, 0.1661088, 0.33, 0, 2911.3,
-		                                                          0.75, 4.0, 0.1963104, 0.38, 0, 3581.7, 0.75, 4.0, 0.226512, 0.44,
-		                                                          0, 4239.5, 0.75, 4.0, 0.2567136, 0.5, 0, 4885.7, 0.75, 4.0,
-		                                                          0.2869152, 0.57, 0, 5520.7, 0.75, 4.0, 0.31711680, 0.63, 0, 6144.8,
-		                                                          .75, 4.0, 0.3473184, 0.69, 0, 6758.0, 0.75, 4.0, 0.37752, 0.74, 0 } ), Numbers ) );
+																  2, 1524.1, .75, 4, 0.1359072, 0.26, 0, 1877.9, 0.75, 4.0,
+																  0.151008, 0.30, 0, 2226.6, .75, 4.0, 0.1661088, 0.33, 0, 2911.3,
+																  0.75, 4.0, 0.1963104, 0.38, 0, 3581.7, 0.75, 4.0, 0.226512, 0.44,
+																  0, 4239.5, 0.75, 4.0, 0.2567136, 0.5, 0, 4885.7, 0.75, 4.0,
+																  0.2869152, 0.57, 0, 5520.7, 0.75, 4.0, 0.31711680, 0.63, 0, 6144.8,
+																  .75, 4.0, 0.3473184, 0.69, 0, 6758.0, 0.75, 4.0, 0.37752, 0.74, 0 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, true, false, false, true, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true,
-		                                                        false, false, false, false, false, true } ), lNumericBlanks ) );
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true } ), lNumericBlanks ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 
 	TEST_F( InputProcessorFixture, getObjectItem_curve_biquadratic)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Curve:Biquadratic,",
-				                                                 "  CoolCapFT,        !- Name",
-				                                                 "  0.942587793,            !- Coefficient1 Constant",
-				                                                 "  0.009543347,            !- Coefficient2 x",
-				                                                 "  0.000683770,            !- Coefficient3 x**2",
-				                                                 "  -0.011042676,           !- Coefficient4 y",
-				                                                 "  0.000005249,            !- Coefficient5 y**2",
-				                                                 "  -0.000009720,           !- Coefficient6 x*y",
-				                                                 "  12.77778,               !- Minimum Value of x",
-				                                                 "  23.88889,               !- Maximum Value of x",
-				                                                 "  18.0,                   !- Minimum Value of y",
-				                                                 "  46.11111,               !- Maximum Value of y",
-				                                                 "  ,                       !- Minimum Curve Output",
-				                                                 "  ,                       !- Maximum Curve Output",
-				                                                 "  Temperature,            !- Input Unit Type for X",
-				                                                 "  Temperature,            !- Input Unit Type for Y",
-				                                                 "  Dimensionless;          !- Output Unit Type",
-				                                                 " ",
-				                                                 "Curve:Biquadratic,",
-				                                                 "  COOLEIRFT,            !- Name",
-				                                                 "  0.342414409,            !- Coefficient1 Constant",
-				                                                 "  0.034885008,            !- Coefficient2 x",
-				                                                 "  -0.000623700,           !- Coefficient3 x**2",
-				                                                 "  0.004977216,            !- Coefficient4 y",
-				                                                 "  0.000437951,            !- Coefficient5 y**2",
-				                                                 "  -0.000728028,           !- Coefficient6 x*y",
-				                                                 "  12.77778,               !- Minimum Value of x",
-				                                                 "  23.88889,               !- Maximum Value of x",
-				                                                 "  18.0,                   !- Minimum Value of y",
-				                                                 "  46.11111,               !- Maximum Value of y",
-				                                                 "  ,                       !- Minimum Curve Output",
-				                                                 "  ,                       !- Maximum Curve Output",
-				                                                 "  Temperature,            !- Input Unit Type for X",
-				                                                 "  Temperature,            !- Input Unit Type for Y",
-				                                                 "  Dimensionless;          !- Output Unit Type",
-		                                                 });
+															"Curve:Biquadratic,",
+															"  CoolCapFT,        !- Name",
+															"  0.942587793,            !- Coefficient1 Constant",
+															"  0.009543347,            !- Coefficient2 x",
+															"  0.000683770,            !- Coefficient3 x**2",
+															"  -0.011042676,           !- Coefficient4 y",
+															"  0.000005249,            !- Coefficient5 y**2",
+															"  -0.000009720,           !- Coefficient6 x*y",
+															"  12.77778,               !- Minimum Value of x",
+															"  23.88889,               !- Maximum Value of x",
+															"  18.0,                   !- Minimum Value of y",
+															"  46.11111,               !- Maximum Value of y",
+															"  ,                       !- Minimum Curve Output",
+															"  ,                       !- Maximum Curve Output",
+															"  Temperature,            !- Input Unit Type for X",
+															"  Temperature,            !- Input Unit Type for Y",
+															"  Dimensionless;          !- Output Unit Type",
+															" ",
+															"Curve:Biquadratic,",
+															"  COOLEIRFT,            !- Name",
+															"  0.342414409,            !- Coefficient1 Constant",
+															"  0.034885008,            !- Coefficient2 x",
+															"  -0.000623700,           !- Coefficient3 x**2",
+															"  0.004977216,            !- Coefficient4 y",
+															"  0.000437951,            !- Coefficient5 y**2",
+															"  -0.000728028,           !- Coefficient6 x*y",
+															"  12.77778,               !- Minimum Value of x",
+															"  23.88889,               !- Maximum Value of x",
+															"  18.0,                   !- Minimum Value of y",
+															"  46.11111,               !- Maximum Value of y",
+															"  ,                       !- Minimum Curve Output",
+															"  ,                       !- Maximum Curve Output",
+															"  Temperature,            !- Input Unit Type for X",
+															"  Temperature,            !- Input Unit Type for Y",
+															"  Dimensionless;          !- Output Unit Type",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -3103,15 +3103,15 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 4, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFT", "TEMPERATURE", "TEMPERATURE",
-		                                                               "DIMENSIONLESS" } ), Alphas ) );
+																	   "DIMENSIONLESS" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 12, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.942587793, 0.009543347, 0.000683770, -0.011042676, 0.000005249,
-		                                                          -0.000009720, 12.77778, 23.88889, 18.0, 46.11111,
-		                                                          0, 0 } ), Numbers ) );
+																  -0.000009720, 12.77778, 23.88889, 18.0, 46.11111,
+																  0, 0 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
-		                                                        false, false, false, false, true, true } ), lNumericBlanks ) );
+																false, false, false, false, true, true } ), lNumericBlanks ) );
 
 
 		int TotalArgs2 = 0;
@@ -3131,15 +3131,15 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 4, NumAlphas2 );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFT", "TEMPERATURE", "TEMPERATURE",
-		                                                               "DIMENSIONLESS" } ), Alphas2 ) );
+																	   "DIMENSIONLESS" } ), Alphas2 ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks2 ) );
 
 		EXPECT_EQ( 12, NumNumbers2 );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.342414409, 0.034885008, -0.000623700, 0.004977216, 0.000437951,
-		                                                          -0.000728028, 12.77778, 23.88889, 18.0, 46.11111,
-		                                                          0, 0 } ), Numbers2 ) );
+																  -0.000728028, 12.77778, 23.88889, 18.0, 46.11111,
+																  0, 0 } ), Numbers2 ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
-		                                                        false, false, false, false, true, true } ), lNumericBlanks2 ) );
+																false, false, false, false, true, true } ), lNumericBlanks2 ) );
 
 		EXPECT_EQ( 1, IOStatus );
 	}
@@ -3147,24 +3147,24 @@ namespace EnergyPlus {
 	TEST_F( InputProcessorFixture, getObjectItem_curve_biquadratic2)
 	{
 		std::string const idf_objects = delimited_string({
-				                                                 "Curve:Biquadratic,",
-				                                                 "  HPACCoolCapFT Speed 1, !- Name",
-				                                                 "  1, !- Coefficient1 Constant",
-				                                                 "  0, !- Coefficient2 x",
-				                                                 "  0, !- Coefficient3 x**2",
-				                                                 "  0, !- Coefficient4 y",
-				                                                 "  0, !- Coefficient5 y**2",
-				                                                 "  0, !- Coefficient6 x*y",
-				                                                 "  0, !- Minimum Value of x",
-				                                                 "  0, !- Maximum Value of x",
-				                                                 "  0, !- Minimum Value of y",
-				                                                 "  46.11111, !- Maximum Value of y",
-				                                                 "  , !- Minimum Curve Output",
-				                                                 "  , !- Maximum Curve Output",
-				                                                 "  Temperature, !- Input Unit Type for X",
-				                                                 "  Temperature, !- Input Unit Type for Y",
-				                                                 "  Dimensionless;           !- Output Unit Type",
-		                                                 });
+															"Curve:Biquadratic,",
+															"  HPACCoolCapFT Speed 1, !- Name",
+															"  1, !- Coefficient1 Constant",
+															"  0, !- Coefficient2 x",
+															"  0, !- Coefficient3 x**2",
+															"  0, !- Coefficient4 y",
+															"  0, !- Coefficient5 y**2",
+															"  0, !- Coefficient6 x*y",
+															"  0, !- Minimum Value of x",
+															"  0, !- Maximum Value of x",
+															"  0, !- Minimum Value of y",
+															"  46.11111, !- Maximum Value of y",
+															"  , !- Minimum Curve Output",
+															"  , !- Maximum Curve Output",
+															"  Temperature, !- Input Unit Type for X",
+															"  Temperature, !- Input Unit Type for Y",
+															"  Dimensionless;           !- Output Unit Type",
+														 });
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -3191,15 +3191,15 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 4, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLCAPFT SPEED 1", "TEMPERATURE", "TEMPERATURE",
-		                                                               "DIMENSIONLESS" } ), Alphas ) );
+																	   "DIMENSIONLESS" } ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks ) );
 
 		EXPECT_EQ( 12, NumNumbers );
 		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 0, 0, 0, 0,
-		                                                          0, 0, 0, 0, 46.11111,
-		                                                          0, 0 } ), Numbers ) );
+																  0, 0, 0, 0, 46.11111,
+																  0, 0 } ), Numbers ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
-		                                                        false, false, false, false, true, true } ), lNumericBlanks ) );
+																false, false, false, false, true, true } ), lNumericBlanks ) );
 		EXPECT_EQ( 1, IOStatus );
 	}
 

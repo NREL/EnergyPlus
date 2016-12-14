@@ -114,10 +114,12 @@ def change_version(schema):
     loc['default'] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"
     loc['type'] = "string"
 
+
 def change_schedule_compact(schema):
     loc = schema['properties']['Schedule:Compact']['patternProperties']['.*']['properties']['extensions']['items']['properties']['field']
     loc.pop('type')
     loc['anyOf'] = anyOf()
+
 
 def change_special_cased_enums(schema):
     loc = schema['properties']['GroundHeatTransfer:Slab:Insulation']['patternProperties']['.*']['properties']['ivins_flag_is_there_vertical_insulation']
@@ -201,6 +203,7 @@ def change_special_cased_name_fields(schema):
     del schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['name'] = \
         schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('heat_pump_name')
+
 
 def change_extensions_name(schema):
     for key, value in extension_renaming.items():
