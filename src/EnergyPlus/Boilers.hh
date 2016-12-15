@@ -153,6 +153,10 @@ namespace Boilers {
 		int CalculatedEffError; // calculated efficiency >1.1 recurring warning error counter
 		int CalculatedEffIndex; // calculated efficiency >1.1 recurring warning error message index
 		bool IsThisSized; // TRUE if sizing is done
+		//Operational fault parameters
+		bool FaultyBoilerFoulingFlag; // True if the boiler has fouling fault
+		int FaultyBoilerFoulingIndex;  // Index of the fault object corresponding to the boiler
+		Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
 
 		// Default Constructor
 		BoilerSpecs() :
@@ -191,7 +195,10 @@ namespace Boilers {
 			EffCurveOutputIndex( 0 ),
 			CalculatedEffError( 0 ),
 			CalculatedEffIndex( 0 ),
-			IsThisSized( false )
+			IsThisSized( false ),
+			FaultyBoilerFoulingFlag( false ),
+			FaultyBoilerFoulingIndex( 0 ),
+			FaultyBoilerFoulingFactor( 1.0 )
 		{}
 
 	};

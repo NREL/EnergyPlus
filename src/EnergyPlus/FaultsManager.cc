@@ -58,6 +58,7 @@
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
+#include <Boilers.hh>
 #include <ChillerReformulatedEIR.hh>
 #include <CondenserLoopTowers.hh>
 #include <CurveManager.hh>
@@ -117,7 +118,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 13 );
+	int const NumFaultTypes( 14 );
 	int const NumFaultTypesEconomizer( 5 );
 
 	// FaultTypeEnum
@@ -324,6 +325,9 @@ namespace FaultsManager {
 			} else if( i == 13 ) {
 				// 13th fault: Faulty Coil Supply Air Temperature Sensor
 				NumFaultyCoilSATSensor = NumFaultsTemp;  
+			} else if( i == 14 ) {
+				// 14th fault: Faulty Boiler with Fouling
+				NumFaultyBoilerFouling = NumFaultsTemp;  
 			}
 		}
 	
@@ -348,7 +352,75 @@ namespace FaultsManager {
 		if( NumFaultyCondenserSWTSensor > 0 ) FaultsCondenserSWTSensor.allocate( NumFaultyCondenserSWTSensor );
 		if( NumFaultyTowerFouling > 0 ) FaultsTowerFouling.allocate( NumFaultyTowerFouling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
+		if( NumFaultyBoilerFouling > 0 ) FaultsBoilerFouling.allocate( NumFaultyBoilerFouling );
+		
+		
+		// read faults input of Fault_type 114: Boiler Fouling
+		for ( int jFault_BoilerFouling = 1; jFault_BoilerFouling <= NumFaultyBoilerFouling; ++jFault_BoilerFouling ) {
 
+			cFaultCurrentObject = cFaults( 12 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_BoilerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsBoilerFouling( jFault_BoilerFouling ).FaultType = cFaultCurrentObject;
+			FaultsBoilerFouling( jFault_BoilerFouling ).FaultTypeEnum = iFault_Fouling_Boiler;
+			FaultsBoilerFouling( jFault_BoilerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsBoilerFouling( jFault_BoilerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsBoilerFouling( jFault_BoilerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// CapReductionFactor - degree of fault
+			FaultsBoilerFouling( jFault_BoilerFouling ).CapReductionFactor = rNumericArgs( 1 );
+			
+			// Boiler type
+			FaultsBoilerFouling( jFault_BoilerFouling ).BoilerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Boiler name
+			FaultsBoilerFouling( jFault_BoilerFouling ).BoilerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Boiler check and link
+			{
+				// Check the boiler name and boiler type
+				int BoilerNum = FindItemInList( FaultsBoilerFouling( jFault_BoilerFouling ).BoilerName, Boilers::Boiler );
+				if ( BoilerNum <= 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+					ErrorsFound = true;
+				} else {
+				// Link the boiler with the fault model
+					Boilers::Boiler( BoilerNum ).FaultyBoilerFoulingFlag = true;
+					Boilers::Boiler( BoilerNum ).FaultyBoilerFoulingIndex = jFault_BoilerFouling;
+				}
+			}
+		}
+		
 		// read faults input of Fault_type 113: Coil SAT Sensor Offset
 		for ( int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT ) {
 
