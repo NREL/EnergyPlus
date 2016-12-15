@@ -1233,6 +1233,45 @@ namespace FaultsManager {
 
 		return OffsetAct;
 	}
+	
+	Real64
+	FaultPropertiesFouling::CalFaultyFoulingCapReductionFactor()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Nov. 2016
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// To calculate the dynamic Nominal Capacity Reduction Factor due to fouling, based on the fault availability schedule and severity schedule.
+		// The factor is the ratio between the nominal capacity at fouling case and that at fault free case
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using ScheduleManager::GetCurrentScheduleValue;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FaultFac( 0.0 ); // fault modification factor
+		Real64 FoulingCapReductionFactor( 1.0 ); // Actual Nominal Capacity Reduction Factor, ratio between the nominal capacity at fouling case and that at fault free case
+
+		// FLOW
+		
+		// Check fault availability schedules
+		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
+		
+			// Check fault severity schedules 
+			if ( this->SeveritySchedPtr >= 0 ) {
+				FaultFac = GetCurrentScheduleValue( this->SeveritySchedPtr );
+			} else {
+				FaultFac = 1.0;
+			}
+		}
+		
+		// The more severe the fouling fault is (i.e., larger FaultFac), the less the CapReductionFactor is
+		if( FaultFac > 0.0 ) FoulingCapReductionFactor = min( this->RefCapReductionFactor / FaultFac, 1.0 );
+
+		return FoulingCapReductionFactor;
+	}
 
 	Real64
 	FaultPropertiesTowerFouling::CalFaultyTowerFoulingFactor()

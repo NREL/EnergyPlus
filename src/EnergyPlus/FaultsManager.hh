@@ -359,23 +359,32 @@ namespace FaultsManager {
 			Real64 CalFaultyTowerFoulingFactor();
 	};
 	
-		
-	struct FaultPropertiesBoilerFouling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
+
+	struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
+	{
+		// Members
+		Real64 RefCapReductionFactor; //UA Reduction Factor
+	
+		// Default Constructor
+		FaultPropertiesFouling():
+			RefCapReductionFactor( 1.0 )
+		{}
+
+		public:
+			Real64 CalFaultyFoulingCapReductionFactor(); // To calculate the dynamic fouling factor
+	};
+
+	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:CoolingTower
 	{
 		// Members
 		std::string BoilerType; // Boiler type
 		std::string BoilerName; // Boiler name
-		Real64 CapReductionFactor; //UA Reduction Factor
 	
 		// Default Constructor
 		FaultPropertiesBoilerFouling():
 			BoilerType( "" ),
-			BoilerName( "" ),
-			CapReductionFactor( 1.0 )
+			BoilerName( "" )
 		{}
-		
-		public:
-			Real64 CalFaultyFoulingCapReductionFactor();
 	};
 
 
