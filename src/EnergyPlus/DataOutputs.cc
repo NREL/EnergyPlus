@@ -49,6 +49,10 @@
 
 // EnergyPlus Headers
 #include <DataOutputs.hh>
+#include "internal/regex.h"
+
+using regex = rapidjson::internal::Regex;
+using regex_search = rapidjson::internal::RegexSearch;
 
 namespace EnergyPlus {
 
@@ -136,29 +140,10 @@ namespace DataOutputs {
 		// This function looks up a key and variable name value and determines if they are
 		// in the list of required variables for a simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
 		bool InVariableList;
 
 		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Found;
@@ -172,19 +157,24 @@ namespace DataOutputs {
 			break;
 		}
 		if ( Found != 0 ) {
-			if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
-				InVariableList = true;
-			} else {
-				while ( Found != 0 ) {
-					Found = OutputVariablesForSimulation( Found ).Next;
-					if ( Found != 0 ) {
-						if ( equali( KeyedValue, OutputVariablesForSimulation( Found ).Key ) || OutputVariablesForSimulation( Found ).Key == "*" ) {
-							InVariableList = true;
-							break;
-						}
+			do{
+				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
+					InVariableList = true;
+					break;
+				}else{
+					regex KeyRegex( OutputVariablesForSimulation( Found ).Key.c_str() );
+					if ( ! KeyRegex.IsValid() ) {
+						//error message that regular expression is wrong
+						break;
+					}
+					regex_search KeySearch( KeyRegex );
+					if ( KeySearch.Match( KeyedValue.c_str()) ) { //removed equali( KeyedValue, OutputVariablesForSimulation( Found ).Key )
+						InVariableList = true;
+						break;
 					}
 				}
-			}
+				Found = OutputVariablesForSimulation( Found ).Next;
+			}while( Found != 0 );
 		}
 
 		return InVariableList;
