@@ -390,7 +390,7 @@ namespace FaultsManager {
 			}
 
 			// CapReductionFactor - degree of fault
-			FaultsBoilerFouling( jFault_BoilerFouling ).CapReductionFactor = rNumericArgs( 1 );
+			FaultsBoilerFouling( jFault_BoilerFouling ).RefCapReductionFactor = rNumericArgs( 1 );
 			
 			// Boiler type
 			FaultsBoilerFouling( jFault_BoilerFouling ).BoilerType = cAlphaArgs( 4 );

@@ -80646,7 +80646,7 @@ FaultModel:Fouling:Boiler,
        \note It is the ratio between the nominal capacity at fouling case and that at fault free case
        \type real
        \minimum> 0
-       \maximum<= 1
+       \maximum 1
        \default 1
        \units dimensionless
 
