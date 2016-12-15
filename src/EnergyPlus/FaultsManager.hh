@@ -104,6 +104,7 @@ namespace FaultsManager {
 	extern int const iFault_TemperatureSensorOffset_CondenserSupplyWater;
 	extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
 	extern int const iFault_Fouling_Tower;
+	extern int const iFault_Fouling_Boiler;
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -151,6 +152,7 @@ namespace FaultsManager {
 	extern int NumFaultyCondenserSWTSensor;  // Total number of faulty Condenser Supply Water Temperature Sensor
 	extern int NumFaultyTowerFouling;  // Total number of faulty Towers with Scaling
 	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
+	extern int NumFaultyBoilerFouling;  // Total number of faulty Boilers with Fouling
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -357,6 +359,27 @@ namespace FaultsManager {
 			Real64 CalFaultyTowerFoulingFactor();
 	};
 	
+		
+	struct FaultPropertiesBoilerFouling : public FaultProperties // Class for FaultModel:Fouling:CoolingTower
+	{
+		// Members
+		std::string BoilerType; // Boiler type
+		std::string BoilerName; // Boiler name
+		Real64 CapReductionFactor; //UA Reduction Factor
+	
+		// Default Constructor
+		FaultPropertiesBoilerFouling():
+			BoilerType( "" ),
+			BoilerName( "" ),
+			CapReductionFactor( 1.0 )
+		{}
+		
+		public:
+			Real64 CalFaultyFoulingCapReductionFactor();
+	};
+
+
+	
 	// Object Data
 	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
 	extern Array1D< FaultPropertiesFoulingCoil > FouledCoils;
@@ -367,6 +390,7 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
 	extern Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	extern Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
+	extern Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
 
 	// Functions
 

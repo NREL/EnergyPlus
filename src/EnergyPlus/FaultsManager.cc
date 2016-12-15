@@ -134,6 +134,7 @@ namespace FaultsManager {
 	int const iFault_TemperatureSensorOffset_CondenserSupplyWater( 111 );
 	int const iFault_Fouling_Tower( 112 );
 	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 113 );
+	int const iFault_Fouling_Boiler( 114 );
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -169,7 +170,8 @@ namespace FaultsManager {
 	"FaultModel:TemperatureSensorOffset:ChillerSupplyWater",
 	"FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
 	"FaultModel:Fouling:CoolingTower",
-	"FaultModel:TemperatureSensorOffset:CoilSupplyAir"
+	"FaultModel:TemperatureSensorOffset:CoilSupplyAir",
+	"FaultModel:Fouling:Boiler"
 	} );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
@@ -192,8 +194,9 @@ namespace FaultsManager {
 	iFault_Fouling_AirFilter,
 	iFault_TemperatureSensorOffset_ChillerSupplyWater,
 	iFault_TemperatureSensorOffset_CondenserSupplyWater,
+	iFault_Fouling_Tower,
 	iFault_TemperatureSensorOffset_CoilSupplyAir,
-	iFault_Fouling_Tower
+	iFault_Fouling_Boiler
 	});
 
 	bool AnyFaultsInModel( false ); // True if there are operational faults in the model
@@ -208,6 +211,7 @@ namespace FaultsManager {
 	int NumFaultyCondenserSWTSensor( 0 );  // Total number of faulty Condenser Supply Water Temperature Sensor
 	int NumFaultyTowerFouling( 0 );  // Total number of faulty Towers with Scaling
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
+	int NumFaultyBoilerFouling( 0 );  // Total number of faulty Boilers with Fouling
 	
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -221,6 +225,7 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesCondenserSWT > FaultsCondenserSWTSensor;
 	Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
+	Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
 
 	// Functions
 

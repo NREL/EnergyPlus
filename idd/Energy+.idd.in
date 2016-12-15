@@ -80640,7 +80640,7 @@ FaultModel:Fouling:Boiler,
        \note Enter the name of a Boiler object
        \required-field
        \type object-list
-       \object-list Chillers
+       \object-list Boilers
    N1; \field Reference Capacity Reduction Factor
        \note The factor indicates the decrease of the nominal capacity
        \note It is the ratio between the nominal capacity at fouling case and that at fault free case
