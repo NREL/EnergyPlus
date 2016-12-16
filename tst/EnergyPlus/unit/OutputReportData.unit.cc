@@ -55,11 +55,12 @@
 #include <EnergyPlus/OutputReportData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/DataOutputs.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace OutputProcessor;
-
+using namespace DataOutputs;
 TEST_F( EnergyPlusFixture, OutputReportData_AnnualFieldSetConstructor )
 {
 	std::string varNameTest = "TestReport";
@@ -103,4 +104,35 @@ TEST_F( EnergyPlusFixture, OutputReportData_getVariableKeys )
 	EXPECT_EQ( fldStTest.m_namesOfKeys[0], "LITE1" );
 	EXPECT_EQ( fldStTest.m_namesOfKeys[1], "LITE2" );
 	EXPECT_EQ( fldStTest.m_namesOfKeys[2], "LITE3" );
+}
+
+TEST_F( EnergyPlusFixture, OutputReportData_Regex )
+{
+	std::string const idf_objects = delimited_string({
+			                                                 "Version,8.6;",
+			                                                 " Output:Variable,", "Outside Air Inlet Node,", "System Node Mass Flow Rate,", "timestep;",
+			                                                // " Output:Variable,", "Outside Air Inlet Node,", "System Node Temperature,", "timestep;",
+			                                                 " Output:Variable,", "Relief Air Outlet Node,", "System Node Mass Flow Rate,", "timestep;",
+			                                                 " Output:Variable,", "(Relief|Outside) Air (Outlet|Inlet) Node,", "System Node Temperature,", "timestep;",
+			                                                 " Output:Variable,", "Mixed Air Node,", "System Node Mass Flow Rate,", "timestep;",
+			                                                 " Output:Variable,", "(Mixed|Single) Air Node,", "System Node Temperature,", "timestep;",
+			                                                 " Output:Variable,", "*,", "Unitary System Compressor Part Load Ratio,", "timestep;",
+			                                                 " Output:Variable,", ".*,", "Zone Air System Sensible Heating Rate,", "timestep;",
+	                                                 });
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	bool OnTheList;
+
+	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "System Node Mass Flow Rate" );
+	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate" );
+	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "Mixed Air Node", "System Node Temperature" );
+	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "System Node Temperature" );
+	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" );
+	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "Any Node Here", "Zone Air System Sensible Heating Rate" );
+	EXPECT_EQ(true, OnTheList);
 }

@@ -156,6 +156,9 @@ namespace DataOutputs {
 			Found = Item;
 			break;
 		}
+		if ( Found!=0 && OutputVariablesForSimulation( Found ).VarName == "System Node Mass Flow Rate") {
+			int flag = 1;
+		}
 		if ( Found != 0 ) {
 			do{
 				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
@@ -168,7 +171,7 @@ namespace DataOutputs {
 						break;
 					}
 					regex_search KeySearch( KeyRegex );
-					if ( KeySearch.Match( KeyedValue.c_str()) ) { //removed equali( KeyedValue, OutputVariablesForSimulation( Found ).Key )
+					if ( KeySearch.Match( KeyedValue.c_str()) || equali( KeyedValue, OutputVariablesForSimulation( Found ).Key) ) { //need to resolve lower/uppercase
 						InVariableList = true;
 						break;
 					}
