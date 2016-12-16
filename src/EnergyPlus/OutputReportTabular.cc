@@ -10809,18 +10809,17 @@ namespace OutputReportTabular {
 
 		if (displayEioSummary)
 		{
-			// all arrays are in the format: (row, column)
 			Array1D_string columnHead;
 			Array1D_int columnWidth;
 			Array1D_string rowHead;
-			Array2D_string tableBody;
+			Array2D_string tableBody; //in the format: (row, column)
 			Array1D_int colUnitConv;
 
 			// setting up  report header 
 			WriteReportHeaders("Initialization Summary", "Entire Facility", isAverage);
 
 			// since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
-			gio::close(OutputFileInits); 		// for testing only
+			gio::close(OutputFileInits); 		
 
 			std::ifstream eioFile;
 			eioFile.open(DataStringGlobals::outputEioFileName);
@@ -10928,10 +10927,10 @@ namespace OutputReportTabular {
 		}
 	}
 
-	// changes the heading that contains and SI to IP as well as providing the unit conversion index
-	// Glazer Nov 2016
+    // changes the heading that contains and SI to IP as well as providing the unit conversion index
+    // Glazer Nov 2016
     int
-	unitsFromHeading(std::string & heading)
+    unitsFromHeading(std::string & heading)
 	{
 		std::string curHeading = "";
 		int unitConv = 0;
@@ -14357,12 +14356,16 @@ Label900: ;
 		return StringOut;
 	}
 
-	// adapted from http://stackoverflow.com/questions/4654636/how-to-determine-if-a-string-is-a-number-with-c
 	bool 
 	isNumber(std::string s)
 	{
-		std::string trimmed = stripped(s);
-		return(strspn(trimmed.c_str(), "-.0123456789eE") == trimmed.size());
+		bool is = true;
+		try {
+			std::stof(s);
+		} catch ( std::exception & e ) {
+			is = false;
+		}
+		return is;
 	}
 
 	// return the number of digits after the decimal point
@@ -15043,7 +15046,7 @@ Label900: ;
 				stringOutWithIP = stringInWithSI.substr( 0, posLBrac + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRBrac );
 			} else if ( modeInString == misParen ) {
 				stringOutWithIP = stringInWithSI.substr( 0, posLParen + 1 ) + UnitConv( selectedConv ).ipName + stringInWithSI.substr( posRParen );
-			} else if (modeInString == misBrce) {
+			} else if ( modeInString == misBrce ) {
 				stringOutWithIP = stringInWithSI.substr(0, posLBrce + 1) + UnitConv(selectedConv).ipName + stringInWithSI.substr(posRBrce);
 			} else if ( modeInString == misNoHint ) {
 				stringOutWithIP = UnitConv( selectedConv ).ipName;
