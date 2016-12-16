@@ -139,6 +139,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
@@ -229,13 +230,11 @@ namespace EnergyPlus {
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->m_delightin_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
-		DataGlobals::delightin_stream = this->m_delightin_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
@@ -341,6 +340,7 @@ namespace EnergyPlus {
 		HeatPumpWaterToWaterSimple::clear_state();
 		HeatRecovery::clear_state();
 		HeatingCoils::clear_state();
+		HighTempRadiantSystem::clear_state();
 		Humidifiers::clear_state();
 		HVACControllers::clear_state();
 		HVACDXHeatPumpSystem::clear_state();
@@ -494,15 +494,6 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_delightin_stream( std::string const & expected_string, bool reset_stream ) {
-		auto const stream_str = this->m_delightin_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if (reset_stream) this->m_delightin_stream->str(std::string());
-		return are_equal;
-	}
-
-
 	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
 	{
 		auto const has_output = this->eso_stream->str().size() > 0;
@@ -545,13 +536,6 @@ namespace EnergyPlus {
 		return has_output;
 	}
 
-
-	bool EnergyPlusFixture::has_delightin_output( bool reset_stream )
-	{
-		auto const has_output = this->m_delightin_stream->str().size() > 0;
-		if ( reset_stream ) this->m_delightin_stream->str( std::string() );
-		return has_output;
-	}
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
 		if ( idf_snippet.empty() ) {
@@ -777,7 +761,6 @@ namespace EnergyPlus {
 
 		ProcessingIDD = true;
 		DataSystemVariables::SortedIDD = true;
-		InitReferenceObjectsClass();
 		ProcessDataDicFile( *idd_stream, errors_found );
 		ProcessingIDD = false;
 

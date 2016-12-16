@@ -231,23 +231,6 @@ namespace InputProcessor {
 	int ExtensibleNumFields( 0 ); // set to number when ReadInputLine has an extensible object
 	Array1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
 
-	bool ObjectList( false ); // Set to true when ReadInputLine has an object-list
-	bool FieldsObjectList( false ); // Set to true when ReadInputLine finds fields with an object-list 
-	int NumObjectsList( 0 ); // Number of \object-list
-
-	int PlantEquipListType( 1 ); // plant equipment list type
-	int CondenserEquipListType( 2 ); // condenser equipment list type
-	int BranchEquipListType( 3 ); // Air loop brnch equipment list type
-	//int OAEquipmentListType( 4 ); // outdoor air equipment list type
-
-	std::string ObjectListName; // valid object list name
-	bool ReferenceClass( false ); // Set to true when ReadInputLine has a reference-calls-name
-	std::string ReferenceObjectsName; // reference object class name
-	int NumReferenceObjectsClass( 3 ); // number of rerference object classes
-	int NumRefObjectsPlant( 0 ); // Number of \reference-class-names for plant equipment list
-	int NumRefObjectsCondenser( 0 ); // Number of \reference-class-names for condenser equipment list
-	int NumRefObjectsBranch( 0 ); // Number of \reference-class-names for branch equipment list
-
 	//Derived Types Variables
 
 	// Object Data
@@ -257,7 +240,6 @@ namespace InputProcessor {
 	LineDefinition LineItem; // Description of current record
 	Array1D< LineDefinition > IDFRecords; // All the objects read from the IDF
 	Array1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
-	Array1D< ObjectsReferenceClass > ObjectRefClass; // Contains all the Valid Object reference class on the IDD
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -333,17 +315,6 @@ namespace InputProcessor {
 		NumberArgsBlank.deallocate();
 
 		echo_stream = nullptr;
-
-		ObjectList = false;
-		FieldsObjectList = false;
-		NumObjectsList = 0;
-		ReferenceClass = false;
-		NumReferenceObjectsClass = 0;
-		NumRefObjectsPlant = 0;
-		NumRefObjectsCondenser = 0;
-		NumRefObjectsBranch = 0;
-		ObjectListName = std::string();
-		ReferenceObjectsName = std::string();
 	}
 
 	void
@@ -403,8 +374,6 @@ namespace InputProcessor {
 		int read_stat;
 
 		InitSecretObjects();
-
-		InitReferenceObjectsClass();
 
 		EchoInputFile = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFileName, flags ); write_stat = flags.ios(); }
@@ -829,8 +798,6 @@ namespace InputProcessor {
 		static int PrevCount( -1 );
 		static int PrevSizeNumAlpha( -1 );
 
-		static Array1D_bool ObjectListFields; // Array of argument Object-list fields
-
 		// Object Data
 		static Array1D< RangeCheckDef > NumRangeChecks; // Structure for Range Check, Defaults of numeric fields
 		static Array1D< RangeCheckDef > TempChecks; // Structure (ref: NumRangeChecks) for re-allocation procedure
@@ -843,8 +810,6 @@ namespace InputProcessor {
 			AlphFieldChecks.allocate( MaxANArgs );
 			AlphFieldDefaults.allocate( MaxANArgs );
 			ObsoleteObjectsRepNames.allocate( 0 );
-
-			ObjectListFields.allocate( { 0, MaxANArgs } );
 		}
 
 		SqueezedObject = MakeUPPERCase( stripped( ProposedObject ) );
@@ -868,10 +833,6 @@ namespace InputProcessor {
 		AutoSize = false;
 		AutoCalculate = false;
 		WhichMinMax = 0;
-
-		ObjectList = false;
-		FieldsObjectList = false;
-		ReferenceClass = false;
 
 		if ( ! SqueezedObject.empty() ) {
 			if ( FindItemInList( SqueezedObject, ObjectDef ) > 0 ) {
@@ -900,8 +861,6 @@ namespace InputProcessor {
 		ObjectDef( NumObjectDefs ).RequiredObject = false;
 		ObjectDef( NumObjectDefs ).ExtensibleObject = false;
 		ObjectDef( NumObjectDefs ).ExtensibleNum = 0;
-		ObjectDef( NumObjectDefs ).ObjectList = false;
-		ObjectDef( NumObjectDefs ).ObjectListPtr = 0;
 
 		if ( PrevCount == -1 ) {
 			PrevCount = MaxANArgs;
@@ -910,7 +869,6 @@ namespace InputProcessor {
 		AlphaOrNumeric( {0,PrevCount} ) = true;
 		RequiredFields( {0,PrevCount} ) = false;
 		AlphRetainCase( {0,PrevCount} ) = false;
-		ObjectListFields( {0,PrevCount } ) = false;
 
 		if ( PrevSizeNumAlpha == -1 ) {
 			PrevSizeNumAlpha = MaxANArgs;
@@ -959,16 +917,12 @@ namespace InputProcessor {
 					++Count;
 					RequiredField = false;
 					RetainCaseFlag = false;
-					FieldsObjectList = false;
-					ReferenceClass = false;
-					ReferenceObjectsName = "";
 
 					if ( Count > MaxANArgs ) { // Reallocation
 						int const newANArgs( MaxANArgs + ANArgsDefAllocInc );
 						AlphaOrNumeric.redimension( {0,newANArgs}, false );
 						RequiredFields.redimension( {0,newANArgs}, false );
 						AlphRetainCase.redimension( {0,newANArgs}, false );
-						ObjectListFields.redimension( { 0, newANArgs }, false );
 						NumRangeChecks.redimension( newANArgs );
 						AlphFieldChecks.redimension( newANArgs );
 						AlphFieldDefaults.redimension( newANArgs );
@@ -1037,37 +991,6 @@ namespace InputProcessor {
 					if ( RetainCaseFlag ) {
 						AlphRetainCase( Count ) = true;
 					}
-
-					if ( FieldsObjectList ) {
-						if ( ObjectListName == "validPlantEquipmentTypes" ) { // "PLANTEQUIPMENTLIST"
-							ObjectListFields( Count ) = true;
-						}
-						if ( ObjectListName == "validCondenserEquipmentTypes" ) {
-							ObjectListFields( Count ) = true;
-						}
-						if ( ObjectListName == "validBranchEquipmentTypes" ) {
-							ObjectListFields( Count ) = true;
-						}
-					}
-					if ( ReferenceClass ) {
-						if ( ReferenceObjectsName == "validPlantEquipmentTypes" ) { // "PLANTEQUIPMENTLIST"
-							ObjectRefClass( PlantEquipListType ).ObjName.redimension( ++NumRefObjectsPlant );
-							ObjectRefClass( PlantEquipListType ).ObjName( NumRefObjectsPlant ) = ObjectDef( NumObjectDefs ).Name;
-							ObjectRefClass( PlantEquipListType ).NumObjects = NumRefObjectsPlant;
-						}						
-						if ( ReferenceObjectsName == "validCondenserEquipmentTypes" ) {
-							ObjectRefClass( CondenserEquipListType ).ObjName.redimension( ++NumRefObjectsCondenser );
-							ObjectRefClass( CondenserEquipListType ).ObjName( NumRefObjectsCondenser ) = ObjectDef( NumObjectDefs ).Name;
-							ObjectRefClass( CondenserEquipListType ).NumObjects = NumRefObjectsCondenser;
-						}
-						if ( ReferenceObjectsName == "validBranchEquipmentTypes" ) {
-							ObjectRefClass( BranchEquipListType ).ObjName.redimension( ++NumRefObjectsBranch );
-							ObjectRefClass( BranchEquipListType ).ObjName( NumRefObjectsBranch ) = ObjectDef( NumObjectDefs ).Name;
-							ObjectRefClass( BranchEquipListType ).NumObjects = NumRefObjectsBranch;
-						}
-						ReferenceClass = false;
-					}
-
 					continue;
 				}
 
@@ -1183,19 +1106,6 @@ namespace InputProcessor {
 			ObjectDef( NumObjectDefs ).ExtensibleNum = ExtensibleNumFields;
 		}
 
-		if ( ObjectList ) {			
-			if ( ObjectDef( NumObjectDefs ).Name == "PLANTEQUIPMENTLIST" ) { // "PLANTEQUIPMENTLIST"
-				ObjectDef( NumObjectDefs ).ObjectList = true;
-				ObjectDef( NumObjectDefs ).ObjectListPtr = PlantEquipListType;
-			} else if ( ObjectDef( NumObjectDefs ).Name == "CONDENSEREQUIPMENTLIST" ) { // "CONDENSEREQUIPMENTLIST"
-				ObjectDef( NumObjectDefs ).ObjectList = true;
-				ObjectDef( NumObjectDefs ).ObjectListPtr = CondenserEquipListType;
-			} else if ( ObjectDef( NumObjectDefs ).Name == "BRANCH" ) { // "BRANCH"
-				ObjectDef( NumObjectDefs ).ObjectList = true;
-				ObjectDef( NumObjectDefs ).ObjectListPtr = BranchEquipListType;
-			}
-		}
-
 		NumAlphaArgsFound += ObjectDef( NumObjectDefs ).NumAlpha;
 		MaxAlphaArgsFound = max( MaxAlphaArgsFound, ObjectDef( NumObjectDefs ).NumAlpha );
 		NumNumericArgsFound += ObjectDef( NumObjectDefs ).NumNumeric;
@@ -1221,9 +1131,6 @@ namespace InputProcessor {
 		PrevSizeNumAlpha = ObjectDef( NumObjectDefs ).NumAlpha;
 		ObjectDef( NumObjectDefs ).ReqField.allocate( Count );
 		ObjectDef( NumObjectDefs ).ReqField = RequiredFields( {1,Count} );
-		ObjectDef( NumObjectDefs ).ObjectListFields.allocate( Count );
-		ObjectDef( NumObjectDefs ).ObjectListFields = ObjectListFields( { 1, Count } );
-
 		for ( Count = 1; Count <= ObjectDef( NumObjectDefs ).NumNumeric; ++Count ) {
 			if ( ObjectDef( NumObjectDefs ).NumRangeChks( Count ).MinMaxChk ) {
 				// Checking MinMax Range (min vs. max and vice versa)
@@ -1307,7 +1214,6 @@ namespace InputProcessor {
 			ObjectDef( NumObjectDefs ).AlphFieldDefs.deallocate();
 			ObjectDef( NumObjectDefs ).ReqField.deallocate();
 			ObjectDef( NumObjectDefs ).AlphRetainCase.deallocate();
-			ObjectDef( NumObjectDefs ).ObjectListFields.deallocate();
 			--NumObjectDefs;
 			ErrorsFound = true;
 		}
@@ -1585,10 +1491,6 @@ namespace InputProcessor {
 		std::string::size_type NextChr;
 		std::string String1;
 
-		int objectlistPtr; // pointer to object-list type
-		int loop; // index 
-		bool objectmismatchflag; // local error flag
-
 		SqueezedObject = MakeUPPERCase( stripped( ProposedObject ) );
 		if ( len( SqueezedObject ) > static_cast< std::string::size_type >( MaxObjectNameLength ) ) {
 			ShowWarningError( "IP: Object name length exceeds maximum, will be truncated=" + stripped( ProposedObject ), EchoInputFile );
@@ -1834,26 +1736,6 @@ namespace InputProcessor {
 									}
 								}
 							}
-							// check if object is type object-list 
-							if ( ObjectDef( Found ).ObjectList ) { // this is object-list type 
-								objectmismatchflag = false;
-								if ( ObjectDef( Found ).ObjectListFields( NumArg ) ) { // this is object-list to be verified
-									objectlistPtr = ObjectDef( Found ).ObjectListPtr;									
-									for ( loop = 1; loop <= ObjectRefClass( objectlistPtr ).NumObjects; ++loop ) {
-										if ( SqueezedArg == ObjectRefClass( objectlistPtr ).ObjName( loop ) ) {
-											objectmismatchflag = true;
-											break;
-										}
-									}		
-									if ( !objectmismatchflag ) {
-										DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
-										ShowSevereError( "IP: IDF line~" + IPTrimSigDigits( NumLines ) + " Error detected for Object=" + ObjectDef( Found ).Name, EchoInputFile );
-										ShowContinueError( SqueezedArg + " is invalid object in object-list-class = " + ObjectRefClass( objectlistPtr ).Name, EchoInputFile );
-										// errFlag = true;
-									}
-								}
-							}
-
 						} else {
 							if ( NumNumeric == ObjectDef( Found ).NumNumeric ) {
 								DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
@@ -2974,7 +2856,7 @@ namespace InputProcessor {
 								ReplacementName = trimmed( name_str );
 								ObsoleteObject = true;
 							}
-						} 
+						}
 						break;
 					case 'R':
 						if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
@@ -3202,22 +3084,6 @@ namespace InputProcessor {
 								}
 								ObsoleteObject = true;
 							}
-						} else if ( has_prefix( UCInputLine, "\\OBJECT-LIST" ) ) { // Object-list arg
-							ObjectList = true;
-							FieldsObjectList = true;
-							NSpace = FindNonSpace( UCInputLine.substr( 12 ) );
-							if ( NSpace == std::string::npos ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need object for \\Object-list", EchoInputFile );
-								errFlag = true;
-							} else {
-								std::string const name_str( InputLine.substr( Pos + 12 + 1 ) );
-								NSpace = scan( name_str, '!' );
-								if ( NSpace == std::string::npos ) {
-									ObjectListName = trimmed( name_str );
-								} else {
-									ObjectListName = trimmed( name_str.substr( 0, NSpace ) );
-								}								
-							}
 						}
 						break;
 					case 'R':
@@ -3227,23 +3093,6 @@ namespace InputProcessor {
 							RequiredObject = true;
 						} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
 							RetainCase = true;
-						} else if ( has_prefix( UCInputLine, "\\REFERENCE-CLASS-NAME" ) ) {
-							//  \reference-class-name validPlantEquipmentTypes
-							//	\reference validPlantEquipmentNames
-							ReferenceClass = true;
-							NSpace = FindNonSpace( UCInputLine.substr( 21 ) );
-							if ( NSpace == std::string::npos ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need object for \\Object-list", EchoInputFile );
-								errFlag = true;
-							} else {
-								std::string const name_str( InputLine.substr( Pos + 21 + 1 ) );
-								NSpace = scan( name_str, '!' );
-								if ( NSpace == std::string::npos ) {
-									ReferenceObjectsName = trimmed( name_str );
-								} else {
-									ReferenceObjectsName = trimmed( name_str.substr( 0, NSpace ) );
-								}
-							}
 						}
 						break;
 					case 'U':
@@ -6413,41 +6262,6 @@ namespace InputProcessor {
 		gio::write( String, fmtLD ) << IntegerValue;
 		return stripped( String );
 
-	}
-
-	void
-	InitReferenceObjectsClass() {
-
-		// SUBROUTINE INFORMATION:
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine holds a set of objects that are used as a reference class
-		// objects. This routine allocates and builds an internal structure used by 
-		// the InputProcessor.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		NumReferenceObjectsClass = 3;
-		ObjectRefClass.allocate( NumReferenceObjectsClass );
-
-		ObjectRefClass( PlantEquipListType ).Name = "PLANTEQUIPMENTLIST"; // PlantEquipmentList
-		ObjectRefClass( PlantEquipListType ).RefObjType = PlantEquipListType;
-		ObjectRefClass( PlantEquipListType ).ObjName.allocate( 0 );
-
-		ObjectRefClass( CondenserEquipListType ).Name = "CONDENSEREQUIPMENTLIST"; // CondenserEquipmentList
-		ObjectRefClass( CondenserEquipListType ).RefObjType = CondenserEquipListType;
-		ObjectRefClass( CondenserEquipListType ).ObjName.allocate( 0 );
-
-		ObjectRefClass( BranchEquipListType ).Name = "BRANCH"; // Branch, Airloop branch Equipment List
-		ObjectRefClass( BranchEquipListType ).RefObjType = BranchEquipListType;
-		ObjectRefClass( BranchEquipListType ).ObjName.allocate( 0 );
 	}
 
 } // InputProcessor

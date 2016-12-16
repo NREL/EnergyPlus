@@ -168,23 +168,6 @@ namespace InputProcessor {
 	extern int ExtensibleNumFields; // set to number when ReadInputLine has an extensible object
 	extern Array1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
 
-	extern bool ObjectList; // Set to true when ReadInputLine find object with an object-list type
-	extern bool FieldsObjectList; // Set to true when ReadInputLine finds fields with an object-list 
-	extern int NumObjectsList; // Number of \object-list
-
-	extern int PlantEquipListType; // plant equipment list type
-	extern int CondenserEquipListType; // condenser equipment list type
-	extern int BranchEquipListType; // Air loop brnch equipment list type
-	//extern int OAEquipmentListType; // outdoor air equipment list type
-
-	extern std::string ObjectListName; // valid object list name
-	extern bool ReferenceClass; // Set to true when ReadInputLine has a reference-clas-name
-	extern std::string ReferenceObjectsName; // reference object class name
-	extern int NumReferenceObjectsClass; // number of rerference object classes
-	extern int NumRefObjectsPlant; // Number of \reference-class-names for plant equipment list
-	extern int NumRefObjectsCondenser; // Number of \reference-class-names for condenser equipment list
-	extern int NumRefObjectsBranch; // Number of \reference-class-names for branch equipment list
-
 	//Derived Types Variables
 
 	// Types
@@ -254,10 +237,6 @@ namespace InputProcessor {
 		Array1D< RangeCheckDef > NumRangeChks; // Used to range check and default numeric fields
 		int NumFound; // Number of this object found in IDF
 
-		bool ObjectList; // True if this object has been designated as \type object-list
-		int ObjectListPtr; // If > 0, object is \type object-list and this is a pointer valid object lists
-		Array1D_bool ObjectListFields; // True if this field has been designated as \type object-list
-
 		// Default Constructor
 		ObjectsDefinition() :
 			NumParams( 0 ),
@@ -272,9 +251,7 @@ namespace InputProcessor {
 			LastExtendAlpha( 0 ),
 			LastExtendNum( 0 ),
 			ObsPtr( 0 ),
-			NumFound( 0 ),
-			ObjectList( false ),
-			ObjectListPtr( 0 )
+			NumFound( 0 )
 		{}
 
 	};
@@ -352,20 +329,6 @@ namespace InputProcessor {
 
 	};
 
-	struct ObjectsReferenceClass {
-		// Members
-		std::string Name; // name of the reference class type
-		Array1D_string ObjName; // name of object in the reference class
-		int RefObjType; // reference class type for object-list
-		int NumObjects; // number of valid objects 
-
-		// Default Constructor
-		ObjectsReferenceClass() :
-			RefObjType( 0 ),
-			NumObjects( 0 )
-		{}
-	};
-
 	// Object Data
 	extern Array1D< ObjectsDefinition > ObjectDef; // Contains all the Valid Objects on the IDD
 	extern Array1D< SectionsDefinition > SectionDef; // Contains all the Valid Sections on the IDD
@@ -373,7 +336,7 @@ namespace InputProcessor {
 	extern LineDefinition LineItem; // Description of current record
 	extern Array1D< LineDefinition > IDFRecords; // All the objects read from the IDF
 	extern Array1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
-	extern Array1D< ObjectsReferenceClass > ObjectRefClass; // Contains all the Valid Object reference class on the IDD
+
 	// Functions
 
 	// Clears the global data in InputProcessor.
@@ -1144,9 +1107,6 @@ namespace InputProcessor {
 
 	void
 	InitSecretObjects();
-
-	void
-	InitReferenceObjectsClass();
 
 	void
 	MakeTransition( int & ObjPtr ); // Pointer to Object Definition
