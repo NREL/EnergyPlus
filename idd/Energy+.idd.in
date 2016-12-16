@@ -22896,10 +22896,25 @@ AirflowNetwork:MultiZone:Surface,
       \note equal to 1. If this schedule is not specified then venting is allowed if
       \note other venting control conditions are satisfied.
       \note Not used if Ventilation Control Mode = NoVent or ZoneLevel.
-  A7; \field Occupant Ventilation Control Name
+  A7, \field Occupant Ventilation Control Name
       \type object-list
       \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required.
+  A8, \field Equivalent Rectangle Method
+      \type choice
+      \key PolygonHeight
+      \Key BaseSurfaceAspectRatio
+      \Key UserDefinedAspectRatio
+      \default PolygonHeight
+      \note This field is applied to a non-rectangular window or door. The equivalent shape has
+      \note the same area as a polygonal window or door.
+  N7; \field Equivalent Rectangle Aspect Ratio
+      \note This field is used when UserDefinedAspectRatio is entered in the Equivalent
+      \note Rectangle Method field.
+      \units dimensionless
+      \type real
+      \minimum> 0.0
+      \default 1.0
 
 AirflowNetwork:MultiZone:ReferenceCrackConditions,
       \min-fields 4
@@ -31068,7 +31083,7 @@ DesignSpecification:OutdoorAir,
       \note the previous four inputs. Schedule values are limited to 0 to 1. If left blank, the schedule defaults to 1.0.
       \note This schedule is ignored during sizing.  All other components which reference this design specification
       \note use the current schedule value to calculate the current outdoor air requirement. This includes
-      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir, 
+      \note AirTerminal:SingleDuct:VAV:NoReheat, AirTerminal:SingleDuct:VAV:Reheat, AirTerminal:DualDuct:VAV:OutdoorAir,
       \note ZoneHVAC:FourPipeFanCoil, and ZoneHVAC:IdealLoadsAirSystem.
       \note This schedule will also be applied by Controller:MechanicalVentilation for all System Outdoor Air Methods.
 
@@ -56145,7 +56160,7 @@ Controller:OutdoorAir,
        \note Outdoor air inlet node entering the first pre-treat component if any
   N1 , \field Minimum Outdoor Air Flow Rate
        \note If there is a Mechanical Ventilation Controller (Controller:MechanicalVentilation), note
-       \note that this value times the Minimum Outdoor Air Schedule is a hard minimum that may 
+       \note that this value times the Minimum Outdoor Air Schedule is a hard minimum that may
        \note override DCV or other advanced OA controls.
        \type real
        \required-field
@@ -71254,7 +71269,7 @@ EnergyManagementSystem:Actuator,
        \required-field
        \type alpha
        \note This name becomes a variable for use in Erl programs
-       \note no spaces allowed in name
+       \note no spaces or other special characters (-,+,/,\) allowed in name
   A2 , \field Actuated Component Unique Name
        \required-field
        \type alpha
@@ -98646,6 +98661,7 @@ Meter:Custom,
    \memo Used to allow users to combine specific variables and/or meters into
    \memo "custom" meter configurations. To access these meters by name, one must
    \memo first run a simulation to generate the RDD/MDD files and names.
+   \memo A Meter:Custom cannot reference another Meter:Custom.
    A1,  \field Name
         \required-field
    A2,  \field Fuel Type
