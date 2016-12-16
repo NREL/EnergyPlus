@@ -1565,7 +1565,7 @@ This field is the average depth of the pool in meters. If the pool has variable 
 
 \paragraph{Field: Activity Factor Schedule Name}\label{field-activity-factor-schedule-name}
 
-This field references a schedule that contains values for pool activity. This parameter can be varied using the schedule named here, and it has an impact on the amount of evaporation that will take place from the pool to the surrounding zone air. For example values of the activity factor and what impact it will have on the evaporation of water from the pool, please refer to indoor swimming pool section of the EnergyPlus Engineering Reference document. If left blank, the activity factor will be assumed to be unity.
+This field references a schedule that contains values for pool activity. This parameter can be varied using the schedule named here, and it has an impact on the amount of evaporation that will take place from the pool to the surrounding zone air. For example values of the activity factor and what impact it will have on the evaporation of water from the pool, please refer to the Indoor Swimming Pool section of the EnergyPlus Engineering Reference document. If left blank, the activity factor will be assumed to be unity. Note that the activity factor should not be set equal to an occupancy schedule since an activity factor of zero means that no evaporation will take place from the pool.
 
 \paragraph{Field: Make-up Water Supply Schedule Name}\label{field-make-up-water-supply-schedule-name}
 
@@ -1684,6 +1684,18 @@ SwimmingPool:Indoor,
   HVAC, Average, Indoor Pool Evaporative Heat Loss Rate {[}W{]}
 \item
   HVAC, Sum, Indoor Pool Evaporative Heat Loss Energy {[}J{]}
+\item
+  HVAC, Average, Indoor Pool Saturation Pressure at Pool Temperature {[}Pa{]}
+\item
+  HVAC, Average, Indoor Pool Partial Pressure of Water Vapor in Air {[}Pa{]}
+\item
+  HVAC, Average, Indoor Pool Current Cover Evaporation Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Current Cover Convective Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Current Cover SW Radiation Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Current Cover LW Radiation Factor {[]}
 \end{itemize}
 
 \paragraph{Indoor Pool Makeup Water Rate {[}m3/s{]}}\label{indoor-pool-makeup-water-rate-m3s}
@@ -1745,6 +1757,30 @@ This is the rate of evaporative heat loss (latent) to the zone from the pool in 
 \paragraph{Indoor Pool Evaporative Heat Loss Energy {[}J{]}}\label{indoor-pool-evaporative-heat-loss-energy-j}
 
 This is the amount of evaporative heat loss (latent) to the zone from the pool in in Joules over the time step requested.
+
+\paragraph{Indoor Pool Saturation Pressure at Pool Temperature {[}Pa{]}}\label{indoor-pool-saturation-pressure-at-pool-temperature-pa}
+
+This is the saturation pressure of water vapor in air at the pool water temperature.
+
+\paragraph{Indoor Pool Partial Pressure of Water Vapor in Air {[}Pa{]}}\label{indoor-pool-partia-pressure-of-water-vapor-in-air-pa}
+
+This is the partial pressure of water vapor in air at the current zone air conditions for dry bulb temperature and humidity ratio.
+
+\paragraph{Indoor Pool Current Cover Evaporation Factor {[]}}\label{indoor-pool-current-cover-evaporation-factor}
+
+This is the current value of the cover evaporation factor that is used as a modifier for the actual evaporation.  A value of zero means no evaporation will take place while a value of unity means the maximum allowed evaporation will take place.  This value is based on the current cover condition as well as the user input for the cover evaporation factor.
+
+\paragraph{Indoor Pool Current Cover Convective Factor {[]}}\label{indoor-pool-current-cover-convective-factor}
+
+This is the current value of the cover convective factor that is used as a modifier for the actual convection.  A value of zero means the cover will block all convection while a value of unity means that the cover will not affect convection from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover convective factor.
+
+\paragraph{Indoor Pool Current Cover SW Radiation Factor {[]}}\label{indoor-pool-current-cover-sw-radiation-factor}
+
+This is the current value of the cover short wavelength radiation factor that is used as a modifier for the actual short wavelength radiation.  A value of zero means the cover will block all short wavelength radiation while a value of unity means that the cover will not affect short wavelength radiation from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover short wavelength radiation factor.
+
+\paragraph{Indoor Pool Current Cover LW Radiation Factor {[]}}\label{indoor-pool-current-cover-lw-radiation-factor}
+
+This is the current value of the cover long wavelength radiation factor that is used as a modifier for the actual long wavelength radiation.  A value of zero means the cover will block all long wavelength radiation while a value of unity means that the cover will not affect long wavelength radiation from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover long wavelength radiation factor.
 
 \subsection{OtherEquipment}\label{otherequipment}
 

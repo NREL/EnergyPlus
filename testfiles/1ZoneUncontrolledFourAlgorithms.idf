@@ -502,17 +502,17 @@
     0.7500000;               !- Visible Absorptance
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
-    GP01,                   !- Name
-    27.3004417577,          !- Water Vapor Diffusion Resistance Factor {dimensionless}
-    0.072549,               !- Moisture Equation Coefficient a {dimensionless}
-    0.397173,               !- Moisture Equation Coefficient b {dimensionless}
-    0.007774,               !- Moisture Equation Coefficient c {dimensionless}
-    11.7057,                !- Moisture Equation Coefficient d {dimensionless}
-    0.004,                  !- Surface Layer Penetration Depth {m}
-    0,                      !- Deep Layer Penetration Depth {m}
-    0,                      !- Coating Layer Thickness {m}
-    0;                      !- Coating Layer Water Vapor Diffusion Resistance Factor {m}
-    
+    GP01,                    !- Name
+    27.3004417577,           !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.072549,                !- Moisture Equation Coefficient a {dimensionless}
+    0.397173,                !- Moisture Equation Coefficient b {dimensionless}
+    0.007774,                !- Moisture Equation Coefficient c {dimensionless}
+    11.7057,                 !- Moisture Equation Coefficient d {dimensionless}
+    0.004,                   !- Surface Layer Penetration Depth {m}
+    0,                       !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
   Zone,
     ZONE ONE,                !- Name
     0,                       !- Direction of Relative North {deg}

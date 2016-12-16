@@ -1256,12 +1256,12 @@
     Air Loop Outlet Node,    !- Furnace Air Outlet Node Name
     CyclingFanSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    0.83,                    !- Supply Air Flow Rate {m3/s}
+    0.83,                    !- Heating Supply Air Flow Rate {m3/s}
     East Zone,               !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Coil;            !- Heating Coil Name
 
   AirLoopHVAC:UnitaryHeatOnly,
@@ -1271,12 +1271,12 @@
     Air Loop Outlet Node 2,  !- Unitary System Air Outlet Node Name
     CyclingFanSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     80,                      !- Maximum Supply Air Temperature {C}
-    0.47,                    !- Supply Air Flow Rate {m3/s}
+    0.47,                    !- Heating Supply Air Flow Rate {m3/s}
     North Zone,              !- Controlling Zone or Thermostat Location
     Fan:OnOff,               !- Supply Fan Object Type
     Supply Fan 2,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Fuel,        !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Coil 2;          !- Heating Coil Name
 
   AirTerminal:SingleDuct:Uncontrolled,
@@ -1380,7 +1380,7 @@
     ,                        !- Temperature Setpoint Node Name
     100,                     !- Parasitic Electric Load {W}
     PLFCurveforGasFurnace,   !- Part Load Fraction Correlation Curve Name
-    10;                      !- Parasitic Gas Load {W}
+    10;                      !- Parasitic Fuel Load {W}
 
   Coil:Heating:Fuel,
     Furnace Coil 2,          !- Name
@@ -1393,7 +1393,7 @@
     ,                        !- Temperature Setpoint Node Name
     100,                     !- Parasitic Electric Load {W}
     PLFCurveforGasFurnace 2, !- Part Load Fraction Correlation Curve Name
-    10;                      !- Parasitic Gas Load {W}
+    10;                      !- Parasitic Fuel Load {W}
 
   Fan:OnOff,
     Supply Fan 1,            !- Name

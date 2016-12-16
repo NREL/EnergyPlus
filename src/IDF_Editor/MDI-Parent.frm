@@ -346,7 +346,6 @@ If isAlreadyOpen Then
   Exit Sub
 End If
 'Debug.Print CommonDialog1.filename
-If isUnixFileFormat(openedFileName) Then Exit Sub
 lDocumentCount = lDocumentCount + 1
 Call AddRecentFileItem(openedFileName)
 Set frmD = New IDFEdit
@@ -370,50 +369,6 @@ Else
   Unload frmD
 End If
 End Sub
-
-'-----------------------------------------------------------------------------
-' Check if the file is just a unix file and cannot be read using line input
-'-----------------------------------------------------------------------------
-Function isUnixFileFormat(fileName As String) As Boolean
-Dim fnum As Long
-Dim prevChar As String * 1
-Dim oneChar As String * 1
-fnum = FreeFile
-isUnixFileFormat = False
-On Error Resume Next
-'first open the file and see if unix line endings
-Open fileName For Binary As fnum
-If Err.Number <> 0 Then
-  MsgBox "File not found:" & vbCrLf & vbCrLf & fileName, vbExclamation, "Error"
-  Exit Function
-End If
-oneChar = " "
-Do
-  prevChar = oneChar
-  Get fnum, , oneChar
-  If Err.Number <> 0 Then
-    MsgBox "cannot find next character"
-    Exit Do
-  End If
-  If EOF(fnum) Then Exit Do
-  If oneChar = Chr(10) Then
-    If prevChar = Chr(13) Then
-      'this is a msdos file with cr-lf
-      Exit Do
-    Else
-      'if the line ending ascii 10 shows up without ascii 13 before it then
-      'it is a unix file
-      MsgBox "Unix file format detected. " & vbCrLf & vbCrLf & "Please convert the file with a text editor to have CR LF line endings." _
-      & vbCrLf & vbCrLf & fileName, vbExclamation, "Error"
-      isUnixFileFormat = True
-      Exit Do
-    End If
-  End If
-  'for mac files that line input can handle
-  If prevChar = Chr(13) Then Exit Do
-Loop
-Close fnum
-End Function
 
 '-----------------------------------------------------------------------------
 ' When a file has not been double clicked then just load a blank document
@@ -454,7 +409,6 @@ If isAlreadyOpen Then
   MsgBox "The file: " & vbCrLf & vbCrLf & openedFileName & vbCrLf & vbCrLf & "is already open in another window", vbInformation, "Warning"
   Exit Sub
 End If
-If isUnixFileFormat(openedFileName) Then Exit Sub
 'Debug.Print CommonDialog1.filename
 lDocumentCount = lDocumentCount + 1
 Set frmD = New IDFEdit

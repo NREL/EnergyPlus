@@ -252,7 +252,13 @@ namespace SurfaceGeometry {
 		Real64 const Length,
 		Real64 const Height
 	);
-
+	
+	void
+	MakeEquivalentRectangle(
+		int const SurfNum, // Surface number
+		bool & ErrorsFound // Error flag indicator (true if errors found)
+	);
+	
 	void
 	GetAttShdSurfaceData(
 		bool & ErrorsFound, // Error flag indicator (true if errors found)

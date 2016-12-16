@@ -1318,16 +1318,16 @@
     ChW Circ Pump,           !- Name
     ChW Supply Inlet Node,   !- Inlet Node Name
     ChW Pump Outlet Node,    !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   BranchList,
@@ -1551,16 +1551,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   BranchList,
@@ -1778,21 +1778,21 @@
 
   DesignSpecification:ZoneHVAC:Sizing,
     FanCoilDesignSpec1,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    0.0,                     !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required {m3/s-m2}
-    ,                        !- Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
-    ,                        !- Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Fraction of Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+    0.0,                     !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Heating Supply Air Flow Rate
+    SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     autosize,                !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
@@ -1907,21 +1907,21 @@
 
   DesignSpecification:ZoneHVAC:Sizing,
     FanCoilDesignSpec2,      !- Name
-    FlowPerFloorArea,        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate {m3/s}
-    9.9676501E-3,            !- Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    FlowPerFloorArea,        !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
-    0.0,                     !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required {m3/s-m2}
-    ,                        !- Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
-    ,                        !- Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
-    FlowPerFloorArea,        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate {m3/s}
-    9.9676501E-3,            !- Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Fraction of Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    FlowPerFloorArea,        !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    9.9676501E-3,            !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    FlowPerFloorArea,        !- No Load Supply Air Flow Rate Method
+    ,                        !- No Load Supply Air Flow Rate {m3/s}
+    0.0,                     !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Heating Supply Air Flow Rate
+    FlowPerFloorArea,        !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    9.9676501E-3,            !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     FractionOfAutosizedCoolingCapacity,  !- Cooling Design Capacity Method
     ,                        !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
@@ -2036,21 +2036,21 @@
 
   DesignSpecification:ZoneHVAC:Sizing,
     FanCoilDesignSpec3,      !- Name
-    FractionOfAutosizedCoolingAirflow,  !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    1.0,                     !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required {m3/s-m2}
-    ,                        !- Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
-    ,                        !- Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
-    FractionOfAutosizedHeatingAirflow,  !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    1.0,                     !- Fraction of Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    FractionOfAutosizedCoolingAirflow,  !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1.0,                     !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Heating Supply Air Flow Rate
+    FractionOfAutosizedHeatingAirflow,  !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1.0,                     !- Heating Fraction of Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     CapacityPerFloorArea,    !- Cooling Design Capacity Method
     ,                        !- Cooling Design Capacity {W}
     234.74985,               !- Cooling Design Capacity Per Floor Area {W/m2}
