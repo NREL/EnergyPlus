@@ -64,8 +64,12 @@ public: // Types
 	using Super::conformable;
 	using Super::npos;
 	using Super::operator ();
+
+protected: // Types
+
 	using Super::shift_set;
 	using Super::size_set;
+
 	using Super::data_;
 	using Super::I_;
 	using Super::sdata_;

@@ -57,15 +57,18 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	// Using
-	using Super::in_range;
 	using Super::isize;
 	using Super::l;
 	using Super::u;
 	using Super::size;
+
+protected: // Types
+
+	using Super::in_range;
 	using Super::j1;
 	using Super::j2;
 	using Super::j3;
+
 	using Super::array_;
 	using Super::pmem_;
 

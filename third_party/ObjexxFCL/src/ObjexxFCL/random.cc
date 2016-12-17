@@ -24,7 +24,7 @@ namespace { // Internal shared global
 std::default_random_engine random_generator;
 }
 
-// Random float on [0,1]
+// Random int on [0,1]
 std::int32_t
 IRANDM()
 {
@@ -32,7 +32,7 @@ IRANDM()
 	return distribution( random_generator );
 }
 
-// Random float on [0,1]
+// Random int on [0,1]
 std::int32_t
 IRANDM( int const iflag )
 {

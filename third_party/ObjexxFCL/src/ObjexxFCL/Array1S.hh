@@ -66,12 +66,15 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	// Using
-	using Super::in_range;
 	using Super::isize;
 	using Super::overlap;
 	using Super::size;
+
+protected: // Types
+
+	using Super::in_range;
 	using Super::slice_k;
+
 	using Super::contiguous_;
 	using Super::data_;
 	using Super::data_beg_;

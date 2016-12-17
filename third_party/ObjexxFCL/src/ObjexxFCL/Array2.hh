@@ -84,9 +84,13 @@ public: // Types
 	using Super::npos;
 	using Super::overlap;
 	using Super::size;
+
+protected: // Types
+
 	using Super::size_of;
 	using Super::slice_k;
 	using Super::swapB;
+
 	using Super::data_;
 	using Super::sdata_;
 	using Super::shift_;
