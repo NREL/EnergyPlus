@@ -357,7 +357,7 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions",
+									{"vertices",
 										{
 											{
 												{"vertex_x_coordinate", ""},
@@ -481,7 +481,7 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions",
+									{"vertices",
 										{
 											{
 												{"vertex_x_coordinate", 10},
@@ -593,7 +593,7 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions",
+									{"vertices",
 										{
 											{
 												{"vertex_x_coordinate", 10},
@@ -630,7 +630,7 @@ namespace EnergyPlus {
 									{"wind_exposure", "NoWind"},
 									{"view_factor_to_ground", 1.000000},
 									{"number_of_vertices", 4},
-									{"extensions",
+									{"vertices",
 									{
 											{
 												{"vertex_x_coordinate", 10},
@@ -934,7 +934,7 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions",
+							{"vertices",
 							{
 								{
 									{"vertex_x_coordinate", 10},
@@ -1040,7 +1040,7 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions",
+							{"vertices",
 								{
 									{
 										{"vertex_x_coordinate", 10},
@@ -1077,7 +1077,7 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions",
+							{"vertices",
 								{
 									{
 										{"vertex_x_coordinate", 10},
@@ -1182,7 +1182,7 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"non_existent_field_2", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions",
+							{"vertices",
 								{
 									{
 										{"vertex_x_coordinate", 10},
@@ -1259,7 +1259,7 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", 1.000000},
 							{"number_of_vertices", 4},
-							{"extensions",
+							{"vertices",
 								{
 									{
 										{"vertex_z_coordinate", 0}
@@ -1315,10 +1315,10 @@ namespace EnergyPlus {
 		EXPECT_EQ(errors.size(), 4ul);
 		EXPECT_EQ(warnings.size(), 0ul);
 		if (errors.size() >= 4) {
-			EXPECT_NE(errors[0].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
-			EXPECT_NE(errors[1].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
-			EXPECT_NE(errors[2].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
-			EXPECT_NE(errors[2].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
+			EXPECT_NE(errors[0].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+			EXPECT_NE(errors[0].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
+			EXPECT_NE(errors[1].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
 			EXPECT_NE(errors[3].find("Required field \"construction_name\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
 //            EXPECT_NE(errors[4].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
 //            EXPECT_NE(errors[5].find("Required object \"Building\" was not provided"), std::string::npos);
@@ -1342,7 +1342,7 @@ namespace EnergyPlus {
 							{"wind_exposure", "NoWind"},
 							{"view_factor_to_ground", -987.654321},
 							{"number_of_vertices", -98765.4321},
-							{"extensions",
+							{"vertices",
 								{
 									{
 										{"vertex_x_coordinate", "definitely not a number"},
@@ -1397,10 +1397,10 @@ namespace EnergyPlus {
 			EXPECT_NE(errors[0].find("is less than or equal to the exclusive minimum"), std::string::npos);
 			EXPECT_NE(errors[1].find("Value \"0.000000\" parsed at line"), std::string::npos);
 			EXPECT_NE(errors[1].find("is less than or equal to the exclusive minimum"), std::string::npos);
-			EXPECT_NE(errors[2].find("In object \"BuildingSurface:Detailed\", at line"), std::string::npos);
-			EXPECT_NE(errors[2].find("type needs to be string"), std::string::npos);
-			EXPECT_NE(errors[3].find("Value \"-98765.432100\" parsed at line"), std::string::npos);
-			EXPECT_NE(errors[3].find("less than the minimum"), std::string::npos);
+			EXPECT_NE(errors[2].find("Value \"-98765.432100\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("less than the minimum"), std::string::npos);
+			EXPECT_NE(errors[3].find("In object \"BuildingSurface:Detailed\", at line"), std::string::npos);
+			EXPECT_NE(errors[3].find("type needs to be string"), std::string::npos);
 			EXPECT_NE(errors[4].find("Value \"-987.654321\" parsed at line"), std::string::npos);
 			EXPECT_NE(errors[4].find("less than the minimum"), std::string::npos);
 //			EXPECT_NE(errors[5].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
