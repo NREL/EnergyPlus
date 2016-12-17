@@ -105,6 +105,7 @@ namespace FaultsManager {
 	extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
 	extern int const iFault_Fouling_Tower;
 	extern int const iFault_Fouling_Boiler;
+	extern int const iFault_Fouling_Chiller;
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -153,6 +154,7 @@ namespace FaultsManager {
 	extern int NumFaultyTowerFouling;  // Total number of faulty Towers with Scaling
 	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
 	extern int NumFaultyBoilerFouling;  // Total number of faulty Boilers with Fouling
+	extern int NumFaultyChillerFouling;  // Total number of faulty Chillers with Fouling
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -374,7 +376,7 @@ namespace FaultsManager {
 			Real64 CalFaultyFoulingCapReductionFactor(); // To calculate the dynamic fouling factor
 	};
 
-	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:CoolingTower
+	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler
 	{
 		// Members
 		std::string BoilerType; // Boiler type
@@ -386,7 +388,19 @@ namespace FaultsManager {
 			BoilerName( "" )
 		{}
 	};
-
+	
+	struct FaultPropertiesChillerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Chiller
+	{
+		// Members
+		std::string ChillerType; // Chiller type
+		std::string ChillerName; // Chiller name
+	
+		// Default Constructor
+		FaultPropertiesChillerFouling():
+			ChillerType( "" ),
+			ChillerName( "" )
+		{}
+	};
 
 	
 	// Object Data
@@ -400,6 +414,7 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	extern Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 	extern Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
+	extern Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
 
 	// Functions
 

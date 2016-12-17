@@ -118,7 +118,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 14 );
+	int const NumFaultTypes( 15 );
 	int const NumFaultTypesEconomizer( 5 );
 
 	// FaultTypeEnum
@@ -136,6 +136,7 @@ namespace FaultsManager {
 	int const iFault_Fouling_Tower( 112 );
 	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 113 );
 	int const iFault_Fouling_Boiler( 114 );
+	int const iFault_Fouling_Chiller( 115 );
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -172,7 +173,8 @@ namespace FaultsManager {
 	"FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
 	"FaultModel:Fouling:CoolingTower",
 	"FaultModel:TemperatureSensorOffset:CoilSupplyAir",
-	"FaultModel:Fouling:Boiler"
+	"FaultModel:Fouling:Boiler",
+	"FaultModel:Fouling:Chiller"
 	} );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
@@ -197,7 +199,8 @@ namespace FaultsManager {
 	iFault_TemperatureSensorOffset_CondenserSupplyWater,
 	iFault_Fouling_Tower,
 	iFault_TemperatureSensorOffset_CoilSupplyAir,
-	iFault_Fouling_Boiler
+	iFault_Fouling_Boiler,
+	iFault_Fouling_Chiller
 	});
 
 	bool AnyFaultsInModel( false ); // True if there are operational faults in the model
@@ -213,6 +216,7 @@ namespace FaultsManager {
 	int NumFaultyTowerFouling( 0 );  // Total number of faulty Towers with Scaling
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
 	int NumFaultyBoilerFouling( 0 );  // Total number of faulty Boilers with Fouling
+	int NumFaultyChillerFouling( 0 );  // Total number of faulty Chillers with Fouling
 	
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -227,6 +231,7 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 	Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
+	Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
 
 	// Functions
 
@@ -235,14 +240,17 @@ namespace FaultsManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Tianzhen Hong
+		//       AUTHOR         Tianzhen Hong, LBNL
 		//       DATE WRITTEN   August 2013
-		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
-		//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
-		//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
-		//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
-		//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
-		//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
+		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), LBNL. Added Fouling Coil fault
+		//                      Feb. 2015, Rongpeng Zhang, LBNL. Added Thermostat/Humidistat Offset faults
+		//                      Apr. 2015, Rongpeng Zhang, LBNL. Added Fouling Air Filter fault
+		//                      May. 2016, Rongpeng Zhang, LBNL. Added Chiller/Condenser Supply Water Temperature Sensor fault 
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Added Tower Scaling fault
+		//                      Jul. 2016, Rongpeng Zhang, LBNL. Added Coil Supply Air Temperature Sensor fault
+		//                      Oct. 2016, Rongpeng Zhang, LBNL. Added Fouling Boiler fault
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
+		//                      Dec. 2016, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
 		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -328,6 +336,9 @@ namespace FaultsManager {
 			} else if( i == 14 ) {
 				// 14th fault: Faulty Boiler with Fouling
 				NumFaultyBoilerFouling = NumFaultsTemp;  
+			} else if( i == 15 ) {
+				// 14th fault: Faulty Chiller with Fouling
+				NumFaultyChillerFouling = NumFaultsTemp;  
 			}
 		}
 	
@@ -353,6 +364,7 @@ namespace FaultsManager {
 		if( NumFaultyTowerFouling > 0 ) FaultsTowerFouling.allocate( NumFaultyTowerFouling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 		if( NumFaultyBoilerFouling > 0 ) FaultsBoilerFouling.allocate( NumFaultyBoilerFouling );
+		if( NumFaultyChillerFouling > 0 ) FaultsChillerFouling.allocate( NumFaultyChillerFouling );
 		
 		
 		// read faults input of Fault_type 114: Boiler Fouling
