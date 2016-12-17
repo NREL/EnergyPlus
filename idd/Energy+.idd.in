@@ -80650,6 +80650,44 @@ FaultModel:Fouling:Boiler,
        \default 1
        \units dimensionless
 
+FaultModel:Fouling:Chiller,
+   \memo This object describes the fouling fault of chillers with water-cooled condensers
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Chiller Object Type
+       \note Enter the type of a chiller object
+       \note The fault applies to the chillers with water-cooled condensers
+       \required-field
+       \type choice
+       \key Chiller:Electric
+       \key Chiller:Electric:EIR
+       \key Chiller:Electric:ReformulatedEIR
+       \key Chiller:ConstantCOP
+       \key Chiller:EngineDriven
+       \key Chiller:CombustionTurbine
+   A5, \field Chiller Object Name
+       \note Enter the name of a chiller object
+       \required-field
+       \type object-list
+       \object-list Chillers
+   N1; \field Reference Capacity Reduction Factor
+       \note The factor indicates the decrease of the nominal capacity
+       \note It is the ratio between the nominal capacity at fouling case and that at fault free case
+       \type real
+       \minimum> 0
+       \maximum 1
+       \default 1
+       \units dimensionless
+
 FaultModel:Fouling:CoolingTower,
    \memo This object describes the fault of fouling cooling towers
    \min-fields 6
