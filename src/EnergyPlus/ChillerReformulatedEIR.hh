@@ -232,6 +232,10 @@ namespace ChillerReformulatedEIR {
 		//  INTEGER           :: MsgErrorCount = 0   ! number of occurrences of warning
 		//  INTEGER           :: ErrCount1     = 0   ! for recurring error messages
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
+		//Operational fault parameters
+		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
 
 		// Default Constructor
 		ReformulatedEIRChillerSpecs() :
@@ -333,7 +337,10 @@ namespace ChillerReformulatedEIR {
 			HRBranchNum( 0 ),
 			HRCompNum( 0 ),
 			CondMassFlowIndex( 0 ),
-			PossibleSubcooling( false )
+			PossibleSubcooling( false ),
+			FaultyChillerFoulingFlag( false ),
+			FaultyChillerFoulingIndex( 0 ),
+			FaultyChillerFoulingFactor( 1.0 )
 		{}
 	};
 

@@ -194,6 +194,10 @@ namespace PlantChillers {
 		bool CheckEquipName;
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 		int CondMassFlowIndex;
+		// Operational fault parameters
+		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
 
 		// Default Constructor
 		BaseChillerSpecs() :
@@ -234,7 +238,10 @@ namespace PlantChillers {
 			MsgErrorCount( 0 ),
 			CheckEquipName( true ),
 			PossibleSubcooling( false ),
-			CondMassFlowIndex( 0 )
+			CondMassFlowIndex( 0 ),
+			FaultyChillerFoulingFlag( false ),
+			FaultyChillerFoulingIndex( 0 ),
+			FaultyChillerFoulingFactor( 1.0 )
 		{}
 	};
 
