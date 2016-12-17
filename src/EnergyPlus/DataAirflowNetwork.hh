@@ -400,6 +400,9 @@ namespace DataAirflowNetwork {
 		int ClosingProbStatus; // Closing probability status
 		int OpeningProbStatus; // Opening probability status
 		bool RAFNflag; // True if this surface is used in AirflowNetwork:IntraZone:Linkage
+		bool NonRectangular; // True if this surface is not rectangular
+		int EquivRecMethod; // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
+		Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3 
 
 		// Default Constructor
 		MultizoneSurfaceProp() :
@@ -440,7 +443,10 @@ namespace DataAirflowNetwork {
 			OpenElapsedTime( 0.0 ),
 			ClosingProbStatus( 0 ),
 			OpeningProbStatus( 0 ),
-			RAFNflag( false )
+			RAFNflag( false ),
+			NonRectangular( false ),
+			EquivRecMethod( 1 ),
+			EquivRecUserAspectRatio( 1.0 )
 		{}
 
 	};
