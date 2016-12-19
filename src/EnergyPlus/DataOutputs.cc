@@ -103,7 +103,7 @@ namespace DataOutputs {
 
 	// Object Data
 	Array1D< OutputReportingVariables > OutputVariablesForSimulation;
-
+	std::unordered_map <std::string, int> OutputVariablesNames;
 	// Functions
 
 	// Clears the global data in DataOutputs.
@@ -121,6 +121,7 @@ namespace DataOutputs {
 		iNumberOfAutoCalcedFields = int();
 		iTotalAutoCalculatableFields = int();
 		OutputVariablesForSimulation.deallocate();
+		OutputVariablesNames.clear();
 	}
 
 	bool
@@ -133,32 +134,18 @@ namespace DataOutputs {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
+		//       MODIFIED       December 2016
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up a key and variable name value and determines if they are
 		// in the list of required variables for a simulation.
 
-		// Return value
-		bool InVariableList;
+		bool InVariableList = false;
+		int Found = 0;
+		auto const FirstIndex = OutputVariablesNames.find(VariableName);
 
-		// Locals
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int Found;
-		int Item;
-
-		InVariableList = false;
-		Found = 0;
-		for ( Item = 1; Item <= NumConsideredOutputVariables; ++Item ) {
-			if ( ! equali( VariableName, OutputVariablesForSimulation( Item ).VarName ) ) continue;
-			Found = Item;
-			break;
-		}
-		if ( Found!=0 && OutputVariablesForSimulation( Found ).VarName == "System Node Mass Flow Rate") {
-			int flag = 1;
-		}
+		if ( FirstIndex != OutputVariablesNames.end() ) Found = FirstIndex->second;
 		if ( Found != 0 ) {
 			do{
 				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
