@@ -51,7 +51,7 @@ Output variables reported by the VRF AC object include the heat pump's operating
 
 \subsubsection{Model Description}\label{model-description-015}
 
-As described previously, the VRF AC system conditions multiple zones and is controlled by one or more zone thermostats (ZoneControl:Thermostatic). Each simulation time step, EnergyPlus performs a zone air heat balance to determine if cooling or heating is required to meet each zone's thermostat set point. When heat pump mode is selected (i.e., heat recovery is not selected), an operating mode is chosen based on the master thermostat priority control and all terminal units are operated in that specific mode. When heat recovery mode is selected, the dominant load is determined based on the master thermostat priority control and the outdoor unit operates in this mode. The indoor terminal units operate in either cooling or heating mode based on the individual coil loads The heat pump condenser is then modeled to determine any impact the condensing unit might have on the zone terminal units (i.e., capacity limitations due to oversized terminal units, operating limitations due to allowable operating temperature range, impacts of defrost operation, changes in performance when heat recovery mode is active, etc.). The following sections describe the performance calculations for cooling and heating.
+As described previously, the VRF AC system conditions multiple zones and is controlled by one or more zone thermostats (ZoneControl:Thermostatic). Each simulation time step, EnergyPlus performs a zone air heat balance to determine if cooling or heating is required to meet each zone's thermostat set point. When heat pump mode is selected (i.e., heat recovery is not selected), an operating mode is chosen based on the master thermostat priority control and all terminal units are operated in that specific mode. When heat recovery mode is selected, the dominant load is determined based on the master thermostat priority control and the outdoor unit operates in this mode. The indoor terminal units operate in either cooling or heating mode based on the individual coil loads. The heat pump condenser is then modeled to determine any impact the condensing unit might have on the zone terminal units (i.e., capacity limitations due to over-sized terminal units, operating limitations due to allowable operating temperature range, impacts of defrost operation, changes in performance when heat recovery mode is active, etc.). The following sections describe the performance calculations for cooling and heating.
 
 \subsubsection{Cooling Operation}\label{cooling-operation-000}
 
@@ -209,9 +209,9 @@ where
 
 \(PLR_i\) = cooling coil sensible part-load ratio in zone \emph{i}
 
-\(SHR_{PLR}\) = cooling coil sensible heat ratio (function of PLR, inlet air wet-bulb temperature, and cooling coil inlet air mass flow rate)
+\(SHR_{PLR}\) = cooling coil sensible heat ratio (function of PLR, inlet air wet-bulb temperature, and cooling coil inlet air mass flow rate)
 
-\(\dot{m}_{i}\) = cooling coil inlet air mass flow rate [m\(^3\)/s]
+\(\dot{m}_{i}\) = cooling coil inlet air mass flow rate [m\(^3\)/s]
 
 The terminal unit total cooling (sensible + latent) capacity is then summed to provide the total terminal unit cooling requirement. The cooling coils capacity includes the impacts of fan heat and any outdoor air provided to the zone.
 
@@ -248,17 +248,17 @@ or
 
 where
 
-\({P_{\,correction,\,cooling}}\) = Piping Correction Factor in Cooling Mode
+\({P_{\,correction,\,cooling}}\) = Piping Correction Factor in Cooling Mode
 
 \emph{a -- f} = equation coefficients for piping correction factor in cooling mode
 
-\emph{g} = user specified piping correction factor for height in cooling mode coefficient
+\emph{g} = user specified piping correction factor for height in cooling mode coefficient
 
-\(P_{EQ,\,cooling}\) = user specified equivalent piping length in cooling mode [m]
+\(P_{EQ,\,cooling}\) = user specified equivalent piping length in cooling mode [m]
 
-\(CR_{cooling}\) = combination ratio in cooling mode (total rated indoor terminal unit capacity divided by the rated condenser cooling capacity) (reported to eio file)
+\(CR_{cooling}\) = combination ratio in cooling mode (total rated indoor terminal unit capacity divided by the rated condenser cooling capacity) (reported to eio file)
 
-\(P_H\) = user specified vertical height used for piping correction factor calculation [m]
+\(P_H\) = user specified vertical height used for piping correction factor calculation [m]
 
 An example piping correction factor chart is shown in the following figure. The height selected for use in the equation above is selected to minimize the piping correction factor and serves to identify the worst case piping losses.
 
@@ -282,9 +282,9 @@ The heat pump's total available cooling capacity is then calculated as:
 
 where
 
-\(\dot{Q}_{cooling,\,total}\) = total heat pump condenser cooling load (W)
+\(\dot{Q}_{cooling,\,total}\) = total heat pump condenser cooling load (W)
 
-\(\dot{Q}_{HP,\,cooling,\,total}\) = heat pump total available cooling capacity (W)
+\(\dot{Q}_{HP,\,cooling,\,total}\) = heat pump total available cooling capacity (W)
 
 \subsubsection{Heat-Recovery-Cooling-Capacity-Modifier}\label{heat-recovery-cooling-capacity-modifier}
 
@@ -302,7 +302,7 @@ This equation can be used to provide a constant fractional difference for availa
 
 where
 
-\(\dot{Q}_{HR,\,cooling,\,total}\) = heat recovery total available cooling capacity (W)
+\(\dot{Q}_{HR,\,cooling,\,total}\) = heat recovery total available cooling capacity (W)
 
 The figure below shows VRF system laboratory data for cooling only mode (solid characters) and heat recovery mode (dotted characters). Using the limited laboratory data, the available cooling capacity fraction used to model heat recovery mode is approximately 0.91 and the cooling energy fraction is approximately 1.14. This is the only data available at this time to estimate the impact of heat recovery mode on performance. In the bi-quadratic equation, only coefficient a should be used until more complete data sets exist. Laboratory testing will eventually provide more data and better estimates of performance in heat recovery mode.
 
@@ -332,11 +332,11 @@ When the heat pump changes operating modes (i.e., from cooling only to heat reco
 
 where:
 
-\(k_{cool}\) = fraction of steady-state capacity at beginning of heat recovery mode
+\(k_{cool}\) = fraction of steady-state capacity at beginning of heat recovery mode
 
-\emph{t}\(_c\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\emph{t}\(_c\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-\(Q_{HR,avail,cooling}\) = available cooling capacity in heat recovery mode (W)
+\(Q_{HR,avail,cooling}\) = available cooling capacity in heat recovery mode (W)
 
 \(\left( 1 - e^{\left( -t / t_{c,cool} \right)} \right)\) = The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: object Output:Variable).
 
@@ -346,9 +346,9 @@ The operating part-load ratio of the VRF system can then be calculated:
   PLR = \frac{\dot{Q}_{cooling,\,total}}{\dot{Q}_{HR,\,avail,\,cooling}}
 \end{equation}
 
-\(PLR\) = heat pump part-load ratio, report variable ``VRF Heat Pump Part Load Ratio''
+\(PLR\) = heat pump part-load ratio, report variable ``VRF Heat Pump Part Load Ratio''
 
-Note: for calculation purposes \(\dot{Q}_{HR,\,avail,\,cooling}\) is equivalent to \(\dot{Q}_{HR,\,cooling,\,total}\) when heat recovery mode is not active.
+Note: for calculation purposes \(\dot{Q}_{HR,\,avail,\,cooling}\) is equivalent to \(\dot{Q}_{HR,\,cooling,\,total}\) when heat recovery mode is not active.
 
 The heat pump total available cooling capacity must be greater than or equal to the total cooling capacity requested by the zone terminal units. When the total operating capacity of all terminal unit's will be greater than the available operating capacity of the heat pump condenser, one or more of the terminal unit's operating capacity must be reduced to the point where the sum of the indoor terminal unit demand request plus piping losses is equal to the total available cooling capacity of the outdoor condenser. At this point, the part-load ratio of the heat pump condenser will be equal to 1.
 
@@ -362,7 +362,7 @@ where:
 
 \(CoolingCapacityLimit(CL_{cooling})\) = Report variable (ref: Output:Variable) describing the ``VRF Heat Pump Maximum Capacity Cooling Rate'', W
 
-When multiple terminal units are operating, the terminal units near their maximum capacity are more likely to be capacity limited than those terminal units operating well below their available capacity. The assumption here is that terminal units that are not capacity limited can provide more refrigerant to meet the same load. When the model finds that there is no terminal unit capacity limit, this variable will report 1E+20 indicating that no limit exists.  The figure below demonstrates the application of the capacity limit factor for the case where all indoor terminal units are operating at different capacities. A solution is reached when the sum of the indoor terminal unit's cooling capacities (accounting for piping losses) is equal to the heat pump condenser's available cooling capacity.
+When multiple terminal units are operating, the terminal units near their maximum capacity are more likely to be capacity limited than those terminal units operating well below their available capacity. The assumption here is that terminal units that are not capacity limited can provide more refrigerant to meet the same load. When the model finds that there is no terminal unit capacity limit, this variable will report 1E+20 indicating that no limit exists.  The figure below demonstrates the application of the capacity limit factor for the case where all indoor terminal units are operating at different capacities. A solution is reached when the sum of the indoor terminal unit's cooling capacities (accounting for piping losses) is equal to the heat pump condenser's available cooling capacity.
 
 \begin{figure}[hbtp] % figure 248
 \centering
@@ -392,7 +392,7 @@ The cycling ratio can be viewed using the report variable ``VRF Heat Pump Cyclin
 
 The cooling part-load ratio correlation should be normalized to a value of 1.0 when the cycling ratio equals 1.0 (i.e., no efficiency losses when the heat pump runs continuously [PLR ≥ PLR\(_{min}\)] for the simulation time step). For cycling ratio values between 0 and 1 (0 <= CyclingRatio < 1), the following rules apply:
 
-\(CyclingRatioFrac \ge 0.7\) and \(CyclingRatioFrac \ge CyclingRatio\)
+\(CyclingRatioFrac \ge 0.7\) and \(CyclingRatioFrac \ge CyclingRatio\)
 
 If CyclingRatioFrac < 0.7 a warning message is issued, the program resets the CyclingRatioFrac value to 0.7, and the simulation proceeds. The runtime fraction of the heat pump is defined as CyclingRatio/CyclingRatioFrac. If CyclingRatioFrac < CyclingRatio, the runtime fraction will exceed 1. In this case a warning message is issued and the runtime fraction of the heat pump is limited to 1.0.
 
@@ -420,7 +420,7 @@ As described previously (Ref. Application of Dual Performance Curves), the cooli
 
 where
 
-\(EIRFT_{cooling}\) = cooling energy input ratio modifier (function of temperature)
+\(EIRFT_{cooling}\) = cooling energy input ratio modifier (function of temperature)
 
 \subsubsection{Cooling Energy Input Ratio Modifier Function of Part-Load Ratio}\label{cooling-energy-input-ratio-modifier-function-of-part-load-ratio}
 
@@ -437,7 +437,7 @@ The cooling energy input ratio calculation is based on 2 EIR curves. One is used
 
 where
 
-\(EIRFPLR_{cooling}\) = cooling energy input ratio correction factor (function of part-load ratio)
+\(EIRFPLR_{cooling}\) = cooling energy input ratio correction factor (function of part-load ratio)
 
 a-d = coefficient for cooling energy input ratio correlation when part-load ratio ≤ 1
 
@@ -463,7 +463,7 @@ P\(_{CrankcaseHeater}\) = report variable for electric consumption rate of crank
 
 P\(_{EvapCoolerPump}\) = report variable for electric consumption rate of evaporatively-cooled condenser water pump (W)
 
-\({P_{defrost}}\) = report variable for average defrost power for the simulation time step (W)
+\({P_{defrost}}\) = report variable for average defrost power for the simulation time step (W)
 
 When operating in heat recovery mode, equations similar to those used for available cooling capacity are used to model heating electric consumption rate.
 
@@ -483,11 +483,11 @@ This equation can be used to provide a constant fractional difference for coolin
   
 where:
 
-\(k_{EIR,\, copl}\) = fraction of steady-state cooling electric consumption rate at beginning of heat recovery mode
+\(k_{EIR,\, copl}\) = fraction of steady-state cooling electric consumption rate at beginning of heat recovery mode
 
-\(t_{c,EIR,\, cool}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\(t_{c,EIR,\, cool}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-\(CoolingPower_{HR}\) = cooling electric consumption rate in heat recovery mode (W)
+\(CoolingPower_{HR}\) = cooling electric consumption rate in heat recovery mode (W)
 
 \(\left( 1 - e^{\left( -t / \tau_{c,\,EIR,\,cool} \right)} \right)\) = The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
 
@@ -515,15 +515,15 @@ The heating combination ratio correction factor is defined as the total terminal
 
 where
 
-\(\dot{Q}_{coil(i),\,heating,\,rated}\) = rated total heating capacity in zone \emph{i} (W)
+\(\dot{Q}_{coil(i),\,heating,\,rated}\) = rated total heating capacity in zone \emph{i} (W)
 
-\(\dot{Q}_{heating,\,total,\,rated}\) = rated total heating capacity of heat pump (W)
+\(\dot{Q}_{heating,\,total,\,rated}\) = rated total heating capacity of heat pump (W)
 
-\(CR_{heating,\,correction}\) = Heating Combination Ratio capacity correction factor at rated conditions
+\(CR_{heating,\,correction}\) = Heating Combination Ratio capacity correction factor at rated conditions
 
 \(a - d\) = cubic equation coefficients for heating combination ratio correction factor
 
-\(CR_{heating}\) = combination ratio in heating mode (total rated indoor terminal unit capacity divided by the rated condenser heating capacity) (reported to eio file)
+\(CR_{heating}\) = combination ratio in heating mode (total rated indoor terminal unit capacity divided by the rated condenser heating capacity) (reported to eio file)
 
 \subsubsection{Heating Capacity Ratio Modifier (function of temperature)}\label{heating-capacity-ratio-modifier-function-of-temperature}
 
@@ -551,11 +551,11 @@ where
 
 \(T_{db,avg}\) = weighted-average dry-bulb temperature of the air entering all operating heating coils, °C
 
-\(CAPFT_{heating}\) = Heating Capacity Correction Factor (function of temperature)
+\(CAPFT_{heating}\) = Heating Capacity Correction Factor (function of temperature)
 
-\(a - f\)  = bi-quadratic equation coefficients
+\(a - f\)  = bi-quadratic equation coefficients
 
-\(T_c\)    = wet-bulb temperature of the air entering an air-cooled condenser, °C
+\(T_c\)    = wet-bulb temperature of the air entering an air-cooled condenser, °C
 
 The total terminal unit heating capacity required is the simple sum of the terminal unit capacity. If the heat pump is off or there is no zone heating requirement, the terminal unit total heating requirement will be zero. The heating coils capacity includes the impacts of fan heat and any outdoor air provided to the zone.
 
@@ -590,7 +590,7 @@ or
 
 where
 
-\(P_{correction,\,heating}\) = Piping Correction Factor in Heating Mode
+\(P_{correction,\,heating}\) = Piping Correction Factor in Heating Mode
 
 \emph{a-f} = equation coefficients for piping correction factor in heating mode
 
@@ -598,7 +598,7 @@ where
 
 \(P_{EQ,\,heating}\) = the equivalent piping length for heating specified by the user [m]
 
-\(P_H\) = user specified vertical height used for piping correction factor [m]
+\(P_H\) = user specified vertical height used for piping correction factor [m]
 
 The heat pump's total available heating capacity is then determined using the previously described modifiers.
 
@@ -636,9 +636,9 @@ where:
 
 \(k_{heat}\) = fraction of steady-state heating capacity at beginning of heat recovery mode
 
-\(t_{c,\, heat}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\(t_{c,\, heat}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-\(Q_{HR,avail,heating}\) = available heating capacity in heat recovery mode (W)
+\(Q_{HR,avail,heating}\) = available heating capacity in heat recovery mode (W)
 
 \(\left( 1 - e^{\left( -t / t_{c,heat} \right)} \right)\) = The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
 
@@ -668,7 +668,7 @@ The heat pump's total (gross) heating capacity is then calculated based on the c
 
 where
 
-\(\dot{Q}_{HP,\,total}\) = heat pump total available heating capacity (W)
+\(\dot{Q}_{HP,\,total}\) = heat pump total available heating capacity (W)
 
 \(PLR\) = heat pump part-load ratio
 
@@ -702,7 +702,7 @@ The cycling ratio can be viewed using the report variable ``VRF Heat Pump Cyclin
 
 The cycling ratio correlation should be normalized to a value of 1.0 when the cycling ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation time step). For cycling ratio values between 0 and 1 (0 <= CyclingRatio < 1), the following rules apply:
 
-\(CyclingRatioFrac \ge 0.7\)   and   \(CyclingRatioFrac \ge CyclingRatio\)
+\(CyclingRatioFrac \ge 0.7\)   and   \(CyclingRatioFrac \ge CyclingRatio\)
 
 If CyclingRatioFrac < 0.7 a warning message is issued, the program resets the CyclingRatioFrac value to 0.7, and the simulation proceeds. The runtime fraction of the heat pump is defined as CyclingRatio/CyclingRatioFrac. If CyclingRatioFrac < CyclingRatio, then a warning message is issued and the runtime fraction of the heat pump is limited to 1.0.
 
@@ -728,7 +728,7 @@ As described previously (Ref. Application of Dual Performance Curves), the heati
 
 where
 
-\(EIRFT_{heating}\) = heating energy input ratio correction factor (function of temperature) (0-1)
+\(EIRFT_{heating}\) = heating energy input ratio correction factor (function of temperature) (0-1)
 
 Heating Energy Input Ratio Modifier (function of part-load ratio)
 
@@ -743,7 +743,7 @@ Heating Energy Input Ratio Modifier (function of part-load ratio)
 
 where
 
-\(EIRFPLR_{heating}\) = heating energy input ratio modifier (function of part-load ratio)
+\(EIRFPLR_{heating}\) = heating energy input ratio modifier (function of part-load ratio)
 
 a-d = coefficient for heating energy input ratio modifier when part-load ratio ≤ 1
 
@@ -765,7 +765,7 @@ The heating COP is then calculated as the ratio of the outdoor unit heating capa
   COP_{heating} = \dot{Q}_{heating,total} / \left( HeatingPower + P_{CrankaseHeater} + P_{EvapCoolerPower} + P_{defrost} \right)
 \end{equation}
 
-COP\(_{heating}\) = operating coefficient of performance, report variable ``VRF Heat Pump Heating COP''
+COP\(_{heating}\) = operating coefficient of performance, report variable ``VRF Heat Pump Heating COP''
 
 HeatingPower = operating electric consumption rate, [W], report variable ``VRF Heat Pump Heating Electric Power''
 
@@ -787,11 +787,11 @@ This equation can be used to provide a constant fractional difference for heatin
 
 where:
 
-\(k_{EIR,\,heat}\) = fraction of steady-state heating electric consumption rate at beginning of heat recovery mode
+\(k_{EIR,\,heat}\) = fraction of steady-state heating electric consumption rate at beginning of heat recovery mode
 
-\(\tau_{c,\,EIR,\,heat}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
+\(\tau_{c,\,EIR,\,heat}\) = time constant to reach steady-state operation, 5 time constants equals 99\% of steady-state capacity (hr)
 
-HeatingPower\(_{HR}\) = heating electric consumption rate in heat recovery mode (W)
+HeatingPower\(_{HR}\) = heating electric consumption rate in heat recovery mode (W)
 
 \(\left( 1 - e^{\left( -t / \tau_{c,\,EIR,\,heat} \right)} \right)\) = The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable ``VRF Heat Pump Heat Recovery Status Change Multiplier'' (ref: Output:Variable).
 
@@ -827,7 +827,7 @@ The difference between the outdoor air humidity ratio (from the weather file) an
   \Delta \omega_{coil,out} = MAX \left[ 1.0E - 6, \omega_{outdoor} - \omega_{sat} \left( T_{coil,out},OutBaroPress \right) \right]
 \end{equation}
 
-Frost formation on the outdoor coil must be periodically removed. The fraction of compressor runtime when the coil is being defrosted is entered by the user. Adjustment factors to total heating coil capacity and input power due to frost formation on the outdoor coil are calculated by an empirical model with \(\Delta \omega_{coil,out}\) as the independent variable as shown below.
+Frost formation on the outdoor coil must be periodically removed. The fraction of compressor runtime when the coil is being defrosted is entered by the user. Adjustment factors to total heating coil capacity and input power due to frost formation on the outdoor coil are calculated by an empirical model with \(\Delta \omega_{coil,out}\) as the independent variable as shown below.
 
 \begin{equation}
   HCAP_{defrost} = 0.909 - 107.33 \left( \Delta w_{coil,\,out} \right)
@@ -853,11 +853,11 @@ If the fractional defrost time period is greater than zero for the simulation ti
 
 where:
 
-\(Q_{defrost}\) = additional indoor heating load due to reverse-cycle defrost (W)
+\(Q_{defrost}\) = additional indoor heating load due to reverse-cycle defrost (W)
 
 \(Q_{total,rated}\) = total full-load heating capacity of the coil at rated conditions (W)
 
-\(P_{defrost}\) = report variable for average defrost power for the simulation time step (W)
+\(P_{defrost}\) = report variable for average defrost power for the simulation time step (W)
 
 \emph{DefrostEIRTempModFac} = energy input ratio modifier curve applicable during defrost
 
