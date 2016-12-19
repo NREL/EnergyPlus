@@ -1949,7 +1949,7 @@ namespace OutputReportTabular {
 					WriteTabularFiles = true;
 					nameFound = true;
 				} else if (SameString(AlphArray(iReport), "EIO")) {
-					WriteTabularFiles = true;
+					displayEioSummary = true;
 					nameFound = true;
 				} else if (SameString(AlphArray(iReport), "InitializationSummary")) {
 					displayEioSummary = true;
@@ -10949,7 +10949,7 @@ namespace OutputReportTabular {
 	// function that returns a vector of strings when given a string with comma delimitters
 	// Glazer Nov 2016
 	std::vector<std::string>
-	splitCommaString(std::string inputString) 
+	splitCommaString(std::string const & inputString) 
 	{
 		std::vector<std::string> fields;
 		std::string field;
@@ -14357,7 +14357,7 @@ Label900: ;
 	}
 
 	bool 
-	isNumber(std::string s)
+	isNumber(std::string const & s)
 	{
 		bool is = true;
 		try {

@@ -781,7 +781,7 @@ namespace OutputReportTabular {
 	unitsFromHeading(std::string & heading);
 
 	std::vector<std::string>
-	splitCommaString(std::string inputString);
+	splitCommaString(std::string const & inputString);
 	
 	void
 	AddTOCZoneLoadComponentTable();
@@ -951,7 +951,7 @@ namespace OutputReportTabular {
 	DateToString( int const codedDate ); // word containing encoded month, day, hour, minute
 
 	bool
-	isNumber(std::string s);
+	isNumber(std::string const & s);
 
 	int
 	digitsAferDecimal(std::string s);
