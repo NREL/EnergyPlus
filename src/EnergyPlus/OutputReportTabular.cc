@@ -14359,13 +14359,10 @@ Label900: ;
 	bool 
 	isNumber(std::string const & s)
 	{
-		bool is = true;
-		try {
-			std::stof(s);
-		} catch ( std::exception & e ) {
-			is = false;
-		}
-		return is;
+		char* p;
+		strtod(s.c_str(), &p);
+		for (; isspace(*p); ++p); // handle trailing whitespace
+		return *p == 0;
 	}
 
 	// return the number of digits after the decimal point
