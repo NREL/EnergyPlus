@@ -64596,8 +64596,40 @@ CoolingTower:SingleSpeed,
        \default 0.1
        \minimum> 0.0
        \maximum< 1.0
-       \note This field is only used if the previous field is set to autocalculate
-  N13, \field Basin Heater Capacity
+       \note This field is only used if the previous field is set to autocalculate 
+  N13, \field Design Inlet Air Dry-Bulb Temperature
+       \type real
+       \units C
+       \default 35.0
+       \minimum 20.0
+       \note Enter the tower's design inlet air dry-bulb temperature
+  N14, \field Design Inlet Air Wet-Bulb Temperature
+       \type real
+       \units C
+       \default 25.6
+       \minimum 20.0
+       \note Enter the tower's design inlet air wet-bulb temperature
+  N15, \field Design Approach Temperature
+       \type real
+       \units deltaC
+       \autosizable
+       \default autosize   
+       \minimum> 0
+       \note Enter the approach temperature corresponding to the design inlet air
+       \note wet-bulb temperature and design range temperature.
+       \note Design approach temp = outlet water temperature minus inlet air wet-bulb temperature
+       \note at design conditions. Autosized to 3.9 deltaC.
+  N16, \field Design Range Temperature
+       \type real
+       \units deltaC
+       \autosizable
+       \default autosize 
+       \minimum> 0
+       \note Enter the range temperature corresponding to the design inlet air
+       \note wet-bulb temperature and design approach temperature.
+       \note Design range = inlet water temperature minus outlet water temperature
+       \note at design conditions. Autosized to 5.6 deltaC.
+  N17, \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -64605,7 +64637,7 @@ CoolingTower:SingleSpeed,
        \note This heater maintains the basin water temperature at the basin heater setpoint
        \note temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when water is not flowing through the tower.
-  N14, \field Basin Heater Setpoint Temperature
+  N18, \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -64622,7 +64654,7 @@ CoolingTower:SingleSpeed,
        \type choice
        \key LossFactor
        \key SaturatedExit
-  N15, \field Evaporation Loss Factor
+  N19, \field Evaporation Loss Factor
        \type real
        \units percent/K
        \note Rate of water evaporation from the cooling tower and lost to the outdoor air [%/K]
@@ -64630,7 +64662,7 @@ CoolingTower:SingleSpeed,
        \note Value entered here is percent-per-degree K of temperature drop in the condenser water
        \note Typical values are from 0.15 to 0.27 [%/K].
        \default 0.2
-  N16, \field Drift Loss Percent
+  N20, \field Drift Loss Percent
        \type real
        \default 0.008
        \units percent
@@ -64640,7 +64672,7 @@ CoolingTower:SingleSpeed,
        \type choice
        \key ConcentrationRatio
        \key ScheduledRate
-  N17, \field Blowdown Concentration Ratio
+  N21, \field Blowdown Concentration Ratio
        \type real
        \minimum 2.0
        \default 3.0
@@ -64667,7 +64699,7 @@ CoolingTower:SingleSpeed,
        \key FanCycling
        \key FluidBypass
        \default FanCycling
-  N18, \field Number of Cells
+  N22, \field Number of Cells
        \type integer
        \minimum 1
        \default 1
@@ -64676,18 +64708,18 @@ CoolingTower:SingleSpeed,
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
-  N19, \field Cell Minimum  Water Flow Rate Fraction
+  N23, \field Cell Minimum  Water Flow Rate Fraction
        \type real
        \minimum> 0.0
        \maximum 1.0
        \default 0.33
        \note The allowable minimal fraction of the nominal flow rate per cell
-  N20, \field Cell Maximum Water Flow Rate Fraction
+  N24, \field Cell Maximum Water Flow Rate Fraction
        \type real
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N21; \field Sizing Factor
+  N25; \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
@@ -64868,7 +64900,39 @@ CoolingTower:TwoSpeed,
        \minimum> 0.0
        \maximum< 1.0
        \note This field is only used if the previous field is set to autocalculate
-  N21, \field Basin Heater Capacity
+  N21, \field Design Inlet Air Dry-Bulb Temperature
+       \type real
+       \units C
+       \default 35.0
+       \minimum 20.0
+       \note Enter the tower's design inlet air dry-bulb temperature
+  N22, \field Design Inlet Air Wet-Bulb Temperature
+       \type real
+       \units C
+       \default 25.6
+       \minimum 20.0
+       \note Enter the tower's design inlet air wet-bulb temperature
+  N23, \field Design Approach Temperature
+       \type real
+       \units deltaC
+       \autosizable
+       \default autosize 
+       \minimum> 0
+       \note Enter the approach temperature corresponding to the design inlet air
+       \note wet-bulb temperature and design range temperature.
+       \note Design approach temp = outlet water temperature minus inlet air wet-bulb temperature
+       \note at design conditions. Autosized to 3.9 deltaC.
+  N24, \field Design Range Temperature
+       \type real
+       \units deltaC
+       \autosizable
+       \default autosize 
+       \minimum> 0
+       \note Enter the range temperature corresponding to the design inlet air
+       \note wet-bulb temperature and design approach temperature.
+       \note Design range = inlet water temperature minus outlet water temperature
+       \note at design conditions. Autosized to 5.6 deltaC. 
+  N25, \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -64876,7 +64940,7 @@ CoolingTower:TwoSpeed,
        \note This heater maintains the basin water temperature at the basin heater setpoint
        \note temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when water is not flowing through the tower.
-  N22, \field Basin Heater Setpoint Temperature
+  N26, \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -64893,7 +64957,7 @@ CoolingTower:TwoSpeed,
        \type choice
        \key LossFactor
        \key SaturatedExit
-  N23, \field Evaporation Loss Factor
+  N27, \field Evaporation Loss Factor
        \type real
        \units percent/K
        \note Rate of water evaporated from the cooling tower and lost to the outdoor air [%/K]
@@ -64901,7 +64965,7 @@ CoolingTower:TwoSpeed,
        \note Value entered here is percent-per-degree K of temperature drop in the condenser water
        \note Typical values are from 0.15 to 0.27 [%/K].
        \default 0.2
-  N24, \field Drift Loss Percent
+  N28, \field Drift Loss Percent
        \type real
        \units percent
        \default 0.008
@@ -64911,7 +64975,7 @@ CoolingTower:TwoSpeed,
        \type choice
        \key ConcentrationRatio
        \key ScheduledRate
-  N25, \field Blowdown Concentration Ratio
+  N29, \field Blowdown Concentration Ratio
        \type real
        \minimum 2.0
        \default 3.0
@@ -64933,7 +64997,7 @@ CoolingTower:TwoSpeed,
   A10 , \field Outdoor Air Inlet Node Name
        \type node
        \note Enter the name of an outdoor air node
-  N26, \field Number of Cells
+  N30, \field Number of Cells
        \type integer
        \minimum 1
        \default 1
@@ -64942,18 +65006,18 @@ CoolingTower:TwoSpeed,
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
-  N27, \field Cell Minimum  Water Flow Rate Fraction
+  N31, \field Cell Minimum  Water Flow Rate Fraction
        \type real
        \minimum> 0.0
        \maximum 1.0
        \default 0.33
        \note The allowable minimal fraction of the nominal flow rate per cell
-  N28, \field Cell Maximum Water Flow Rate Fraction
+  N32, \field Cell Maximum Water Flow Rate Fraction
        \type real
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N29; \field Sizing Factor
+  N33; \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
@@ -65142,7 +65206,39 @@ CoolingTower:VariableSpeed:Merkel,
        \note cubic curve = a + b*WFR + c*WFR**2 + d*WFR**3
        \note quartic curve = a + b*WFR + c*WFR**2 + d*WFR**3 + e*WFR**4
        \note x = WFR = Ratio of current operating water flow rate to Design Water Flow Rate
-  N17, \field Basin Heater Capacity
+  N17, \field Design Inlet Air Dry-Bulb Temperature
+       \type real
+       \units C
+       \default 35.0
+       \minimum 20.0
+       \note Enter the tower's design inlet air dry-bulb temperature
+  N18, \field Design Inlet Air Wet-Bulb Temperature
+       \type real
+       \units C
+       \default 25.6
+       \minimum 20.0
+       \note Enter the tower's design inlet air wet-bulb temperature
+  N19, \field Design Approach Temperature
+       \type real
+       \units deltaC
+       \autosizable
+       \default autosize
+       \minimum> 0
+       \note Enter the approach temperature corresponding to the design inlet air
+       \note wet-bulb temperature and design range temperature.
+       \note Design approach temp = outlet water temperature minus inlet air wet-bulb temperature
+       \note at design conditions. Autosized to 3.9 deltaC.
+  N20, \field Design Range Temperature
+       \type real
+       \units deltaC
+       \autosizable
+       \default autosize
+       \minimum> 0
+       \note Enter the range temperature corresponding to the design inlet air
+       \note wet-bulb temperature and design approach temperature.
+       \note Design range = inlet water temperature minus outlet water temperature
+       \note at design conditions. Autosized to 3.9 deltaC.
+  N21, \field Basin Heater Capacity
        \type real
        \units W/K
        \minimum 0.0
@@ -65150,7 +65246,7 @@ CoolingTower:VariableSpeed:Merkel,
        \note This heater maintains the basin water temperature at the basin heater setpoint
        \note temperature when the outdoor air temperature falls below the setpoint temperature.
        \note The basin heater only operates when water is not flowing through the tower.
-  N18, \field Basin Heater Setpoint Temperature
+  N22, \field Basin Heater Setpoint Temperature
        \type real
        \units C
        \minimum 2.0
@@ -65167,7 +65263,7 @@ CoolingTower:VariableSpeed:Merkel,
        \type choice
        \key LossFactor
        \key SaturatedExit
-  N19, \field Evaporation Loss Factor
+  N23, \field Evaporation Loss Factor
        \type real
        \units percent/K
        \note Rate of water evaporated from the cooling tower and lost to the outdoor air [%/K]
@@ -65175,7 +65271,7 @@ CoolingTower:VariableSpeed:Merkel,
        \note Value entered here is percent-per-degree K of temperature drop in the condenser water
        \note Typical values are from 0.15 to 0.27 [%/K].
        \default 0.2
-  N20, \field Drift Loss Percent
+  N24, \field Drift Loss Percent
        \type real
        \units percent
        \default 0.008
@@ -65185,7 +65281,7 @@ CoolingTower:VariableSpeed:Merkel,
        \type choice
        \key ConcentrationRatio
        \key ScheduledRate
-  N21, \field Blowdown Concentration Ratio
+  N25, \field Blowdown Concentration Ratio
        \type real
        \minimum 2.0
        \default 3.0
@@ -65207,7 +65303,7 @@ CoolingTower:VariableSpeed:Merkel,
   A14, \field Outdoor Air Inlet Node Name
        \type node
        \note Enter the name of an outdoor air node
-  N22, \field Number of Cells
+  N26, \field Number of Cells
        \type integer
        \minimum 1
        \default 1
@@ -65216,18 +65312,18 @@ CoolingTower:VariableSpeed:Merkel,
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
-  N23, \field Cell Minimum  Water Flow Rate Fraction
+  N27, \field Cell Minimum  Water Flow Rate Fraction
        \type real
        \minimum> 0.0
        \maximum 1.0
        \default 0.33
        \note The allowable minimal fraction of the nominal flow rate per cell
-  N24, \field Cell Maximum Water Flow Rate Fraction
+  N28, \field Cell Maximum Water Flow Rate Fraction
        \type real
        \minimum 1
        \default 2.5
        \note The allowable maximal fraction of the nominal flow rate per cell
-  N25; \field Sizing Factor
+  N29; \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0

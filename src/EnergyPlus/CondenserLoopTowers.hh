@@ -273,7 +273,13 @@ namespace CondenserLoopTowers {
 		bool SetpointIsOnOutlet; // if true look to outlet node of tower, if flase look to overall loop setpoint
 		int VSMerkelAFRErrorIter; // error counter for regula falsi failed with max iterations, vs merkel model
 		int VSMerkelAFRErrorFail; // error counter for regula falsi failed with limits exceeded, vs merkel model
-
+		Real64 DesInletWaterTemp; // design tower inlet water temperature (C)
+		Real64 DesOutletWaterTemp; // design tower outlet water temperature (C)
+		Real64 DesInletAirDBTemp; // design tower inlet air dry-bulb temperature (C)
+		Real64 DesInletAirWBTemp; // design tower outlet air wet-bulb temperature (C)
+		Real64 DesApproach; // design tower approach temperature (deltaC)
+		Real64 DesRange; // design tower range temperature (deltaC)
+		bool TowerInletCondsAutoSize; // true if tower inlet condition is autosized or defaulted to autosize
 		// Default Constructor
 		Towerspecs() :
 			TowerType_Num( 0 ),
@@ -375,7 +381,14 @@ namespace CondenserLoopTowers {
 			UAModFuncWaterFlowRatioCurvePtr( 0 ),
 			SetpointIsOnOutlet( false ),
 			VSMerkelAFRErrorIter( 0 ),
-			VSMerkelAFRErrorFail( 0 )
+			VSMerkelAFRErrorFail( 0 ),
+			DesInletWaterTemp( 0 ),
+			DesOutletWaterTemp( 0 ),
+			DesInletAirDBTemp( 0 ),
+			DesInletAirWBTemp( 0 ),
+			DesApproach( 0 ),
+			DesRange( 0 ),
+			TowerInletCondsAutoSize( false )
 		{}
 	};
 
