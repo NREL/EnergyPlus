@@ -8469,11 +8469,16 @@ namespace SurfaceGeometry {
 				Surface( ThisSurf ).Width = ThisWidth;
 				Surface( ThisSurf ).Height = ThisHeight;
 
-				// Test for rectangularity
+				// Processing of 4-sided but non-rectangular Window, Door or GlassDoor, for use in calc of convective air flow.
 				if ( ! isRectangle( ThisSurf ) ) {
-					ShowSevereError( RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:" );
-					ShowContinueError( "Surface=" + Surface( ThisSurf ).Name );
-					ErrorInSurface = true;
+
+					// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio. 
+					MakeEquivalentRectangle( ThisSurf, ErrorsFound );
+
+					if( DisplayExtraWarnings ){
+						ShowWarningError( RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:" );
+						ShowContinueError( "Surface=" + Surface( ThisSurf ).Name + " is transformed into an equivalent rectangular surface with the same area and aspect ratio. ");
+					}
 				}
 
 				Xpsv( 1 ) = XLLC;
@@ -10575,6 +10580,118 @@ namespace SurfaceGeometry {
 
 	}
 
+	void
+	MakeEquivalentRectangle(
+		int const SurfNum, // Surface number
+		bool & ErrorsFound // Error flag indicator (true if errors found)
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         R. Zhang, LBNL
+		//       DATE WRITTEN   September 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Processing of 4-sided but non-rectangular Window, Door or GlassDoor.
+		// Calculate the effective height and width of the surface.
+		// 
+		// METHODOLOGY EMPLOYED:
+		// Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static Real64 BaseCosAzimuth;
+		static Real64 BaseCosTilt;
+		static Real64 BaseSinAzimuth;
+		static Real64 BaseSinTilt;
+		static Real64 SurfWorldAz;
+		static Real64 SurfTilt;
+		Real64 AspectRatio; // Aspect ratio
+		Real64 NumSurfSides; // Number of surface sides
+		Real64 WidthEff; // Effective width of the surface
+		Real64 WidthMax; // X difference between the vertex on the most left and the one on the most right
+		Real64 HeightEff; // Effective height of the surface
+		Real64 HeightMax; // Y difference between the lowest and toppest vertices
+		Real64 Xp;
+		Real64 Yp;
+		Real64 Zp;
+		Real64 XLLC;
+		Real64 YLLC;
+		Real64 ZLLC;
+		
+		if( SurfNum == 0 ){ 
+		// invalid surface 
+			ErrorsFound = true;
+			return; 
+		} else if( Surface( SurfNum ).Sides != 4 ){
+		// the method is designed for 4-sided surface 
+			return; 
+		} else if( isRectangle( SurfNum )){
+		// no need to transform
+			return;  
+		}
+		
+		SurfWorldAz = Surface( SurfNum ).Azimuth;
+		SurfTilt = Surface( SurfNum ).Tilt;
+		BaseCosAzimuth = std::cos( SurfWorldAz * DegToRadians );
+		BaseSinAzimuth = std::sin( SurfWorldAz * DegToRadians );
+		BaseCosTilt = std::cos( SurfTilt * DegToRadians );
+		BaseSinTilt = std::sin( SurfTilt * DegToRadians );
+		NumSurfSides = Surface( SurfNum ).Sides;
+
+		// Calculate WidthMax and HeightMax
+		WidthMax = 0.0;
+		HeightMax = 0.0;
+		for ( int i = 1; i < NumSurfSides; ++i ) {
+			for ( int j = i + 1; j <= NumSurfSides; ++j ) {
+			
+				Xp = Surface( SurfNum ).Vertex( j ).x - Surface( SurfNum ).Vertex( i ).x ;
+				Yp = Surface( SurfNum ).Vertex( j ).y - Surface( SurfNum ).Vertex( i ).y ;
+				Zp = Surface( SurfNum ).Vertex( j ).z - Surface( SurfNum ).Vertex( i ).z ;
+				
+				XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
+				YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
+				ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
+			
+				if( std::abs( XLLC ) > WidthMax ) WidthMax = std::abs( XLLC );
+				if( std::abs( YLLC ) > WidthMax ) HeightMax = std::abs( YLLC );
+			
+			}
+		}
+		
+		// Perform transformation by calculating WidthEff and HeightEff 
+		if(( WidthMax > 0 ) && ( HeightMax > 0 )){
+			AspectRatio = WidthMax / HeightMax;
+		} else {
+			AspectRatio = 1;
+		}
+		WidthEff = std::sqrt( Surface( SurfNum ).Area * AspectRatio );
+		HeightEff = std::sqrt( Surface( SurfNum ).Area / AspectRatio );
+		
+		// Assign the effective width and length to the surface
+		Surface( SurfNum ).Width = WidthEff;
+		Surface( SurfNum ).Height = HeightEff;
+
+	}
+	
 } // SurfaceGeometry
 
 } // EnergyPlus
