@@ -4745,6 +4745,8 @@ namespace SingleDuct {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 5;
 			} else if ( cAlphaArgs( 2 ) == "AIRLOOP:UNITARYSYSTEM" ) {
 				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 6;
+			} else if ( cAlphaArgs( 2 ) == "ZONEHVAC:UNITVENTILATOR") {
+				SysATMixer( ATMixerNum ).ZoneHVACUnitType = 7;
 			}
 
 			SysATMixer( ATMixerNum ).ZoneHVACUnitName = cAlphaArgs( 3 );

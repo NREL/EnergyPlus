@@ -1,6 +1,7 @@
 NFP – Dedicated OA to supply and inlet side of zone HVAC units
 
-FSEC, B. Nigusse, December 6, 2016
+FSEC, B. Nigusse, December 6, 2016, initial NFP
+FSEC, B. Nigusse, December 22, 2016, Final NFP
 
 
 #Justification for Feature Update:
@@ -28,7 +29,7 @@ The arrangements shown in Figure 1 is supported in EnergyPlus version 8.6 for th
  
 A central DOAS provides fresh air to the zone mixed either at the inlet or outlet of a local zoneHVAC equipment that conditions the recirculation air.
 
-![Figure 1 Air Terminal OA Mixer at inlet and supply side of each zoneHVAC equipment](DOAStoZoneHVACEquipment.png)
+![Figure 1 Air Terminal OA Mixer at inlet and supply side of each zoneHVAC equipment](DOAToZoneHVACEquipment.png)
 
 To allow for this configuration, the terminal unit mixer existing objects, *AirTerminal:SingleDuct:Mixer* is used. The proposed task will add such capability to **ZoneHVAC:UnitVentilator** zoneHVAC equipment.
 
@@ -39,7 +40,7 @@ The *AirTerminal:SingleDuct:Mixer* object provides the zoneHVAC equipment object
 
 - Currently supported outdoor air control types for unit ventilator are: FixedAmount, VariablePercent and FixedTemperature. These Outdoor Air Control Types require the minimum and maximum outdoor air flow rates and the corresponding schedule input fields to work. The three outdoor air flow control types will be available when the unit ventilator is connected to DOA.
  
-- Input fields: *Outdoor Air Node Name*, *Exhaust Air Node Name*, and *Mixed Air Node Name* in **ZoneHVAC:UnitVentilator** object are the node names that are used for *built-in* outdoor air mixer. These three node names are not required if the UnitVentilator object is connected to DOA. Therefore, the required field restriction need to be removed. Eventually it is recommended to replace the "built-in" outdoor air mixer with a OutdoorAir:Mixer child object as it is done for other ZoneHVAC equipment.
+- Input fields: *Outdoor Air Node Name*, *Exhaust Air Node Name*, and *Mixed Air Node Name* in **ZoneHVAC:UnitVentilator** object are the node names that are required for *built-in* outdoor air mixer only. These three node names are not required if the UnitVentilator object is connected to DOA. Therefore, the required field restriction will be removed. The IDD will be modified to remove the restriction and appropriate note will be added for each of the three input fields. Eventually it is recommended to replace the "built-in" outdoor air mixer with a OutdoorAir:Mixer child object as it is done for other ZoneHVAC equipment.
 
 
 ###Testing/Validation/Data Source(s):

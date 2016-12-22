@@ -33626,15 +33626,18 @@ ZoneHVAC:UnitVentilator,
         \required-field
         \type node
    A8,  \field Outdoor Air Node Name
-        \required-field
         \type node
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A9,  \field Exhaust Air Node Name
-        \required-field
         \type node
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A10, \field Mixed Air Node Name
-        \required-field
         \type node
         \note inlet to coils
+        \note this field is left blank only if the Unit Ventilator is connected to a central
+        \note dedicated outdoor air (DOA) via AirTerminal:SingleDuct:Mixer object
    A11, \field Supply Air Fan Object Type
         \required-field
         \type choice
@@ -40503,6 +40506,7 @@ AirTerminal:SingleDuct:Mixer,
        \key ZoneHVAC:PackagedTerminalAirConditioner
        \key ZoneHVAC:PackagedTerminalHeatPump
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+       \key ZoneHVAC:UnitVentilator 
        \key AirLoopHVAC:UnitarySystem
        \note The type of ZoneHVAC equipment to which this terminal mixer will be connected.
    A3, \field ZoneHVAC Unit Object Name
