@@ -3308,7 +3308,7 @@ namespace HeatBalanceManager {
 			// wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
 			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, SpecDataNames, SpecDataNumAlpha, SpecDataProps, SpecDataNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			if ( InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
+			if ( InputProcessor::IsNameEmpty(SpecDataNames( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
 
 			//Load the spectral data derived type from the input data.
 			SpectralData( Loop ).Name = SpecDataNames( 1 );
