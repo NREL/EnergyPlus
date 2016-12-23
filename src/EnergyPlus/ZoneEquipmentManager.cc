@@ -2535,6 +2535,11 @@ namespace ZoneEquipmentManager {
 							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 							if ( TimeStepIndex == CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax ) {
 								gio::write( HrMinString, PeakHrMinFmt ) << HourPrint << Minutes;
+								// testing only
+								int tMinOfDay = CalcFinalZoneSizing (CtrlZoneNum).TimeStepNumAtHeatMax * MinutesPerTimeStep;
+								int tHr = int(tMinOfDay/60.);
+								int tMin = tMinOfDay - tHr * 60;
+								// testing only
 								HeatPeakDateHrMin( CtrlZoneNum ) = CalcFinalZoneSizing( CtrlZoneNum ).cHeatDDDate + ' ' + HrMinString;
 							}
 							if ( TimeStepIndex == CalcFinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax ) {

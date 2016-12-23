@@ -3902,9 +3902,11 @@ namespace SimAirServingZones {
 			SysSizPeakDDNum( AirLoopNum ).TimeStepAtSensCoolPk.allocate( TotDesDays + TotRunDesPersDays );
 			SysSizPeakDDNum( AirLoopNum ).TimeStepAtTotCoolPk.allocate( TotDesDays + TotRunDesPersDays );
 			SysSizPeakDDNum( AirLoopNum ).TimeStepAtCoolFlowPk.allocate( TotDesDays + TotRunDesPersDays );
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk.allocate (TotDesDays + TotRunDesPersDays);
 			SysSizPeakDDNum( AirLoopNum ).TimeStepAtSensCoolPk = 0;
 			SysSizPeakDDNum( AirLoopNum ).TimeStepAtTotCoolPk = 0;
 			SysSizPeakDDNum( AirLoopNum ).TimeStepAtCoolFlowPk = 0;
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk = 0;
 
 			if ( AnyEnergyManagementSystemInModel ) {
 
@@ -4871,6 +4873,7 @@ namespace SimAirServingZones {
 
 					// Get the maximum system heating capacity
 					if ( SysHeatCap > SysSizing( CurOverallSimDay, AirLoopNum ).HeatCap ) {
+						SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk (CurOverallSimDay) = TimeStepInDay;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatCap = SysHeatCap;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatMixTemp = SysHeatMixTemp;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatMixHumRat = SysHeatMixHumRat;
@@ -4921,6 +4924,7 @@ namespace SimAirServingZones {
 
 					// Get the maximum system heating capacity
 					if ( SysHeatCap > SysSizing( CurOverallSimDay, AirLoopNum ).HeatCap ) {
+						SysSizPeakDDNum (AirLoopNum).TimeStepAtHeatPk (CurOverallSimDay) = TimeStepInDay;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatCap = SysHeatCap;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatMixTemp = SysHeatMixTemp;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatMixHumRat = SysHeatMixHumRat;
@@ -5502,6 +5506,7 @@ namespace SimAirServingZones {
 
 					if ( SysSizing( DDNum, AirLoopNum ).SensCoolCap > SensCoolCapTemp( AirLoopNum ) ) {
 						SysSizPeakDDNum( AirLoopNum ).SensCoolPeakDD = DDNum;
+						SysSizPeakDDNum( AirLoopNum ).cSensCoolPeakDDDate = DesDayWeath( DDNum ).DateString;
 						SensCoolCapTemp( AirLoopNum ) = SysSizing( DDNum, AirLoopNum ).SensCoolCap;
 						if ( SysSizing( DDNum, AirLoopNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
 							CalcSysSizing( AirLoopNum ).DesCoolVolFlow = SysSizing( DDNum, AirLoopNum ).DesCoolVolFlow;
@@ -5530,6 +5535,7 @@ namespace SimAirServingZones {
 
 					if ( SysSizing( DDNum, AirLoopNum ).TotCoolCap > TotCoolCapTemp( AirLoopNum ) ) {
 						SysSizPeakDDNum( AirLoopNum ).TotCoolPeakDD = DDNum;
+						SysSizPeakDDNum (AirLoopNum).cTotCoolPeakDDDate = DesDayWeath( DDNum ).DateString;
 						TotCoolCapTemp( AirLoopNum ) = SysSizing( DDNum, AirLoopNum ).TotCoolCap;
 						if ( SysSizing( DDNum, AirLoopNum ).CoolingPeakLoadType == TotalCoolingLoad ) {
 							CalcSysSizing( AirLoopNum ).DesCoolVolFlow = SysSizing( DDNum, AirLoopNum ).DesCoolVolFlow;
@@ -5559,9 +5565,12 @@ namespace SimAirServingZones {
 					if ( SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow > CalcSysSizing( AirLoopNum ).CoinCoolMassFlow ) {
 						CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
 						SysSizPeakDDNum( AirLoopNum ).CoolFlowPeakDD = DDNum;
+						SysSizPeakDDNum( AirLoopNum ).cCoolFlowPeakDDDate = DesDayWeath (DDNum).DateString;
 					}
 
 					if ( SysSizing( DDNum, AirLoopNum ).HeatCap > CalcSysSizing( AirLoopNum ).HeatCap ) {
+						SysSizPeakDDNum( AirLoopNum ).HeatPeakDD = DDNum;
+						SysSizPeakDDNum( AirLoopNum ).cHeatPeakDDDate = DesDayWeath (DDNum).DateString;
 						CalcSysSizing( AirLoopNum ).DesHeatVolFlow = SysSizing( DDNum, AirLoopNum ).DesHeatVolFlow;
 						CalcSysSizing( AirLoopNum ).HeatDesDay = SysSizing( DDNum, AirLoopNum ).HeatDesDay;
 						CalcSysSizing( AirLoopNum ).CoinHeatMassFlow = SysSizing( DDNum, AirLoopNum ).CoinHeatMassFlow;

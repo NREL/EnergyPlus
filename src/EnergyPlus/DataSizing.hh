@@ -1126,17 +1126,24 @@ namespace DataSizing {
 	{
 		// Members
 		int SensCoolPeakDD; // design day containing the sensible cooling peak
+		std::string cSensCoolPeakDDDate; // date string of design day causing sensible cooling peak
 		int TotCoolPeakDD; // design day containing total cooling peak
+		std::string cTotCoolPeakDDDate; // date string of design day causing total cooling peak
 		int CoolFlowPeakDD; // design day containing the cooling air flow peak
+		std::string cCoolFlowPeakDDDate; // date string of design day causing cooling air flow peak
+		int HeatPeakDD; // design day containing the heating peak
+		std::string cHeatPeakDDDate; // date string of design day causing heating peak
 		Array1D< int > TimeStepAtSensCoolPk; // time step of the sensible cooling peak
 		Array1D< int > TimeStepAtTotCoolPk; // time step of the total cooling peak
 		Array1D< int > TimeStepAtCoolFlowPk; // time step of the cooling air flow peak
+		Array1D< int > TimeStepAtHeatPk; // time step of the heating peak
 
 		// Default Constructor
 		SysSizPeakDDNumData() :
 			SensCoolPeakDD( 0 ),
 			TotCoolPeakDD( 0 ),
-			CoolFlowPeakDD( 0 )
+			CoolFlowPeakDD( 0 ),
+			HeatPeakDD( 0 )
 		{}
 
 	};
