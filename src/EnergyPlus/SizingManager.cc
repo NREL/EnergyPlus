@@ -714,21 +714,23 @@ namespace SizingManager {
 		if ( SysSizingRunDone ) {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				curName = FinalSysSizing( AirLoopNum ).AirPriLoopName;
-				ReportSysSizing( curName, "Calculated Cooling Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
+				//ReportSysSizing( curName, "Calculated Cooling Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				PreDefTableEntry( pdchSysSizCalcClAir, curName, CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesCoolVolFlow ) <= 1.e-8 ) {
 					ShowWarningError( RoutineName + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
-				ReportSysSizing( curName, "User Cooling Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
+				//ReportSysSizing( curName, "User Cooling Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
 				PreDefTableEntry( pdchSysSizUserClAir, curName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
-				ReportSysSizing( curName, "Calculated Heating Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
+				//ReportSysSizing( curName, "Calculated Heating Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				PreDefTableEntry( pdchSysSizCalcHtAir, curName, CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesHeatVolFlow ) <= 1.e-8 ) {
 					ShowWarningError( RoutineName + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
-				ReportSysSizing( curName, "User Heating Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
+				//ReportSysSizing( curName, "User Heating Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
+
+				ReportSysSizing( curName, CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
 				PreDefTableEntry( pdchSysSizUserHtAir, curName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
 			}
 			// Deallocate arrays no longer needed
@@ -2798,63 +2800,33 @@ namespace SizingManager {
 
 	}
 
+	// Writes system sizing data to EIO file using one row per system
 	void
-	ReportSysSizing(
+	ReportSysSizing (
 		std::string const & SysName, // the name of the zone
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
+		Real64 const & CalcDesCoolVolFlow, // Calculated Cooling Design Air Flow Rate
+		Real64 const & UserDesCoolVolFlow, // User Cooling Design Air Flow Rate
+		Real64 const & CalcDesHeatVolFlow, // Calculated Heating Design Air Flow Rate
+		Real64 const & UserDesHeatVolFlow // User Heating Design Air Flow Rate
 	)
 	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   January 2003
-		//       MODIFIED       August 2008, Greg Stark
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine writes one item of system sizing data to the "eio" file..
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileInits;
-		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
-
-		// Formats
-		static gio::Fmt Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
-		static gio::Fmt Format_991( "(' System Sizing Information',3(', ',A))" );
+		static bool MyOneTimeFlag ( true );
 
 		if ( MyOneTimeFlag ) {
-			gio::write( OutputFileInits, Format_990 );
-			MyOneTimeFlag = false;
+			gio::write( OutputFileInits, "('! <System Sizing Information>, System Name, Calculated Cooling Design Air Flow Rate [m3/s], User Cooling Design Air Flow Rate [m3/s], Calculated Heating Design Air Flow Rate [m3/s], User Heating Design Air Flow Rate [m3/s]')");
+			MyOneTimeFlag=false;
 		}
 
-		gio::write( OutputFileInits, Format_991 ) << SysName << VarDesc << RoundSigDigits( VarValue, 5 );
+		gio::write( OutputFileInits, "(' System Sizing Information, ',A, 4(', ',A))" ) << SysName << RoundSigDigits( CalcDesCoolVolFlow, 5 ) << RoundSigDigits( UserDesCoolVolFlow, 5 ) << RoundSigDigits( CalcDesHeatVolFlow, 5 ) << RoundSigDigits( UserDesHeatVolFlow, 5 );
 
 		// BSLLC Start
-		if ( sqlite ) sqlite->addSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
+		if ( sqlite ) sqlite->addSQLiteSystemSizingRecord( SysName, CalcDesCoolVolFlow, UserDesCoolVolFlow, CalcDesHeatVolFlow, UserDesHeatVolFlow );
 		// BSLLC Finish
+
 
 	}
 

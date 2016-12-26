@@ -176,9 +176,11 @@ namespace SizingManager {
 	void
 	ReportSysSizing(
 		std::string const & SysName, // the name of the zone
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
-	);
+		Real64 const & CalcDesCoolVolFlow, // Calculated Cooling Design Air Flow Rate
+		Real64 const & UserDesCoolVolFlow, // User Cooling Design Air Flow Rate
+		Real64 const & CalcDesHeatVolFlow, // Calculated Heating Design Air Flow Rate
+		Real64 const & UserDesHeatVolFlow // User Heating Design Air Flow Rate
+		);
 
 } // SizingManager
 

@@ -1776,29 +1776,29 @@ void SQLite::addSQLiteZoneSizingRecord(
 	}
 }
 
-void SQLite::addSQLiteSystemSizingRecord(
-	std::string const & sysName, // the name of the system
-	std::string const & varDesc, // the description of the input variable
-	Real64 const varValue // the value from the sizing calculation
+void SQLite::addSQLiteSystemSizingRecord (
+	std::string const & SysName, // the name of the system
+	Real64 const & CalcDesCoolVolFlow, // Calculated Cooling Design Air Flow Rate
+	Real64 const & UserDesCoolVolFlow, // User Cooling Design Air Flow Rate
+	Real64 const & CalcDesHeatVolFlow, // Calculated Heating Design Air Flow Rate
+	Real64 const & UserDesHeatVolFlow // User Heating Design Air Flow Rate
 )
 {
 	if ( m_writeOutputToSQLite ) {
-		++m_systemSizingIndex;
-		std::string description;
-		std::string units;
+		++m_zoneSizingIndex;
+		sqliteBindInteger( m_systemSizingInsertStmt, 1, m_systemSizingIndex );
+		sqliteBindText( m_systemSizingInsertStmt, 2, SysName );
 
-		parseUnitsAndDescription(varDesc,units,description);
+		sqliteBindDouble( m_zoneSizingInsertStmt, 3, CalcDesCoolVolFlow );
+		sqliteBindDouble( m_zoneSizingInsertStmt, 4, UserDesCoolVolFlow );
+		sqliteBindDouble( m_zoneSizingInsertStmt, 5, CalcDesHeatVolFlow );
+		sqliteBindDouble( m_zoneSizingInsertStmt, 6, UserDesHeatVolFlow );
 
-		sqliteBindInteger(m_systemSizingInsertStmt, 1, m_systemSizingIndex);
-		sqliteBindText(m_systemSizingInsertStmt, 2, sysName);
-		sqliteBindText(m_systemSizingInsertStmt, 3, description);
-		sqliteBindDouble(m_systemSizingInsertStmt, 4, varValue);
-		sqliteBindText(m_systemSizingInsertStmt, 5, units);
-
-		sqliteStepCommand(m_systemSizingInsertStmt);
-		sqliteResetCommand(m_systemSizingInsertStmt);
+		sqliteStepCommand( m_systemSizingInsertStmt );
+		sqliteResetCommand( m_systemSizingInsertStmt );
 	}
 }
+
 
 void SQLite::addSQLiteComponentSizingRecord(
 	std::string const & compType, // the type of the component

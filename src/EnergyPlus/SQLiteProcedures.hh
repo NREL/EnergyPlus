@@ -204,10 +204,12 @@ public:
 		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	);
 
-	void addSQLiteSystemSizingRecord(
+	void addSQLiteSystemSizingRecord (
 		std::string const & SysName, // the name of the system
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
+		Real64 const & CalcDesCoolVolFlow, // Calculated Cooling Design Air Flow Rate
+		Real64 const & UserDesCoolVolFlow, // User Cooling Design Air Flow Rate
+		Real64 const & CalcDesHeatVolFlow, // Calculated Heating Design Air Flow Rate
+		Real64 const & UserDesHeatVolFlow // User Heating Design Air Flow Rate
 	);
 
 	void addSQLiteComponentSizingRecord(
