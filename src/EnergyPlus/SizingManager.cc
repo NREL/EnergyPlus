@@ -714,23 +714,35 @@ namespace SizingManager {
 		if ( SysSizingRunDone ) {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				curName = FinalSysSizing( AirLoopNum ).AirPriLoopName;
-				//ReportSysSizing( curName, "Calculated Cooling Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				PreDefTableEntry( pdchSysSizCalcClAir, curName, CalcSysSizing( AirLoopNum ).DesCoolVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesCoolVolFlow ) <= 1.e-8 ) {
 					ShowWarningError( RoutineName + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
-				//ReportSysSizing( curName, "User Cooling Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
 				PreDefTableEntry( pdchSysSizUserClAir, curName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow );
-				//ReportSysSizing( curName, "Calculated Heating Design Air Flow Rate [m3/s]", CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				PreDefTableEntry( pdchSysSizCalcHtAir, curName, CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 				if ( std::abs( CalcSysSizing( AirLoopNum ).DesHeatVolFlow ) <= 1.e-8 ) {
 					ShowWarningError( RoutineName + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing( AirLoopNum ).AirPriLoopName + " is zero." );
 					ShowContinueError( "Check Sizing:Zone and ZoneControl:Thermostat inputs." );
 				}
-				//ReportSysSizing( curName, "User Heating Design Air Flow Rate [m3/s]", FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
-
-				ReportSysSizing( curName, CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
+				std::string coolPeakLoadKind = "";
+				std::string coolPeakDDDate = "";
+				int coolPeakDD = 0;
+				Real64 coolCap = 0.;
+				if ( FinalSysSizing ( AirLoopNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
+					coolPeakLoadKind = "Sensible";
+					coolPeakDDDate = SysSizPeakDDNum( AirLoopNum ).cSensCoolPeakDDDate;
+					coolPeakDD = SysSizPeakDDNum( AirLoopNum ).SensCoolPeakDD;
+					coolCap = FinalSysSizing( AirLoopNum ).SensCoolCap;
+				} else if ( FinalSysSizing( AirLoopNum ).CoolingPeakLoadType == TotalCoolingLoad ) {
+					coolPeakLoadKind = "Total";
+					coolPeakDDDate = SysSizPeakDDNum( AirLoopNum ).cTotCoolPeakDDDate;
+					coolPeakDD = SysSizPeakDDNum( AirLoopNum ).TotCoolPeakDD;
+					coolCap = FinalSysSizing( AirLoopNum ).TotCoolCap;
+				}
+				int heatPeakDD = SysSizPeakDDNum( AirLoopNum ).HeatPeakDD;
+				ReportSysSizing( curName, "Cooling", coolPeakLoadKind, coolCap,                              CalcSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, FinalSysSizing( AirLoopNum ).CoolDesDay, coolPeakDDDate,                                SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( coolPeakDD ));
+				ReportSysSizing( curName, "Heating", "Sensible",       FinalSysSizing( AirLoopNum ).HeatCap, CalcSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).DesHeatVolFlow, FinalSysSizing( AirLoopNum ).HeatDesDay, SysSizPeakDDNum( AirLoopNum ).cHeatPeakDDDate, SysSizPeakDDNum( AirLoopNum ).TimeStepAtHeatPk( heatPeakDD ));
 				PreDefTableEntry( pdchSysSizUserHtAir, curName, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
 			}
 			// Deallocate arrays no longer needed
@@ -2802,12 +2814,16 @@ namespace SizingManager {
 
 	// Writes system sizing data to EIO file using one row per system
 	void
-	ReportSysSizing (
+	ReportSysSizing(
 		std::string const & SysName, // the name of the zone
-		Real64 const & CalcDesCoolVolFlow, // Calculated Cooling Design Air Flow Rate
-		Real64 const & UserDesCoolVolFlow, // User Cooling Design Air Flow Rate
-		Real64 const & CalcDesHeatVolFlow, // Calculated Heating Design Air Flow Rate
-		Real64 const & UserDesHeatVolFlow // User Heating Design Air Flow Rate
+		std::string const & LoadType, // either "Cooling" or "Heating"
+		std::string const & PeakLoadKind, // either "Sensible" or "Total"
+		Real64 const & UserDesCap, // User  Design Capacity
+		Real64 const & CalcDesVolFlow, // Calculated  Design Air Flow Rate
+		Real64 const & UserDesVolFlow, // User Design Air Flow Rate
+		std::string const & DesDayName, // the name of the design day that produced the peak
+		std::string const & DesDayDate, // the date that produced the peak
+		int const & TimeStepIndex // time step of the peak
 	)
 	{
 		using namespace DataPrecisionGlobals;
@@ -2817,17 +2833,30 @@ namespace SizingManager {
 		static bool MyOneTimeFlag ( true );
 
 		if ( MyOneTimeFlag ) {
-			gio::write( OutputFileInits, "('! <System Sizing Information>, System Name, Calculated Cooling Design Air Flow Rate [m3/s], User Cooling Design Air Flow Rate [m3/s], Calculated Heating Design Air Flow Rate [m3/s], User Heating Design Air Flow Rate [m3/s]')");
+			gio::write( OutputFileInits, "('! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak')");
 			MyOneTimeFlag=false;
 		}
-
-		gio::write( OutputFileInits, "(' System Sizing Information, ',A, 4(', ',A))" ) << SysName << RoundSigDigits( CalcDesCoolVolFlow, 5 ) << RoundSigDigits( UserDesCoolVolFlow, 5 ) << RoundSigDigits( CalcDesHeatVolFlow, 5 ) << RoundSigDigits( UserDesHeatVolFlow, 5 );
+		std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString( TimeStepIndex );
+		gio::write( OutputFileInits, "(' System Sizing Information, ',A, 7(', ',A))" ) << SysName << LoadType << PeakLoadKind << RoundSigDigits( UserDesCap, 2 ) << RoundSigDigits( CalcDesVolFlow, 5 ) << RoundSigDigits( UserDesVolFlow, 5 ) << DesDayName << dateHrMin;
 
 		// BSLLC Start
-		if ( sqlite ) sqlite->addSQLiteSystemSizingRecord( SysName, CalcDesCoolVolFlow, UserDesCoolVolFlow, CalcDesHeatVolFlow, UserDesHeatVolFlow );
+		if ( sqlite ) sqlite->addSQLiteSystemSizingRecord( SysName, LoadType, PeakLoadKind, UserDesCap, CalcDesVolFlow, UserDesVolFlow, DesDayName, dateHrMin );
 		// BSLLC Finish
 
 
+	}
+
+	// convert an index for the timestep of the day into a hour minute string in the format 00:00
+	std::string TimeIndexToHrMinString (
+		int timeIndex
+	)
+	{
+		std::string hrMinString = "";
+		int tMinOfDay = timeIndex * MinutesPerTimeStep;
+		int tHr = int ( tMinOfDay / 60. );
+		int tMin = tMinOfDay - tHr * 60;
+		gio::write ( hrMinString, PeakHrMinFmt ) << tHr << tMin;
+		return hrMinString;
 	}
 
 

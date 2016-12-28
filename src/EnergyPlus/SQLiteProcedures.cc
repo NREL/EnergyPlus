@@ -1778,21 +1778,27 @@ void SQLite::addSQLiteZoneSizingRecord(
 
 void SQLite::addSQLiteSystemSizingRecord (
 	std::string const & SysName, // the name of the system
-	Real64 const & CalcDesCoolVolFlow, // Calculated Cooling Design Air Flow Rate
-	Real64 const & UserDesCoolVolFlow, // User Cooling Design Air Flow Rate
-	Real64 const & CalcDesHeatVolFlow, // Calculated Heating Design Air Flow Rate
-	Real64 const & UserDesHeatVolFlow // User Heating Design Air Flow Rate
+	std::string const & LoadType, // either "Cooling" or "Heating"
+	std::string const & PeakLoadType, // either "Sensible" or "Total"
+	Real64 const & UserDesCap, // User  Design Capacity
+	Real64 const & CalcDesVolFlow, // Calculated Cooling Design Air Flow Rate
+	Real64 const & UserDesVolFlow, // User Cooling Design Air Flow Rate
+	std::string const & DesDayName, // the name of the design day that produced the peak
+	std::string const & PeakHrMin // time stamp of the peak
 )
 {
 	if ( m_writeOutputToSQLite ) {
 		++m_zoneSizingIndex;
 		sqliteBindInteger( m_systemSizingInsertStmt, 1, m_systemSizingIndex );
 		sqliteBindText( m_systemSizingInsertStmt, 2, SysName );
+		sqliteBindText( m_zoneSizingInsertStmt, 3, LoadType );
+		sqliteBindText( m_zoneSizingInsertStmt, 4, PeakLoadType );
 
-		sqliteBindDouble( m_zoneSizingInsertStmt, 3, CalcDesCoolVolFlow );
-		sqliteBindDouble( m_zoneSizingInsertStmt, 4, UserDesCoolVolFlow );
-		sqliteBindDouble( m_zoneSizingInsertStmt, 5, CalcDesHeatVolFlow );
-		sqliteBindDouble( m_zoneSizingInsertStmt, 6, UserDesHeatVolFlow );
+		sqliteBindDouble( m_zoneSizingInsertStmt, 5, UserDesCap );
+		sqliteBindDouble( m_zoneSizingInsertStmt, 6, CalcDesVolFlow );
+		sqliteBindDouble( m_zoneSizingInsertStmt, 7, UserDesVolFlow );
+		sqliteBindText( m_systemSizingInsertStmt, 8, DesDayName );
+		sqliteBindText( m_zoneSizingInsertStmt, 9, PeakHrMin );
 
 		sqliteStepCommand( m_systemSizingInsertStmt );
 		sqliteResetCommand( m_systemSizingInsertStmt );
