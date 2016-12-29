@@ -124,6 +124,10 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex )
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	bool OnTheList;
 
+	EXPECT_EQ(OutputVariablesNames.size(), 5
+	);
+	EXPECT_EQ(OutputVariablesForSimulation.size(), 10);
+
 	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
 	OnTheList = FindItemInVariableList( "OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate" );
@@ -170,6 +174,9 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Plus )
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	bool OnTheList;
 
+	EXPECT_EQ(OutputVariablesNames.size(), 6);
+	EXPECT_EQ(OutputVariablesForSimulation.size(), 6);
+
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
 	OnTheList = FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" );
@@ -204,6 +211,9 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
 	                                                 });
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	bool OnTheList;
+
+	EXPECT_EQ(OutputVariablesNames.size(), 7);
+	EXPECT_EQ(OutputVariablesForSimulation.size(), 7);
 
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
@@ -259,6 +269,9 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Pipe )
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	bool OnTheList;
 
+	EXPECT_EQ(OutputVariablesNames.size(), 3);
+	EXPECT_EQ(OutputVariablesForSimulation.size(), 4);
+
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
 	OnTheList = FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" );
@@ -289,9 +302,14 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 			                                                 "Version,8.6;",
 			                                                 " Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
 			                                                 " Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,", "timestep;",
+			                                                 " Output:Variable,", "[A-Z]{4},", "Unitary System Compressor Part Load Ratio,", "timestep;",
+			                                                // " Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,", "timestep;",
 	                                                 });
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	bool OnTheList;
+
+//	EXPECT_EQ(OutputVariablesNames.size(), 4);
+//	EXPECT_EQ(OutputVariablesForSimulation.size(), 4);
 
 	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
 	EXPECT_EQ(true, OnTheList);
@@ -303,5 +321,19 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 	EXPECT_NE(true, OnTheList);
 	OnTheList = FindItemInVariableList( "BackRoom_NODE1", "System Node Humidity Ratio" );
 	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "NODE", "Unitary System Compressor Part Load Ratio" );
+	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "Node", "Unitary System Compressor Part Load Ratio" );
+	EXPECT_NE(true, OnTheList);
+	OnTheList = FindItemInVariableList( "NOD", "Unitary System Compressor Part Load Ratio" );
+	EXPECT_NE(true, OnTheList);
+	// these two should work for [A-Za-z]{5,6}, but they don't
+//	OnTheList = FindItemInVariableList( "Inlet", "Zone Air System Sensible Heating Rate" );
+//	EXPECT_EQ(true, OnTheList);
+//	OnTheList = FindItemInVariableList( "Outlet", "Zone Air System Sensible Heating Rate" );
+//	EXPECT_EQ(true, OnTheList);
+	OnTheList = FindItemInVariableList( "Any Node", "Zone Air System Sensible Heating Rate" );
+	EXPECT_NE(true, OnTheList);
+
 
 }
