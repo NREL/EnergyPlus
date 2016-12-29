@@ -376,11 +376,11 @@ namespace DXCoils {
 
 		} else if ( SELECT_CASE_var == CoilVRF_Cooling ) {
 
-			CalcVRFCoolingCoil( DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _, MaxCap );
+			CalcVRFCoolingCoil( DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, AirFlowRatio, MaxCap );
 
 		} else if ( SELECT_CASE_var == CoilVRF_Heating ) {
 
-			CalcDXHeatingCoil( DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap );
+			CalcDXHeatingCoil( DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio, MaxCap );
 
 		} else if ( SELECT_CASE_var == CoilVRF_FluidTCtrl_Cooling ) {
 
@@ -8695,7 +8695,8 @@ Label50: ;
 			if ( FanOpMode == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF;
 
 			//  Calculate full load output conditions
-			if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+//			if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+			if ( SHR > 1.0 ) SHR = 1.0;
 			FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 			hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 			if ( SHR < 1.0 ) {
@@ -8732,13 +8733,14 @@ Label50: ;
 			//  If constant fan with cycling compressor, call function to determine "effective SHR"
 			//  which includes the part-load degradation on latent capacity
 			if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
-				QLatRated = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * ( 1.0 - DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+				QLatRated = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * ( 1.0 - DXCoil( DXCoilNum ).RatedSHR( Mode ) ); // always the same number
 				QLatActual = TotCap * ( 1.0 - SHR );
 				SHRUnadjusted = SHR;
 				SHR = CalcEffectiveSHR( DXCoilNum, SHR, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, QLatRated, QLatActual, InletAirDryBulbTemp, InletAirWetBulbC, Mode );
 
 				//  Calculate full load output conditions
-				if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+//				if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+				if ( SHR > 1.0 ) SHR = 1.0;
 				FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 				if ( SHR < 1.0 ) {
@@ -8755,6 +8757,7 @@ Label50: ;
 
 			if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
 				// Continuous fan, cycling compressor
+				// hmmm ... this seems wrong. PLR * AirFlowRatio = 1. So we get FullLoadOutAirEnth all this time. This is OK since above TotCap *= PLR.
 				OutletAirEnthalpy = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirEnth + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirEnthalpy );
 				OutletAirHumRat = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirHumRat + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirHumRat );
 				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
