@@ -144,6 +144,7 @@ namespace DataOutputs {
 		// in the list of required variables for a simulation.
 
 		int Found = 0;
+		// previously case-insensitive search was done
 		std::string const uppercaseVariableName = InputProcessor::MakeUPPERCase( VariableName );
 		auto const FirstIndex = OutputVariablesNames.find( uppercaseVariableName );
 
