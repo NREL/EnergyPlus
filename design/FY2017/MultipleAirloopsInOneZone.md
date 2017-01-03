@@ -20,25 +20,25 @@ Allow Multiple Air Loops to One Thermal Zone
 
 ## Table of Contents ##
 
-[Justification for New Feature](#Justification-for-New-Feature)
+[Justification for New Feature](#justification-for-new-feature)
 
-[E-mail and  Conference Call Conclusions](#E-mail-and-Conference-Call-Conclusions)
+[E-mail and  Conference Call Conclusions](#e-mail-and-conference-call-conclusions)
 
-[Overview](#Overview)
+[Overview](#overview)
 
-[Approach](#Approach)
+[Approach](#approach)
 
-[Testing/Validation/Data Sources](#Testing/Validation/Data-Sources)
+[Testing/Validation/Data Sources](#testing/validation/data-sources)
 
-[Input Output Reference Documentation](#Input-Output-Reference-Documentation)
+[Input Output Reference Documentation](#input-output-reference-documentation)
 
-[Engineering Reference](#Engineering-Reference)
+[Engineering Reference](#engineering-reference)
 
-[Example File and Transition Changes](#Example-File-and-Transition-Changes)
+[Example File and Transition Changes](#example-file-and-transition-changes)
 
-[Detailed Comments and Responses](#Detailed-Comments-and-Responses)
+[Detailed Comments and Responses](#detailed-comments-and-responses)
 
-[Design](#Design)
+[Design](#design)
 
 ## Justification for New Feature ##
 
