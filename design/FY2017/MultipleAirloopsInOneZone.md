@@ -5,14 +5,40 @@ Allow Multiple Air Loops to One Thermal Zone
 
  - October 28, 2016 - Initial NFP
  - November 10, 2016 - Revised NFP
- - November 22, 2016 - Draft final NFP
+ - November 22, 2016 - Final NFP
 	 - Simplified proposal for new DesignSpecification:AirTerminal:Sizing object
 	 - Add new field to AirLoopHVAC to control return flows
 	 - Add new fields for Lights and Refrigeration:Case objects return heat gain
 	 - Add new outputs
 	 - Add method to allocate return flows to multiple loops
+ - January 3, 2017 - Initial Design
+ 	 - Add Design section at end
+ 	 - Add airflow windows - need to specify optional return node
+ 	 - *Change* - add the new field referencing `DesignSpecification:AirTerminal:Sizing` object to  `ZoneHVAC:AirDistributionUnit` and `AirTerminal:SingleDuct:Uncontrolled` (*not* to every terminal unit as previously proposed).
  
-*Reviewers - Hong, Griffith, Gu, Buhl, Raustad, Horowitz, Merket, Winkler, Scheier
+*Reviewers - Hong, Griffith, Gu, Buhl, Raustad, Horowitz, Merket, Winkler, Scheier, Lee
+
+## Table of Contents ##
+
+[Justification for New Feature](#Justification-for-New-Feature)
+
+[E-mail and  Conference Call Conclusions](#E-mail-and-Conference-Call-Conclusions)
+
+[Overview](#Overview)
+
+[Approach](#Approach)
+
+[Testing/Validation/Data Sources](#Testing/Validation/Data-Sources)
+
+[Input Output Reference Documentation](#Input-Output-Reference-Documentation)
+
+[Engineering Reference](#Engineering-Reference)
+
+[Example File and Transition Changes](#Example-File-and-Transition-Changes)
+
+[Detailed Comments and Responses](#Detailed-Comments-and-Responses)
+
+[Design](#Design)
 
 ## Justification for New Feature ##
 
@@ -93,7 +119,7 @@ The return air flow will be allocated as follows, similar to the current return 
       - For each return node on the loop AdjustedReturnFlow = ReturnFlow*LoopReturn/LoopReturn0
 
 ### 5. Allocate return air heat gains to specific return air nodes
-This applies to return air heat gain from lights and refrigerated case under-case return.
+This applies to return air heat gain from lights, refrigerated case under-case return,and airflow windows.
 
 ### 6. Revise other places that assume a single airloop is associated with a zone
 Preliminary code review shows that there are several places that use `ZoneEquipConfig::AirLoopNum`.  More details to follow in the design doc.
@@ -103,10 +129,9 @@ The present sizing inputs apply a single `Sizing:Zone` object to a given zone to
 
 ZoneHVAC:* equipment (such as fan coils or PTACs) can reference a `DesignSpecification:ZoneHVAC:Sizing` object to customize the sizing for a given ZoneHVAC unit.  A similar approach is proposed for air terminal units.
 
-
 A new object named `DesignSpecification:AirTerminal:Sizing` will be added to allow specification of any required differences from the base Sizing:Zone specifications. 
 
-A new optional field will be added at the end of every `AirTerminal:*` object to reference a `DesignSpecification:AirTerminal:Sizing` object as needed.
+A new optional field will be added at the end of the `ZoneHVAC:AirDistributionUnit` and `AirTerminal:SingleDuct:Uncontrolled` objects to reference a `DesignSpecification:AirTerminal:Sizing` object as needed.
 
 ### 8. Allow an airloop with no return path *(if budget allows)*
 This would remove any checks that throw errors when there is no return path.  Beyond that the airloop should function normally with zero flow at the supply side inlet node.  Input changes would include making the following nodes optional with a blank allowed:
@@ -237,9 +262,9 @@ Minimum outdoor air flow rate = 0.1\*0.0 = 0.0 [m3/s]
 
 Recirculation terminal unit flow rate = Max(0.06375, 0.0) = 0.06375 [m3/s]
 
-### Modified Objects: AirTerminal:*###
+### Modified Objects: `ZoneHVAC:AirDistributionUnit` and `AirTerminal:SingleDuct:Uncontrolled` ###
 
-In all `AirTerminal:*` objects, add the following field at the end of the object.
+In the `ZoneHVAC:AirDistributionUnit` and `AirTerminal:SingleDuct:Uncontrolled` objects, add the following field at the end of the object. (At some point in the future, plan to address [#4988](https://github.com/NREL/EnergyPlus/issues/4988) which would create a new AirTerminal:SingleDuct:ConstantVolume:NoReheat that sits inside an ADU just like all the other terminal units.)
 
 *New field:  Design Specification Air Terminal Sizing Name*
 
@@ -282,19 +307,25 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow
 
 ```
 
-### Modified Object: Lights###
+### Modified Object: Lights ###
 
 *New Field: Return Air Heat Gain Node Name*
 
 Name of the return air node for this heat gain. If left blank, defaults to the first return air node for this zone.
 
-### Modified Object: Refrigeration:Case###
+### Modified Object: Refrigeration:Case ###
 
 *New Field: Under Case HVAC Return Air Node Name*
 
 Name of the return air node for this case. If left blank, defaults to the first return air node for this zone.
 
-## Outputs Description ##
+### Modified Object: WindowProperty:AirflowControl ###
+
+*New Field: Return Air Node Name*
+
+Name of the return air node for this airflow window if the Airflow Destination is ReturnAir. If left blank, defaults to the first return air node for this zone.
+
+### Outputs Description ##
 
 Existing output variables for "Zone Air Terminal * " and "Air System * " should provide details about each airloop.  For other types of zone equipment, outputs are available by type of equipment, such as "Fan Coil * " and "Zone Radiant HVAC * ". It would be useful to have a general set of output variables that report the contribution of each piece of zone equipment, regardless of type.  
 
@@ -356,3 +387,160 @@ New example files will be made to show various combinations of systems.
 
 1. Try to minimize the size of the new DesignSpecification:AirTerminal:Sizing object.  Think in terms of only what might be different from the base Sizing:Zone inputs.  Fields such as VentilationRequirement, Do/Don't use OA specifications, 
 
+## Design ##
+### 1. Remove error checks on number of air terminals in a zone ###
+Actually, the only existing check looks for *an air distribution unit and an AirTerminal:SingleDuct:Uncontrolled (direct air) object in the same zone.* This check will be removed.  The code already allows more than one air distribution unit without throwing an error.
+
+#### ZoneEquipmentManager::SimZoneEquipment ####
+
+- Delete all uses of `ZoneHasAirLoopHVACTerminal` and `ZoneHasAirLoopHVACDirectAir` which includes the error check.  That's the only purpose of these variables.
+
+### 2. Allow more than one return air node in a zone ###
+
+#### DataZoneEquipment.hh ####
+In struct `EquipConfiguration`
+
+ - Delete `int ReturnAirNode`
+ - Add `int NumReturnNodes`
+ - Add `Array1D_int ReturnNode`
+ - Add to IDD and input processing for Return Air Node or Nodelist
+
+ - Delete `int AirLoopNum`
+ - Add `int NumAirLoops` (this may not always equal `NumReturnNodes` if an airloop has no return path)
+ - Add `Array1D_int AirLoopPointer`
+
+### 3. Add a new field to AirloopHVAC to specify loop return air flow fraction
+
+#### DataAirSystems.hh ####
+In struct `DefinePrimaryAirSystem`
+
+ - Add `Real64 DesignReturnFlowFrac`
+ - Add to IDD and input processing
+
+### 4. Revise return air flow and air loop flow balance calculations
+
+#### ZoneEquipmentManager::CalcZoneMassBalance ####
+This function will be refactored into multiple smaller functions reflecting the steps outlined  in the above NFP section plus other sections currently in this function:
+
+  - Initialize values to zero
+  - Sum zone inlet, exhaust, and mixing flows
+  - Step 1 - Set known return node flows
+  - Step 2 - Calculate remaining unallocated return air flow for each zone (*modified step*)
+  - Step 3 - Set remaining return node flows (*new step*)
+  - Step 4 - Allocate unbalanced exhaust air flows to each air loop (*modified step*)
+  - Adjust infiltration and mixing flows for zone air mass balance
+  - Step 5 - Balance each air loop
+  - Iterate until converged or limit reached
+
+
+### 5. Allocate return air heat gains to specific return air nodes
+
+#### DataHeatBalance.hh
+In struct `LightsData` (Lights object)
+
+ - Add `int ReturnNodePtr`
+ - Add new field to IDD and input processing
+
+#### RefrigeratedCase.hh
+In struct `RefrigCaseData` (Refrigeration:Case object)
+
+ - Use existing `int ZoneRANode; // Node number of return node in zone`
+ - Add new field to IDD and input processing
+
+#### DataSurfaces.hh
+In struct `SurfaceWindowCalc` (WindowProperty:AirflowControl object)
+
+ - Add `int ReturnNodePtr`
+ - Add new field to IDD and input processing
+
+
+#### DataZoneEquipment.hh ####
+In struct `EquipConfiguration`
+
+ - Add `bool ZoneHasAirFlowWindow` to avoid [looping over every zone surface](https://github.com/NREL/EnergyPlus/blob/2592ba992c6cba84395eef038be8d3a049304067/src/EnergyPlus/ZoneEquipmentManager.cc#L4178-L4183) every iteration in `ZoneEquipmentManager::CalcZoneLeavingConditions`
+ - Possibly add an array of just the airflow window surface numbers to avoid looping over all the surfaces in the zone even when there *is* an airflow window
+
+#### ZoneEquipmentManager::CalcZoneLeavingConditions ####
+
+ - Do some minor reorganization
+ - Add a for loop over all the return nodes in the zone
+ - Add an if on `ZoneHasAirFlowWindow` to skip the for [loop over all the surfaces](https://github.com/NREL/EnergyPlus/blob/2592ba992c6cba84395eef038be8d3a049304067/src/EnergyPlus/ZoneEquipmentManager.cc#L4178-L4183) just to look for an airflow window
+ - Change `InternalHeatGains::SumAllReturnAirConvectionGains` to allocate gains to specific nodes
+ - Change `QRetAir` to be an array, sized to the max number of return nodes across all zones - this may work better as an array inside `EquipConfiguration`
+ - Modify as needed to allocate heat gains to specific nodes and track multiple return temperatures
+
+
+### 6. Revise other places that assume a single airloop is associated with a zone
+Searching on `.ReturnAirNode` and `.AirLoopNum` shows relevant hits in: 
+
+ - AirflowNetworkBalanceManager.cc
+ - DualDuct.cc
+ - Furnaces.cc
+ - HVACFourPipeBeam.cc
+ - HVACManager.cc
+ - HVACMultiSpeedHeatPump.cc
+ - HVACUnitarySystem.cc
+ - MixedAir.cc
+ - PackagedTerminalHeatPump.cc
+ - PurchasedAirManager.cc
+ - ReportSizingManager.cc
+ - RoomAirModelAirflowNetwork.cc
+ - RoomAirModelManager.cc
+ - RoomAirModelUserTempPattern.cc
+ - SimAirServingZones.cc
+ - SimulationManager.cc
+ - SingleDuct.cc
+ - SystemAvailabilityManager.cc
+ - SystemReports.cc
+ - ZoneAirLoopEquipmentManager.cc
+ - ZoneContaminantPredictorCorrector.cc
+ - ZoneEquipmentManager.cc
+ - ZonePlenum.cc
+ - ZoneTempPredictorCorrector.cc
+ - And numerous unit tests
+
+### 7. Allow different sizing specifications for different air terminal units
+
+#### DataSizing::TermUnitFinalZoneSizing ####
+
+- Terminal units get their final sizing data from `TermUnitFinalZoneSizing`
+- TermUnitFinalZoneSizing` holds flow rates and other data which have been adjusted for sizing on ventilation load or other Sizing:System inputs such as a hard size for total air loop flow rate.
+- `TermUnitFinalZoneSizing` is initialized to `DataSizing::FinalZoneSizing` in  `ZoneEquipmentManager:UpdateZoneSizing`
+- `TermUnitFinalZoneSizing` is updated to adjusted `FinalZoneSizing` data in `SimAirServingZones::UpdateSysSizing`
+- `TermUnitFinalZoneSizing` is further adjusted in `SimAirServingZones::UpdateSysSizing`
+
+#### DataSizing::TermUnitSizing ####
+
+- `TermUnitSizing` is used as input in `SimAirServingZones::UpdateSysSizing` and in `ReportSizingManager::RequestSizing`.
+- `DataSizing::TermUnitSizing` is initialized in the various terminal unit sizing routines.
+
+#### SimAirServingZones::UpdateSysSizing ####
+- `UpdateSysSizing` uses `TermUnitSizing`, `ZoneSizing` and `FinalZoneSizing` as inputs.
+- `UpdateSysSizing` is basically four functions in one, split up by a big case statement for `CallIndicator` = BeginDay, DuringDay, EndDay, or EndSysSizingCalc (tempted to split that into four separate functions).
+- Lots of sizing calcs are done here, and the most pertinent section is that it makes final adjustments to `TermUnitFinalZoneSizing`.
+
+#### Proposed Changes ####
+- Add new struct `DataSizing::AirTerminalSizingData` to hold input for the new `DesignSpecification:AirTerminal:Sizing` object. (Similar to ZoneHVACSizingData)
+- The new array will be called `AirTerminalSizingSpecifications`.
+- Add new function `SizingManager::GetAirTerminalSizing` to process input for the new ` DesignSpecification:AirTerminal:Sizing` object.
+
+- Change `TermUnitSizing` and `TermUnitFinalZoneSizing` to be indexed by air distribution unit (ADU) number instead of by zone. Direct air terminal units will be added to the end of the ADU list for this indexing.
+- Expand `TermUnitSizing` to include pertinent inputs from a referenced `DesignSpecification:AirTerminal:Sizing` object. These fields will default to 1.0 if there is no `DesignSpecification:AirTerminal:Sizing` object for a given ADU.
+- In `UpdateSysSizing`, change anything that is indexed by CtrlZoneNum (or equivalent) to be indexed by air distribution unit.
+- Add two arrays to `DataAirloop::AirLoopZoneEquipConnectData`
+  - `Array1D_int CoolZoneADUNums`
+  - `Array1D_int HeatZoneADUNums`
+- Wherever sizing calculations are made in the terminal unit sizing routines and in `RequestSizing`, apply the input factors from `DesignSpecification:AirTerminal:Sizing` which are stored in `TermUnitSizing`.
+
+### 8. Allow an airloop with no return path *(if budget allows)*
+
+#### SimAirServingZones::GetAirPathData ####
+- Modify input processing for `AirLoopHVAC` to allow the Demand Side Outlet Node Name to be blank
+- Skip the check for proper return connection if the Demand Side Outlet Node Name is blank
+
+#### ReturnAirPathManager::InitReturnAirPath  ####
+- This function is currently just a placeholder and is not used.
+- Add a test here to make sure that the Return Air Path Outlet Node Name is connected to an AirLoopHVAC Demand Side Outlet Node. This should detect a dangling ReturnAirPath.
+
+#### HVACInterfaceManager::UpdateHVACInterface ####
+- Add logic to allow for systems without a return path
