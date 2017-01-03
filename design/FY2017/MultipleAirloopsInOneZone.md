@@ -28,7 +28,7 @@ Allow Multiple Air Loops to One Thermal Zone
 
 [Approach](#approach)
 
-[Testing/Validation/Data Sources](#testing/validation/data-sources)
+[Testing/Validation/Data Sources](#testingvalidationdata-sources)
 
 [Input Output Reference Documentation](#input-output-reference-documentation)
 
@@ -58,7 +58,7 @@ None of the available workarounds will model both systems correctly. In this par
 
 Rather than develop more workaround components, it is time to remove the restriction of one airloop per zone.
 
-## E-mail and  Conference Call Conclusions ##
+## E-mail and Conference Call Conclusions ##
 
 1. Add output variables and/or table report to summarize how various air loops operate in a zone. E.g., what loads they meet, how many hours each loop operate.
 
