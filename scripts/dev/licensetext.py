@@ -150,6 +150,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
              'message':'Non-year differences in license text, check entire license'})
 
 def mergeParagraphs(text):
+    '''Merge license text lines into a single line per paragraph.'''
     lines = []
     current = ''
     for line in text.splitlines():

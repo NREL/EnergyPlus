@@ -22,7 +22,7 @@ previous = licensetext.previous()
 licensetxt = licensetext.mergeParagraphs(current)
 
 if not dryrun:
-    print('Writing out LICENSE.txt.')
+    print('Writing out LICENSE.txt')
     filename = "LICENSE.txt"
     fp = open(filename,'w')
     fp.write(licensetxt)
