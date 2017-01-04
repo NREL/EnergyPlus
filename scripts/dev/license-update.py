@@ -28,7 +28,7 @@ if not dryrun:
     fp.write(licensetxt)
     fp.close
 else:
-    print('Skipping writing out LICENSE.txt.')
+    print('Skipping writing out LICENSE.txt')
 
 # Create Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
