@@ -1,10 +1,10 @@
-Improve Control of Multiple/Partial HVAC in One Zone
+Improve Control of Multiple HVAC in One Zone
 ====================================================
 
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - November 30, 2016 - Original NFP
- - January 4, 2017 - Revised NFP
+ - January 4, 2017 - Revised NFP and Initial Design
  
 Reviewers - Raustad, Griffith, Lee, Gu, Horowitz, Merket, Winkler, Sheier
 
@@ -26,9 +26,9 @@ Reviewers - Raustad, Griffith, Lee, Gu, Horowitz, Merket, Winkler, Sheier
 
 [Example File and Transition Changes](#example-file-and-transition-changes)
 
-[Detailed Comments and Responses](#detailed-comments-and-responses)
-
 [Design](#design)
+
+[Detailed Comments and Responses](#detailed-comments-and-responses)
 
 [Original Approach - Dropped](#original-approach---dropped)
 
@@ -137,6 +137,38 @@ Proposed example files:
  - Retail store with two rooftop units, one high-efficiency and one low-efficiency serving the same core zone.
 
 Transition will be required for `ZoneHVAC:EquipmentList`.
+
+## Design ##
+
+Not many details worked out here yet.
+
+The logical place to make the load assignements/adjustements is in
+```
+Array1D< Real64 > SequencedOutputRequired;
+Array1D< Real64 > SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
+Array1D< Real64 > SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
+```
+
+Currently, only the unitary systems use these for control, so other zone equipment will need to be modified to access these, either by passing the desired loads as arguments to the equipment or by passing the equipment list sequence number.
+
+The current functions which set/adjust the sequenced outputs required are:
+```
+ZoneEquipmentManager::InitZoneEquipment (allocates the sequenced output arrays)
+ZoneEquipmentManager::InitSystemOutputRequired (initializes all sequenced output = full output required)
+ZoneEquipmentManager::UpdateSystemOutputRequired (if EquipPriorityNum is passed in, then sets next sequenced output required to be the remaining load)
+ 
+ZoneTempPredictorCorrector::InitZoneAirSetPoints (initiales all sequenced outputs to zero)
+ZoneTempPredictorCorrector::CalPredictedSystemLoad (initializes all sequenced output = full output required)
+```
+
+So, the likely places to implement the load distribution options is in `ZoneEquipmentManager::InitSystemOutputRequired` and `ZoneEquipmentManager::UpdateSystemOutputRequired`.
+
+In order to establish a PLR, some kind of query needs to be done to find out what the equipment can do and if it is active (it could be scheduled off or an airloop or plant loop could be shut down) and how much output it can give.
+
+Then the initial allocation to the active equipment (sequenced output required) is done.
+
+Then these need to be updated based on what the equipment actually delivers.
+
 
 ## Detailed Comments and Responses ##
 
