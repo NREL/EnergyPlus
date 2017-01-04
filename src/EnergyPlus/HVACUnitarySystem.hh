@@ -102,6 +102,8 @@ namespace HVACUnitarySystem {
 	extern int const LoadBased; // control system based on zone load
 	extern int const SetPointBased; // control system based on coil set point manager
 
+	extern int const ASHRAE90LOAD; // capacity control type
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -199,6 +201,7 @@ namespace HVACUnitarySystem {
 		int DehumidControlType_Num; // Set to Dehumid Control None, CoolReheat or MultiMode
 		int AirFlowControl; // UseCompressorOnFlow or UseCompressorOffFlow
 		int ControlType; // Setpoint or Load based control
+		int CapacityControlType; // ASHRAE90.1 control or normal control
 		bool RequestAutoSize; // determines if inputs need autosizing
 		bool RunOnSensibleLoad; // logical determines if this system will run to
 		bool RunOnLatentLoad; // logical determines if this system will run to
@@ -488,6 +491,7 @@ namespace HVACUnitarySystem {
 			DehumidControlType_Num( 0 ),
 			AirFlowControl( 1 ),
 			ControlType( 0 ),
+			CapacityControlType( 0 ),
 			RequestAutoSize( false ),
 			RunOnSensibleLoad( true ),
 			RunOnLatentLoad( false ),

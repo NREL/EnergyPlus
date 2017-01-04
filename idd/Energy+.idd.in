@@ -32678,6 +32678,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For Capacity Control Method = ASHRAE90VariableFan, enter the minimum air temperature in cooling mode.
         \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
         \type real
+        \units C
         \minimum 0.0
         \autosizable
         \default autosize
@@ -32685,6 +32686,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For Capacity Control Method = ASHRAE90VariableFan, enter the maximum air temperature in heating mode.
         \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
         \type real
+        \units C
         \minimum 0.0
         \autosizable
         \default autosize
@@ -52940,6 +52942,7 @@ AirLoopHVAC:UnitarySystem,
        \type choice
        \key Load
        \key SetPoint
+       \key ASHRAE90VariableFan
        \default Load
        \note Load control requires a Controlling Zone name.
        \note SetPoint control requires set points at coil outlet node.

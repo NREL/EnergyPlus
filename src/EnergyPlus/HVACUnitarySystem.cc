@@ -237,6 +237,8 @@ namespace HVACUnitarySystem {
 	int const LoadBased( 1 ); // control system based on zone load
 	int const SetPointBased( 2 ); // control system based on coil set point manager
 
+	int const ASHRAE90LOAD( 1 ); // capacity control type
+
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const BlankString;
 
@@ -3135,6 +3137,9 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).ControlType = LoadBased;
 			} else if ( SameString( Alphas( iControlTypeAlphaNum ), "SetPoint" ) ) {
 				UnitarySystem( UnitarySysNum ).ControlType = SetPointBased;
+			} else if ( SameString( Alphas( iControlTypeAlphaNum ), "ASHRAE90VariableFan" ) ) {
+				UnitarySystem( UnitarySysNum ).ControlType = LoadBased;
+				UnitarySystem( UnitarySysNum ).CapacityControlType = ASHRAE90LOAD;
 			} else {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( iControlTypeAlphaNum ) + " = " + Alphas( iControlTypeAlphaNum ) );
