@@ -3,9 +3,6 @@
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
 //
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
-//
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
 // granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::AirflowNetworkBalanceManager unit tests
 
@@ -135,6 +123,7 @@ namespace EnergyPlus {
 		Surface( 1 ).ExtBoundCond = 0;
 		Surface( 1 ).HeatTransSurf = true;
 		Surface( 1 ).Tilt = 90.0;
+		Surface( 1 ).Sides = 4;
 		Surface( 2 ).Name = "WINDOW AULA 2";
 		Surface( 2 ).Zone = 1;
 		Surface( 2 ).ZoneName = "SALA DE AULA";
@@ -142,6 +131,7 @@ namespace EnergyPlus {
 		Surface( 2 ).ExtBoundCond = 0;
 		Surface( 2 ).HeatTransSurf = true;
 		Surface( 2 ).Tilt = 90.0;
+		Surface( 2 ).Sides = 4;
 
 		SurfaceWindow.allocate( 2 );
 		SurfaceWindow( 1 ).OriginalClass = 11;
@@ -224,7 +214,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangulerWindowWarning ) {
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarning ) {
 
 		// Unit test for #5384
 
@@ -256,6 +246,16 @@ namespace EnergyPlus {
 		Surface( 3 ).HeatTransSurf = true;
 		Surface( 3 ).Tilt = 90.0;
 		Surface( 3 ).Sides = 3;
+		Surface( 3 ).Vertex.allocate( 3 );
+		Surface( 3 ).Vertex( 1 ).x = 3.0;
+		Surface( 3 ).Vertex( 2 ).x = 3.0;
+		Surface( 3 ).Vertex( 3 ).x = 1.0;
+		Surface( 3 ).Vertex( 1 ).y = 10.778;
+		Surface( 3 ).Vertex( 2 ).y = 10.778;
+		Surface( 3 ).Vertex( 3 ).y = 10.778;
+		Surface( 3 ).Vertex( 1 ).z = 2.0;
+		Surface( 3 ).Vertex( 2 ).z = 1.0;
+		Surface( 3 ).Vertex( 3 ).z = 1.0;
 
 		SurfaceWindow.allocate( 3 );
 		SurfaceWindow( 1 ).OriginalClass = 11;
@@ -328,11 +328,10 @@ namespace EnergyPlus {
 		} );
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
-
 		GetAirflowNetworkInput( );
 		std::string const error_string = delimited_string( {
 			"   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
-			"   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with effective width and height.",
+			"   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
 		} );
 
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
@@ -2316,6 +2315,7 @@ namespace EnergyPlus {
 		Surface( 1 ).ExtBoundCond = 0;
 		Surface( 1 ).HeatTransSurf = true;
 		Surface( 1 ).Tilt = 90.0;
+		Surface( 1 ).Sides = 4;
 		Surface( 2 ).Name = "WINDOW 2";
 		Surface( 2 ).Zone = 1;
 		Surface( 2 ).ZoneName = "SOFF";
@@ -2323,6 +2323,7 @@ namespace EnergyPlus {
 		Surface( 2 ).ExtBoundCond = 0;
 		Surface( 2 ).HeatTransSurf = true;
 		Surface( 2 ).Tilt = 90.0;
+		Surface( 2 ).Sides = 4;
 
 		SurfaceWindow.allocate( 2 );
 		SurfaceWindow( 1 ).OriginalClass = 11;
@@ -2398,4 +2399,569 @@ namespace EnergyPlus {
 		People.deallocate( );
 
 	}
+
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManagerTest_PolygonalWindows ) {
+
+		// Unit test for a new feature
+
+		Zone.allocate( 1 );
+		Zone( 1 ).Name = "ZONE 1";
+
+		Surface.allocate( 14 );
+		// Rectangular base surface
+		Surface( 1 ).Name = "LIVING:NORTH";
+		Surface( 1 ).Zone = 1;
+		Surface( 1 ).ZoneName = "ZONE 1";
+		Surface( 1 ).Azimuth = 180.0;
+		Surface( 1 ).ExtBoundCond = 0;
+		Surface( 1 ).HeatTransSurf = true;
+		Surface( 1 ).Tilt = 90.0;
+		Surface( 1 ).Sides = 4;
+		Surface( 1 ).Area = 25.17;
+		Surface( 1 ).Vertex.allocate( 4 );
+		Surface( 1 ).Vertex( 1 ).x = 10.323;
+		Surface( 1 ).Vertex( 2 ).x = 10.323;
+		Surface( 1 ).Vertex( 3 ).x = 0.0;
+		Surface( 1 ).Vertex( 4 ).x = 0.0;
+		Surface( 1 ).Vertex( 1 ).y = 10.778;
+		Surface( 1 ).Vertex( 2 ).y = 10.778;
+		Surface( 1 ).Vertex( 3 ).y = 10.778;
+		Surface( 1 ).Vertex( 4 ).y = 10.778;
+		Surface( 1 ).Vertex( 1 ).z = 2.4384;
+		Surface( 1 ).Vertex( 2 ).z = 0.0;
+		Surface( 1 ).Vertex( 3 ).z = 0.0;
+		Surface( 1 ).Vertex( 4 ).z = 2.4384;
+
+		// Rectangular base surface
+		Surface( 2 ).Name = "LIVING:SOUTH";
+		Surface( 2 ).Zone = 1;
+		Surface( 2 ).ZoneName = "ZONE 1";
+		Surface( 2 ).Azimuth = 0.0;
+		Surface( 2 ).ExtBoundCond = 0;
+		Surface( 2 ).HeatTransSurf = true;
+		Surface( 2 ).Tilt = 90.0;
+		Surface( 2 ).Sides = 4;
+		Surface( 2 ).Width = 10.323;
+		Surface( 2 ).Height = 2.4384;
+		Surface( 2 ).Area = 25.17;
+		Surface( 2 ).Vertex.allocate( 4 );
+		Surface( 2 ).Vertex( 1 ).x = 10.323;
+		Surface( 2 ).Vertex( 2 ).x = 10.323;
+		Surface( 2 ).Vertex( 3 ).x = 0.0;
+		Surface( 2 ).Vertex( 4 ).x = 0.0;
+		Surface( 2 ).Vertex( 1 ).y = 0.0;
+		Surface( 2 ).Vertex( 2 ).y = 0.0;
+		Surface( 2 ).Vertex( 3 ).y = 0.0;
+		Surface( 2 ).Vertex( 4 ).y = 0.0;
+		Surface( 2 ).Vertex( 1 ).z = 2.4384;
+		Surface( 2 ).Vertex( 2 ).z = 0.0;
+		Surface( 2 ).Vertex( 3 ).z = 0.0;
+		Surface( 2 ).Vertex( 4 ).z = 2.4384;
+
+		// Polygonal base surface
+		Surface( 3 ).Name = "LIVING:EAST";
+		Surface( 3 ).Zone = 1;
+		Surface( 3 ).ZoneName = "ZONE 1";
+		Surface( 3 ).Azimuth = 90.0;
+		Surface( 3 ).ExtBoundCond = 0;
+		Surface( 3 ).HeatTransSurf = true;
+		Surface( 3 ).Tilt = 90.0;
+		Surface( 3 ).Sides = 5;
+		Surface( 3 ).Area = 25.17;
+		Surface( 3 ).Vertex.allocate( 5 );
+		Surface( 3 ).Vertex( 1 ).x = 10.0;
+		Surface( 3 ).Vertex( 2 ).x = 10.0;
+		Surface( 3 ).Vertex( 3 ).x = 10.0;
+		Surface( 3 ).Vertex( 4 ).x = 10.0;
+		Surface( 3 ).Vertex( 5 ).x = 10.0;
+		Surface( 3 ).Vertex( 1 ).y = 0.0;
+		Surface( 3 ).Vertex( 2 ).y = 0.0;
+		Surface( 3 ).Vertex( 3 ).y = 10.0;
+		Surface( 3 ).Vertex( 4 ).y = 10.0;
+		Surface( 3 ).Vertex( 5 ).y = 5.0;
+		Surface( 3 ).Vertex( 1 ).z = 2.0;
+		Surface( 3 ).Vertex( 2 ).z = 0.0;
+		Surface( 3 ).Vertex( 3 ).z = 0.0;
+		Surface( 3 ).Vertex( 4 ).z = 2.0;
+		Surface( 3 ).Vertex( 5 ).z = 2.5;
+
+		// Triangular window sub surface
+		Surface( 4 ).Name = "NORTH:WINDOW1";
+		Surface( 4 ).Zone = 1;
+		Surface( 4 ).ZoneName = "ZONE 1";
+		Surface( 4 ).Azimuth = 180.0;
+		Surface( 4 ).ExtBoundCond = 0;
+		Surface( 4 ).HeatTransSurf = true;
+		Surface( 4 ).Tilt = 90.0;
+		Surface( 4 ).Sides = 3;
+		Surface( 4 ).Area = 1.0;
+		Surface( 4 ).BaseSurf = 1;
+		Surface( 4 ).Vertex.allocate( 3 );
+		Surface( 4 ).Vertex( 1 ).x = 3.0;
+		Surface( 4 ).Vertex( 2 ).x = 3.0;
+		Surface( 4 ).Vertex( 3 ).x = 1.0;
+		Surface( 4 ).Vertex( 1 ).y = 10.778;
+		Surface( 4 ).Vertex( 2 ).y = 10.778;
+		Surface( 4 ).Vertex( 3 ).y = 10.778;
+		Surface( 4 ).Vertex( 1 ).z = 2.0;
+		Surface( 4 ).Vertex( 2 ).z = 1.0;
+		Surface( 4 ).Vertex( 3 ).z = 1.0;
+
+		// Polygonal window sub surface
+		Surface( 5 ).Name = "NORTH:WINDOW2";
+		Surface( 5 ).Zone = 1;
+		Surface( 5 ).ZoneName = "ZONE 1";
+		Surface( 5 ).Azimuth = 180.0;
+		Surface( 5 ).ExtBoundCond = 0;
+		Surface( 5 ).HeatTransSurf = true;
+		Surface( 5 ).Tilt = 90.0;
+		Surface( 5 ).Sides = 5;
+		Surface( 5 ).Area = 2.5;
+		Surface( 5 ).BaseSurf = 1;
+		Surface( 5 ).Vertex.allocate( 5 );
+		Surface( 5 ).Vertex( 1 ).x = 5.0;
+		Surface( 5 ).Vertex( 2 ).x = 5.0;
+		Surface( 5 ).Vertex( 3 ).x = 3.0;
+		Surface( 5 ).Vertex( 4 ).x = 3.0;
+		Surface( 5 ).Vertex( 5 ).x = 4.0;
+		Surface( 5 ).Vertex( 1 ).y = 10.778;
+		Surface( 5 ).Vertex( 2 ).y = 10.778;
+		Surface( 5 ).Vertex( 3 ).y = 10.778;
+		Surface( 5 ).Vertex( 4 ).y = 10.778;
+		Surface( 5 ).Vertex( 5 ).y = 10.778;
+		Surface( 5 ).Vertex( 1 ).z = 2.0;
+		Surface( 5 ).Vertex( 2 ).z = 1.0;
+		Surface( 5 ).Vertex( 3 ).z = 1.0;
+		Surface( 5 ).Vertex( 4 ).z = 2.0;
+		Surface( 5 ).Vertex( 5 ).z = 2.5;
+
+		// Triangular window sub surface
+		Surface( 6 ).Name = "SOUTH:WINDOW1";
+		Surface( 6 ).Zone = 1;
+		Surface( 6 ).ZoneName = "ZONE 1";
+		Surface( 6 ).Azimuth = 0.0;
+		Surface( 6 ).ExtBoundCond = 0;
+		Surface( 6 ).HeatTransSurf = true;
+		Surface( 6 ).Tilt = 90.0;
+		Surface( 6 ).Sides = 3;
+		Surface( 6 ).Area = 0.5;
+		Surface( 6 ).BaseSurf = 2;
+		Surface( 6 ).Vertex.allocate( 3 );
+		Surface( 6 ).Vertex( 1 ).x = 9.0;
+		Surface( 6 ).Vertex( 2 ).x = 9.0;
+		Surface( 6 ).Vertex( 3 ).x = 8.0;
+		Surface( 6 ).Vertex( 1 ).y = 0.0;
+		Surface( 6 ).Vertex( 2 ).y = 0.0;
+		Surface( 6 ).Vertex( 3 ).y = 0.0;
+		Surface( 6 ).Vertex( 1 ).z = 2.0;
+		Surface( 6 ).Vertex( 2 ).z = 1.0;
+		Surface( 6 ).Vertex( 3 ).z = 1.0;
+
+		// Triangular window sub surface
+		Surface( 9 ).Name = "SOUTH:WINDOW2";
+		Surface( 9 ).Zone = 1;
+		Surface( 9 ).ZoneName = "ZONE 1";
+		Surface( 9 ).Azimuth = 0.0;
+		Surface( 9 ).ExtBoundCond = 0;
+		Surface( 9 ).HeatTransSurf = true;
+		Surface( 9 ).Tilt = 90.0;
+		Surface( 9 ).Sides = 3;
+		Surface( 9 ).Area = 0.5;
+		Surface( 9 ).BaseSurf = 2;
+		Surface( 9 ).Vertex.allocate( 3 );
+		Surface( 9 ).Vertex( 1 ).x = 7.0;
+		Surface( 9 ).Vertex( 2 ).x = 7.0;
+		Surface( 9 ).Vertex( 3 ).x = 6.0;
+		Surface( 9 ).Vertex( 1 ).y = 0.0;
+		Surface( 9 ).Vertex( 2 ).y = 0.0;
+		Surface( 9 ).Vertex( 3 ).y = 0.0;
+		Surface( 9 ).Vertex( 1 ).z = 2.0;
+		Surface( 9 ).Vertex( 2 ).z = 1.0;
+		Surface( 9 ).Vertex( 3 ).z = 1.0;
+
+		Surface( 10 ).Name = "EAST:WINDOW1";
+		Surface( 10 ).Zone = 1;
+		Surface( 10 ).ZoneName = "ZONE 1";
+		Surface( 10 ).Azimuth = 90.0;
+		Surface( 10 ).ExtBoundCond = 0;
+		Surface( 10 ).HeatTransSurf = true;
+		Surface( 10 ).Tilt = 90.0;
+		Surface( 10 ).Sides = 3;
+		Surface( 10 ).Area = 0.5;
+		Surface( 10 ).BaseSurf = 3;
+		Surface( 10 ).Vertex.allocate( 3 );
+		Surface( 10 ).Vertex( 1 ).x = 10.0;
+		Surface( 10 ).Vertex( 2 ).x = 10.0;
+		Surface( 10 ).Vertex( 3 ).x = 10.0;
+		Surface( 10 ).Vertex( 1 ).y = 1.0;
+		Surface( 10 ).Vertex( 2 ).y = 1.0;
+		Surface( 10 ).Vertex( 3 ).y = 2.0;
+		Surface( 10 ).Vertex( 1 ).z = 2.0;
+		Surface( 10 ).Vertex( 2 ).z = 1.0;
+		Surface( 10 ).Vertex( 3 ).z = 1.0;
+
+		// Polygonal horizontal base surface
+		Surface( 7 ).Name = "ROOF-POLY";
+		Surface( 7 ).Zone = 1;
+		Surface( 7 ).ZoneName = "ZONE 1";
+		Surface( 7 ).Azimuth = 0.0;
+		Surface( 7 ).ExtBoundCond = 0;
+		Surface( 7 ).HeatTransSurf = true;
+		Surface( 7 ).Tilt = 0.0;
+		Surface( 7 ).Sides = 5;
+		Surface( 7 ).Area = 55.0;
+		Surface( 7 ).Vertex.allocate( 5 );
+		Surface( 7 ).Vertex( 1 ).x = 0.0;
+		Surface( 7 ).Vertex( 2 ).x = 0.0;
+		Surface( 7 ).Vertex( 3 ).x = 10.0;
+		Surface( 7 ).Vertex( 4 ).x = 10.0;
+		Surface( 7 ).Vertex( 5 ).x = 5.0;
+		Surface( 7 ).Vertex( 1 ).y = 10.0;
+		Surface( 7 ).Vertex( 2 ).y = 5.0;
+		Surface( 7 ).Vertex( 3 ).y = 5.0;
+		Surface( 7 ).Vertex( 4 ).y = 10.0;
+		Surface( 7 ).Vertex( 5 ).y = 11.0;
+		Surface( 7 ).Vertex( 1 ).z = 2.4384;
+		Surface( 7 ).Vertex( 2 ).z = 2.4384;
+		Surface( 7 ).Vertex( 3 ).z = 2.4384;
+		Surface( 7 ).Vertex( 4 ).z = 2.4384;
+		Surface( 7 ).Vertex( 5 ).z = 2.4384;
+
+		// Polygonal horizontal base surface
+		Surface( 13 ).Name = "ROOF-POLY-WINDOW1";
+		Surface( 13 ).Zone = 1;
+		Surface( 13 ).ZoneName = "ZONE 1";
+		Surface( 13 ).Azimuth = 0.0;
+		Surface( 13 ).ExtBoundCond = 0;
+		Surface( 13 ).HeatTransSurf = true;
+		Surface( 13 ).Tilt = 0.0;
+		Surface( 13 ).Sides = 3;
+		Surface( 13 ).Area = 1;
+		Surface( 13 ).BaseSurf = 7;
+		Surface( 13 ).Vertex.allocate( 3 );
+		Surface( 13 ).Vertex( 1 ).x = 8.0;
+		Surface( 13 ).Vertex( 2 ).x = 8.0;
+		Surface( 13 ).Vertex( 3 ).x = 9.0;
+		Surface( 13 ).Vertex( 1 ).y = 9.0;
+		Surface( 13 ).Vertex( 2 ).y = 7.0;
+		Surface( 13 ).Vertex( 3 ).y = 7.0;
+		Surface( 13 ).Vertex( 1 ).z = 2.4384;
+		Surface( 13 ).Vertex( 2 ).z = 2.4384;
+		Surface( 13 ).Vertex( 3 ).z = 2.4384;
+
+		// Polygonal horizontal base surface
+		Surface( 14 ).Name = "ROOF-POLY-WINDOW2";
+		Surface( 14 ).Zone = 1;
+		Surface( 14 ).ZoneName = "ZONE 1";
+		Surface( 14 ).Azimuth = 0.0;
+		Surface( 14 ).ExtBoundCond = 0;
+		Surface( 14 ).HeatTransSurf = true;
+		Surface( 14 ).Tilt = 0.0;
+		Surface( 14 ).Sides = 3;
+		Surface( 14 ).Area = 1;
+		Surface( 14 ).BaseSurf = 7;
+		Surface( 14 ).Vertex.allocate( 3 );
+		Surface( 14 ).Vertex( 1 ).x = 6.0;
+		Surface( 14 ).Vertex( 2 ).x = 6.0;
+		Surface( 14 ).Vertex( 3 ).x = 7.0;
+		Surface( 14 ).Vertex( 1 ).y = 9.0;
+		Surface( 14 ).Vertex( 2 ).y = 7.0;
+		Surface( 14 ).Vertex( 3 ).y = 7.0;
+		Surface( 14 ).Vertex( 1 ).z = 2.4384;
+		Surface( 14 ).Vertex( 2 ).z = 2.4384;
+		Surface( 14 ).Vertex( 3 ).z = 2.4384;
+
+		// Rectangular horizontal base surface
+		Surface( 8 ).Name = "ROOF-REC";
+		Surface( 8 ).Zone = 1;
+		Surface( 8 ).ZoneName = "ZONE 1";
+		Surface( 8 ).Azimuth = 0.0;
+		Surface( 8 ).ExtBoundCond = 0;
+		Surface( 8 ).HeatTransSurf = true;
+		Surface( 8 ).Tilt = 0.0;
+		Surface( 8 ).Sides = 4;
+		Surface( 8 ).Area = 50.0;
+		Surface( 8 ).Width = 10.0;
+		Surface( 8 ).Height = 5.0;
+		Surface( 8 ).Vertex.allocate( 4 );
+		Surface( 8 ).Vertex( 1 ).x = 0.0;
+		Surface( 8 ).Vertex( 2 ).x = 0.0;
+		Surface( 8 ).Vertex( 3 ).x = 10.0;
+		Surface( 8 ).Vertex( 4 ).x = 10.0;
+		Surface( 8 ).Vertex( 1 ).y = 5.0;
+		Surface( 8 ).Vertex( 2 ).y = 0.0;
+		Surface( 8 ).Vertex( 3 ).y = 0.0;
+		Surface( 8 ).Vertex( 4 ).y = 5.0;
+		Surface( 8 ).Vertex( 1 ).z = 2.4384;
+		Surface( 8 ).Vertex( 2 ).z = 2.4384;
+		Surface( 8 ).Vertex( 3 ).z = 2.4384;
+		Surface( 8 ).Vertex( 4 ).z = 2.4384;
+
+		// Rectangular horizontal base surface
+		Surface( 12 ).Name = "ROOF-REC-WINDOW1";
+		Surface( 12 ).Zone = 1;
+		Surface( 12 ).ZoneName = "ZONE 1";
+		Surface( 12 ).Azimuth = 0.0;
+		Surface( 12 ).ExtBoundCond = 0;
+		Surface( 12 ).HeatTransSurf = true;
+		Surface( 12 ).Tilt = 0.0;
+		Surface( 12 ).Sides = 3;
+		Surface( 12 ).Area = 0.5;
+		Surface( 12 ).BaseSurf = 8;
+		Surface( 12 ).Vertex.allocate( 3 );
+		Surface( 12 ).Vertex( 1 ).x = 8.0;
+		Surface( 12 ).Vertex( 2 ).x = 8.0;
+		Surface( 12 ).Vertex( 3 ).x = 9.0;
+		Surface( 12 ).Vertex( 1 ).y = 4.0;
+		Surface( 12 ).Vertex( 2 ).y = 3.0;
+		Surface( 12 ).Vertex( 3 ).y = 3.0;
+		Surface( 12 ).Vertex( 1 ).z = 2.4384;
+		Surface( 12 ).Vertex( 2 ).z = 2.4384;
+		Surface( 12 ).Vertex( 3 ).z = 2.4384;
+
+		Surface( 11 ).Name = "ROOF-REC-WINDOW2";
+		Surface( 11 ).Zone = 1;
+		Surface( 11 ).ZoneName = "ZONE 1";
+		Surface( 11 ).Azimuth = 0.0;
+		Surface( 11 ).ExtBoundCond = 0;
+		Surface( 11 ).HeatTransSurf = true;
+		Surface( 11 ).Tilt = 0.0;
+		Surface( 11 ).Sides = 3;
+		Surface( 11 ).Area = 0.5;
+		Surface( 11 ).BaseSurf = 8;
+		Surface( 11 ).Vertex.allocate( 3 );
+		Surface( 11 ).Vertex( 1 ).x = 7.0;
+		Surface( 11 ).Vertex( 2 ).x = 7.0;
+		Surface( 11 ).Vertex( 3 ).x = 8.0;
+		Surface( 11 ).Vertex( 1 ).y = 4.0;
+		Surface( 11 ).Vertex( 2 ).y = 3.0;
+		Surface( 11 ).Vertex( 3 ).y = 3.0;
+		Surface( 11 ).Vertex( 1 ).z = 2.4384;
+		Surface( 11 ).Vertex( 2 ).z = 2.4384;
+		Surface( 11 ).Vertex( 3 ).z = 2.4384;
+
+		SurfaceWindow.allocate( 14 );
+		SurfaceWindow( 4 ).OriginalClass = 11;
+		SurfaceWindow( 5 ).OriginalClass = 11;
+		SurfaceWindow( 6 ).OriginalClass = 11;
+		SurfaceWindow( 9 ).OriginalClass = 11;
+		SurfaceWindow( 10 ).OriginalClass = 11;
+		SurfaceWindow( 11 ).OriginalClass = 11;
+		SurfaceWindow( 12 ).OriginalClass = 11;
+		SurfaceWindow( 13 ).OriginalClass = 11;
+		SurfaceWindow( 14 ).OriginalClass = 11;
+		NumOfZones = 1;
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			"Schedule:Constant,OnSch,,1.0;",
+			"Schedule:Constant,Aula people sched,,0.0;",
+			"Schedule:Constant,Sempre 21,,21.0;",
+			"AirflowNetwork:SimulationControl,",
+			"  NaturalVentilation, !- Name",
+			"  MultizoneWithoutDistribution, !- AirflowNetwork Control",
+			"  SurfaceAverageCalculation, !- Wind Pressure Coefficient Type",
+			"  , !- AirflowNetwork Wind Pressure Coefficient Array Name",
+			"  , !- Height Selection for Local Wind Pressure Calculation",
+			"  LOWRISE, !- Building Type",
+			"  1000, !- Maximum Number of Iterations{ dimensionless }",
+			"  LinearInitializationMethod, !- Initialization Type",
+			"  0.0001, !- Relative Airflow Convergence Tolerance{ dimensionless }",
+			"  0.0001, !- Absolute Airflow Convergence Tolerance{ kg / s }",
+			"  -0.5, !- Convergence Acceleration Limit{ dimensionless }",
+			"  90, !- Azimuth Angle of Long Axis of Building{ deg }",
+			"  0.36;                    !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+			"AirflowNetwork:MultiZone:Zone,",
+			"  ZONE 1, !- Zone Name",
+			"  Temperature, !- Ventilation Control Mode",
+			"  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  1, !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched, !- Venting Availability Schedule Name",
+			"  Standard;                !- Single Sided Wind Pressure Coefficient Algorithm",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  NORTH:WINDOW1, !- Surface Name",
+			"  Simple Window, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  ZoneLevel, !- Ventilation Control Mode",
+			"  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  , !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched;       !- Venting Availability Schedule Name",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  NORTH:WINDOW2, !- Surface Name",
+			"  Simple Window, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  Temperature, !- Ventilation Control Mode",
+			"  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  1, !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched;       !- Venting Availability Schedule Name",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  SOUTH:WINDOW1, !- Surface Name",
+			"  Simple Window, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  ZoneLevel, !- Ventilation Control Mode",
+			"  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  , !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched,       !- Venting Availability Schedule Name",
+			"  ,       !- Occupant Ventilation Control Name",
+			"  BaseSurfaceAspectRatio;       !- Equivalent Rectangle Method",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  SOUTH:WINDOW2, !- Surface Name",
+			"  Simple Window, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  Temperature, !- Ventilation Control Mode",
+			"  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  1, !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched,       !- Venting Availability Schedule Name",
+			"  ,       !- Occupant Ventilation Control Name",
+			"  UserDefinedAspectRatio,       !- Equivalent Rectangle Method",
+			"  1.0;       !- Equivalent Rectangle Aspect Ratio",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  EAST:WINDOW1, !- Surface Name",
+			"  Simple Window, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  ZoneLevel, !- Ventilation Control Mode",
+			"  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  , !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched,       !- Venting Availability Schedule Name",
+			"  ,       !- Occupant Ventilation Control Name",
+			"  BaseSurfaceAspectRatio;       !- Equivalent Rectangle Method",
+
+			"AirflowNetwork:MultiZone:Surface,",
+			"  ROOF-REC-WINDOW1, !- Surface Name",
+			"  CR-1, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  ZoneLevel, !- Ventilation Control Mode",
+			"  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  , !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched;       !- Venting Availability Schedule Name",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  ROOF-REC-WINDOW2, !- Surface Name",
+			"  CR-1, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  ZoneLevel, !- Ventilation Control Mode",
+			"  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  , !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched,       !- Venting Availability Schedule Name",
+			"  ,       !- Occupant Ventilation Control Name",
+			"  BaseSurfaceAspectRatio;       !- Equivalent Rectangle Method",
+
+			"AirflowNetwork:MultiZone:Surface,",
+			"  ROOF-POLY-WINDOW1, !- Surface Name",
+			"  CR-1, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  ZoneLevel, !- Ventilation Control Mode",
+			"  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  , !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched,       !- Venting Availability Schedule Name",
+			"  ,       !- Occupant Ventilation Control Name",
+			"  BaseSurfaceAspectRatio;       !- Equivalent Rectangle Method",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  ROOF-POLY-WINDOW2, !- Surface Name",
+			"  CR-1, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"  ZoneLevel, !- Ventilation Control Mode",
+			"  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  , !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched;       !- Venting Availability Schedule Name",
+
+			"AirflowNetwork:MultiZone:Component:SimpleOpening,",
+			"  Simple Window, !- Name",
+			"  0.0010, !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+			"  0.65, !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+			"  0.01, !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+			"  0.78;                    !- Discharge Coefficient{ dimensionless }",
+			"AirflowNetwork:MultiZone:Surface:Crack,",
+			"  CR-1, !- Name",
+			"  0.05, !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
+			"  0.667;                   !- Air Mass Flow Exponent{ dimensionless }",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetAirflowNetworkInput( );
+
+		// Choice: Height; Base Surface: Vertical Rectangular
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 1 ).Width, 0.0001 );
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 1 ).Height, 0.0001 );
+		// Choice: Height; Base Surface: Vertical Polygon
+		EXPECT_NEAR( 1.666667, MultizoneSurfaceData( 2 ).Width, 0.0001 );
+		EXPECT_NEAR( 1.5, MultizoneSurfaceData( 2 ).Height, 0.0001 );
+		// Choice: Base aspect ratio; Base Surface: Vertical Rectangular
+		EXPECT_NEAR( 1.454907, MultizoneSurfaceData( 3 ).Width, 0.0001 );
+		EXPECT_NEAR( 0.343664, MultizoneSurfaceData( 3 ).Height, 0.0001 );
+		// Choice: User aspect ratio; Base Surface: Vertical Rectangular
+		EXPECT_NEAR( 0.70711, MultizoneSurfaceData( 4 ).Width, 0.0001 );
+		EXPECT_NEAR( 0.70711, MultizoneSurfaceData( 4 ).Height, 0.0001 );
+		// Choice: Base aspect ratio --> Height; Base Surface: Vertical Polygon
+		EXPECT_NEAR( 0.5, MultizoneSurfaceData( 5 ).Width, 0.0001 );
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 5 ).Height, 0.0001 );
+		// Choice: Height --> Base aspect ratio; Base Surface: Horizontal Rectangular
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 6 ).Width, 0.0001 );
+		EXPECT_NEAR( 0.5, MultizoneSurfaceData( 6 ).Height, 0.0001 );
+		// Choice: Base aspect ratio; Base Surface: Horizontal Rectangular
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 7 ).Width, 0.0001 );
+		EXPECT_NEAR( 0.5, MultizoneSurfaceData( 7 ).Height, 0.0001 );
+		// Choice: Base aspect ratio --> User Aspect Ratio; Base Surface: Horizontal Polygon
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 8 ).Width, 0.0001 );
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 8 ).Height, 0.0001 );
+		// Choice: Height --> User Aspect Ratio; Base Surface: Horizontal Polygon
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 9 ).Width, 0.0001 );
+		EXPECT_NEAR( 1.0, MultizoneSurfaceData( 9 ).Height, 0.0001 );
+
+		Zone.deallocate( );
+		Surface.deallocate( );
+		SurfaceWindow.deallocate( );
+
+	}
+
 }

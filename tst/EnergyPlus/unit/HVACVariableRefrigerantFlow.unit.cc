@@ -3,9 +3,6 @@
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
 //
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
-//
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
 // granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HVACVariableRefrigerantFlow unit tests
 
@@ -2456,12 +2444,12 @@ namespace EnergyPlus {
 			"  TU1 Inlet Node,           !- Terminal Unit Air Inlet Node Name",
 			"  TU1 Outlet Node,          !- Terminal Unit Air Outlet Node Name",
 			"  autosize,                 !- Supply Air Flow Rate During Cooling Operation {m3/s}",
-			"  autosize,                 !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+			"  0,                        !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"  autosize,                 !- Supply Air Flow Rate During Heating Operation {m3/s}",
-			"  autosize,                 !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+			"  0,                        !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
 			"  autosize,                 !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
 			"  autosize,                 !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"  autosize,                 !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
 			"  drawthrough,              !- Supply Air Fan Placement",
 			"  Fan:OnOff,                !- Supply Air Fan Object Type",
@@ -3008,20 +2996,48 @@ namespace EnergyPlus {
 		ZT.allocate( 1 );
 		ZT = 25.0;
 
-		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = -VRF( VRFCond ).CoolingCapacity; // set load equal to the VRF cooling capacity
-		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = -VRF( VRFCond ).CoolingCapacity;
-		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = -VRF( VRFCond ).CoolingCapacity - 1000.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = -VRF( VRFCond ).CoolingCapacity * 0.75; // set load equal to the VRF cooling capacity adjusted for SHR
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = -VRF( VRFCond ).CoolingCapacity * 0.75;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = -VRF( VRFCond ).CoolingCapacity * 0.75 - 1000.0;
 
 		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 35.0; // AHRI condition at 95 F db
-		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 25.0;
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 27.0; // some zone return condition
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).HumRat = 0.011;
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Enthalpy = 55194.0; // VRF DX coil model uses node enthalpy
 		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 35.0; // AHRI condition at 95 F db
-		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).HumRat = 0.01; // don't care
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).HumRat = 0.008; // don't care
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Enthalpy = 55698.0;
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).OutAirWetBulb = 19.652;
 
 		VRF( VRFCond ).MasterZonePtr = 0;
 		VRF( VRFCond ).MasterZoneTUIndex = 0;
 		VRF( VRFCond ).ThermostatPriority = ThermostatOffsetPriority;
 		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
-		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system output should be less than 0
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system output should be less than 0 and approx = to VRF capacity * SHR
+
+		// ensure that TU turns off when fan heat exceeds the heating load
+		ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 19.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = 400.0; // set load equal to small value less than expected fan heat
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = 500.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = 400.0;
+		Schedule( VRFTU( VRFTUNum ).FanOpModeSchedPtr ).CurrentValue = 1.0; // set constant fan operating mode
+		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+		EXPECT_EQ( SysOutputProvided, 0.0 ); // for this system with 0 no load flow rate output should be = 0 when fan heat at very low TU PLR (1E-20) is greater than load
+		EXPECT_EQ(  VRF( VRFCond ).VRFCondPLR, 0.0 ); // system should be off
+
+		// ensure that TU operates when fan heat does not exceed the heating load
+		ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 19.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = 800.0; // set load equal to small value less than expected fan heat
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = 900.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = 800.0;
+		Schedule( VRFTU( VRFTUNum ).FanOpModeSchedPtr ).CurrentValue = 1.0; // set constant fan operating mode
+		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system should meet the heating load
+		EXPECT_GT(  VRF( VRFCond ).VRFCondPLR, 0.0 ); // system should be on
 
 	}
 
