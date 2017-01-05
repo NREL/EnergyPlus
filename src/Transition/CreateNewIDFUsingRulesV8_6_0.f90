@@ -123,6 +123,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: cycling
   LOGICAL :: continuous
   CHARACTER(len=MaxNameLength) :: OutScheduleName
+  LOGICAL :: isDElightOutVar
 
 
   REAL MaterialDensity
@@ -478,7 +479,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(3)=InArgs(5)
                 CurArgs = CurArgs-2
 
-              CASE('BRANCH')
+            CASE('AIRTERMINAL:SINGLEDUCT:VAV:REHEAT')
+                nodiff=.false.
+                OutArgs=InArgs
+                IF (SameString(InArgs(16), 'REVERSE')) THEN
+                  IF ( (.NOT. SameString(InArgs(17),'')) .OR. (.NOT. SameString(InArgs(18),''))  ) THEN
+                    OutArgs(16)='ReverseWithLimits'
+                  END IF
+                END IF
+
+            CASE('BRANCH')
                 ObjectName='Branch'
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1)=InArgs(1) ! No change
@@ -489,16 +499,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! eliminate Control Type fields
                 ! Control Type fields are on: 8, 13, 18, 23, ...
                 I = 0
+                CurField = 4
+                NewField = 3
                 DO WHILE (.TRUE.)
-                    I = I + 1
-                    CurField = 5*(I-1) + 3
-                    NewField = 4*(I-1) + 2
-                    IF ( CurField > CurArgs ) EXIT
-                    OutArgs(NewField+1)=InArgs(CurField+1)  ! Type
-                    OutArgs(NewField+2)=InArgs(CurField+2)  ! Name
-                    OutArgs(NewField+3)=InArgs(CurField+3)  ! Inlet Node Name
-                    OutArgs(NewField+4)=InArgs(CurField+4)  ! Outlet Node Name
+                    OutArgs(NewField)=InArgs(CurField)  ! Type
+                    OutArgs(NewField+1)=InArgs(CurField+1)  ! Name
+                    OutArgs(NewField+2)=InArgs(CurField+2)  ! Inlet Node Name
+                    OutArgs(NewField+3)=InArgs(CurField+3)  ! Outlet Node Name
                     ! Remove Control Type
+                    CurField = CurField + 5
+                    NewField = NewField + 4
+                    IF(NewField > CurArgs) EXIT
                     CurArgs = CurArgs-1
                 END DO
 
@@ -602,7 +613,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  Written = .true.
 
               CASE('DAYLIGHTING:DELIGHT:CONTROLS')
-                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
                  ObjectName='Daylighting:Controls'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  OutArgs(1:2) = InArgs(1:2)
@@ -636,7 +646,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ENDDO
 
               CASE('DAYLIGHTING:DELIGHT:REFERENCEPOINT')
-                 CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
                  ObjectName='Daylighting:ReferencePoint'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  OutArgs(1) = InArgs(1)
@@ -718,6 +727,36 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(1)='*'
                   nodiff=.false.
                 ENDIF
+
+                ! For Output:Variable that reference a specific Daylighting:Controls object need update to the new reference point name
+                IF (InArgs(1) .NE. '*') THEN
+                  isDElightOutVar = .FALSE. ! first assume that it is not a DElight related variable
+                  IF (SameString(InArgs(2)(1:27),'Daylighting Reference Point')) THEN
+                    DO iRefPt = 1,NumDElightRefPt
+                      IF (MakeUPPERCase(InArgs(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%RefPtName)) THEN
+                        isDElightOutVar = .TRUE. ! if it is related to DElight than flip flag
+                      ENDIF
+                    ENDDO
+                    IF (.NOT. isDElightOutVar) THEN
+                      OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
+                     ENDIF
+                  ENDIF
+                  
+                  IF (SameString(InArgs(2),'Daylighting Lighting Power Multiplier')) THEN
+                    DO iRefPt = 1,NumDElightRefPt
+                      IF (MakeUPPERCase(InArgs(1)) == MakeUPPERCase(DElightRefPt(iRefPt)%ZoneName)) THEN
+                        isDElightOutVar = .TRUE. ! if it is related to DElight than flip flag
+                        OutArgs(1) = DElightRefPt(iRefPt)%ControlName
+                      ENDIF
+                    ENDDO
+                    IF (.NOT. isDElightOutVar) THEN
+                      OutArgs(1) = TRIM(InArgs(1)) // '_DaylCtrl'
+                     ENDIF
+                  ENDIF
+                ENDIF
+
+                
+
                 CALL ScanOutputVariablesForReplacement(  &
                    2,  &
                    DelThis,  &

@@ -187,8 +187,8 @@
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
-    1,                      !- Begin Day of Month
-    12,                       !- End Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
     31,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -201,8 +201,8 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    No,                     !- Run Simulation for Sizing Periods
-    Yes;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Sizing Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 
@@ -1891,17 +1891,17 @@
     no,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ,                        !- System Outdoor Air Method
     1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -3087,16 +3087,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   PlantLoop,
@@ -3327,16 +3327,16 @@
     CW Circ Pump,            !- Name
     CW Supply Inlet Node,    !- Inlet Node Name
     CW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3366,20 +3366,20 @@
     Temperature,             !- Control Variable
     12,                      !- Minimum Lift {deltaC}
     32,                      !- Maximum Condenser Entering Water Temperature {C}
-    Tower Outlet Nodes;  !- Setpoint Node or NodeList Name
+    Tower Outlet Nodes;      !- Setpoint Node or NodeList Name
 
   NodeList,
-    Tower Outlet Nodes,
-    Condenser Tower Outlet Node,
-    Condenser Tower Outlet Node 2;
+    Tower Outlet Nodes,      !- Name
+    Condenser Tower Outlet Node,  !- Node 1 Name
+    Condenser Tower Outlet Node 2;  !- Node 2 Name
 
   BranchList,
     Condenser Supply Side Branches,  !- Name
     Condenser Supply Inlet Branch,  !- Branch 1 Name
     Condenser Supply Tower Branch,  !- Branch 2 Name
-    Condenser Supply Tower Branch 2,  !- Branch 2 Name
-    Condenser Supply Bypass Branch,  !- Branch 3 Name
-    Condenser Supply Outlet Branch;  !- Branch 4 Name
+    Condenser Supply Tower Branch 2,  !- Branch 3 Name
+    Condenser Supply Bypass Branch,  !- Branch 4 Name
+    Condenser Supply Outlet Branch;  !- Branch 5 Name
 
   ConnectorList,
     Condenser Supply Side Connectors,  !- Name
@@ -3408,7 +3408,7 @@
     Condenser Supply Tower Branch 2,  !- Name
     ,                        !- Pressure Drop Curve Name
     CoolingTower:VariableSpeed,  !- Component 1 Object Type
-    Central Tower 2,           !- Component 1 Name
+    Central Tower 2,         !- Component 1 Name
     Condenser Tower Inlet Node 2,  !- Component 1 Inlet Node Name
     Condenser Tower Outlet Node 2;  !- Component 1 Outlet Node Name
 
@@ -3515,15 +3515,15 @@
     Condenser Supply Splitter,  !- Name
     Condenser Supply Inlet Branch,  !- Inlet Branch Name
     Condenser Supply Tower Branch,  !- Outlet Branch 1 Name
-    Condenser Supply Tower Branch 2,
-    Condenser Supply Bypass Branch;  !- Outlet Branch 2 Name
+    Condenser Supply Tower Branch 2,  !- Outlet Branch 2 Name
+    Condenser Supply Bypass Branch;  !- Outlet Branch 3 Name
 
   Connector:Mixer,
     Condenser Supply Mixer,  !- Name
     Condenser Supply Outlet Branch,  !- Outlet Branch Name
     Condenser Supply Tower Branch,  !- Inlet Branch 1 Name
-    Condenser Supply Tower Branch 2,
-    Condenser Supply Bypass Branch;  !- Inlet Branch 2 Name
+    Condenser Supply Tower Branch 2,  !- Inlet Branch 2 Name
+    Condenser Supply Bypass Branch;  !- Inlet Branch 3 Name
 
   CondenserEquipmentOperationSchemes,
     Tower Loop Operation,    !- Name
@@ -3541,8 +3541,8 @@
     All Towers,              !- Name
     CoolingTower:VariableSpeed,  !- Equipment 1 Object Type
     Central Tower,           !- Equipment 1 Name
-    CoolingTower:VariableSpeed,  !- Equipment 1 Object Type
-    Central Tower 2;           !- Equipment 1 Name
+    CoolingTower:VariableSpeed,  !- Equipment 2 Object Type
+    Central Tower 2;         !- Equipment 2 Name
 
   CoolingTower:VariableSpeed,
     Central Tower,           !- Name
@@ -3569,7 +3569,7 @@
     4.0;                     !- Blowdown Concentration Ratio
 
   CoolingTower:VariableSpeed,
-    Central Tower 2,           !- Name
+    Central Tower 2,         !- Name
     Condenser Tower Inlet Node 2,  !- Water Inlet Node Name
     Condenser Tower Outlet Node 2,  !- Water Outlet Node Name
     YorkCalcUserDefined,     !- Model Type
@@ -3646,16 +3646,16 @@
     Cond Circ Pump,          !- Name
     Condenser Supply Inlet Node,  !- Inlet Node Name
     Condenser Pump Outlet Node,  !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
@@ -3777,6 +3777,7 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-Output:Variable,Condenser Tower Outlet Node,System Node Setpoint Temperature,hourly;
+  Output:Variable,Condenser Tower Outlet Node,System Node Setpoint Temperature,hourly;
 
-Output:Variable,Condenser Tower Outlet Node 2,System Node Setpoint Temperature,hourly;
+  Output:Variable,Condenser Tower Outlet Node 2,System Node Setpoint Temperature,hourly;
+

@@ -509,13 +509,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
+    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
+    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -534,13 +534,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU2 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU2 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
+    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
+    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -558,14 +558,14 @@
     TU4,                     !- Zone Terminal Unit Name
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     zTU4 Inlet Node,         !- Terminal Unit Air Inlet Node Name
-    SPACE4-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    SPACE4-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Air Outlet Node Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
+    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
+    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -584,13 +584,13 @@
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU3 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU3 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
+    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
+    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -608,14 +608,14 @@
     TU5,                     !- Zone Terminal Unit Name
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     zTU5 Inlet Node,         !- Terminal Unit Air Inlet Node Name
-    SPACE5-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Air Outlet Node Name
-    autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Cooling is Needed {m3/s}
-    autosize,                !- Supply Air Flow Rate During Heating Operation {m3/s}
-    autosize,                !- Supply Air Flow Rate When No Heating is Needed {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}
-    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    SPACE5-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Air Outlet Node Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
+    0,                       !- Heating Outdoor Air Flow Rate {m3/s}
+    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
@@ -671,7 +671,7 @@
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     TU4 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-    SPACE4-1 Air Terminal Mixer Secondary Inlet; !- Air Outlet Node Name
+    SPACE4-1 Air Terminal Mixer Secondary Inlet;  !- Air Outlet Node Name
 
   Fan:ConstantVolume,
     TU5 VRF Supply Fan,      !- Name
@@ -682,7 +682,7 @@
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     TU5 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-    SPACE5-1 Air Terminal Mixer Secondary Inlet; !- Air Outlet Node Name
+    SPACE5-1 Air Terminal Mixer Secondary Inlet;  !- Air Outlet Node Name
 
   COIL:Cooling:DX:VariableRefrigerantFlow,
     TU1 VRF DX Cooling Coil, !- Name
@@ -856,26 +856,20 @@
     For: AllDays,            !- Field 20
     Until: 24:00,1.0;        !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     FanAvailSched,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2,  !- Field 2
-    Until: 7:00,             !- Field 3
-    0.0,                     !- Field 4
-    Until: 21:00,            !- Field 5
-    1.0,                     !- Field 6
-    Until: 24:00,            !- Field 7
-    0.0,                     !- Field 8
+    For: WeekDays CustomDay1 CustomDay2, !- Field 2
+    Until: 7:00,0.0,         !- Field 3
+    Until: 21:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
     For: Weekends Holiday,   !- Field 9
-    Until: 24:00,            !- Field 10
-    0.0,                     !- Field 11
+    Until: 24:00,0.0,        !- Field 10
     For: SummerDesignDay,    !- Field 12
-    Until: 24:00,            !- Field 13
-    1.0,                     !- Field 14
+    Until: 24:00,1.0,        !- Field 13
     For: WinterDesignDay,    !- Field 15
-    Until: 24:00,            !- Field 16
-    1.0;                     !- Field 17
+    Until: 24:00,1.0;        !- Field 16
 
 !***************************************************************************
 
@@ -939,7 +933,7 @@ Schedule:Compact,
     10,                      !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     HVACTemplate Any Number; !- Name
 
   RunPeriod,
@@ -2509,10 +2503,10 @@ ScheduleTypeLimits,
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outside Air System
-    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    14.8,                    !- Dedicated Outside Air Low Setpoint for Design
-    15.6;                    !- Dedicated Outside Air High Setpoint for Design
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    14.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -2545,10 +2539,10 @@ ScheduleTypeLimits,
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outside Air System
-    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    14.8,                    !- Dedicated Outside Air Low Setpoint for Design
-    15.6;                    !- Dedicated Outside Air High Setpoint for Design
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    14.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -2581,10 +2575,10 @@ ScheduleTypeLimits,
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outside Air System
-    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    14.8,                    !- Dedicated Outside Air Low Setpoint for Design
-    15.6;                    !- Dedicated Outside Air High Setpoint for Design
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    14.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
@@ -2617,10 +2611,10 @@ ScheduleTypeLimits,
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outside Air System
-    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    14.8,                    !- Dedicated Outside Air Low Setpoint for Design
-    15.6;                    !- Dedicated Outside Air High Setpoint for Design
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    14.8,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -2653,10 +2647,10 @@ ScheduleTypeLimits,
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
     ZoneAirDistribution,     !- Design Specification Zone Air Distribution Object Name
-    Yes,                     !- Account for Dedicated Outside Air System
-    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
-    14.5,                    !- Dedicated Outside Air Low Setpoint for Design
-    15.6;                    !- Dedicated Outside Air High Setpoint for Design
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
+    14.5,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    15.6;                    !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
@@ -2667,7 +2661,7 @@ ScheduleTypeLimits,
 
 !-   ===========  ALL OBJECTS IN CLASS: DESIGNSPECIFICATION:ZONEAIRDISTRIBUTION ===========
 
-DesignSpecification:ZoneAirDistribution,
+  DesignSpecification:ZoneAirDistribution,
     ZoneAirDistribution,     !- Name
     1,                       !- Zone Air Distribution Effectiveness in Cooling Mode {dimensionless}
     1,                       !- Zone Air Distribution Effectiveness in Heating Mode {dimensionless}
@@ -2676,7 +2670,7 @@ DesignSpecification:ZoneAirDistribution,
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:SYSTEM ===========
 
-Sizing:System,
+  Sizing:System,
     DOAS,                    !- AirLoop Name
     VentilationRequirement,  !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
@@ -2905,8 +2899,8 @@ Sizing:System,
 
   NodeList,
     OutsideAirInletNodes,    !- Name
-    MyVRFOANode,             !- Node 6 Name
-    DOAS OUTDOOR AIR INLET;  !- Node 7 Name
+    MyVRFOANode,             !- Node 1 Name
+    DOAS OUTDOOR AIR INLET;  !- Node 2 Name
 
   NodeList,
     SPACE1-1 In Nodes,       !- Name
@@ -2930,96 +2924,96 @@ Sizing:System,
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:MIXER ===========
 
-AirTerminal:SingleDuct:Mixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE1-1 DOAS Air Terminal,  !- Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
-    TU1,                         !- ZoneHVAC Unit Object Name
-    TU1 Inlet Node,              !- Mixer Outlet Node Name
-    SPACE1-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    TU1,                     !- ZoneHVAC Unit Object Name
+    TU1 Inlet Node,          !- Mixer Outlet Node Name
+    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;                                    !- Mixer Connection Type
+    InletSide;               !- Mixer Connection Type
 
-AirTerminal:SingleDuct:Mixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
-    TU2,                         !- ZoneHVAC Unit Object Name
-    TU2 Inlet Node,              !- Mixer Outlet Node Name
-    SPACE2-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    TU2,                     !- ZoneHVAC Unit Object Name
+    TU2 Inlet Node,          !- Mixer Outlet Node Name
+    SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;                                    !- Mixer Connection Type
+    InletSide;               !- Mixer Connection Type
 
-AirTerminal:SingleDuct:Mixer,
+  AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
-    TU3,                         !- ZoneHVAC Unit Object Name
-    TU3 Inlet Node,              !- Mixer Outlet Node Name
-    SPACE3-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    TU3,                     !- ZoneHVAC Unit Object Name
+    TU3 Inlet Node,          !- Mixer Outlet Node Name
+    SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;                                    !- Mixer Connection Type
+    InletSide;               !- Mixer Connection Type
 
-AirTerminal:SingleDuct:Mixer,
-    SPACE4-1 DOAS Air Terminal,   !- Name
+  AirTerminal:SingleDuct:Mixer,
+    SPACE4-1 DOAS Air Terminal,  !- Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
-    TU4,                          !- ZoneHVAC Unit Object Name
-    TU4 Outlet Node,              !- Mixer Outlet Node Name
-    SPACE4-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    TU4,                     !- ZoneHVAC Unit Object Name
+    TU4 Outlet Node,         !- Mixer Outlet Node Name
+    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE4-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;                                   !- Mixer Connection Type
+    SupplySide;              !- Mixer Connection Type
 
-AirTerminal:SingleDuct:Mixer,
-    SPACE5-1 DOAS Air Terminal,   !- Name
+  AirTerminal:SingleDuct:Mixer,
+    SPACE5-1 DOAS Air Terminal,  !- Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- ZoneHVAC Unit Object Type
-    TU5,                          !- ZoneHVAC Unit Object Name
-    TU5 Outlet Node,              !- Mixer Outlet Node Name
-    SPACE5-1 Air Terminal Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
+    TU5,                     !- ZoneHVAC Unit Object Name
+    TU5 Outlet Node,         !- Mixer Outlet Node Name
+    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE5-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;                                   !- Mixer Connection Type
+    SupplySide;              !- Mixer Connection Type
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
-ZoneHVAC:AirDistributionUnit,
+  ZoneHVAC:AirDistributionUnit,
     SPACE1-1 DOAS ATU,       !- Name
     TU1 Inlet Node,          !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name
 
-ZoneHVAC:AirDistributionUnit,
+  ZoneHVAC:AirDistributionUnit,
     SPACE2-1 DOAS ATU,       !- Name
     TU2 Inlet Node,          !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE2-1 DOAS Air Terminal;  !- Air Terminal Name
 
-ZoneHVAC:AirDistributionUnit,
+  ZoneHVAC:AirDistributionUnit,
     SPACE3-1 DOAS ATU,       !- Name
     TU3 Inlet Node,          !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE3-1 DOAS Air Terminal;  !- Air Terminal Name
 
-ZoneHVAC:AirDistributionUnit,
+  ZoneHVAC:AirDistributionUnit,
     SPACE4-1 DOAS ATU,       !- Name
     TU4 Outlet Node,         !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE4-1 DOAS Air Terminal;  !- Air Terminal Name
 
-ZoneHVAC:AirDistributionUnit,
+  ZoneHVAC:AirDistributionUnit,
     SPACE5-1 DOAS ATU,       !- Name
     TU5 Outlet Node,         !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:Mixer,!- Air Terminal Object Type
+    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type
     SPACE5-1 DOAS Air Terminal;  !- Air Terminal Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE1-1,                !- Zone Name
     SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name
     SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Zone Air Exhaust Node or NodeList Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 RETURN OUTLET;       !- Zone Return Air Node Name
+    SPACE1-1 RETURN OUTLET;  !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
     SPACE2-1 Eq,             !- Zone Conditioning Equipment List Name
     SPACE2-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
-    SPACE2-1 Air Terminal Mixer Secondary Inlet,      !- Zone Air Exhaust Node or NodeList Name
+    SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
     SPACE2-1 RETURN OUTLET;  !- Zone Return Air Node Name
 
@@ -3027,7 +3021,7 @@ ZoneHVAC:AirDistributionUnit,
     SPACE3-1,                !- Zone Name
     SPACE3-1 Eq,             !- Zone Conditioning Equipment List Name
     SPACE3-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
-    SPACE3-1 Air Terminal Mixer Secondary Inlet,      !- Zone Air Exhaust Node or NodeList Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
     SPACE3-1 RETURN OUTLET;  !- Zone Return Air Node Name
 
@@ -3103,8 +3097,7 @@ ZoneHVAC:AirDistributionUnit,
     Htg-SetP-Sch,            !- Heating Setpoint Temperature Schedule Name
     Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name
 
-
-ZoneHVAC:EquipmentList,
+  ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
@@ -3162,10 +3155,9 @@ ZoneHVAC:EquipmentList,
 ! ************** DOAS System providing OA to the inlet side of VRF terminal units *********
 ! ***** Central OA is Fed Directly to VRF terminal unit inlet and mixed with re-cir air ***
 !
-
 !-   ===========  ALL OBJECTS IN CLASS: FAN:VARIABLEVOLUME ===========
 
-Fan:VariableVolume,
+  Fan:VariableVolume,
     DOAS Supply Fan,         !- Name
     FanAvailSched,           !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
@@ -3184,10 +3176,9 @@ Fan:VariableVolume,
     DOAS Mixed Air Outlet,   !- Air Inlet Node Name
     DOAS Supply Fan Outlet;  !- Air Outlet Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT ===========
 
-HeatExchanger:AirToAir:SensibleAndLatent,
+  HeatExchanger:AirToAir:SensibleAndLatent,
     DOAS Heat Recovery,      !- Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
     autosize,                !- Nominal Supply Air Flow Rate {m3/s}
@@ -3212,10 +3203,9 @@ HeatExchanger:AirToAir:SensibleAndLatent,
     0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}
     Yes;                     !- Economizer Lockout
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
 
-Controller:OutdoorAir,
+  Controller:OutdoorAir,
     DOAS OA Controller,      !- Name
     DOAS Relief Air Outlet,  !- Relief Air Outlet Node Name
     DOAS Air Loop Inlet,     !- Return Air Node Name
@@ -3233,18 +3223,16 @@ Controller:OutdoorAir,
     NoLockout,               !- Lockout Type
     ProportionalMinimum;     !- Minimum Limit Type
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:CONTROLLERLIST ===========
 
-AirLoopHVAC:ControllerList,
+  AirLoopHVAC:ControllerList,
     DOAS OA System Controllers,  !- Name
     Controller:OutdoorAir,   !- Controller 1 Object Type
     DOAS OA Controller;      !- Controller 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC ===========
 
-AirLoopHVAC,
+  AirLoopHVAC,
     DOAS,                    !- Name
     ,                        !- Controller List Name
     DOAS Availability Managers,  !- Availability Manager List Name
@@ -3256,39 +3244,35 @@ AirLoopHVAC,
     DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names
     DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM:EQUIPMENTLIST ===========
 
-AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     DOAS OA System Equipment,!- Name
     HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type
     DOAS Heat Recovery,      !- Component 1 Name
     OutdoorAir:Mixer,        !- Component 2 Object Type
     DOAS OA Mixing Box;      !- Component 2 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM ===========
 
-AirLoopHVAC:OutdoorAirSystem,
-    DOAS OA System,              !- Name
+  AirLoopHVAC:OutdoorAirSystem,
+    DOAS OA System,          !- Name
     DOAS OA System Controllers,  !- Controller List Name
-    DOAS OA System Equipment,    !- Outdoor Air Equipment List Name
+    DOAS OA System Equipment,!- Outdoor Air Equipment List Name
     DOAS Availability Managers;  !- Availability Manager List Name
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 
-OutdoorAir:Mixer,
+  OutdoorAir:Mixer,
     DOAS OA Mixing Box,      !- Name
     DOAS Mixed Air Outlet,   !- Mixed Air Node Name
     DOAS Heat Recovery Supply Outlet,  !- Outdoor Air Stream Node Name
     DOAS Relief Air Outlet,  !- Relief Air Stream Node Name
     DOAS Air Loop Inlet;     !- Return Air Stream Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONESPLITTER ===========
 
-AirLoopHVAC:ZoneSplitter,
+  AirLoopHVAC:ZoneSplitter,
     DOAS Zone Splitter,      !- Name
     DOAS Supply Path Inlet,  !- Inlet Node Name
     SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Outlet 1 Node Name
@@ -3297,19 +3281,17 @@ AirLoopHVAC:ZoneSplitter,
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Outlet 4 Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet;  !- Outlet 5 Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 
-AirLoopHVAC:SupplyPath,
+  AirLoopHVAC:SupplyPath,
     DOAS Supply Path,        !- Name
     DOAS Supply Path Inlet,  !- Supply Air Path Inlet Node Name
     AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
     DOAS Zone Splitter;      !- Component 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONEMIXER ===========
 
-AirLoopHVAC:ZoneMixer,
+  AirLoopHVAC:ZoneMixer,
     DOAS Zone Mixer,         !- Name
     DOAS Return Air Outlet,  !- Outlet Node Name
     SPACE1-1 Return Outlet,  !- Inlet 1 Node Name
@@ -3318,19 +3300,17 @@ AirLoopHVAC:ZoneMixer,
     SPACE4-1 Return Outlet,  !- Inlet 4 Node Name
     SPACE5-1 Return Outlet;  !- Inlet 5 Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:RETURNPATH ===========
 
-AirLoopHVAC:ReturnPath,
+  AirLoopHVAC:ReturnPath,
     DOAS Return Path,        !- Name
     DOAS Return Air Outlet,  !- Return Air Path Outlet Node Name
     AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
     DOAS Zone Mixer;         !- Component 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
 
-Branch,
+  Branch,
     DOAS Main Branch,        !- Name
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
@@ -3344,32 +3324,29 @@ Branch,
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
-BranchList,
+  BranchList,
     DOAS Branches,           !- Name
     DOAS Main Branch;        !- Branch 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGER:SCHEDULED ===========
 
-AvailabilityManager:Scheduled,
+  AvailabilityManager:Scheduled,
     DOAS Availability,       !- Name
     FanAvailSched;           !- Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGERASSIGNMENTLIST ===========
 
-AvailabilityManagerAssignmentList,
+  AvailabilityManagerAssignmentList,
     DOAS Availability Managers,  !- Name
     AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
     DOAS Availability;       !- Availability Manager 1 Name
 
-Schedule:Compact,
+  Schedule:Compact,
     HVACTemplate-Always 1,   !- Name
     HVACTemplate Any Number, !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    1;                       !- Field 4
-
+    Until: 24:00,1;          !- Field 3
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
@@ -3501,162 +3478,67 @@ Schedule:Compact,
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-  Output:Variable,
-    DOAS Mixed Air Outlet,   !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Mixed Air Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    DOAS Mixed Air Outlet,   !- Key Value
-    System Node Temperature, !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Mixed Air Outlet,System Node Temperature,timestep;
 
-  Output:Variable,
-    DOAS Heat Recovery Supply Outlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Heat Recovery Supply Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    DOAS Heat Recovery Supply Outlet,  !- Key Value
-    System Node Temperature, !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Heat Recovery Supply Outlet,System Node Temperature,timestep;
 
-  Output:Variable,
-    DOAS Outdoor Air Inlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Outdoor Air Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    DOAS Outdoor Air Inlet,  !- Key Value
-    System Node Temperature, !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Outdoor Air Inlet,System Node Temperature,timestep;
 
-  Output:Variable,
-    DOAS Air Loop Inlet,     !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Air Loop Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    DOAS Air Loop Inlet,     !- Key Value
-    System Node Temperature, !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Air Loop Inlet,System Node Temperature,timestep;
 
-  Output:Variable,
-    DOAS Relief Air Outlet,  !- Key Value
-    System Node Mass Flow Rate,  !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Relief Air Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    DOAS Relief Air Outlet,  !- Key Value
-    System Node Temperature, !- Variable Name
-    timestep;                !- Reporting Frequency
+  Output:Variable,DOAS Relief Air Outlet,System Node Temperature,timestep;
 
-  Output:Variable,
-    DOAS Return Air Outlet,     !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,DOAS Return Air Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE1-1 Return Outlet,     !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE1-1 Return Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE2-1 Return Outlet,     !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE2-1 Return Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE3-1 Return Outlet,     !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE3-1 Return Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE4-1 Return Outlet,     !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE4-1 Return Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE5-1 Return Outlet,     !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE5-1 Return Outlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    DOAS Supply Path Inlet,     !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,DOAS Supply Path Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE1-1 Air Terminal Mixer Primary Inlet,   !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE1-1 Air Terminal Mixer Primary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE2-1 Air Terminal Mixer Primary Inlet,   !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE2-1 Air Terminal Mixer Primary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE3-1 Air Terminal Mixer Primary Inlet,   !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE3-1 Air Terminal Mixer Primary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE4-1 Air Terminal Mixer Primary Inlet,   !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE4-1 Air Terminal Mixer Primary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE5-1 Air Terminal Mixer Primary Inlet,   !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE5-1 Air Terminal Mixer Primary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE1-1 Air Terminal Mixer Secondary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE2-1 Air Terminal Mixer Secondary Inlet, !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE2-1 Air Terminal Mixer Secondary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE3-1 Air Terminal Mixer Secondary Inlet, !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE3-1 Air Terminal Mixer Secondary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE4-1 Air Terminal Mixer Secondary Inlet, !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE4-1 Air Terminal Mixer Secondary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    SPACE5-1 Air Terminal Mixer Secondary Inlet, !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,SPACE5-1 Air Terminal Mixer Secondary Inlet,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    TU1 Outlet Node,            !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,TU1 Outlet Node,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    TU2 Outlet Node,            !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,TU2 Outlet Node,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    TU3 Outlet Node,            !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,TU3 Outlet Node,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    TU4 Outlet Node,            !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,TU4 Outlet Node,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,
-    TU5 Outlet Node,            !- Key Value
-    System Node Mass Flow Rate, !- Variable Name
-    timestep;                   !- Reporting Frequency
+  Output:Variable,TU5 Outlet Node,System Node Mass Flow Rate,timestep;
+

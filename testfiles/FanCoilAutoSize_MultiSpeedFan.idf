@@ -601,13 +601,13 @@
     Until: 24:00,0.00,       !- Field 11
     For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
     Until: 24:00,0.00,       !- Field 14
-    For: SummerDesignDay,    !- Field 15
-    Until: 24:00,1.00,       !- Field 16
-    For: WinterDesignDay,    !- Field 17
-    Until: 24:00,1.00,       !- Field 18
-    Through: 12/31,          !- Field 19
-    For: Alldays,            !- Field 20
-    Until: 24:00,1.00;       !- Field 21
+    For: SummerDesignDay,    !- Field 16
+    Until: 24:00,1.00,       !- Field 17
+    For: WinterDesignDay,    !- Field 19
+    Until: 24:00,1.00,       !- Field 20
+    Through: 12/31,          !- Field 22
+    For: Alldays,            !- Field 23
+    Until: 24:00,1.00;       !- Field 24
 
   Zone,
     West Zone,               !- Name
@@ -1325,16 +1325,16 @@
     ChW Circ Pump,           !- Name
     ChW Supply Inlet Node,   !- Inlet Node Name
     ChW Pump Outlet Node,    !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   BranchList,
@@ -1558,16 +1558,16 @@
     HW Circ Pump,            !- Name
     HW Supply Inlet Node,    !- Inlet Node Name
     HW Pump Outlet Node,     !- Outlet Node Name
-    autosize,                !- Rated Flow Rate {m3/s}
-    179352,                  !- Rated Pump Head {Pa}
-    autosize,                !- Rated Power Consumption {W}
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    179352,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     0,                       !- Coefficient 1 of the Part Load Performance Curve
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    0,                       !- Minimum Flow Rate {m3/s}
+    0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
   BranchList,
@@ -1874,7 +1874,7 @@
     Zone2FanCoilAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone2FanCoilOAMixer,     !- Outdoor Air Mixer Name
-    Fan:OnOff,      !- Supply Air Fan Object Type
+    Fan:OnOff,               !- Supply Air Fan Object Type
     Zone2FanCoilFan,         !- Supply Air Fan Name
     Coil:Cooling:Water,      !- Cooling Coil Object Type
     Zone2FanCoilCoolingCoil, !- Cooling Coil Name
@@ -2098,17 +2098,17 @@
 
   Output:Variable,Zone3FanCoilAirInletNode,System Node Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power, timestep;
+  Output:Variable,*,Fan Electric Power,timestep;
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature, timestep;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
-  Output:Variable,*,Fan Coil Runtime Fraction, timestep;
-  
-  Output:Variable,*,Fan Coil Fan Speed Level, timestep;
+  Output:Variable,*,Fan Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,Fan Coil Speed Ratio, timestep;
+  Output:Variable,*,Fan Coil Fan Speed Level,timestep;
 
-  Output:Variable,*,Fan Coil Part Load Ratio, timestep; 
+  Output:Variable,*,Fan Coil Speed Ratio,timestep;
+
+  Output:Variable,*,Fan Coil Part Load Ratio,timestep;
 
   Output:VariableDictionary,Regular;
 
@@ -2138,6 +2138,3 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-
-  
-  

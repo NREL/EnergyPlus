@@ -2957,10 +2957,9 @@
     AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
     DOAS Zone Mixer;         !- Component 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
 
-Branch,
+  Branch,
     SPACE1-1 Cooling Coil ChW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
@@ -2968,7 +2967,7 @@ Branch,
     SPACE1-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
     SPACE1-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE1-1 Heating Coil HW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
@@ -2976,7 +2975,7 @@ Branch,
     SPACE1-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name
     SPACE1-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE2-1 Cooling Coil ChW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
@@ -2984,7 +2983,7 @@ Branch,
     SPACE2-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
     SPACE2-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE2-1 Heating Coil HW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
@@ -2992,7 +2991,7 @@ Branch,
     SPACE2-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name
     SPACE2-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE3-1 Cooling Coil ChW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
@@ -3000,7 +2999,7 @@ Branch,
     SPACE3-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
     SPACE3-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE3-1 Heating Coil HW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
@@ -3008,7 +3007,7 @@ Branch,
     SPACE3-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name
     SPACE3-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE4-1 Cooling Coil ChW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
@@ -3016,7 +3015,7 @@ Branch,
     SPACE4-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
     SPACE4-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE4-1 Heating Coil HW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
@@ -3024,7 +3023,7 @@ Branch,
     SPACE4-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name
     SPACE4-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE5-1 Cooling Coil ChW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
@@ -3032,7 +3031,7 @@ Branch,
     SPACE5-1 Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
     SPACE5-1 Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SPACE5-1 Heating Coil HW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
@@ -3040,7 +3039,7 @@ Branch,
     SPACE5-1 Heating Coil HW Inlet,  !- Component 1 Inlet Node Name
     SPACE5-1 Heating Coil HW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     DOAS Main Branch,        !- Name
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
@@ -3060,7 +3059,7 @@ Branch,
     DOAS Heating Coil Outlet,!- Component 4 Inlet Node Name
     DOAS Supply Fan Outlet;  !- Component 4 Outlet Node Name
 
-Branch,
+  Branch,
     DOAS Cooling Coil ChW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
@@ -3068,7 +3067,7 @@ Branch,
     DOAS Cooling Coil ChW Inlet,  !- Component 1 Inlet Node Name
     DOAS Cooling Coil ChW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     DOAS Heating Coil HW Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
@@ -3076,23 +3075,23 @@ Branch,
     DOAS Heating Coil HW Inlet,  !- Component 1 Inlet Node Name
     DOAS Heating Coil HW Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Main Boiler HW Branch,   !- Name
     ,                        !- Pressure Drop Curve Name
     DistrictHeating,         !- Component 1 Object Type
-    Purchased Heating,         !- Component 1 Name
-    Purchased Heat Inlet Node, !- Component 1 Inlet Node Name
-    Purchased Heat Outlet Node;   !- Component 1 Outlet Node Name
+    Purchased Heating,       !- Component 1 Name
+    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
+    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Main Chiller ChW Branch, !- Name
     ,                        !- Pressure Drop Curve Name
-    DistrictCooling,    !- Component 1 Object Type
-    Purchased Cooling,            !- Component 1 Name
+    DistrictCooling,         !- Component 1 Object Type
+    Purchased Cooling,       !- Component 1 Name
     Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name
-    Purchased Cooling Outlet Node; !- Component 1 Outlet Node Name
+    Purchased Cooling Outlet Node;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Hot Water Loop HW Supply Bypass Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3100,7 +3099,7 @@ Branch,
     Hot Water Loop HW Supply Bypass Inlet,  !- Component 1 Inlet Node Name
     Hot Water Loop HW Supply Bypass Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Hot Water Loop HW Supply Inlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
@@ -3108,7 +3107,7 @@ Branch,
     Hot Water Loop HW Supply Inlet,  !- Component 1 Inlet Node Name
     Hot Water Loop HW Pump Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Hot Water Loop HW Supply Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3116,7 +3115,7 @@ Branch,
     Hot Water Loop HW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name
     Hot Water Loop HW Supply Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Hot Water Loop HW Demand Inlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3124,7 +3123,7 @@ Branch,
     Hot Water Loop HW Demand Inlet,  !- Component 1 Inlet Node Name
     Hot Water Loop HW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Hot Water Loop HW Demand Bypass Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3132,7 +3131,7 @@ Branch,
     Hot Water Loop HW Demand Bypass Inlet,  !- Component 1 Inlet Node Name
     Hot Water Loop HW Demand Bypass Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Hot Water Loop HW Demand Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3140,7 +3139,7 @@ Branch,
     Hot Water Loop HW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name
     Hot Water Loop HW Demand Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Chilled Water Loop ChW Supply Bypass Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3148,7 +3147,7 @@ Branch,
     Chilled Water Loop ChW Supply Bypass Inlet,  !- Component 1 Inlet Node Name
     Chilled Water Loop ChW Supply Bypass Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Chilled Water Loop ChW Supply Inlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
@@ -3156,7 +3155,7 @@ Branch,
     Chilled Water Loop ChW Supply Inlet,  !- Component 1 Inlet Node Name
     Chilled Water Loop ChW Pump Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Chilled Water Loop ChW Supply Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3164,7 +3163,7 @@ Branch,
     Chilled Water Loop ChW Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name
     Chilled Water Loop ChW Supply Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Chilled Water Loop ChW Demand Inlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3172,7 +3171,7 @@ Branch,
     Chilled Water Loop ChW Demand Inlet,  !- Component 1 Inlet Node Name
     Chilled Water Loop ChW Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Chilled Water Loop ChW Demand Bypass Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3180,14 +3179,13 @@ Branch,
     Chilled Water Loop ChW Demand Bypass Inlet,  !- Component 1 Inlet Node Name
     Chilled Water Loop ChW Demand Bypass Outlet;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     Chilled Water Loop ChW Demand Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     Chilled Water Loop ChW Demand Outlet Pipe,  !- Component 1 Name
     Chilled Water Loop ChW Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name
     Chilled Water Loop ChW Demand Outlet;  !- Component 1 Outlet Node Name
-
 
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
