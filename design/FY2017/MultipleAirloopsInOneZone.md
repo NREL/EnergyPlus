@@ -15,6 +15,7 @@ Allow Multiple Air Loops to One Thermal Zone
  	 - Add Design section at end
  	 - Add airflow windows - need to specify optional return node
  	 - *Change* - add the new field referencing `DesignSpecification:AirTerminal:Sizing` object to  `ZoneHVAC:AirDistributionUnit` and `AirTerminal:SingleDuct:Uncontrolled` (*not* to every terminal unit as previously proposed).
+ - January 5, 2017 - Final Design
  
 *Reviewers - Hong, Griffith, Gu, Buhl, Raustad, Horowitz, Merket, Winkler, Scheier, Lee
 
@@ -67,6 +68,10 @@ Rather than develop more workaround components, it is time to remove the restric
 3. Minimize the amount of fields in the new DesignSpecification:AirTerminal:Sizing object.  Focus only on changes from the base Sizing:Zone values.
 
 4. Need more details on how return flows will be determined.
+
+5. Make it clear that the air terminal sizing factors are based on sensible heating/cooling loads. *(e-mail RR)*
+
+6. Consider adding a new array indexed by ADU number rather than morphing the existing `TermUnitSizing` and `TermUnitFinalZoneSizing` which are currently indexed by zone. *(Sizing conference call 1/4/2017)*
 
 ## Overview ##
 
@@ -195,19 +200,19 @@ This object modifies the sizing of a given terminal unit given the base sizing r
 
 *Name*
 
-Name of the design specification air terminal sizing object. This name may be reference by any `AirTerminal:*` object.
+Name of the design specification air terminal sizing object. This name may be referenced by a `ZoneHVAC:AirDistributionUnit` or `AirTerminal:SingleDuct:Uncontrolled` object.
 
-*Fraction of Design Cooling Load*
+*Fraction of Design Sensible Cooling Load*
 
-The fraction of the design cooling load to be met by this terminal unit. This fraction is applied after the Zone Cooling Sizing Factor (see `Sizing:Zone`).
+The fraction of the design sensible cooling load to be met by this terminal unit. This fraction is applied after the Zone Cooling Sizing Factor (see `Sizing:Zone`).
 
 *Cooling Design Supply Air Temperature Difference Ratio*
 
 This ratio adjusts the supply air temperature difference used to calculate the cooling design supply air flow rate for this terminal unit.
 
-*Fraction of Design Heating Load*
+*Fraction of Design Sensible Heating Load*
 
-The fraction of the design heating load to be met by this terminal unit. This fraction is applied after the Zone Heating Sizing Factor (see `Sizing:Zone`).
+The fraction of the design sensible heating load to be met by this terminal unit. This fraction is applied after the Zone Heating Sizing Factor (see `Sizing:Zone`).
 
 *Heating Design Supply Air Temperature Difference Ratio*
 
@@ -409,6 +414,8 @@ In struct `EquipConfiguration`
  - Add `int NumAirLoops` (this may not always equal `NumReturnNodes` if an airloop has no return path)
  - Add `Array1D_int AirLoopPointer`
 
+   - *RR recommends that these align so that AirLoopPointer(6) corresponds with ReturnNode(6) to avoid mistakes.*
+
 ### 3. Add a new field to AirloopHVAC to specify loop return air flow fraction
 
 #### DataAirSystems.hh ####
@@ -525,6 +532,7 @@ Searching on `.ReturnAirNode` and `.AirLoopNum` shows relevant hits in:
 - Add new function `SizingManager::GetAirTerminalSizing` to process input for the new ` DesignSpecification:AirTerminal:Sizing` object.
 
 - Change `TermUnitSizing` and `TermUnitFinalZoneSizing` to be indexed by air distribution unit (ADU) number instead of by zone. Direct air terminal units will be added to the end of the ADU list for this indexing.
+  - *If this proves to be too intrusive or risky, consider adding yet another array that is indexed by ADU.* 
 - Expand `TermUnitSizing` to include pertinent inputs from a referenced `DesignSpecification:AirTerminal:Sizing` object. These fields will default to 1.0 if there is no `DesignSpecification:AirTerminal:Sizing` object for a given ADU.
 - In `UpdateSysSizing`, change anything that is indexed by CtrlZoneNum (or equivalent) to be indexed by air distribution unit.
 - Add two arrays to `DataAirloop::AirLoopZoneEquipConnectData`
