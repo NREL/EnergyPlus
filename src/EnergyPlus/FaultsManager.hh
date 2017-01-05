@@ -169,12 +169,15 @@ namespace FaultsManager {
 			Offset( 0.0 ),
 			Status( false )
 		{}
-		
+
+		// Virtual Destructor
+		virtual ~FaultProperties() = default;
+
 		public:
 			Real64 CalFaultOffsetAct();
 
 	};
-	
+
 	struct FaultPropertiesEconomizer : public FaultProperties // Class for fault models related with economizer
 	{
 		// Members
@@ -182,7 +185,7 @@ namespace FaultsManager {
 		int ControllerID; // Point to a controller associated with the fault
 		std::string ControllerType; // Controller type
 		std::string ControllerName; // Controller name
-	
+
 		// Default Constructor
 		FaultPropertiesEconomizer():
 			ControllerTypeEnum( 0 ),
@@ -190,34 +193,46 @@ namespace FaultsManager {
 			ControllerType( "" ),
 			ControllerName( "" )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesEconomizer() = default;
+
 	};
-	
+
 	struct FaultPropertiesThermostat : public FaultProperties // Class for FaultModel:ThermostatOffset
 	{
 		// Members
 		std::string FaultyThermostatName; // The faulty thermostat name
-	
+
 		// Default Constructor
 		FaultPropertiesThermostat():
 			FaultyThermostatName( "" )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesThermostat() = default;
+
 	};
-	
+
 	struct FaultPropertiesHumidistat : public FaultProperties // Class for FaultModel:HumidistatOffset
 	{
 		// Members
 		std::string FaultyThermostatName; // The faulty thermostat name
 		std::string FaultyHumidistatName; // The faulty humidistat name
 		std::string FaultyHumidistatType; // The faulty humidistat type
-	
+
 		// Default Constructor
 		FaultPropertiesHumidistat():
 			FaultyThermostatName( "" ),
 			FaultyHumidistatName( "" ),
 			FaultyHumidistatType( "" )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesHumidistat() = default;
+
 	};
-	
+
 	struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
 	{
 		// Members
@@ -229,7 +244,7 @@ namespace FaultsManager {
 		Real64 Rfa; // Air side fouling factor
 		Real64 Aout; // Coil outside surface area
 		Real64 Aratio; // Inside to outside surface area ratio
-	
+
 		// Default Constructor
 		FaultPropertiesFoulingCoil():
 			FouledCoilName( "" ),
@@ -241,8 +256,12 @@ namespace FaultsManager {
 			Aout( 0.0 ),
 			Aratio( 0.0 )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesFoulingCoil() = default;
+
 	};
-	
+
 	struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
 	{
 		// Members
@@ -254,7 +273,7 @@ namespace FaultsManager {
 		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule
 		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
 		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
-	
+
 		// Default Constructor
 		FaultPropertiesAirFilter():
 			FaultyAirFilterFanName( "" ),
@@ -266,36 +285,42 @@ namespace FaultsManager {
 			FaultyAirFilterFanPressInc( 0.0 ),
 			FaultyAirFilterFanFlowDec( 0.0 )
 		{}
-		
+
+		// Destructor
+		virtual ~FaultPropertiesAirFilter() = default;
+
 		public:
 			bool CheckFaultyAirFilterFanCurve();
 	};
-	
+
 	struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
 	{
 		// Members
 		std::string ChillerType; // Chiller type
 		std::string ChillerName; // Chiller name
-	
+
 		// Default Constructor
 		FaultPropertiesChillerSWT():
 			ChillerType( "" ),
 			ChillerName( "" )
 		{}
-		
+
+		// Destructor
+		virtual ~FaultPropertiesChillerSWT() = default;
+
 		public:
 			void CalFaultChillerSWT(
 				bool FlagConstantFlowChiller, // True if chiller is constant flow and false if it is variable flow
 				Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
 				Real64 Cp, // Local fluid specific heat
-				Real64 EvapInletTemp, // Chiller evaporator inlet water temperature 
-				Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature 
+				Real64 EvapInletTemp, // Chiller evaporator inlet water temperature
+				Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature
 				Real64 & EvapMassFlowRate, // Chiller mass flow rate
 				Real64 & QEvaporator // Chiller evaporator heat transfer rate
 			);
-			
+
 	};
-	
+
 	// Object Data
 	extern Array1D< FaultPropertiesEconomizer > FaultsEconomizer;
 	extern Array1D< FaultPropertiesFoulingCoil > FouledCoils;
@@ -311,7 +336,7 @@ namespace FaultsManager {
 
 	void
 	CheckAndReadFaults();
-	
+
 	void
 	clear_state();
 
