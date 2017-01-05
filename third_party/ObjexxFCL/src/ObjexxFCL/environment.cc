@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,7 @@ void
 get_environment_variable( std::string const & name, Optional< std::string > value, Optional< int > length, Optional< int > status, Optional< bool const > trim_name )
 {
 	std::string val;
-	char const * const cval( getenv( name.c_str() ) );
+	char const * const cval( std::getenv( name.c_str() ) );
 	if ( cval ) val = cval;
 	if ( ( ! trim_name.present() ) || ( trim_name() ) ) rstrip( val ); // Strip any trailing spaces
 	if ( value.present() ) value = val;
@@ -46,7 +46,7 @@ get_environment_variable( std::string const & name, Optional< std::string > valu
 std::string
 get_env_var( std::string const & name )
 {
-	char const * const cval( getenv( name.c_str() ) );
+	char const * const cval( std::getenv( name.c_str() ) );
 	return ( cval != nullptr ? cval : "" );
 }
 
@@ -54,7 +54,7 @@ get_env_var( std::string const & name )
 std::string::size_type
 getenvqq( std::string const & name, std::string & value )
 {
-	char const * const cval( getenv( name.c_str() ) );
+	char const * const cval( std::getenv( name.c_str() ) );
 	value = ( cval != nullptr ? cval : "" );
 	return value.length();
 }

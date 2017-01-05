@@ -3,9 +3,6 @@
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
 //
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
-//
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
 // granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::Low Temperature Radiant Unit Tests
 
@@ -1362,6 +1350,105 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 	EXPECT_EQ( CFloRadSys( RadSysNum ).WaterVolFlowMax, CFloRadSys( RadSysNum ).PumpEffic );
 	EXPECT_TRUE( compare_err_stream( error_string04, true ) );
 	EXPECT_EQ( InitErrorFound, true );
+
+}
+
+TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
+
+	int RadSysNum( 1 );
+
+	std::string const idf_objects = delimited_string( {
+
+		"  ZoneHVAC:LowTemperatureRadiant:Electric,",
+		"    West Zone Radiant Floor, !- Name",
+		"    RadiantSysAvailSched,    !- Availability Schedule Name",
+		"    West Zone,               !- Zone Name",
+		"    West Zone Surface Group, !- Surface Name or Radiant Surface Group Name",
+		"    heatingdesigncapacity,   !- Heating Design Capacity Method",
+		"    100,                     !- Heating Design Capacity{ W }",
+		"    ,                        !- Heating Design Capacity Per Floor Area{ W/m2 }",
+		"    1.0,                     !- Fraction of Autosized Heating Design Capacity",
+		"    MeanAirTemperature,      !- Temperature Control Type",
+		"    2.0,                     !- Heating Throttling Range {deltaC}",
+		"    Radiant Heating Setpoints;  !- Heating Control Temperature Schedule Name",
+
+		"  ZoneHVAC:LowTemperatureRadiant:Electric,",
+		"    East Zone Radiant Floor, !- Name",
+		"    RadiantSysAvailSched,    !- Availability Schedule Name",
+		"    East Zone,               !- Zone Name",
+		"    East Zone Surface Group, !- Surface Name or Radiant Surface Group Name",
+		"    heatingdesigncapacity,   !- Heating Design Capacity Method",
+		"    100,                     !- Heating Design Capacity{ W }",
+		"    ,                        !- Heating Design Capacity Per Floor Area{ W/m2 }",
+		"    1.0,                     !- Fraction of Autosized Heating Design Capacity",
+		"    MeanAirTemperature,      !- Temperature Control Type",
+		"    2.0,                     !- Heating Throttling Range {deltaC}",
+		"    Radiant Heating Setpoints;  !- Heating Control Temperature Schedule Name",
+
+		"  ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,",
+		"    East Zone Surface Group, !- Name",
+		"    Zn002:Flr001,             !- Surface 1 Name",
+		"     0.5,                     !- Flow Fraction for Surface 1",
+		"    Zn002:Flr002,             !- Surface 2 Name",
+		"     0.5;                     !- Flow Fraction for Surface 2",
+
+		"  ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,",
+		"    West Zone Surface Group, !- Name",
+		"    Zn001:Flr001,             !- Surface 1 Name",
+		"     0.5,                     !- Flow Fraction for Surface 1",
+		"    Zn001:Flr002,             !- Surface 2 Name",
+		"     0.5;                     !- Flow Fraction for Surface 2",
+
+		"  Schedule:Compact,",
+		"    RADIANTSYSAVAILSCHED,    !- Name",
+		"    FRACTION,                !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: Alldays,            !- Field 2",
+		"    Until: 24:00,1.00;       !- Field 3",
+
+		"  Schedule:Compact,",
+		"    Radiant Heating Setpoints,   !- Name",
+		"    TEMPERATURE,             !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: Alldays,            !- Field 2",
+		"    Until: 24:00,20.0;       !- Field 3",
+
+	} );
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	Zone.allocate( 2 );
+	Zone( 1 ).Name = "WEST ZONE";
+	Zone( 2 ).Name = "EAST ZONE";
+
+	DataSurfaces::TotSurfaces = 4;
+	Surface.allocate( 4 );
+	Surface( 1 ).Name = "ZN001:FLR001";
+	Surface( 1 ).ZoneName = "WEST ZONE";
+	Surface( 1 ).Zone = 1;
+	Surface( 2 ).Name = "ZN001:FLR002";
+	Surface( 2 ).ZoneName = "WEST ZONE";
+	Surface( 2 ).Zone = 1;
+	Surface( 3 ).Name = "ZN002:FLR001";
+	Surface( 3 ).ZoneName = "EAST ZONE";
+	Surface( 3 ).Zone = 2;
+	Surface( 4 ).Name = "ZN002:FLR002";
+	Surface( 4 ).ZoneName = "EAST ZONE";
+	Surface( 4 ).Zone = 2;
+
+	GetLowTempRadiantSystem();
+	EXPECT_EQ( 2, LowTempRadiantSystem::NumOfElecLowTempRadSys );
+	EXPECT_EQ( "WEST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum ).Name );
+	EXPECT_EQ( "EAST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum + 1 ).Name );
+	EXPECT_EQ( LowTempRadiantSystem::ElectricSystem, RadSysTypes( RadSysNum ).SystemType );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).ZoneName, "WEST ZONE" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfListName, "WEST ZONE SURFACE GROUP" );
+	// the 2nd surface list group holds data for 1st elec rad sys (#5958)
+	EXPECT_EQ( DataSurfaceLists::SurfList( 2 ).Name, "WEST ZONE SURFACE GROUP" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).NumOfSurfaces, 2 );
+	// surface ptr's are not set correctly when elec rad sys "index" (e.g., ElecRadSys(N)) is not the same as surface group "index"
+	// #5958 fixes this issue
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 1 ), 1 );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 2 ), 2 );
 
 }
 
