@@ -1739,10 +1739,10 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 
 	// Formats
 	static gio::Fmt Format_700( "('! <Zone Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
-	static gio::Fmt Format_700b("('! <Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')");
-	static gio::Fmt Format_701("('! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')");
-	static gio::Fmt Format_701b("('! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')");
-	static gio::Fmt Format_701c("('! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')");
+	static gio::Fmt Format_700b( "('! <Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
+	static gio::Fmt Format_701( "('! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_701b( "('! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_701c( "('! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
 	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
 	static gio::Fmt Format_7012( "(',#Sides')" );
 	static gio::Fmt Format_702( "('! <Units>,,,,,')" );
