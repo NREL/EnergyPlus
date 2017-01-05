@@ -2453,43 +2453,61 @@ namespace CondenserLoopTowers {
 		// Find the appropriate Plant Sizing object
 		PltSizCondNum = PlantLoop( SimpleTower( TowerNum ).LoopNum ).PlantSizNum;
 
-		if ( SimpleTower( TowerNum ).TowerInletCondsAutoSize ) {
+		if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed || SimpleTower( TowerNum ).TowerType_Num == CoolingTower_TwoSpeed ) {
+			if ( SimpleTower( TowerNum ).TowerInletCondsAutoSize ) {
+				if ( PltSizCondNum > 0 ) {
+					// use plant sizing data
+					DesTowerExitWaterTemp = PlantSizData( PltSizCondNum ).ExitTemp;
+					DesTowerInletWaterTemp = DesTowerExitWaterTemp + PlantSizData( PltSizCondNum ).DeltaT;
+					DesTowerWaterDeltaT = PlantSizData( PltSizCondNum ).DeltaT;
+				} else {
+					// set hard wired input assumptions
+					//AssumedDeltaT = 11.0;
+					//AssumedExitTemp = 21.0;
+					DesTowerWaterDeltaT = 11.0;
+					DesTowerExitWaterTemp = 21.0;
+					DesTowerInletWaterTemp = DesTowerExitWaterTemp + DesTowerWaterDeltaT;
+				}
+			} else {
+				// use tower sizing data
+				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
+				DesTowerInletWaterTemp = DesTowerExitWaterTemp + SimpleTower( TowerNum ).DesRange;
+				DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
+				if ( PltSizCondNum > 0 ) {
+					// check the tower range against the plant sizing data 
+					if ( abs( DesTowerWaterDeltaT - PlantSizData( PltSizCondNum ).DeltaT ) > TolTemp ) {
+						ShowWarningError( "Error when autosizing the load for cooling tower = " + SimpleTower( TowerNum ).Name + ". Tower Design Range Temperature is different from the Design Loop Delta Temperature." );
+						ShowContinueError( "Tower Design Range Temperature specified in tower = " + SimpleTower( TowerNum ).Name );
+						ShowContinueError( "is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = " + PlantSizData( PltSizCondNum ).PlantLoopName + "." );
+						ShowContinueError( "..The Design Range Temperature specified in tower is = " + TrimSigDigits( SimpleTower( TowerNum ).DesRange, 2 ) );
+						ShowContinueError( "..The Design Loop Delta Temperature specified in plant sizing data is = " + TrimSigDigits( PlantSizData( PltSizCondNum ).DeltaT, 2 ) );
+					}
+					// check if the tower approach is different from plant sizing data
+					DesTowerApproachFromPlant = PlantSizData( PltSizCondNum ).ExitTemp - SimpleTower( TowerNum ).DesInletAirWBTemp;
+					if ( abs( DesTowerApproachFromPlant - SimpleTower( TowerNum ).DesApproach ) > TolTemp ) {
+						ShowWarningError( "Error when autosizing the UA for cooling tower = " + SimpleTower( TowerNum ).Name + ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data." );
+						ShowContinueError( "The Design Approach Temperature from inputs specified in Sizing:Plant object = " + PlantSizData( PltSizCondNum ).PlantLoopName );
+						ShowContinueError( "is inconsistent with Design Approach Temperature specified in tower = " + SimpleTower( TowerNum ).Name + "." );
+						ShowContinueError( "..The Design Approach Temperature from inputs specified is = " + TrimSigDigits( DesTowerApproachFromPlant, 2 ) );
+						ShowContinueError( "..The Design Approach Temperature specified in tower is = " + TrimSigDigits( SimpleTower( TowerNum ).DesApproach, 2 ) );
+					}
+				}
+			}
+		} else {  // CoolingTower_VariableSpeed
 			if ( PltSizCondNum > 0 ) {
 				// use plant sizing data
 				DesTowerExitWaterTemp = PlantSizData( PltSizCondNum ).ExitTemp;
 				DesTowerInletWaterTemp = DesTowerExitWaterTemp + PlantSizData( PltSizCondNum ).DeltaT;
 				DesTowerWaterDeltaT = PlantSizData( PltSizCondNum ).DeltaT;
 			} else {
-				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
-				DesTowerInletWaterTemp = DesTowerExitWaterTemp + SimpleTower( TowerNum ).DesRange;
-				DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
-			}
-		} else {
-			// use tower sizing data
-			DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
-			DesTowerInletWaterTemp = DesTowerExitWaterTemp + SimpleTower( TowerNum ).DesRange;
-			DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
-			if ( PltSizCondNum > 0 ) {
-				// check the tower range against the plant sizing data 
-				if ( abs( DesTowerWaterDeltaT - PlantSizData( PltSizCondNum ).DeltaT ) > TolTemp ) {
-					ShowWarningError( "Error when autosizing the load for cooling tower = " + SimpleTower( TowerNum ).Name + ". Tower Design Range Temperature is different from the Design Loop Delta Temperature." );
-					ShowContinueError( "Tower Design Range Temperature specified in tower = " + SimpleTower( TowerNum ).Name );
-					ShowContinueError( "is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = " + PlantSizData( PltSizCondNum ).PlantLoopName + "." );
-					ShowContinueError( "..The Design Range Temperature specified in tower is = " + TrimSigDigits( SimpleTower( TowerNum ).DesRange, 2 ) );
-					ShowContinueError( "..The Design Loop Delta Temperature specified in plant sizing data is = " + TrimSigDigits( PlantSizData( PltSizCondNum ).DeltaT, 2 ) );
-				}
-				// check if the tower approach is different from plant sizing data
-				DesTowerApproachFromPlant = PlantSizData( PltSizCondNum ).ExitTemp - SimpleTower( TowerNum ).DesInletAirWBTemp;
-				if ( abs( DesTowerApproachFromPlant - SimpleTower( TowerNum ).DesApproach ) > TolTemp ) {
-					ShowWarningError( "Error when autosizing the UA for cooling tower = " + SimpleTower( TowerNum ).Name + ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data." );
-					ShowContinueError( "The Design Approach Temperature from inputs specified in Sizing:Plant object = " + PlantSizData( PltSizCondNum ).PlantLoopName );
-					ShowContinueError( "is inconsistent with Design Approach Temperature specified in tower = " + SimpleTower( TowerNum ).Name + "." );
-					ShowContinueError( "..The Design Approach Temperature from inputs specified is = " + TrimSigDigits( DesTowerApproachFromPlant, 2 ) );
-					ShowContinueError( "..The Design Approach Temperature specified in tower is = " + TrimSigDigits( SimpleTower( TowerNum ).DesApproach, 2 ) );
-				}
+				// set hard wired input assumptions
+				//AssumedDeltaT = 11.0;
+				//AssumedExitTemp = 21.0;
+				DesTowerWaterDeltaT = 11.0;
+				DesTowerExitWaterTemp = 21.0;
+				DesTowerInletWaterTemp = DesTowerExitWaterTemp + DesTowerWaterDeltaT;
 			}
 		}
-
 
 		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_UFactor && (! SimpleTower( TowerNum ).HighSpeedTowerUAWasAutoSized )) {
 			if ( PltSizCondNum > 0 ) {
@@ -3243,7 +3261,6 @@ namespace CondenserLoopTowers {
 		Real64 rho( 0 ); // local density for fluid
 		Real64 UA; // Calculated UA value
 		Real64 OutWaterTemp;
-		Real64 CoolingOutput; // tower capacity during sizing [W]
 		Real64 DesTowerInletAirDBTemp; // design tower inlet air dry-bulb temperature
 		Real64 DesTowerInletAirWBTemp; // design tower inlet air wet-bulb temperature
 		Real64 DesTowerInletWaterTemp; // design tower inlet water temperature
@@ -3273,6 +3290,7 @@ namespace CondenserLoopTowers {
 				DesTowerInletWaterTemp = DesTowerExitWaterTemp + PlantSizData( PltSizCondNum ).DeltaT;
 				DesTowerWaterDeltaT = PlantSizData( PltSizCondNum ).DeltaT;
 			} else {
+				// set default values to replace hard wired input assumptions 
 				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
 				DesTowerInletWaterTemp = DesTowerExitWaterTemp + SimpleTower( TowerNum ).DesRange;
 				DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
