@@ -1105,6 +1105,15 @@ namespace SimAirServingZones {
 								}
 							}
 						}
+						// added to fix bug issue #5695
+						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
+							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
+								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
+								if (SameString( CompType, "Coil:Heating:Water" )) {
+									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -2535,6 +2544,8 @@ namespace SimAirServingZones {
 			if ( AirLoopControlInfo( AirLoopNum ).EconoActive && PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( AirLoopControlNum ) ) {
 				ControllerConvergedFlag = true;
 				continue;
+				// this logic will force a hot water coil in OA system to be off if the Economizer is active because the  "PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( AirLoopControlNum )" 
+				// variable is always true for Hot Water Coils in OA system
 			}
 
 			// For each controller in sequence, iterate until convergence
