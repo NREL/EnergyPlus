@@ -213,7 +213,7 @@ public:
 		Real64 const & UserDesVolFlow, // User Cooling Design Air Flow Rate
 		std::string const & DesDayName, // the name of the design day that produced the peak
 		std::string const & PeakHrMin // time stamp of the peak
-		);
+	);
 
 	void addSQLiteComponentSizingRecord(
 		std::string const & CompType, // the type of the component

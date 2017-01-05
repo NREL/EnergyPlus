@@ -967,12 +967,13 @@ void SQLite::initializeZoneSizingTable()
 void SQLite::initializeSystemSizingTable()
 {
 	const std::string systemSizesTableSQL =
-		"CREATE TABLE SystemSizes (SystemSizesIndex INTEGER PRIMARY KEY, SystemName TEXT, Description TEXT, Value REAL, Units TEXT);";
+		"CREATE TABLE SystemSizes (SystemSizesIndex INTEGER PRIMARY KEY, SystemName TEXT, LoadType TEXT, PeakLoadType TEXT, "
+        "UserDesCap REAL, CalcDesVolFlow REAL, UserDesVolFlow REAL, DesDayName TEXT, PeakHrMin TEXT);";
 
 	sqliteExecuteCommand(systemSizesTableSQL);
 
 	const std::string systemSizingInsertSQL =
-		"INSERT INTO SystemSizes VALUES(?,?,?,?,?);";
+		"INSERT INTO SystemSizes VALUES(?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_systemSizingInsertStmt,systemSizingInsertSQL);
 }
@@ -1788,17 +1789,17 @@ void SQLite::addSQLiteSystemSizingRecord (
 )
 {
 	if ( m_writeOutputToSQLite ) {
-		++m_zoneSizingIndex;
+		++m_systemSizingIndex;
 		sqliteBindInteger( m_systemSizingInsertStmt, 1, m_systemSizingIndex );
 		sqliteBindText( m_systemSizingInsertStmt, 2, SysName );
-		sqliteBindText( m_zoneSizingInsertStmt, 3, LoadType );
-		sqliteBindText( m_zoneSizingInsertStmt, 4, PeakLoadType );
+		sqliteBindText( m_systemSizingInsertStmt, 3, LoadType );
+		sqliteBindText( m_systemSizingInsertStmt, 4, PeakLoadType );
 
-		sqliteBindDouble( m_zoneSizingInsertStmt, 5, UserDesCap );
-		sqliteBindDouble( m_zoneSizingInsertStmt, 6, CalcDesVolFlow );
-		sqliteBindDouble( m_zoneSizingInsertStmt, 7, UserDesVolFlow );
+		sqliteBindDouble( m_systemSizingInsertStmt, 5, UserDesCap );
+		sqliteBindDouble( m_systemSizingInsertStmt, 6, CalcDesVolFlow );
+		sqliteBindDouble( m_systemSizingInsertStmt, 7, UserDesVolFlow );
 		sqliteBindText( m_systemSizingInsertStmt, 8, DesDayName );
-		sqliteBindText( m_zoneSizingInsertStmt, 9, PeakHrMin );
+		sqliteBindText( m_systemSizingInsertStmt, 9, PeakHrMin );
 
 		sqliteStepCommand( m_systemSizingInsertStmt );
 		sqliteResetCommand( m_systemSizingInsertStmt );
