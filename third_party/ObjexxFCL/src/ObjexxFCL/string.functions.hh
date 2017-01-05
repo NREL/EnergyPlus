@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -352,6 +352,28 @@ is_digit( std::string const & s )
 		}
 		return true;
 	}
+}
+
+// string has a Lowercase Character?
+inline
+bool
+has_lower( std::string const & s )
+{
+	for ( char const c : s ) {
+		if ( std::islower( c ) != 0 ) return true;
+	}
+	return false;
+}
+
+// string has an Uppercase Character?
+inline
+bool
+has_upper( std::string const & s )
+{
+	for ( char const c : s ) {
+		if ( std::isupper( c ) != 0 ) return true;
+	}
+	return false;
 }
 
 // string has a string?
