@@ -207,7 +207,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 	// This test will emulate NFRC 100 U-factor test
 	int winNum;
 
-	for (size_t i = 1; i <= DataSurfaces::Surface.size_; ++i) {
+	for (size_t i = 1; i <= DataSurfaces::Surface.size(); ++i) {
 		if (DataSurfaces::Surface( i ).Class == DataSurfaces::SurfaceClass_Window) {
 			winNum = i;
 		}
@@ -215,7 +215,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 	int cNum;
 
-	for (size_t i = 1; i <= DataHeatBalance::Construct.size_; ++i) {
+	for (size_t i = 1; i <= DataHeatBalance::Construct.size(); ++i) {
 		if (DataHeatBalance::Construct( i ).TypeIsWindow) {
 			cNum = i;
 		}
@@ -303,7 +303,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
 {
-	
+
 	Real64 const cs = 0.86603;  // Cosine of incidence angle
 	Real64 const tf0 = 0.8980; // Transmittance at zero incidence angle
 	Real64 const rf0 = 0.0810; // Front reflectance at zero incidence angle
