@@ -3,9 +3,6 @@
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
 //
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
-//
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
 // granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -388,11 +376,11 @@ namespace DXCoils {
 
 		} else if ( SELECT_CASE_var == CoilVRF_Cooling ) {
 
-			CalcVRFCoolingCoil( DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _, MaxCap );
+			CalcVRFCoolingCoil( DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, AirFlowRatio, MaxCap );
 
 		} else if ( SELECT_CASE_var == CoilVRF_Heating ) {
 
-			CalcDXHeatingCoil( DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap );
+			CalcDXHeatingCoil( DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio, MaxCap );
 
 		} else if ( SELECT_CASE_var == CoilVRF_FluidTCtrl_Cooling ) {
 
@@ -8707,7 +8695,8 @@ Label50: ;
 			if ( FanOpMode == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF;
 
 			//  Calculate full load output conditions
-			if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+//			if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+			if ( SHR > 1.0 ) SHR = 1.0;
 			FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 			hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 			if ( SHR < 1.0 ) {
@@ -8744,13 +8733,14 @@ Label50: ;
 			//  If constant fan with cycling compressor, call function to determine "effective SHR"
 			//  which includes the part-load degradation on latent capacity
 			if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
-				QLatRated = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * ( 1.0 - DXCoil( DXCoilNum ).RatedSHR( Mode ) );
+				QLatRated = DXCoil( DXCoilNum ).RatedTotCap( Mode ) * ( 1.0 - DXCoil( DXCoilNum ).RatedSHR( Mode ) ); // always the same number
 				QLatActual = TotCap * ( 1.0 - SHR );
 				SHRUnadjusted = SHR;
 				SHR = CalcEffectiveSHR( DXCoilNum, SHR, DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, QLatRated, QLatActual, InletAirDryBulbTemp, InletAirWetBulbC, Mode );
 
 				//  Calculate full load output conditions
-				if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+//				if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+				if ( SHR > 1.0 ) SHR = 1.0;
 				FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
 				hTinwout = InletAirEnthalpy - ( 1.0 - SHR ) * hDelta;
 				if ( SHR < 1.0 ) {
@@ -8767,6 +8757,7 @@ Label50: ;
 
 			if ( FanOpMode == ContFanCycCoil && CompCycRatio < 1.0 ) {
 				// Continuous fan, cycling compressor
+				// hmmm ... this seems wrong. PLR * AirFlowRatio = 1. So we get FullLoadOutAirEnth all this time. This is OK since above TotCap *= PLR.
 				OutletAirEnthalpy = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirEnth + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirEnthalpy );
 				OutletAirHumRat = ( ( PartLoadRatio * AirFlowRatio ) * FullLoadOutAirHumRat + ( 1.0 - ( PartLoadRatio * AirFlowRatio ) ) * InletAirHumRat );
 				OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );

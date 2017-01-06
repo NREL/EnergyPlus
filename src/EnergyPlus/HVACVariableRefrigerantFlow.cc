@@ -3,9 +3,6 @@
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
 //
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
-//
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
 // granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -5943,7 +5931,7 @@ namespace HVACVariableRefrigerantFlow {
 		HRCoolingMode = TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList );
 		HRHeatingMode = TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList );
 
-		// The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with lastest PLR
+		// The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
 		// do nothing else if TU is scheduled off
 		//!!LKL Discrepancy < 0
@@ -5958,29 +5946,41 @@ namespace HVACVariableRefrigerantFlow {
 			return;
 		}
 
-		// Get result when DX coil is off
-		PartLoadRatio = 0.0;
+		// Get result when DX coil is operating at the minimum PLR (1E-20) if not otherwise specified
+		PartLoadRatio = VRFTU( VRFTUNum ).MinOperatingPLR;
 
 		if ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 		// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-			VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
+			VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio );
 		} else {
 		// Algorithm Type: VRF model based on system curve
-			CalcVRF( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
+			CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio );
 		}
 
 		if ( VRFCoolingMode && HRHeatingMode ) {
 			// IF the system is in cooling mode, but the terminal unit requests heating (heat recovery)
-			if ( NoCompOutput >= QZnReq ) return;
+			if ( NoCompOutput >= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		} else if ( VRFHeatingMode && HRCoolingMode ) {
 			// IF the system is in heating mode, but the terminal unit requests cooling (heat recovery)
-			if ( NoCompOutput <= QZnReq ) return;
+			if ( NoCompOutput <= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		} else if ( VRFCoolingMode || HRCoolingMode ) {
 			// IF the system is in cooling mode and/or the terminal unit requests cooling
-			if ( NoCompOutput <= QZnReq ) return;
+			if ( NoCompOutput <= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		} else if ( VRFHeatingMode || HRHeatingMode ) {
 			// IF the system is in heating mode and/or the terminal unit requests heating
-			if ( NoCompOutput >= QZnReq ) return;
+			if ( NoCompOutput >= QZnReq ) {
+				PartLoadRatio = 0.0;
+				return;
+			}
 		}
 
 		// Otherwise the coil needs to turn on. Get full load result
@@ -6058,10 +6058,10 @@ namespace HVACVariableRefrigerantFlow {
 
 					if ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 					// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-						VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio );
+						VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
 					} else {
 					// Algorithm Type: VRF model based on system curve
-						CalcVRF( VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio );
+						CalcVRF( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
 					}
 
 					if ( VRFHeatingMode && TempOutput < QZnReq ) ContinueIter = false;
@@ -6079,10 +6079,10 @@ namespace HVACVariableRefrigerantFlow {
 
 							if ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 							// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-								VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
+								VRFTU( VRFTUNum ).CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio );
 							} else {
 							// Algorithm Type: VRF model based on system curve
-								CalcVRF( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
+								CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, TempOutput, OnOffAirFlowRatio );
 							}
 
 							ShowContinueError( " Load requested = " + TrimSigDigits( QZnReq, 5 ) + ", Load delivered = " + TrimSigDigits( TempOutput, 5 ) );

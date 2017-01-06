@@ -3,9 +3,6 @@
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
 //
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
-//
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
 // granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataAirflowNetwork_hh_INCLUDED
 #define DataAirflowNetwork_hh_INCLUDED
@@ -400,6 +388,9 @@ namespace DataAirflowNetwork {
 		int ClosingProbStatus; // Closing probability status
 		int OpeningProbStatus; // Opening probability status
 		bool RAFNflag; // True if this surface is used in AirflowNetwork:IntraZone:Linkage
+		bool NonRectangular; // True if this surface is not rectangular
+		int EquivRecMethod; // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
+		Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3 
 
 		// Default Constructor
 		MultizoneSurfaceProp() :
@@ -440,7 +431,10 @@ namespace DataAirflowNetwork {
 			OpenElapsedTime( 0.0 ),
 			ClosingProbStatus( 0 ),
 			OpeningProbStatus( 0 ),
-			RAFNflag( false )
+			RAFNflag( false ),
+			NonRectangular( false ),
+			EquivRecMethod( 1 ),
+			EquivRecUserAspectRatio( 1.0 )
 		{}
 
 	};
