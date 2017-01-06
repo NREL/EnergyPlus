@@ -2791,7 +2791,7 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
 				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
@@ -2923,7 +2923,7 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
 				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
@@ -2994,7 +2994,7 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
 				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
@@ -3332,9 +3332,28 @@ namespace CondenserLoopTowers {
 					}
 
 				} else {
-					if ( PlantFirstSizesOkayToFinalize ) {
-						ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-						ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+					if ( ! SimpleTower( TowerNum ).TowerInletCondsAutoSize ) {
+						if ( SimpleTower( TowerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
+							rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DesTowerExitWaterTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+							Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DesTowerExitWaterTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+							DesTowerLoad = rho * Cp * SimpleTower( TowerNum ).DesignWaterFlowRate * DesTowerWaterDeltaT * SimpleTower( TowerNum ).SizFac;
+							tmpNomTowerCap = DesTowerLoad / SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
+							if ( PlantFirstSizesOkayToFinalize ) {
+								SimpleTower( TowerNum ).TowerNominalCapacity = tmpNomTowerCap;
+								ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
+							}
+						} else {
+							tmpNomTowerCap = 0.0;
+							if ( PlantFirstSizesOkayToFinalize ) {
+								SimpleTower( TowerNum ).TowerNominalCapacity = tmpNomTowerCap;
+								ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
+							}
+						}
+					} else {
+						if ( PlantFirstSizesOkayToFinalize ) {
+							ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
+							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+						}
 					}
 				}
 
@@ -3506,9 +3525,28 @@ namespace CondenserLoopTowers {
 					}
 
 				} else {
-					if ( PlantFirstSizesOkayToFinalize ) {
-						ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-						ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+					if ( ! SimpleTower( TowerNum ).TowerInletCondsAutoSize ) {
+						if ( SimpleTower( TowerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
+								SimpleTower( TowerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
+								if ( PlantFinalSizesOkayToReport ) {
+									ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
+										"Design Water Flow Rate [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
+								}
+								if ( PlantFirstSizesOkayToReport ) {
+									ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
+										"Initial Design Water Flow Rate [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
+								}
+							}
+						} else {
+							tmpDesignWaterFlowRate = 0.0;
+
+						}
+					} else {
+						if ( PlantFirstSizesOkayToFinalize ) {
+							ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
+							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+						}
 					}
 				}
 			}
@@ -3548,9 +3586,42 @@ namespace CondenserLoopTowers {
 						}
 					}
 				} else {
-					if ( PlantFirstSizesOkayToFinalize ) {
-						ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-						ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+					if ( ! SimpleTower( TowerNum ).TowerInletCondsAutoSize ) {
+						if ( SimpleTower( TowerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
+							rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DesTowerExitWaterTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+							Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, DesTowerExitWaterTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+							DesTowerLoad = rho * Cp * SimpleTower( TowerNum ).DesignWaterFlowRate * DesTowerWaterDeltaT * SimpleTower( TowerNum ).SizFac;
+							tmpNomTowerCap = DesTowerLoad / SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
+							if ( PlantFirstSizesOkayToFinalize ) {
+								SimpleTower( TowerNum ).TowerNominalCapacity = tmpNomTowerCap;
+								if ( PlantFinalSizesOkayToReport ) {
+									ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
+										"Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
+								}
+								if ( PlantFirstSizesOkayToReport ) {
+									ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
+										"Initial Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
+								}
+							}
+						} else {
+							tmpNomTowerCap = 0.0;
+							if ( PlantFirstSizesOkayToFinalize ) {
+								SimpleTower( TowerNum ).TowerNominalCapacity = tmpNomTowerCap;
+								if ( PlantFinalSizesOkayToReport ) {
+									ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
+										"Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
+								}
+								if ( PlantFirstSizesOkayToReport ) {
+									ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name,
+										"Initial Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
+								}
+							}
+						}
+					} else {
+						if (PlantFirstSizesOkayToFinalize) {
+							ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
+							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+						}
 					}
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCapWasAutoSized ) {
