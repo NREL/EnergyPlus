@@ -88,6 +88,7 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFi
 
 	NumFans = 2;
 	Fan.allocate( NumFans );
+	FaultsFouledAirFilters.allocate( NumFans );
 
 	// Inputs: fan curve
 	CurveNum = 1;
@@ -103,25 +104,32 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFi
 	PerfCurve( CurveNum ).Var1Min = 7.0;
 	PerfCurve( CurveNum ).Var1Max = 21.0;
 
-	// Inputs: fans
+	// Inputs:
 	FanNum = 1;
 	Fan( FanNum ).FanName = "Fan_1";
 	Fan( FanNum ).FanType = "Fan:VariableVolume";
 	Fan( FanNum ).MaxAirFlowRate = 18.194;
 	Fan( FanNum ).DeltaPress = 1017.59;
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanName = "Fan_1";
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanCurvePtr = CurveNum;
 
 	FanNum = 2;
 	Fan( FanNum ).FanName = "Fan_2";
 	Fan( FanNum ).FanType = "Fan:VariableVolume";
 	Fan( FanNum ).MaxAirFlowRate = 18.194;
 	Fan( FanNum ).DeltaPress = 1017.59 * 1.2;
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanName = "Fan_2";
+	FaultsFouledAirFilters( FanNum ).FaultyAirFilterFanCurvePtr = CurveNum;
+	;
 
 	// Run and Check
 	// (1)The rated operational point of Fan_1 falls on the fan curve
-	TestRestult = CheckFaultyAirFilterFanCurve( "Fan_1", CurveNum );
+	FanNum = 1;
+	TestRestult = FaultsFouledAirFilters( FanNum ).CheckFaultyAirFilterFanCurve();
 	EXPECT_TRUE( TestRestult );
 	// (2)The rated operational point of Fan_2 does not fall on the fan curve
-	TestRestult = CheckFaultyAirFilterFanCurve( "Fan_2", CurveNum );
+	FanNum = 2;
+	TestRestult = FaultsFouledAirFilters( FanNum ).CheckFaultyAirFilterFanCurve();
 	EXPECT_FALSE( TestRestult );
 
 	// Clean up
@@ -178,5 +186,68 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirF
 	// Clean up
 	PerfCurve.deallocate();
 	Fan.deallocate();
+
+}
+
+TEST_F( EnergyPlusFixture, FaultsManager_FaultChillerSWTSensor_CalFaultChillerSWT )
+{
+	// PURPOSE OF THIS SUBROUTINE:
+	// To check CalFaultChillerSWT which calculates the mass flow rate and supply water temperature of a chiller with faulty SWT sensor.
+	
+	bool FlagVariableFlow; // True if chiller is variable flow and false if it is constant flow
+	Real64 FaultyChillerSWTOffset; // Faulty chiller SWT sensor offset
+	Real64 Cp = 4500; // Local fluid specific heat
+	Real64 EvapInletTemp = 12; // Chiller evaporator inlet water temperature 
+	Real64 EvapOutletTemp = 7; // Chiller evaporator outlet water temperature, fault free
+	Real64 EvapMassFlowRate = 40; // Chiller mass flow rate, fault free
+	Real64 QEvaporator = 900000; // Chiller evaporator heat transfer rate, fault free
+	FaultPropertiesChillerSWT FaultChiller;
+
+	//1) offset is 0C
+	FlagVariableFlow = false;
+	Real64 EvapOutletTemp_1 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapMassFlowRate_1 = EvapMassFlowRate; // Chiller mass flow rate
+	Real64 QEvaporator_1 = QEvaporator; // Chiller evaporator heat transfer rate
+	FaultyChillerSWTOffset = 0;
+	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_1, EvapMassFlowRate_1, QEvaporator_1 );
+	EXPECT_EQ( 1, EvapOutletTemp_1/EvapOutletTemp );
+	EXPECT_EQ( 1, QEvaporator_1/QEvaporator );
+	
+	//2) offset is 2C
+	Real64 EvapOutletTemp_2 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapMassFlowRate_2 = EvapMassFlowRate; // Chiller mass flow rate
+	Real64 QEvaporator_2 = QEvaporator; // Chiller evaporator heat transfer rate
+	FaultyChillerSWTOffset = 2;
+	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_2, EvapMassFlowRate_2, QEvaporator_2 );
+	EXPECT_NEAR( 0.714, EvapOutletTemp_2/EvapOutletTemp, 0.001 );
+	EXPECT_NEAR( 1.400, QEvaporator_2/QEvaporator, 0.001 );
+	
+	
+	//3) offset is -2C
+	Real64 EvapOutletTemp_3 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapMassFlowRate_3 = EvapMassFlowRate; // Chiller mass flow rate
+	Real64 QEvaporator_3 = QEvaporator; // Chiller evaporator heat transfer rate
+	FaultyChillerSWTOffset = -2;
+	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_3, EvapMassFlowRate_3, QEvaporator_3 );
+	EXPECT_NEAR( 1.285, EvapOutletTemp_3/EvapOutletTemp, 0.001 );
+	EXPECT_NEAR( 0.600, QEvaporator_3/QEvaporator, 0.001 );
+	
+}
+
+TEST_F( EnergyPlusFixture, FaultsManager_CalFaultOffsetAct )
+{
+	// PURPOSE OF THIS SUBROUTINE:
+	// To check CalFaultOffsetAct which calculates the dynamic fault offset based on the fault availability schedule and severity schedule.
+
+	Real64 OffsetAct;
+	FaultProperties Fault;
+
+	Fault.AvaiSchedPtr = -1;
+	Fault.SeveritySchedPtr = -1;
+	Fault.Offset = 10;
+	
+	// Run and Check
+	OffsetAct = Fault.CalFaultOffsetAct();
+	EXPECT_EQ( 10, OffsetAct );
 
 }

@@ -1535,7 +1535,7 @@ namespace Fans {
 
 		//Faulty fan operations_Jun. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ) {
 
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
 
@@ -1694,7 +1694,7 @@ namespace Fans {
 
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
 
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
 
@@ -1866,7 +1866,7 @@ namespace Fans {
 
 		//Faulty fan operations_Apr. 2015, zrp
 		//Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-		if ( Fan( FanNum ).FaultyFilterFlag && ( FaultsManager::NumFaultyAirFilter > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
+		if ( Fan( FanNum ).FaultyFilterFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( !Fan( FanNum ).EMSMaxMassFlowOverrideOn ) ) {
 
 			int iFault = Fan( FanNum ).FaultyFilterIndex;
 
@@ -3275,7 +3275,6 @@ namespace Fans {
 
 		// Using/Aliasing
 		using namespace CurveManager;
-		using FaultsManager::CheckFaultyAirFilterFanCurve;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
