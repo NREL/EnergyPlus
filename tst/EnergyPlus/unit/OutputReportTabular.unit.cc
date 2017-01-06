@@ -139,6 +139,75 @@ TEST( OutputReportTabularTest, RealToStr )
 
 }
 
+TEST(OutputReportTabularTest, isNumber)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, isNumber");
+	EXPECT_TRUE(isNumber("0"));
+	EXPECT_TRUE(isNumber("0.12"));
+	EXPECT_TRUE(isNumber("0.12E01"));
+	EXPECT_TRUE(isNumber("-6"));
+	EXPECT_TRUE(isNumber("-6.12"));
+	EXPECT_TRUE(isNumber("-6.12E-09"));
+	EXPECT_TRUE(isNumber(" 0"));
+	EXPECT_TRUE(isNumber(" 0.12"));
+	EXPECT_TRUE(isNumber(" 0.12E01"));
+	EXPECT_TRUE(isNumber("0 "));
+	EXPECT_TRUE(isNumber("0.12 "));
+	EXPECT_TRUE(isNumber("0.12E01 "));
+	EXPECT_TRUE(isNumber(" 0 "));
+	EXPECT_TRUE(isNumber(" 0.12 "));
+	EXPECT_TRUE(isNumber(" 0.12E01 "));
+}
+
+TEST(OutputReportTabularTest, digitsAferDecimal)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, digitsAferDecimal");
+	EXPECT_EQ(0, digitsAferDecimal("0"));
+	EXPECT_EQ(0, digitsAferDecimal("1."));
+	EXPECT_EQ(2, digitsAferDecimal("0.12"));
+	EXPECT_EQ(4, digitsAferDecimal("0.1234"));
+	EXPECT_EQ(2, digitsAferDecimal("3.12E01"));
+	EXPECT_EQ(0, digitsAferDecimal("-6"));
+	EXPECT_EQ(0, digitsAferDecimal("-6."));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12"));
+	EXPECT_EQ(5, digitsAferDecimal("-6.12765"));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
+}
+
+TEST(OutputReportTabularTest, splitCommaString)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, splitCommaString");
+	std::vector<std::string> actual;
+	actual.push_back("part1");
+	EXPECT_EQ(actual, splitCommaString("part1"));
+	actual.push_back("part2");
+	EXPECT_EQ(actual, splitCommaString("part1,part2"));
+	EXPECT_EQ(actual, splitCommaString(" part1,part2 "));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 "));
+	actual.push_back("part3");
+	EXPECT_EQ(actual, splitCommaString("part1,part2,part3"));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 , part3 "));
+}
+
+TEST(OutputReportTabularTest, unitsFromHeading)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
+	std::string unitString;
+	SetupUnitConversions();
+	unitsStyle = unitsStyleInchPound;
+	unitString = "";
+	EXPECT_EQ(96, unitsFromHeading(unitString)); 
+	EXPECT_EQ("", unitString);
+	unitString = "Zone Floor Area {m2}";
+	EXPECT_EQ(46, unitsFromHeading(unitString));
+	EXPECT_EQ("Zone Floor Area {ft2}", unitString);
+	unitString = "Fictional field {nonsense}";
+	EXPECT_EQ(0, unitsFromHeading(unitString));
+	EXPECT_EQ("Fictional field {nonsense}", unitString);
+
+}
+
+
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, ConfirmResourceWarning" );
