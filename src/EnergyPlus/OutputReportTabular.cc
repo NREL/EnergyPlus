@@ -1933,13 +1933,13 @@ namespace OutputReportTabular {
 					displayEconomicResultSummary = true;
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "EnergyMeters") ) {
+				} else if ( SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
 					WriteTabularFiles = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "EIO") ) {
+				} else if ( SameString( AlphArray( iReport ), "EIO" ) ) {
 					displayEioSummary = true;
 					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "InitializationSummary") ) {
+				} else if ( SameString( AlphArray( iReport ), "InitializationSummary" ) ) {
 					displayEioSummary = true;
 					nameFound = true;
 				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
@@ -10802,7 +10802,7 @@ namespace OutputReportTabular {
 			Array2D_string tableBody; //in the format: (row, column)
 			Array1D_int colUnitConv;
 
-			// setting up  report header 
+			// setting up  report header
 			WriteReportHeaders( "Initialization Summary", "Entire Facility", isAverage );
 
 			// since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
@@ -14333,12 +14333,12 @@ Label900: ;
 		return StringOut;
 	}
 
-	bool 
-	isNumber(std::string const & s)
+	bool
+	isNumber( std::string const & s )
 	{
 		char* p;
-		strtod(s.c_str(), &p);
-		for (; isspace(*p); ++p); // handle trailing whitespace
+		strtod( s.c_str(), &p );
+		for (; isspace( *p ); ++p); // handle trailing whitespace
 		return *p == 0;
 	}
 
@@ -14355,7 +14355,7 @@ Label900: ;
 			std::size_t epos = s.find( 'E' );
 			if ( epos == s.npos ) epos = s.find( 'e' );
 			if ( epos == s.npos ) {
-				numDigits = s.length( ) - ( decimalpos + 1 );
+				numDigits = s.length() - ( decimalpos + 1 );
 			} else {
 				numDigits = epos - ( decimalpos + 1 );
 			}
