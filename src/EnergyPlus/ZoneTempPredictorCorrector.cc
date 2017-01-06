@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -2998,7 +2998,7 @@ namespace ZoneTempPredictorCorrector {
 			}}
 
 			//Apply offset for faulty therostats_Feb. 2015, zrp
-			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ) {
 
 				//  loop through the FaultsThermostatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
@@ -3450,7 +3450,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			// Apply offsets for faulty humidistats_Feb. 2015, zrp
-			if ( ( NumFaultyHumidistat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			if ( ( NumFaultyHumidistat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ) {
 
 				//  loop through the FaultsHumidistatOffset objects to find the one for the zone
 				for ( int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault ) {
