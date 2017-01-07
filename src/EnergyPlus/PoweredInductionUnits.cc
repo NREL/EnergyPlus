@@ -1549,6 +1549,8 @@ namespace PoweredInductionUnits {
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 CpAirZn; // zone air specific heat [J/kg-C]
 		Real64 FanDeltaTemp( 0.0 ); // fan temperature rise [C]
+		bool PIUTurnFansOn( false ); // If True, overrides fan schedule and cycles PIU fan on
+		bool PIUTurnFansOff( false ); // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 		//unusedREAL(r64)    :: MaxSteamFlow
 		//unusedREAL(r64)    :: MinSteamFlow
 		Real64 mdot; // local fluid flow rate kg/s
@@ -1570,6 +1572,9 @@ namespace PoweredInductionUnits {
 		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired;
 		QToHeatSetPt = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP;
 		CpAirZn = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
+		// Initialize local fan flags to global system flags
+		PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
+		PIUTurnFansOff = DataHVACGlobals::TurnFansOff;
 
 		//On the first HVAC iteration the system values are given to the controller, but after that
 		// the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1602,10 +1607,10 @@ namespace PoweredInductionUnits {
 				if ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) {
 					if ( QZnReq <= SmallLoad ) {
 						SecAirMassFlow = 0.0;
-						DataHVACGlobals::TurnFansOn = false;
+						PIUTurnFansOn = false;
 					} else {
 						SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-						DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+						PIUTurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
 					}
 				} else {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
@@ -1616,10 +1621,10 @@ namespace PoweredInductionUnits {
 				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
 				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-					DataHVACGlobals::TurnFansOn = DataHVACGlobals::TurnZoneFansOnlyOn;
+					PIUTurnFansOn = true;
 				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
 					SecAirMassFlow = 0.0;
-					DataHVACGlobals::TurnFansOn = false;
+					PIUTurnFansOn = false;
 				} else {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
 				}
@@ -1633,7 +1638,7 @@ namespace PoweredInductionUnits {
 				Node( SecNode ).MassFlowRate = PIU( PIUNum ).MaxSecAirMassFlow;
 				Node( SecNode ).MassFlowRateMaxAvail = PIU( PIUNum ).MaxSecAirMassFlow;
 				Node( PriNode ).MassFlowRate = 0.0;
-				SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+				SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff ); // fire the fan
 				SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num ); // fire the mixer
 				FanDeltaTemp = Node( HCoilInAirNode ).Temp - Node( SecNode ).Temp;
 				// Assuming the fan is off, calculate the primary air flow needed to meet the zone cooling demand.
@@ -1643,11 +1648,11 @@ namespace PoweredInductionUnits {
 				// check for fan on or off
 				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && ( PIU( PIUNum ).FanOnFlowFrac > 0.0 ) ) {
 					SecAirMassFlow = 0.0; // Fan is off; no secondary air
-					DataHVACGlobals::TurnFansOn = false;
+					PIUTurnFansOn = false;
 				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
 					// if FanOnFlowFrac is 0, then fan does not run for cooling load unless reheat is required, also reset fan flag if fan should be off
 					SecAirMassFlow = 0.0; // Fan is off; no secondary air
-					DataHVACGlobals::TurnFansOn = false;
+					PIUTurnFansOn = false;
 				} else {
 					// fan is on; recalc primary air flow
 					// CpAir*PriAirMassFlow*(Node(PriNode)%Temp - Node(ZoneNodeNum)%Temp) +
@@ -1668,7 +1673,7 @@ namespace PoweredInductionUnits {
 		Node( SecNode ).MassFlowRateMaxAvail = SecAirMassFlow;
 		//now that inlet airflows have been set, the terminal box components can be simulated.
 		// fire the fan
-		SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index );
+		SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff );
 		// fire the mixer
 		SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num );
 		// check if heating coil is off
