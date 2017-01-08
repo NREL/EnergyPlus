@@ -81099,6 +81099,43 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
+   
+FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
+   \memo This object describes fault of chiller supply water temperature sensor offset
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Chiller Object Type
+       \note Enter the type of a chiller object
+       \required-field
+       \type choice
+       \key Chiller:Electric
+       \key Chiller:Electric:EIR
+       \key Chiller:Electric:ReformulatedEIR
+       \key Chiller:ConstantCOP
+       \key Chiller:EngineDriven
+       \key Chiller:CombustionTurbine
+       \key Chiller:Absorption
+       \key Chiller:Absorption:Indirect
+   A5, \field Chiller Object Name
+       \note Enter the name of a chiller object
+       \required-field
+       \type object-list
+       \object-list Chillers
+   N1; \field Reference Sensor Offset
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 0.0
+       \units deltaC
 
 FaultModel:ThermostatOffset,
    \memo This object describes fault of thermostat offset
@@ -90229,6 +90266,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90323,6 +90361,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90417,6 +90456,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90511,6 +90551,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90605,6 +90646,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90699,6 +90741,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90793,6 +90836,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90887,6 +90931,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90981,6 +91026,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91075,6 +91121,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91169,6 +91216,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91263,6 +91311,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91357,6 +91406,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91451,6 +91501,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91545,6 +91596,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91640,6 +91692,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91734,6 +91787,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91828,6 +91882,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91922,6 +91977,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92016,6 +92072,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92110,6 +92167,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92204,6 +92262,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92298,6 +92357,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92392,6 +92452,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92486,6 +92547,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92580,6 +92642,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92674,6 +92737,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92768,6 +92832,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92862,6 +92927,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92956,6 +93022,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93051,6 +93118,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93145,6 +93213,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93239,6 +93308,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93333,6 +93403,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93427,6 +93498,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93521,6 +93593,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93615,6 +93688,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93709,6 +93783,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93803,6 +93878,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93897,6 +93973,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93991,6 +94068,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94085,6 +94163,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94179,6 +94258,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94273,6 +94353,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94367,6 +94448,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94462,6 +94544,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94556,6 +94639,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94650,6 +94734,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94744,6 +94829,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94838,6 +94924,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94932,6 +95019,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95026,6 +95114,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95120,6 +95209,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95214,6 +95304,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95308,6 +95399,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95402,6 +95494,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95496,6 +95589,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95590,6 +95684,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95684,6 +95779,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95778,6 +95874,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95873,6 +95970,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95967,6 +96065,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96061,6 +96160,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96155,6 +96255,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96249,6 +96350,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96343,6 +96445,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96437,6 +96540,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96531,6 +96635,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96625,6 +96730,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96719,6 +96825,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96813,6 +96920,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96907,6 +97015,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97001,6 +97110,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97095,6 +97205,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97189,6 +97300,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97284,6 +97396,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97378,6 +97491,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97472,6 +97586,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97566,6 +97681,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97660,6 +97776,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97754,6 +97871,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97848,6 +97966,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97942,6 +98061,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport

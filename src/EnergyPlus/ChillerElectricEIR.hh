@@ -190,6 +190,9 @@ namespace ChillerElectricEIR {
 		bool PrintMessage; // logical to determine if message is valid
 		int MsgErrorCount; // number of occurrences of warning
 		int ErrCount1; // for recurring error messages
+		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
+		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 
 		// Default Constructor
@@ -266,6 +269,9 @@ namespace ChillerElectricEIR {
 			PrintMessage( false ),
 			MsgErrorCount( 0 ),
 			ErrCount1( 0 ),
+			FaultyChillerSWTFlag( false ),
+			FaultyChillerSWTIndex( 0 ),
+			FaultyChillerSWTOffset( 0.0 ),
 			PossibleSubcooling( false )
 		{}
 

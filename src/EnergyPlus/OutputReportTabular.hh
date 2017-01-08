@@ -173,6 +173,7 @@ namespace OutputReportTabular {
 	extern bool displayLifeCycleCostReport;
 	extern bool displayTariffReport;
 	extern bool displayEconomicResultSummary;
+	extern bool displayEioSummary;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -762,6 +763,15 @@ namespace OutputReportTabular {
 	WriteSurfaceShadowing();
 
 	void
+	WriteEioTables();
+
+	int
+	unitsFromHeading( std::string & heading );
+
+	std::vector< std::string >
+	splitCommaString (std::string const & inputString );
+	
+	void
 	AddTOCZoneLoadComponentTable();
 
 	void
@@ -927,6 +937,12 @@ namespace OutputReportTabular {
 
 	std::string
 	DateToString( int const codedDate ); // word containing encoded month, day, hour, minute
+
+	bool
+	isNumber( std::string const & s );
+
+	int
+	digitsAferDecimal( std::string s );
 
 	void
 	AddTOCEntry(
