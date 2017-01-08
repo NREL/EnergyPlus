@@ -2217,20 +2217,20 @@ namespace EnergyPlus {
 		// autosized input
 		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedAirFlowRateWasAutoSized );
 		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedAirFlowRate, 2.7632, 0.0001 );
-		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedAirFlowRate, CondenserLoopTowers::SimpleTower( 1 ).HighSpeedFanPower * 0.5 * ( 101325.0 / DataEnvironment::StdBaroPress ) / 190.0 );
+		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedAirFlowRate, CondenserLoopTowers::SimpleTower( 1 ).TowerNominalCapacity * CondenserLoopTowers::SimpleTower( 1 ).DesignAirFlowPerUnitNomCap );
 
 		// autosized input
 		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedFanPowerWasAutoSized );
 		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedFanPower, 1050 );
 		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).HighSpeedFanPower, 0.0105 * CondenserLoopTowers::SimpleTower( 1 ).TowerNominalCapacity );
 
-		// autosized input
+		// input not needed for sizing (NOT WasAutoSized)
 		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).FreeConvAirFlowRateWasAutoSized );
-		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).FreeConvAirFlowRate, 0.27632, 0.0001 );
+		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).FreeConvAirFlowRate, 0.27632, 0.00001 );
 		EXPECT_DOUBLE_EQ( CondenserLoopTowers::SimpleTower( 1 ).FreeConvAirFlowRate, CondenserLoopTowers::SimpleTower( 1 ).FreeConvAirFlowRateSizingFactor * CondenserLoopTowers::SimpleTower( 1 ).HighSpeedAirFlowRate );
 
 		// autosized input
-		EXPECT_TRUE( CondenserLoopTowers::SimpleTower( 1 ).FreeConvTowerUAWasAutoSized );
+		EXPECT_FALSE( CondenserLoopTowers::SimpleTower( 1 ).FreeConvTowerUAWasAutoSized );
 		EXPECT_NEAR( CondenserLoopTowers::SimpleTower( 1 ).FreeConvTowerUA, 573.0, 1.0 );
 
 	}
