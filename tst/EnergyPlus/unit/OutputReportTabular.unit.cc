@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::OutputReportTabular Unit Tests
 
@@ -150,6 +138,75 @@ TEST( OutputReportTabularTest, RealToStr )
 	EXPECT_EQ( "0.123457E+06", RealToStr( 123456.789, 5 ) );
 
 }
+
+TEST(OutputReportTabularTest, isNumber)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, isNumber");
+	EXPECT_TRUE(isNumber("0"));
+	EXPECT_TRUE(isNumber("0.12"));
+	EXPECT_TRUE(isNumber("0.12E01"));
+	EXPECT_TRUE(isNumber("-6"));
+	EXPECT_TRUE(isNumber("-6.12"));
+	EXPECT_TRUE(isNumber("-6.12E-09"));
+	EXPECT_TRUE(isNumber(" 0"));
+	EXPECT_TRUE(isNumber(" 0.12"));
+	EXPECT_TRUE(isNumber(" 0.12E01"));
+	EXPECT_TRUE(isNumber("0 "));
+	EXPECT_TRUE(isNumber("0.12 "));
+	EXPECT_TRUE(isNumber("0.12E01 "));
+	EXPECT_TRUE(isNumber(" 0 "));
+	EXPECT_TRUE(isNumber(" 0.12 "));
+	EXPECT_TRUE(isNumber(" 0.12E01 "));
+}
+
+TEST(OutputReportTabularTest, digitsAferDecimal)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, digitsAferDecimal");
+	EXPECT_EQ(0, digitsAferDecimal("0"));
+	EXPECT_EQ(0, digitsAferDecimal("1."));
+	EXPECT_EQ(2, digitsAferDecimal("0.12"));
+	EXPECT_EQ(4, digitsAferDecimal("0.1234"));
+	EXPECT_EQ(2, digitsAferDecimal("3.12E01"));
+	EXPECT_EQ(0, digitsAferDecimal("-6"));
+	EXPECT_EQ(0, digitsAferDecimal("-6."));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12"));
+	EXPECT_EQ(5, digitsAferDecimal("-6.12765"));
+	EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
+}
+
+TEST(OutputReportTabularTest, splitCommaString)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, splitCommaString");
+	std::vector<std::string> actual;
+	actual.push_back("part1");
+	EXPECT_EQ(actual, splitCommaString("part1"));
+	actual.push_back("part2");
+	EXPECT_EQ(actual, splitCommaString("part1,part2"));
+	EXPECT_EQ(actual, splitCommaString(" part1,part2 "));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 "));
+	actual.push_back("part3");
+	EXPECT_EQ(actual, splitCommaString("part1,part2,part3"));
+	EXPECT_EQ(actual, splitCommaString(" part1 , part2 , part3 "));
+}
+
+TEST(OutputReportTabularTest, unitsFromHeading)
+{
+	ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
+	std::string unitString;
+	SetupUnitConversions();
+	unitsStyle = unitsStyleInchPound;
+	unitString = "";
+	EXPECT_EQ(96, unitsFromHeading(unitString)); 
+	EXPECT_EQ("", unitString);
+	unitString = "Zone Floor Area {m2}";
+	EXPECT_EQ(46, unitsFromHeading(unitString));
+	EXPECT_EQ("Zone Floor Area {ft2}", unitString);
+	unitString = "Fictional field {nonsense}";
+	EXPECT_EQ(0, unitsFromHeading(unitString));
+	EXPECT_EQ("Fictional field {nonsense}", unitString);
+
+}
+
 
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
