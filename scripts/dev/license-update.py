@@ -22,13 +22,13 @@ previous = licensetext.previous()
 licensetxt = licensetext.mergeParagraphs(current)
 
 if not dryrun:
-    print('Writing out LICENSE.txt.')
+    print('Writing out LICENSE.txt')
     filename = "LICENSE.txt"
     fp = open(filename,'w')
     fp.write(licensetxt)
     fp.close
 else:
-    print('Skipping writing out LICENSE.txt.')
+    print('Skipping writing out LICENSE.txt')
 
 # Create Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -173,6 +173,7 @@ namespace OutputReportTabular {
 	extern bool displayLifeCycleCostReport;
 	extern bool displayTariffReport;
 	extern bool displayEconomicResultSummary;
+	extern bool displayEioSummary;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -762,6 +763,15 @@ namespace OutputReportTabular {
 	WriteSurfaceShadowing();
 
 	void
+	WriteEioTables();
+
+	int
+	unitsFromHeading( std::string & heading );
+
+	std::vector< std::string >
+	splitCommaString (std::string const & inputString );
+	
+	void
 	AddTOCZoneLoadComponentTable();
 
 	void
@@ -927,6 +937,12 @@ namespace OutputReportTabular {
 
 	std::string
 	DateToString( int const codedDate ); // word containing encoded month, day, hour, minute
+
+	bool
+	isNumber( std::string const & s );
+
+	int
+	digitsAferDecimal( std::string s );
 
 	void
 	AddTOCEntry(
