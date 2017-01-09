@@ -16,6 +16,7 @@ Allow Multiple Air Loops to One Thermal Zone
  	 - Add airflow windows - need to specify optional return node
  	 - *Change* - add the new field referencing `DesignSpecification:AirTerminal:Sizing` object to  `ZoneHVAC:AirDistributionUnit` and `AirTerminal:SingleDuct:Uncontrolled` (*not* to every terminal unit as previously proposed).
  - January 5, 2017 - Final Design
+ - January 6, 2017 - Document additional review comments
  
 *Reviewers - Hong, Griffith, Gu, Buhl, Raustad, Horowitz, Merket, Winkler, Scheier, Lee
 
@@ -72,6 +73,8 @@ Rather than develop more workaround components, it is time to remove the restric
 5. Make it clear that the air terminal sizing factors are based on sensible heating/cooling loads. *(e-mail RR)*
 
 6. Consider adding a new array indexed by ADU number rather than morphing the existing `TermUnitSizing` and `TermUnitFinalZoneSizing` which are currently indexed by zone. *(Sizing conference call 1/4/2017)*
+
+7. Special sizing cases, such as chilled beam terminal units, may require special handling of the air terminal sizing factors for certain types of terminal units. *(Sizing conference call 1/4/2017)*
 
 ## Overview ##
 
