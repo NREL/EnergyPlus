@@ -242,6 +242,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 		" Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,", "timestep;",
 		" Output:Variable,", "[A-Z]{4},", "Unitary System Compressor Part Load Ratio,", "timestep;",
 		" Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,", "timestep;",
+		" Output:Variable,", "[A-Za-z ]{5,},", "Refrigeration Compressor Rack Electric Power,", "timestep;",
 	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
 

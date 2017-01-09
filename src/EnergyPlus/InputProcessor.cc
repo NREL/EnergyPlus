@@ -5992,8 +5992,10 @@ namespace InputProcessor {
 			OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
 			OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
 			OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
-			//store first index of the list for specific VarName into map for faster look-up
-			OutputVariablesNames[VarName] = NumConsideredOutputVariables;
+			//store first index of the list for specific VarName(in lower case) into map for faster look-up
+			std::string LowerCaseVarName;
+			ConvertCaseToLower(VarName, LowerCaseVarName);
+			OutputVariablesNames[LowerCaseVarName] = NumConsideredOutputVariables;
 		} else {
 			if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
 				NextNum = CurNum;
