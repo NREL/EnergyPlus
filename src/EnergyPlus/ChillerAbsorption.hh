@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -90,6 +90,8 @@ namespace ChillerAbsorption {
 	extern Real64 CondenserEnergy; // J - heat transfer to the condenser coil
 
 	extern Array1D_bool CheckEquipName;
+	
+	extern bool GetInput; // When TRUE, calls subroutine to read input file
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -150,6 +152,9 @@ namespace ChillerAbsorption {
 		int GenLoopSideNum; // generator water plant loop side index
 		int GenBranchNum; // generator water plant loop branch index
 		int GenCompNum; // generator water plant loop component index
+		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
+		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 
 		// Default Constructor
@@ -204,6 +209,9 @@ namespace ChillerAbsorption {
 			GenLoopSideNum( 0 ),
 			GenBranchNum( 0 ),
 			GenCompNum( 0 ),
+			FaultyChillerSWTFlag( false ),
+			FaultyChillerSWTIndex( 0 ),
+			FaultyChillerSWTOffset( 0.0 ),
 			PossibleSubcooling( false )
 		{}
 

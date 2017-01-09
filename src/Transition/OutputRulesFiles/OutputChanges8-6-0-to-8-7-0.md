@@ -14,6 +14,47 @@ The column labeled Zone used to show the daylighting control name but has been f
 
 See [5945](https://github.com/NREL/EnergyPlus/pull/5945). 
 
+### Initialization Summary and EIO file
+
+A new tabular report was added called the Initialization Summary that includes the contents of the EIO file. The new report contains many tables one for each "heading" line shown in the EIO file with lines of data shown as rows in the table. Due to this, the new Initialization Summary report contains a large number of tables. Some of the heading and data lines in the EIO file needed to be changed in order for the parsing routine to work consistently. The data shown in the various lines in the EIO file were not changed but the formatting for some lines were changed. The changed lines in the EIO file are described below.
+
+The following added explicit monthly columns to the heading rows of the EIO file.
+
+- Site:GroundTemperature:BuildingSurface
+- Site:GroundTemperature:Deep
+- Site:GroundTemperature:FCfactorMethod
+- Site:GroundTemperature:Shallow
+- Site:GroundReflectance
+- Site:GroundReflectance:Snow
+- Site:GroundReflectance:Snow:Daylighting
+
+For the following the word "nominal" was shown in the data row and the heading row removed the dash before the word nominal:
+
+- Airflow Stats Nominal
+- Internal Gains Nominal
+
+Heading rows that represented multiple data rows using slashes were broken up into individual heading rows:
+
+- "Zone Internal Gains/Equipment Information" changed to seperate rows labeled "Zone Internal Gains Nominal" and "Equipment Gains Nominal"
+- "Zone/Shading Surfaces" changed to seperate rows labeled "Zone Surfaces" and "Shading Surfaces"
+- "HeatTransfer/Shading/Frame/Divider_Surface" changed to seperate rows labeled "HeatTransfer Surface", "Shading Surface" and "Frame/Divider Surface"
+
+Underscores were removed from row labels:
+
+- Heading rows with labels ending with "_Surface" have been changed to ending with " Surface"
+- "Shading_Surfaces" was changed to "Shading Surfaces"
+- "Zone_Surfaces" was changed to "Zone Surfaces"
+- "Environment:Design_Day_Misc" was changed to "Environment:Design Day Misc"
+
+In addition:
+
+- Data rows labeled "Infiltration" have been changed to be "ZoneInfiltration" to correspond with the appropriate heading row
+- Heading rows labeled "<Shadowing/Sun Position Calculations> [Annual Simulations]" was changed to "<Shadowing/Sun Position Calculations Annual Simulations>" and the corresponding data rows labled "Shadowing/Sun Position Calculations" were changed to "Shadowing/Sun Position Calculations Annual Simulations"
+- Heading rows labeled "SurfaceGeometry" were changed to "Surface Geometry"
+- In the heading row "Environment:Weather Station" the column headings "Wind Speed Modifier Coefficient [Internal]" and "Temperature Modifier Coefficient [Internal]" were changed to "Wind Speed Modifier Coefficient-Internal" and "Temperature Modifier Coefficient-Internal"
+
+See [5928](https://github.com/NREL/EnergyPlus/pull/5928). 
+
 
 ### System Sizing Information in EIO Changed 
 

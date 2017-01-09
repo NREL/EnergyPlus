@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -182,6 +182,9 @@ namespace PlantChillers {
 		bool CheckEquipName;
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 		int CondMassFlowIndex;
+		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
+		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset 
 
 		// Default Constructor
 		BaseChillerSpecs() :
@@ -222,7 +225,10 @@ namespace PlantChillers {
 			MsgErrorCount( 0 ),
 			CheckEquipName( true ),
 			PossibleSubcooling( false ),
-			CondMassFlowIndex( 0 )
+			CondMassFlowIndex( 0 ),
+			FaultyChillerSWTFlag( false ),
+			FaultyChillerSWTIndex( 0 ),
+			FaultyChillerSWTOffset( 0.0 )
 		{}
 	};
 
