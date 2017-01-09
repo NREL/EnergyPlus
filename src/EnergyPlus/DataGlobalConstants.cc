@@ -347,7 +347,7 @@ namespace DataGlobalConstants {
 		} else if ( ( SELECT_CASE_var == "FUELOIL#2" ) || ( SELECT_CASE_var == "RESIDUAL OIL" ) ) {
 			ResourceTypeNum = iRT_FuelOil_2;
 
-		} else if ( ( SELECT_CASE_var == "PROPANE" ) || ( SELECT_CASE_var == "LPG" ) || ( SELECT_CASE_var == "PROPANEGAS" ) ) {
+		} else if ( ( SELECT_CASE_var == "PROPANE" ) || ( SELECT_CASE_var == "LPG" ) ) {
 			ResourceTypeNum = iRT_Propane;
 
 		} else if ( SELECT_CASE_var == "OTHERFUEL1" ) {

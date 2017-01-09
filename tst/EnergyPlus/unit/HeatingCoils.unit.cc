@@ -110,7 +110,7 @@ namespace EnergyPlus {
 			 "Coil:Heating:Fuel,",
 			 "  Furnace Coil,            !- Name",
 			 "  ,    !- Availability Schedule Name",
-			 "  PropaneGas,              !- FuelType",
+			 "  Propane,                 !- FuelType",
 			 "  0.8,                     !- Gas Burner Efficiency",
 			 "  20000,                   !- Nominal Capacity {W}",
 			 "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
