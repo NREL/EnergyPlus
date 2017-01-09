@@ -122,42 +122,26 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex )
 		" Output:Variable,", "(.*)N(ode|ODE),", "System Node Humidity Ratio,", "timestep;",
 	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	// EnergyPlus::InputProcessor::PreScanReportingVariables();
-	bool OnTheList;
 
 	EXPECT_EQ( OutputVariablesNames.size(), 5u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 10u );
 
-	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Mixed Air Node", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Any Node Here", "Zone Air System Sensible Heating Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Salesfloor Outlet Node", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "AnySalesfloor Outlet Node", "System Node Temperature" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "AnyOutside Air Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Inlet NODE", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Node", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Inlet NODE", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Any Node", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "OUTSIDE AIR INLET NODE", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Mixed Air Node", "System Node Temperature" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Inlet Node", "System Node Temperature" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Any Node Here", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Salesfloor Outlet Node", "System Node Temperature" ));
+	EXPECT_NE(true, FindItemInVariableList( "AnySalesfloor Outlet Node", "System Node Temperature" ));
+	EXPECT_NE(true, FindItemInVariableList( "AnyOutside Air Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Temperature" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom Inlet NODE", "System Node Temperature" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom Node", "System Node Temperature" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom Inlet NODE", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom Any Node", "System Node Humidity Ratio" ));
+
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Plus )
@@ -172,30 +156,18 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Plus )
 		" Output:Variable,", ".+,", "System Node Temperature,", "timestep;",
 	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	// EnergyPlus::InputProcessor::PreScanReportingVariables();
-	bool OnTheList;
-
 	EXPECT_EQ( OutputVariablesNames.size(), 6u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 6u );
 
-	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet", "System Node Mass Flow Rate" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Inlet Node", "System Node Humidity Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Any Node", "Zone Air System Sensible Heating Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Outlet Node", "Unitary System Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Any Node", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "", "System Node Temperature" );
-	EXPECT_NE(true, OnTheList);
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "Inlet", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "BackRoom Inlet Node", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom Any Node", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Outlet Node", "Unitary System Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Any Node", "System Node Temperature" ));
+	EXPECT_NE(true, FindItemInVariableList( "", "System Node Temperature" ));
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
@@ -211,52 +183,29 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Star )
 		" Output:Variable,", "*,", "Refrigeration Compressor Rack Electric Power,", "timestep;",
 	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	// EnergyPlus::InputProcessor::PreScanReportingVariables();
-	bool OnTheList;
 
 	EXPECT_EQ( OutputVariablesNames.size(), 7u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 7u );
-
-	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Inlet Node", "System Node Humidity Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Any Inlet", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom Any Node", "Zone Air System Sensible Heating Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Node", "Zone Air System Sensible Heating Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "NODE", "Zone Air System Sensible Heating Rate" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Outlet Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Outlet Node", "Unitary System Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside Air Node", "Unitary System Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outside AirNode", "Unitary System Load Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Any Node", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "", "System Node Temperature" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Any Node", "Refrigeration Compressor Rack Electric Power" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "", "Refrigeration Compressor Rack Electric Power" );
-	EXPECT_EQ(true, OnTheList);
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Inlet", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "BackRoom Inlet Node", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Inlet", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Any Inlet", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom Any Node", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Node", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "NODE", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Inlet Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Outlet Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Outlet Node", "Unitary System Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outside Air Node", "Unitary System Load Ratio" ));
+	EXPECT_NE(true, FindItemInVariableList( "Outside AirNode", "Unitary System Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Any Node", "System Node Temperature" ));
+	EXPECT_EQ(true, FindItemInVariableList( "", "System Node Temperature" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Any Node", "Refrigeration Compressor Rack Electric Power" ));
+	EXPECT_EQ(true, FindItemInVariableList( "", "Refrigeration Compressor Rack Electric Power" ));
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Pipe )
@@ -269,34 +218,20 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Pipe )
 		" Output:Variable,", "(BackRoom|BACKROOM|SALESFLOOR|SalesFloor) (Outlet|OUTLET) (NODE|Node),", "System Node Humidity Ratio,", "timestep;",
 	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	// EnergyPlus::InputProcessor::PreScanReportingVariables();
-	bool OnTheList;
 
 	EXPECT_EQ( OutputVariablesNames.size(), 3u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 4u );
-
-	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor Outlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor OUTLET Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "System Inlet Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "System Outlet Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "System Another Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SALESFLOOR OUTLET NODE", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor Outlet Node", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BACKROOM Outlet Node", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor INLET Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor Outlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor OUTLET Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "System Inlet Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "System Outlet Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_NE(true, FindItemInVariableList( "System Another Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "SALESFLOOR OUTLET NODE", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor Outlet Node", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BACKROOM Outlet Node", "System Node Humidity Ratio" ));
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
@@ -309,95 +244,70 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 		" Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,", "timestep;",
 	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	// EnergyPlus::InputProcessor::PreScanReportingVariables();
-	bool OnTheList;
 
-	EXPECT_EQ( OutputVariablesNames.size(), 4u );
-	EXPECT_EQ( OutputVariablesForSimulation.size(), 4u );
-
-	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "", "System Node Mass Flow Rate" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Humidity Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "BackRoom_NODE1", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "NODE", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Node", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "NOD", "Unitary System Compressor Part Load Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet", "Zone Air System Sensible Heating Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outlet", "Zone Air System Sensible Heating Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Any Node", "Zone Air System Sensible Heating Rate" );
-	EXPECT_NE(true, OnTheList);
+	EXPECT_EQ( OutputVariablesNames.size(), 5u );
+	EXPECT_EQ( OutputVariablesForSimulation.size(), 5u );
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Node", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "BackRoom OUTLET NODE", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "BackRoom_NODE1", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "NODE", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_NE(true, FindItemInVariableList( "Node", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_NE(true, FindItemInVariableList( "NOD", "Unitary System Compressor Part Load Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Inlet", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outlet", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "Any Node", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Inlet", "Refrigeration Compressor Rack Electric Power" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outlet", "Refrigeration Compressor Rack Electric Power" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outlet Node", "Refrigeration Compressor Rack Electric Power" ));
+	EXPECT_NE(true, FindItemInVariableList( "Node", "Refrigeration Compressor Rack Electric Power" ));
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_SpecChars )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "\\w,", "System Node Mass Flow Rate,", "timestep;",
+		"Version,8.6;",
+		" Output:Variable,", "\\w,", "System Node Mass Flow Rate,", "timestep;",
+	});
 
-	                                                 });
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	//bool OnTheList;
 
 	EXPECT_EQ( OutputVariablesNames.size(), 1u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 1u );
 
-//	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
-//	EXPECT_NE(true, OnTheList);
+//	EXPECT_NE(true, FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Carrot )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "^Inlet(.*)Node,", "System Node Mass Flow Rate,", "timestep;",
-			                                                 " Output:Variable,", "[^0-9]+,", "System Node Humidity Ratio,", "timestep;",
-
-	                                                 });
+		"Version,8.6;",
+		" Output:Variable,", "^Inlet(.*)Node,", "System Node Mass Flow Rate,", "timestep;",
+		" Output:Variable,", "[^0-9]+,", "System Node Humidity Ratio,", "timestep;",
+	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	bool OnTheList;
 
 	EXPECT_EQ( OutputVariablesNames.size(), 2u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 2u );
-
-	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet System Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor1", "System Node Humidity Ratio" );
-	EXPECT_NE(true, OnTheList);
-	OnTheList = FindItemInVariableList( "SalesFloor", "System Node Humidity Ratio" );
-	EXPECT_EQ(true, OnTheList);
+	EXPECT_NE(true, FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Inlet System Node", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "SalesFloor1", "System Node Humidity Ratio" ));
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor", "System Node Humidity Ratio" ));
 }
 
 TEST_F( EnergyPlusFixture, OutputReportData_Regex_Dollar )
 {
 	std::string const idf_objects = delimited_string({
-			                                                 "Version,8.6;",
-			                                                 " Output:Variable,", "(.*)Node$,", "System Node Mass Flow Rate,", "timestep;",
-	                                                 });
+		"Version,8.6;",
+		" Output:Variable,", "(.*)Node$,", "System Node Mass Flow Rate,", "timestep;",
+	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	bool OnTheList;
 
 	EXPECT_EQ( OutputVariablesNames.size(), 1u );
 	EXPECT_EQ( OutputVariablesForSimulation.size(), 1u );
-
-	OnTheList = FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Outlet Node", "System Node Mass Flow Rate" );
-	EXPECT_EQ(true, OnTheList);
-	OnTheList = FindItemInVariableList( "Inlet Node1 ", "System Node Mass Flow Rate" );
-	EXPECT_NE(true, OnTheList);
+	EXPECT_EQ(true, FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_EQ(true, FindItemInVariableList( "Outlet Node", "System Node Mass Flow Rate" ));
+	EXPECT_NE(true, FindItemInVariableList( "Inlet Node1 ", "System Node Mass Flow Rate" ));
 }
