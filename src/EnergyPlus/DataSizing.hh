@@ -976,6 +976,8 @@ namespace DataSizing {
 		//  (zone time step)
 		Array1D< Real64 > CoolZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
 		//  (zone time step)
+		Array1D< Real64 > HeatZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
+		//  (zone time step)
 		Array1D< Real64 > SensCoolCapSeq; // daily sequence of system sensible cooling capacity
 		//  (zone time step)
 		Array1D< Real64 > TotCoolCapSeq; // daily sequence of system total cooling capacity

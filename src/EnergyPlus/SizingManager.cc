@@ -56,6 +56,7 @@
 #include <CommandLineInterface.hh>
 #include <SizingManager.hh>
 #include <CostEstimateManager.hh>
+#include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -3452,6 +3453,32 @@ namespace SizingManager {
 		}
 
 	}
+
+
+	// Update the sizing for airloops to gather values for reporting - Glazer January 2017
+	void
+	UpdateAirLoopSizing( )
+	{
+		using DataAirLoop::AirLoopZoneInfo;
+		int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+		for ( int loopNum = 1; loopNum <= NumPrimaryAirSys; ++loopNum ) {
+			int numOfZones = AirLoopZoneInfo( loopNum ).NumZones;
+			for ( int zoneIndx = 1; zoneIndx <= numOfZones; ++zoneIndx ) {
+				int zoneNum = AirLoopZoneInfo( loopNum ).ActualZoneNumber( zoneIndx );
+
+
+			}
+		}
+	}
+
+	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
+	void
+	UpdateFacilitySizing( )
+	{
+		int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+
+	}
+
 
 } // SizingManager
 
