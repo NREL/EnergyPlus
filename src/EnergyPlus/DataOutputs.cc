@@ -145,8 +145,7 @@ namespace DataOutputs {
 
 		int Found = 0;
 		std::string LowerCaseVarName;
-		// previously case-insensitive search was done
-
+		// case-insensitive search
 		ConvertCaseToLower( VariableName, LowerCaseVarName);
 		auto const FirstIndex = OutputVariablesNames.find( LowerCaseVarName );
 
@@ -154,6 +153,7 @@ namespace DataOutputs {
 			Found = FirstIndex->second;
 		}
 		if ( Found != 0 ) {
+			// TODO: take this out in the future InputProcessor
 			std::string const uppercaseKeyedValue = InputProcessor::MakeUPPERCase( KeyedValue );
 			do {
 				if ( OutputVariablesForSimulation( Found ).Key == "*" ) {
