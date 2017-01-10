@@ -8203,7 +8203,7 @@ namespace SetPointManager {
 						HumRatCntrlType = iCtrlVarType_HumRat;
 					} else if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxHumRat ) {
 						HumRatCntrlType = iCtrlVarType_MaxHumRat;
-					}
+					} else { continue; }
 					return HumRatCntrlType;
 				}
 			}
