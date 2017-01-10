@@ -41532,17 +41532,16 @@ ZoneHVAC:EquipmentConnections,
   A5 , \field Zone Air Node Name
        \required-field
        \type node
-  A6 , \field Zone Return Air Node Name
-       \required-field
+  A6 , \field Zone Return Air Node or NodeList Name
        \type node
-  A7 , \field Zone Return Air Flow Rate Fraction Schedule Name
+  A7 , \field Zone Return Air Node 1 Flow Rate Fraction Schedule Name
        \note This schedule is multiplied times the base return air flow rate.
        \note If this field is left blank, the schedule defaults to 1.0 at all times.
        \type object-list
        \object-list ScheduleNames
-  A8 ; \field Zone Return Air Flow Rate Basis Node or NodeList Name
+  A8 ; \field Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name
        \note The optional basis node(s) used to calculate the base return air flow
-       \note rate for this zone. The return air flow rate is the sum of the flow rates
+       \note rate for the first return air node in this zone. The return air flow rate is the sum of the flow rates
        \note at the basis node(s) multiplied by the Zone Return Air Flow Rate Fraction Schedule.
        \note If this  field is blank, then the base return air flow rate is the total supply
        \note inlet flow rate to the zone less the total exhaust node flow rate from the zone.

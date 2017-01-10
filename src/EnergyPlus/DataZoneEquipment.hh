@@ -318,14 +318,16 @@ namespace DataZoneEquipment {
 		int EquipListIndex;
 		std::string ControlListName;
 		int ZoneNode;
-		int ReturnAirNode;
-		int NumInletNodes;
-		int NumExhaustNodes;
+		int ReturnAirNode; // first return node number
+		int NumInletNodes; // number of inlet nodes
+		int NumExhaustNodes; // number of exhaust nodes
+		int NumReturnNodes; // number of return air nodes
 		int NumReturnFlowBasisNodes; // number of return air flow basis nodes
 		int ReturnFlowSchedPtrNum; // return air flow fraction schedule pointer
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
 		Array1D_int ExhaustNode; // zone air exhaust nodes
+		Array1D_int ReturnNode; // zone return air nodes
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
 		int AirLoopNum; // the air loop index for this controlled zone
@@ -364,6 +366,7 @@ namespace DataZoneEquipment {
 			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
 			NumExhaustNodes( 0 ),
+			NumReturnNodes( 0 ),
 			NumReturnFlowBasisNodes( 0 ),
 			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),

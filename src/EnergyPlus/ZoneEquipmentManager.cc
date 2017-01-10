@@ -3048,8 +3048,6 @@ namespace ZoneEquipmentManager {
 		Real64 LatOutputProvided; // latent output delivered by zone equipment (kg/s)
 		Real64 AirSysOutput;
 		Real64 NonAirSysOutput;
-		static bool ZoneHasAirLoopHVACTerminal( false ); // true if zone has an air loop terminal
-		static bool ZoneHasAirLoopHVACDirectAir( false ); // true if zone has an uncontrolled air loop terminal
 		static Array1D_bool DirectAirAndAirTerminalWarningIssued; // only warn once for each zone with problems
 
 		// Determine flow rate and temperature of supply air based on type of damper
@@ -3110,8 +3108,6 @@ namespace ZoneEquipmentManager {
 			ZoneEquipConfig( ControlledZoneNum ).ZoneExh = 0.0;
 			ZoneEquipConfig( ControlledZoneNum ).ZoneExhBalanced = 0.0;
 			ZoneEquipConfig( ControlledZoneNum ).PlenumMassFlow = 0.0;
-			ZoneHasAirLoopHVACTerminal = false;
-			ZoneHasAirLoopHVACDirectAir = false;
 			CurZoneEqNum = ControlledZoneNum;
 
 			InitSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
@@ -3210,10 +3206,8 @@ namespace ZoneEquipmentManager {
 
 					NonAirSystemResponse( ActualZoneNum ) += NonAirSysOutput;
 					SysOutputProvided = NonAirSysOutput + AirSysOutput;
-					ZoneHasAirLoopHVACTerminal = true;
 				} else if ( SELECT_CASE_var == DirectAir_Num ) { // 'AirTerminal:SingleDuct:Uncontrolled'
 					SimDirectAir( PrioritySimOrder( EquipTypeNum ).EquipName, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
-					ZoneHasAirLoopHVACDirectAir = true;
 				} else if ( SELECT_CASE_var == VRFTerminalUnit_Num ) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
 					SimulateVRF( PrioritySimOrder( EquipTypeNum ).EquipName, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
@@ -3347,16 +3341,6 @@ namespace ZoneEquipmentManager {
 
 				UpdateSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided, EquipTypeNum );
 
-				if ( ZoneHasAirLoopHVACTerminal && ZoneHasAirLoopHVACDirectAir ) {
-					// zone has both AirTerminal:SingleDuct:Uncontrolled and another kind of Air terminal unit which is not supported
-					if ( ! DirectAirAndAirTerminalWarningIssued( ActualZoneNum ) ) {
-						ShowSevereError( "In zone \"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\" there are too many air terminals served by AirLoopHVAC systems." );
-						ShowContinueError( "A single zone cannot have both an AirTerminal:SingleDuct:Uncontrolled and also a second AirTerminal:* object." );
-
-						DirectAirAndAirTerminalWarningIssued( ActualZoneNum ) = true;
-						ErrorFlag = true;
-					}
-				}
 			} // zone loop
 
 			AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;

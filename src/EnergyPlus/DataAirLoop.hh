@@ -94,11 +94,11 @@ namespace DataAirLoop {
 	{
 		// Members
 		std::string AirLoopName; // Name of Primary Air System
-		int NumReturnNodes; // Number of return nodes connected to system
+		int NumReturnNodes; // Number of return nodes entering primary air system (currently limited to 1 node)
 		int NumSupplyNodes; // number of supply nodes exiting primary air system
 		int NumZonesCooled; // number of zones cooled by this primary air system
 		int NumZonesHeated; // number of zones heated by this primary air system
-		Array1D_int ZoneEquipReturnNodeNum; // Zone Equip side return air node numbers
+		Array1D_int ZoneEquipReturnNodeNum; // Zone Equip side return air node numbers (currently limited to 1 node)
 		Array1D_int ZoneEquipSupplyNodeNum; // Zone equip side supply air node numbers
 		Array1D_int AirLoopReturnNodeNum; // Air loop side return air node numbers
 		Array1D_int AirLoopSupplyNodeNum; // Air loop side supply air node numbers
