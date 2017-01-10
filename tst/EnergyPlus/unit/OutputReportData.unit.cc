@@ -236,11 +236,12 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,8.6;",
-		" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
+		//" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
 		" Output:Variable,", "[A-Za-z0-9_]+,", "System Node Humidity Ratio,", "timestep;",
 		" Output:Variable,", "[A-Z]{4},", "Unitary System Compressor Part Load Ratio,", "timestep;",
 		" Output:Variable,", "[A-Za-z]{5,6},", "Zone Air System Sensible Heating Rate,", "timestep;",
 		" Output:Variable,", "[A-Za-z ]{5,},", "Refrigeration Compressor Rack Electric Power,", "timestep;",
+		" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
 	});
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
@@ -254,12 +255,13 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 	EXPECT_TRUE( FindItemInVariableList( "NODE", "Unitary System Compressor Part Load Ratio" ));
 	EXPECT_FALSE( FindItemInVariableList( "Node", "Unitary System Compressor Part Load Ratio" ));
 	EXPECT_FALSE( FindItemInVariableList( "NOD", "Unitary System Compressor Part Load Ratio" ));
-	EXPECT_TRUE( FindItemInVariableList( "Inlet", "Zone Air System Sensible Heating Rate" ));
-	EXPECT_TRUE( FindItemInVariableList( "Outlet", "Zone Air System Sensible Heating Rate" ));
+	//next 7 test cases are meant for "{,}" type of regexes
+	EXPECT_FALSE( FindItemInVariableList( "Inlet", "Zone Air System Sensible Heating Rate" ));
+	EXPECT_FALSE( FindItemInVariableList( "Outlet", "Zone Air System Sensible Heating Rate" ));
 	EXPECT_FALSE( FindItemInVariableList( "Any Node", "Zone Air System Sensible Heating Rate" ));
-	EXPECT_TRUE( FindItemInVariableList( "Inlet", "Refrigeration Compressor Rack Electric Power" ));
-	EXPECT_TRUE( FindItemInVariableList( "Outlet", "Refrigeration Compressor Rack Electric Power" ));
-	EXPECT_TRUE( FindItemInVariableList( "Outlet Node", "Refrigeration Compressor Rack Electric Power" ));
+	EXPECT_FALSE( FindItemInVariableList( "Inlet", "Refrigeration Compressor Rack Electric Power" ));
+	EXPECT_FALSE( FindItemInVariableList( "Outlet", "Refrigeration Compressor Rack Electric Power" ));
+	EXPECT_FALSE( FindItemInVariableList( "Outlet Node", "Refrigeration Compressor Rack Electric Power" ));
 	EXPECT_FALSE( FindItemInVariableList( "Node", "Refrigeration Compressor Rack Electric Power" ));
 }
 
