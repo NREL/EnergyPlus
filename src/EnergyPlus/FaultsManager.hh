@@ -292,6 +292,7 @@ namespace FaultsManager {
 		public:
 			bool CheckFaultyAirFilterFanCurve();
 	};
+<<<<<<< HEAD
 	
 	struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
 	{
@@ -309,6 +310,9 @@ namespace FaultsManager {
 			
 	};
 	
+=======
+
+>>>>>>> refs/remotes/origin/develop
 	struct FaultPropertiesChillerSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:ChillerSupplyWater
 	{
 		// Members
