@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::FaultManager unit tests
 // Fouling Air Filter
@@ -296,5 +284,68 @@ TEST_F( EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT ) {
 	EXPECT_EQ( 1, HVACControllers::ControllerProps( 1 ).FaultyCoilSATIndex );
 
 }
+
+}
+
+TEST_F( EnergyPlusFixture, FaultsManager_FaultChillerSWTSensor_CalFaultChillerSWT )
+{
+	// PURPOSE OF THIS SUBROUTINE:
+	// To check CalFaultChillerSWT which calculates the mass flow rate and supply water temperature of a chiller with faulty SWT sensor.
+	
+	bool FlagVariableFlow; // True if chiller is variable flow and false if it is constant flow
+	Real64 FaultyChillerSWTOffset; // Faulty chiller SWT sensor offset
+	Real64 Cp = 4500; // Local fluid specific heat
+	Real64 EvapInletTemp = 12; // Chiller evaporator inlet water temperature 
+	Real64 EvapOutletTemp = 7; // Chiller evaporator outlet water temperature, fault free
+	Real64 EvapMassFlowRate = 40; // Chiller mass flow rate, fault free
+	Real64 QEvaporator = 900000; // Chiller evaporator heat transfer rate, fault free
+	FaultPropertiesChillerSWT FaultChiller;
+
+	//1) offset is 0C
+	FlagVariableFlow = false;
+	Real64 EvapOutletTemp_1 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapMassFlowRate_1 = EvapMassFlowRate; // Chiller mass flow rate
+	Real64 QEvaporator_1 = QEvaporator; // Chiller evaporator heat transfer rate
+	FaultyChillerSWTOffset = 0;
+	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_1, EvapMassFlowRate_1, QEvaporator_1 );
+	EXPECT_EQ( 1, EvapOutletTemp_1/EvapOutletTemp );
+	EXPECT_EQ( 1, QEvaporator_1/QEvaporator );
+	
+	//2) offset is 2C
+	Real64 EvapOutletTemp_2 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapMassFlowRate_2 = EvapMassFlowRate; // Chiller mass flow rate
+	Real64 QEvaporator_2 = QEvaporator; // Chiller evaporator heat transfer rate
+	FaultyChillerSWTOffset = 2;
+	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_2, EvapMassFlowRate_2, QEvaporator_2 );
+	EXPECT_NEAR( 0.714, EvapOutletTemp_2/EvapOutletTemp, 0.001 );
+	EXPECT_NEAR( 1.400, QEvaporator_2/QEvaporator, 0.001 );
+	
+	
+	//3) offset is -2C
+	Real64 EvapOutletTemp_3 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapMassFlowRate_3 = EvapMassFlowRate; // Chiller mass flow rate
+	Real64 QEvaporator_3 = QEvaporator; // Chiller evaporator heat transfer rate
+	FaultyChillerSWTOffset = -2;
+	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_3, EvapMassFlowRate_3, QEvaporator_3 );
+	EXPECT_NEAR( 1.285, EvapOutletTemp_3/EvapOutletTemp, 0.001 );
+	EXPECT_NEAR( 0.600, QEvaporator_3/QEvaporator, 0.001 );
+	
+}
+
+TEST_F( EnergyPlusFixture, FaultsManager_CalFaultOffsetAct )
+{
+	// PURPOSE OF THIS SUBROUTINE:
+	// To check CalFaultOffsetAct which calculates the dynamic fault offset based on the fault availability schedule and severity schedule.
+
+	Real64 OffsetAct;
+	FaultProperties Fault;
+
+	Fault.AvaiSchedPtr = -1;
+	Fault.SeveritySchedPtr = -1;
+	Fault.Offset = 10;
+	
+	// Run and Check
+	OffsetAct = Fault.CalFaultOffsetAct();
+	EXPECT_EQ( 10, OffsetAct );
 
 }
