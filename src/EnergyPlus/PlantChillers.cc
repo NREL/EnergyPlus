@@ -4299,7 +4299,7 @@ namespace PlantChillers {
 		LoopSideNum = ElectricChiller( ChillNum ).Base.CWLoopSideNum;
 
 		//If there is a fault of chiller fouling (zrp_Nov2016)
-		if( ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			
@@ -4925,7 +4925,7 @@ namespace PlantChillers {
 		EvapMassFlowRateMax = EngineDrivenChiller( ChillerNum ).Base.EvapMassFlowRateMax;
 		
 		//If there is a fault of chiller fouling (zrp_Nov2016)
-		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			
@@ -5537,7 +5537,7 @@ namespace PlantChillers {
 		LoopSideNum = GTChiller( ChillerNum ).Base.CWLoopSideNum;
 		
 		//If there is a fault of chiller fouling (zrp_Nov2016)
-		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			
@@ -6053,7 +6053,7 @@ namespace PlantChillers {
 		CondOutletNode = ConstCOPChiller( ChillNum ).Base.CondOutletNodeNum;
 
 		//If there is a fault of chiller fouling (zrp_Nov2016)
-		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ){
+		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			
