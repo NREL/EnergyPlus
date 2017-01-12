@@ -1521,19 +1521,19 @@ INTEGER,PARAMETER :: chlreirLastFieldOff = 26
 INTEGER,PARAMETER :: twrssNameOff = 1
 INTEGER,PARAMETER :: twrssInletNodeOff = 2
 INTEGER,PARAMETER :: twrssOutletNodeOff = 3
-INTEGER,PARAMETER :: twrssLastFieldOff = 33
+INTEGER,PARAMETER :: twrssLastFieldOff = 37
 
   ! CoolingTower:TwoSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrtsNameOff = 1
 INTEGER,PARAMETER :: twrtsInletNodeOff = 2
 INTEGER,PARAMETER :: twrtsOutletNodeOff = 3
-INTEGER,PARAMETER :: twrtsLastFieldOff = 40
+INTEGER,PARAMETER :: twrtsLastFieldOff = 44
 
   ! CoolingTower:VariableSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrvsNameOff = 1
 INTEGER,PARAMETER :: twrvsInletNodeOff = 2
 INTEGER,PARAMETER :: twrvsOutletNodeOff = 3
-INTEGER,PARAMETER :: twrvsLastFieldOff = 30
+INTEGER,PARAMETER :: twrvsLastFieldOff = 34
 
 !following objects are identified just by the first and last fields
 INTEGER,PARAMETER :: ghtBsSimParamFirstOff = 1
