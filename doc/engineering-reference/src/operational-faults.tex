@@ -1,6 +1,6 @@
 \chapter{Operational Faults}\label{operational-faults}
 
-\subsection{Introduction to Operational Faults Modeling}\label{introduction-to-operational-faults-modeling}
+\section{Introduction to HVAC Operational Faults Modeling}\label{introduction-to-hvac-operational-faults}
 
 Most of the buildings, either new or old, have operational faults in the sensors, controllers, meters, equipment and systems. Being able to model and simulate these faults and their impact on energy performance of buildings is crucial to improve accuracy of building simulations and to support the retrofit of buildings. To date, the main practitioner use of EnergyPlus has been for new construction design. With the new high priority attached by USDOE to retrofit and improved operation of existing buildings, there is a need to extend the capabilities of EnergyPlus to model existing buildings, including faulty operation:
 
@@ -16,7 +16,10 @@ Most of the buildings, either new or old, have operational faults in the sensors
 
 The users in these cases are practitioners, not power users, so it is needed to implement the fault models using conventional EnergyPlus objects rather than the EMS, which, in any case, could only be used to model limited types of faults.
 
-EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, and (3) heating and cooling coil fouling faults.
+EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of a number of fault types that categorized as: (1) sensor faults with air economizers (e.g., outdoor air temperature sensor) (2) thermostat/humidistat offset faults, (3) fouling or scaling at air side or water side components (e.g., heating and cooling coil, air filter, cooling tower), (4) sensor faults with plant components (e.g., chiller supply water temperature sensor offset).
+
+
+\section{Operational Faults Modeling}\label{operational-faults-modeling}
 
 \subsection{Sensor Faults with Air Economizers}\label{sensor-faults-with-air-economizers}
 
@@ -316,6 +319,7 @@ Where,
 
 \(_{df}\) is for the parameters in the dirty filter case.
 
+
 \subsection{Chiller Supply Water Temperature Sensor Offset}\label{chiller-supply-water-temperature-sensor-offset}
 
 \subsubsection{Symptom}
@@ -445,7 +449,6 @@ Where,
 Note that operational faults only affect the HVAC operations, not the system design. Therefore, the fault model will only be applied at real weather simulations instead of the sizing and warm-up simulations. If the faulty sensor leads to a supply water temperature level that goes beyond the limits defined in the chiller object, the predefined bound values will be used as the actual supply water temperature \(T_{evap-o,f}\).
 
 If there are multiple chillers operating together with one shared faulty supply water temperature sensor, one fault object needs to be created for every chiller that is affected.
-
 
 \subsection{Condenser Supply Water Temperature Sensor Offset}\label{condenser-supply-water-temperature-sensor-offset}
 

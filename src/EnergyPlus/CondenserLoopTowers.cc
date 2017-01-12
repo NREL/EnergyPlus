@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -776,30 +764,27 @@ namespace CondenserLoopTowers {
 				}
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate != 0.0 ) {
 					if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
 					}
-					ShowContinueError( "Design water flow rate must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Design water flow rate will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).HighSpeedTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity and design tower UA have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity and design tower UA have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal tower capacity has been specified and design tower UA is being autosized." );
 					}
-					ShowContinueError( "Design tower UA field must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Design tower UA will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
 					}
-					ShowContinueError( "Free convection UA should be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Free convection UA will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).TowerFreeConvNomCap >= SimpleTower( TowerNum ).TowerNominalCapacity ) {
 					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Free convection nominal capacity must be less than the nominal (design) tower capacity." );
@@ -1080,39 +1065,35 @@ namespace CondenserLoopTowers {
 				}
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate != 0.0 ) {
 					if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and design water flow rate have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and design water flow rate is being autosized." );
 					}
-					ShowContinueError( "Design water flow rate must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Design water flow rate will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).HighSpeedTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at high fan speed have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at high fan speed have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and tower UA at high fan speed is being autosized." );
 					}
-					ShowContinueError( "Tower UA at high fan speed must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Tower UA at high fan speed will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).LowSpeedTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).LowSpeedTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at low fan speed have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and tower UA at low fan speed have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and tower UA at low fan speed is being autosized." );
 					}
-					ShowContinueError( "Tower UA at low fan speed must be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Tower UA at low fan speed will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).FreeConvTowerUA != 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvTowerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
+						ShowWarningError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method and free convection UA have been specified." );
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Nominal capacity input method has been specified and free convection UA is being autosized." );
 					}
-					ShowContinueError( "Free convection UA should be left blank when nominal tower capacity input method is used." );
-					ErrorsFound = true;
+					ShowContinueError( "Free convection UA will be set according to nominal tower capacity." );
 				}
 				if ( SimpleTower( TowerNum ).TowerLowSpeedNomCap >= SimpleTower( TowerNum ).TowerNominalCapacity ) {
 					ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Low-speed nominal capacity must be less than the high-speed nominal capacity." );
@@ -2380,6 +2361,8 @@ namespace CondenserLoopTowers {
 		Real64 AssumedDeltaT; // default delta T for nominal capacity of hard sized with UA method
 		Real64 AssumedExitTemp; // default for cp fo nominal capacity of hard sized with UA method
 		bool ErrorsFound;
+		Real64 OutWaterTemp; // outlet water temperature during sizing [C]
+		Real64 CoolingOutput; // tower capacity during sizing [W]
 
 		tmpDesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 		tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
@@ -2463,6 +2446,7 @@ namespace CondenserLoopTowers {
 			// We assume the nominal fan power is 0.0105 times the design load
 			if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				SimpleTower( TowerNum ).HighSpeedFanPower = 0.0105 * SimpleTower( TowerNum ).TowerNominalCapacity;
+				tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
 			} else {
 				if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -2779,6 +2763,7 @@ namespace CondenserLoopTowers {
 		}
 
 		if ( SimpleTower( TowerNum ).FreeConvAirFlowRateWasAutoSized ) {
+			SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor * tmpHighSpeedAirFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {
 				SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor * SimpleTower( TowerNum ).HighSpeedAirFlowRate;
 				if ( PlantFinalSizesOkayToReport ) {
@@ -2829,8 +2814,25 @@ namespace CondenserLoopTowers {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
 					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
 				} else if ( SolFla == -2 ) {
-					ShowSevereError( "Bad starting values for UA" );
+					ShowSevereError( "Bad starting values for UA calculations" );
+					ShowContinueError( "Tower inlet design water temperature assumed to be 35.0 C." );
+					ShowContinueError( "Tower inlet design air dry-bulb temperature assumed to be 35.0 C." );
+					ShowContinueError( "Tower inlet design air wet-bulb temperature assumed to be 25.6 C." );
+					ShowContinueError( "Tower load assumed to be " + TrimSigDigits( SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio, 3 ) + " times free convection capacity of " + TrimSigDigits( SimpleTower( TowerNum ).TowerFreeConvNomCap, 0 ) + " W." );
+
+					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA0, OutWaterTemp );
+					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
+					ShowContinueError( "Tower capacity at lower UA guess (" + TrimSigDigits( UA0, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );
+					
+					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA1, OutWaterTemp );
+					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
+					ShowContinueError( "Tower capacity at upper UA guess (" + TrimSigDigits( UA1, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );
+
+					if ( CoolingOutput < DesTowerLoad ) {
+						ShowContinueError( "Free convection capacity should be less than tower capacity at upper UA guess." );
+					}
 					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+
 				}
 				if ( PlantFirstSizesOkayToFinalize ) {
 					SimpleTower( TowerNum ).FreeConvTowerUA = UA;

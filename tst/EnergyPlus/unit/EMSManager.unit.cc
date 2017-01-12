@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::EMSManager Unit Tests
 
@@ -76,6 +64,7 @@
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <DataRuntimeLanguage.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -176,9 +165,42 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 
 
-		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
+		EXPECT_NEAR( DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
 
-		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001 );
+		EXPECT_NEAR( DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001 );
+
+}
+
+TEST_F( EnergyPlusFixture, CheckActuatorInit ) {
+		// this test checks that new actuators have the Erl variable associated with them set to Null right away, issue #5710
+		std::string const idf_objects = delimited_string( {
+		"Version,8.6;",
+
+		"OutdoorAir:Node, Test node;",
+
+		"EnergyManagementSystem:Actuator,",
+		"TempSetpointLo,          !- Name",
+		"Test node,  !- Actuated Component Unique Name",
+		"System Node Setpoint,    !- Actuated Component Type",
+		"Temperature Minimum Setpoint;    !- Actuated Component Control Type",
+
+		"EnergyManagementSystem:ProgramCallingManager,",
+		"Dual Setpoint Test Manager,  !- Name",
+		"EndSystemTimestepBeforeHVACReporting,  !- EnergyPlus Model Calling Point",
+		"DualSetpointTestControl;  !- Program Name 1",
+
+		"EnergyManagementSystem:Program,",
+		"DualSetpointTestControl,",
+		"Set TempSetpointLo = 16.0;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+		OutAirNodeManager::SetOutAirNodes();
+		EMSManager::GetEMSInput();
+
+		// now check that Erl variable is Null
+		EXPECT_EQ( DataRuntimeLanguage::ErlVariable( 1 ).Value.Type, DataRuntimeLanguage::ValueNull );
 
 }
 
@@ -814,41 +836,34 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
 	std::string const idf_objects = delimited_string( {
 		"Version,8.6;",
 
-		"OutdoorAir:Node, Test node 1;",
-
-		"EnergyManagementSystem:Actuator,",
-		"TempSetpoint1,          !- Name",
-		"Test node 1,  !- Actuated Component Unique Name",
-		"System Node Setpoint,    !- Actuated Component Type",
-		"Temperature Setpoint;    !- Actuated Component Control Type",
+		"EnergyManagementSystem:GlobalVariable,",
+		"TempSetpoint1;          !- Name",
 
 		"EnergyManagementSystem:Program,",
-		"SetNodeSetpointTest,",
+		"InitVariableTest,",
 		"Set TempSetpoint1 = 21.0;"
 
 		"EnergyManagementSystem:ProgramCallingManager,",
 		"Test Program Manager 1,  !- Name",
 		"BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
-		"SetNodeSetpointTest;  !- Program Name 1",
+		"InitVariableTest;  !- Program Name 1",
 
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-
-	OutAirNodeManager::SetOutAirNodes();
 
 	EMSManager::CheckIfAnyEMS();
 	EMSManager::FinishProcessingUserInput = true;
 	bool anyRan;
 	EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation, anyRan );
 	// Expect the variable to not yet be initialized
-	EXPECT_FALSE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
+	EXPECT_FALSE ( ErlVariable( 25 ).Value.initialized );
 	// next run a small program that sets the value
 	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment, anyRan );
 	// check that it worked and the value came thru
-	EXPECT_NEAR( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.Number, 21.0, 0.0000001 );
+	EXPECT_NEAR( ErlVariable( 25 ).Value.Number, 21.0, 0.0000001 );
 	// check of state to see if now initialized
-	EXPECT_TRUE ( ErlVariable( EMSActuatorUsed( 1 ).ErlVariableNum ).Value.initialized );
+	EXPECT_TRUE ( ErlVariable( 25 ).Value.initialized );
 
 }
 

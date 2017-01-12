@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HeatBalFiniteDiffManager Unit Tests
 
@@ -66,6 +54,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
@@ -122,6 +111,109 @@ namespace EnergyPlus {
 		
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
+		// Tests for correction of view factors based on GitHub Issue #5772
+
+		A( 1 ) = 20.0;
+		A( 2 ) = 180.0;
+		A( 3 ) = 180.0;
+		F( 1, 1 ) = 0.0;
+		F( 1, 2 ) = 0.5;
+		F( 1, 3 ) = 0.5;
+		F( 2, 1 ) = 0.1;
+		F( 2, 2 ) = 0.0;
+		F( 2, 3 ) = 0.9;
+		F( 3, 1 ) = 0.1;
+		F( 3, 2 ) = 0.9;
+		F( 3, 3 ) = 0.0;
+
+		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
+		EXPECT_NEAR( F( 1, 2 ), 0.07986, 0.001 );
+		EXPECT_NEAR( F( 2, 1 ), 0.71875, 0.001 );
+		EXPECT_NEAR( F( 3, 2 ), 0.28125, 0.001 );
+		
+		A( 1 ) = 100.0;
+		A( 2 ) = 100.0;
+		A( 3 ) = 200.0;
+		F( 1, 1 ) = 0.0;
+		F( 1, 2 ) = 1.0/3.0;
+		F( 1, 3 ) = 2.0/3.0;
+		F( 2, 1 ) = 1.0/3.0;
+		F( 2, 2 ) = 0.0;
+		F( 2, 3 ) = 2.0/3.0;
+		F( 3, 1 ) = 0.5;
+		F( 3, 2 ) = 0.5;
+		F( 3, 3 ) = 0.0;
+		
+		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
+		EXPECT_NEAR( F( 1, 2 ), 0.181818, 0.001 );
+		EXPECT_NEAR( F( 2, 3 ), 0.25, 0.001 );
+		EXPECT_NEAR( F( 3, 2 ), 0.5, 0.001 );
+		
+		A( 1 ) = 100.0;
+		A( 2 ) = 150.0;
+		A( 3 ) = 200.0;
+		F( 1, 1 ) = 0.0;
+		F( 1, 2 ) = 150.0/350.0;
+		F( 1, 3 ) = 200.0/350.0;
+		F( 2, 1 ) = 1.0/3.0;
+		F( 2, 2 ) = 0.0;
+		F( 2, 3 ) = 2.0/3.0;
+		F( 3, 1 ) = 0.4;
+		F( 3, 2 ) = 0.6;
+		F( 3, 3 ) = 0.0;
+
+		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
+		EXPECT_NEAR( F( 1, 2 ), 0.21466, 0.001 );
+		EXPECT_NEAR( F( 1, 3 ), 0.25445, 0.001 );
+		EXPECT_NEAR( F( 2, 1 ), 0.32199, 0.001 );
+		EXPECT_NEAR( F( 2, 3 ), 0.36832, 0.001 );
+		EXPECT_NEAR( F( 3, 1 ), 0.50890, 0.001 );
+		EXPECT_NEAR( F( 3, 2 ), 0.49110, 0.001 );
+
+		A.deallocate();
+		F.deallocate();
+		
 	}
 
+	TEST_F( EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagTest)
+	{
+	
+		bool DidMIChange;
+		int SurfNum;
+		
+		DataHeatBalance::Construct.allocate( 1 );
+		DataHeatBalance::Material.allocate( 1 );
+		DataSurfaces::Surface.allocate( 1 );
+		
+		SurfNum = 1;
+		DataSurfaces::Surface( 1 ).MaterialMovInsulInt = 1;
+		DataSurfaces::Surface( 1 ).MovInsulIntPresent = false;
+		DataSurfaces::Surface( 1 ).MovInsulIntPresentPrevTS = false;
+		DataSurfaces::Surface( 1 ).Construction = 1;
+		DataSurfaces::Surface( 1 ).MaterialMovInsulInt = 1;
+		DataHeatBalance::Construct( 1 ).InsideAbsorpThermal = 0.9;
+		DataHeatBalance::Material( 1 ).AbsorpThermal = 0.5;
+		DataHeatBalance::Material( 1 ).Resistance = 1.25;
+		DataSurfaces::Surface( 1 ).SchedMovInsulInt = -1;
+		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.25;
+		
+		// Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
+		//         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
+		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
+		EXPECT_TRUE( DidMIChange );
+
+		// Test 2: Movable insulation present and was also present in previous time step.  This should result in a false value since nothing has changed.
+		DataSurfaces::Surface( 1 ).MovInsulIntPresentPrevTS = true;
+		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
+		EXPECT_TRUE( !DidMIChange );
+
+		// Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
+  		// 		   construction are the same so nothing has actually changed.  This should result in a false value.
+		DataSurfaces::Surface( 1 ).MovInsulIntPresentPrevTS = false;
+		DataHeatBalance::Material( 1 ).AbsorpThermal = DataHeatBalance::Construct( 1 ).InsideAbsorpThermal;
+		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
+		EXPECT_TRUE( !DidMIChange );
+		
+	}
+	
 }

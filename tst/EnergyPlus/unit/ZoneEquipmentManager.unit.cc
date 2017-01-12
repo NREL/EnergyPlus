@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::ZoneEquipmentManager Unit Tests
 
@@ -70,6 +58,10 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -152,4 +144,295 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 	EXPECT_TRUE(has_err_output());
 
 	// Deallocate everything - should all be taken care of in clear_states
+}
+
+TEST_F( EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest )
+{
+
+	std::string const idf_objects = delimited_string( {
+		" Version,8.5;",
+
+		"  Zone,",
+		"    SPACE1-1,                !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0,                       !- X Origin {m}",
+		"    0,                       !- Y Origin {m}",
+		"    0,                       !- Z Origin {m}",
+		"    1,                       !- Type",
+		"    1,                       !- Multiplier",
+		"    2.438400269,             !- Ceiling Height {m}",
+		"    239.247360229;           !- Volume {m3}",
+
+		"  Zone,",
+		"    SPACE2-1,                !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0,                       !- X Origin {m}",
+		"    0,                       !- Y Origin {m}",
+		"    0,                       !- Z Origin {m}",
+		"    1,                       !- Type",
+		"    1,                       !- Multiplier",
+		"    2.438400269,             !- Ceiling Height {m}",
+		"    103.311355591;           !- Volume {m3}",
+
+		"  Zone,",
+		"    SPACE3-1,                !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0,                       !- X Origin {m}",
+		"    0,                       !- Y Origin {m}",
+		"    0,                       !- Z Origin {m}",
+		"    1,                       !- Type",
+		"    1,                       !- Multiplier",
+		"    2.438400269,             !- Ceiling Height {m}",
+		"    239.247360229;           !- Volume {m3}",
+
+		"  Zone,",
+		"    SPACE4-1,                !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0,                       !- X Origin {m}",
+		"    0,                       !- Y Origin {m}",
+		"    0,                       !- Z Origin {m}",
+		"    1,                       !- Type",
+		"    1,                       !- Multiplier",
+		"    2.438400269,             !- Ceiling Height {m}",
+		"    103.311355591;           !- Volume {m3}",
+
+		"  Zone,",
+		"    SPACE5-1,                !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0,                       !- X Origin {m}",
+		"    0,                       !- Y Origin {m}",
+		"    0,                       !- Z Origin {m}",
+		"    1,                       !- Type",
+		"    1,                       !- Multiplier",
+		"    2.438400269,             !- Ceiling Height {m}",
+		"    447.682556152;           !- Volume {m3}",
+
+		"  Schedule:Compact,",
+		"    MixingAvailSched,        !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 3/31,           !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,1.00,       !- Field 3",
+		"    Through: 9/30,           !- Field 5",
+		"    For: Weekdays,           !- Field 6",
+		"    Until: 7:00,1.00,        !- Field 7",
+		"    Until: 17:00,1.00,       !- Field 9",
+		"    Until: 24:00,1.00,       !- Field 11",
+		"    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13",
+		"    Until: 24:00,1.00,       !- Field 14",
+		"    For: SummerDesignDay WinterDesignDay, !- Field 16",
+		"    Until: 24:00,1.00,       !- Field 17",
+		"    Through: 12/31,          !- Field 19",
+		"    For: AllDays,            !- Field 20",
+		"    Until: 24:00,1.00;       !- Field 21",
+
+		"  Schedule:Compact,",
+		"    MinIndoorTemp,           !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,18;         !- Field 3",
+
+		"  Schedule:Compact,",
+		"    MaxIndoorTemp,           !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,100;        !- Field 3",
+
+		"  Schedule:Compact,",
+		"    DeltaTemp,               !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,2;          !- Field 3",
+
+		"  Schedule:Compact,",
+		"    MinOutdoorTemp,          !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,-100;       !- Field 3",
+
+		"  Schedule:Compact,",
+		"    MaxOutdoorTemp,          !- Name",
+		"    Any Number,              !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,100;        !- Field 3",
+
+		"  ZoneCrossMixing,",
+		"    SPACE2-4 XMixng 1,       !- Name",
+		"    SPACE2-1,                !- Zone Name",
+		"    MixingAvailSched,        !- Schedule Name",
+		"    flow/zone,               !- Design Flow Rate Calculation Method",
+		"    0.1,                     !- Design Flow Rate {m3/s}",
+		"    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}",
+		"    ,                        !- Flow Rate per Person {m3/s-person}",
+		"    ,                        !- Air Changes per Hour {1/hr}",
+		"    SPACE4-1,                !- Source Zone Name",
+		"    1.0,                     !- Delta Temperature {deltaC}",
+		"    ,                        !- Delta Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name",
+		"    MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name",
+		"    MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name",
+
+		"  ZoneCrossMixing,",
+		"    SPACE4-2 XMixng 1,       !- Name",
+		"    SPACE4-1,                !- Zone Name",
+		"    MixingAvailSched,        !- Schedule Name",
+		"    flow/zone,               !- Design Flow Rate Calculation Method",
+		"    0.1,                     !- Design Flow Rate {m3/s}",
+		"    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}",
+		"    ,                        !- Flow Rate per Person {m3/s-person}",
+		"    ,                        !- Air Changes per Hour {1/hr}",
+		"    SPACE2-1,                !- Source Zone Name",
+		"    1.0,                     !- Delta Temperature {deltaC}",
+		"    ,                        !- Delta Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name",
+		"    MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name",
+		"    MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name",
+
+		"  ZoneCrossMixing,",
+		"    SPACE3-4 XMixng 1,       !- Name",
+		"    SPACE3-1,                !- Zone Name",
+		"    MixingAvailSched,        !- Schedule Name",
+		"    flow/zone,               !- Design Flow Rate Calculation Method",
+		"    0.2,                     !- Design Flow Rate {m3/s}",
+		"    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}",
+		"    ,                        !- Flow Rate per Person {m3/s-person}",
+		"    ,                        !- Air Changes per Hour {1/hr}",
+		"    SPACE4-1,                !- Source Zone Name",
+		"    0.0,                     !- Delta Temperature {deltaC}",
+		"    ,                        !- Delta Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name",
+		"    MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name",
+		"    MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name",
+
+		"  ZoneCrossMixing,",
+		"    SPACE1-4 XMixng 1,       !- Name",
+		"    SPACE1-1,                !- Zone Name",
+		"    MixingAvailSched,        !- Schedule Name",
+		"    flow/zone,               !- Design Flow Rate Calculation Method",
+		"    0.3,                     !- Design Flow Rate {m3/s}",
+		"    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}",
+		"    ,                        !- Flow Rate per Person {m3/s-person}",
+		"    ,                        !- Air Changes per Hour {1/hr}",
+		"    SPACE4-1,                !- Source Zone Name",
+		"    0.0,                     !- Delta Temperature {deltaC}",
+		"    ,                        !- Delta Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name",
+		"    MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name",
+		"    MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name",
+
+		"  ZoneCrossMixing,",
+		"    SPACE1-3 XMixng 1,       !- Name",
+		"    SPACE1-1,                !- Zone Name",
+		"    MixingAvailSched,        !- Schedule Name",
+		"    flow/zone,               !- Design Flow Rate Calculation Method",
+		"    0.3,                     !- Design Flow Rate {m3/s}",
+		"    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}",
+		"    ,                        !- Flow Rate per Person {m3/s-person}",
+		"    ,                        !- Air Changes per Hour {1/hr}",
+		"    SPACE3-1,                !- Source Zone Name",
+		"    0.0,                     !- Delta Temperature {deltaC}",
+		"    ,                        !- Delta Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name",
+		"    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name",
+		"    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name",
+		"    MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name",
+		"    MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output( ) );
+	bool ErrorsFound = false;
+	ScheduleManager::ProcessScheduleInput( );
+	GetZoneData( ErrorsFound );
+	DataHeatBalFanSys::ZoneReOrder.allocate( NumOfZones );
+
+	GetSimpleAirModelInputs( ErrorsFound );
+
+	EXPECT_FALSE( ErrorsFound );
+
+	DataHeatBalFanSys::MAT.allocate( NumOfZones );
+	DataHeatBalFanSys::ZoneAirHumRat.allocate( NumOfZones );
+	DataHeatBalFanSys::MCPM.allocate( NumOfZones );
+	DataHeatBalFanSys::MCPTM.allocate( NumOfZones );
+
+	DataHeatBalFanSys::MCPI.allocate( NumOfZones );
+	DataHeatBalFanSys::OAMFL.allocate( NumOfZones );
+	DataHeatBalFanSys::MCPTI.allocate( NumOfZones );
+
+	DataHeatBalFanSys::MixingMassFlowZone.allocate( NumOfZones );
+	DataHeatBalFanSys::MixingMassFlowXHumRat.allocate( NumOfZones );
+
+	DataHeatBalFanSys::MAT( 1 ) = 21.0;
+	DataHeatBalFanSys::MAT( 2 ) = 22.0;
+	DataHeatBalFanSys::MAT( 3 ) = 23.0;
+	DataHeatBalFanSys::MAT( 4 ) = 24.0;
+	DataHeatBalFanSys::MAT( 5 ) = 25.0;
+	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.001;
+	DataHeatBalFanSys::ZoneAirHumRat( 2 ) = 0.001;
+	DataHeatBalFanSys::ZoneAirHumRat( 3 ) = 0.001;
+	DataHeatBalFanSys::ZoneAirHumRat( 4 ) = 0.001;
+	DataHeatBalFanSys::ZoneAirHumRat( 5 ) = 0.001;
+
+	DataHeatBalance::AirFlowFlag = 1;
+	ScheduleManager::Schedule( 1 ).CurrentValue = 1.0;
+	ScheduleManager::Schedule( 2 ).CurrentValue = 18.0;
+	ScheduleManager::Schedule( 3 ).CurrentValue = 100.0;
+	ScheduleManager::Schedule( 4 ).CurrentValue = 2.0;
+	ScheduleManager::Schedule( 5 ).CurrentValue = -100.0;
+	ScheduleManager::Schedule( 6 ).CurrentValue = 100.0;
+	DataEnvironment::OutBaroPress = 101325.0;
+
+	InitSimpleMixingConvectiveHeatGains( );
+
+	CalcAirFlowSimple( 2 );
+
+	EXPECT_NEAR( 720.738493, DataHeatBalFanSys::MCPM( 1 ), 0.00001 );
+	EXPECT_NEAR( 119.818784, DataHeatBalFanSys::MCPM( 2 ), 0.00001 );
+	EXPECT_NEAR( 599.907893, DataHeatBalFanSys::MCPM( 3 ), 0.00001 );
+	EXPECT_NEAR( 719.116710, DataHeatBalFanSys::MCPM( 4 ), 0.00001 );
+	EXPECT_NEAR( 16937.0496, DataHeatBalFanSys::MCPTM( 1 ), 0.001 );
+	EXPECT_NEAR( 2875.6508, DataHeatBalFanSys::MCPTM( 2 ), 0.001 );
+	EXPECT_NEAR( 13315.7667, DataHeatBalFanSys::MCPTM( 3 ), 0.001 );
+	EXPECT_NEAR( 15699.7370, DataHeatBalFanSys::MCPTM( 4 ), 0.001 );
+	EXPECT_NEAR( 0.71594243, DataHeatBalFanSys::MixingMassFlowZone( 1 ), 0.00001 );
+	EXPECT_NEAR( 0.11902146, DataHeatBalFanSys::MixingMassFlowZone( 2 ), 0.00001 );
+	EXPECT_NEAR( 0.59591588, DataHeatBalFanSys::MixingMassFlowZone( 3 ), 0.00001 );
+	EXPECT_NEAR( 0.71433143, DataHeatBalFanSys::MixingMassFlowZone( 4 ), 0.00001 );
+	EXPECT_NEAR( 0.00071594243, DataHeatBalFanSys::MixingMassFlowXHumRat( 1 ), 0.0000001 );
+	EXPECT_NEAR( 0.00011902146, DataHeatBalFanSys::MixingMassFlowXHumRat( 2 ), 0.0000001 );
+	EXPECT_NEAR( 0.00059591588, DataHeatBalFanSys::MixingMassFlowXHumRat( 3 ), 0.0000001 );
+	EXPECT_NEAR( 0.00071433143, DataHeatBalFanSys::MixingMassFlowXHumRat( 4 ), 0.0000001 );
+
+	// Deallocate everything - should all be taken care of in clear_states
+
+	DataHeatBalFanSys::MAT.deallocate( );
+	DataHeatBalFanSys::ZoneAirHumRat.deallocate( );
+	DataHeatBalFanSys::MCPM.deallocate( );
+	DataHeatBalFanSys::MCPTM.deallocate( );
+	DataHeatBalFanSys::MCPI.deallocate( );
+	DataHeatBalFanSys::OAMFL.deallocate( );
+	DataHeatBalFanSys::MCPTI.deallocate( );
+	DataHeatBalFanSys::MixingMassFlowZone.deallocate( );
+	DataHeatBalFanSys::MixingMassFlowXHumRat.deallocate( );
+	DataHeatBalFanSys::ZoneReOrder.deallocate( );
+
 }

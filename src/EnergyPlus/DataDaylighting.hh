@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataDaylighting_hh_INCLUDED
 #define DataDaylighting_hh_INCLUDED
@@ -84,6 +72,7 @@ namespace DataDaylighting {
 	// Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
 	extern int const MaxRefPoints; // Maximum number of daylighting reference points, 2
 	extern int const MaxMapRefPoints; // Maximum number of Illuminance Map Ref Points
+	extern int TotRefPoints; // number of Daylighting:ReferencePoint objects found
 
 	extern int const NotInOrAdjZoneExtWin; // Exterior window is not in a Daylighting:Detailed zone
 	// or in an adjacent zone with a shared interior window
@@ -94,11 +83,16 @@ namespace DataDaylighting {
 	extern int const CalledForRefPoint;
 	extern int const CalledForMapPoint;
 
-	// Parameters for "DaylightType"
+	// Parameters for "DaylightMethod"
 	extern int const NoDaylighting;
-	extern int const DetailedDaylighting;
+	extern int const SplitFluxDaylighting;
 	extern int const DElightDaylighting;
-	extern Array1D_string const DaylightTypes;
+
+	// Parameters for "Lighting Control Type"
+	extern int const Continuous;
+	extern int const Stepped;
+	extern int const ContinuousOff;
+
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -135,10 +129,12 @@ namespace DataDaylighting {
 	struct ZoneDaylightCalc
 	{
 		// Members
-		int DaylightType; // Type of Daylighting (1=Detailed, 2=DElight)
+		std::string Name; // Name of the daylighting:controls object
+		std::string ZoneName; //name of the zone where the daylighting:controls object is located
+		int DaylightMethod; // Type of Daylighting (1=SplitFlux, 2=DElight)
 		int AvailSchedNum; // pointer to availability schedule if present
-		int TotalDaylRefPoints; // Number of detailed daylighting reference points in a zone (0,1 or 2)
-		int TotalDElightRefPts; // Number of DElight daylighting reference points in a zone (0,1 or 2) - RJH
+		int TotalDaylRefPoints; // Number of daylighting reference points in a zone (0,1 or 2)
+		Array1D_int DaylRefPtNum; // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
 		Array2D< Real64 > DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
 		// in absolute coordinate system (m)
 		// Points 1 and 2 are the control reference points
@@ -147,6 +143,7 @@ namespace DataDaylighting {
 		Array1D< Real64 > IllumSetPoint; // =0.0  ! Illuminance setpoint at each reference point (lux)
 		int LightControlType; // Lighting control type (same for all reference points)
 		// (1=continuous, 2=stepped, 3=continuous/off)
+		int glareRefPtNumber; // from field: Glare Calculation Daylighting Reference Point Name
 		Real64 ViewAzimuthForGlare; // View direction relative to window for glare calculation (deg)
 		int MaxGlareallowed; // Maximum allowable discomfort glare index
 		Real64 MinPowerFraction; // Minimum fraction of power input that continuous dimming system can dim down to
@@ -155,6 +152,7 @@ namespace DataDaylighting {
 		Real64 LightControlProbability; // For manual control of stepped systems, probability that lighting will
 		int TotalExtWindows; // Total number of exterior windows in the zone
 		Real64 AveVisDiffReflect; // Area-weighted average inside surface visible reflectance of zone
+		Real64 DElightGriddingResolution; // Field: Delight Gridding Resolution
 		Array1D< Real64 > RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
 		// due to daylighting
 		Real64 ZonePowerReductionFactor; // Electric power reduction factor for entire zone due to daylighting
@@ -217,10 +215,9 @@ namespace DataDaylighting {
 
 		// Default Constructor
 		ZoneDaylightCalc() :
-			DaylightType( 0 ),
+			DaylightMethod( 0 ),
 			AvailSchedNum( 0 ),
 			TotalDaylRefPoints( 0 ),
-			TotalDElightRefPts( 0 ),
 			LightControlType( 1 ),
 			ViewAzimuthForGlare( 0.0 ),
 			MaxGlareallowed( 0 ),
@@ -330,10 +327,42 @@ namespace DataDaylighting {
 
 	};
 
+	struct RefPointData
+	{
+		std::string Name; // Map name
+		int ZoneNum;  // Pointer to zone being referenced
+		Real64 x;  // x coordinate
+		Real64 y;  // y coordinate
+		Real64 z;  // z coordinate
+		int indexToFracAndIllum; 
+
+		// Default Constructor
+		RefPointData() :
+			ZoneNum( 0 ),
+			x( 0.0 ),
+			y( 0.0 ),
+			z( 0.0 ),
+			indexToFracAndIllum( 0 )
+		{}
+
+	};
+
+	struct DElightComplexFeneData // holds Daylighting:DELight:ComplexFenestration
+	{
+		std::string Name;
+		std::string ComplexFeneType; // Complex Fenestration Type
+		std::string surfName; // Building Surface name
+		std::string wndwName; // Window name
+		Real64 feneRota; // Fenestration Rotation
+	};
+	extern int TotDElightCFS; // number of Daylighting:DELight:ComplexFenestration
+
 	// Object Data
 	extern Array1D< ZoneDaylightCalc > ZoneDaylight;
 	extern Array1D< IllumMapData > IllumMap;
 	extern Array1D< MapCalcData > IllumMapCalc;
+	extern Array1D< RefPointData > DaylRefPt;
+	extern Array1D< DElightComplexFeneData> DElightComplexFene;
 
 } // DataDaylighting
 

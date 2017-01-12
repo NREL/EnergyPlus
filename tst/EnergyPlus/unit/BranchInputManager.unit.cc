@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,35 +43,305 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
-
-// EnergyPlus::BranchNodeConnections Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/InputProcessor.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::BranchInputManager;
+using namespace BranchInputManager;
+
+using InputProcessor::GetNumObjectsFound;
+using InputProcessor::GetObjectDefMaxArgs;
+using InputProcessor::GetObjectItem;
+using InputProcessor::VerifyName;
+using InputProcessor::SameString;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
+	// EnergyPlus::GetBranchInput Unit Tests
+
+	TEST_F( EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch )
+	{
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			"Branch,",
+				"VAV Sys 1 Main Branch,   !- Name",
+				",                        !- Pressure Drop Curve Name",
+				"AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
+				"OA Sys 1,                !- Component 1 Name",
+				"VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name",
+				"Mixed Air Node 1;        !- Component 1 Outlet Node Name",
+
+			"AirLoopHVAC:OutdoorAirSystem,",
+				"OA Sys 1,                !- Name",
+				"OA Sys 1 Controllers,    !- Controller List Name",
+				"OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
+				"VAV Sys 1 Avail List;    !- Availability Manager List Name",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		static std::string const RoutineName( "GetBranchInput: " );
+		CurrentModuleObject = "Branch";
+		int	NumOfBranches = GetNumObjectsFound( CurrentModuleObject );
+		int NumParams;
+		int NumAlphas; // Used to retrieve names from IDF
+		int NumNumbers; // Used to retrieve numbers from IDF
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+		Array1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_int NodeNums; // Possible Array of Node Numbers (only 1 allowed)
+		Array1D< Real64 > Numbers; // Used to retrieve numbers from IDF
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
+		int IOStat; // Could be used in the Get Routines, not currently checked
+
+		if ( NumOfBranches > 0 ) {
+			Branch.allocate( NumOfBranches );
+			for ( auto & e : Branch ) e.AssignedLoopName.clear();
+			bool ErrFound = false;
+			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+			NodeNums.dimension( NumParams, 0 );
+			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+			Alphas.allocate( NumAlphas );
+			Numbers.dimension( NumNumbers, 0.0 );
+			cAlphaFields.allocate( NumAlphas );
+			cNumericFields.allocate( NumNumbers );
+			lAlphaBlanks.dimension( NumAlphas, true );
+			lNumericBlanks.dimension( NumNumbers, true );
+			int BCount = 0;
+			for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
+
+				GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrFound = true;
+					if ( IsBlank ) {
+						continue;
+					} else {
+						Alphas( 1 ) = Alphas( 1 ) + "--dup";
+					}
+				}
+				++BCount;
+
+				GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
+
+			}
+
+			EXPECT_EQ( NumOfBranches, 1 );
+
+			EXPECT_TRUE( SameString( Alphas( 1 ), "VAV Sys 1 Main Branch" ) );
+
+			EXPECT_TRUE( SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) );
+			EXPECT_TRUE( SameString( Alphas( 4 ), "OA Sys 1" ) );
+			EXPECT_TRUE( SameString( Alphas( 5 ), "VAV Sys 1 Inlet Node" ) );
+			EXPECT_TRUE( SameString( Alphas( 6 ), "Mixed Air Node 1" ) );
+
+			NumOfBranches = BCount;
+			NodeNums.deallocate();
+			Alphas.deallocate();
+			Numbers.deallocate();
+			cAlphaFields.deallocate();
+			cNumericFields.deallocate();
+			lAlphaBlanks.deallocate();
+			lNumericBlanks.deallocate();
+
+		}
+
+	}
+
+	TEST_F( EnergyPlusFixture, GetBranchInput_One_FourComponentBranch )
+	{
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.6;",
+			"Branch,",
+				"VAV Sys 1 Main Branch,   !- Name",
+				",                        !- Pressure Drop Curve Name",
+				"AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
+				"OA Sys 1,                !- Component 1 Name",
+				"VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name",
+				"Mixed Air Node 1,        !- Component 1 Outlet Node Name",
+				"Coil:Cooling:Water,      !- Component 2 Object Type",
+				"Main Cooling Coil 1,     !- Component 2 Name",
+				"Mixed Air Node 1,        !- Component 2 Inlet Node Name",
+				"Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name",
+				"Coil:Heating:Water,      !- Component 3 Object Type",
+				"Main Heating Coil 1,     !- Component 3 Name",
+				"Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name",
+				"Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name",
+				"Fan:VariableVolume,      !- Component 4 Object Type",
+				"Supply Fan 1,            !- Component 4 Name",
+				"Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name",
+				"VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
+
+			"AirLoopHVAC:OutdoorAirSystem,",
+				"OA Sys 1,                !- Name",
+				"OA Sys 1 Controllers,    !- Controller List Name",
+				"OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
+				"VAV Sys 1 Avail List;    !- Availability Manager List Name",
+
+			"Coil:Cooling:Water,",
+				"Main Cooling Coil 1,     !- Name",
+				"CoolingCoilAvailSched,   !- Availability Schedule Name",
+				"0.0033,                  !- Design Water Flow Rate {m3/s}",
+				"2.284,                   !- Design Air Flow Rate {m3/s}",
+				"7.222,                   !- Design Inlet Water Temperature {C}",
+				"26.667,                  !- Design Inlet Air Temperature {C}",
+				"14.389,                  !- Design Outlet Air Temperature {C}",
+				"0.0167,                  !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+				"0.0099,                  !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+				"Main Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+				"Main Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+				"Mixed Air Node 1,        !- Air Inlet Node Name",
+				"Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
+				"SimpleAnalysis,          !- Type of Analysis",
+				"CrossFlow;               !- Heat Exchanger Configuration",
+
+			"Coil:Heating:Water,",
+				"Main Heating Coil 1,     !- Name",
+				"ReheatCoilAvailSched,    !- Availability Schedule Name",
+				"5000.0,                  !- U-Factor Times Area Value {W/K}",
+				"0.0043,                  !- Maximum Water Flow Rate {m3/s}",
+				"Main Heating Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+				"Main Heating Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+				"Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name",
+				"Main Heating Coil 1 Outlet Node,  !- Air Outlet Node Name",
+				"UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+				"autosize,                !- Rated Capacity {W}",
+				"82.2,                    !- Rated Inlet Water Temperature {C}",
+				"16.6,                    !- Rated Inlet Air Temperature {C}",
+				"71.1,                    !- Rated Outlet Water Temperature {C}",
+				"32.2,                    !- Rated Outlet Air Temperature {C}",
+				";                        !- Rated Ratio for Air and Water Convection",
+
+			"Fan:VariableVolume,",
+				"Supply Fan 1,            !- Name",
+				"FanAvailSched,           !- Availability Schedule Name",
+				"0.7,                     !- Fan Total Efficiency",
+				"600.0,                   !- Pressure Rise {Pa}",
+				"autosize,                !- Maximum Flow Rate {m3/s}",
+				"Fraction,                !- Fan Power Minimum Flow Rate Input Method",
+				"0.25,                    !- Fan Power Minimum Flow Fraction",
+				",                        !- Fan Power Minimum Air Flow Rate {m3/s}",
+				"0.9,                     !- Motor Efficiency",
+				"1.0,                     !- Motor In Airstream Fraction",
+				"0.35071223,              !- Fan Power Coefficient 1",
+				"0.30850535,              !- Fan Power Coefficient 2",
+				"-0.54137364,             !- Fan Power Coefficient 3",
+				"0.87198823,              !- Fan Power Coefficient 4",
+				"0.000,                   !- Fan Power Coefficient 5",
+				"Main Heating Coil 1 Outlet Node,  !- Air Inlet Node Name",
+				"VAV Sys 1 Outlet Node;   !- Air Outlet Node Name",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		static std::string const RoutineName( "GetBranchInput: " );
+		CurrentModuleObject = "Branch";
+		int	NumOfBranches = GetNumObjectsFound( CurrentModuleObject );
+		int NumParams;
+		int NumAlphas; // Used to retrieve names from IDF
+		int NumNumbers; // Used to retrieve numbers from IDF
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+		Array1D_string Alphas; // Used to retrieve names from IDF
+		Array1D_int NodeNums; // Possible Array of Node Numbers (only 1 allowed)
+		Array1D< Real64 > Numbers; // Used to retrieve numbers from IDF
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D_bool lNumericBlanks;
+		Array1D_bool lAlphaBlanks;
+		int IOStat; // Could be used in the Get Routines, not currently checked
+
+		if ( NumOfBranches > 0 ) {
+			Branch.allocate( NumOfBranches );
+			for ( auto & e : Branch ) e.AssignedLoopName.clear();
+			bool ErrFound = false;
+			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
+			NodeNums.dimension( NumParams, 0 );
+			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
+			Alphas.allocate( NumAlphas );
+			Numbers.dimension( NumNumbers, 0.0 );
+			cAlphaFields.allocate( NumAlphas );
+			cNumericFields.allocate( NumNumbers );
+			lAlphaBlanks.dimension( NumAlphas, true );
+			lNumericBlanks.dimension( NumNumbers, true );
+			int BCount = 0;
+			for ( int Count = 1; Count <= NumOfBranches; ++Count ) {
+
+				GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrFound = true;
+					if ( IsBlank ) {
+						continue;
+					} else {
+						Alphas( 1 ) = Alphas( 1 ) + "--dup";
+					}
+				}
+				++BCount;
+
+				GetSingleBranchInput( RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks );
+
+			}
+
+			EXPECT_EQ( NumOfBranches, 1 );
+
+			EXPECT_TRUE( SameString( Alphas( 1 ), "VAV Sys 1 Main Branch" ) );
+
+			EXPECT_TRUE( SameString( Alphas( 3 ), "AirLoopHVAC:OutdoorAirSystem" ) );
+			EXPECT_TRUE( SameString( Alphas( 4 ), "OA Sys 1" ) );
+			EXPECT_TRUE( SameString( Alphas( 5 ), "VAV Sys 1 Inlet Node" ) );
+			EXPECT_TRUE( SameString( Alphas( 6 ), "Mixed Air Node 1" ) );
+
+			EXPECT_TRUE( SameString( Alphas( 7 ), "Coil:Cooling:Water" ) );
+			EXPECT_TRUE( SameString( Alphas( 8 ), "Main Cooling Coil 1" ) );
+			EXPECT_TRUE( SameString( Alphas( 9 ), "Mixed Air Node 1" ) );
+			EXPECT_TRUE( SameString( Alphas( 10 ), "Main Cooling Coil 1 Outlet Node" ) );
+
+			EXPECT_TRUE( SameString( Alphas( 11 ), "Coil:Heating:Water" ) );
+			EXPECT_TRUE( SameString( Alphas( 12 ), "Main Heating Coil 1" ) );
+			EXPECT_TRUE( SameString( Alphas( 13 ), "Main Cooling Coil 1 Outlet Node" ) );
+			EXPECT_TRUE( SameString( Alphas( 14 ), "Main Heating Coil 1 Outlet Node" ) );
+
+			EXPECT_TRUE( SameString( Alphas( 15 ), "Fan:VariableVolume" ) );
+			EXPECT_TRUE( SameString( Alphas( 16 ), "Supply Fan 1" ) );
+			EXPECT_TRUE( SameString( Alphas( 17 ), "Main Heating Coil 1 Outlet Node" ) );
+			EXPECT_TRUE( SameString( Alphas( 18 ), "VAV Sys 1 Outlet Node" ) );
+
+			NumOfBranches = BCount;
+			NodeNums.deallocate();
+			Alphas.deallocate();
+			Numbers.deallocate();
+			cAlphaFields.deallocate();
+			cNumericFields.deallocate();
+			lAlphaBlanks.deallocate();
+			lNumericBlanks.deallocate();
+
+		}
+
+	}
+
+	// EnergyPlus::BranchNodeConnections Unit Tests
+
+		TEST_F( EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
 	{
 
 		std::string const idf_objects = delimited_string( {
@@ -176,38 +443,31 @@ namespace EnergyPlus {
 
 			"Branch,",
 			"  DOAS Main Branch,        !- Name",
-			"  autosize,                !- Maximum Flow Rate {m3/s}",
 			"  ,                        !- Pressure Drop Curve Name",
 			"  AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
 			"  DOAS OA System,          !- Component 1 Name",
 			"  DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name",
 			"  DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name",
-			"  Passive,                 !- Component 1 Branch Control Type",
 			"  CoilSystem:Cooling:DX,   !- Component 2 Object Type",
 			"  DOAS Cooling Coil,       !- Component 2 Name",
 			"  DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name",
 			"  DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name",
-			"  Passive,                 !- Component 2 Branch Control Type",
-			"  Coil:Heating:Gas,        !- Component 2 Object Type",
+			"  Coil:Heating:Fuel,        !- Component 2 Object Type",
 			"  DOAS Heating Coil,       !- Component 2 Name",
 			"  DOAS Cooling Coil Outlet,  !- Component 2 Inlet Node Name",
 			"  DOAS Heating Coil Outlet,!- Component 2 Outlet Node Name",
-			"  Passive,                 !- Component 2 Branch Control Type",
 			"  Fan:VariableVolume,      !- Component 3 Object Type",
 			"  DOAS Supply Fan,         !- Component 3 Name",
 			"  DOAS Heating Coil Outlet,!- Component 3 Inlet Node Name",
-			"  DOAS Supply Fan Outlet,  !- Component 3 Outlet Node Name",
-			"  Active;                  !- Component 3 Branch Control Type",
+			"  DOAS Supply Fan Outlet;  !- Component 3 Outlet Node Name",
 
 			"  Branch,",
 			"    TowerWaterSys Demand Bypass Branch,  !- Name",
-			"    ,                        !- Maximum Flow Rate {m3/s}",
 			"    ,                        !- Pressure Drop Curve Name",
 			"    Pipe:Adiabatic,          !- Component 1 Object Type",
 			"    TowerWaterSys Demand Bypass Pipe,  !- Component 1 Name",
 			"    TowerWaterSys Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
-			"    TowerWaterSys Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name",
-			"    Bypass;                  !- Component 1 Branch Control Type",
+			"    TowerWaterSys Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name",
 
 		} );
 
@@ -245,4 +505,5 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0, BranchIndex );
 
 	}
+
 }

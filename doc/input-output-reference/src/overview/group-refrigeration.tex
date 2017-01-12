@@ -5,16 +5,13 @@ There are two ways to model a supermarket refrigeration system.~ The first, and 
 For the first approach, the input objects needed are:
 
 \begin{itemize}
-\item
-  One Refrigeration:CompressorRack object
-\item
-  At least one refrigeration load, which may be any combination of:
-\item
-  Refrigeration:Case or
-\item
-  Refrigeration:WalkIn or
-\item
-  Refrigeration:CaseAndWalkInList objects .
+  \item  One Refrigeration:CompressorRack object
+  \item  At least one refrigeration load, which may be any combination of:
+  \begin{itemize}
+    \item  Refrigeration:Case or
+    \item  Refrigeration:WalkIn or
+    \item  Refrigeration:CaseAndWalkInList objects .
+  \end{itemize}
 \end{itemize}
 
 The second approach requires more input objects but also allows the user to model more complex systems.~ This detailed approach must be used whenever loads are transferred from one system to another, such as with secondary loops, cascade condensers, or mechanical subcoolers. Again lists are used to enter multiple load or compressor names.
@@ -22,38 +19,26 @@ The second approach requires more input objects but also allows the user to mode
 For the detailed approach, the input objects needed are:
 
 \begin{itemize}
-\item
-  One Refrigeration:System object
-\item
-  At least one refrigeration load object which may include any combination of:
-\item
-  Refrigeration:Case,
-\item
-  Refrigeration:WalkIn,
-\item
-  Refrigeration:CaseAndWalkInList (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
-\item
-  Refrigeration:SecondarySystem,
-\item
-  Refrigeration:Condenser:Cascade (as a load, cooling a lower-temperature system) objects,
-\item
-  Refrigeration:TransferLoadList (may include cascade condenser loads and/or secondary loop loads)
-\item
-  Refrigeration:AirChiller
-\item
-  At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
-\item
-  One condenser object which may be either:
-\item
-  Refrigeration:Condenser:AirCooled,
-\item
-  Refrigeration:Condenser:EvaporativeCooled,
-\item
-  Refrigeration:Condenser:WaterCooled, or
-\item
-  Refrigeration:Condenser:Cascade (rejecting heat from this system)
-\item
-  The object Refrigeration:Subcooler may optionally be included to describe either a liquid suction or mechanical subcooler.
+  \item  One Refrigeration:System object
+  \item  At least one refrigeration load object which may include any combination of:
+  \begin{itemize}
+    \item  Refrigeration:Case,
+    \item  Refrigeration:WalkIn,
+    \item  Refrigeration:CaseAndWalkInList (may include any combination of cases and walk in cooler names, OR, a list of air chiller names)
+    \item  Refrigeration:SecondarySystem,
+    \item  Refrigeration:Condenser:Cascade (as a load, cooling a lower-temperature system) objects,
+    \item  Refrigeration:TransferLoadList (may include cascade condenser loads and/or secondary loop loads)
+    \item  Refrigeration:AirChiller
+  \end{itemize}
+  \item  At least one Refrigeration:Compressor object (multiple compressors are entered using a Refrigeration:CompressorList),
+  \item  One condenser object which may be either:
+  \begin{itemize}
+    \item  Refrigeration:Condenser:AirCooled,
+    \item  Refrigeration:Condenser:EvaporativeCooled,
+    \item  Refrigeration:Condenser:WaterCooled, or
+    \item  Refrigeration:Condenser:Cascade (rejecting heat from this system)
+  \end{itemize}
+  \item  The object Refrigeration:Subcooler may optionally be included to describe either a liquid suction or mechanical subcooler.
 \end{itemize}
 
 Output variables are also available to describe the total heat exchange between all refrigeration objects and the zones containing these objects. These variables are described at the end of this section after all the refrigeration objects.

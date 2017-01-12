@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -150,7 +138,7 @@ namespace DesiccantDehumidifiers {
 	using DataHVACGlobals::DrawThru;
 	using DataHVACGlobals::Coil_HeatingWater;
 	using DataHVACGlobals::Coil_HeatingSteam;
-	using DataHVACGlobals::Coil_HeatingGas;
+	using DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
 	using DataHVACGlobals::Coil_HeatingElectric;
 	using DataHeatBalance::HeatReclaimDXCoil;
 	// Use statements for access to subroutines in other modules
@@ -505,9 +493,9 @@ namespace DesiccantDehumidifiers {
 			RegenCoilType = Alphas( 8 );
 			RegenCoilName = Alphas( 9 );
 
-			if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) {
+			if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) {
 				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
-				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGas;
+				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
 				ValidateComponent( DesicDehum( DesicDehumNum ).RegenCoilType, DesicDehum( DesicDehumNum ).RegenCoilName, ErrorsFound2, CurrentModuleObject + '=' + Alphas( 1 ) );
 				if ( ErrorsFound2 ) ErrorsFound = true;
 				GetHeatingCoilIndex( DesicDehum( DesicDehumNum ).RegenCoilName, DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2 );
@@ -878,9 +866,9 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).RegenSetPointTemp = Numbers( 1 );
 
 			if ( ! lAlphaBlanks( 10 ) ) {
-				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) {
+				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) {
 					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
-					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Gas" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGas;
+					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
 					ErrorsFound2 = false;
 					ValidateComponent( RegenCoilType, RegenCoilName, ErrorsFound2, DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 					if ( ErrorsFound2 ) ErrorsFoundGeneric = true;
@@ -2745,7 +2733,7 @@ namespace DesiccantDehumidifiers {
 		RegenCoilActual = 0.0;
 		if ( RegenCoilLoad > SmallLoad ) {
 			{ auto const SELECT_CASE_var( DesicDehum( DesicDehumNum ).RegenCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( DesicDehum( DesicDehumNum ).RegenCoilName, FirstHVACIteration, RegenCoilLoad, DesicDehum( DesicDehumNum ).RegenCoilIndex, RegenCoilActual );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				MaxHotWaterFlow = DesicDehum( DesicDehumNum ).MaxCoilFluidFlow;
@@ -2796,7 +2784,7 @@ namespace DesiccantDehumidifiers {
 			}}
 		} else {
 			{ auto const SELECT_CASE_var( DesicDehum( DesicDehumNum ).RegenCoilType_Num );
-			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
+			if ( ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
 				SimulateHeatingCoilComponents( DesicDehum( DesicDehumNum ).RegenCoilName, FirstHVACIteration, RegenCoilLoad, DesicDehum( DesicDehumNum ).RegenCoilIndex, RegenCoilActual );
 			} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 				mdot = 0.0;

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -78,7 +66,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, PlantLoopSourceSideTest ) {
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.3;",
 		"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
 		"Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
@@ -489,7 +477,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Pump Branch, !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    GHEV pump,               !- Component 1 Name",
@@ -498,7 +485,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Borehole Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    GroundHeatExchanger:Vertical,  !- Component 1 Object Type",
 		"    Vertical GHE JL2015,     !- Component 1 Name",
@@ -507,7 +493,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Bypass Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV supp bypass pipe,   !- Component 1 Name",
@@ -516,7 +501,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Supply Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV supp exit pipe,     !- Component 1 Name",
@@ -525,7 +509,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand Inlet Branch,!- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV dem entrance pipe,  !- Component 1 Name",
@@ -534,7 +517,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand HPRad Branch,!- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatPump:WaterToWater:EquationFit:Heating,  !- Component 1 Object Type",
 		"    Rad Heat Pump,           !- Component 1 Name",
@@ -543,7 +525,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand Bypass Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV dem bypass pipe,    !- Component 1 Name",
@@ -552,7 +533,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    GHEV Demand Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    GHEV dem exit pipe,      !- Component 1 Name",
@@ -561,7 +541,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply Inlet Pump, !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pump:VariableSpeed,      !- Component 1 Object Type",
 		"    RAD HP pump,             !- Component 1 Name",
@@ -570,7 +549,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply HPR Branch ,!- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    HeatPump:WaterToWater:EquationFit:Heating,  !- Component 1 Object Type",
 		"    Rad Heat Pump,           !- Component 1 Name",
@@ -579,7 +557,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply Bypass Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP supp bypass pipe,  !- Component 1 Name",
@@ -588,7 +565,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Supply Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP supp exit pipe,    !- Component 1 Name",
@@ -597,7 +573,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Inlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP dem entrance pipe, !- Component 1 Name",
@@ -606,7 +581,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Radload Branch ,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    LoadProfile:Plant,       !- Component 1 Object Type",
 		"    Radiator load,           !- Component 1 Name",
@@ -615,7 +589,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Bypass Branch ,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP dem bypass pipe,   !- Component 1 Name",
@@ -624,7 +597,6 @@ namespace EnergyPlus {
 
 		"Branch,",
 		"    RADHP Demand Outlet Branch,  !- Name",
-		"    0.001,                   !- Maximum Flow Rate {m3/s}",
 		"    ,                        !- Pressure Drop Curve Name",
 		"    Pipe:Adiabatic,          !- Component 1 Object Type",
 		"    RADHP dem exit pipe,     !- Component 1 Name",
@@ -719,7 +691,7 @@ namespace EnergyPlus {
 		OutputProcessor::GetReportVariableInput();
 		PlantManager::CheckIfAnyPlant();
 
-		BranchInputManager::ManageBranchInput(); // just gets input and 
+		BranchInputManager::ManageBranchInput(); // just gets input and
 
 		DataGlobals::DoingSizing = false;
 		DataGlobals::KickOffSimulation = true;
@@ -826,5 +798,5 @@ namespace EnergyPlus {
 		EXPECT_NEAR(DataLoopNode::Node( 12 ).MassFlowRate,  0.3, 0.0001 );
 
 	}
-	
+
 }
