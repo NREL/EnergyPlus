@@ -125,6 +125,7 @@ namespace MoistureBalanceEMPDManager {
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
 	Array1D< EMPDReportVarsData > EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
+	bool InitEnvrnFlag( true );
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 	//******************************************************************************
@@ -135,6 +136,7 @@ namespace MoistureBalanceEMPDManager {
 	clear_state()
 	{
 		EMPDReportVars.deallocate();
+		InitEnvrnFlag = true;
 	}
 
 	Real64
@@ -386,7 +388,6 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
 		int SurfNum;
-		static bool InitEnvrnFlag( true );
 
 		if ( InitEnvrnFlag ) {
 			RVSurfaceOld.allocate( TotSurfaces );
