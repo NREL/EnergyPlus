@@ -104,4 +104,25 @@ namespace EnergyPlus {
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 		
 	}
+
+	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas ) {
+		std::string const idf_objects = delimited_string({
+			 "Coil:Heating:Fuel,",
+			 "  Furnace Coil,            !- Name",
+			 "  ,    !- Availability Schedule Name",
+			 "  Propane,                 !- FuelType",
+			 "  0.8,                     !- Gas Burner Efficiency",
+			 "  20000,                   !- Nominal Capacity {W}",
+			 "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
+			 "  Air Loop Outlet Node;    !- Air Outlet Node Name"
+														 });
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
+
+		EXPECT_EQ( HeatingCoils::HeatingCoil( 1 ).FuelType_Num, DataGlobalConstants::iRT_Propane);
+
+	}
+
 }
