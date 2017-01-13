@@ -3455,29 +3455,27 @@ namespace SizingManager {
 	}
 
 
-	// Update the sizing for airloops to gather values for reporting - Glazer January 2017
-	void
-	UpdateAirLoopSizing( )
-	{
-		using DataAirLoop::AirLoopZoneInfo;
-		int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
-		for ( int loopNum = 1; loopNum <= NumPrimaryAirSys; ++loopNum ) {
-			int numOfZones = AirLoopZoneInfo( loopNum ).NumZones;
-			for ( int zoneIndx = 1; zoneIndx <= numOfZones; ++zoneIndx ) {
-				int zoneNum = AirLoopZoneInfo( loopNum ).ActualZoneNumber( zoneIndx );
+	// stubs that may or may not be used for the Checksum report enhancement project
+	//// Update the sizing for airloops to gather values for reporting - Glazer January 2017
+	//void
+	//UpdateAirLoopSizing( )
+	//{
+	//	using DataAirLoop::AirLoopZoneInfo;
+	//	int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+	//	for ( int loopNum = 1; loopNum <= NumPrimaryAirSys; ++loopNum ) {
+	//		int numOfZones = AirLoopZoneInfo( loopNum ).NumZones;
+	//		for ( int zoneIndx = 1; zoneIndx <= numOfZones; ++zoneIndx ) {
+	//			int zoneNum = AirLoopZoneInfo( loopNum ).ActualZoneNumber( zoneIndx );
+	//		}
+	//	}
+	//}
 
-
-			}
-		}
-	}
-
-	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-	void
-	UpdateFacilitySizing( )
-	{
-		int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
-
-	}
+	//// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
+	//void
+	//UpdateFacilitySizing( )
+	//{
+	//	int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+	//}
 
 
 } // SizingManager
