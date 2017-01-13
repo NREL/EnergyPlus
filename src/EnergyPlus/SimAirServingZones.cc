@@ -3655,6 +3655,8 @@ namespace SimAirServingZones {
 				SysSizing( DesDayEnvrnNum, AirLoopNum ).SysCoolOutHumRatSeq.dimension( NumOfTimeStepInDay, 0.0 );
 				SysSizing( DesDayEnvrnNum, AirLoopNum ).SysHeatOutTempSeq.dimension( NumOfTimeStepInDay, 0.0 );
 				SysSizing( DesDayEnvrnNum, AirLoopNum ).SysHeatOutHumRatSeq.dimension( NumOfTimeStepInDay, 0.0 );
+				SysSizing( DesDayEnvrnNum, AirLoopNum ).SysDOASHeatAddSeq.dimension( NumOfTimeStepInDay, 0.0 );
+				SysSizing( DesDayEnvrnNum, AirLoopNum ).SysDOASLatAddSeq.dimension( NumOfTimeStepInDay, 0.0 );
 			} // end the primary air system loop
 		}
 
@@ -3836,6 +3838,8 @@ namespace SimAirServingZones {
 			FinalSysSizing( AirLoopNum ).SysCoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
 			FinalSysSizing( AirLoopNum ).SysHeatOutTempSeq.allocate( NumOfTimeStepInDay );
 			FinalSysSizing( AirLoopNum ).SysHeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
+			FinalSysSizing( AirLoopNum ).SysDOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+			FinalSysSizing( AirLoopNum ).SysDOASLatAddSeq.allocate( NumOfTimeStepInDay );
 			FinalSysSizing( AirLoopNum ).HeatFlowSeq = 0.0;
 			FinalSysSizing( AirLoopNum ).CoolFlowSeq = 0.0;
 			FinalSysSizing( AirLoopNum ).SumZoneCoolLoadSeq = 0.0;
@@ -3853,6 +3857,8 @@ namespace SimAirServingZones {
 			FinalSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = 0.0;
 			FinalSysSizing( AirLoopNum ).SysHeatOutTempSeq = 0.0;
 			FinalSysSizing( AirLoopNum ).SysHeatOutHumRatSeq = 0.0;
+			FinalSysSizing( AirLoopNum ).SysDOASHeatAddSeq = 0.0;
+			FinalSysSizing( AirLoopNum ).SysDOASLatAddSeq = 0.0;
 			FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 0.0;
 			FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated = 0.0;
 			CalcSysSizing( AirLoopNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
@@ -3872,6 +3878,8 @@ namespace SimAirServingZones {
 			CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq.allocate( NumOfTimeStepInDay );
 			CalcSysSizing( AirLoopNum ).SysHeatOutTempSeq.allocate( NumOfTimeStepInDay );
 			CalcSysSizing( AirLoopNum ).SysHeatOutHumRatSeq.allocate( NumOfTimeStepInDay );
+			CalcSysSizing( AirLoopNum ).SysDOASHeatAddSeq.allocate( NumOfTimeStepInDay );
+			CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq.allocate( NumOfTimeStepInDay );
 			CalcSysSizing( AirLoopNum ).HeatFlowSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).CoolFlowSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).SumZoneCoolLoadSeq = 0.0;
@@ -3889,6 +3897,8 @@ namespace SimAirServingZones {
 			CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).SysHeatOutTempSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).SysHeatOutHumRatSeq = 0.0;
+			CalcSysSizing( AirLoopNum ).SysDOASHeatAddSeq = 0.0;
+			CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 0.0;
 			CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated = 0.0;
 
@@ -4556,6 +4566,8 @@ namespace SimAirServingZones {
 		Real64 SysCoolOutHumRat; // system cooling outside air humidity ratio [kg water/kg dry air]
 		Real64 SysHeatOutTemp; // system heating outside air temperature [C]
 		Real64 SysHeatOutHumRat; // system heating outside air humidity ratio [kg water/kg dry air]
+		Real64 SysDOASHeatAdd; // system DOAS heat addition rate [W]
+		Real64 SysDOASLatAdd; // system DOAS latent heat addition rate [W]
 		Real64 SysCoolSizingRat; // ratio of user input design flow for cooling divided by calculated design cooling flow
 		Real64 SysHeatSizingRat; // ratio of user input design flow for heating divided by calculated design heating flow
 		Real64 ZoneOARatio; // ratio of zone OA flow to zone design cooling or heating flow
@@ -4736,6 +4748,8 @@ namespace SimAirServingZones {
 				SysCoolZoneAvgTemp = 0.0;
 				SysHeatZoneAvgTemp = 0.0;
 				SysTotCoolCap = 0.0;
+				SysDOASHeatAdd = 0.0;
+				SysDOASLatAdd = 0.0;
 
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over zones cooled by central system
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
@@ -4747,6 +4761,8 @@ namespace SimAirServingZones {
 					SysCoolRetTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
 					SysCoolRetHumRat += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
 					SysCoolZoneAvgTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
+					SysDOASHeatAdd += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
+					SysDOASLatAdd += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat );
 				} // end of loop over zones cooled by central system
 				// check that there is system mass flow
 				if ( SysSizing( CurOverallSimDay, AirLoopNum ).CoolFlowSeq( TimeStepInDay ) > 0.0 ) {
@@ -4782,7 +4798,9 @@ namespace SimAirServingZones {
 					SysSizing( CurOverallSimDay, AirLoopNum ).SensCoolCapSeq( TimeStepInDay ) = SysSensCoolCap;
 					// Save the tot cool cap for this time step
 					SysSizing( CurOverallSimDay, AirLoopNum ).TotCoolCapSeq( TimeStepInDay ) = SysTotCoolCap;
-
+					// Save the DOAS flows
+					SysSizing( CurOverallSimDay, AirLoopNum ).SysDOASHeatAddSeq( TimeStepInDay ) = SysDOASHeatAdd;
+					SysSizing( CurOverallSimDay, AirLoopNum ).SysDOASLatAddSeq( TimeStepInDay ) = SysDOASLatAdd;
 				} // end of system mass flow check
 
 				// get the maximum system sensible cooling capacity
@@ -5528,6 +5546,8 @@ namespace SimAirServingZones {
 							CalcSysSizing( AirLoopNum ).SysCoolRetHumRatSeq = SysSizing( DDNum, AirLoopNum ).SysCoolRetHumRatSeq;
 							CalcSysSizing( AirLoopNum ).SysCoolOutTempSeq = SysSizing( DDNum, AirLoopNum ).SysCoolOutTempSeq;
 							CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = SysSizing( DDNum, AirLoopNum ).SysCoolOutHumRatSeq;
+							CalcSysSizing( AirLoopNum ).SysDOASHeatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASHeatAddSeq;
+							CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASLatAddSeq;
 						}
 					}
 
@@ -5557,6 +5577,8 @@ namespace SimAirServingZones {
 							CalcSysSizing( AirLoopNum ).SysCoolRetHumRatSeq = SysSizing( DDNum, AirLoopNum ).SysCoolRetHumRatSeq;
 							CalcSysSizing( AirLoopNum ).SysCoolOutTempSeq = SysSizing( DDNum, AirLoopNum ).SysCoolOutTempSeq;
 							CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = SysSizing( DDNum, AirLoopNum ).SysCoolOutHumRatSeq;
+							CalcSysSizing( AirLoopNum ).SysDOASHeatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASHeatAddSeq;
+							CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASLatAddSeq;
 						}
 					}
 
@@ -5822,6 +5844,8 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).SysCoolOutHumRatSeq( TimeStepIndex ) = CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq( TimeStepIndex );
 					FinalSysSizing( AirLoopNum ).SysHeatOutTempSeq( TimeStepIndex ) = CalcSysSizing( AirLoopNum ).SysHeatOutTempSeq( TimeStepIndex );
 					FinalSysSizing( AirLoopNum ).SysHeatOutHumRatSeq( TimeStepIndex ) = CalcSysSizing( AirLoopNum ).SysHeatOutHumRatSeq( TimeStepIndex );
+					FinalSysSizing( AirLoopNum ).SysDOASHeatAddSeq( TimeStepIndex ) = CalcSysSizing( AirLoopNum ).SysDOASHeatAddSeq( TimeStepIndex );
+					FinalSysSizing( AirLoopNum ).SysDOASLatAddSeq( TimeStepIndex ) = CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq( TimeStepIndex );
 				}
 			}
 

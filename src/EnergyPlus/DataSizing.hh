@@ -1000,6 +1000,8 @@ namespace DataSizing {
 		//  [zone time step]
 		Array1D< Real64 > SysHeatOutHumRatSeq; // daily sequence of system heating outside humidity ratios
 		//   [kg water/kg dry air] [zone time step]
+		Array1D< Real64 > SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
+		Array1D< Real64 > SysDOASLatAddSeq; // daily sequence of latent heat addition rate from DOAS supply air [W]
 		int SystemOAMethod; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 		Real64 MaxZoneOAFraction; // maximum value of min OA for zones served by system
 		Real64 SysUncOA; // uncorrected system outdoor air flow based on zone people and zone area
