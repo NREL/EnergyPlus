@@ -3252,12 +3252,12 @@ namespace HeatBalanceManager {
 			}
 
 			if ( Material( MaterNum ).InitMoisture > Material( MaterNum ).Porosity ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
-				ShowContinueError( ".." + cNumericFieldNames( 13 ) + " is greater than " + cNumericFieldNames( 15 ) + ". It must be less or equal." );
-				ShowContinueError( ".." + cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
-				ShowContinueError( ".." + cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
-				ShowContinueError( ".." + cNumericFieldNames( 13 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
-				ShowContinueError( "..Simulation continues." );
+				ShowWarningError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value combination." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is greater than " + cNumericFieldNames( 13 ) + ". It must be less or equal." );
+				ShowContinueError( cNumericFieldNames( 13 ) + " = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " = " + TrimSigDigits( Material( MaterNum ).InitMoisture, 3 ) + "." );
+				ShowContinueError( cNumericFieldNames( 15 ) + " is reset to the maximum (saturation) value = " + TrimSigDigits( Material( MaterNum ).Porosity, 3 ) + "." );
+				ShowContinueError( "Simulation continues." );
 				Material( MaterNum ).InitMoisture = Material( MaterNum ).Porosity;
 			}
 
