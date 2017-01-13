@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::OutputProcessor Unit Tests
 
@@ -3354,6 +3342,108 @@ namespace EnergyPlus {
 				"37,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
 			} ) );
 
+		}
+		TEST_F (EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
+		{
+			std::string const idf_objects = delimited_string ({
+				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
+				"Output:Variable,*,Boiler Gas Rate,detailed;",
+				"Output:Variable,*,Boiler Heating Rate,detailed;",
+				"Output:Meter,Electricity:Facility,timestep;",
+			});
+
+			ASSERT_FALSE (process_idf (idf_objects));
+
+			DataGlobals::DayOfSim = 365;
+			DataGlobals::DayOfSimChr = "365";
+			DataEnvironment::Month = 12;
+			DataEnvironment::DayOfMonth = 31;
+			DataEnvironment::DSTIndicator = 0;
+			DataEnvironment::DayOfWeek = 3;
+			DataEnvironment::HolidayIndex = 0;
+			DataGlobals::HourOfDay = 24;
+			DataGlobals::NumOfDayInEnvrn = 365;
+			DataGlobals::MinutesPerTimeStep = 10;
+
+			if ( DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour ) {
+				DataGlobals::EndHourFlag = true;
+				if ( DataGlobals::HourOfDay == 24 ) {
+					DataGlobals::EndDayFlag = true;
+					if ( (!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn) ) {
+						DataGlobals::EndEnvrnFlag = true;
+					}
+				}
+			}
+
+			if ( DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth (DataEnvironment::Month) ) {
+				DataEnvironment::EndMonthFlag = true;
+			}
+
+			TimeValue.allocate (2);
+
+			auto timeStep = 1.0 / 6;
+
+			SetupTimePointers ("Zone", timeStep);
+			SetupTimePointers ("HVAC", timeStep);
+
+			TimeValue (1).CurMinute = 50;
+			TimeValue (2).CurMinute = 50;
+
+			GetReportVariableInput ();
+			SetupOutputVariable ("Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+			Real64 light_consumption = 999;
+			SetupOutputVariable ("Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
+			UpdateMeterReporting ();
+			UpdateDataandReport (DataGlobals::ZoneTSReporting);
+
+			GenOutputVariablesAuditReport();
+
+			std::string errMsg = delimited_string ({
+				"   ** Warning ** The following Report Variables were requested but not generated",
+				"   **   ~~~   ** because IDF did not contain these elements or misspelled variable name -- check .rdd file",
+				"   ************* Key=*, VarName=BOILER GAS RATE, Frequency=Detailed",
+				"   ************* Key=*, VarName=BOILER HEATING RATE, Frequency=Detailed",
+			});
+
+			compare_err_stream(errMsg);
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_DuplicateMeterCustom )
+		{
+			std::string const idf_objects = delimited_string({
+				"Version,8.6;",
+				"Meter:Custom,",
+				"CustomMeter1,               !- Name",
+				"Generic,                    !- Fuel Type",
+				",                           !- Key Name 1",
+				"DistrictHeating:Facility;   !- Variable or Meter 1 Name",
+				"Meter:Custom,",
+				"CustomMeter2,               !- Name",
+				"Generic,                    !- Fuel Type",
+				",                           !- Key Name 1",
+				"CustomMeter1;               !- Variable or Meter 1 Name",
+				"Output:Meter,CustomMeter1,Hourly;",
+				"Output:Meter,CustomMeter2,Hourly;"
+			});
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			bool errors_found = false;
+
+			GetCustomMeterInput( errors_found );
+
+			EXPECT_FALSE( errors_found );
+
+			std::string errMsg = delimited_string ({
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name 1=\"DISTRICTHEATING:FACILITY\".",
+				"   **   ~~~   ** ...will not be shown with the Meter results.",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
+				"   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter Name 1=\"CUSTOMMETER1\"."
+			});
+
+			compare_err_stream(errMsg);
 		}
 
 	}
