@@ -276,6 +276,18 @@ If the actual zone air humidity ratio is below the humidity ratio setpoint and t
 
 If the actual zone air humidity ratio is above the humidity ratio setpoint and the controlled zone needs dehumidification as the second scenario, then the initial decision is overridden and natural ventilation is not allowed. This is intended to avoid humidifying a space, which could result in additional dehumidification load.
 
+\subsubsection{Operative Temperature Control with 80% Acceptability Limits}\label{operative-temperature-control-with-80-acceptability-limits}
+
+ This control mode checks whether the zone air operative temperature is between the lower and upper 80% acceptability limits or not. If the zone air operative temperature is between the lower and upper limits, then natural ventilation is allowed, else natural ventilation is not allowed. 
+
+\subsubsection{Operative Temperature Control with 90% Acceptability Limits}\label{operative-temperature-control-with-90-acceptability-limits}
+
+ This control mode checks whether the zone air operative temperature is between the lower and upper 90% acceptability limits or not. If the zone air operative temperature is between the lower and upper limits, then natural ventilation is allowed, else natural ventilation is not allowed. 
+
+\subsubsection{CO2 control}\label{co2-control} 
+
+ This control mode checks whether the zone air CO2 concentration level is above the CO2 setpoint or not. If the zone air CO2 concentration level is above the setpoit, the control checks availability of HVAC system. If available, The available status will be ForceOn. If not available, natural ventilation will be allowed. 
+
 \subsubsection{Outdoor ventilation air control}\label{outdoor-ventilation-air-control}
 
 This control mode does not require any additional checks. The control only works with Airflow Network opening objects only, and is not allowed to work with ZoneVentilation and ZoneMixing objects.
