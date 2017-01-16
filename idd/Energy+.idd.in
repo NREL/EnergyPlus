@@ -20355,8 +20355,7 @@ Lights,
        \maximum 1.0
        \default 0
   N7 , \field Fraction Replaceable
-       \note For Daylighting:Controls and Daylighting:DElight:Controls,
-       \note must be 0 or 1:  0 = no dimming control, 1 = full dimming control
+       \note For Daylighting:Controls must be 0 or 1:  0 = no dimming control, 1 = full dimming control
        \type real
        \minimum 0.0
        \maximum 1.0
@@ -20989,6 +20988,8 @@ SwimmingPool:Indoor,
   A1,  \field Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2,  \field Surface Name
        \required-field
        \note Name of the floor surface where the pool is located.
@@ -23266,10 +23267,25 @@ AirflowNetwork:MultiZone:Surface,
       \note equal to 1. If this schedule is not specified then venting is allowed if
       \note other venting control conditions are satisfied.
       \note Not used if Ventilation Control Mode = NoVent or ZoneLevel.
-  A7; \field Occupant Ventilation Control Name
+  A7, \field Occupant Ventilation Control Name
       \type object-list
       \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required.
+  A8, \field Equivalent Rectangle Method
+      \type choice
+      \key PolygonHeight
+      \Key BaseSurfaceAspectRatio
+      \Key UserDefinedAspectRatio
+      \default PolygonHeight
+      \note This field is applied to a non-rectangular window or door. The equivalent shape has
+      \note the same area as a polygonal window or door.
+  N7; \field Equivalent Rectangle Aspect Ratio
+      \note This field is used when UserDefinedAspectRatio is entered in the Equivalent
+      \note Rectangle Method field.
+      \units dimensionless
+      \type real
+      \minimum> 0.0
+      \default 1.0
 
 AirflowNetwork:MultiZone:ReferenceCrackConditions,
       \min-fields 4
@@ -34635,6 +34651,8 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \min-fields 12
   A1,  \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -35429,6 +35447,8 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \memo groups to the end of the list
   A1,  \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -37769,7 +37789,9 @@ ZoneHVAC:Baseboard:Convective:Water,
        \memo Hot water baseboard heater, convection-only. Natural convection hydronic heating unit.
        \min-fields 10
   A1 , \field Name
-        \required-field
+       \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -37882,7 +37904,9 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \memo flow to the unit.
    \min-fields 29
    A1 , \field Name
-       \required-field
+        \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -38041,6 +38065,8 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \min-fields 29
    A1 , \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -40571,6 +40597,8 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
   A1 , \field Name
        \type alpha
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Primary Air Availability Schedule Name
        \note Primary air is supplied by central air handling unit and must be on for heating or cooling.
        \note Schedule value > 0 means the primary air supply is available.
@@ -40738,6 +40766,8 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
   A1 , \field Name
        \type alpha
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41903,6 +41933,10 @@ Fan:ConstantVolume,
        \reference FansCVandOnOff
        \reference FansCVandVAV
        \reference FansCVandOnOffandVAV
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41954,6 +41988,10 @@ Fan:VariableVolume,
        \reference FansCVandVAV
        \reference FansOnOffandVAV
        \reference FansCVandOnOffandVAV
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -42173,6 +42211,10 @@ Fan:ComponentModel,
   A1 , \field Name
        \required-field
        \reference Fans
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Air Inlet Node Name
        \required-field
        \type node
@@ -42406,6 +42448,10 @@ Coil:Cooling:Water,
        \reference CoolingCoilsWaterNoHX
        \reference AFNCoilNames
        \reference SimpleCoils
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -42482,6 +42528,10 @@ Coil:Cooling:Water:DetailedGeometry,
        \reference CoolingCoilsWater
        \reference CoolingCoilsWaterNoHX
        \reference AFNCoilNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -45013,6 +45063,10 @@ Coil:Heating:Water,
        \reference HeatingCoilsWater
        \reference AFNCoilNames
        \reference SimpleCoils
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -45079,6 +45133,10 @@ Coil:Heating:Steam,
        \required-field
        \type alpha
        \reference HeatingCoilName
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -45132,6 +45190,10 @@ Coil:Heating:Electric,
        \reference HeatingCoilName
        \reference HeatingCoilsElectric
        \reference AFNCoilNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -45239,6 +45301,10 @@ Coil:Heating:Fuel,
        \type alpha
        \reference HeatingCoilName
        \reference AFNCoilNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -45248,7 +45314,7 @@ Coil:Heating:Fuel,
        \type choice
        \key Gas
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
@@ -45421,6 +45487,8 @@ Coil:Heating:Desuperheater,
        \type alpha
        \reference HeatingCoilsDesuperheater
        \reference AFNCoilNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -46940,6 +47008,8 @@ Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
         \required-field
         \type alpha
         \reference CoolingCoilsWaterToAirHP
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2 , \field Compressor Type
         \required-field
         \type choice
@@ -47109,6 +47179,8 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
         \required-field
         \type alpha
         \reference HeatingCoilsWaterToAirHP
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2 , \field Compressor Type
         \required-field
         \type choice
@@ -47253,6 +47325,8 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
         \required-field
         \type alpha
         \reference CoolingCoilsWaterToAirHP
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Water Inlet Node Name
         \required-field
         \type node
@@ -47377,6 +47451,8 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
         \type alpha
         \reference CoolingCoilsWaterToAirVSHP
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Water-to-Refrigerant HX Water Inlet Node Name
         \required-field
         \type node
@@ -48279,6 +48355,8 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \required-field
         \type alpha
         \reference HeatingCoilsWaterToAirHP
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Water Inlet Node Name
         \required-field
         \type node
@@ -48356,6 +48434,8 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
         \type alpha
         \reference HeatingCoilsWaterToAirVSHP
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Water-to-Refrigerant HX Water Inlet Node Name
         \required-field
         \type node
@@ -50690,6 +50770,10 @@ CoilSystem:Cooling:DX,
    A1 , \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
+        \reference-class-name validOASysEquipmentTypes
+        \reference validOASysEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -50787,6 +50871,10 @@ CoilSystem:Heating:DX,
    A1 , \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
+        \reference-class-name validOASysEquipmentTypes
+        \reference validOASysEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -50813,6 +50901,10 @@ CoilSystem:Cooling:Water:HeatExchangerAssisted,
   A1 , \field Name
        \required-field
        \reference CoolingCoilsWater
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Heat Exchanger Object Type
        \required-field
        \type choice
@@ -50975,6 +51067,8 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \reference CoolingCoilsDXSingleSpeed
        \reference CoolingCoilsDXMultiModeOrSingleSpeed
        \reference AFNCoilNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51764,6 +51858,10 @@ EvaporativeCooler:Direct:CelDekPad,
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51804,6 +51902,10 @@ EvaporativeCooler:Indirect:CelDekPad,
        \required-field
        \type alpha
        \reference EvapCoolerNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51868,6 +51970,10 @@ EvaporativeCooler:Indirect:WetCoil,
        \required-field
        \type alpha
        \reference EvapCoolerNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -51922,6 +52028,10 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -52114,6 +52224,10 @@ EvaporativeCooler:Direct:ResearchSpecial,
   A1 , \field Name
        \type alpha
        \reference EvapCoolerNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -52226,6 +52340,10 @@ Humidifier:Steam:Electric,
       \memo Electrically heated steam humidifier with fan.
   A1, \field Name
       \required-field
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -52269,6 +52387,10 @@ Humidifier:Steam:Gas,
       \memo Natural gas fired steam humidifier with optional blower fan.
   A1, \field Name
       \required-field
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -52369,6 +52491,10 @@ Dehumidifier:Desiccant:NoFans,
        \memo but can also be specified in any AirLoopHVAC.
    A1, \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
    A2, \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -52552,6 +52678,10 @@ Dehumidifier:Desiccant:System,
   A1,  \field Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2,  \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -52647,6 +52777,10 @@ HeatExchanger:AirToAir:FlatPlate,
       \type alpha
       \reference HXAirToAirNames
       \reference AFNHeatExchangerNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -52720,6 +52854,10 @@ HeatExchanger:AirToAir:SensibleAndLatent,
       \reference HXAirToAirNames
       \reference HXAirToAirSensibleAndLatentNames
       \reference AFNHeatExchangerNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -52857,6 +52995,10 @@ HeatExchanger:Desiccant:BalancedFlow,
       \reference HXDesiccantBalanced
       \reference HXAirToAirNames
       \reference AFNHeatExchangerNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
       \note If this field is blank, the system is always available.
@@ -53159,6 +53301,10 @@ AirLoopHVAC:UnitarySystem,
        \type alpha
        \reference DOAToZonalUnit
        \note Unique name for the Unitary System.
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2,  \field Control Type
        \type choice
        \key Load
@@ -53699,6 +53845,8 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -53773,6 +53921,8 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -53908,6 +54058,8 @@ AirLoopHVAC:UnitaryHeatOnly,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -53982,6 +54134,8 @@ AirLoopHVAC:UnitaryHeatCool,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54117,6 +54271,8 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54271,6 +54427,8 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54434,6 +54592,8 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \required-field
         \type alpha
         \note Enter a unique name for this unitary system.
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54642,6 +54802,8 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2,  \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -54858,6 +55020,8 @@ AirConditioner:VariableRefrigerantFlow,
   A1 , \field Heat Pump Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
        \note Enter a unique name for this variable refrigerant flow heat pump.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -57330,24 +57494,60 @@ AirLoopHVAC:OutdoorAirSystem:EquipmentList,
        \reference AirLoopOAEquipmentLists
   A2 , \field Component 1 Object Type
        \required-field
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A3 , \field Component 1 Name
        \required-field
+       \type object-list
+       \object-list validOASysEquipmentNames
   A4 , \field Component 2 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A5 , \field Component 2 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A6 , \field Component 3 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A7 , \field Component 3 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A8 , \field Component 4 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A9 , \field Component 4 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A10, \field Component 5 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A11, \field Component 5 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A12, \field Component 6 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A13, \field Component 6 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A14, \field Component 7 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A15, \field Component 7 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A16, \field Component 8 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A17, \field Component 8 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
   A18, \field Component 9 Object Type
+       \type object-list
+       \object-list validOASysEquipmentTypes
   A19; \field Component 9 Name
+       \type object-list
+       \object-list validOASysEquipmentNames
 
 AirLoopHVAC:OutdoorAirSystem,
        \memo Outdoor air subsystem for an AirLoopHVAC. Includes an outdoor air mixing box and
@@ -57358,6 +57558,8 @@ AirLoopHVAC:OutdoorAirSystem,
    A1, \field Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
    A2, \field Controller List Name
        \note Enter the name of an AirLoopHVAC:ControllerList object.
        \required-field
@@ -57380,6 +57582,8 @@ OutdoorAir:Mixer,
       \required-field
       \type alpha
       \reference OutdoorAirMixers
+      \reference-class-name validOASysEquipmentTypes
+      \reference validOASysEquipmentNames
   A2, \field Mixed Air Node Name
       \note Name of Mixed Air Node
       \required-field
@@ -58814,7 +59018,7 @@ Branch,
    A1,  \field Name
         \required-field
         \reference Branches
-   A2, \field Pressure Drop Curve Name
+   A2,  \field Pressure Drop Curve Name
         \type object-list
         \object-list PressureDropCurves
         \object-list ExponentCurves
@@ -58826,73 +59030,117 @@ Branch,
         \note Air loops do not account for pressure drop using this field
         \note Valid curve types are: Curve:Functional:PressureDrop or
         \note one of Curve:{Linear,Quadratic,Cubic,Exponent}')
-   A3, \field Component 1 Object Type
+   A3,  \field Component 1 Object Type
         \begin-extensible
         \required-field
-   A4, \field Component 1 Name
+        \type object-list 
+        \object-list validBranchEquipmentTypes
+   A4,  \field Component 1 Name
         \required-field
-   A5, \field Component 1 Inlet Node Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
+   A5,  \field Component 1 Inlet Node Name
         \required-field
         \type node
-   A6, \field Component 1 Outlet Node Name
+   A6,  \field Component 1 Outlet Node Name
         \required-field
         \type node
-   A7, \field Component 2 Object Type
-   A8, \field Component 2 Name
-   A9,\field Component 2 Inlet Node Name
+   A7,  \field Component 2 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
+   A8,  \field Component 2 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
+   A9,  \field Component 2 Inlet Node Name
         \type node
    A10, \field Component 2 Outlet Node Name
         \type node
    A11, \field Component 3 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A12, \field Component 3 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A13, \field Component 3 Inlet Node Name
         \type node
    A14, \field Component 3 Outlet Node Name
         \type node
    A15, \field Component 4 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A16, \field Component 4 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A17, \field Component 4 Inlet Node Name
         \type node
    A18, \field Component 4 Outlet Node Name
         \type node
    A19, \field Component 5 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A20, \field Component 5 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A21, \field Component 5 Inlet Node Name
         \type node
    A22, \field Component 5 Outlet Node Name
         \type node
    A23, \field Component 6 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A24, \field Component 6 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A25, \field Component 6 Inlet Node Name
         \type node
    A26, \field Component 6 Outlet Node Name
         \type node
    A27, \field Component 7 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A28, \field Component 7 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A29, \field Component 7 Inlet Node Name
         \type node
    A30, \field Component 7 Outlet Node Name
         \type node
    A31, \field Component 8 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A32, \field Component 8 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A33, \field Component 8 Inlet Node Name
         \type node
    A34, \field Component 8 Outlet Node Name
         \type node
    A35, \field Component 9 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A36, \field Component 9 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A37, \field Component 9 Inlet Node Name
         \type node
    A38, \field Component 9 Outlet Node Name
         \type node
    A39, \field Component 10 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A40, \field Component 10 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A41, \field Component 10 Inlet Node Name
         \type node
    A42, \field Component 10 Outlet Node Name
         \type node
    A43, \field Component 11 Object Type
+        \type object-list 
+        \object-list validBranchEquipmentTypes
    A44, \field Component 11 Name
+        \type object-list 
+        \object-list validBranchEquipmentNames
    A45, \field Component 11 Inlet Node Name
         \type node
    A46; \field Component 11 Outlet Node Name
@@ -60497,6 +60745,8 @@ Pipe:Adiabatic,
        \memo Passes Inlet Node state variables to Outlet Node state variables
    A1,  \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2, \field Inlet Node Name
         \required-field
         \type node
@@ -60508,6 +60758,8 @@ Pipe:Adiabatic:Steam,
        \memo Passes Inlet Node state variables to Outlet Node state variables
    A1,  \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2, \field Inlet Node Name
         \required-field
         \type node
@@ -60519,6 +60771,8 @@ Pipe:Indoor,
         \memo Pipe model with transport delay and heat transfer to the environment.
    A1,  \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2,  \field Construction Name
         \required-field
         \type object-list
@@ -60557,6 +60811,8 @@ Pipe:Outdoor,
         \memo Pipe model with transport delay and heat transfer to the environment.
    A1,  \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2,  \field Construction Name
         \required-field
         \type object-list
@@ -60585,6 +60841,8 @@ Pipe:Underground,
         \memo HeatExchanger:Surface
    A1,  \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2,  \field Construction Name
         \required-field
         \type object-list
@@ -60835,6 +61093,12 @@ PipingSystem:Underground:PipeCircuit,
         \required-field
         \type alpha
         \reference PipingSystemUndergroundCircuitNames
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    N1,  \field Pipe Thermal Conductivity
         \required-field
         \type real
@@ -60969,6 +61233,8 @@ Duct,
        \memo Passes inlet node state variables to outlet node state variables
    A1,  \field Name
         \required-field
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2, \field Inlet Node Name
         \required-field
         \type node
@@ -60983,6 +61249,8 @@ Pump:VariableSpeed,
        \min-fields 14
   A1 , \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node Name
        \required-field
        \type node
@@ -61128,6 +61396,8 @@ Pump:ConstantSpeed,
        \min-fields 9
   A1,  \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node Name
        \required-field
        \type node
@@ -61232,6 +61502,8 @@ Pump:VariableSpeed:Condensate,
        \min-fields 13
   A1 , \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node Name
        \required-field
        \type node
@@ -61319,6 +61591,8 @@ HeaderedPumps:ConstantSpeed,
        \min-fields 9
   A1 , \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node Name
        \required-field
        \type node
@@ -61412,6 +61686,8 @@ HeaderedPumps:VariableSpeed,
        \min-fields 14
   A1 , \field Name
        \required-field
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node Name
        \required-field
        \type node
@@ -61522,6 +61798,12 @@ TemperingValve,
   A1, \field Name
       \required-field
       \type alpha
+      \reference-class-name validPlantEquipmentTypes
+      \reference validPlantEquipmentNames
+      \reference-class-name validCondenserEquipmentTypes
+      \reference validCondenserEquipmentNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   A2, \field Inlet Node Name
       \required-field
       \type node
@@ -61552,6 +61834,8 @@ LoadProfile:Plant,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node Name
        \required-field
        \type node
@@ -61637,6 +61921,8 @@ SolarCollector:FlatPlate:Water,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field SolarCollectorPerformance Name
        \required-field
        \type object-list
@@ -61661,10 +61947,14 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
        \memo Models hybrid photovoltaic-thermal (PVT) solar collectors that convert incident solar
        \memo energy into both electricity and useful thermal energy by heating air or water.
   A1 , \field Name
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2 , \field Surface Name
        \required-field
        \type object-list
        \object-list AllShadingAndHTSurfNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A3 , \field Photovoltaic-Thermal Model Performance Name
        \type object-list
        \object-list FlatPlatePVTParameters
@@ -61726,6 +62016,8 @@ SolarCollector:IntegralCollectorStorage,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field IntegralCollectorStorageParameters Name
        \required-field
        \type object-list
@@ -61906,6 +62198,8 @@ SolarCollector:UnglazedTranspired,
        \required-field
        \type alpha
        \reference UTSCNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
   A2,  \field Boundary Conditions Model Name
        \required-field
        \type object-list
@@ -62123,6 +62417,10 @@ Boiler:HotWater,
        \required-field
        \type alpha
        \reference Boilers
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Fuel Type
        \required-field
        \type choice
@@ -62228,6 +62526,10 @@ Boiler:Steam,
        \memo the fuel use coefficients as follows: N9=1, N10=0, N11=0
   A1 , \field Name
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Fuel Type
        \required-field
        \type choice
@@ -62280,6 +62582,10 @@ Chiller:Electric:EIR,
        \type alpha
        \reference Chillers
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Reference Capacity
        \type real
        \units W
@@ -62485,7 +62791,11 @@ Chiller:Electric:ReformulatedEIR,
        \type alpha
        \reference Chillers
        \required-field
-  N1 , \field Reference Capacity
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
+   N1 , \field Reference Capacity
        \type real
        \units W
        \required-field
@@ -62677,6 +62987,10 @@ Chiller:Electric,
   A1 , \field Name
        \required-field
        \reference Chillers
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Condenser Type
        \type choice
        \key AirCooled
@@ -62819,6 +63133,10 @@ Chiller:Absorption:Indirect,
        \type alpha
        \reference Chillers
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Nominal Capacity
        \type real
        \required-field
@@ -62991,6 +63309,10 @@ Chiller:Absorption,
   A1 , \field Name
        \reference Chillers
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Nominal Capacity
        \type real
        \units W
@@ -63097,6 +63419,10 @@ Chiller:ConstantCOP,
   A1 , \field Name
        \reference Chillers
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Nominal Capacity
        \type real
        \autosizable
@@ -63188,6 +63514,10 @@ Chiller:EngineDriven,
   A1 , \field Name
        \reference Chillers
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Condenser Type
        \type choice
        \key AirCooled
@@ -63376,6 +63706,10 @@ Chiller:CombustionTurbine,
   A1 , \field Name
        \reference Chillers
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Condenser Type
        \type choice
        \key AirCooled
@@ -63543,6 +63877,10 @@ ChillerHeater:Absorption:DirectFired,
   \memo Direct fired gas absorption chiller-heater using performance curves similar to DOE-2
   A1,  \field Name
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Nominal Cooling Capacity
        \autosizable
        \default autosize
@@ -63750,6 +64088,10 @@ ChillerHeater:Absorption:DoubleEffect,
   A1,  \field Name
        \type alpha
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Nominal Cooling Capacity
        \autosizable
        \default autosize
@@ -63948,6 +64290,10 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \min-fields 19
    A1,  \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Source Side Inlet Node Name
         \required-field
         \type node
@@ -64018,6 +64364,10 @@ HeatPump:WaterToWater:EquationFit:Cooling,
         \min-fields 19
    A1,  \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2,  \field Source Side Inlet Node Name
         \required-field
         \type node
@@ -64088,6 +64438,10 @@ HeatPump:WaterToWater:ParameterEstimation:Cooling,
   \min-fields 20
   A1,  \field Name
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2,\field Source Side Inlet Node Name
        \required-field
        \type node
@@ -64158,6 +64512,10 @@ HeatPump:WaterToWater:ParameterEstimation:Heating,
    \min-fields 20
   A1,  \field Name
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2,\field Source Side Inlet Node Name
        \required-field
        \type node
@@ -64227,6 +64585,12 @@ DistrictCooling,
        \memo Centralized source of chilled water, such as a district cooling system.
   A1 , \field Name
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Chilled Water Inlet Node Name
        \required-field
        \type node
@@ -64246,6 +64610,12 @@ DistrictHeating,
        \memo Centralized source of hot water, such as a district heating system.
   A1 , \field Name
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference validBranchEquipmentNames 
   A2 , \field Hot Water Inlet Node Name
        \required-field
        \type node
@@ -64270,6 +64640,12 @@ PlantComponent:TemperatureSource,
        \required-field
        \type alpha
        \note Component Name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Inlet Node
        \required-field
        \type node
@@ -64309,6 +64685,10 @@ CentralHeatPumpSystem,
   A1,  \field Name
        \type alpha
        \required-field
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2,  \field Control Method
        \type choice
        \key SmartMixing
@@ -64853,6 +65233,12 @@ CoolingTower:SingleSpeed,
        \type alpha
        \reference CoolingTowers
        \note Tower Name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -65060,6 +65446,12 @@ CoolingTower:TwoSpeed,
        \type alpha
        \reference CoolingTowers
        \note Tower Name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -65326,6 +65718,12 @@ CoolingTower:VariableSpeed:Merkel,
        \type alpha
        \reference CoolingTowers
        \note Tower Name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -65600,6 +65998,12 @@ CoolingTower:VariableSpeed,
        \type alpha
        \reference CoolingTowers
        \note Tower Name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66094,6 +66498,12 @@ EvaporativeFluidCooler:SingleSpeed,
        \required-field
        \type alpha
        \note Fluid Cooler Name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66263,6 +66673,12 @@ EvaporativeFluidCooler:TwoSpeed,
        \required-field
        \type alpha
        \note fluid cooler name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66495,6 +66911,12 @@ FluidCooler:SingleSpeed,
        \required-field
        \type alpha
        \note fluid cooler name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66579,6 +67001,12 @@ FluidCooler:TwoSpeed,
        \required-field
        \type alpha
        \note fluid cooler name
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -66712,6 +67140,12 @@ GroundHeatExchanger:Vertical,
  \memo g-functions below are calculated.
   A1,   \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
   A2,   \field Inlet Node Name
         \required-field
         \type node
@@ -67204,6 +67638,12 @@ GroundHeatExchanger:Pond,
         \memo This component may also be used as a simple solar collector.
    A1 , \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2 , \field Fluid Inlet Node Name
         \type node
         \required-field
@@ -67259,6 +67699,12 @@ GroundHeatExchanger:Surface,
         \memo The bottom surface may be defined as ground-coupled or exposed to wind (eg. bridge deck).
    A1 , \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2 , \field Construction Name
         \required-field
         \type object-list
@@ -67302,6 +67748,12 @@ GroundHeatExchanger:HorizontalTrench,
         \min-fields 20
    A1 , \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2 , \field Inlet Node Name
         \type node
         \required-field
@@ -67431,6 +67883,12 @@ GroundHeatExchanger:Slinky,
         \min-fields 21
    A1 , \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2 , \field Inlet Node Name
         \type node
         \required-field
@@ -67556,6 +68014,12 @@ HeatExchanger:FluidToFluid,
         \min-fields 14
    A1 , \field Name
         \required-field
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames
    A2 , \field Availability Schedule Name
         \note Availability schedule name for this system. Schedule value > 0 means the system is available.
         \note If this field is blank, the system is always available.
@@ -67678,6 +68142,12 @@ WaterHeater:Mixed,
        \type alpha
        \reference WaterHeaterNames
        \reference WaterHeaterMixedNames
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   N1 , \field Tank Volume
        \autosizable
        \type real
@@ -67907,6 +68377,12 @@ WaterHeater:Stratified,
        \type alpha
        \reference WaterHeaterNames
        \reference WaterHeaterStratifiedNames
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field End-Use Subcategory
        \type alpha
        \retaincase
@@ -68359,6 +68835,10 @@ WaterHeater:HeatPump:PumpedCondenser,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -68618,6 +69098,10 @@ WaterHeater:HeatPump:WrappedCondenser,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
        \note Unique name for this instance of a heat pump water heater.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -68865,6 +69349,8 @@ ThermalStorage:Ice:Simple,
       \type alpha
       \required-field
       \reference IceThermalStorageEquipment
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   A2, \field Ice Storage Type
       \note IceOnCoilInternal = Ice-on-Coil, internal melt
       \note IceOnCoilExternal = Ice-on-Coil, external melt
@@ -68893,6 +69379,8 @@ ThermalStorage:Ice:Detailed,
   A1 , \field Name
        \required-field
        \reference IceThermalStorageEquipment
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -68957,6 +69445,12 @@ ThermalStorage:ChilledWater:Mixed,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Tank Volume
        \type real
        \units m3
@@ -69053,6 +69547,12 @@ ThermalStorage:ChilledWater:Stratified,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validPlantEquipmentTypes
+       \reference validPlantEquipmentNames
+       \reference-class-name validCondenserEquipmentTypes
+       \reference validCondenserEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames 
   N1 , \field Tank Volume
        \required-field
        \type real
@@ -69473,25 +69973,67 @@ PlantEquipmentList,
         \required-field
         \reference PlantAndCondenserEquipmentLists
   A2 , \field Equipment 1 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A3 , \field Equipment 1 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A4 , \field Equipment 2 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A5 , \field Equipment 2 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A6 , \field Equipment 3 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A7 , \field Equipment 3 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A8 , \field Equipment 4 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A9 , \field Equipment 4 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A10, \field Equipment 5 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A11, \field Equipment 5 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A12, \field Equipment 6 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A13, \field Equipment 6 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A14, \field Equipment 7 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A15, \field Equipment 7 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A16, \field Equipment 8 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A17, \field Equipment 8 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A18, \field Equipment 9 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A19, \field Equipment 9 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
   A20, \field Equipment 10 Object Type
+       \type object-list 
+       \object-list validPlantEquipmentTypes
   A21; \field Equipment 10 Name
+       \type object-list 
+       \object-list validPlantEquipmentNames
+
+
 
 CondenserEquipmentList,
     \memo List condenser equipment in order of operating priority, 1st in list will be used 1st, etc
@@ -69505,26 +70047,66 @@ CondenserEquipmentList,
         \reference PlantAndCondenserEquipmentLists
         \reference CondenserEquipmentLists
   A2 , \field Equipment 1 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A3 , \field Equipment 1 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A4 , \field Equipment 2 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A5 , \field Equipment 2 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A6 , \field Equipment 3 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A7 , \field Equipment 3 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A8 , \field Equipment 4 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A9 , \field Equipment 4 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A10, \field Equipment 5 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A11, \field Equipment 5 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A12, \field Equipment 6 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A13, \field Equipment 6 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A14, \field Equipment 7 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A15, \field Equipment 7 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A16, \field Equipment 8 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A17, \field Equipment 8 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A18, \field Equipment 9 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A19, \field Equipment 9 Name
+       \type object-list 
+       \object-list validCondenserEquipmentNames
   A20, \field Equipment 10 Object Type
+       \type object-list 
+       \object-list validCondenserEquipmentTypes
   A21; \field Equipment 10 Name
-
+       \type object-list 
+       \object-list validCondenserEquipmentNames
+   
 !Plant Control Schemes:
 
 PlantEquipmentOperation:Uncontrolled,
@@ -71624,7 +72206,7 @@ EnergyManagementSystem:Actuator,
        \required-field
        \type alpha
        \note This name becomes a variable for use in Erl programs
-       \note no spaces allowed in name
+       \note no spaces or other special characters (-,+,/,\) allowed in name
   A2 , \field Actuated Component Unique Name
        \required-field
        \type alpha
@@ -72384,6 +72966,8 @@ ZoneHVAC:ForcedAir:UserDefined,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
         \note This is the name of the zone unit
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
@@ -72442,6 +73026,8 @@ ZoneHVAC:ForcedAir:UserDefined,
    A1,  \field Name
         \required-field
         \type alpha
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
         \note This is the name of the air terminal
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
@@ -72500,6 +73086,10 @@ ZoneHVAC:ForcedAir:UserDefined,
         \type alpha
         \reference UserDefinedCoil
         \note This is the name of the coil
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
+        \reference-class-name validOASysEquipmentTypes
+        \reference validOASysEquipmentNames
    A2 , \field Overall Model Simulation Program Calling Manager Name
         \type object-list
         \object-list ProgramNames
@@ -72555,6 +73145,12 @@ ZoneHVAC:ForcedAir:UserDefined,
         \required-field
         \type alpha
         \note This is the name of the plant component
+        \reference-class-name validPlantEquipmentTypes
+        \reference validPlantEquipmentNames
+        \reference-class-name validCondenserEquipmentTypes
+        \reference validCondenserEquipmentNames
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
    A2 , \field Main Model Program Calling Manager Name
         \type object-list
         \object-list ProgramNames
@@ -74426,6 +75022,8 @@ Refrigeration:CompressorRack,
         \required-field
         \type alpha
         \reference DesuperHeatingCoilSources
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
   A2 ,  \field Heat Rejection Location
         \type choice
         \key Outdoors
@@ -74966,6 +75564,8 @@ Refrigeration:Condenser:WaterCooled,
         \type alpha
         \reference RefrigerationAllTypesCondenserNames
         \reference DesuperHeatingCoilSources
+        \reference-class-name validBranchEquipmentTypes
+        \reference validBranchEquipmentNames 
   N1 ,  \field Rated Effective Total Heat Rejection Rate
         \note Rating as per ARI 450
         \note Be sure the rating corresponds to the correct refrigerant
@@ -77247,6 +77847,8 @@ Generator:InternalCombustionEngine,
   A1, \field Name
       \required-field
       \reference GeneratorNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   N1, \field Rated Power Output
        \units W
   A2, \field Electric Circuit Node Name
@@ -77335,6 +77937,8 @@ Generator:CombustionTurbine,
   A1, \field Name
       \required-field
       \reference GeneratorNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   N1, \field Rated Power Output
       \units W
   A2, \field Electric Circuit Node Name
@@ -77443,6 +78047,8 @@ Generator:MicroTurbine,
       \type alpha
       \reference GeneratorNames
       \reference MicroTurbineGeneratorNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   N1, \field Reference Electrical Power Output
       \required-field
       \type real
@@ -78304,6 +78910,10 @@ Generator:FuelCell:ExhaustGasToWaterHeatExchanger,
   A1, \field Name
       \required-field
       \reference FCExhaustHXNames
+      \reference-class-name validPlantEquipmentTypes
+      \reference validPlantEquipmentNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   A2, \field Heat Recovery Water Inlet Node Name
       \type node
   A3, \field Heat Recovery Water Outlet Node Name
@@ -78392,6 +79002,8 @@ Generator:FuelCell:Inverter,
       \required-field
       \type alpha
       \reference FCStackCoolerNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   A2, \field Heat Recovery Water Inlet Node Name
       \type node
   A3, \field Heat Recovery Water Outlet Node Name
@@ -78432,6 +79044,10 @@ Generator:MicroCHP,
       \memo engines, but might be used for other types of residential CHP devices.
   A1, \field Name
       \reference GeneratorNames
+      \reference-class-name validPlantEquipmentTypes
+      \reference validPlantEquipmentNames
+      \reference-class-name validBranchEquipmentTypes
+      \reference validBranchEquipmentNames 
   A2, \field Performance Parameters Name
       \note Enter the name of a Generator:MicroCHP:NonNormalizedParameters object.
       \type object-list
@@ -80312,6 +80928,8 @@ WaterUse:Connections,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Inlet Node Name
        \type node
   A3 , \field Outlet Node Name
@@ -80755,6 +81373,43 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
+   
+FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
+   \memo This object describes fault of chiller supply water temperature sensor offset
+   \min-fields 6
+   A1, \field Name
+       \note Enter the name of the fault
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A4, \field Chiller Object Type
+       \note Enter the type of a chiller object
+       \required-field
+       \type choice
+       \key Chiller:Electric
+       \key Chiller:Electric:EIR
+       \key Chiller:Electric:ReformulatedEIR
+       \key Chiller:ConstantCOP
+       \key Chiller:EngineDriven
+       \key Chiller:CombustionTurbine
+       \key Chiller:Absorption
+       \key Chiller:Absorption:Indirect
+   A5, \field Chiller Object Name
+       \note Enter the name of a chiller object
+       \required-field
+       \type object-list
+       \object-list Chillers
+   N1; \field Reference Sensor Offset
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 0.0
+       \units deltaC
 
 FaultModel:ThermostatOffset,
    \memo This object describes fault of thermostat offset
@@ -89885,6 +90540,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -89979,6 +90635,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90073,6 +90730,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90167,6 +90825,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90261,6 +90920,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90355,6 +91015,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90449,6 +91110,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90543,6 +91205,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90637,6 +91300,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90731,6 +91395,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90825,6 +91490,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -90919,6 +91585,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91013,6 +91680,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91107,6 +91775,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91201,6 +91870,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91296,6 +91966,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91390,6 +92061,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91484,6 +92156,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91578,6 +92251,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91672,6 +92346,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91766,6 +92441,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91860,6 +92536,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -91954,6 +92631,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92048,6 +92726,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92142,6 +92821,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92236,6 +92916,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92330,6 +93011,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92424,6 +93106,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92518,6 +93201,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92612,6 +93296,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92707,6 +93392,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92801,6 +93487,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92895,6 +93582,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -92989,6 +93677,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93083,6 +93772,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93177,6 +93867,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93271,6 +93962,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93365,6 +94057,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93459,6 +94152,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93553,6 +94247,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93647,6 +94342,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93741,6 +94437,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93835,6 +94532,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -93929,6 +94627,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94023,6 +94722,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94118,6 +94818,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94212,6 +94913,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94306,6 +95008,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94400,6 +95103,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94494,6 +95198,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94588,6 +95293,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94682,6 +95388,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94776,6 +95483,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94870,6 +95578,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -94964,6 +95673,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95058,6 +95768,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95152,6 +95863,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95246,6 +95958,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95340,6 +96053,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95434,6 +96148,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95529,6 +96244,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95623,6 +96339,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95717,6 +96434,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95811,6 +96529,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95905,6 +96624,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -95999,6 +96719,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96093,6 +96814,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96187,6 +96909,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96281,6 +97004,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96375,6 +97099,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96469,6 +97194,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96563,6 +97289,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96657,6 +97384,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96751,6 +97479,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96845,6 +97574,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -96940,6 +97670,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97034,6 +97765,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97128,6 +97860,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97222,6 +97955,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97316,6 +98050,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97410,6 +98145,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97504,6 +98240,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -97598,6 +98335,7 @@ Output:Table:SummaryReports,
        \key ZoneComponentLoadSummary
        \key Standard62.1Summary
        \key EnergyMeters
+       \key InitializationSummary
        \key LEEDSummary
        \key LifeCycleCostReport
        \key TariffReport
@@ -98933,6 +99671,7 @@ Meter:Custom,
    \memo Used to allow users to combine specific variables and/or meters into
    \memo "custom" meter configurations. To access these meters by name, one must
    \memo first run a simulation to generate the RDD/MDD files and names.
+   \memo A Meter:Custom cannot reference another Meter:Custom.
    A1,  \field Name
         \required-field
    A2,  \field Fuel Type
