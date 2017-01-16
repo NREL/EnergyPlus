@@ -970,6 +970,8 @@ namespace DataSizing {
 		Real64 DesCoolVolFlowMin; // design minimum system cooling flow rate [m3/s]
 		Array1D< Real64 > HeatFlowSeq; // daily sequence of system heating air mass flow rate
 		//  (zone time step)
+		Array1D< Real64 > SumZoneHeatLoadSeq; // daily sequence of zones summed heating load [W]
+		//  (zone time step)
 		Array1D< Real64 > CoolFlowSeq; // daily sequence of system cooling air mass flow rate
 		//  (zone time step)
 		Array1D< Real64 > SumZoneCoolLoadSeq; // daily sequence of zones summed cooling load [W]
