@@ -1239,6 +1239,8 @@ namespace UnitVentilator {
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
+		using WaterCoils::GetWaterCoilIndex;
+		using WaterCoils::WaterCoil;
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -1315,6 +1317,9 @@ namespace UnitVentilator {
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		Real64 CoolingAirVolFlowScalable; // cooling airvolume for rate determined using scalable sizing method
 		Real64 HeatingAirVolFlowScalable; // heating airvolume for rate determined using scalable sizing method
+		bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
+		Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
+		int CoilNum; // index of water coil object
 
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
@@ -1340,6 +1345,8 @@ namespace UnitVentilator {
 		DataZoneNumber = UnitVent(UnitVentNum).ZonePtr;
 		ZoneCoolingOnlyFan = false;
 		ZoneHeatingOnlyFan = false;
+		DoWaterCoilSizing = false;
+		CoilNum = 0;
 
 		if ( UnitVent( UnitVentNum ).CoilOption == BothOption ) {
 			ZoneCoolingOnlyFan = true;
@@ -1661,8 +1668,26 @@ namespace UnitVentilator {
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", UnitVent( UnitVentNum ).HCoilName, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", UnitVent( UnitVentNum ).HCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
-						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitVent( UnitVentNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						if ( PltSizHeatNum > 0 ) {
+						PltSizHeatNum = MyPlantSizingIndex( "COIL:HEATING:WATER", UnitVent( UnitVentNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
+
+						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", UnitVent( UnitVentNum ).HCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseWaterCoilDeltaT ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).WaterCoilDeltaT;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizHeatNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizHeatNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
+								ErrorsFound = true;
+							}
+						}
+
+						if ( DoWaterCoilSizing ) {
 							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = HeatingCapacitySizing;
 								if ( UnitVent( UnitVentNum ).HVACSizingIndex > 0 ) {
@@ -1704,15 +1729,11 @@ namespace UnitVentilator {
 								}
 								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, HWInitConvTemp, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
-								MaxVolHotWaterFlowDes = DesHeatingLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+								MaxVolHotWaterFlowDes = DesHeatingLoad / ( WaterCoilSizDeltaT * Cp * rho );
 
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
 							}
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
-							ErrorsFound = true;
 						}
 					}
 					if ( IsAutoSize ) {
@@ -1861,7 +1882,23 @@ namespace UnitVentilator {
 					CoilWaterOutletNode = GetCoilWaterOutletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
 						PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						if ( PltSizCoolNum > 0 ) {
+						CoilNum = GetWaterCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
+						if ( WaterCoil( CoilNum ).UseWaterCoilDeltaT ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).WaterCoilDeltaT;
+							DoWaterCoilSizing = true;
+						} else {
+							if ( PltSizCoolNum > 0 ) {
+								WaterCoilSizDeltaT = PlantSizData( PltSizCoolNum ).DeltaT;
+								DoWaterCoilSizing = true;
+							} else {
+								DoWaterCoilSizing = false;
+								// If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
+								ShowSevereError( "Autosizing of water coil requires a cooling loop Sizing:Plant object" );
+								ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
+								ErrorsFound = true;
+							}
+						}
+						if ( DoWaterCoilSizing ) {
 							if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = CoolingCapacitySizing;
 								if ( UnitVent( UnitVentNum ).HVACSizingIndex > 0 ) {
@@ -1903,7 +1940,7 @@ namespace UnitVentilator {
 								}
 								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5., PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5., PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
-								MaxVolColdWaterFlowDes = DesCoolingLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
+								MaxVolColdWaterFlowDes = DesCoolingLoad / ( WaterCoilSizDeltaT * Cp * rho );
 
 								if ( MaxVolColdWaterFlowDes < 0.0 ) {
 									ShowWarningError( "Autosizing of water flow resulted in negative value." );
@@ -1918,10 +1955,6 @@ namespace UnitVentilator {
 							} else {
 								MaxVolColdWaterFlowDes = 0.0;
 							}
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_UnitVentilator + " Object=" + UnitVent( UnitVentNum ).Name );
-							ErrorsFound = true;
 						}
 					}
 					if ( IsAutoSize ) {
