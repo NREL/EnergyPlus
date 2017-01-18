@@ -485,6 +485,7 @@ ProcessArgs(int argc, const char * argv[])
 		inputIddFileName = ProgramPath + "Energy+.idd";
 	}
 
+
 	// Check if specified files exist
 	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {

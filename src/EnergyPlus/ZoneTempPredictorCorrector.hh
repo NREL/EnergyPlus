@@ -178,6 +178,31 @@ namespace ZoneTempPredictorCorrector {
 
 	};
 
+	struct AdaptiveComfortDailySetPointSchedule
+	{
+		// Members
+		bool initialized;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_90;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_80;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Central;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_I;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_II;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_III;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Central;
+
+		// Default Constructor
+		AdaptiveComfortDailySetPointSchedule() :
+			initialized(0),
+			ThermalComfortAdaptiveASH55_Upper_90(366, 0.0),
+			ThermalComfortAdaptiveASH55_Upper_80(366, 0.0),
+			ThermalComfortAdaptiveASH55_Central(366, 0.0),
+			ThermalComfortAdaptiveCEN15251_Upper_I(366, 0.0),
+			ThermalComfortAdaptiveCEN15251_Upper_II(366, 0.0),
+			ThermalComfortAdaptiveCEN15251_Upper_III(366, 0.0),
+			ThermalComfortAdaptiveCEN15251_Central(366, 0.0)
+		{}
+	};
+
 	struct ZoneComfortFangerControlType
 	{
 		// Members
@@ -191,9 +216,9 @@ namespace ZoneTempPredictorCorrector {
 
 		// Default Constructor
 		ZoneComfortFangerControlType() :
-			PMVSchedIndex( 0 ),
-			HeatPMVSchedIndex( 0 ),
-			CoolPMVSchedIndex( 0 )
+			PMVSchedIndex(0),
+			HeatPMVSchedIndex(0),
+			CoolPMVSchedIndex(0)
 		{}
 
 	};
@@ -207,6 +232,7 @@ namespace ZoneTempPredictorCorrector {
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	extern AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
 
 	// Functions
 	void
@@ -226,6 +252,15 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	InitZoneAirSetPoints();
+
+	void
+	CalculateAdaptiveComfortSetPointSchl();
+
+	void
+	GetZoneAdaptiveComfortSetPointSchl(
+		int AdaptiveComfortModelTypeIndex,
+		Array1D< Real64 > & AdaptiveComfortMonthlySetPoint
+	);
 
 	void
 	PredictSystemLoads(
@@ -323,6 +358,13 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	AdjustAirSetPointsforOpTempCntrl(
+		int const TempControlledZoneID,
+		int const ActualZoneNum,
+		Real64 & ZoneAirSetPoint
+	);
+
+	void
+	AdjustOperativeSetPointsforAdapComfort(
 		int const TempControlledZoneID,
 		int const ActualZoneNum,
 		Real64 & ZoneAirSetPoint

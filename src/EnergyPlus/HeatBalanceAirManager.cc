@@ -3281,6 +3281,7 @@ namespace HeatBalanceAirManager {
 							thisMRTFraction = TempControlledZone( TempControlledZoneID ).FixedRadiativeFraction;
 						}
 						ZnAirRpt( ZoneLoop ).ThermOperativeTemp = ( 1.0 - thisMRTFraction ) * ZTAV( ZoneLoop ) + thisMRTFraction * MRT( ZoneLoop );
+						double test = ZnAirRpt(ZoneLoop).ThermOperativeTemp;
 					}
 				}
 			}
