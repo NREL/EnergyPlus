@@ -1213,7 +1213,7 @@ namespace AirflowNetworkBalanceManager {
 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 					}
 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ); // Name of external node
-					MultizoneExternalNodeData( i ).Height = Numbers( 1 ); // Nodal height
+					MultizoneExternalNodeData( i ).height = Numbers( 1 ); // Nodal height
 					if ( SameString( AirflowNetworkSimu.HeightOption, "ExternalNode" ) && lNumericBlanks( 1 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + " object =" + Alphas( 1 ) + ". The input of " + cNumericFields( 1 ) + " is required, but a blank is found." );
 						ShowContinueError( "The default value is assigned as " + RoundSigDigits( Numbers( 1 ), 1 ) );
@@ -2315,7 +2315,7 @@ namespace AirflowNetworkBalanceManager {
 				for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
 					if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( j ).SurfNum ).ExtWind ) ) {
 						if ( SameString( MultizoneSurfaceData( j ).ExternalNodeName, MultizoneExternalNodeData( i ).Name ) ) {
-							MultizoneExternalNodeData( i ).Height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
+							MultizoneExternalNodeData( i ).height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
 							break;
 						}
 					}
@@ -3234,7 +3234,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkNodeData( i ).Name = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).Name;
 				AirflowNetworkNodeData( i ).NodeTypeNum = 1;
 				AirflowNetworkNodeData( i ).EPlusZoneNum = 0;
-				AirflowNetworkNodeData( i ).NodeHeight = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).Height;
+				AirflowNetworkNodeData( i ).NodeHeight = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).height;
 				AirflowNetworkNodeData( i ).ExtNodeNum = i - AirflowNetworkNumOfZones;
 			}
 		} else { // Surface-Average input
@@ -4537,11 +4537,11 @@ namespace AirflowNetworkBalanceManager {
 			if ( AirflowNetworkNodeData( n ).NodeTypeNum == 0 ) {
 				AirflowNetworkNodeSimu( n ).PZ = 0.0;
 			} else {
-				// Assing ambient conditions to external nodes
+				// Assign ambient conditions to external nodes
 				i = AirflowNetworkNodeData( n ).ExtNodeNum;
 				if ( i > 0 ) {
 					if ( i <= AirflowNetworkNumOfExtNode ) {
-						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).Height );
+						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).height );
 						AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
 					}
 					AirflowNetworkNodeSimu( n ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( n ).NodeHeight );
@@ -5155,6 +5155,46 @@ namespace AirflowNetworkBalanceManager {
 		CalcWindPressure = CPV * 0.5 * RhoOut * Vref * Vref;
 
 		return CalcWindPressure;
+	}
+
+	Real64
+		CalcWindPressureFromCurve(
+			int const curve, // Curve index, change this to pointer after curve refactor
+			Real64 const windDir, // Wind direction
+			Real64 const Vref, // Velocity at reference height
+			Real64 const height, // Node height for outdoor temperature calculation
+			bool const symmetricCurve // True if the curve is symmetric (0 to 180)
+		)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason DeGraw
+		//       DATE WRITTEN   Jan. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates surface wind pressure based on a given CP curve object
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+		// COMIS Fundamentals & CalcWindPressure
+
+		// Return value is wind pressure[Pa]
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 rho; // Outdoor air density
+		Real64 Cp; // Cp value at given wind direction
+
+		// Calculate outdoor density
+		rho = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTempAt(height),
+			DataEnvironment::OutHumRat);
+
+		// Calculate pressure coefficient
+		Cp = CurveManager::CurveValue(curve, windDir);
+
+		return Cp * 0.5 * rho * Vref * Vref;
 	}
 
 	void

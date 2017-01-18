@@ -206,6 +206,15 @@ namespace AirflowNetworkBalanceManager {
 		Real64 const Height // Node height for outdoor temperature calculation
 	);
 
+	Real64
+		CalcWindPressureFromCurve(
+			int const curve, // Curve index, change this to pointer after curve refactor
+			Real64 const windDir, // Wind direction
+			Real64 const Vref, // Velocity at reference height
+			Real64 const height, // Node height for outdoor temperature calculation
+			bool const symmetricCurve // True if the curve is symmetric (0 to 180)
+		);
+
 	void
 	CalcAirflowNetworkHeatBalance();
 

@@ -61,6 +61,9 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -2962,6 +2965,79 @@ namespace EnergyPlus {
 		Surface.deallocate( );
 		SurfaceWindow.deallocate( );
 
+	}
+
+	TEST_F(EnergyPlusFixture, TestWindPressureTable) {
+		std::string const idf_objects = delimited_string({
+			"Version,8.6;",
+			"Table:OneIndependentVariable,",
+			"  EFacade_WPCCurve,        !- Name",
+			"  Linear,                  !- Curve Type",
+			"  LinearInterpolationOfTable,  !- Interpolation Method",
+			"  0,                       !- Minimum Value of X",
+			"  360,                     !- Maximum Value of X",
+			"  -1,                      !- Minimum Table Output",
+			"  1,                       !- Maximum Table Output",
+			"  Dimensionless,           !- Input Unit Type for X",
+			"  Dimensionless,           !- Output Unit Type",
+			"  1,                       !- Normalization Reference",
+			"  0,                       !- X Value #1",
+			"  -0.56,                   !- Output Value #1",
+			"  30,                      !- X Value #2",
+			"  0.04,                    !- Output Value #2",
+			"  60,                      !- X Value #3",
+			"  0.48,                    !- Output Value #3",
+			"  90,                      !- X Value #4",
+			"  0.6,                     !- Output Value #4",
+			"  120,                     !- X Value #5",
+			"  0.48,                    !- Output Value #5",
+			"  150,                     !- X Value #6",
+			"  0.04,                    !- Output Value #6",
+			"  180,                     !- X Value #7",
+			"  -0.56,                   !- Output Value #7",
+			"  210,                     !- N20",
+			"  -0.56,                   !- N21",
+			"  240,                     !- N22",
+			"  -0.42,                   !- N23",
+			"  270,                     !- N24",
+			"  -0.37,                   !- N25",
+			"  300,                     !- N26",
+			"  -0.42,                   !- N27",
+			"  330,                     !- N28",
+			"  -0.56,                   !- N29",
+			"  360,                     !- N30",
+			"  -0.56;                   !- N31" });
+
+		// Load and verify the table
+		ASSERT_FALSE(process_idf(idf_objects));
+		EXPECT_EQ(0, CurveManager::NumCurves);
+		CurveManager::GetCurveInput();
+		CurveManager::GetCurvesInputFlag = false;
+		ASSERT_EQ(1, CurveManager::NumCurves);
+		EXPECT_EQ("LINEAR", CurveManager::GetCurveType(1));
+		EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(1));
+		EXPECT_EQ(1, CurveManager::GetCurveIndex("EFACADE_WPCCURVE"));
+		EXPECT_EQ(CurveManager::CurveType_TableOneIV, CurveManager::GetCurveObjectTypeNum(1));
+		EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 0.0)); // In-range value
+		EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(1, 105.0)); // In-range value
+		EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, -10.0)); // Minimum x
+		EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 5000)); // Maximum x
+		EXPECT_FALSE(has_err_output());
+
+		// Set up some environmental parameters
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutDryBulbTemp = 25.0;
+		DataEnvironment::OutHumRat = 0.0;
+		DataEnvironment::SiteTempGradient = 0.0;
+
+		// Make sure we can compute the right density
+		Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp,
+			DataEnvironment::OutHumRat);
+		EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
+
+		// Compute wind pressure
+		Real64 p = AirflowNetworkBalanceManager::CalcWindPressureFromCurve(1, 105, 1, 10, false);
+		EXPECT_DOUBLE_EQ(0.54*0.5*1.1841123742118911, p);
 	}
 
 }

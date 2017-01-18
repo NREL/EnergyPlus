@@ -651,19 +651,25 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of external node
 		std::string WPCName; // Wind Pressure Coefficient Values Object Name
-		Real64 Orien; // Orientation
-		Real64 Height; // Nodal height
+		Real64 orientation; // Orientation, not currently used
+		Real64 height; // Nodal height
 		int ExtNum; // External node number
 		int CPVNum; // CP Value number
 		int FacadeNum; // Facade number
+		int curve; // Curve ID, replace with pointer after curve refactor
+		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
+		bool relativeAngle; // Determines whether the wind angle is relative to the surface or absolute
 
 		// Default Constructor
 		MultizoneExternalNodeProp() :
-			Orien( 0.0 ),
-			Height( 0.0 ),
+			orientation( 0.0 ),
+			height( 0.0 ),
 			ExtNum( 0 ),
 			CPVNum( 0 ),
-			FacadeNum( 0 )
+			FacadeNum( 0 ),
+			curve( 0 ),
+			symmetricCurve( false ),
+			relativeAngle( false )
 		{}
 
 	};
