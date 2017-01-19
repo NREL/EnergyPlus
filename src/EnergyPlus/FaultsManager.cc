@@ -1409,7 +1409,7 @@ namespace FaultsManager {
 		NumFaultyAirFilter = 0;
 		NumFaultyChillerSWTSensor = 0;
 		NumFaultyCondenserSWTSensor = 0;
-		NumFaultyTowerScaling = 0;
+		NumFaultyTowerFouling = 0;
 		NumFaultyCoilSATSensor = 0;
 
 		FaultsEconomizer.deallocate();
@@ -1419,7 +1419,7 @@ namespace FaultsManager {
 		FaultsFouledAirFilters.deallocate();
 		FaultsChillerSWTSensor.deallocate();
 		FaultsCondenserSWTSensor.deallocate();
-		FaultsTowerScaling.deallocate();
+		FaultsTowerFouling.deallocate();
 		FaultsCoilSATSensor.deallocate();
 	}
 

@@ -285,8 +285,6 @@ TEST_F( EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT ) {
 
 }
 
-}
-
 TEST_F( EnergyPlusFixture, FaultsManager_FaultChillerSWTSensor_CalFaultChillerSWT )
 {
 	// PURPOSE OF THIS SUBROUTINE:
@@ -347,5 +345,7 @@ TEST_F( EnergyPlusFixture, FaultsManager_CalFaultOffsetAct )
 	// Run and Check
 	OffsetAct = Fault.CalFaultOffsetAct();
 	EXPECT_EQ( 10, OffsetAct );
+
+}
 
 }
