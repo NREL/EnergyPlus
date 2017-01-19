@@ -92,6 +92,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -152,10 +153,11 @@ namespace HeatingCoils {
 
 	// reclaim heat object types
 	int const COMPRESSORRACK_REFRIGERATEDCASE( 1 );
-	int const COIL_DX_COOLING( 2 );
+	int const COIL_DX_COOLING( 2 ); // single speed DX
 	int const COIL_DX_MULTISPEED( 3 );
 	int const COIL_DX_MULTIMODE( 4 );
 	int const CONDENSER_REFRIGERATION( 5 );
+	int const COIL_DX_VARIABLE_COOLING( 6 );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -2987,6 +2989,13 @@ namespace HeatingCoils {
 			GetDXCoilIndex( CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning );
 			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
 				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTISPEED && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
+				CoilFound = CoilNum;
+				break;
+			}
+		} else if ( SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( CoilType, CoilName, GetCoilErrFlag );
+			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
+				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
 				CoilFound = CoilNum;
 				break;
 			}
