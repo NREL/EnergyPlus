@@ -1,4 +1,4 @@
-ï»¿// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1392,12 +1392,12 @@ namespace EconomicTariff {
 		monetaryUnit( 28 ).txt = "kr";
 		monetaryUnit( 29 ).txt = "RD$";
 		monetaryUnit( 30 ).txt = "kr";
-		monetaryUnit( 31 ).txt = "ï¿½";
+		monetaryUnit( 31 ).txt = "£";
 		monetaryUnit( 32 ).txt = "EUR";
 		monetaryUnit( 33 ).txt = "$";
-		monetaryUnit( 34 ).txt = "ï¿½";
-		monetaryUnit( 35 ).txt = "ï¿½";
-		monetaryUnit( 36 ).txt = "ï¿½";
+		monetaryUnit( 34 ).txt = "£";
+		monetaryUnit( 35 ).txt = "¢";
+		monetaryUnit( 36 ).txt = "£";
 		monetaryUnit( 37 ).txt = "Q";
 		monetaryUnit( 38 ).txt = "$";
 		monetaryUnit( 39 ).txt = "HK$";
@@ -1406,13 +1406,13 @@ namespace EconomicTariff {
 		monetaryUnit( 42 ).txt = "Ft";
 		monetaryUnit( 43 ).txt = "Rp";
 		monetaryUnit( 44 ).txt = "ILS";
-		monetaryUnit( 45 ).txt = "ï¿½";
+		monetaryUnit( 45 ).txt = "£";
 		monetaryUnit( 46 ).txt = "INR";
 		monetaryUnit( 47 ).txt = "IRR";
 		monetaryUnit( 48 ).txt = "kr";
-		monetaryUnit( 49 ).txt = "ï¿½";
+		monetaryUnit( 49 ).txt = "£";
 		monetaryUnit( 50 ).txt = "J$";
-		monetaryUnit( 51 ).txt = "ï¿½";
+		monetaryUnit( 51 ).txt = "¥";
 		monetaryUnit( 52 ).txt = "KGS";
 		monetaryUnit( 53 ).txt = "KHR";
 		monetaryUnit( 54 ).txt = "KPW";
@@ -1420,7 +1420,7 @@ namespace EconomicTariff {
 		monetaryUnit( 56 ).txt = "$";
 		monetaryUnit( 57 ).txt = "KZT";
 		monetaryUnit( 58 ).txt = "LAK";
-		monetaryUnit( 59 ).txt = "ï¿½";
+		monetaryUnit( 59 ).txt = "£";
 		monetaryUnit( 60 ).txt = "LKR";
 		monetaryUnit( 61 ).txt = "$";
 		monetaryUnit( 62 ).txt = "Lt";
@@ -1453,11 +1453,11 @@ namespace EconomicTariff {
 		monetaryUnit( 89 ).txt = "SCR";
 		monetaryUnit( 90 ).txt = "kr";
 		monetaryUnit( 91 ).txt = "$";
-		monetaryUnit( 92 ).txt = "ï¿½";
+		monetaryUnit( 92 ).txt = "£";
 		monetaryUnit( 93 ).txt = "S";
 		monetaryUnit( 94 ).txt = "$";
 		monetaryUnit( 95 ).txt = "$";
-		monetaryUnit( 96 ).txt = "ï¿½";
+		monetaryUnit( 96 ).txt = "£";
 		monetaryUnit( 97 ).txt = "THB";
 		monetaryUnit( 98 ).txt = "TRL";
 		monetaryUnit( 99 ).txt = "YTL";
@@ -1504,12 +1504,12 @@ namespace EconomicTariff {
 		monetaryUnit( 28 ).html = "kr";
 		monetaryUnit( 29 ).html = "RD$";
 		monetaryUnit( 30 ).html = "kr";
-		monetaryUnit( 31 ).html = "ï¿½";
+		monetaryUnit( 31 ).html = "£";
 		monetaryUnit( 32 ).html = "&#x20ac;";
 		monetaryUnit( 33 ).html = "$";
-		monetaryUnit( 34 ).html = "ï¿½";
-		monetaryUnit( 35 ).html = "ï¿½";
-		monetaryUnit( 36 ).html = "ï¿½";
+		monetaryUnit( 34 ).html = "£";
+		monetaryUnit( 35 ).html = "¢";
+		monetaryUnit( 36 ).html = "£";
 		monetaryUnit( 37 ).html = "Q";
 		monetaryUnit( 38 ).html = "$";
 		monetaryUnit( 39 ).html = "HK$";
@@ -1518,13 +1518,13 @@ namespace EconomicTariff {
 		monetaryUnit( 42 ).html = "Ft";
 		monetaryUnit( 43 ).html = "Rp";
 		monetaryUnit( 44 ).html = "&#x20aa;";
-		monetaryUnit( 45 ).html = "ï¿½";
+		monetaryUnit( 45 ).html = "£";
 		monetaryUnit( 46 ).html = "&#x20a8;";
 		monetaryUnit( 47 ).html = "&#xfdfc;";
 		monetaryUnit( 48 ).html = "kr";
-		monetaryUnit( 49 ).html = "ï¿½";
+		monetaryUnit( 49 ).html = "£";
 		monetaryUnit( 50 ).html = "J$";
-		monetaryUnit( 51 ).html = "ï¿½";
+		monetaryUnit( 51 ).html = "¥";
 		monetaryUnit( 52 ).html = "&#x043b;&#x0432;";
 		monetaryUnit( 53 ).html = "&#x17db;";
 		monetaryUnit( 54 ).html = "&#x20a9;";
@@ -1532,7 +1532,7 @@ namespace EconomicTariff {
 		monetaryUnit( 56 ).html = "$";
 		monetaryUnit( 57 ).html = "&#x043b;&#x0432;";
 		monetaryUnit( 58 ).html = "&#x20ad;";
-		monetaryUnit( 59 ).html = "ï¿½";
+		monetaryUnit( 59 ).html = "£";
 		monetaryUnit( 60 ).html = "&#x20a8;";
 		monetaryUnit( 61 ).html = "$";
 		monetaryUnit( 62 ).html = "Lt";
@@ -1565,11 +1565,11 @@ namespace EconomicTariff {
 		monetaryUnit( 89 ).html = "&#x20a8;";
 		monetaryUnit( 90 ).html = "kr";
 		monetaryUnit( 91 ).html = "$";
-		monetaryUnit( 92 ).html = "ï¿½";
+		monetaryUnit( 92 ).html = "£";
 		monetaryUnit( 93 ).html = "S";
 		monetaryUnit( 94 ).html = "$";
 		monetaryUnit( 95 ).html = "$";
-		monetaryUnit( 96 ).html = "ï¿½";
+		monetaryUnit( 96 ).html = "£";
 		monetaryUnit( 97 ).html = "&#x0e3f;";
 		monetaryUnit( 98 ).html = "&#x20a4;";
 		monetaryUnit( 99 ).html = "YTL";
