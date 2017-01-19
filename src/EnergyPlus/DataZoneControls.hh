@@ -128,12 +128,6 @@ namespace DataZoneControls {
 		// else constant
 		Real64 FixedRadiativeFraction; // weighting factor for mean radiant temp for Operative temperature
 		int OpTempRadiativeFractionSched; // index of schedule for when fraction is scheduled
-
-		bool AdaptiveComfortTempControl; // flag to indicate whether control based on Operative Temp
-		int AdaptiveComfortModelTypeIndex; // index to adaptive comfort model type
-
-		Array1D< Real64 > AdaptiveComfortSetPointSchedule; // annual zone adaptive comfort setpoint schedule
-
 		Real64 ZoneOvercoolRange; // Zone overcool temperature range (max), deg C
 		bool ZoneOvercoolControl; // Flag to indicate whether control is based on overcool
 		bool OvercoolCntrlModeScheduled; // Flag to indicate if zone overcool range is scheduled
@@ -144,8 +138,6 @@ namespace DataZoneControls {
 		//      below the original cooling setpoint, %RH/deltaC
 		std::string DehumidifyingSched; // Name of the schedule to determine the zone dehumidifying setpoint
 		int DehumidifyingSchedIndex; // Index for dehumidifying schedule
-
-		// Add table here
 
 		// Default Constructor
 		ZoneTempControls() :
@@ -165,18 +157,15 @@ namespace DataZoneControls {
 			EMSOverrideCoolingSetPointValue( 0.0 ),
 			OperativeTempControl( false ),
 			OpTempCntrlModeScheduled( false ),
-			AdaptiveComfortTempControl(false),
 			FixedRadiativeFraction( 0.0 ),
 			OpTempRadiativeFractionSched( 0 ),
-			AdaptiveComfortModelTypeIndex(0),
 			ZoneOvercoolRange( 0.0 ),
 			ZoneOvercoolControl( false ),
 			OvercoolCntrlModeScheduled( false ),
 			ZoneOvercoolConstRange( 0.0 ),
 			ZoneOvercoolRangeSchedIndex( 0 ),
 			ZoneOvercoolControlRatio( 0.0 ),
-			DehumidifyingSchedIndex( 0 ),
-			AdaptiveComfortSetPointSchedule(366, 0.0)
+			DehumidifyingSchedIndex( 0 )
 		{}
 
 	};

@@ -2798,7 +2798,6 @@ namespace ThermalComfort {
 			if ( runningAverageASH >= 10.0 && runningAverageASH <= 33.5 ) {
 				// Calculate the comfort here  (people/output handling loop)
 				numOccupants = People( PeopleNum ).NumberOfPeople * GetCurrentScheduleValue( People( PeopleNum ).NumberOfPeoplePtr );
-
 				tComf = 0.31 * runningAverageASH + 17.8;
 				ThermalComfortData( PeopleNum ).TComfASH55 = tComf;
 				if ( numOccupants > 0 ) {
