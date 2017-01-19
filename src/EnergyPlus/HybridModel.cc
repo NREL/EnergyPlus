@@ -71,6 +71,12 @@ namespace HybridModel {
 		Array1D_string cAlphaFieldNames( 10 );
 		Array1D_string cNumericFieldNames( 10 );
 		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
+		int HybridModelStartMonth( 0 ); // Hybrid model start month 
+		int HybridModelStartDate( 0 ); // Hybrid model start date of month 
+		int HybridModelEndMonth( 0 ); // Hybrid model end month 
+		int HybridModelEndDate( 0 ); // Hybrid model end date of month 
+		int HMStartDay( 0 );
+		int HMEndDay( 0 );
 
 		if ( RunMeOnceFlag ) return;
 
@@ -82,7 +88,7 @@ namespace HybridModel {
 		if ( NumOfHybridModelZones > 0 ) {
 
 			RunMeOnceFlag = true;
-		
+
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
 				GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -120,6 +126,33 @@ namespace HybridModel {
 						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate = rNumericArgs( 2 );
 						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth = rNumericArgs( 3 );
 						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndDate = rNumericArgs( 4 );
+
+						// prepare start and end date for Hybrid Modeling
+						{
+							int HMDayArr[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+							HybridModelStartMonth = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartMonth;
+							HybridModelStartDate = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate;
+							HybridModelEndMonth = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth;
+							HybridModelEndDate = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndDate;
+
+							if ( HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12 ){
+								HMStartDay = HMDayArr[ HybridModelStartMonth - 1 ];
+							}
+							else {
+								HMStartDay = 0;
+							}
+
+							if ( HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12 ){
+								HMEndDay = HMDayArr[ HybridModelEndMonth - 1 ];
+							}
+							else {
+								HMEndDay = 0;
+							}
+
+							HybridModelZone( ZonePtr ).HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
+							HybridModelZone( ZonePtr ).HybridEndDayOfYear = HMEndDay + HybridModelEndDate;
+						}
 					}
 				} else {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );

@@ -3895,19 +3895,6 @@ namespace ZoneTempPredictorCorrector {
 		static Real64 SNLoad( 0.0 ); // Sensible load calculated for zone in watts and then loaded in report variables
 		static int ZoneNum( 0 );
 		static int ZoneNodeNum( 0 ); // System node number for air flow through zone either by system or as a plenum
-		
-		// Hybrid Modeling
-		static int HMStartDay( 0 ); // Temporary date   
-		static int HMEndDay( 0 ); // Temporary date   
-		static int HybridModelStartMonth ( 0 ); // Hybrid model start month 
-		static int HybridModelStartDate( 0 ); // Hybrid model start date of month 
-		static int HybridModelEndMonth( 0 ); // Hybrid model end month 
-		static int HybridModelEndDate( 0 ); // Hybrid model end date of month 
-		static int HybridStartDayOfYear( 0 ); // Hybrid model start date of year 
-		static int HybridEndDayOfYear( 0 ); // Hybrid model end date of year 
-		Real64 HMMultiplierAverage ( 1.0 );
-		static Real64 MultpHM( 1.0 );
-		static Real64 InfilOAACHHM( 0.0 );
 
 		//  LOGICAL,SAVE   :: OneTimeFlag = .TRUE.
 		//unusd1208  LOGICAL,SAVE   :: MyEnvrnFlag = .TRUE.
@@ -4117,33 +4104,12 @@ namespace ZoneTempPredictorCorrector {
 
 				Zone( ZoneNum ).ZoneMeasuredTemperature = GetCurrentScheduleValue( HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureSchedulePtr );
 
-				// prepare start and end date for Hybrid Modeling
-				{
-					int HMDayArr[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-
-					HybridModelStartMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartMonth;
-					HybridModelStartDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureStartDate;
-					HybridModelEndMonth = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndMonth;
-					HybridModelEndDate = HybridModelZone( ZoneNum ).ZoneMeasuredTemperatureEndDate;
-
-					if( HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12 ){
-						HMStartDay = HMDayArr[ HybridModelStartMonth - 1 ];
-					} else {
-						HMStartDay = 0;
-					}
-
-					if( HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12 ){
-						HMEndDay = HMDayArr[ HybridModelEndMonth - 1 ];
-					} else {
-						HMEndDay = 0;
-					}
-
-					HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
-					HybridEndDayOfYear = HMEndDay + HybridModelEndDate;
-				}
-
 				// HM calculation only HM calculation period start
-				if ( DayOfYear >= HybridStartDayOfYear && DayOfYear <= HybridEndDayOfYear ){
+				if ( DayOfYear >= HybridModelZone( ZoneNum ).HybridStartDayOfYear && DayOfYear <= HybridModelZone( ZoneNum ).HybridEndDayOfYear ){
+
+					Real64 HMMultiplierAverage( 1.0 );
+					Real64 MultpHM( 1.0 );
+					Real64 InfilOAACHHM( 0.0 );
 
 					ZT( ZoneNum ) = Zone( ZoneNum ).ZoneMeasuredTemperature;
 
@@ -4221,7 +4187,7 @@ namespace ZoneTempPredictorCorrector {
 							}
 							
 							// Calculate and store the multiplier average at the end of HM simulations 
-							if ( DayOfYear == HybridEndDayOfYear && EndDayFlag ){
+							if ( DayOfYear == HybridModelZone( ZoneNum ).HybridEndDayOfYear && EndDayFlag ){
 								HMMultiplierAverage = Zone( ZoneNum ).ZoneVolCapMultpSensHMSum / Zone( ZoneNum ).ZoneVolCapMultpSensHMCountSum;
 								Zone( ZoneNum ).ZoneVolCapMultpSensHMAverage = HMMultiplierAverage;
 							}

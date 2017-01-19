@@ -81643,6 +81643,7 @@ Matrix:TwoDimension,
 
 HybridModel:Zone,
        \memo Zones with measured air temperature data and a range of dates.
+	   \memo If the range of temperature measurement dates includes a leap day, the weather data should include a leap day.
   A1 , \field Name
        \required-field
        \type alpha
