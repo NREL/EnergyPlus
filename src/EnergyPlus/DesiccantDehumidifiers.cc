@@ -2299,8 +2299,13 @@ namespace DesiccantDehumidifiers {
 			if ( DesicDehum( DesicDehumNum ).Preheat == Yes ) {
 
 				//     condenser waste heat is proportional to DX coil PLR
-				CondenserWasteHeat = HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity;
-				HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;
+				if ( ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) || ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) ) {
+					CondenserWasteHeat = HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity;
+					HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;				
+				} else if ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+					CondenserWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity;
+					DataHeatBalance::HeatReclaimVS_DXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;
+				}
 
 				CpAir = PsyCpAirFnWTdb( Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).HumRat, Node( DesicDehum( DesicDehumNum ).CondenserInletNode ).Temp );
 

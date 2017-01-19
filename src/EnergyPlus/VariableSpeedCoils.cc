@@ -58,6 +58,7 @@
 #include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
@@ -153,7 +154,7 @@ namespace VariableSpeedCoils {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Identifier is VarSpeedCoil
-	int NumWatertoAirHPs( 0 ); // The Number of Water to Air Heat Pumps found in the Input
+	int NumVarSpeedCoils( 0 ); // The Number of Water to Air Heat Pumps found in the Input
 
 	bool MyOneTimeFlag( true ); // one time allocation flag
 	bool GetCoilsInputFlag( true ); // Flag set to make sure you get input once
@@ -205,7 +206,7 @@ namespace VariableSpeedCoils {
 	// Functions
 	void
 	clear_state() {
-		NumWatertoAirHPs = 0;
+		NumVarSpeedCoils = 0;
 		MyOneTimeFlag = true;
 		GetCoilsInputFlag = true;
 		SourceSideMassFlowRate = 0.0;
@@ -448,8 +449,8 @@ namespace VariableSpeedCoils {
 			CompIndex = DXCoilNum;
 		} else {
 			DXCoilNum = CompIndex;
-			if ( DXCoilNum > NumWatertoAirHPs || DXCoilNum < 1 ) {
-				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
+			if ( DXCoilNum > NumVarSpeedCoils || DXCoilNum < 1 ) {
+				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumVarSpeedCoils ) + ", WaterToAir HP name=" + CompName );
 			}
 			if ( !CompName.empty() && CompName != VarSpeedCoil( DXCoilNum ).Name ) {
 				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + VarSpeedCoil( DXCoilNum ).Name );
@@ -574,17 +575,18 @@ namespace VariableSpeedCoils {
 		NumCoolAS = GetNumObjectsFound( "COIL:COOLING:DX:VARIABLESPEED" );
 		NumHeatAS = GetNumObjectsFound( "COIL:HEATING:DX:VARIABLESPEED" );
 		NumHPWHAirToWater = GetNumObjectsFound( "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" );
-		NumWatertoAirHPs = NumCool + NumHeat + NumCoolAS + NumHeatAS + NumHPWHAirToWater;
+		NumVarSpeedCoils = NumCool + NumHeat + NumCoolAS + NumHeatAS + NumHPWHAirToWater;
 		DXCoilNum = 0;
 
-		if ( NumWatertoAirHPs <= 0 ) {
+		if ( NumVarSpeedCoils <= 0 ) {
 			ShowSevereError( "No Equipment found in GetVarSpeedCoilInput" );
 			ErrorsFound = true;
 		}
 
 		// Allocate Arrays
-		if ( NumWatertoAirHPs > 0 ) {
-			VarSpeedCoil.allocate( NumWatertoAirHPs );
+		if ( NumVarSpeedCoils > 0 ) {
+			VarSpeedCoil.allocate( NumVarSpeedCoils );
+			DataHeatBalance::HeatReclaimVS_DXCoil( NumVarSpeedCoils );
 		}
 
 		GetObjectDefMaxArgs( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums );
@@ -1014,6 +1016,9 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
+			// Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
+			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name = VarSpeedCoil( DXCoilNum ).Name;
+			DataHeatBalance::HeatReclaimDXCoil( DXCoilNum ).SourceType = CurrentModuleObject;
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_CoolingAirToAirVariableSpeed;
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
@@ -2487,7 +2492,7 @@ namespace VariableSpeedCoils {
 			ShowFatalError( RoutineName + "Errors found getting input. Program terminates." );
 		}
 
-		for ( DXCoilNum = 1; DXCoilNum <= NumWatertoAirHPs; ++DXCoilNum ) {
+		for ( DXCoilNum = 1; DXCoilNum <= NumVarSpeedCoils; ++DXCoilNum ) {
 			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) ||
 				 ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) ) {
 				// Setup Report variables for the Heat Pump
@@ -2714,9 +2719,9 @@ namespace VariableSpeedCoils {
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			MySizeFlag.allocate( NumWatertoAirHPs );
-			MyEnvrnFlag.allocate( NumWatertoAirHPs );
-			MyPlantScanFlag.allocate( NumWatertoAirHPs );
+			MySizeFlag.allocate( NumVarSpeedCoils );
+			MyEnvrnFlag.allocate( NumVarSpeedCoils );
+			MyPlantScanFlag.allocate( NumVarSpeedCoils );
 			MySizeFlag = true;
 			MyEnvrnFlag = true;
 			MyPlantScanFlag = true;
@@ -2906,6 +2911,7 @@ namespace VariableSpeedCoils {
 			}
 
 			VarSpeedCoil( DXCoilNum ).SimFlag = true;
+			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).AvailCapacity = 0.0;
 
 			MyEnvrnFlag( DXCoilNum ) = false;
 
@@ -3016,6 +3022,7 @@ namespace VariableSpeedCoils {
 		VSHPWHHeatingCapacity = 0.0; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
 		VSHPWHHeatingCOP = 0.0; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 		VarSpeedCoil( DXCoilNum ).OutletWaterTemp = VarSpeedCoil( DXCoilNum ).InletWaterTemp;
+		DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).AvailCapacity = 0.0;
 	}
 
 	void
@@ -4485,6 +4492,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = 0.0;
 			VarSpeedCoil( DXCoilNum ).OutletWaterTemp = 0.0;
 			VarSpeedCoil( DXCoilNum ).OutletWaterEnthalpy = 0.0;
+			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).AvailCapacity = QWasteHeat;
 		} else {
 			VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = SourceSideMassFlowRate;
 			VarSpeedCoil( DXCoilNum ).OutletWaterTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpSource );
@@ -5996,8 +6004,8 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		if ( WSHPNum <= 0 || WSHPNum > NumWatertoAirHPs ) {
-			ShowSevereError( "SetVarSpeedCoilData: called with VS WSHP Coil Number out of range=" + TrimSigDigits( WSHPNum ) + " should be >0 and <" + TrimSigDigits( NumWatertoAirHPs ) );
+		if ( WSHPNum <= 0 || WSHPNum > NumVarSpeedCoils ) {
+			ShowSevereError( "SetVarSpeedCoilData: called with VS WSHP Coil Number out of range=" + TrimSigDigits( WSHPNum ) + " should be >0 and <" + TrimSigDigits( NumVarSpeedCoils ) );
 			ErrorsFound = true;
 			return;
 		}

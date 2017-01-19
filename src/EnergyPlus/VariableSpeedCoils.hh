@@ -108,7 +108,7 @@ namespace VariableSpeedCoils {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Identifier is VarSpeedCoil
-	extern int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
+	extern int NumVarSpeedCoils; // The Number of variable speed Water to Air Heat Pumps and variable dx coils found in the Input
 
 	extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
 	// LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag
