@@ -586,7 +586,7 @@ namespace VariableSpeedCoils {
 		// Allocate Arrays
 		if ( NumVarSpeedCoils > 0 ) {
 			VarSpeedCoil.allocate( NumVarSpeedCoils );
-			DataHeatBalance::HeatReclaimVS_DXCoil( NumVarSpeedCoils );
+			DataHeatBalance::HeatReclaimVS_DXCoil.allocate( NumVarSpeedCoils );
 		}
 
 		GetObjectDefMaxArgs( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums );
@@ -1018,7 +1018,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			// Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
 			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name = VarSpeedCoil( DXCoilNum ).Name;
-			DataHeatBalance::HeatReclaimDXCoil( DXCoilNum ).SourceType = CurrentModuleObject;
+			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).SourceType = CurrentModuleObject;
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_CoolingAirToAirVariableSpeed;
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
