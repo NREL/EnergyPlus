@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -80,6 +68,7 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DaylightingManager;
 using namespace EnergyPlus::DataDaylighting;
+using namespace EnergyPlus::DataSurfaces;
 
 TEST_F( EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test )
 {
@@ -718,4 +707,38 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test )
 	EXPECT_NEAR( 3.048, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 1, 1 ), 0.001 );
 	EXPECT_NEAR( -2.048, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 2, 1 ), 0.001 );
 	EXPECT_NEAR( 0.9, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 3, 1 ), 0.001 );
+}
+
+TEST_F (EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
+{
+
+	Surface.allocate(1);
+	Surface(1).Tilt = 90.0;
+	Surface(1).Azimuth = 180.0;
+	int horiz = 1;
+	int vert = 2;
+	Real64 ProfAng;
+	Vector3< Real64 > CosDirSun; // Solar direction cosines
+
+	CosDirSun (1) = 0.882397;
+	CosDirSun (2) = 0.470492;
+	CosDirSun (3) = 0.003513;
+
+	ProfileAngle(1, CosDirSun, horiz, ProfAng);
+	EXPECT_NEAR(0.00747,ProfAng, 0.00001);
+
+	ProfileAngle(1, CosDirSun, vert, ProfAng);
+	EXPECT_NEAR(2.06065, ProfAng, 0.00001);
+
+
+	CosDirSun(1) = 0.92318;
+	CosDirSun(2) = 0.36483;
+	CosDirSun(3) = 0.12094;
+
+	ProfileAngle(1, CosDirSun, horiz, ProfAng);
+	EXPECT_NEAR(0.32010, ProfAng, 0.00001);
+
+	ProfileAngle(1, CosDirSun, vert, ProfAng);
+	EXPECT_NEAR(1.94715, ProfAng, 0.00001);
+
 }

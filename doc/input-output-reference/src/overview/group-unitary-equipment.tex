@@ -888,6 +888,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   Coil:Heating:Fuel,
       Furnace Heating Coil 1,         !- Coil Name
       FanAndCoilAvailSched,           !- Availability Schedule Name
+      NaturalGas,                     !- Fuel Type
       0.8,    !- Gas Burner Efficiency of the Coil
       25000,  !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
@@ -1130,6 +1131,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
     Coil:Heating:Fuel,
       Unitary System Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,           !- Availability Schedule Name
+      NaturalGas,                     !- Fuel Type
       0.8,    !- Gas Burner Efficiency of the Coil
       25000,  !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
@@ -1415,6 +1417,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
      Coil:Heating:Fuel,
         Heat Pump DX Supp Heating Coil 1, ! Name of heating coil
         FanAndCoilAvailSched,             ! Availability schedule
+        NaturalGas,                       ! Fuel Type
         0.8 ,                             ! Gas Burner Efficiency of the Coil
         32000,                            ! Nominal Capacity of the Coil [W]
         SuppHeating Coil Air Inlet Node,  ! Supplementary heating coil air side inlet node
@@ -1838,6 +1841,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
   Coil:Heating:Fuel,
       Supp Gas Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency of the Coil
       45000,                   !- Nominal Capacity of the Coil {W}
       SuppHeating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
@@ -2117,6 +2121,7 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
     Coil:Heating:Fuel,
       Furnace Coil,          !- Coil Name
       FanAndCoilAvailSched,  !- Availability Schedule Name
+      NaturalGas,            !- Fuel Type
       0.8,                   !- Gas Burner Efficiency of the Coil
       20000,                 !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
@@ -2292,6 +2297,7 @@ AirLoopHVAC:UnitaryHeatOnly,
     Coil:Heating:Fuel,
       Unitary System Heating Coil, !- Coil Name
       FanAndCoilAvailSched,        !- Availability Schedule Name
+      NaturalGas,                 !- Fuel Type
       0.8,                         !- Gas Burner Efficiency of the Coil
       20000,                       !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
@@ -2683,6 +2689,7 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
     Coil:Heating:Fuel,
       Heat Pump DX Supp Heating Coil 1,  !- Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency
       32000,                   !- Nominal Capacity {W}
       SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -3074,6 +3081,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
   Coil:Heating:Fuel,
       Furnace Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency of the Coil
       35000,                   !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
