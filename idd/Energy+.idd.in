@@ -42872,7 +42872,7 @@ Coil:Cooling:DX:MultiSpeed,
        \type choice
        \key Electricity
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
@@ -45491,7 +45491,7 @@ Coil:Heating:DX:MultiSpeed,
        \type choice
        \key Electricity
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
