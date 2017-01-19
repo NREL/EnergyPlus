@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+ï»¿// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -1404,12 +1392,12 @@ namespace EconomicTariff {
 		monetaryUnit( 28 ).txt = "kr";
 		monetaryUnit( 29 ).txt = "RD$";
 		monetaryUnit( 30 ).txt = "kr";
-		monetaryUnit( 31 ).txt = "£";
+		monetaryUnit( 31 ).txt = "ï¿½";
 		monetaryUnit( 32 ).txt = "EUR";
 		monetaryUnit( 33 ).txt = "$";
-		monetaryUnit( 34 ).txt = "£";
-		monetaryUnit( 35 ).txt = "¢";
-		monetaryUnit( 36 ).txt = "£";
+		monetaryUnit( 34 ).txt = "ï¿½";
+		monetaryUnit( 35 ).txt = "ï¿½";
+		monetaryUnit( 36 ).txt = "ï¿½";
 		monetaryUnit( 37 ).txt = "Q";
 		monetaryUnit( 38 ).txt = "$";
 		monetaryUnit( 39 ).txt = "HK$";
@@ -1418,13 +1406,13 @@ namespace EconomicTariff {
 		monetaryUnit( 42 ).txt = "Ft";
 		monetaryUnit( 43 ).txt = "Rp";
 		monetaryUnit( 44 ).txt = "ILS";
-		monetaryUnit( 45 ).txt = "£";
+		monetaryUnit( 45 ).txt = "ï¿½";
 		monetaryUnit( 46 ).txt = "INR";
 		monetaryUnit( 47 ).txt = "IRR";
 		monetaryUnit( 48 ).txt = "kr";
-		monetaryUnit( 49 ).txt = "£";
+		monetaryUnit( 49 ).txt = "ï¿½";
 		monetaryUnit( 50 ).txt = "J$";
-		monetaryUnit( 51 ).txt = "¥";
+		monetaryUnit( 51 ).txt = "ï¿½";
 		monetaryUnit( 52 ).txt = "KGS";
 		monetaryUnit( 53 ).txt = "KHR";
 		monetaryUnit( 54 ).txt = "KPW";
@@ -1432,7 +1420,7 @@ namespace EconomicTariff {
 		monetaryUnit( 56 ).txt = "$";
 		monetaryUnit( 57 ).txt = "KZT";
 		monetaryUnit( 58 ).txt = "LAK";
-		monetaryUnit( 59 ).txt = "£";
+		monetaryUnit( 59 ).txt = "ï¿½";
 		monetaryUnit( 60 ).txt = "LKR";
 		monetaryUnit( 61 ).txt = "$";
 		monetaryUnit( 62 ).txt = "Lt";
@@ -1465,11 +1453,11 @@ namespace EconomicTariff {
 		monetaryUnit( 89 ).txt = "SCR";
 		monetaryUnit( 90 ).txt = "kr";
 		monetaryUnit( 91 ).txt = "$";
-		monetaryUnit( 92 ).txt = "£";
+		monetaryUnit( 92 ).txt = "ï¿½";
 		monetaryUnit( 93 ).txt = "S";
 		monetaryUnit( 94 ).txt = "$";
 		monetaryUnit( 95 ).txt = "$";
-		monetaryUnit( 96 ).txt = "£";
+		monetaryUnit( 96 ).txt = "ï¿½";
 		monetaryUnit( 97 ).txt = "THB";
 		monetaryUnit( 98 ).txt = "TRL";
 		monetaryUnit( 99 ).txt = "YTL";
@@ -1516,12 +1504,12 @@ namespace EconomicTariff {
 		monetaryUnit( 28 ).html = "kr";
 		monetaryUnit( 29 ).html = "RD$";
 		monetaryUnit( 30 ).html = "kr";
-		monetaryUnit( 31 ).html = "£";
+		monetaryUnit( 31 ).html = "ï¿½";
 		monetaryUnit( 32 ).html = "&#x20ac;";
 		monetaryUnit( 33 ).html = "$";
-		monetaryUnit( 34 ).html = "£";
-		monetaryUnit( 35 ).html = "¢";
-		monetaryUnit( 36 ).html = "£";
+		monetaryUnit( 34 ).html = "ï¿½";
+		monetaryUnit( 35 ).html = "ï¿½";
+		monetaryUnit( 36 ).html = "ï¿½";
 		monetaryUnit( 37 ).html = "Q";
 		monetaryUnit( 38 ).html = "$";
 		monetaryUnit( 39 ).html = "HK$";
@@ -1530,13 +1518,13 @@ namespace EconomicTariff {
 		monetaryUnit( 42 ).html = "Ft";
 		monetaryUnit( 43 ).html = "Rp";
 		monetaryUnit( 44 ).html = "&#x20aa;";
-		monetaryUnit( 45 ).html = "£";
+		monetaryUnit( 45 ).html = "ï¿½";
 		monetaryUnit( 46 ).html = "&#x20a8;";
 		monetaryUnit( 47 ).html = "&#xfdfc;";
 		monetaryUnit( 48 ).html = "kr";
-		monetaryUnit( 49 ).html = "£";
+		monetaryUnit( 49 ).html = "ï¿½";
 		monetaryUnit( 50 ).html = "J$";
-		monetaryUnit( 51 ).html = "¥";
+		monetaryUnit( 51 ).html = "ï¿½";
 		monetaryUnit( 52 ).html = "&#x043b;&#x0432;";
 		monetaryUnit( 53 ).html = "&#x17db;";
 		monetaryUnit( 54 ).html = "&#x20a9;";
@@ -1544,7 +1532,7 @@ namespace EconomicTariff {
 		monetaryUnit( 56 ).html = "$";
 		monetaryUnit( 57 ).html = "&#x043b;&#x0432;";
 		monetaryUnit( 58 ).html = "&#x20ad;";
-		monetaryUnit( 59 ).html = "£";
+		monetaryUnit( 59 ).html = "ï¿½";
 		monetaryUnit( 60 ).html = "&#x20a8;";
 		monetaryUnit( 61 ).html = "$";
 		monetaryUnit( 62 ).html = "Lt";
@@ -1577,11 +1565,11 @@ namespace EconomicTariff {
 		monetaryUnit( 89 ).html = "&#x20a8;";
 		monetaryUnit( 90 ).html = "kr";
 		monetaryUnit( 91 ).html = "$";
-		monetaryUnit( 92 ).html = "£";
+		monetaryUnit( 92 ).html = "ï¿½";
 		monetaryUnit( 93 ).html = "S";
 		monetaryUnit( 94 ).html = "$";
 		monetaryUnit( 95 ).html = "$";
-		monetaryUnit( 96 ).html = "£";
+		monetaryUnit( 96 ).html = "ï¿½";
 		monetaryUnit( 97 ).html = "&#x0e3f;";
 		monetaryUnit( 98 ).html = "&#x20a4;";
 		monetaryUnit( 99 ).html = "YTL";
