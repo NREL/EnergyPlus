@@ -42868,6 +42868,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
   A12, \field Fuel Type
+       \required-field
        \type choice
        \key Electricity
        \key NaturalGas
@@ -42878,7 +42879,6 @@ Coil:Cooling:DX:MultiSpeed,
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-       \default NaturalGas
   N5 , \field Number of Speeds
        \required-field
        \type integer
@@ -45487,6 +45487,7 @@ Coil:Heating:DX:MultiSpeed,
        \key No
        \default No
   A9 , \field Fuel Type
+       \required-field
        \type choice
        \key Electricity
        \key NaturalGas
@@ -45497,7 +45498,6 @@ Coil:Heating:DX:MultiSpeed,
        \key FuelOil#2
        \key OtherFuel1
        \key OtherFuel2
-       \default NaturalGas
   N8,  \field Region number for Calculating HSPF
        \type integer
        \minimum 1
