@@ -1548,7 +1548,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( allocated( TComfortControlTypes ) ) TComfortControlTypes.deallocate();
 
 		// Get the Hybrid Model setting inputs
-		CheckAndReadHybridModelZone();
+		GetHybridModelZone();
 		
 		// Default multiplier values
 		Real64 ZoneVolCapMultpSens = 1.0;
@@ -1577,14 +1577,7 @@ namespace ZoneTempPredictorCorrector {
 			// Assign the user inputted multipliers to specified zones
 			for ( int ZoneCapNum = 1; ZoneCapNum <= NumZoneCapaMultiplier; ZoneCapNum++ ) {
 				GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				// IsNotOK = false;
-				// IsBlank = false;
-				// 
-				// VerifyName( cAlphaArgs( 1 ), ZoneCapMultiplierResearchSpecial, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				// if ( IsNotOK ) {
-				// 	ErrorsFound = true;
-				// 	if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				// }
+
 				ZoneCapMultiplierResearchSpecial( Item ).Name = cAlphaArgs( 1 );
 				
 				if( lAlphaFieldBlanks( 2 )){
@@ -1626,7 +1619,7 @@ namespace ZoneTempPredictorCorrector {
 			// Assign default multiplier values to all the other zones
 			for( int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++ ){
 				if( ! Zone( ZoneNum ).FlagCustomizedZoneCap ){
-					Zone(ZoneNum).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
+					Zone( ZoneNum ).ZoneVolCapMultpSens = ZoneVolCapMultpSens;
 					Zone( ZoneNum ).ZoneVolCapMultpMoist = ZoneVolCapMultpMoist;
 					Zone( ZoneNum ).ZoneVolCapMultpCO2 = ZoneVolCapMultpCO2;
 					Zone( ZoneNum ).ZoneVolCapMultpGenContam = ZoneVolCapMultpGenContam;
@@ -2835,9 +2828,7 @@ namespace ZoneTempPredictorCorrector {
 
 			}
 
-
-
-			AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)) / (TimeStepSys * SecInHour);
+			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 			AirCap = AIRRAT( ZoneNum );
 			RAFNFrac = 0.0;
 
@@ -3905,15 +3896,15 @@ namespace ZoneTempPredictorCorrector {
 		static int ZoneNum( 0 );
 		static int ZoneNodeNum( 0 ); // System node number for air flow through zone either by system or as a plenum
 		
-		// Added for hybrid model by Sang Hoon Lee, July 2015
+		// Hybrid Modeling
 		static int HMStartDay( 0 ); // Temporary date   
 		static int HMEndDay( 0 ); // Temporary date   
-		static int HybridModelStartMonth ( 0 ); // Hybrid start month 
-		static int HybridModelStartDate( 0 ); // Hybrid start date of month 
-		static int HybridModelEndMonth( 0 ); // Hybrid end month 
-		static int HybridModelEndDate( 0 ); // Hybrid end date of month 
-		static int HybridStartDayOfYear( 0 ); // Hybrid start date of year 
-		static int HybridEndDayOfYear( 0 ); // Hybrid end date of year 
+		static int HybridModelStartMonth ( 0 ); // Hybrid model start month 
+		static int HybridModelStartDate( 0 ); // Hybrid model start date of month 
+		static int HybridModelEndMonth( 0 ); // Hybrid model end month 
+		static int HybridModelEndDate( 0 ); // Hybrid model end date of month 
+		static int HybridStartDayOfYear( 0 ); // Hybrid model start date of year 
+		static int HybridEndDayOfYear( 0 ); // Hybrid model end date of year 
 		Real64 HMMultiplierAverage ( 1.0 );
 		static Real64 MultpHM( 1.0 );
 		static Real64 InfilOAACHHM( 0.0 );
@@ -4160,17 +4151,17 @@ namespace ZoneTempPredictorCorrector {
 					if ( HybridModelZone( ZoneNum ).InfiltrationCalc && SumSysMCpT == 0 && UseZoneTimeStepHistory ){ // HM calculation only when SumSysMCpT =0, TimeStepZone (not @ TimeStepSys)
 
 						// Calculate MCPI used for hybrid modeling included in TempIndCoef and TempDepCoef
-						double a = Zone( ZoneNum ).OutDryBulbTemp;
-						double b = SumIntGain + SumHATsurf - SumHATref + MCPTV( ZoneNum ) + MCPTM( ZoneNum ) + MCPTE( ZoneNum ) + MCPTC( ZoneNum ) + MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp;
-						double c = SumHA + MCPV( ZoneNum ) + MCPM( ZoneNum ) + MCPE( ZoneNum ) + MCPC( ZoneNum ) + MDotCPOA( ZoneNum );
-						double d = AirCap;
+						Real64 a = Zone( ZoneNum ).OutDryBulbTemp;
+						Real64 b = SumIntGain + SumHATsurf - SumHATref + MCPTV( ZoneNum ) + MCPTM( ZoneNum ) + MCPTE( ZoneNum ) + MCPTC( ZoneNum ) + MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp;
+						Real64 c = SumHA + MCPV( ZoneNum ) + MCPM( ZoneNum ) + MCPE( ZoneNum ) + MCPC( ZoneNum ) + MDotCPOA( ZoneNum );
+						Real64 d = AirCap;
 						//Use3rdOrder
-						double AA = b + d * (3.0 * PreviousMeasuredZT1( ZoneNum ) - ( 3.0 / 2.0 ) * PreviousMeasuredZT2( ZoneNum ) + ( 1.0 / 3.0 ) * PreviousMeasuredZT3( ZoneNum ) );
-						double BB = ( 11.0 / 6.0 ) * d + c;
-						double InfilVolumeOADensityHM;
-						double AirDensity;
-						double CpAir;
-						double MCPIHM;
+						Real64 AA = b + d * ( 3.0 * PreviousMeasuredZT1( ZoneNum ) - ( 3.0 / 2.0 ) * PreviousMeasuredZT2( ZoneNum ) + ( 1.0 / 3.0 ) * PreviousMeasuredZT3( ZoneNum ) );
+						Real64 BB = ( 11.0 / 6.0 ) * d + c;
+						Real64 InfilVolumeOADensityHM;
+						Real64 AirDensity;
+						Real64 CpAir;
+						Real64 MCPIHM;
 						static std::string const RoutineNameInfiltration( "CalcAirFlowSimple:Infiltration" );
 
      					CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneNum ).OutDryBulbTemp );

@@ -219,7 +219,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	extern Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
 	extern Array1D< Real64 > ZTM3; // zone air temperature at previous T-3
-	// Added by Sang Hoon Lee, Aug 2016 for Hybrid Modeling
+	// Hybrid Modeling
 	extern Array1D< Real64 > PreviousMeasuredZT1; // Measured zone air temperature at previous timestep1
 	extern Array1D< Real64 > PreviousMeasuredZT2; // Measured zone air temperature at previous timestep2
 	extern Array1D< Real64 > PreviousMeasuredZT3; // Measured zone air temperature at previous timestep3

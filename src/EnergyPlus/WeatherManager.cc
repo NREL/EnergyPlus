@@ -6315,7 +6315,6 @@ Label9999: ;
 		int NumNumbers;
 
 		cCurrentModuleObject = "RunPeriodControl:DaylightSavingTime";
-
 		NumFound = GetNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumFound == 1 ) {

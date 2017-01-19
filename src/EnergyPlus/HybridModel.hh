@@ -58,7 +58,7 @@ namespace HybridModel {
 	// Functions
 
 	void
-	CheckAndReadHybridModelZone();
+	GetHybridModelZone();
 
 } // HybridModel
 

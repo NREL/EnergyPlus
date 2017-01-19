@@ -83,16 +83,16 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL ===========
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
-	,                        !- MultiplierName
+	Multiplier1,             !- MultiplierName
 	ZONE 1,                  !- Zone or ZoneList Name
-	,                       !- Temperature Capacity Multiplier
+	,                        !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
 	,                        !- Carbon Dioxide Capacity Multiplier
 	;                        !- Generic Contaminant Capacity Multiplier
 
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
-	,                        !- MultiplierName
+	Multiplier2,             !- MultiplierName
 	ZONE 2,                  !- Zone or ZoneList Name
     5,                       !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
@@ -101,7 +101,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
 
 	
 ZoneCapacitanceMultiplier:ResearchSpecial,
-	,                        !- MultiplierName
+	Multiplier3,             !- MultiplierName
 	ZONE 3,                  !- Zone or ZoneList Name
     8,                       !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
@@ -110,7 +110,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
 
 	
 ZoneCapacitanceMultiplier:ResearchSpecial,
-    ,                        !- MultiplierName
+    Multiplier4,             !- MultiplierName
 	ZONE 4,                  !- Zone or ZoneList Name
 	12,                      !- Temperature Capacity Multiplier
 	,                        !- Humidity Capacity Multiplier
@@ -121,9 +121,9 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION:DESIGNFLOWRATE ===========
   
 ZoneInfiltration:DesignFlowRate,
-    ZONE 1 Infil,  !- Name
-    ZONE 1,        !- Zone or ZoneList Name
-    INFIL-SCHED,                !- Schedule Name
+    ZONE 1 Infil,            !- Name
+    ZONE 1,                  !- Zone or ZoneList Name
+    INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
@@ -135,9 +135,9 @@ ZoneInfiltration:DesignFlowRate,
     0.0000;                  !- Velocity Squared Term Coefficient
   
 ZoneInfiltration:DesignFlowRate,
-    ZONE 2 Infil,  !- Name
-    ZONE 2,        !- Zone or ZoneList Name
-    INFIL-SCHED,                !- Schedule Name
+    ZONE 2 Infil,            !- Name
+    ZONE 2,                  !- Zone or ZoneList Name
+    INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
@@ -149,9 +149,9 @@ ZoneInfiltration:DesignFlowRate,
     0.0000;                  !- Velocity Squared Term Coefficient
 
 ZoneInfiltration:DesignFlowRate,
-    ZONE 3 Infil,  !- Name
-    ZONE 3,        !- Zone or ZoneList Name
-    INFIL-SCHED,                !- Schedule Name
+    ZONE 3 Infil,            !- Name
+    ZONE 3,                  !- Zone or ZoneList Name
+    INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
@@ -163,9 +163,9 @@ ZoneInfiltration:DesignFlowRate,
     0.0000;                  !- Velocity Squared Term Coefficient
 	
 ZoneInfiltration:DesignFlowRate,
-    ZONE 4 Infil,  !- Name
-    ZONE 4,        !- Zone or ZoneList Name
-    INFIL-SCHED,                !- Schedule Name
+    ZONE 4 Infil,            !- Name
+    ZONE 4,                  !- Zone or ZoneList Name
+    INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
     ,                        !- Flow per Zone Floor Area {m3/s-m2}
@@ -199,7 +199,7 @@ HybridModel:Zone,
 	ZONE 1 HybridModel,      !- Name
 	ZONE 1,                  !- Zone or ZoneList Name
 	NO,                      !- Calculate Zone Internal Thermal Mass
-	NO,                     !- Calculate Zone Air Infiltration Rate
+	NO,                      !- Calculate Zone Air Infiltration Rate
 	ZONE 1_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
 	1,                       !- Begin Month
 	1,                       !- Begin Day of Month
@@ -220,8 +220,8 @@ HybridModel:Zone,
 HybridModel:Zone,
 	ZONE 3 HybridModel,      !- Name
 	ZONE 3,                  !- Zone or ZoneList Name
-	YES,                      !- Calculate Zone Internal Thermal Mass
-	NO,                     !- Calculate Zone Air Infiltration Rate
+	YES,                     !- Calculate Zone Internal Thermal Mass
+	NO,                      !- Calculate Zone Air Infiltration Rate
 	ZONE 3_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
 	1,                       !- Begin Month
 	1,                       !- Begin Day of Month
@@ -231,8 +231,8 @@ HybridModel:Zone,
 HybridModel:Zone,
 	ZONE 4 HybridModel,      !- Name
 	ZONE 4,                  !- Zone or ZoneList Name
-	YES,                      !- Calculate Zone Internal Thermal Mass
-	NO,                     !- Calculate Zone Air Infiltration Rate
+	YES,                     !- Calculate Zone Internal Thermal Mass
+	NO,                      !- Calculate Zone Air Infiltration Rate
 	ZONE 4_MeasuredTemperature,  !- Zone Measured Air Temperature Schedule Name
 	1,                       !- Begin Month
 	1,                       !- Begin Day of Month

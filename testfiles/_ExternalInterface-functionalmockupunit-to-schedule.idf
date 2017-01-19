@@ -383,7 +383,7 @@
     259.2;                   !- Volume {m3}
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    ,      					 !- Name
+    Multiplier,              !- Name
 	,                 		 !- Zone or ZoneList Name
 	1.2,                     !- Temperature Capacity Multiplier
     1.2,                     !- Humidity Capacity Multiplier

@@ -120,7 +120,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL ===========
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    ,      					 !- Name
+    Multiplier,              !- Name
 	,                 		 !- Zone or ZoneList Name
 	1,                       !- Temperature Capacity Multiplier
     1,                       !- Humidity Capacity Multiplier

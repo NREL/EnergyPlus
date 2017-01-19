@@ -123,7 +123,6 @@ extern "C" {
 #include <HVACControllers.hh>
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
-#include <HybridModel.hh>
 #include <InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
@@ -296,7 +295,6 @@ namespace SimulationManager {
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
 		using FaultsManager::CheckAndReadFaults;
-		using namespace HybridModel;
 		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -367,7 +365,7 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 		createFacilityElectricPowerServiceObject();
-		
+
 		ManageBranchInput(); // just gets input and returns.
 
 		DoingSizing = true;

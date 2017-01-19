@@ -25,7 +25,7 @@ namespace HybridModel {
 	// This module manages hybrid model.
 
 	// METHODOLOGY EMPLOYED:
-	//  The model uses measured zone air temperature to calculate internal thermal mass and infiltration air flow rate.
+	//  The model uses measured zone air temperature to calculate internal thermal mass or infiltration air flow rate.
 
 	// USE STATEMENTS:
 
@@ -52,7 +52,7 @@ namespace HybridModel {
 	// Functions
 
 	void
-	CheckAndReadHybridModelZone()
+	GetHybridModelZone()
 	{
 
 		using ScheduleManager::GetScheduleIndex;

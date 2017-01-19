@@ -127,7 +127,7 @@
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    ,      					 !- Name
+    Multiplier,              !- Name
 	,                 		 !- Zone or ZoneList Name
 	1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier

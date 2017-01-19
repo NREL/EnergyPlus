@@ -723,6 +723,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
        \memo Multiplier altering the relative capacitance of the air compared to an empty zone
        \min-fields 6
   A1 , \field Name
+       \required-field
        \type alpha
   A2 , \field Zone or ZoneList Name
        \type object-list
@@ -81642,7 +81643,6 @@ Matrix:TwoDimension,
 
 HybridModel:Zone,
        \memo Zones with measured air temperature data and a range of dates.
-       \memo A range of dates may differ from zones.
   A1 , \field Name
        \required-field
        \type alpha

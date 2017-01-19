@@ -1374,7 +1374,7 @@ namespace DataHeatBalance {
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
-		// Added for hybrid modeling by Sang Hoon Lee, May 2015
+		// Hybrid Modeling
 		bool FlagHMInternalThermalMass; // True if hybrid modeling (Internal thermal mass calculations) is used for the Zone
 		bool FlagHMInfiltration;  // True if hybrid modeling (Infiltration calculations) is used for the Zone
 		Real64 ZoneMeasuredTemperature; // Measured zone air temperature input by user
@@ -1454,7 +1454,7 @@ namespace DataHeatBalance {
 			ZoneMinCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
 			FlagCustomizedZoneCap( false ),
-			// Added for hybrid modeling by Sang Hoon Lee, Sep 2016
+			// Hybrid Modeling
 			FlagHMInternalThermalMass( false ),
 			FlagHMInfiltration( false ),
 			ZoneMeasuredTemperature( 0.0 ),

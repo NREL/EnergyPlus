@@ -2251,12 +2251,12 @@ namespace HVACManager {
 			}
 
 			// first calculate mass flows using outside air heat capacity for consistency with input to heat balance
-			CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneLoop ).OutDryBulbTemp );			
+			CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneLoop ).OutDryBulbTemp );
 			ZnAirRpt( ZoneLoop ).InfilMass = ( MCPI( ZoneLoop ) / CpAir ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 			ZnAirRpt( ZoneLoop ).InfilMdot = ( MCPI( ZoneLoop ) / CpAir ) * ADSCorrectionFactor;
 			ZnAirRpt( ZoneLoop ).VentilMass = ( MCPV( ZoneLoop ) / CpAir ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 			ZnAirRpt( ZoneLoop ).VentilMdot = ( MCPV( ZoneLoop ) / CpAir ) * ADSCorrectionFactor;
-			
+
 			//CR7751  second, calculate using indoor conditions for density property
 			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneLoop ), ZoneAirHumRatAvg( ZoneLoop ), RoutineName3 );
 			CpAir = PsyCpAirFnWTdb( ZoneAirHumRatAvg( ZoneLoop ), MAT( ZoneLoop ) );
