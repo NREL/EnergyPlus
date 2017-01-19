@@ -44944,7 +44944,7 @@ Coil:Heating:Fuel,
        \type choice
        \key Gas
        \key NaturalGas
-       \key PropaneGas
+       \key Propane
        \key Diesel
        \key Gasoline
        \key FuelOil#1
