@@ -83,40 +83,36 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL ===========
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
-	Multiplier1,             !- MultiplierName
-	ZONE 1,                  !- Zone or ZoneList Name
-	,                        !- Temperature Capacity Multiplier
-	,                        !- Humidity Capacity Multiplier
-	,                        !- Carbon Dioxide Capacity Multiplier
-	;                        !- Generic Contaminant Capacity Multiplier
-
+    Multiplier1,             !- MultiplierName
+    ZONE 1,                  !- Zone or ZoneList Name
+    ,                        !- Temperature Capacity Multiplier
+    ,                        !- Humidity Capacity Multiplier
+    ,                        !- Carbon Dioxide Capacity Multiplier
+    ;                        !- Generic Contaminant Capacity Multiplier
 
 ZoneCapacitanceMultiplier:ResearchSpecial,
-	Multiplier2,             !- MultiplierName
-	ZONE 2,                  !- Zone or ZoneList Name
+    Multiplier2,             !- MultiplierName
+    ZONE 2,                  !- Zone or ZoneList Name
     5,                       !- Temperature Capacity Multiplier
-	,                        !- Humidity Capacity Multiplier
-	,                        !- Carbon Dioxide Capacity Multiplier
-	;                        !- Generic Contaminant Capacity Multiplier
-
+    ,                        !- Humidity Capacity Multiplier
+    ,                        !- Carbon Dioxide Capacity Multiplier
+    ;                        !- Generic Contaminant Capacity Multiplier
 	
 ZoneCapacitanceMultiplier:ResearchSpecial,
-	Multiplier3,             !- MultiplierName
-	ZONE 3,                  !- Zone or ZoneList Name
+    Multiplier3,             !- MultiplierName
+    ZONE 3,                  !- Zone or ZoneList Name
     8,                       !- Temperature Capacity Multiplier
-	,                        !- Humidity Capacity Multiplier
-	,                        !- Carbon Dioxide Capacity Multiplier
-	;                        !- Generic Contaminant Capacity Multiplier
-
+    ,                        !- Humidity Capacity Multiplier
+    ,                        !- Carbon Dioxide Capacity Multiplier
+    ;                        !- Generic Contaminant Capacity Multiplier
 	
 ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier4,             !- MultiplierName
-	ZONE 4,                  !- Zone or ZoneList Name
-	12,                      !- Temperature Capacity Multiplier
-	,                        !- Humidity Capacity Multiplier
-	,                        !- Carbon Dioxide Capacity Multiplier
-	;                        !- Generic Contaminant Capacity Multiplier
-
+    ZONE 4,                  !- Zone or ZoneList Name
+    12,                      !- Temperature Capacity Multiplier
+    ,                        !- Humidity Capacity Multiplier
+    ,                        !- Carbon Dioxide Capacity Multiplier
+    ;                        !- Generic Contaminant Capacity Multiplier
   
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION:DESIGNFLOWRATE ===========
   

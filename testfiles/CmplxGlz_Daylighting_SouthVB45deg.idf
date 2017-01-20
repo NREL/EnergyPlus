@@ -118,8 +118,8 @@
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier,              !- Name
-	,                 		 !- Zone or ZoneList Name
-	1,                       !- Temperature Capacity Multiplier
+    ,                        !- Zone or ZoneList Name
+    1,                       !- Temperature Capacity Multiplier
     1,                       !- Humidity Capacity Multiplier
     1,                       !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
