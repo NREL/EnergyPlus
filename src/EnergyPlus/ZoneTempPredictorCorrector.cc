@@ -493,7 +493,6 @@ namespace ZoneTempPredictorCorrector {
 		// Object Data
 		Array1D< NeededControlTypes > TStatControlTypes;
 		Array1D< NeededComfortControlTypes > TComfortControlTypes;
-		Array1D< ZoneCapMultiplierData > ZoneCapMultiplierResearchSpecial;
 
 		// Formats
 		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
@@ -1569,17 +1568,13 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		} else {
-		// Allow user to specify ZoneCapacitanceMultiplier:ResearchSpecial at zone level
-		// Added by S. Lee and R. Zhang in Oct. 2016.
-
-			ZoneCapMultiplierResearchSpecial.allocate( NumZoneCapaMultiplier );
-
+		
+			// Allow user to specify ZoneCapacitanceMultiplier:ResearchSpecial at zone level
+			// Added by S. Lee and R. Zhang in Oct. 2016.
 			// Assign the user inputted multipliers to specified zones
 			for ( int ZoneCapNum = 1; ZoneCapNum <= NumZoneCapaMultiplier; ZoneCapNum++ ) {
 				GetObjectItem( cCurrentModuleObject, ZoneCapNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				ZoneCapMultiplierResearchSpecial( Item ).Name = cAlphaArgs( 1 );
-				
 				if( lAlphaFieldBlanks( 2 )){
 				// default multiplier values for all the zones not specified
 					ZoneVolCapMultpSens = rNumericArgs( 1 );

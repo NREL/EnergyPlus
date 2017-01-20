@@ -1280,25 +1280,6 @@ namespace DataHeatBalance {
 		{}
 
 	};
-	
-	struct ZoneCapMultiplierData
-	{
-		// Members
-		std::string Name;
-		Real64 ZoneVolCapMultpSens; //Temperature capacity multiplier
-		Real64 ZoneVolCapMultpMoist; //Moist capacity multiplier
-		Real64 ZoneVolCapMultpCO2; //CO2 capacity multiplier
-		Real64 ZoneVolCapMultpGenContam; //Contam capacity multiplier
-	
-		// Default Constructor
-		ZoneCapMultiplierData() :
-			ZoneVolCapMultpSens( 1.0 ), 
-			ZoneVolCapMultpMoist( 1.0 ), 
-			ZoneVolCapMultpCO2( 1.0 ), 
-			ZoneVolCapMultpGenContam( 1.0 ) 
-		{}
-	
-	};
 
 	struct ZoneData
 	{

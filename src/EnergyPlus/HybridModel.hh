@@ -38,6 +38,8 @@ namespace HybridModel {
 		int ZoneMeasuredTemperatureStartDate;
 		int ZoneMeasuredTemperatureEndMonth;
 		int ZoneMeasuredTemperatureEndDate;
+		int HybridStartDayOfYear; // Hybrid model start date of year 
+		int	HybridEndDayOfYear; // Hybrid model end date of year 
 
 		// Default Constructor
 		HybridModelProperties() :
