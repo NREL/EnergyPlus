@@ -608,9 +608,9 @@ void KivaManager::defineDefaultFoundation() {
   defFnd.wall.heightAboveGrade = 0.2; // m
 
   Kiva::Material concrete;
-  concrete.conductivity = 1.98;  // W/m-K
-  concrete.density = 1900;  // kg/m3
-  concrete.specificHeat = 1800;  // J/kg-K
+  concrete.conductivity = 1.95;  // W/m-K
+  concrete.density = 2400;  // kg/m3
+  concrete.specificHeat = 900;  // J/kg-K
 
   Kiva::Layer defaultFoundationWall;
   defaultFoundationWall.thickness = 0.3; // m
