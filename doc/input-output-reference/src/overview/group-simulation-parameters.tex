@@ -743,7 +743,7 @@ SimulationControl,
 
 \subsection{Meter:Custom}\label{metercustom}
 
-A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar.
+A custom meter allows the user to group variables or meters onto a virtual meter that can be used just like a normal meter created by EnergyPlus. For consistency, the items being grouped must all be similar. A Meter:Custom cannot reference another Meter:Custom.
 
 \subsubsection{Inputs}\label{inputs-17-008}
 
@@ -794,7 +794,7 @@ A key name field is used when the following field specifies an output variable. 
 
 \paragraph{Field: Output Variable or Meter Name \#}\label{field-output-variable-or-meter-name}
 
-This field must be a valid output variable name or a valid meter name.
+This field must be a valid output variable name or a valid meter name. If a Meter:Custom references another Meter:Custom it will generate a warning and not product any output.
 
 \subsection{Meter:CustomDecrement}\label{metercustomdecrement}
 

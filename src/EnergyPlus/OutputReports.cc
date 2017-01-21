@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -1750,15 +1738,18 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	std::string AlgoName;
 
 	// Formats
-	static gio::Fmt Format_700( "('! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
-	static gio::Fmt Format_701( "('! <HeatTransfer/Shading/Frame/Divider_Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_700( "('! <Zone Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
+	static gio::Fmt Format_700b( "('! <Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
+	static gio::Fmt Format_701( "('! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_701b( "('! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_701c( "('! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
 	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
 	static gio::Fmt Format_7012( "(',#Sides')" );
 	static gio::Fmt Format_702( "('! <Units>,,,,,')" );
 	static gio::Fmt Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
 	static gio::Fmt Format_7022( "(',')" );
 	static gio::Fmt Format_703( "(A,',',A,',',I5)" );
-	static gio::Fmt Format_704( "(A,'_Surface,',A,',',A,',',A,',',A)" );
+	static gio::Fmt Format_704( "(A,' Surface,',A,',',A,',',A,',',A)" );
 	static gio::Fmt Format_7041( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','),A)" );
 	static gio::Fmt Format_7042( "(',',A)" );
 	static gio::Fmt Format_7044( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','))" );
@@ -1782,14 +1773,25 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	//!!!    Write Header lines for report
 	if ( RptType == 10 ) { // Details only
 		gio::write( unit, Format_700 );
+		gio::write( unit, Format_700b);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
 		gio::write( unit, Format_7011 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		gio::write(unit, Format_7011);
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
+		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
 		gio::write( unit, Format_7021 );
 	} else if ( RptType == 11 ) { // Details with Vertices
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
 		gio::write( unit, Format_710 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700b, flags); }
+		gio::write(unit, Format_710);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		gio::write(unit, Format_7011);
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
+		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7011, flags ); }
 		gio::write( unit, Format_707 );
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
@@ -1798,7 +1800,13 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	} else { // Vertices only
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700, flags ); }
 		gio::write( unit, Format_710 );
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_700b, flags); }
+		gio::write(unit, Format_710);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701, flags ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701b, flags); }
+		gio::write(unit, Format_7011);
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_701c, flags); }
+		gio::write(unit, Format_7011);
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7012, flags ); }
 		gio::write( unit, Format_707 );
 		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_702, flags ); }
@@ -1810,7 +1818,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 		if ( Surface( surf ).Zone != 0 ) break;
 	}
 	if ( ( surf - 1 ) > 0 ) {
-		gio::write( unit, Format_703 ) << "Shading_Surfaces" << "Number of Shading Surfaces" << surf - 1;
+		gio::write( unit, Format_703 ) << "Shading Surfaces" << "Number of Shading Surfaces" << surf - 1;
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != 0 ) break;
 			AlgoName = "None";
@@ -1856,7 +1864,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	}
 
 	for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-		gio::write( unit, Format_703 ) << "Zone_Surfaces" << Zone( ZoneNum ).Name << ( Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1 );
+		gio::write( unit, Format_703 ) << "Zone Surfaces" << Zone( ZoneNum ).Name << ( Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1 );
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != ZoneNum ) continue;
 			SolarDiffusing = "";
