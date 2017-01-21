@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,22 +43,17 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
 #include <Boilers.hh>
+#include <ChillerAbsorption.hh>
+#include <ChillerElectricEIR.hh>
+#include <ChillerIndirectAbsorption.hh>
 #include <ChillerReformulatedEIR.hh>
 #include <CondenserLoopTowers.hh>
 #include <CurveManager.hh>
+#include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <Fans.hh>
 #include <HeatingCoils.hh>
@@ -70,6 +62,7 @@
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACUnitarySystem.hh>
 #include <InputProcessor.hh>
+#include <PlantChillers.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
@@ -82,12 +75,15 @@ namespace FaultsManager {
 	// MODULE INFORMATION:
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
-	//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
-	//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
-	//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
-	//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
-	//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
-	//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
+	//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), LBNL. Added Fouling Coil fault
+	//                      Feb. 2015, Rongpeng Zhang, LBNL. Added Thermostat/Humidistat Offset faults
+	//                      Apr. 2015, Rongpeng Zhang, LBNL. Added Fouling Air Filter fault
+	//                      May. 2016, Rongpeng Zhang, LBNL. Added Chiller/Condenser Supply Water Temperature Sensor fault 
+	//                      Jun. 2016, Rongpeng Zhang, LBNL. Added Tower Scaling fault
+	//                      Jul. 2016, Rongpeng Zhang, LBNL. Added Coil Supply Air Temperature Sensor fault
+	//                      Oct. 2016, Rongpeng Zhang, LBNL. Added Fouling Boiler fault
+	//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
+	//                      Dec. 2016, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
@@ -109,7 +105,18 @@ namespace FaultsManager {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
-
+	
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this module should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		
+		bool RunFaultMgrOnceFlag( false ); // True if CheckAndReadFaults is already done
+		bool ErrorsFound( false ); // True if errors detected in input
+	}
+	
 	// ControllerTypeEnum
 	int const iController_AirEconomizer( 1001 );
 
@@ -118,7 +125,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 14 );
+	int const NumFaultTypes( 15 );
 	int const NumFaultTypesEconomizer( 5 );
 
 	// FaultTypeEnum
@@ -136,6 +143,7 @@ namespace FaultsManager {
 	int const iFault_Fouling_Tower( 112 );
 	int const iFault_TemperatureSensorOffset_CoilSupplyAir( 113 );
 	int const iFault_Fouling_Boiler( 114 );
+	int const iFault_Fouling_Chiller( 115 );
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -172,7 +180,8 @@ namespace FaultsManager {
 	"FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
 	"FaultModel:Fouling:CoolingTower",
 	"FaultModel:TemperatureSensorOffset:CoilSupplyAir",
-	"FaultModel:Fouling:Boiler"
+	"FaultModel:Fouling:Boiler",
+	"FaultModel:Fouling:Chiller"
 	} );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
@@ -197,7 +206,8 @@ namespace FaultsManager {
 	iFault_TemperatureSensorOffset_CondenserSupplyWater,
 	iFault_Fouling_Tower,
 	iFault_TemperatureSensorOffset_CoilSupplyAir,
-	iFault_Fouling_Boiler
+	iFault_Fouling_Boiler,
+	iFault_Fouling_Chiller
 	});
 
 	bool AnyFaultsInModel( false ); // True if there are operational faults in the model
@@ -213,6 +223,7 @@ namespace FaultsManager {
 	int NumFaultyTowerFouling( 0 );  // Total number of faulty Towers with Scaling
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
 	int NumFaultyBoilerFouling( 0 );  // Total number of faulty Boilers with Fouling
+	int NumFaultyChillerFouling( 0 );  // Total number of faulty Chillers with Fouling
 	
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -227,6 +238,7 @@ namespace FaultsManager {
 	Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 	Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
+	Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
 
 	// Functions
 
@@ -235,14 +247,17 @@ namespace FaultsManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Tianzhen Hong
+		//       AUTHOR         Tianzhen Hong, LBNL
 		//       DATE WRITTEN   August 2013
-		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
-		//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
-		//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
-		//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
-		//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
-		//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
+		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), LBNL. Added Fouling Coil fault
+		//                      Feb. 2015, Rongpeng Zhang, LBNL. Added Thermostat/Humidistat Offset faults
+		//                      Apr. 2015, Rongpeng Zhang, LBNL. Added Fouling Air Filter fault
+		//                      May. 2016, Rongpeng Zhang, LBNL. Added Chiller/Condenser Supply Water Temperature Sensor fault 
+		//                      Jun. 2016, Rongpeng Zhang, LBNL. Added Tower Scaling fault
+		//                      Jul. 2016, Rongpeng Zhang, LBNL. Added Coil Supply Air Temperature Sensor fault
+		//                      Oct. 2016, Rongpeng Zhang, LBNL. Added Fouling Boiler fault
+		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
+		//                      Dec. 2016, Rongpeng Zhang, LBNL. Added Fouling Evaporative Cooler fault
 		//       RE-ENGINEERED
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -275,15 +290,12 @@ namespace FaultsManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool RunFaultMgrOnceFlag( false );
-
-		static bool ErrorsFound( false ); // If errors detected in input
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int IOStatus;
 		Array1D_string cAlphaArgs( 10 ); // Alpha input items for object
-		static Array1D_bool lAlphaFieldBlanks( 10, false );
-		static Array1D_bool lNumericFieldBlanks( 10, false );
+		Array1D_bool lAlphaFieldBlanks( 10, false );
+		Array1D_bool lNumericFieldBlanks( 10, false );
 		Array1D_string cAlphaFieldNames( 10 );
 		Array1D_string cNumericFieldNames( 10 );
 		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
@@ -328,6 +340,9 @@ namespace FaultsManager {
 			} else if( i == 14 ) {
 				// 14th fault: Faulty Boiler with Fouling
 				NumFaultyBoilerFouling = NumFaultsTemp;  
+			} else if( i == 15 ) {
+				// 14th fault: Faulty Chiller with Fouling
+				NumFaultyChillerFouling = NumFaultsTemp;  
 			}
 		}
 	
@@ -353,8 +368,218 @@ namespace FaultsManager {
 		if( NumFaultyTowerFouling > 0 ) FaultsTowerFouling.allocate( NumFaultyTowerFouling );
 		if( NumFaultyCoilSATSensor > 0 ) FaultsCoilSATSensor.allocate( NumFaultyCoilSATSensor );
 		if( NumFaultyBoilerFouling > 0 ) FaultsBoilerFouling.allocate( NumFaultyBoilerFouling );
+		if( NumFaultyChillerFouling > 0 ) FaultsChillerFouling.allocate( NumFaultyChillerFouling );
 		
-		
+		// read faults input of Fault_type 115: Chiller Fouling
+		for ( int jFault_ChillerFouling = 1; jFault_ChillerFouling <= NumFaultyChillerFouling; ++jFault_ChillerFouling ) {
+
+			cFaultCurrentObject = cFaults( 15 ); // fault object string
+			GetObjectItem( cFaultCurrentObject, jFault_ChillerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			
+			FaultsChillerFouling( jFault_ChillerFouling ).FaultType = cFaultCurrentObject;
+			FaultsChillerFouling( jFault_ChillerFouling ).FaultTypeEnum = iFault_Fouling_Chiller;
+			FaultsChillerFouling( jFault_ChillerFouling ).Name = cAlphaArgs( 1 );
+
+			// Fault availability schedule
+			FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedule = cAlphaArgs( 2 );
+			if ( lAlphaFieldBlanks( 2 ) ) {
+				FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( FaultsChillerFouling( jFault_ChillerFouling ).AvaiSchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// Fault severity schedule
+			FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedule = cAlphaArgs( 3 );
+			if ( lAlphaFieldBlanks( 3 ) ) {
+				FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedPtr = -1; // returns schedule value of 1
+			} else {
+				FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( FaultsChillerFouling( jFault_ChillerFouling ).SeveritySchedPtr == 0 ) {
+					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+					ErrorsFound = true;
+				}
+			}
+
+			// CapReductionFactor - degree of fault
+			FaultsChillerFouling( jFault_ChillerFouling ).RefCapReductionFactor = rNumericArgs( 1 );
+			
+			// Chiller type
+			FaultsChillerFouling( jFault_ChillerFouling ).ChillerType = cAlphaArgs( 4 );
+			if ( lAlphaFieldBlanks( 4 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Chiller name
+			FaultsChillerFouling( jFault_ChillerFouling ).ChillerName = cAlphaArgs( 5 );
+			if ( lAlphaFieldBlanks( 5 ) ) {
+				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" blank." );
+				ErrorsFound = true;
+			}
+
+			// Chiller check
+			{ auto const SELECT_CASE_VAR( FaultsChillerFouling( jFault_ChillerFouling ).ChillerType );
+			
+				int ChillerNum; 
+				
+				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetElectricInput ) {
+						PlantChillers::GetElectricChillerInput();
+						PlantChillers::GetElectricInput = false;
+					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::ElectricChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+  					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerElectricEIR::GetInputEIR ) {
+						ChillerElectricEIR::GetElectricEIRChillerInput();
+						ChillerElectricEIR::GetInputEIR = false;
+  					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).CondenserType != ChillerElectricEIR::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerFoulingFlag = true;
+							ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+  					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
+				
+					// Read in chiller is not done yet
+					if ( ChillerReformulatedEIR::GetInputREIR ) {
+						ChillerReformulatedEIR::GetElecReformEIRChillerInput();
+						ChillerReformulatedEIR::GetInputREIR = false;
+					}
+
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).CondenserType != ChillerReformulatedEIR::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerFoulingFlag = true;
+							ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+					}
+				
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetConstCOPInput ) {
+						PlantChillers::GetConstCOPChillerInput();
+						PlantChillers::GetConstCOPInput = false;
+					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::ConstCOPChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the chiller with the fault model
+							PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+					}
+ 
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetEngineDrivenInput ) {
+						PlantChillers::GetEngineDrivenChillerInput();
+						PlantChillers::GetEngineDrivenInput = false;
+					}
+					
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::EngineDrivenChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the fault model with the water cooled chiller
+							PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetGasTurbineInput ) {
+						PlantChillers::GetGTChillerInput();
+						PlantChillers::GetGasTurbineInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerFouling( jFault_ChillerFouling ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+
+						if( PlantChillers::GTChiller( ChillerNum ).Base.CondenserType != PlantChillers::WaterCooled ){
+						// The fault model is only applicable to the chillers with water based condensers
+							ShowWarningError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied." );
+							
+						} else {
+						// Link the fault model with the water cooled chiller
+							PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag = true;
+							PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex = jFault_ChillerFouling;
+						}
+						
+					}
+				}
+			}
+		}
+				
 		// read faults input of Fault_type 114: Boiler Fouling
 		for ( int jFault_BoilerFouling = 1; jFault_BoilerFouling <= NumFaultyBoilerFouling; ++jFault_BoilerFouling ) {
 
@@ -839,8 +1064,42 @@ namespace FaultsManager {
 			// Chiller check
 			{ auto const SELECT_CASE_VAR( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType );
 				
+				int ChillerNum; 
+				
 				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetElectricInput ) {
+						PlantChillers::GetElectricChillerInput();
+						PlantChillers::GetElectricInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
+						PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
+					}
+					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerElectricEIR::GetInputEIR ) {
+						ChillerElectricEIR::GetElectricEIRChillerInput();
+						ChillerElectricEIR::GetInputEIR = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerSWTFlag = true;
+						ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+					}
+					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
 					// Read in chiller if not done yet
 					if ( ChillerReformulatedEIR::GetInputREIR ) {
@@ -848,25 +1107,100 @@ namespace FaultsManager {
 						ChillerReformulatedEIR::GetInputREIR = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					if ( FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller ) <= 0 ) {
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
+					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
 					} else {
 					// Link the chiller with the fault model
-						for ( int ChillerNum = 1; ChillerNum <= ChillerReformulatedEIR::NumElecReformEIRChillers; ++ChillerNum ) {
-							if ( SameString( ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).Name, FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName ) ) {
-								ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTFlag = true;
-								ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
-								break;
-							}
-						}
+						ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTFlag = true;
+						ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetEngineDrivenInput ) {
+						PlantChillers::GetEngineDrivenChillerInput();
+						PlantChillers::GetEngineDrivenInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
+						PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
+					}
+					
+				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetGasTurbineInput ) {
+						PlantChillers::GetGTChillerInput();
+						PlantChillers::GetGasTurbineInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
+						PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
 					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+					// Read in chiller is not done yet
+					if ( PlantChillers::GetConstCOPInput ) {
+						PlantChillers::GetConstCOPChillerInput();
+						PlantChillers::GetConstCOPInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
+						PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
+					}
+					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerAbsorption::GetInput ) {
+						ChillerAbsorption::GetBLASTAbsorberInput();
+						ChillerAbsorption::GetInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerAbsorption::BLASTAbsorber );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+					// Link the chiller with the fault model
+						ChillerAbsorption::BLASTAbsorber( ChillerNum ).FaultyChillerSWTFlag = true;
+						ChillerAbsorption::BLASTAbsorber( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+					}
+					
 				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
+					// Read in chiller is not done yet
+					if ( ChillerIndirectAbsorption::GetInput ) {
+						ChillerIndirectAbsorption::GetIndirectAbsorberInput();
+						ChillerIndirectAbsorption::GetInput = false;
+					}
+					// Check whether the chiller name and chiller type match each other
+					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerIndirectAbsorption::IndirectAbsorber );
+					if ( ChillerNum <= 0 ) {
+						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
+						ErrorsFound = true;
+					} else {
+						ChillerIndirectAbsorption::IndirectAbsorber( ChillerNum ).FaultyChillerSWTFlag = true;
+						ChillerIndirectAbsorption::IndirectAbsorber( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
+					}
+					
 				}
 			}
 			
@@ -1184,39 +1518,17 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang
 		//       DATE WRITTEN   Jun. 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// To calculate the dynamic fault offset based on the fault availability schedule and severity schedule.
-
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
+		//       To calculate the dynamic fault offset based on the fault availability schedule and severity schedule.
 
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetCurrentScheduleValue;
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FaultFac( 0.0 ); // fault modification factor
 		Real64 OffsetAct( 0.0 ); // actual offset after applying the modification factor
-
-		// FLOW
 		
 		// Check fault availability schedules
 		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
@@ -1326,32 +1638,9 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang
 		//       DATE WRITTEN   Jun. 2016
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To calculate the mass flow rate and supply water temperature of a chiller with faulty SWT sensor.
-
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// Variables for fault free cases
@@ -1363,8 +1652,6 @@ namespace FaultsManager {
 		Real64 EvapOutletTemp_f = EvapOutletTemp_ff;    // Chiller supply water temperature, faulty case [C]
 		Real64 EvapMassFlowRate_f = EvapMassFlowRate_ff;  // Chiller mass flow rate, faulty case [kg/s]
 		Real64 QEvaporator_f = QEvaporator_ff;  // Chiller evaporator heat transfer rate, faulty case [W]
-		
-		// FLOW
 		
 		if( !FlagVariableFlow ){
 		// Chillers with ConstantFlow mode
@@ -1405,35 +1692,15 @@ namespace FaultsManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang
 		//       DATE WRITTEN   Apr. 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
 		// covers the rated operational point of the corresponding fan
 		// Return true if the curve covers the fan rated operational point
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using namespace Fans;
-		
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FanMaxAirFlowRate; // Design Max Specified Volume Flow Rate of Fan [m3/sec]
@@ -1464,6 +1731,37 @@ namespace FaultsManager {
 		FanDeltaPressCal = CurveValue( FanCurvePtr, FanMaxAirFlowRate );
 
 		return ( ( FanDeltaPressCal > 0.95 * FanDeltaPress ) && ( FanDeltaPressCal < 1.05 * FanDeltaPress ) );
+	}
+	
+	// Clears the global data in Fans.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		RunFaultMgrOnceFlag = false;
+		ErrorsFound = false;
+		AnyFaultsInModel = false;
+		
+		NumFaults = 0 ;
+		NumFaultyEconomizer = 0;
+		NumFouledCoil = 0;
+		NumFaultyThermostat = 0;
+		NumFaultyHumidistat = 0;
+		NumFaultyAirFilter = 0;
+		NumFaultyChillerSWTSensor = 0;
+		NumFaultyCondenserSWTSensor = 0;
+		NumFaultyTowerFouling = 0;
+		NumFaultyCoilSATSensor = 0;
+
+		FaultsEconomizer.deallocate();
+		FouledCoils.deallocate();
+		FaultsThermostatOffset.deallocate();
+		FaultsHumidistatOffset.deallocate();
+		FaultsFouledAirFilters.deallocate();
+		FaultsChillerSWTSensor.deallocate();
+		FaultsCondenserSWTSensor.deallocate();
+		FaultsTowerFouling.deallocate();
+		FaultsCoilSATSensor.deallocate();
 	}
 
 } // FaultsManager

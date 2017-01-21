@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef FaultsManager_hh_INCLUDED
 #define FaultsManager_hh_INCLUDED
@@ -105,6 +93,7 @@ namespace FaultsManager {
 	extern int const iFault_TemperatureSensorOffset_CoilSupplyAir;
 	extern int const iFault_Fouling_Tower;
 	extern int const iFault_Fouling_Boiler;
+	extern int const iFault_Fouling_Chiller;
 
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset (FY14)
@@ -153,6 +142,7 @@ namespace FaultsManager {
 	extern int NumFaultyTowerFouling;  // Total number of faulty Towers with Scaling
 	extern int NumFaultyCoilSATSensor;  // Total number of faulty Coil Supply Air Temperature Sensor
 	extern int NumFaultyBoilerFouling;  // Total number of faulty Boilers with Fouling
+	extern int NumFaultyChillerFouling;  // Total number of faulty Chillers with Fouling
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -183,12 +173,15 @@ namespace FaultsManager {
 			Offset( 0.0 ),
 			Status( false )
 		{}
-		
+
+		// Virtual Destructor
+		virtual ~FaultProperties() = default;
+
 		public:
 			Real64 CalFaultOffsetAct();
 
 	};
-	
+
 	struct FaultPropertiesEconomizer : public FaultProperties // Class for fault models related with economizer
 	{
 		// Members
@@ -196,7 +189,7 @@ namespace FaultsManager {
 		int ControllerID; // Point to a controller associated with the fault
 		std::string ControllerType; // Controller type
 		std::string ControllerName; // Controller name
-	
+
 		// Default Constructor
 		FaultPropertiesEconomizer():
 			ControllerTypeEnum( 0 ),
@@ -204,34 +197,46 @@ namespace FaultsManager {
 			ControllerType( "" ),
 			ControllerName( "" )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesEconomizer() = default;
+
 	};
-	
+
 	struct FaultPropertiesThermostat : public FaultProperties // Class for FaultModel:ThermostatOffset
 	{
 		// Members
 		std::string FaultyThermostatName; // The faulty thermostat name
-	
+
 		// Default Constructor
 		FaultPropertiesThermostat():
 			FaultyThermostatName( "" )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesThermostat() = default;
+
 	};
-	
+
 	struct FaultPropertiesHumidistat : public FaultProperties // Class for FaultModel:HumidistatOffset
 	{
 		// Members
 		std::string FaultyThermostatName; // The faulty thermostat name
 		std::string FaultyHumidistatName; // The faulty humidistat name
 		std::string FaultyHumidistatType; // The faulty humidistat type
-	
+
 		// Default Constructor
 		FaultPropertiesHumidistat():
 			FaultyThermostatName( "" ),
 			FaultyHumidistatName( "" ),
 			FaultyHumidistatType( "" )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesHumidistat() = default;
+
 	};
-	
+
 	struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
 	{
 		// Members
@@ -243,7 +248,7 @@ namespace FaultsManager {
 		Real64 Rfa; // Air side fouling factor
 		Real64 Aout; // Coil outside surface area
 		Real64 Aratio; // Inside to outside surface area ratio
-	
+
 		// Default Constructor
 		FaultPropertiesFoulingCoil():
 			FouledCoilName( "" ),
@@ -255,8 +260,12 @@ namespace FaultsManager {
 			Aout( 0.0 ),
 			Aratio( 0.0 )
 		{}
+
+		// Destructor
+		virtual ~FaultPropertiesFoulingCoil() = default;
+
 	};
-	
+
 	struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
 	{
 		// Members
@@ -268,7 +277,7 @@ namespace FaultsManager {
 		int         FaultyAirFilterPressFracSchePtr; // The pointer to the schedule
 		Real64      FaultyAirFilterFanPressInc;      // The increase of the fan pressure due to fouled air filter
 		Real64      FaultyAirFilterFanFlowDec;       // The decrease of the fan airflow rate due to fouled air filter
-	
+
 		// Default Constructor
 		FaultPropertiesAirFilter():
 			FaultyAirFilterFanName( "" ),
@@ -280,7 +289,10 @@ namespace FaultsManager {
 			FaultyAirFilterFanPressInc( 0.0 ),
 			FaultyAirFilterFanFlowDec( 0.0 )
 		{}
-		
+
+		// Destructor
+		virtual ~FaultPropertiesAirFilter() = default;
+
 		public:
 			bool CheckFaultyAirFilterFanCurve();
 	};
@@ -306,24 +318,27 @@ namespace FaultsManager {
 		// Members
 		std::string ChillerType; // Chiller type
 		std::string ChillerName; // Chiller name
-	
+
 		// Default Constructor
 		FaultPropertiesChillerSWT():
 			ChillerType( "" ),
 			ChillerName( "" )
 		{}
-		
+
+		// Destructor
+		virtual ~FaultPropertiesChillerSWT() = default;
+
 		public:
 			void CalFaultChillerSWT(
 				bool FlagConstantFlowChiller, // True if chiller is constant flow and false if it is variable flow
 				Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
 				Real64 Cp, // Local fluid specific heat
-				Real64 EvapInletTemp, // Chiller evaporator inlet water temperature 
-				Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature 
+				Real64 EvapInletTemp, // Chiller evaporator inlet water temperature
+				Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature
 				Real64 & EvapMassFlowRate, // Chiller mass flow rate
 				Real64 & QEvaporator // Chiller evaporator heat transfer rate
 			);
-			
+
 	};
 		
 	struct FaultPropertiesCondenserSWT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CondenserSupplyWater
@@ -374,7 +389,7 @@ namespace FaultsManager {
 			Real64 CalFaultyFoulingCapReductionFactor(); // To calculate the dynamic fouling factor
 	};
 
-	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:CoolingTower
+	struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler
 	{
 		// Members
 		std::string BoilerType; // Boiler type
@@ -386,7 +401,19 @@ namespace FaultsManager {
 			BoilerName( "" )
 		{}
 	};
-
+	
+	struct FaultPropertiesChillerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Chiller
+	{
+		// Members
+		std::string ChillerType; // Chiller type
+		std::string ChillerName; // Chiller name
+	
+		// Default Constructor
+		FaultPropertiesChillerFouling():
+			ChillerType( "" ),
+			ChillerName( "" )
+		{}
+	};
 
 	
 	// Object Data
@@ -400,11 +427,15 @@ namespace FaultsManager {
 	extern Array1D< FaultPropertiesTowerFouling > FaultsTowerFouling;
 	extern Array1D< FaultPropertiesCoilSAT > FaultsCoilSATSensor;
 	extern Array1D< FaultPropertiesBoilerFouling > FaultsBoilerFouling;
+	extern Array1D< FaultPropertiesChillerFouling > FaultsChillerFouling;
 
 	// Functions
 
 	void
 	CheckAndReadFaults();
+
+	void
+	clear_state();
 
 } // FaultsManager
 

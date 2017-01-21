@@ -17,9 +17,9 @@ To date, the main practitioner use of EnergyPlus has been for new construction d
 
 The users in these cases are practitioners, not power users, so it is needed to implement the fault models using conventional EnergyPlus objects rather than the EMS, which, in any case, could only be used to model limited types of faults.
 
-\subsection{Operational Fault Objects}\label{operational-fault-objects}
+\subsection{Overview of Operational Fault Objects}\label{operational-fault-objects}
 
-EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, and (3) heating and cooling coil fouling faults.
+EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, (3) fouling or scaling at air side or water side components (e.g., heating and cooling coil, air filter, cooling tower), (4) sensor faults with plant components.
 
 The objects used by EnergyPlus to model the faults are as follows:
 
@@ -40,6 +40,16 @@ The objects used by EnergyPlus to model the faults are as follows:
   FaultModel:ThermostatOffset
 \item
   FaultModel:HumidistatOffset
+\item
+  FaultModel:Fouling:AirFilter
+\item
+  FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+\item
+  FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+\item
+  FaultModel:Fouling:CoolingTower
+\item
+  FaultModel:TemperatureSensorOffset:CoilSupplyAir
 \end{itemize}
 
 \subsection{FaultModel:TemperatureSensorOffset:OutdoorAir}\label{faultmodeltemperaturesensoroffsetoutdoorair}
@@ -238,7 +248,7 @@ This field defines outside surface area of the cooling or heating coil. The unit
 
 This field specifies the inside to outside surface area ratio of the cooling or heating coil.
 
-IDF examples:
+\paragraph{IDF Examples}
 
 \begin{lstlisting}
 
@@ -353,9 +363,11 @@ This field defines the reference offset value of the humidistat. This field is r
 
 This field provides the name of a Thermostat Offset Fault object that causes the humidistat offset fault. It should be the name of a FaultModel:ThermostatOffset object. This field is required for the Type ThermostatOffsetDependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
 
-\subsection{An example of IDF codes for the thermostat/humidistat offset fault models:}\label{an-example-of-idf-codes-for-the-thermostathumidistat-offset-fault-models}
+\paragraph{IDF Examples}\label{an-example-of-idf-codes-for-the-thermostathumidistat-offset-fault-models}
 
 \begin{lstlisting}
+! IDF examples:
+! example faults for the thermostat/humidistat offset
 
 FaultModel:ThermostatOffset,
   Ther_Offset_Zone1,   !- Name
@@ -413,9 +425,11 @@ This field provides the name of a schedule that describes the pressure rise vari
 
 This field provides the name of a fan curve for the fan associated with the fault. The curve describes the relationship between the fan pressure rise and air flow rate. This is used to estimate the variations of the fan air flow rate in the faulty cases, given the Pressure Rise Variation Schedule. For variable speed fans, the curve should be the one corresponding to the maximum fan speed. The fan curve should cover the design operational point specified in the corresponding fan object. It is also required that the faulty fan operatinal state point falls within the fan selection range that is monotonically decreasing.
 
-\subsection{An example of IDF codes for the fouling air filter fault models:}\label{an-example-of-idf-codes-for-the-fouling-air-filter-fault-models}
+\paragraph{IDF Examples}\label{an-example-of-idf-codes-for-the-fouling-air-filter-fault-models}
 
 \begin{lstlisting}
+! IDF examples:
+! example faults for the fouling air filter 
 
 FaultModel:Fouling:AirFilter,
   DF_VAV_1_Fan,             !- Name
@@ -460,6 +474,52 @@ FaultModel:Fouling:AirFilter,
   VAV_1_HeatC-VAV_1_FanNode,  !- Air Inlet Node Name
   VAV_1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
   Fan Energy;              !- End-Use Subcategory
+\end{lstlisting}
+
+\subsection{FaultModel:TemperatureSensorOffset:ChillerSupplyWater}\label{faultmodeltemperaturesensoroffsetchillersupplywater}
+
+This object defines the operational fault of chiller supply water temperature sensor offset.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
+
+This field defines the chiller object type that this fault is associated with. Choices are from a list of applicable chiller types, including Chiller:Electric, Chiller:Electric:EIR, Chiller:Electric:ReformulatedEIR,  Chiller:ConstantCOP, Chiller:EngineDriven, Chiller:CombustionTurbine, Chiller:Absorption, Chiller:Absorption:Indirect.
+
+\paragraph{Field: Chiller Object Name}\label{field-chiller-object-name}
+
+This field defines the name of the chiller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Reference Sensor Offset}\label{field-reference-sensor-offset}
+
+This field defines the reference offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the chiller supply water temperature sensor offset
+
+  FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
+    Fault_SWT_MainChiller,   !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Chiller:Electric:ReformulatedEIR,   !- Chiller Object Type
+    MainChiller,             !- Chiller Object Name
+    2.0;                     !- Reference Sensor Offset {deltaC}
+
 \end{lstlisting}
 
 
@@ -606,5 +666,4 @@ This field defines the reference offset of the temperature sensor. A positive va
     2.0;                     !- Reference Sensor Offset {deltaC}
 
 \end{lstlisting}
-
 
