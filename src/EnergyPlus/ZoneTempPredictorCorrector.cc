@@ -182,7 +182,7 @@ namespace ZoneTempPredictorCorrector {
 	int const iZC_TandHStat( 5 );
 	int const iZC_StagedDual( 6 );
 
-	int const NONE( 1 );
+	int const ADAP_NONE( 1 );
 	int const ASH55_CENTRAL( 2 );
 	int const ASH55_UPPER_90( 3 );
 	int const ASH55_UPPER_80( 4 );
@@ -213,8 +213,6 @@ namespace ZoneTempPredictorCorrector {
 	int const AverageMethodNum_SPE( 1 ); // Specific people object
 	int const AverageMethodNum_OBJ( 2 ); // People object average
 	int const AverageMethodNum_PEO( 3 ); // People number average
-
-
 
 	static std::string const BlankString;
 
@@ -1646,14 +1644,17 @@ namespace ZoneTempPredictorCorrector {
 						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
 							if ( NumAlphas == 4 ) {
 								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
-								TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
-								TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
-								if ( !AdapComfortDailySetPointSchedule.initialized ) {
-									CalculateAdaptiveComfortSetPointSchl();
-								}
-								if ( !TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex ) {
-									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
-									ErrorsFound = true;
+								if ( adaptiveComfortModelTypeIndex != ADAP_NONE ) {
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+									if ( !AdapComfortDailySetPointSchedule.initialized ) {
+										CalculateAdaptiveComfortSetPointSchl();
+
+									}
+									if (!TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex ) {
+										ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+										ErrorsFound = true;
+									}
 								}
 							}
 						}
@@ -1716,15 +1717,17 @@ namespace ZoneTempPredictorCorrector {
 						if ( TempControlledZone( TempControlledZoneNum ).OperativeTempControl ) {
 							if ( NumAlphas == 4 ) {
 								int adaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
-								TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
-								TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
-								if ( !AdapComfortDailySetPointSchedule.initialized ) {
-									CalculateAdaptiveComfortSetPointSchl();
-								}
+								if ( adaptiveComfortModelTypeIndex != ADAP_NONE ) {
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortTempControl = true;
+									TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex = FindItem( cAlphaArgs( 4 ), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize() );
+									if ( !AdapComfortDailySetPointSchedule.initialized ) {
+										CalculateAdaptiveComfortSetPointSchl();
+									}
 
-								if ( !TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex ) {
-									ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
-									ErrorsFound = true;
+									if ( !TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex ) {
+										ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
+										ErrorsFound = true;
+									}
 								}
 							}
 						}
@@ -2108,8 +2111,6 @@ namespace ZoneTempPredictorCorrector {
 
 		Real64 dryBulb;
 		Real64 avgDryBulb;
-		Real64 adaptedSetPointASH;
-		Real64 adaptedSetPointCEN;
 		Real64 GrossApproxAvgDryBulbDesignDay;
 		Real64 runningAverage( 0.0 );
 
@@ -2214,19 +2215,17 @@ namespace ZoneTempPredictorCorrector {
 
 		for ( i = 1; i <= DesDayInput.size(); i++ ) {
 			if ( DesDayInput(i).DayType == 9 ) {
-				GrossApproxAvgDryBulbDesignDay = ( DesDayInput( i ).MaxDryBulb + ( DesDayInput( i ).MaxDryBulb - DesDayInput( i ).DailyDBRange ) ) / 2.0;
-				adaptedSetPointASH = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
-				adaptedSetPointCEN = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
+				GrossApproxAvgDryBulbDesignDay = ( DesDayInput( i ).MaxDryBulb + ( DesDayInput( i ).MaxDryBulb - DesDayInput( i ).DailyDBRange ) ) / 2.0;				
 				if ( GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5 ) {
-					AdapComfortSetPointSummerDesDay( 1 ) = adaptedSetPointASH;
-					AdapComfortSetPointSummerDesDay( 2 ) = adaptedSetPointASH + 0.5;
-					AdapComfortSetPointSummerDesDay( 3 ) = adaptedSetPointASH + 0.85;
+					AdapComfortSetPointSummerDesDay( 1 ) = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
+					AdapComfortSetPointSummerDesDay( 2 ) = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
+					AdapComfortSetPointSummerDesDay( 3 ) = 0.31 * GrossApproxAvgDryBulbDesignDay + 21.3;
 				}
 				if ( GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 30 ) {
-					AdapComfortSetPointSummerDesDay( 4 ) = adaptedSetPointCEN;
-					AdapComfortSetPointSummerDesDay( 5 ) = adaptedSetPointCEN + 2;
-					AdapComfortSetPointSummerDesDay( 6 ) = adaptedSetPointCEN + 3;
-					AdapComfortSetPointSummerDesDay( 7 ) = adaptedSetPointCEN + 4;
+					AdapComfortSetPointSummerDesDay( 4 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
+					AdapComfortSetPointSummerDesDay( 5 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;;
+					AdapComfortSetPointSummerDesDay( 6 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;;
+					AdapComfortSetPointSummerDesDay( 7 ) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;;
 				}
 			}
 		}
@@ -2242,12 +2241,10 @@ namespace ZoneTempPredictorCorrector {
 		//TODO CHECK -1
 		// Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
 		for ( int day = 1; day < NumDaysInYear; day++ ) {
-			adaptedSetPointASH = 0.31 * runningAverageASH( day ) + 17.8;
-			adaptedSetPointCEN = 0.33 * runningAverageCEN( day ) + 18.8;
 			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 33.5 ) {
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = adaptedSetPointASH;
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = adaptedSetPointASH + 0.5;
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = adaptedSetPointASH + 0.85;				
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = 0.31 * runningAverageASH(day) + 17.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = 0.31 * runningAverageASH(day) + 20.3;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = 0.31 * runningAverageASH(day) + 21.3;
 			}
 			else {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = -1;
@@ -2255,10 +2252,10 @@ namespace ZoneTempPredictorCorrector {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = -1;
 			}
 			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 30) {
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( day ) = adaptedSetPointCEN;
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( day ) = adaptedSetPointCEN + 2;
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( day ) = adaptedSetPointCEN + 3;
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( day ) = adaptedSetPointCEN + 4;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( day ) = 0.33 * runningAverageCEN( day ) + 18.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( day ) = 0.33 * runningAverageCEN( day ) + 20.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( day ) = 0.33 * runningAverageCEN( day ) + 21.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( day ) = 0.33 * runningAverageCEN( day ) + 22.8;
 			}
 			else {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( day ) = -1;

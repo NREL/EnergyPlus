@@ -212,7 +212,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Default Constructor
 		AdaptiveComfortDailySetPointSchedule() :
-			initialized(0)
+			initialized( false )
 		{}
 	};
 
