@@ -212,14 +212,7 @@ namespace ZoneTempPredictorCorrector {
 
 		// Default Constructor
 		AdaptiveComfortDailySetPointSchedule() :
-			initialized(0),
-			ThermalComfortAdaptiveASH55_Upper_90(366, 0.0),
-			ThermalComfortAdaptiveASH55_Upper_80(366, 0.0),
-			ThermalComfortAdaptiveASH55_Central(366, 0.0),
-			ThermalComfortAdaptiveCEN15251_Upper_I(366, 0.0),
-			ThermalComfortAdaptiveCEN15251_Upper_II(366, 0.0),
-			ThermalComfortAdaptiveCEN15251_Upper_III(366, 0.0),
-			ThermalComfortAdaptiveCEN15251_Central(366, 0.0)
+			initialized(0)
 		{}
 	};
 
@@ -234,6 +227,7 @@ namespace ZoneTempPredictorCorrector {
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 	extern AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
+	extern Array1D< Real64 > AdapComfortSetPointSummerDesDay;
 
 	// Functions
 	void
@@ -266,12 +260,6 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	CalculateAdaptiveComfortSetPointSchl();
-
-	void
-	GetZoneAdaptiveComfortSetPointSchl(
-		int AdaptiveComfortModelTypeIndex,
-		Array1D< Real64 > & AdaptiveComfortMonthlySetPoint
-	);
 
 	void
 	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );

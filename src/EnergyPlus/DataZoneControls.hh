@@ -131,7 +131,7 @@ namespace DataZoneControls {
 
 		bool AdaptiveComfortTempControl; // flag to indicate whether control based on Operative Temp
 		int AdaptiveComfortModelTypeIndex; // index to adaptive comfort model type
-		Array1D< Real64 > AdaptiveComfortSetPointSchedule; // annual zone adaptive comfort setpoint schedule
+		//Array1D< Real64 > AdaptiveComfortSetPointSchedule; // annual zone adaptive comfort setpoint schedule
 
 		Real64 ZoneOvercoolRange; // Zone overcool temperature range (max), deg C
 		bool ZoneOvercoolControl; // Flag to indicate whether control is based on overcool
@@ -172,8 +172,7 @@ namespace DataZoneControls {
 			ZoneOvercoolConstRange( 0.0 ),
 			ZoneOvercoolRangeSchedIndex( 0 ),
 			ZoneOvercoolControlRatio( 0.0 ),
-			DehumidifyingSchedIndex( 0 ),
-			AdaptiveComfortSetPointSchedule( 366, 0.0 )
+			DehumidifyingSchedIndex( 0 )
 		{}
 
 	};
