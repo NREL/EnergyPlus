@@ -2100,7 +2100,6 @@ namespace ZoneTempPredictorCorrector {
 		Real64 dryBulb;
 		Real64 avgDryBulb;
 		Real64 GrossApproxAvgDryBulbDesignDay;
-		Real64 runningAverage( 0.0 );
 
 
 		int epwFile;
@@ -2201,7 +2200,7 @@ namespace ZoneTempPredictorCorrector {
 			ShowFatalError("CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read).");
 		}
 
-		for ( i = 1; i <= DesDayInput.size(); i++ ) {
+		for ( size_t i = 1; i <= DesDayInput.size(); i++ ) {
 			if ( DesDayInput(i).DayType == 9 ) {
 				GrossApproxAvgDryBulbDesignDay = ( DesDayInput( i ).MaxDryBulb + ( DesDayInput( i ).MaxDryBulb - DesDayInput( i ).DailyDBRange ) ) / 2.0;				
 				if ( GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5 ) {
@@ -2239,7 +2238,7 @@ namespace ZoneTempPredictorCorrector {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = -1;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = -1;
 			}
-			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 30) {
+			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 30 ) {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central( day ) = 0.33 * runningAverageCEN( day ) + 18.8;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( day ) = 0.33 * runningAverageCEN( day ) + 20.8;
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( day ) = 0.33 * runningAverageCEN( day ) + 21.8;
@@ -3188,8 +3187,8 @@ namespace ZoneTempPredictorCorrector {
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
-				if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-					AdjustOperativeSetPointsforAdapComfort(RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
+				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
+					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				}
 
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
@@ -3210,7 +3209,7 @@ namespace ZoneTempPredictorCorrector {
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
 				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
-					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
+					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				}
 
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
@@ -3249,8 +3248,8 @@ namespace ZoneTempPredictorCorrector {
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
-				if ((TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-					AdjustOperativeSetPointsforAdapComfort(RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
+				if ( ( TempControlledZone( RelativeZoneNum ).AdaptiveComfortTempControl ) ) {
+					AdjustOperativeSetPointsforAdapComfort( RelativeZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
 				}
 
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
@@ -5955,7 +5954,6 @@ namespace ZoneTempPredictorCorrector {
 	void
 	AdjustOperativeSetPointsforAdapComfort(
 		int const TempControlledZoneID,
-		int const ActualZoneNum,
 		Real64 & ZoneAirSetPoint
 		)
 	{

@@ -343,7 +343,6 @@ namespace ZoneTempPredictorCorrector {
 	void
 	AdjustOperativeSetPointsforAdapComfort(
 		int const TempControlledZoneID,
-		int const ActualZoneNum,
 		Real64 & ZoneAirSetPoint
 	);
 
