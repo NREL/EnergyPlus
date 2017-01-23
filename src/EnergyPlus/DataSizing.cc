@@ -309,8 +309,6 @@ namespace DataSizing {
 	Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
 	// used only for Facility Load Component Summary
-	Array1D< FacilitySizingData > FacilitySizing; // Data for facility sizing 
-	FacilitySizingData FinalFacilitySizing; // Final data for zone sizing including effects
 	Array1D< FacilitySizingData > CalcFacilitySizing; // Data for zone sizing 
 	FacilitySizingData CalcFinalFacilitySizing; // Final data for zone sizing 
 
@@ -426,7 +424,6 @@ namespace DataSizing {
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
 
-		FacilitySizing.deallocate();
 		CalcFacilitySizing.deallocate(); 
 	}
 

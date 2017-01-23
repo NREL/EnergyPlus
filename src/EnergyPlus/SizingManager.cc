@@ -3462,11 +3462,9 @@ namespace SizingManager {
 		int const CallIndicator
 	)
 	{
+		int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		if ( CallIndicator == BeginDay ) {
 			// this is always called first so test if allocated here
-			if ( !FacilitySizing.allocated( ) ) {
-				FacilitySizing.allocate( DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays );
-			}
 			if ( !CalcFacilitySizing.allocated( ) ) {
 				CalcFacilitySizing.allocate( DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays );
 			}
@@ -3477,18 +3475,64 @@ namespace SizingManager {
 		} else if ( CallIndicator == DuringDay ) {
 			int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 			// save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
+			Real64 sumCoolLoad = 0.;
+			Real64 sumHeatLoad = 0.;
+			Real64 wghtdCoolZoneTemp = 0.;
+			Real64 wghtdHeatZoneTemp = 0.;
+			Real64 wghtdCoolHumRat = 0.;
+			Real64 wghtdHeatHumRat = 0.;
+			Real64 wghtdCoolDOASHeatAdd = 0.;
+			Real64 wghtdCoolDOASLatAdd = 0.;
 			for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( !ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				SysSizing( CurOverallSimDay, AirLoopNum ).SysCoolOutTempSeq( TimeStepInDay ) = OutDryBulbTemp;
-				SysSizing( CurOverallSimDay, AirLoopNum ).SysCoolOutHumRatSeq( TimeStepInDay ) = OutHumRat;
-
+				Real64 curCoolLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq( TimeStepInDay );
+				if ( curCoolLoad > 0.0 ) {
+					sumCoolLoad += curCoolLoad;
+					wghtdCoolZoneTemp += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneTempSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdCoolHumRat += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdCoolDOASHeatAdd += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASHeatAddSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdCoolDOASLatAdd += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).DOASLatAddSeq( TimeStepInDay ) * curCoolLoad;
+				}
+				Real64 curHeatLoad = CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepInDay );
+				if ( curHeatLoad > 0.0 ) {
+					sumHeatLoad += curHeatLoad;
+					wghtdHeatZoneTemp += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneTempSeq( TimeStepInDay ) * curCoolLoad;
+					wghtdHeatHumRat += CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepInDay ) * curHeatLoad;
+				}
 			}
+
+			CalcFacilitySizing( CurOverallSimDay ).CoolLoadSeq( TimeStepInDay ) = sumCoolLoad;
+			CalcFacilitySizing( CurOverallSimDay ).HeatLoadSeq( TimeStepInDay ) = sumHeatLoad;
+
+			CalcFacilitySizing( CurOverallSimDay ).CoolZoneTempSeq( TimeStepInDay ) = wghtdCoolZoneTemp / sumCoolLoad;
+			CalcFacilitySizing( CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay ) = wghtdHeatZoneTemp  / sumHeatLoad;
+
+			CalcFacilitySizing( CurOverallSimDay ).CoolOutHumRatSeq( TimeStepInDay ) = wghtdCoolHumRat / sumCoolLoad;
+			CalcFacilitySizing( CurOverallSimDay ).HeatOutHumRatSeq( TimeStepInDay ) = wghtdHeatHumRat / sumHeatLoad;
+
+			CalcFacilitySizing( CurOverallSimDay ).CoolOutTempSeq( TimeStepInDay ) = DataEnvironment::OutDryBulbTemp;
+			CalcFacilitySizing( CurOverallSimDay ).HeatOutTempSeq( TimeStepInDay ) = DataEnvironment::OutDryBulbTemp;
+
+			CalcFacilitySizing( CurOverallSimDay ).DOASHeatAddSeq( TimeStepInDay ) = wghtdCoolDOASHeatAdd / sumCoolLoad;
+			CalcFacilitySizing( CurOverallSimDay ).DOASLatAddSeq( TimeStepInDay ) = wghtdCoolDOASLatAdd / sumHeatLoad;
+
 		} else if ( CallIndicator == EndDay ) {
-		
+			for ( int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
+				if ( CalcFacilitySizing( CurOverallSimDay ).CoolLoadSeq( TimeStepIndex ) > CalcFacilitySizing( CurOverallSimDay ).DesCoolLoad ) {
+					CalcFacilitySizing( CurOverallSimDay ).DesCoolLoad = CalcFacilitySizing( CurOverallSimDay ).CoolLoadSeq( TimeStepIndex );
+					CalcFacilitySizing( CurOverallSimDay ).TimeStepNumAtCoolMax = TimeStepIndex;
+				}
+				if ( CalcFacilitySizing( CurOverallSimDay ).HeatLoadSeq( TimeStepIndex ) > CalcFacilitySizing( CurOverallSimDay ).DesHeatLoad ) {
+					CalcFacilitySizing( CurOverallSimDay ).DesHeatLoad = CalcFacilitySizing( CurOverallSimDay ).HeatLoadSeq( TimeStepIndex );
+					CalcFacilitySizing( CurOverallSimDay ).TimeStepNumAtHeatMax = TimeStepIndex;
+				}
+			}
+
 		} else if ( CallIndicator == EndZoneSizingCalc ) {
 		
 		}
 		// what is ultimately wanted
+		int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 		CalcFinalFacilitySizing.CoolDDNum = 0;
 		CalcFinalFacilitySizing.HeatDDNum = 0;
 		CalcFinalFacilitySizing.TimeStepNumAtCoolMax = 0 ; 
