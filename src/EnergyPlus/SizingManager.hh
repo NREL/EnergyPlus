@@ -178,6 +178,11 @@ namespace SizingManager {
 		int timeIndex
 	);
 
+	void
+	UpdateFacilitySizing(
+		int const CallIndicator
+	);
+
 } // SizingManager
 
 } // EnergyPlus

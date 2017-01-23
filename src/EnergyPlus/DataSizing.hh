@@ -1172,6 +1172,37 @@ namespace DataSizing {
 
 	};
 
+	// based on ZoneSizingData but only have member variables that are related to the CheckSum/
+	struct FacilitySizingData
+	{
+		// Members  
+		int CoolDDNum; // design day index of design day causing heating peak
+		int HeatDDNum; // design day index of design day causing heating peak
+		int TimeStepNumAtCoolMax; // time step number (in day) at cooling peak
+		Array1D< Real64 > DOASHeatAddSeq; // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+		Array1D< Real64 > DOASLatAddSeq; // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
+		Array1D< Real64 > CoolOutHumRatSeq; // daily sequence of outdoor humidity ratios (cooling, zone time step)
+		Array1D< Real64 > CoolOutTempSeq; // daily sequence of outdoor temperatures (cooling, zone time step)
+		Array1D< Real64 > CoolZoneTempSeq; // daily sequence of zone temperatures (cooling, zone time step)
+		Real64 DesCoolLoad; // zone design cooling load [W]
+		int TimeStepNumAtHeatMax; // time step number (in day) at Heating peak
+		Array1D< Real64 > HeatOutHumRatSeq; // daily sequence of outdoor humidity ratios (heating, zone time step)
+		Array1D< Real64 > HeatOutTempSeq; // daily sequence of outdoor temperatures (heating, zone time step)
+		Array1D< Real64 > HeatZoneTempSeq; // daily sequence of zone temperatures (heating, zone time step)
+		Real64 DesHeatLoad; // zone design heating load [W]
+		
+        // Default Constructor
+		FacilitySizingData( ):
+			CoolDDNum( 0 ),
+			HeatDDNum( 0 ),
+			TimeStepNumAtCoolMax( 0 ),
+			TimeStepNumAtHeatMax( 0 ),
+			DesCoolLoad( 0.0 ),
+			DesHeatLoad( 0.0 )
+		{}
+
+	};
+
 	struct DesDayWeathData
 	{
 		// Members
@@ -1278,6 +1309,11 @@ namespace DataSizing {
 	extern Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	extern Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	extern Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	// used only for Facility Load Component Summary
+	extern Array1D< FacilitySizingData > FacilitySizing; // Data for facility sizing 
+	extern FacilitySizingData FinalFacilitySizing; // Final data for zone sizing including effects
+	extern Array1D< FacilitySizingData > CalcFacilitySizing; // Data for facility sizing 
+	extern FacilitySizingData CalcFinalFacilitySizing; // Final data for facility sizing 
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.

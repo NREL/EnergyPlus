@@ -3455,27 +3455,56 @@ namespace SizingManager {
 	}
 
 
-	// stubs that may or may not be used for the Checksum report enhancement project
-	//// Update the sizing for airloops to gather values for reporting - Glazer January 2017
-	//void
-	//UpdateAirLoopSizing( )
-	//{
-	//	using DataAirLoop::AirLoopZoneInfo;
-	//	int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
-	//	for ( int loopNum = 1; loopNum <= NumPrimaryAirSys; ++loopNum ) {
-	//		int numOfZones = AirLoopZoneInfo( loopNum ).NumZones;
-	//		for ( int zoneIndx = 1; zoneIndx <= numOfZones; ++zoneIndx ) {
-	//			int zoneNum = AirLoopZoneInfo( loopNum ).ActualZoneNumber( zoneIndx );
-	//		}
-	//	}
-	//}
 
-	//// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-	//void
-	//UpdateFacilitySizing( )
-	//{
-	//	int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
-	//}
+	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
+	void
+	UpdateFacilitySizing( 
+		int const CallIndicator
+	)
+	{
+		if ( CallIndicator == BeginDay ) {
+			// this is always called first so test if allocated here
+			if ( !FacilitySizing.allocated( ) ) {
+				FacilitySizing.allocate( DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays );
+			}
+			if ( !CalcFacilitySizing.allocated( ) ) {
+				CalcFacilitySizing.allocate( DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays );
+			}
+			CalcFacilitySizing( CurOverallSimDay ).HeatDDNum = CurOverallSimDay;
+			CalcFacilitySizing( CurOverallSimDay ).CoolDDNum = CurOverallSimDay;
+
+
+		} else if ( CallIndicator == DuringDay ) {
+			int TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+			// save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
+			for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+				if ( !ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+				SysSizing( CurOverallSimDay, AirLoopNum ).SysCoolOutTempSeq( TimeStepInDay ) = OutDryBulbTemp;
+				SysSizing( CurOverallSimDay, AirLoopNum ).SysCoolOutHumRatSeq( TimeStepInDay ) = OutHumRat;
+
+			}
+		} else if ( CallIndicator == EndDay ) {
+		
+		} else if ( CallIndicator == EndZoneSizingCalc ) {
+		
+		}
+		// what is ultimately wanted
+		CalcFinalFacilitySizing.CoolDDNum = 0;
+		CalcFinalFacilitySizing.HeatDDNum = 0;
+		CalcFinalFacilitySizing.TimeStepNumAtCoolMax = 0 ; 
+		CalcFinalFacilitySizing.DOASHeatAddSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.DOASLatAddSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.CoolOutHumRatSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.CoolOutTempSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.CoolZoneTempSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.DesCoolLoad = 0.; 
+		CalcFinalFacilitySizing.TimeStepNumAtHeatMax = 0 ; 
+		CalcFinalFacilitySizing.HeatOutHumRatSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.HeatOutTempSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.HeatZoneTempSeq( TimeStepInDay ) = 0.; 
+		CalcFinalFacilitySizing.DesHeatLoad = 0.; 
+
+	}
 
 
 } // SizingManager
