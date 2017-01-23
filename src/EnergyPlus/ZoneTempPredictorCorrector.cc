@@ -5974,7 +5974,6 @@ namespace ZoneTempPredictorCorrector {
 
 		// Using/Aliasing
 		using DataEnvironment::DayOfYear;
-		using DataEnvironment::RunPeriodEnvironment;
 		using WeatherManager::DesDayInput;
 		using WeatherManager::Envrn;
 		using WeatherManager::Environment;		
