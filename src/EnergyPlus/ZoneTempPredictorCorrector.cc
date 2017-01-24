@@ -1639,7 +1639,7 @@ namespace ZoneTempPredictorCorrector {
 										CalculateAdaptiveComfortSetPointSchl();
 
 									}
-									if (!TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex ) {
+									if ( !TempControlledZone( TempControlledZoneNum ).AdaptiveComfortModelTypeIndex ) {
 										ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + " invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
 										ErrorsFound = true;
 									}
@@ -2201,6 +2201,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		for ( size_t i = 1; i <= DesDayInput.size(); i++ ) {
+			// Summer design day
 			if ( DesDayInput(i).DayType == 9 ) {
 				GrossApproxAvgDryBulbDesignDay = ( DesDayInput( i ).MaxDryBulb + ( DesDayInput( i ).MaxDryBulb - DesDayInput( i ).DailyDBRange ) ) / 2.0;				
 				if ( GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5 ) {
@@ -2225,7 +2226,6 @@ namespace ZoneTempPredictorCorrector {
 		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate( NumDaysInYear );
 		AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate( NumDaysInYear );
 
-		//TODO CHECK -1
 		// Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
 		for ( int day = 1; day < NumDaysInYear; day++ ) {
 			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 33.5 ) {
