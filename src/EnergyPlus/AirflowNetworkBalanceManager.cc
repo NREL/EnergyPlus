@@ -2879,7 +2879,7 @@ namespace AirflowNetworkBalanceManager {
 		DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
 		if ( DisSysNumOfDuctViewFactors > 0 ) {
 			AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
-			for ( i = 1; i <= DisSysNumOfDucts; ++i ) {
+			for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
 				IsBlank = false;
@@ -2889,21 +2889,21 @@ namespace AirflowNetworkBalanceManager {
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 				}
 
-				auto & this_VF_object( AirflowNetworkLinkageViewFactorData(i) );
+				auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
 
-				this_VF_object.name = Alphas( 1 ); // Name duct view factor component
-				this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction []
+				this_VF_object.name = Alphas( 1 ); // Name of linkage
+				this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction
 				this_VF_object.surfaceEmittance = Numbers( 2 ); // Duct surface emittance
 
 				int numSurfaces = NumAlphas - 1;
 
-				this_VF_object.linkageSurfaceData.allocate(numSurfaces);
+				this_VF_object.linkageSurfaceData.allocate( numSurfaces ) ;
 
-				for (int surfNum = 0; surfNum < NumAlphas; ++surfNum)
+				for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
 				{
-					this_VF_object.linkageSurfaceData( surfNum ).surfaceName = Alphas( i + 1 ); // Surface name
-					this_VF_object.linkageSurfaceData( surfNum ).surfaceNum = FindItemInList( Alphas( i + 1 ), Surface );
-					this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( i + 2 ); // Surface view factor
+					this_VF_object.linkageSurfaceData( surfNum ).surfaceName = Alphas( surfNum + 1 ); // Surface name
+					this_VF_object.linkageSurfaceData( surfNum ).surfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
+					this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( surfNum + 2 ); // Surface view factor
 				}
 			}
 		}
