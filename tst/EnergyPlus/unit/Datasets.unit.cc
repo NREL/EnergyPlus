@@ -117,12 +117,6 @@ namespace EnergyPlus {
 	TEST_F( DataSetFixture, GlycolPropertiesRefData ) {
 		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/GlycolPropertiesRefData.idf" ) ) ) );
 	}
-<<<<<<< HEAD
-	TEST_F( DataSetFixture, LCCusePriceEscalationDataSet2011 ) {
-		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2011.idf" ) ) ) );
-	}
-=======
->>>>>>> NREL/develop
 	TEST_F( DataSetFixture, LCCusePriceEscalationDataSet2012 ) {
 		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2012.idf" ) ) ) );
 	}
@@ -136,7 +130,7 @@ namespace EnergyPlus {
 		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2015.idf" ) ) ) );
 	}
 	TEST_F (DataSetFixture, LCCusePriceEscalationDataSet2016) {
-		ASSERT_FALSE (process_idf (delimited_string (getAllLinesInFile (configured_source_directory () + "/datasets/LCCusePriceEscalationDataSet2016.idf"))));
+		ASSERT_TRUE(process_idf (delimited_string (getAllLinesInFile (configured_source_directory () + "/datasets/LCCusePriceEscalationDataSet2016.idf"))));
 	}
 	TEST_F( DataSetFixture, MoistureMaterials ) {
 		ASSERT_TRUE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/MoistureMaterials.idf" ) ) ) );

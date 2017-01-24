@@ -1270,17 +1270,10 @@ namespace MixedAir {
 
 				// add applicable faults identifier to avoid string comparison at each time step
 				//  loop through each fault for each OA controller
-<<<<<<< HEAD
-				for ( i = 1; i <= NumFaults; ++i ) {
-					if ( Faults( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
-					if ( InputProcessor::SameString( OAController( OutAirNum ).Name, Faults( i ).ControllerName ) ) {
-						Faults( i ).ControllerID = OutAirNum;
-=======
 				for ( i = 1; i <= NumFaultyEconomizer; ++i ) {
 					if ( FaultsEconomizer( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
-					if ( SameString( OAController( OutAirNum ).Name, FaultsEconomizer( i ).ControllerName ) ) {
+					if ( InputProcessor::SameString( OAController( OutAirNum ).Name, FaultsEconomizer( i ).ControllerName ) ) {
 						FaultsEconomizer( i ).ControllerID = OutAirNum;
->>>>>>> NREL/develop
 					}
 				}
 

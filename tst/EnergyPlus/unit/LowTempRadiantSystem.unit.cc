@@ -1188,13 +1188,13 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystem )
 	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
 	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
 	CFloRadSys( RadSysNum ).MotorEffic = 1.2;
-	
+
 	CFloRadSys( RadSysNum ).CoolingSystem = true;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	EXPECT_EQ( 3.0, CFloRadSys( RadSysNum ).ChWaterMassFlowRate );
 	EXPECT_EQ( 0.0, CFloRadSys( RadSysNum ).WaterMassFlowRate );
-	
+
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = true;
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
@@ -1206,7 +1206,7 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 {
 
 	bool InitErrorFound;
-	
+
 	// Test 1: with autosize for max flow, nothing should happen
 	LowTempRadiantSystem::clear_state();
 	RadSysNum = 1;
@@ -1234,12 +1234,12 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
-	
+
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	EXPECT_EQ( CFloRadSys( RadSysNum ).PumpEffic, 0.0 );
 	EXPECT_EQ( InitErrorFound, false );
-	
+
 	// Test 2: pump efficiency below 50%
 	LowTempRadiantSystem::clear_state();
 	RadSysNum = 1;
@@ -1304,7 +1304,7 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
-	
+
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = 0.98; // because of how other parameters are set, this value is equal to the pump efficiency
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	std::string const error_string03 = delimited_string( {
@@ -1341,7 +1341,7 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
-	
+
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = 1.23; // because of how other parameters are set, this value is equal to the pump efficiency
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	std::string const error_string04 = delimited_string( {
@@ -1414,7 +1414,7 @@ TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
 		"    Until: 24:00,20.0;       !- Field 3",
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Zone.allocate( 2 );
 	Zone( 1 ).Name = "WEST ZONE";
@@ -1437,18 +1437,18 @@ TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
 
 	GetLowTempRadiantSystem();
 	EXPECT_EQ( 2, LowTempRadiantSystem::NumOfElecLowTempRadSys );
-	EXPECT_EQ( "WEST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum ).Name );
-	EXPECT_EQ( "EAST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum + 1 ).Name );
+	EXPECT_EQ( "EAST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum ).Name );
+	EXPECT_EQ( "WEST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum + 1 ).Name );
 	EXPECT_EQ( LowTempRadiantSystem::ElectricSystem, RadSysTypes( RadSysNum ).SystemType );
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).ZoneName, "WEST ZONE" );
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfListName, "WEST ZONE SURFACE GROUP" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).ZoneName, "EAST ZONE" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfListName, "EAST ZONE SURFACE GROUP" );
 	// the 2nd surface list group holds data for 1st elec rad sys (#5958)
 	EXPECT_EQ( DataSurfaceLists::SurfList( 2 ).Name, "WEST ZONE SURFACE GROUP" );
 	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).NumOfSurfaces, 2 );
 	// surface ptr's are not set correctly when elec rad sys "index" (e.g., ElecRadSys(N)) is not the same as surface group "index"
 	// #5958 fixes this issue
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 1 ), 1 );
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 2 ), 2 );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 1 ), 3 );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 2 ), 4 );
 
 }
 

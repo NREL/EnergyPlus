@@ -73,7 +73,7 @@ namespace EnergyPlus {
 		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
 
 		EXPECT_EQ( HeatingCoils::HeatingCoil( 1 ).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypeInputError ) {
@@ -102,7 +102,7 @@ namespace EnergyPlus {
 
 
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas ) {
@@ -117,7 +117,7 @@ namespace EnergyPlus {
 			 "  Air Loop Outlet Node;    !- Air Outlet Node Name"
 														 });
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
 

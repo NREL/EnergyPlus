@@ -68,7 +68,7 @@ namespace FaultsManager {
 	//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
 	//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
 	//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
-	//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
+	//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault
 	//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
 	//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
 	//       RE-ENGINEERED
@@ -91,18 +91,18 @@ namespace FaultsManager {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
-	
+
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
 	// These are purposefully not in the header file as an extern variable. No one outside of this module should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		
+
 		bool RunFaultMgrOnceFlag( false ); // True if CheckAndReadFaults is already done
 		bool ErrorsFound( false ); // True if errors detected in input
 	}
-	
+
 	// ControllerTypeEnum
 	int const iController_AirEconomizer( 1001 );
 
@@ -150,15 +150,15 @@ namespace FaultsManager {
 	//  Pressure sensor offset
 	//  more
 
-	Array1D_string const cFaults( NumFaultTypes, 
-	{ "FaultModel:TemperatureSensorOffset:OutdoorAir", 
-	"FaultModel:HumiditySensorOffset:OutdoorAir", 
-	"FaultModel:EnthalpySensorOffset:OutdoorAir", 
-	"FaultModel:TemperatureSensorOffset:ReturnAir", 
-	"FaultModel:EnthalpySensorOffset:ReturnAir", 
-	"FaultModel:Fouling:Coil", 
-	"FaultModel:ThermostatOffset", 
-	"FaultModel:HumidistatOffset", 
+	Array1D_string const cFaults( NumFaultTypes,
+	{ "FaultModel:TemperatureSensorOffset:OutdoorAir",
+	"FaultModel:HumiditySensorOffset:OutdoorAir",
+	"FaultModel:EnthalpySensorOffset:OutdoorAir",
+	"FaultModel:TemperatureSensorOffset:ReturnAir",
+	"FaultModel:EnthalpySensorOffset:ReturnAir",
+	"FaultModel:Fouling:Coil",
+	"FaultModel:ThermostatOffset",
+	"FaultModel:HumidistatOffset",
 	"FaultModel:Fouling:AirFilter",
 	"FaultModel:TemperatureSensorOffset:ChillerSupplyWater",
 	"FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
@@ -174,15 +174,15 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	Array1D_int const iFaultTypeEnums( NumFaultTypes, 
-	{ iFault_TemperatureSensorOffset_OutdoorAir, 
-	iFault_HumiditySensorOffset_OutdoorAir, 
-	iFault_EnthalpySensorOffset_OutdoorAir, 
-	iFault_TemperatureSensorOffset_ReturnAir, 
-	iFault_EnthalpySensorOffset_ReturnAir, 
-	iFault_Fouling_Coil, 
-	iFault_ThermostatOffset, 
-	iFault_HumidistatOffset, 
+	Array1D_int const iFaultTypeEnums( NumFaultTypes,
+	{ iFault_TemperatureSensorOffset_OutdoorAir,
+	iFault_HumiditySensorOffset_OutdoorAir,
+	iFault_EnthalpySensorOffset_OutdoorAir,
+	iFault_TemperatureSensorOffset_ReturnAir,
+	iFault_EnthalpySensorOffset_ReturnAir,
+	iFault_Fouling_Coil,
+	iFault_ThermostatOffset,
+	iFault_HumidistatOffset,
 	iFault_Fouling_AirFilter,
 	iFault_TemperatureSensorOffset_ChillerSupplyWater,
 	iFault_TemperatureSensorOffset_CondenserSupplyWater,
@@ -192,7 +192,7 @@ namespace FaultsManager {
 
 	bool AnyFaultsInModel( false ); // True if there are operational faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
-	
+
 	int NumFaultyEconomizer( 0 ); // Total number of faults related with the economizer
 	int NumFouledCoil( 0 ); // Total number of fouled coils
 	int NumFaultyThermostat( 0 ); // Total number of faulty thermostat with offset
@@ -202,7 +202,7 @@ namespace FaultsManager {
 	int NumFaultyCondenserSWTSensor( 0 );  // Total number of faulty Condenser Supply Water Temperature Sensor
 	int NumFaultyTowerScaling( 0 );  // Total number of faulty Towers with Scaling
 	int NumFaultyCoilSATSensor( 0 );  // Total number of faulty Coil Supply Air Temperature Sensor
-	
+
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
@@ -228,7 +228,7 @@ namespace FaultsManager {
 		//       MODIFIED       Sep. 2013, Xiufeng Pang (XP), added fouling coil fault
 		//                      Feb. 2015, Rongpeng Zhang, added thermostat/humidistat offset faults
 		//                      Apr. 2015, Rongpeng Zhang, added fouling air filter fault
-		//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault 
+		//                      May. 2016, Rongpeng Zhang, added Chiller/Condenser Supply Water Temperature Sensor fault
 		//                      Jun. 2016, Rongpeng Zhang, added tower scaling fault
 		//                      Jul. 2016, Rongpeng Zhang, added Coil Supply Air Temperature Sensor fault
 		//       RE-ENGINEERED
@@ -278,58 +278,41 @@ namespace FaultsManager {
 
 		// check number of faults
 		NumFaults = 0;
-<<<<<<< HEAD
-		for ( i = 1; i <= NumFaultTypes; ++i ) {
-			iFaults = InputProcessor::GetNumObjectsFound( cFaults( i ) );
-			NumFaults += iFaults;
-		}
-
-		// Coil fouling is the 6th fault
-		NumFouledCoil = InputProcessor::GetNumObjectsFound( cFaults( 6 ) );
-		// Faulty thermostat is the 7th fault
-		NumFaultyThermostat = InputProcessor::GetNumObjectsFound( cFaults( 7 ) );
-		// Faulty humidistat is the 8th fault
-		NumFaultyHumidistat = InputProcessor::GetNumObjectsFound( cFaults( 8 ) );
-		// Fouled air filter is the 9th fault
-		NumFaultyAirFilter = InputProcessor::GetNumObjectsFound( cFaults( 9 ) );
-
-=======
 		NumFaultyEconomizer = 0;
 		for ( int NumFaultsTemp = 0, i = 1; i <= 10; ++i ){ //@@ i <= NumFaultTypes
-			NumFaultsTemp = GetNumObjectsFound( cFaults( i ) );
+			NumFaultsTemp = InputProcessor::GetNumObjectsFound( cFaults( i ) );
 			NumFaults += NumFaultsTemp;
-			
+
 			if( i <= 5 ){
 				// 1st-5th fault: economizer sensor offset
 				NumFaultyEconomizer += NumFaultsTemp;
 			} else if( i == 6 ) {
-				// 6th fault: Coil fouling 
+				// 6th fault: Coil fouling
 				NumFouledCoil = NumFaultsTemp;
 			} else if( i == 7 ) {
 				// 7th fault: Faulty thermostat
 				NumFaultyThermostat = NumFaultsTemp;
 			} else if( i == 8 ) {
-				// 8th fault: Faulty humidistat 
+				// 8th fault: Faulty humidistat
 				NumFaultyHumidistat = NumFaultsTemp;
 			} else if( i == 9 ) {
 				// 9th fault: Fouled air filter
 				NumFaultyAirFilter = NumFaultsTemp;
 			} else if( i == 10 ) {
-				// 10th fault: Faulty Chillers Supply Water Temperature Sensor 
+				// 10th fault: Faulty Chillers Supply Water Temperature Sensor
 				NumFaultyChillerSWTSensor = NumFaultsTemp;
 			} else if( i == 11 ) {
 				// 11th fault: Faulty Condenser Supply Water Temperature Sensor
-				NumFaultyCondenserSWTSensor = NumFaultsTemp; 
+				NumFaultyCondenserSWTSensor = NumFaultsTemp;
 			} else if( i == 12 ) {
 				// 12th fault: Faulty Towers with Scaling
 				NumFaultyTowerScaling = NumFaultsTemp;
 			} else if( i == 13 ) {
 				// 13th fault: Faulty Coil Supply Air Temperature Sensor
-				NumFaultyCoilSATSensor = NumFaultsTemp;  
+				NumFaultyCoilSATSensor = NumFaultsTemp;
 			}
 		}
-	
->>>>>>> NREL/develop
+
 		if ( NumFaults > 0 ) {
 			AnyFaultsInModel = true;
 		} else {
@@ -341,30 +324,6 @@ namespace FaultsManager {
 			return;
 		}
 
-<<<<<<< HEAD
-		// read faults input
-		Faults.allocate( NumFaults );
-		FouledCoils.allocate( NumFouledCoil );
-		FaultsThermostatOffset.allocate( NumFaultyThermostat );
-		FaultsHumidistatOffset.allocate( NumFaultyHumidistat );
-		FaultsFouledAirFilters.allocate( NumFaultyAirFilter );
-
-		j = 0;
-		jFoulingCoil = 0;
-		jFaultyThermostat = 0;
-		jFaultyHumidistat = 0;
-		jFaultyAirFilter = 0;
-
-		for ( i = 1; i <= NumFaultTypes; ++i ) {
-			cFault1 = cFaults( i ); // fault object string
-			iFaults = InputProcessor::GetNumObjectsFound( cFault1 );
-
-			for ( jj = 1; jj <= iFaults; ++jj ) {
-				InputProcessor::GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				if ( InputProcessor::SameString( cFault1, "FaultModel:Fouling:AirFilter" ) ) { // For Fault_type 109: Fouled Air Filters
-					++jFaultyAirFilter;
-=======
 		// allocate fault array
 		if( NumFaultyEconomizer > 0 ) FaultsEconomizer.allocate( NumFaultyEconomizer );
 		if( NumFouledCoil > 0 ) FouledCoils.allocate( NumFouledCoil );
@@ -380,8 +339,8 @@ namespace FaultsManager {
 		for ( int jFault_ChillerSWT = 1; jFault_ChillerSWT <= NumFaultyChillerSWTSensor; ++jFault_ChillerSWT ) {
 
 			cFaultCurrentObject = cFaults( 10 ); // fault object string
-			GetObjectItem( cFaultCurrentObject, jFault_ChillerSWT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			
+			InputProcessor::GetObjectItem( cFaultCurrentObject, jFault_ChillerSWT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 			FaultsChillerSWTSensor( jFault_ChillerSWT ).FaultType = cFaultCurrentObject;
 			FaultsChillerSWTSensor( jFault_ChillerSWT ).FaultTypeEnum = iFault_TemperatureSensorOffset_ChillerSupplyWater;
 			FaultsChillerSWTSensor( jFault_ChillerSWT ).Name = cAlphaArgs( 1 );
@@ -409,11 +368,10 @@ namespace FaultsManager {
 					ErrorsFound = true;
 				}
 			}
->>>>>>> NREL/develop
 
 			// offset - degree of fault
 			FaultsChillerSWTSensor( jFault_ChillerSWT ).Offset = rNumericArgs( 1 );
-			
+
 			// Chiller type
 			FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType = cAlphaArgs( 4 );
 			if ( lAlphaFieldBlanks( 4 ) ) {
@@ -428,53 +386,36 @@ namespace FaultsManager {
 				ErrorsFound = true;
 			}
 
-<<<<<<< HEAD
-					// Check whether the specified fan exsits in the fan list
-					if ( InputProcessor::FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) != 1 ) {
-						ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
-=======
 			// Chiller check
 			{ auto const SELECT_CASE_VAR( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerType );
-				
-				int ChillerNum; 
-				
-				if( SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
+
+				int ChillerNum;
+
+				if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric" ) ) {
 					// Read in chiller is not done yet
 					if ( PlantChillers::GetElectricInput ) {
 						PlantChillers::GetElectricChillerInput();
 						PlantChillers::GetElectricInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ElectricChiller.ma( &PlantChillers::ElectricChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
->>>>>>> NREL/develop
 						ErrorsFound = true;
 					} else {
 					// Link the chiller with the fault model
 						PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
 						PlantChillers::ElectricChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-<<<<<<< HEAD
 
-					// Assign fault index to the fan object
-					for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
-						if ( InputProcessor::SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
-							Fans::Fan( FanNum ).FaultyFilterFlag = true;
-							Fans::Fan( FanNum ).FaultyFilterIndex = jFaultyAirFilter;
-							break;
-						}
-=======
-					
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
+				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric:EIR" ) ) {
 					// Read in chiller is not done yet
 					if ( ChillerElectricEIR::GetInputEIR ) {
 						ChillerElectricEIR::GetElectricEIRChillerInput();
 						ChillerElectricEIR::GetInputEIR = false;
->>>>>>> NREL/develop
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerElectricEIR::ElectricEIRChiller );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -483,15 +424,15 @@ namespace FaultsManager {
 						ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerSWTFlag = true;
 						ChillerElectricEIR::ElectricEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-					
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
+
+				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR" ) ) {
 					// Read in chiller is not done yet
 					if ( ChillerReformulatedEIR::GetInputREIR ) {
 						ChillerReformulatedEIR::GetElecReformEIRChillerInput();
 						ChillerReformulatedEIR::GetInputREIR = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerReformulatedEIR::ElecReformEIRChiller );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -500,15 +441,15 @@ namespace FaultsManager {
 						ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTFlag = true;
 						ChillerReformulatedEIR::ElecReformEIRChiller( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-					
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
+
+				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:EngineDriven" ) ) {
 					// Read in chiller is not done yet
 					if ( PlantChillers::GetEngineDrivenInput ) {
 						PlantChillers::GetEngineDrivenChillerInput();
 						PlantChillers::GetEngineDrivenInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::EngineDrivenChiller.ma( &PlantChillers::EngineDrivenChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -517,15 +458,15 @@ namespace FaultsManager {
 						PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
 						PlantChillers::EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-					
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
+
+				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:CombustionTurbine" ) ) {
 					// Read in chiller is not done yet
 					if ( PlantChillers::GetGasTurbineInput ) {
 						PlantChillers::GetGTChillerInput();
 						PlantChillers::GetGasTurbineInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::GTChiller.ma( &PlantChillers::GTChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -534,15 +475,15 @@ namespace FaultsManager {
 						PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
 						PlantChillers::GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-					
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
+
+				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:ConstantCOP" ) ) {
 					// Read in chiller is not done yet
 					if ( PlantChillers::GetConstCOPInput ) {
 						PlantChillers::GetConstCOPChillerInput();
 						PlantChillers::GetConstCOPInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, PlantChillers::ConstCOPChiller.ma( &PlantChillers::ConstCOPChillerSpecs::Base ) );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -551,15 +492,15 @@ namespace FaultsManager {
 						PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerSWTFlag = true;
 						PlantChillers::ConstCOPChiller( ChillerNum ).Base.FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-					
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
+
+				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Absorption" ) ) {
 					// Read in chiller is not done yet
 					if ( ChillerAbsorption::GetInput ) {
 						ChillerAbsorption::GetBLASTAbsorberInput();
 						ChillerAbsorption::GetInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerAbsorption::BLASTAbsorber );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerAbsorption::BLASTAbsorber );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -568,15 +509,15 @@ namespace FaultsManager {
 						ChillerAbsorption::BLASTAbsorber( ChillerNum ).FaultyChillerSWTFlag = true;
 						ChillerAbsorption::BLASTAbsorber( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-					
-				} else if( SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
+
+				} else if( InputProcessor::SameString( SELECT_CASE_VAR, "Chiller:Absorption:Indirect" ) ) {
 					// Read in chiller is not done yet
 					if ( ChillerIndirectAbsorption::GetInput ) {
 						ChillerIndirectAbsorption::GetIndirectAbsorberInput();
 						ChillerIndirectAbsorption::GetInput = false;
 					}
 					// Check whether the chiller name and chiller type match each other
-					ChillerNum = FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerIndirectAbsorption::IndirectAbsorber );
+					ChillerNum = InputProcessor::FindItemInList( FaultsChillerSWTSensor( jFault_ChillerSWT ).ChillerName, ChillerIndirectAbsorption::IndirectAbsorber );
 					if ( ChillerNum <= 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 						ErrorsFound = true;
@@ -584,18 +525,18 @@ namespace FaultsManager {
 						ChillerIndirectAbsorption::IndirectAbsorber( ChillerNum ).FaultyChillerSWTFlag = true;
 						ChillerIndirectAbsorption::IndirectAbsorber( ChillerNum ).FaultyChillerSWTIndex = jFault_ChillerSWT;
 					}
-					
+
 				}
 			}
-			
+
 		}
-		
+
 		// read faults input of Fault_type 109: Fouled Air Filters
 		for ( int jFault_AirFilter = 1; jFault_AirFilter <= NumFaultyAirFilter; ++jFault_AirFilter ) {
 
 			cFaultCurrentObject = cFaults( 9 ); // fault object string
-			GetObjectItem( cFaultCurrentObject, jFault_AirFilter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			
+			InputProcessor::GetObjectItem( cFaultCurrentObject, jFault_AirFilter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultType = cFaultCurrentObject;
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultTypeEnum = iFault_Fouling_AirFilter;
 			FaultsFouledAirFilters( jFault_AirFilter ).Name = cAlphaArgs( 1 );
@@ -605,24 +546,20 @@ namespace FaultsManager {
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanName = cAlphaArgs( 3 );
 
 			// Check whether the specified fan exists in the fan list
-			if ( FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) <= 0 ) {
+			if ( InputProcessor::FindItemInList( cAlphaArgs( 3 ), Fans::Fan, &Fans::FanEquipConditions::FanName ) <= 0 ) {
 				ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 				ErrorsFound = true;
 			}
 
 			// Assign fault index to the fan object
 			for ( int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum ) {
-				if ( SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
+				if ( InputProcessor::SameString( Fans::Fan( FanNum ).FanName, cAlphaArgs( 3 ) ) ) {
 					Fans::Fan( FanNum ).FaultyFilterFlag = true;
 					Fans::Fan( FanNum ).FaultyFilterIndex = jFault_AirFilter;
 					break;
 				}
 			}
 
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( cFault1, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
-					++jFaultyHumidistat;
-=======
 			// Fault availability schedule
 			FaultsFouledAirFilters( jFault_AirFilter ).AvaiSchedule = cAlphaArgs( 4 );
 			if ( lAlphaFieldBlanks( 4 ) ) {
@@ -634,7 +571,6 @@ namespace FaultsManager {
 					ErrorsFound = true;
 				}
 			}
->>>>>>> NREL/develop
 
 			// Fan pressure increase fraction schedule
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterPressFracSche = cAlphaArgs( 5 );
@@ -648,10 +584,6 @@ namespace FaultsManager {
 				}
 			}
 
-<<<<<<< HEAD
-					if ( InputProcessor::SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
-					// For Humidistat Offset Type: ThermostatOffsetDependent
-=======
 			// Fan curve describing the relationship between fan pressure rise and air flow rate
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanCurve = cAlphaArgs( 6 );
 			FaultsFouledAirFilters( jFault_AirFilter ).FaultyAirFilterFanCurvePtr = GetCurveIndex( cAlphaArgs( 6 ) );
@@ -660,7 +592,6 @@ namespace FaultsManager {
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + " = \"" + cAlphaArgs( 6 ) + "\" not found."  );
 				ErrorsFound = true;
 			}
->>>>>>> NREL/develop
 
 			// Check whether the specified fan curve covers the design operational point of the fan
 			if ( !FaultsFouledAirFilters( jFault_AirFilter ).CheckFaultyAirFilterFanCurve() ) {
@@ -672,20 +603,20 @@ namespace FaultsManager {
 
 			//In the fan object, calculate by each time-step: 1) pressure increase value; 2) air flow rate decrease value.
 		}
-		
+
 		// read faults input of Fault_type 108: HumidistatOffset
 		for ( int jFault_Humidistat = 1; jFault_Humidistat <= NumFaultyHumidistat; ++jFault_Humidistat ) {
 
 			cFaultCurrentObject = cFaults( 8 ); // fault object string
-			GetObjectItem( cFaultCurrentObject, jFault_Humidistat, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			
+			InputProcessor::GetObjectItem( cFaultCurrentObject, jFault_Humidistat, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 			FaultsHumidistatOffset( jFault_Humidistat ).FaultType = cFaultCurrentObject;
 			FaultsHumidistatOffset( jFault_Humidistat ).FaultTypeEnum = iFault_HumidistatOffset;
 			FaultsHumidistatOffset( jFault_Humidistat ).Name = cAlphaArgs( 1 );
 			FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
 			FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
 
-			if ( SameString( FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
+			if ( InputProcessor::SameString( FaultsHumidistatOffset( jFault_Humidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
 			// For Humidistat Offset Type: ThermostatOffsetDependent
 
 				// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
@@ -723,15 +654,6 @@ namespace FaultsManager {
 					}
 				}
 
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
-					++jFaultyThermostat;
-
-					FaultsThermostatOffset( jFaultyThermostat ).FaultType = cFault1;
-					FaultsThermostatOffset( jFaultyThermostat ).FaultTypeEnum = iFaultTypeEnums( i );
-					FaultsThermostatOffset( jFaultyThermostat ).Name = cAlphaArgs( 1 );
-					FaultsThermostatOffset( jFaultyThermostat ).FaultyThermostatName = cAlphaArgs( 2 );
-=======
 				// Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
 				if ( lNumericFieldBlanks( 1 ) ) {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\": " + cNumericFieldNames( 1 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\"." );
@@ -739,7 +661,6 @@ namespace FaultsManager {
 				} else {
 					FaultsHumidistatOffset( jFault_Humidistat ).Offset = rNumericArgs( 1 );
 				}
->>>>>>> NREL/develop
 
 			}
 		}
@@ -748,8 +669,8 @@ namespace FaultsManager {
 		for ( int jFault_Thermostat = 1; jFault_Thermostat <= NumFaultyThermostat; ++jFault_Thermostat ) {
 
 			cFaultCurrentObject = cFaults( 7 ); // fault object string
-			GetObjectItem( cFaultCurrentObject, jFault_Thermostat, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			
+			InputProcessor::GetObjectItem( cFaultCurrentObject, jFault_Thermostat, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 			FaultsThermostatOffset( jFault_Thermostat ).FaultType = cFaultCurrentObject;
 			FaultsThermostatOffset( jFault_Thermostat ).FaultTypeEnum = iFault_ThermostatOffset;
 			FaultsThermostatOffset( jFault_Thermostat ).Name = cAlphaArgs( 1 );
@@ -779,10 +700,6 @@ namespace FaultsManager {
 				}
 			}
 
-<<<<<<< HEAD
-				} else if ( InputProcessor::SameString( cFault1, "FaultModel:Fouling:Coil" ) ) { // For Fault_type 106: Fouling_Coil
-					++jFoulingCoil;
-=======
 			// Reference offset value is required
 			if ( lNumericFieldBlanks( 1 ) ) {
 				ShowSevereError( cFaultCurrentObject + " = \"" + cNumericFieldNames( 1 ) + "\" cannot be blank." );
@@ -791,14 +708,13 @@ namespace FaultsManager {
 				FaultsThermostatOffset( jFault_Thermostat ).Offset = rNumericArgs( 1 );
 			}
 		}
->>>>>>> NREL/develop
 
 		// read faults input of Fault_type 106: Fouling_Coil
 		for ( int jFault_FoulingCoil = 1; jFault_FoulingCoil <= NumFouledCoil; ++jFault_FoulingCoil ) {
 
 			cFaultCurrentObject = cFaults( 6 ); // fault object string
-			GetObjectItem( cFaultCurrentObject, jFault_FoulingCoil, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			
+			InputProcessor::GetObjectItem( cFaultCurrentObject, jFault_FoulingCoil, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 			FouledCoils( jFault_FoulingCoil ).FaultType = cFaultCurrentObject;
 			FouledCoils( jFault_FoulingCoil ).FaultTypeEnum = iFault_Fouling_Coil;
 			FouledCoils( jFault_FoulingCoil ).Name = cAlphaArgs( 1 );
@@ -828,18 +744,12 @@ namespace FaultsManager {
 				}
 			}
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 5 ) ) );
+			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 5 ) ) );
 			if ( SELECT_CASE_var == "FOULEDUARATED" ) {
 				FouledCoils( jFault_FoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
 
-<<<<<<< HEAD
-					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 5 ) ) );
-					if ( SELECT_CASE_var == "FOULEDUARATED" ) {
-						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
-=======
 			} else if ( SELECT_CASE_var == "FOULINGFACTOR" ) {
 				FouledCoils( jFault_FoulingCoil ).FoulingInputMethod = iFouledCoil_FoulingFactor;
->>>>>>> NREL/develop
 
 			} else {
 				FouledCoils( jFault_FoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
@@ -856,11 +766,11 @@ namespace FaultsManager {
 		// read faults input: Fault_type 101-105, which are related with economizer sensors
 		for ( int j = 0, i = 1; i <= NumFaultTypesEconomizer; ++i ) {
 			cFaultCurrentObject = cFaults( i ); // fault object string
-			int NumFaultsTemp = GetNumObjectsFound( cFaultCurrentObject );
+			int NumFaultsTemp = InputProcessor::GetNumObjectsFound( cFaultCurrentObject );
 
 			for ( int jj = 1; jj <= NumFaultsTemp; ++jj ) {
-				GetObjectItem( cFaultCurrentObject, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				
+				InputProcessor::GetObjectItem( cFaultCurrentObject, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 				++j;
 				FaultsEconomizer( j ).FaultType = cFaultCurrentObject;
 				FaultsEconomizer( j ).FaultTypeEnum = iFaultTypeEnums( i );
@@ -887,15 +797,8 @@ namespace FaultsManager {
 					if ( FaultsEconomizer( j ).SeveritySchedPtr == 0 ) {
 						ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 						ErrorsFound = true;
-<<<<<<< HEAD
-					} else {
-						{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 4 ) ) );
-						if ( SELECT_CASE_var == "CONTROLLER:OUTDOORAIR" ) {
-							Faults( j ).ControllerTypeEnum = iController_AirEconomizer;
-=======
 					}
 				}
->>>>>>> NREL/develop
 
 				FaultsEconomizer( j ).ControllerType = cAlphaArgs( 4 );
 				// check controller type
@@ -903,7 +806,7 @@ namespace FaultsManager {
 					ShowSevereError( cFaultCurrentObject + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" blank." );
 					ErrorsFound = true;
 				} else {
-					{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 4 ) ) );
+					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( cAlphaArgs( 4 ) ) );
 					if ( SELECT_CASE_var == "CONTROLLER:OUTDOORAIR" ) {
 						FaultsEconomizer( j ).ControllerTypeEnum = iController_AirEconomizer;
 
@@ -924,7 +827,7 @@ namespace FaultsManager {
 				FaultsEconomizer( j ).Offset = rNumericArgs( 1 );
 			}
 		}
-		
+
 		RunFaultMgrOnceFlag = true;
 
 		if ( ErrorsFound ) {
@@ -951,18 +854,18 @@ namespace FaultsManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 FaultFac( 0.0 ); // fault modification factor
 		Real64 OffsetAct( 0.0 ); // actual offset after applying the modification factor
-		
+
 		// Check fault availability schedules
 		if ( GetCurrentScheduleValue( this->AvaiSchedPtr ) > 0.0 ) {
-		
-			// Check fault severity schedules 
+
+			// Check fault severity schedules
 			if ( this->SeveritySchedPtr >= 0 ) {
 				FaultFac = GetCurrentScheduleValue( this->SeveritySchedPtr );
 			} else {
 				FaultFac = 1.0;
 			}
 		}
-		
+
 		OffsetAct = FaultFac * this->Offset;
 
 		return OffsetAct;
@@ -973,8 +876,8 @@ namespace FaultsManager {
 		bool FlagVariableFlow, // True if chiller is variable flow and false if it is constant flow
 		Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
 		Real64 Cp, // Local fluid specific heat
-		Real64 EvapInletTemp, // Chiller evaporator inlet water temperature 
-		Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature 
+		Real64 EvapInletTemp, // Chiller evaporator inlet water temperature
+		Real64 & EvapOutletTemp, // Chiller evaporator outlet water temperature
 		Real64 & EvapMassFlowRate, // Chiller mass flow rate
 		Real64 & QEvaporator // Chiller evaporator heat transfer rate
 	)
@@ -991,29 +894,29 @@ namespace FaultsManager {
 		Real64 EvapOutletTemp_ff = EvapOutletTemp;   // Chiller supply water temperature, fault free [C]
 		Real64 EvapMassFlowRate_ff = EvapMassFlowRate; // Chiller mass flow rate, fault free [kg/s]
 		Real64 QEvaporator_ff = QEvaporator; // Chiller evaporator heat transfer rate, fault free [W]
-		
+
 		// Variables for faulty cases
 		Real64 EvapOutletTemp_f = EvapOutletTemp_ff;    // Chiller supply water temperature, faulty case [C]
 		Real64 EvapMassFlowRate_f = EvapMassFlowRate_ff;  // Chiller mass flow rate, faulty case [kg/s]
 		Real64 QEvaporator_f = QEvaporator_ff;  // Chiller evaporator heat transfer rate, faulty case [W]
-		
+
 		if( !FlagVariableFlow ){
 		// Chillers with ConstantFlow mode
-		
+
 			EvapOutletTemp_f = EvapOutletTemp_ff - FaultyChillerSWTOffset;
-			
+
 			if( ( EvapInletTemp > EvapOutletTemp_f ) && ( EvapMassFlowRate_ff > 0 )){
 				QEvaporator_f = EvapMassFlowRate_ff * Cp * ( EvapInletTemp - EvapOutletTemp_f );
 			} else {
 				EvapMassFlowRate_f = 0.0;
 				QEvaporator_f = 0.0;
 			}
-		
+
 		} else {
 		// Chillers with LeavingSetpointModulated mode
-		
+
 			EvapOutletTemp_f = EvapOutletTemp_ff - FaultyChillerSWTOffset;
-			
+
 			if( ( EvapInletTemp > EvapOutletTemp_f ) && ( Cp > 0 ) && ( EvapMassFlowRate_ff > 0 ) ){
 				EvapMassFlowRate_f = QEvaporator_ff / Cp / ( EvapInletTemp - EvapOutletTemp_ff );
 				QEvaporator_f =  EvapMassFlowRate_f * Cp * ( EvapInletTemp - EvapOutletTemp_f );
@@ -1022,7 +925,7 @@ namespace FaultsManager {
 				QEvaporator_f = 0.0;
 			}
 		}
-		
+
 		// Return variables
 		EvapOutletTemp = EvapOutletTemp_f;
 		EvapMassFlowRate = EvapMassFlowRate_f;
@@ -1051,7 +954,7 @@ namespace FaultsManager {
 		Real64 FanDeltaPress;     // Design Delta Pressure Across the Fan [Pa]
 		Real64 FanDeltaPressCal;  // Calculated Delta Pressure Across the Fan [Pa]
 		bool   FanFound;          // Whether the fan is found or not
-		
+
 		std::string const FanName = this->FaultyAirFilterFanName; // name of the fan
 		int const FanCurvePtr = this->FaultyAirFilterFanCurvePtr; // pointer of the fan curve
 
@@ -1076,7 +979,7 @@ namespace FaultsManager {
 
 		return ( ( FanDeltaPressCal > 0.95 * FanDeltaPress ) && ( FanDeltaPressCal < 1.05 * FanDeltaPress ) );
 	}
-	
+
 	// Clears the global data in Fans.
 	// Needed for unit tests, should not be normally called.
 	void
@@ -1085,7 +988,7 @@ namespace FaultsManager {
 		RunFaultMgrOnceFlag = false;
 		ErrorsFound = false;
 		AnyFaultsInModel = false;
-		
+
 		NumFaults = 0 ;
 		NumFaultyEconomizer = 0;
 		NumFouledCoil = 0;

@@ -1928,17 +1928,13 @@ namespace OutputReportTabular {
 				} else if ( InputProcessor::SameString( AlphArray( iReport ), "EnergyMeters" ) ) {
 					WriteTabularFiles = true;
 					nameFound = true;
-<<<<<<< HEAD
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "EIO" ) ) {
+					displayEioSummary = true;
+					nameFound = true;
+				} else if ( InputProcessor::SameString( AlphArray( iReport ), "InitializationSummary" ) ) {
+					displayEioSummary = true;
+					nameFound = true;
 				} else if ( InputProcessor::SameString( AlphArray( iReport ), "AllSummary" ) ) {
-=======
-				} else if ( SameString( AlphArray( iReport ), "EIO" ) ) {
-					displayEioSummary = true;
-					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "InitializationSummary" ) ) {
-					displayEioSummary = true;
-					nameFound = true;
-				} else if ( SameString( AlphArray( iReport ), "AllSummary" ) ) {
->>>>>>> NREL/develop
 					WriteTabularFiles = true;
 					displayTabularBEPS = true;
 					displayTabularVeriSum = true;
@@ -14876,14 +14872,9 @@ Label900: ;
 		int modeInString;
 		int const misBrac( 1 );
 		int const misParen( 2 );
-<<<<<<< HEAD
-		int const misNoHint( 3 );
-		std::string const stringInUpper( InputProcessor::MakeUPPERCase( stringInWithSI ) );
-=======
 		int const misBrce( 3 );
 		int const misNoHint( 4 );
-		std::string const stringInUpper( MakeUPPERCase( stringInWithSI ) );
->>>>>>> NREL/develop
+		std::string const stringInUpper( InputProcessor::MakeUPPERCase( stringInWithSI ) );
 
 		stringOutWithIP = "";
 		//check if string has brackets or parentheses
