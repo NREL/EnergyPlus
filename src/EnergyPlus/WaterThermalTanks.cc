@@ -192,6 +192,7 @@ namespace WaterThermalTanks {
 	int const COIL_DX_MULTISPEED( 3 ); // reclaim heating source is DX multispeed coil
 	int const COIL_DX_MULTIMODE( 4 ); // reclaim heating source is DX multimode coil
 	int const CONDENSER_REFRIGERATION( 5 ); // reclaim heating source is detailed refrigeration system condenser
+	int const COIL_DX_VARIABLE_COOLING( 6 ); // reclaim heating source is Variable Speed DX cooling coil
 
 	int const UseSide( 101 ); // Indicates Use side of water heater
 	int const SourceSide( 102 ); // Indicates Source side of water heater
@@ -1310,6 +1311,15 @@ namespace WaterThermalTanks {
 							ShowContinueError( "...occurs in " + cCurrentModuleObject + '=' + WaterHeaterDesuperheater( DesuperheaterNum ).Name );
 							ErrorsFound = true;
 						}
+					} else if ( SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceType = cAlphaArgs( 9 );
+						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceName = cAlphaArgs( 10 );
+						errFlag = false;
+						HeatingSourceNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( cAlphaArgs( 9 ), cAlphaArgs( 10 ), errFlag );
+						if ( errFlag ) {
+							ShowContinueError( "...occurs in " + cCurrentModuleObject + '=' + WaterHeaterDesuperheater( DesuperheaterNum ).Name );
+							ErrorsFound = true;
+						}
 					} else if ( ( SameString( cAlphaArgs( 9 ), "Refrigeration:CompressorRack" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:AirCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:EvaporativeCooled" ) ) || ( SameString( cAlphaArgs( 9 ), "Refrigeration:Condenser:WaterCooled" ) ) ) {
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceType = cAlphaArgs( 9 );
 						WaterHeaterDesuperheater( DesuperheaterNum ).HeatingSourceName = cAlphaArgs( 10 );
@@ -1380,6 +1390,18 @@ namespace WaterThermalTanks {
 							if ( !SameString( HeatReclaimDXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
 							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
 							if ( allocated( HeatReclaimDXCoil ) ) ValidSourceType( DesuperheaterNum ) = true;
+							break;
+						}
+						if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum == 0 ) {
+							ShowSevereError( cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\" desuperheater heat source object not found: " + cAlphaArgs( 9 ) + " \"" + cAlphaArgs( 10 ) + "\"" );
+							ErrorsFound = true;
+						}
+					} else if ( SameString( cAlphaArgs( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+						WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
+						for ( DXCoilNum = 1; DXCoilNum <= VariableSpeedCoils::NumVarSpeedCoils; ++DXCoilNum ) {
+							if ( !SameString( DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name, cAlphaArgs( 10 ) ) ) continue;
+							WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
+							if ( allocated(  DataHeatBalance::HeatReclaimVS_DXCoil ) ) ValidSourceType( DesuperheaterNum ) = true;
 							break;
 						}
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSourceIndexNum == 0 ) {
@@ -7374,6 +7396,9 @@ namespace WaterThermalTanks {
 			} else if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_COOLING || WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_MULTISPEED || WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 				AverageWasteHeat = HeatReclaimDXCoil( SourceID ).AvailCapacity;
 				WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR = DXCoil( SourceID ).PartLoadRatio;
+			} else if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil( SourceID ).AvailCapacity;
+				WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR = VariableSpeedCoils::VarSpeedCoil( SourceID ).PartLoadRatio;
 			}
 		} else {
 			AverageWasteHeat = 0.0;
@@ -7601,6 +7626,8 @@ namespace WaterThermalTanks {
 				HeatReclaimRefrigCondenser( SourceID ).UsedWaterHeater = WaterHeaterDesuperheater( DesuperheaterNum ).HeaterRate;
 			} else if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_COOLING || WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_MULTISPEED || WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 				HeatReclaimDXCoil( SourceID ).AvailCapacity -= WaterHeaterDesuperheater( DesuperheaterNum ).HeaterRate;
+			} else if ( WaterHeaterDesuperheater( DesuperheaterNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				DataHeatBalance::HeatReclaimVS_DXCoil( SourceID ).AvailCapacity -= WaterHeaterDesuperheater( DesuperheaterNum ).HeaterRate;
 			}
 		}
 
