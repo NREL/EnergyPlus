@@ -261,8 +261,8 @@ namespace WaterCoils {
 		Real64 FoulingFactor; // Coil fouling factor [m2K/W]
 		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
-		Real64 WaterCoilDeltaT; // water deltaT for coil sizing [K]
-		bool UseWaterCoilDeltaT; // is true, the WaterCoilDeltaT is used for sizing coil design water flow rate
+		Real64 DesignWaterDeltaTemp; // water deltaT for coil sizing [K]
+		bool UseDesignWaterDeltaTemp; // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -374,8 +374,8 @@ namespace WaterCoils {
 			FoulingFactor( 0.0 ),
 			DesiccantRegenerationCoil( false ),
 			DesiccantDehumNum( 0 ),
-			WaterCoilDeltaT( 0.0 ),
-			UseWaterCoilDeltaT( false )
+			DesignWaterDeltaTemp( 0.0 ),
+			UseDesignWaterDeltaTemp( false )
 		{}
 
 	};

@@ -1023,8 +1023,8 @@ namespace UnitHeater {
 					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
-						if ( WaterCoil( CoilNum ).UseWaterCoilDeltaT ) {
-							WaterCoilSizDeltaT = WaterCoil( CoilNum ).WaterCoilDeltaT;
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
 							DoWaterCoilSizing = true;
 						} else {
 							if ( PltSizHeatNum > 0 ) {

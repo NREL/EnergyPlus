@@ -1473,8 +1473,8 @@ namespace FanCoilUnits {
 					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
-						if ( WaterCoil( CoilNum ).UseWaterCoilDeltaT ) {
-							WaterCoilSizDeltaT = WaterCoil( CoilNum ).WaterCoilDeltaT;
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
 							DoWaterCoilSizing = true;
 						} else {
 							if ( PltSizHeatNum > 0 ) {
@@ -1611,8 +1611,8 @@ namespace FanCoilUnits {
 				if ( IsAutoSize ) {
 					PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 					CoilNum = GetWaterCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
-					if ( WaterCoil( CoilNum ).UseWaterCoilDeltaT ) {
-						WaterCoilSizDeltaT = WaterCoil( CoilNum ).WaterCoilDeltaT;
+					if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+						WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
 						DoWaterCoilSizing = true;
 					} else {
 						if ( PltSizCoolNum > 0 ) {

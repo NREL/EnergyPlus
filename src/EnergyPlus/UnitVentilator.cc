@@ -1671,8 +1671,8 @@ namespace UnitVentilator {
 						PltSizHeatNum = MyPlantSizingIndex( "COIL:HEATING:WATER", UnitVent( UnitVentNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 
 						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", UnitVent( UnitVentNum ).HCoilName, ErrorsFound );
-						if ( WaterCoil( CoilNum ).UseWaterCoilDeltaT ) {
-							WaterCoilSizDeltaT = WaterCoil( CoilNum ).WaterCoilDeltaT;
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
 							DoWaterCoilSizing = true;
 						} else {
 							if ( PltSizHeatNum > 0 ) {
@@ -1883,8 +1883,8 @@ namespace UnitVentilator {
 					if ( IsAutoSize ) {
 						PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						CoilNum = GetWaterCoilIndex( CoolingCoilType, CoolingCoilName, ErrorsFound );
-						if ( WaterCoil( CoilNum ).UseWaterCoilDeltaT ) {
-							WaterCoilSizDeltaT = WaterCoil( CoilNum ).WaterCoilDeltaT;
+						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
+							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
 							DoWaterCoilSizing = true;
 						} else {
 							if ( PltSizCoolNum > 0 ) {
