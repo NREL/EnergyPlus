@@ -86,12 +86,12 @@ namespace MoistureBalanceEMPDManager {
 	// To calculate moisture adsorption and desorption at interior wall surfaces
 	// using EMPD model (Effective Moisture Penetration Depth) developed by
 	// Florida Solar Energy Center. Input consists of interior surface temperatures
-	// and sorption curve of interior layer materials. Output consists of mositure
+	// and sorption curve of interior layer materials. Output consists of moisture
 	// fluxes from wall interior surfaces, which will be used in zone moisture balance.
 
 	// METHODOLOGY EMPLOYED:
 	// Add something
-	// EMPD is a simplified method of analysing moisture transport in buildings and
+	// EMPD is a simplified method of analyzing moisture transport in buildings and
 	// is easy to incorporate into existing building energy analysis computer codes.
 	// The components of the moisture balance equation involving moisture adsorption
 	// and desorption are described in detail where the concept of EMPD is discussed.

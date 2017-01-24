@@ -2862,40 +2862,6 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// Read AirflowNetwork distribution system component: DuctViewFactors
-		CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
-		DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
-		if ( DisSysNumOfDuctViewFactors > 0 ) {
-			AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
-			for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
-				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
-
-				auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
-
-				this_VF_object.name = Alphas( 1 ); // Name of linkage
-				this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction
-				this_VF_object.surfaceEmittance = Numbers( 2 ); // Duct surface emittance
-
-				int numSurfaces = NumAlphas - 1;
-
-				this_VF_object.linkageSurfaceData.allocate( numSurfaces ) ;
-
-				for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
-				{
-					this_VF_object.linkageSurfaceData( surfNum ).surfaceName = Alphas( surfNum + 1 ); // Surface name
-					this_VF_object.linkageSurfaceData( surfNum ).surfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
-					this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( surfNum + 2 ); // Surface view factor
-				}
-			}
-		}
-
 		// Read AirflowNetwork Distribution system component: Damper
 		//  CurrentModuleObject='AIRFLOWNETWORK:DISTRIBUTION:COMPONENT DAMPER'
 		// Deleted on Aug. 13, 2008
@@ -3845,6 +3811,58 @@ namespace AirflowNetworkBalanceManager {
 				if ( ! found ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": The " + cAlphaFields( 3 ) + " is not found in the node data " + AirflowNetworkLinkageData( count ).Name );
 					ErrorsFound = true;
+				}
+			}
+
+			// Read AirflowNetwork distribution system component: DuctViewFactors
+			CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
+			DisSysNumOfDuctViewFactors = GetNumObjectsFound( CurrentModuleObject );
+			if ( DisSysNumOfDuctViewFactors > 0 ) {
+				AirflowNetworkLinkageViewFactorData.allocate( DisSysNumOfDuctViewFactors );
+				for ( i = 1; i <= DisSysNumOfDuctViewFactors; ++i ) {
+					GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					IsNotOK = false;
+					IsBlank = false;
+					VerifyName( Alphas( 1 ), DisSysCompDuctData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					if ( IsNotOK ) {
+						ErrorsFound = true;
+						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+					}
+
+					auto & this_VF_object( AirflowNetworkLinkageViewFactorData( i ) );
+
+					this_VF_object.linkageName = Alphas( 1 ); // Name of linkage
+
+					for ( int i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
+						if ( this_VF_object.linkageName == AirflowNetworkLinkageData( i ).Name ) {
+							this_VF_object.linkageNum = AirflowNetworkLinkageData( i ).CompNum;
+							break;
+						}
+					}
+
+					if ( this_VF_object.linkageNum == 0 ) {
+						ShowFatalError( "Linkage " + this_VF_object.linkageName + " not found. See: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+					}
+
+					this_VF_object.surfaceExposureFraction = Numbers( 1 ); // Surface exposure fraction
+					this_VF_object.surfaceEmittance = Numbers( 2 ); // Duct surface emittance
+
+
+					int numSurfaces = NumAlphas - 1;
+
+					this_VF_object.linkageSurfaceData.allocate( numSurfaces ) ;
+
+					for ( int surfNum = 1; surfNum < NumAlphas; ++surfNum )
+					{
+						this_VF_object.linkageSurfaceData( surfNum ).surfaceName = Alphas( surfNum + 1 ); // Surface name
+						this_VF_object.linkageSurfaceData( surfNum ).surfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
+
+						if ( this_VF_object.linkageSurfaceData( surfNum ).surfaceNum == 0 ) {
+							ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.linkageName );
+						}
+
+						this_VF_object.linkageSurfaceData( surfNum ).viewFactor = Numbers( surfNum + 2 ); // Surface view factor
+					}
 				}
 			}
 
@@ -5212,6 +5230,7 @@ namespace AirflowNetworkBalanceManager {
 			// Calculate duct radiation
 			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct element only
 				// Duct radiation calculations here
+				int a = 0;
 			}
 		}
 	}
@@ -5507,7 +5526,7 @@ namespace AirflowNetworkBalanceManager {
 		//       RE-ENGINEERED  Revised based on Subroutine CalcADSMoistureBalance
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine performs AirflowNetwork mositure simulations.
+		// This subroutine performs AirflowNetwork moisture simulations.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -7468,8 +7487,8 @@ namespace AirflowNetworkBalanceManager {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine validates the inputs of distribution system, since node data from a pimary airloop
-		// are nor available in the first call during reading input data of airflownetwrok objects.
+		// This subroutine validates the inputs of distribution system, since node data from a primary airloop
+		// are not available in the first call during reading input data of airflownetwork objects.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -7759,7 +7778,7 @@ namespace AirflowNetworkBalanceManager {
 				}}
 			}
 
-			// Validate ternimal unit name and type
+			// Validate terminal unit name and type
 			for ( i = 1; i <= DisSysNumOfTermUnits; ++i ) {
 				if ( SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat" ) || SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
 					LocalError = false;
@@ -7770,7 +7789,7 @@ namespace AirflowNetworkBalanceManager {
 						if ( ! SameString( DisSysCompTermUnitData( i ).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat" ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " Invalid terminal type for a VAV system = " + DisSysCompTermUnitData( i ).Name );
 							ShowContinueError( "The input type = " + DisSysCompTermUnitData( i ).EPlusType );
-							ShowContinueError( "A VAV system requires all ternimal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
+							ShowContinueError( "A VAV system requires all terminal units with type = AirTerminal:SingleDuct:VAV:Reheat" );
 							ErrorsFound = true;
 						}
 					}
@@ -7919,7 +7938,7 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 
-			// Assing inlet and oulet nodes for a splitter
+			// Assigning inlet and outlet nodes for a splitter
 			for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
 				if ( AirflowNetworkNodeData( i ).EPlusNodeNum == SplitterNodeNumbers( 1 ) ) {
 					if ( AirflowNetworkNodeData( i ).EPlusTypeNum == 0 ) AirflowNetworkNodeData( i ).EPlusTypeNum = EPlusTypeNum_SPI;
@@ -7937,7 +7956,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// Catch a fan flow rate from EPlus input file and add a flag for VAV teminal damper
+		// Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 		for ( i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 			{ auto const SELECT_CASE_var( AirflowNetworkCompData( AirflowNetworkLinkageData( i ).CompNum ).CompTypeNum );
 			if ( SELECT_CASE_var == CompTypeNum_CVF ) { // 'CVF'

@@ -952,6 +952,15 @@
     0.1,                     !- Air Path Length {m}
     1.000;                   !- Air Path Hydraulic Diameter {m}
 
+ AirflowNetwork:Distribution:DuctViewFactors,
+    Main Trunk,              !- Name of Linkage
+    0.5,                     !- Surface Exposure Fraction
+    0.9,                     !- Duct surface emittance
+    West Wall,               !- Surface 1
+    0.2,                     !- View Factor for Surface 1
+    East Wall,               !- Surface 2
+    0.3;                     !- View Factor for Surface 2
+
   AirflowNetwork:Distribution:Linkage,
     Main Link,               !- Name
     EquipmentInletNode,      !- Node 1 Name
@@ -1270,13 +1279,21 @@
   Output:Variable,*,AFN Zone Duct Conduction Sensible Heat Gain Rate,hourly; !- HVAC Average [W]
 
   Output:Variable,*,AFN Zone Duct Conduction Sensible Heat Loss Rate,hourly; !- HVAC Average [W]
-  
+
+  Output:Variable,*,AFN Zone Duct Radiation Heat Gain Rate,hourly; !- HVAC Average [W]
+
+  Output:Variable,*,AFN Zone Duct Radiation Sensible Heat Gain Energy,hourly; !- HVAC Average [W]
+
+  Output:Variable,*,AFN Zone Duct Radiation Heat Loss Rate,hourly; !- HVAC Average [W]
+
+  Output:Variable,*,AFN Zone Duct Radiation Sensible Heat Loss Energy,hourly; !- HVAC Average [W]
+
   Output:Variable,*,Surface Outside Face Conduction Heat Transfer Rate per Area;
-  
+
   Output:Variable,*,Surface Inside Face Conduction Heat Transfer Rate per Area;
-  
+
   Output:Variable,*,Surface Outside Face Temperature;
-  
+
   Output:Variable,*,Surface Inside Face Temperature;
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT METER ===========

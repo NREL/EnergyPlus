@@ -816,14 +816,14 @@ namespace DataAirflowNetwork {
 		// Members
 		std::string Name; // Name of duct component
 		Real64 L; // Duct length [m]
-		Real64 D; // Hydrolic diameter [m]
+		Real64 D; // Hydraulic diameter [m]
 		Real64 A; // Cross section area [m2]
 		Real64 Rough; // Surface roughness [m]
 		Real64 TurDynCoef; // Turbulent dynamic loss coefficient
 		Real64 UThermal; // Overall heat transmittance [W/m2.K]
 		Real64 UMoisture; // Overall moisture transmittance [kg/m2]
 		Real64 MThermal; // Thermal capacity [J/K]
-		Real64 MMoisture; // Mositure capacity [kg]
+		Real64 MMoisture; // Moisture capacity [kg]
 		Real64 LamDynCoef; // Laminar dynamic loss coefficient
 		Real64 LamFriCoef; // Laminar friction loss coefficient
 		Real64 InitLamCoef; // Coefficient of linear initialization
@@ -1410,12 +1410,14 @@ namespace DataAirflowNetwork {
 	struct AirflowNetworkLinkageViewFactorProp
 	{
 		// Members
-		std::string name;
+		std::string linkageName;
+		int linkageNum;
 		Real64 surfaceExposureFraction;
 		Real64 surfaceEmittance;
 		Array1D< LinkageSurfaceProp > linkageSurfaceData;
 
 		AirflowNetworkLinkageViewFactorProp() :
+			linkageNum( 0 ),
 			surfaceExposureFraction( 0.0 ),
 			surfaceEmittance( 0.0 )
 		{}
