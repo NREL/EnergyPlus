@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -3599,8 +3587,8 @@ Label902: ;
 		Real64 const ZHGlobalSolarConstant( 1355.0 );
 		static gio::Fmt EnvDDHdFormat( "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   'Hum Ind Value at Max Temp, Hum Ind Type,Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind Speed {m/s}, Clearness, Rain, Snow')" );
 		static gio::Fmt EnvDDayFormat( "('Environment:Design Day Data,')" );
-		static gio::Fmt DDayMiscHdFormat( "('! <Environment:Design_Day_Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')" );
-		static gio::Fmt DDayMiscFormat( "('Environment:Design_Day_Misc,',I3,',')" );
+		static gio::Fmt DDayMiscHdFormat( "('! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')" );
+		static gio::Fmt DDayMiscFormat( "('Environment:Design Day Misc,',I3,',')" );
 		static gio::Fmt MnDyFmt( "(I2.2,'/',I2.2)" );
 		Real64 const ZhangHuangModCoeff_C0( 0.5598 ); // 37.6865d0
 		Real64 const ZhangHuangModCoeff_C1( 0.4982 ); // 13.9263d0
@@ -7171,7 +7159,7 @@ Label9999: ;
 		}
 
 		// Write Final Ground Reflectance Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance>, Months From Jan to Dec {dimensionless}";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, "(' ',A,$)" ) << "Site:GroundReflectance";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I ); gio::write( OutputFileInits );
 
@@ -7233,10 +7221,10 @@ Label9999: ;
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:SnowModifier>, Normal, Daylighting {dimensionless}";
 		gio::write( OutputFileInits, Format_720 ) << SnowGndRefModifier << SnowGndRefModifierForDayltg;
 
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow>, Months From Jan to Dec {dimensionless}";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifier, 1.0 ), 0.0 ); gio::write( OutputFileInits );
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow:Daylighting>, Months From Jan to Dec {dimensionless}";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow:Daylighting>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow:Daylighting";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifierForDayltg, 1.0 ), 0.0 ); gio::write( OutputFileInits );
 
@@ -7441,7 +7429,7 @@ Label9999: ;
 		WeatherFileTempModCoeff = AtmosphericTempGradient * EarthRadius * WeatherFileTempSensorHeight / ( EarthRadius + WeatherFileTempSensorHeight );
 
 		// Write to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal],Temperature Modifier Coefficient [Internal]";
+		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient-Internal,Temperature Modifier Coefficient-Internal";
 
 		gio::write( OutputFileInits, Format_720 ) << RoundSigDigits( WeatherFileWindSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindExp, 3 ) << RoundSigDigits( WeatherFileWindBLHeight, 3 ) << RoundSigDigits( WeatherFileTempSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindModCoeff, 3 ) << RoundSigDigits( WeatherFileTempModCoeff, 3 );
 

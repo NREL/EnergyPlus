@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -1282,10 +1270,17 @@ namespace MixedAir {
 
 				// add applicable faults identifier to avoid string comparison at each time step
 				//  loop through each fault for each OA controller
+<<<<<<< HEAD
 				for ( i = 1; i <= NumFaults; ++i ) {
 					if ( Faults( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
 					if ( InputProcessor::SameString( OAController( OutAirNum ).Name, Faults( i ).ControllerName ) ) {
 						Faults( i ).ControllerID = OutAirNum;
+=======
+				for ( i = 1; i <= NumFaultyEconomizer; ++i ) {
+					if ( FaultsEconomizer( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
+					if ( SameString( OAController( OutAirNum ).Name, FaultsEconomizer( i ).ControllerName ) ) {
+						FaultsEconomizer( i ).ControllerID = OutAirNum;
+>>>>>>> NREL/develop
 					}
 				}
 
@@ -2963,27 +2958,27 @@ namespace MixedAir {
 		// Check sensors faults for the air economizer
 		iEco = thisOAController.Econo;
 		if ( AnyFaultsInModel && ( iEco > NoEconomizer ) ) {
-			for ( i = 1; i <= NumFaults; ++i ) {
-				if ( ( Faults( i ).ControllerTypeEnum == iController_AirEconomizer ) && ( Faults( i ).ControllerID == OAControllerNum ) ) {
+			for ( i = 1; i <= NumFaultyEconomizer; ++i ) {
+				if ( ( FaultsEconomizer( i ).ControllerTypeEnum == iController_AirEconomizer ) && ( FaultsEconomizer( i ).ControllerID == OAControllerNum ) ) {
 
-					if ( GetCurrentScheduleValue( Faults( i ).AvaiSchedPtr ) > 0.0 ) {
+					if ( GetCurrentScheduleValue( FaultsEconomizer( i ).AvaiSchedPtr ) > 0.0 ) {
 						rSchVal = 1.0;
-						if ( Faults( i ).SeveritySchedPtr > 0 ) {
-							rSchVal = GetCurrentScheduleValue( Faults( i ).SeveritySchedPtr );
+						if ( FaultsEconomizer( i ).SeveritySchedPtr > 0 ) {
+							rSchVal = GetCurrentScheduleValue( FaultsEconomizer( i ).SeveritySchedPtr );
 						}
 					} else {
 						// no fault
 						continue;
 					}
 
-					rOffset = rSchVal * Faults( i ).Offset;
+					rOffset = rSchVal * FaultsEconomizer( i ).Offset;
 
 					if ( std::abs( rOffset ) < 0.000000001 ) continue;
 
 					// ECONOMIZER - outdoor air dry-bulb temperature sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedDryBulb ) || ( SELECT_CASE_var == DifferentialDryBulb ) || ( SELECT_CASE_var == FixedDewPointAndDryBulb ) || ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir ) {
 							// FaultModel:TemperatureSensorOffset:OutdoorAir
 							thisOAController.OATemp += rOffset;
 							thisOAController.InletTemp += rOffset;
@@ -2994,7 +2989,7 @@ namespace MixedAir {
 					// ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedDewPointAndDryBulb ) || ( SELECT_CASE_var == ElectronicEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir ) {
 							// FaultModel:HumiditySensorOffset:OutdoorAir
 							thisOAController.OAHumRat += rOffset;
 							thisOAController.InletHumRat += rOffset;
@@ -3005,7 +3000,7 @@ namespace MixedAir {
 					// ECONOMIZER - outdoor air enthalpy sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedEnthalpy ) || ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir ) {
 							// FaultModel:EnthalpySensorOffset:OutdoorAir
 							thisOAController.OAEnth += rOffset;
 							thisOAController.InletEnth += rOffset;
@@ -3016,7 +3011,7 @@ namespace MixedAir {
 					// ECONOMIZER - return air dry-bulb temperature sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == DifferentialDryBulb ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir ) {
 							// FaultModel:TemperatureSensorOffset:ReturnAir
 							thisOAController.RetTemp += rOffset;
 						}
@@ -3026,7 +3021,7 @@ namespace MixedAir {
 					// ECONOMIZER - return air enthalpy sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir ) {
 							// FaultModel:EnthalpySensorOffset:ReturnAir
 							thisOAController.RetEnth += rOffset;
 						}
