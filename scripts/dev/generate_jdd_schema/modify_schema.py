@@ -106,6 +106,11 @@ extension_renaming = {
     'NodeList': 'nodes',
     'OutdoorAir:NodeList': 'nodes'
 }
+remaining_objects = [
+    'Site:SpectrumData',
+    'Schedule:Day:List',
+    'MaterialProperty:GlazingSpectralData'
+]
 
 def change_version(schema):
     schema["jdd_version"] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
@@ -211,3 +216,8 @@ def change_extensions_name(schema):
         loc = schema['properties'][key]['patternProperties']['.*']['properties']
         del loc['extensions']
         schema['properties'][key]['legacy_idd']['extension'] = value
+        
+    for key in remaining_objects:
+        schema['properties'][key]['legacy_idd']['extension'] = 'extensions'
+        schema['properties'][key]['legacy_idd']['extension'] = 'extensions'
+        schema['properties'][key]['legacy_idd']['extension'] = 'extensions'
