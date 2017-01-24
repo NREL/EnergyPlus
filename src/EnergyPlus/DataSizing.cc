@@ -425,6 +425,16 @@ namespace DataSizing {
 		DataDesicRegCoil = false;
 
 		CalcFacilitySizing.deallocate(); 
+		CalcFinalFacilitySizing.DOASHeatAddSeq.deallocate();
+		CalcFinalFacilitySizing.DOASLatAddSeq.deallocate();
+		CalcFinalFacilitySizing.CoolOutHumRatSeq.deallocate();
+		CalcFinalFacilitySizing.CoolOutTempSeq.deallocate();
+		CalcFinalFacilitySizing.CoolZoneTempSeq.deallocate();
+		CalcFinalFacilitySizing.CoolLoadSeq.deallocate();
+		CalcFinalFacilitySizing.HeatOutHumRatSeq.deallocate();
+		CalcFinalFacilitySizing.HeatOutTempSeq.deallocate();
+		CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
+		CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
 	}
 
 } // DataSizing
