@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -309,10 +309,10 @@ namespace InternalHeatGains {
 		int Item1;
 
 		// Formats
-		static gio::Fmt Format_720( "(' Zone Internal Gains, ',A,',',A,',',A,',')" );
-		static gio::Fmt Format_721( "('! <Zone Internal Gains/Equipment Information - Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant {m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard Heat')" );
-		static gio::Fmt Format_722( "(' ',A,' Internal Gains, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt Format_723( "('! <',A,' Internal Gains - Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)" );
+		static gio::Fmt Format_720( "(' Zone Internal Gains Nominal, ',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <Zone Internal Gains Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant {m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard Heat')" );
+		static gio::Fmt Format_722( "(' ',A,' Internal Gains Nominal, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_723( "('! <',A,' Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)" );
 		static gio::Fmt Format_724( "(' ',A,', ',A)" );
 
 		// FLOW:

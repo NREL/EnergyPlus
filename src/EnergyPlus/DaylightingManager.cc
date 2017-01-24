@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -4880,15 +4880,20 @@ namespace DaylightingManager {
 						}
 					}
 					refName = curRefPt.Name;
-					PreDefTableEntry( pdchDyLtZone, refName, daylCntrl.Name );
-					PreDefTableEntry( pdchDyLtKind, refName, "Detailed" );
+					PreDefTableEntry(pdchDyLtZone, refName, daylCntrl.ZoneName);
+					PreDefTableEntry(pdchDyLtCtrlName, refName, daylCntrl.Name );
+					if (daylCntrl.DaylightMethod == SplitFluxDaylighting ){
+						PreDefTableEntry (pdchDyLtKind, refName, "SplitFlux");
+					} else {
+						PreDefTableEntry (pdchDyLtKind, refName, "DElight");
+					}
 					// (1=continuous, 2=stepped, 3=continuous/off)
 					if ( daylCntrl.LightControlType == Continuous ) {
-						PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous" );
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Continuous" );
 					} else if ( daylCntrl.LightControlType == Stepped ) {
-						PreDefTableEntry( pdchDyLtCtrl, refName, "Stepped" );
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Stepped" );
 					} else if ( daylCntrl.LightControlType == ContinuousOff ) {
-						PreDefTableEntry( pdchDyLtCtrl, refName, "Continuous/Off" );
+						PreDefTableEntry( pdchDyLtCtrlType, refName, "Continuous/Off" );
 					}
 					PreDefTableEntry( pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit( refPtNum ) );
 					PreDefTableEntry( pdchDyLtWInst, refName, rLightLevel );

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -283,8 +283,9 @@ namespace OutputReportPredefined {
 	int pdchExLtConsump;
 	int pdstDaylight;
 	int pdchDyLtZone;
+	int pdchDyLtCtrlName;
 	int pdchDyLtKind;
-	int pdchDyLtCtrl;
+	int pdchDyLtCtrlType;
 	int pdchDyLtFrac;
 	int pdchDyLtWInst;
 	int pdchDyLtWCtrl;
@@ -902,8 +903,9 @@ namespace OutputReportPredefined {
 		pdchExLtConsump = 0;
 		pdstDaylight = 0;
 		pdchDyLtZone = 0;
+		pdchDyLtCtrlName = 0;
 		pdchDyLtKind = 0;
-		pdchDyLtCtrl = 0;
+		pdchDyLtCtrlType = 0;
 		pdchDyLtFrac = 0;
 		pdchDyLtWInst = 0;
 		pdchDyLtWCtrl = 0;
@@ -1428,8 +1430,9 @@ namespace OutputReportPredefined {
 		pdstDaylight = newPreDefSubTable( pdrLighting, "Daylighting" );
 
 		pdchDyLtZone = newPreDefColumn( pdstDaylight, "Zone" );
-		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Type" ); //detailed or DElight
-		pdchDyLtCtrl = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
+		pdchDyLtCtrlName = newPreDefColumn (pdstDaylight, "Control Name");
+		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Method" ); //detailed or DElight
+		pdchDyLtCtrlType = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
 		pdchDyLtFrac = newPreDefColumn( pdstDaylight, "Fraction Controlled" );
 		pdchDyLtWInst = newPreDefColumn( pdstDaylight, "Lighting Installed in Zone [W]" );
 		pdchDyLtWCtrl = newPreDefColumn( pdstDaylight, "Lighting Controlled [W]" );

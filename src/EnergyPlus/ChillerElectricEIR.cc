@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -67,6 +67,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -1375,7 +1376,8 @@ namespace ChillerElectricEIR {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   July 2004
-		//       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
+		//       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
+		//                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1388,8 +1390,10 @@ namespace ChillerElectricEIR {
 		// 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
 		// Using/Aliasing
-		using DataGlobals::WarmupFlag;
 		using DataGlobals::CurrentTime;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::TimeStepSys;
@@ -1408,6 +1412,7 @@ namespace ChillerElectricEIR {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
 		using Psychrometrics::PsyWFnTdbTwbPb;
@@ -1606,6 +1611,19 @@ namespace ChillerElectricEIR {
 		} else {
 			assert( false );
 		}}
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
+			
+			//calculate the sensor offset using fault information
+			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the EvapOutletTempSetPoint
+			EvapOutletTempSetPoint = max( ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
+			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
+			
+		}
 
 		// correct temperature if using heat recovery
 		// use report values for latest valid calculation, lagged somewhat
@@ -1762,6 +1780,7 @@ namespace ChillerElectricEIR {
 			QEvaporator = max( 0.0, ( EvapMassFlowRate * Cp * EvapDeltaTemp ) );
 			EvapOutletTemp = EvapOutletTempSetPoint;
 		}
+		
 		//Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
 		if ( EvapOutletTemp < TempLowLimitEout ) {
 			if ( ( Node( EvapInletNode ).Temp - TempLowLimitEout ) > DeltaTempTol ) {
@@ -1795,6 +1814,19 @@ namespace ChillerElectricEIR {
 				QEvaporator = 0.0;
 				EvapOutletTemp = Node( EvapInletNode ).Temp;
 			}
+		}
+
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+			//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+			bool VarFlowFlag = ( ElectricEIRChiller( EIRChillNum ).FlowMode == LeavingSetPointModulated );
+			FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+			//update corresponding variables at faulty case
+			PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+			PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+			ChillerPartLoadRatio = PartLoadRat;
+			EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 		}
 
 		// Checks QEvaporator on the basis of the machine limits.
