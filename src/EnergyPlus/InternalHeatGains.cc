@@ -571,16 +571,7 @@ namespace InternalHeatGains {
 					}
 
 					People( Loop ).ActivityLevelPtr = GetScheduleIndex( AlphaName( 5 ) );
-					if ( People( Loop ).ActivityLevelPtr == 0 ) {
-						if ( Item1 == 1 ) {
-							if ( lAlphaFieldBlanks( 5 ) ) {
-								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 5 ) + " is required." );
-							} else {
-								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 5 ) + " entered=" + AlphaName( 5 ) );
-							}
-							ErrorsFound = true;
-						}
-					} else { // Check values in Schedule
+					if ( People( Loop ).ActivityLevelPtr > 0 ) { // Check values in Schedule
 						SchMin = GetScheduleMinValue( People( Loop ).ActivityLevelPtr );
 						SchMax = GetScheduleMaxValue( People( Loop ).ActivityLevelPtr );
 						if ( SchMin < 0.0 || SchMax < 0.0 ) {
@@ -668,6 +659,16 @@ namespace InternalHeatGains {
 
 						}
 
+						if ( People( Loop ).ActivityLevelPtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
+							if ( Item1 == 1 ) {
+								if ( lAlphaFieldBlanks( 5 ) ) {
+									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 5 ) + " is required." );
+								} else {
+									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 5 ) + " entered=" + AlphaName( 5 ) );
+								}
+								ErrorsFound = true;
+							}
+						}
 						if ( UsingThermalComfort ) {
 
 							// Set the default value of MRTCalcType as 'ZoneAveraged'
@@ -740,7 +741,7 @@ namespace InternalHeatGains {
 										}
 									}
 								}
-							} else if ( MustInpSch ) {
+							} else if ( MustInpSch && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 								if ( Item1 == 1 ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 9 ) + " is required for this item." );
 									ErrorsFound = true;
@@ -752,7 +753,7 @@ namespace InternalHeatGains {
 								if ( clothingType == "CLOTHINGINSULATIONSCHEDULE" ) {
 									People( Loop ).ClothingType = 1;
 									People( Loop ).ClothingPtr = GetScheduleIndex( AlphaName( 12 ) );
-									if ( People( Loop ).ClothingPtr == 0 ) {
+									if ( People( Loop ).ClothingPtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 										if ( Item1 == 1 ) {
 											ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 12 ) + " entered=" + AlphaName( 12 ) );
 											ErrorsFound = true;
@@ -840,7 +841,7 @@ namespace InternalHeatGains {
 										}
 									}
 								}
-							} else if ( MustInpSch ) {
+							} else if ( MustInpSch && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 								if ( Item1 == 1 ) {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 13 ) + " is required for this item." );
 									ErrorsFound = true;
