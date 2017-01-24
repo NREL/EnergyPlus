@@ -160,8 +160,7 @@ namespace ZoneTempPredictorCorrector {
 	Array1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
 
 	Array1D_string const AdaptiveComfortModelTypes( 8, { "None", "AdaptiveASH55_CentralLine", "AdaptiveASH55_90PercentUpperLine", "AdaptiveASH55_80PercentUpperLine", "AdaptiveCEN15251_CentralLine", "AdaptiveCEN15251_CategoryIUpperLine", "AdaptiveCEN15251_CategoryIIUpperLine", "AdaptiveCEN15251_CategoryIIIUpperLine" } );
-	
-	Array1D_int const iZControlTypes( 6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual } );
+
 
 	int const iZC_TStat( 1 );
 	int const iZC_TCTStat( 2 );
@@ -169,6 +168,7 @@ namespace ZoneTempPredictorCorrector {
 	int const iZC_HStat( 4 );
 	int const iZC_TandHStat( 5 );
 	int const iZC_StagedDual( 6 );
+	Array1D_int const iZControlTypes(6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual });
 
 	int const ADAP_NONE( 1 );
 	int const ASH55_CENTRAL( 2 );
@@ -2229,9 +2229,9 @@ namespace ZoneTempPredictorCorrector {
 		// Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
 		for ( int day = 1; day < NumDaysInYear; day++ ) {
 			if ( runningAverageASH( day ) > 10 && runningAverageASH( day ) < 33.5 ) {
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = 0.31 * runningAverageASH(day) + 17.8;
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = 0.31 * runningAverageASH(day) + 20.3;
-				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = 0.31 * runningAverageASH(day) + 21.3;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = 0.31 * runningAverageASH( day ) + 17.8;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90( day ) = 0.31 * runningAverageASH( day ) + 20.3;
+				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80( day ) = 0.31 * runningAverageASH( day ) + 21.3;
 			}
 			else {
 				AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( day ) = -1;
