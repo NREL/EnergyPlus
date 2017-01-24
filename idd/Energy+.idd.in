@@ -64999,7 +64999,7 @@ CoolingTower:SingleSpeed,
        \note Enter the range temperature corresponding to the design inlet air
        \note wet-bulb temperature and design approach temperature.
        \note Design range = inlet water temperature minus outlet water temperature
-       \note at design conditions. Autosized to 5.6 deltaC.
+       \note at design conditions. Autosized to 5.5 deltaC.
   N17, \field Basin Heater Capacity
        \type real
        \units W/K
@@ -65308,7 +65308,7 @@ CoolingTower:TwoSpeed,
        \note Enter the range temperature corresponding to the design inlet air
        \note wet-bulb temperature and design approach temperature.
        \note Design range = inlet water temperature minus outlet water temperature
-       \note at design conditions. Autosized to 5.6 deltaC. 
+       \note at design conditions. Autosized to 5.5 deltaC. 
   N25, \field Basin Heater Capacity
        \type real
        \units W/K
@@ -65620,7 +65620,7 @@ CoolingTower:VariableSpeed:Merkel,
        \note Enter the range temperature corresponding to the design inlet air
        \note wet-bulb temperature and design approach temperature.
        \note Design range = inlet water temperature minus outlet water temperature
-       \note at design conditions. Autosized to 3.9 deltaC.
+       \note at design conditions. Autosized to 5.5 deltaC.
   N21, \field Basin Heater Capacity
        \type real
        \units W/K

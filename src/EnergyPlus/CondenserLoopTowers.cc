@@ -586,12 +586,12 @@ namespace CondenserLoopTowers {
 			}
 			// cooling tower design inlet conditions
 			SimpleTower( TowerNum ).DesInletAirDBTemp = NumArray( 13 );
-			if ( SimpleTower( TowerNum ).DesInletAirDBTemp == AutoSize || SimpleTower( TowerNum ).DesInletAirDBTemp == 0 ) {
+			if ( SimpleTower( TowerNum ).DesInletAirDBTemp == 0 ) {
 				SimpleTower( TowerNum ).DesInletAirDBTemp = 35.0;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
-			SimpleTower( TowerNum ).DesInletAirWBTemp = NumArray ( 14 );
-			if ( SimpleTower( TowerNum ).DesInletAirWBTemp == AutoSize || SimpleTower( TowerNum ).DesInletAirWBTemp == 0 ) {
+			SimpleTower( TowerNum ).DesInletAirWBTemp = NumArray( 14 );
+			if ( SimpleTower( TowerNum ).DesInletAirWBTemp == 0 ) {
 				SimpleTower( TowerNum ).DesInletAirWBTemp = 25.6;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
@@ -602,9 +602,12 @@ namespace CondenserLoopTowers {
 			}
 			SimpleTower( TowerNum ).DesRange = NumArray( 16 );
 			if ( SimpleTower( TowerNum ).DesRange == AutoSize || SimpleTower( TowerNum ).DesRange == 0 ) {
-				SimpleTower( TowerNum ).DesRange = 5.6;
+				SimpleTower( TowerNum ).DesRange = 5.5;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
+			// set tower design water outlet and inlet temperatures 
+			SimpleTower( TowerNum ).DesOutletWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
+			SimpleTower( TowerNum ).DesInletWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp + SimpleTower( TowerNum ).DesRange;
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff = NumArray( 17 );
 			if ( NumArray( 17 ) < 0.0 ) {
@@ -911,12 +914,12 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).TowerFreeConvNomCapSizingFactor = NumArray( 20 );
 			// cooling tower design inlet conditions
 			SimpleTower( TowerNum ).DesInletAirDBTemp = NumArray( 21 );
-			if ( SimpleTower( TowerNum ).DesInletAirDBTemp == AutoSize || SimpleTower( TowerNum ).DesInletAirDBTemp == 0 ) {
+			if ( SimpleTower( TowerNum ).DesInletAirDBTemp == 0 ) {
 				SimpleTower( TowerNum ).DesInletAirDBTemp = 35.0;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
 			SimpleTower( TowerNum ).DesInletAirWBTemp = NumArray ( 22 );
-			if ( SimpleTower( TowerNum ).DesInletAirWBTemp == AutoSize || SimpleTower( TowerNum ).DesInletAirWBTemp == 0 ) {
+			if ( SimpleTower( TowerNum ).DesInletAirWBTemp == 0 ) {
 				SimpleTower( TowerNum ).DesInletAirWBTemp = 25.6;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
@@ -927,9 +930,12 @@ namespace CondenserLoopTowers {
 			}
 			SimpleTower( TowerNum ).DesRange = NumArray( 24 );
 			if ( SimpleTower( TowerNum ).DesRange == AutoSize || SimpleTower( TowerNum ).DesRange == 0 ) {
-				SimpleTower( TowerNum ).DesRange = 5.6;
+				SimpleTower( TowerNum ).DesRange = 5.5;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
+			// set tower design water outlet and inlet temperatures 
+			SimpleTower( TowerNum ).DesOutletWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
+			SimpleTower( TowerNum ).DesInletWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp + SimpleTower( TowerNum ).DesRange;
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff = NumArray( 25 );
 			if ( NumArray( 25 ) < 0.0 ) {
@@ -1862,12 +1868,12 @@ namespace CondenserLoopTowers {
 			}
 			// cooling tower design inlet conditions
 			SimpleTower( TowerNum ).DesInletAirDBTemp = NumArray( 17 );
-			if ( SimpleTower( TowerNum ).DesInletAirDBTemp == AutoSize || SimpleTower( TowerNum ).DesInletAirDBTemp == 0 ) {
+			if ( SimpleTower( TowerNum ).DesInletAirDBTemp == 0 ) {
 				SimpleTower( TowerNum ).DesInletAirDBTemp = 35.0;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
 			SimpleTower( TowerNum ).DesInletAirWBTemp = NumArray ( 18 );
-			if ( SimpleTower( TowerNum ).DesInletAirWBTemp == AutoSize || SimpleTower( TowerNum ).DesInletAirWBTemp == 0 ) {
+			if ( SimpleTower( TowerNum ).DesInletAirWBTemp == 0 ) {
 				SimpleTower( TowerNum ).DesInletAirWBTemp = 25.6;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
@@ -1878,9 +1884,12 @@ namespace CondenserLoopTowers {
 			}
 			SimpleTower( TowerNum ).DesRange = NumArray( 20 );
 			if ( SimpleTower( TowerNum ).DesRange == AutoSize || SimpleTower( TowerNum ).DesRange == 0 ) {
-				SimpleTower( TowerNum ).DesRange = 5.6;
+				SimpleTower( TowerNum ).DesRange = 5.5;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
+			// set tower design water outlet and inlet temperatures 
+			SimpleTower( TowerNum ).DesOutletWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
+			SimpleTower( TowerNum ).DesInletWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp + SimpleTower( TowerNum ).DesRange;
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
 			SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff = NumArray( 21 );
 			if ( NumArray( 21 ) < 0.0 ) {
@@ -2458,8 +2467,8 @@ namespace CondenserLoopTowers {
 				}
 			} else {
 				// use tower sizing data
-				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
-				DesTowerInletWaterTemp = DesTowerExitWaterTemp + SimpleTower( TowerNum ).DesRange;
+				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp;
+				DesTowerInletWaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp;
 				DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
 				if ( PltSizCondNum > 0 ) {
 					// check the tower range against the plant sizing data 
@@ -2665,8 +2674,8 @@ namespace CondenserLoopTowers {
 					UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 					UA1 = DesTowerLoad; // Assume deltaT = 1K
 					SimpleTowerInlet( TowerNum ).WaterTemp = DesTowerInletWaterTemp; //PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0;
-					SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
+					SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 35.0;
+					SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 					//        SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
@@ -2732,8 +2741,8 @@ namespace CondenserLoopTowers {
 					UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 					UA1 = DesTowerLoad; // Assume deltaT = 1K
 					SimpleTowerInlet( TowerNum ).WaterTemp = DesTowerInletWaterTemp; //PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0;
-					SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
+					SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 35.0;
+					SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 					//        SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
@@ -2791,9 +2800,9 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
-				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 95F design inlet air dry-bulb temp
-				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 78F design inlet air wet-bulb temp
+				SimpleTowerInlet( TowerNum ).WaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp; // 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 95F design inlet air dry-bulb temp
+				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 				//      SimpleTowerInlet(TowerNum)%AirHumRat = PsyWFnTdbTwbPb(35.,25.6,StdBaroPress)
@@ -2923,9 +2932,9 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
-				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0; // 95F design inlet air dry-bulb temp
-				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
+				SimpleTowerInlet( TowerNum ).WaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp; // 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 35.0; // 95F design inlet air dry-bulb temp
+				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
@@ -2994,9 +3003,9 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // DesTowerInletWaterTemp; // 35.0; // 95F design inlet water temperature
-				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0; // 95F design inlet air dry-bulb temp
-				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
+				SimpleTowerInlet( TowerNum ).WaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp; // 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 35.0; // 95F design inlet air dry-bulb temp
+				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
@@ -3279,14 +3288,14 @@ namespace CondenserLoopTowers {
 				DesTowerWaterDeltaT = PlantSizData( PltSizCondNum ).DeltaT;
 			} else {
 				// set default values to replace hard wired input assumptions 
-				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
-				DesTowerInletWaterTemp = DesTowerExitWaterTemp + SimpleTower( TowerNum ).DesRange;
+				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp;
+				DesTowerInletWaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp;
 				DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
 			}
 		} else {
 			// use tower sizing data
-			DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
-			DesTowerInletWaterTemp = DesTowerExitWaterTemp + SimpleTower( TowerNum ).DesRange;
+			DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp;
+			DesTowerInletWaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp;
 			DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
 			if ( PltSizCondNum > 0 ) {
 				// check the tower range against the plant sizing data 
@@ -3446,8 +3455,8 @@ namespace CondenserLoopTowers {
 				UA0 = 0.0001 * Par( 1 ); // Assume deltaT = 10000K (limit)
 				UA1 = Par( 1 ); // Assume deltaT = 1K
 
-				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0;
-				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
+				SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 35.0;
+				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
@@ -3477,8 +3486,8 @@ namespace CondenserLoopTowers {
 				UA0 = max( UA0, 1.0 ); // limit to 1.0
 				UA1 = Par( 1 ); // Assume deltaT = 1K
 
-				SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0;
-				SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
+				SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 35.0;
+				SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
@@ -3682,9 +3691,9 @@ namespace CondenserLoopTowers {
 					Par( 5 ) = Cp;
 					UA0 = 0.0001 * Par( 1 ); // Assume deltaT = 10000K (limit)
 					UA1 = Par( 1 ); // Assume deltaT = 1K
-					SimpleTowerInlet( TowerNum ).WaterTemp = DesTowerInletWaterTemp ; // PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleTowerInlet( TowerNum ).AirTemp = DesTowerInletAirDBTemp; // 35.0;
-					SimpleTowerInlet( TowerNum ).AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
+					SimpleTowerInlet( TowerNum ).WaterTemp = DesTowerInletWaterTemp; // PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
+					SimpleTowerInlet( TowerNum ).AirTemp = SimpleTower( TowerNum ).DesInletAirDBTemp; // 35.0;
+					SimpleTowerInlet( TowerNum ).AirWetBulb = SimpleTower( TowerNum ).DesInletAirWBTemp; // 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
