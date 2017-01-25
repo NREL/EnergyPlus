@@ -859,13 +859,13 @@ As stated above in the assumptions, the most prudent simple method for calculati
 
 Several heat balances can be constructed that relate to the situation at hand.  First, a heat balance on the water loop results in:
 
-$ q = \PB{m c_p}_{water} \PB{T_{wi}-T_{wo}} $  % note \PB is defined in header.tex
+$q = \PB{m c_p}_{water} \PB{T_{wi}-T_{wo}}$  % note \PB is defined in header.tex
 
 where q is the energy transferred between the water loop and the surrounding space to which the cooling panel is exposed, m ̇ is the mass flow rate of the water, cp is the specific heat of the water, Twi is the inlet water temperature and Two is the outlet water temperature.
 
 The maximum amount of heat transfer that is possible according to the Second Law of Thermodynamics is:
 
-$ q_{max} = \PB{m c_p}_{water} \PB{T_{wi} - T_z} $
+$q_{max} = \PB{m c_p}_{water} \PB{T_{wi} - T_z}$
 
 where qmax is the maximum possible energy transfer and Tz is the temperature of the surroundings (assumes that the air and the unconditioned surfaces in the space are at the same temperature for the sake of this development and the calculation of a UA; more explanation of Tz is given in the next section).
 
@@ -877,7 +877,7 @@ $ε = 1 - e^{-NTU}$
 
 and NTU is defined by:
 
-$NTU = \frac{UA}{ \PB{m c_p}_{water} } $
+$NTU = \frac{UA}{ \PB{m c_p}_{water} }$
 
 The above equations will be used to model the performance of the panel within EnergyPlus and also to obtain a “design” UA value for the panel.
 
@@ -905,11 +905,11 @@ $NTU = -\ln{\PB{1-ε}}$
 
 where $ε = Qr/qmax$ and qmax is calculated using design conditions.  This leads to:
 
-$NTU = -\ln⁡{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T{rz}}}}$
+$NTU = -\ln{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T_{rz}}}}}$
 
 Finally, substituting the definition of NTU as shown in Equation 4, we obtain an equation for UA that is calculated directly from the rated values that the user supplies:
 
-$UA = -\PB{m_r c_p}_{water} \ln⁡{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T{rz}}}}$
+$UA = -\PB{m_r c_p}_{water} \ln{\PB{\frac{1-Q_r}{\PB{m_r c_p}_{water}\PB{T_{rwi}-T_{rz}}}}}$
 
 This UA value will be used by the simple model to calculate the output of the radiant cooling panel based on the current water inlet temperature and mass flow rate as well as the space temperature (combination of air and radiant temperature) as described below.
 
