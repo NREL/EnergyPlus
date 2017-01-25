@@ -3990,66 +3990,65 @@ namespace EconomicTariff {
 
 		if ( numTariff > 0 ) {
 			if ( displayEconomicResultSummary ) {
-				DisplayString("Writing Tariff Reports");
-				for (auto &e : econVar) e.isReported = false;
+				DisplayString( "Writing Tariff Reports" );
+				for ( auto & e : econVar ) e.isReported = false;
 				//CALL selectTariff moved to the end of computeTariff.
 				showWarningsBasedOnTotal();
 				//---------------------------------
 				// Economics Results Summary Report
 				//---------------------------------
-				WriteReportHeaders("Economics Results Summary Report", "Entire Facility", 1);
-				elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
-				gasFacilMeter = GetMeterIndex("GAS:FACILITY");
+				WriteReportHeaders( "Economics Results Summary Report", "Entire Facility", 1 );
+				elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
+				gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
 				//---- Annual Summary
-				rowHead.allocate(3);
-				columnHead.allocate(4);
-				columnWidth.allocate(4);
-				tableBody.allocate(4, 3);
+				rowHead.allocate( 3 );
+				columnHead.allocate( 4 );
+				columnWidth.allocate( 4 );
+				tableBody.allocate( 4, 3 );
 				tableBody = "";
-				columnHead(1) = "Electric";
-				columnHead(2) = "Gas";
-				columnHead(3) = "Other";
-				columnHead(4) = "Total";
-				rowHead(1) = "Cost [~~$~~]";
-				rowHead(2) = "Cost per Total Building Area " + perAreaUnitName;
-				rowHead(3) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
+				columnHead( 1 ) = "Electric";
+				columnHead( 2 ) = "Gas";
+				columnHead( 3 ) = "Other";
+				columnHead( 4 ) = "Total";
+				rowHead( 1 ) = "Cost [~~$~~]";
+				rowHead( 2 ) = "Cost per Total Building Area " + perAreaUnitName;
+				rowHead( 3 ) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
 				elecTotalCost = 0.0;
 				gasTotalCost = 0.0;
 				otherTotalCost = 0.0;
 				allTotalCost = 0.0;
-				for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
-					if (tariff(iTariff).isSelected) {
-						allTotalCost += tariff(iTariff).totalAnnualCost;
-						if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
-							elecTotalCost += tariff(iTariff).totalAnnualCost;
-						} else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
-							gasTotalCost += tariff(iTariff).totalAnnualCost;
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					if ( tariff( iTariff ).isSelected ) {
+						allTotalCost += tariff( iTariff ).totalAnnualCost;
+						if ( tariff( iTariff ).kindElectricMtr >= kindMeterElecSimple ) {
+							elecTotalCost += tariff( iTariff ).totalAnnualCost;
+						} else if ( tariff( iTariff ).reportMeterIndx == gasFacilMeter ) {
+							gasTotalCost += tariff( iTariff ).totalAnnualCost;
 						} else {
-							otherTotalCost += tariff(iTariff).totalAnnualCost;
+							otherTotalCost += tariff( iTariff ).totalAnnualCost;
 							// removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
 						}
 					}
 				}
-
-				tableBody(1, 1) = RealToStr(elecTotalCost, 2);
-				tableBody(2, 1) = RealToStr(gasTotalCost, 2);
-				tableBody(3, 1) = RealToStr(otherTotalCost, 2);
-				tableBody(4, 1) = RealToStr(allTotalCost, 2);
-				if (buildingGrossFloorArea > 0.0) {
-					tableBody(1, 2) = RealToStr((elecTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
-					tableBody(2, 2) = RealToStr((gasTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
-					tableBody(3, 2) = RealToStr((otherTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
-					tableBody(4, 2) = RealToStr((allTotalCost / buildingGrossFloorArea) * perAreaUnitConv, 2);
+				tableBody( 1, 1 ) = RealToStr( elecTotalCost, 2 );
+				tableBody( 2, 1 ) = RealToStr( gasTotalCost, 2 );
+				tableBody( 3, 1 ) = RealToStr( otherTotalCost, 2 );
+				tableBody( 4, 1 ) = RealToStr( allTotalCost, 2 );
+				if ( buildingGrossFloorArea > 0.0 ) {
+					tableBody( 1, 2 ) = RealToStr( ( elecTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 2, 2 ) = RealToStr( ( gasTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 3, 2 ) = RealToStr( ( otherTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 4, 2 ) = RealToStr( ( allTotalCost / buildingGrossFloorArea ) * perAreaUnitConv, 2 );
 				}
-				if (buildingConditionedFloorArea > 0.0) {
-					tableBody(1, 3) = RealToStr((elecTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
-					tableBody(2, 3) = RealToStr((gasTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
-					tableBody(3, 3) = RealToStr((otherTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
-					tableBody(4, 3) = RealToStr((allTotalCost / buildingConditionedFloorArea) * perAreaUnitConv, 2);
+				if ( buildingConditionedFloorArea > 0.0 ) {
+					tableBody( 1, 3 ) = RealToStr( ( elecTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 2, 3 ) = RealToStr( ( gasTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 3, 3 ) = RealToStr( ( otherTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
+					tableBody( 4, 3 ) = RealToStr( ( allTotalCost / buildingConditionedFloorArea ) * perAreaUnitConv, 2 );
 				}
 				columnWidth = 14; //array assignment - same for all columns
-				WriteSubtitle("Annual Cost");
-				WriteTable(tableBody, rowHead, columnHead, columnWidth);
+				WriteSubtitle( "Annual Cost" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if (sqlite) {
 					sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead,
 					                                       "Economics Results Summary Report", "Entire Facility",
@@ -4064,54 +4063,50 @@ namespace EconomicTariff {
 				columnWidth.deallocate();
 				tableBody.deallocate();
 				//---- Tariff Summary
-				rowHead.allocate(numTariff);
-				columnHead.allocate(6);
-				columnWidth.allocate(6);
-				tableBody.allocate(numTariff, 6);
+				rowHead.allocate( numTariff );
+				columnHead.allocate( 6 );
+				columnWidth.allocate( 6 );
+				tableBody.allocate( 6, numTariff );
 				tableBody = "";
-				columnHead(1) = "Selected";
-				columnHead(2) = "Qualified";
-				columnHead(3) = "Meter";
-				columnHead(4) = "Buy or Sell";
-				columnHead(5) = "Group";
-				columnHead(6) = "Annual Cost (~~$~~)";
-				for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
-					rowHead(iTariff) = tariff(iTariff).tariffName;
-					if (tariff(iTariff).isSelected) {
-						tableBody(1, iTariff) = "Yes";
+				columnHead( 1 ) = "Selected";
+				columnHead( 2 ) = "Qualified";
+				columnHead( 3 ) = "Meter";
+				columnHead( 4 ) = "Buy or Sell";
+				columnHead( 5 ) = "Group";
+				columnHead( 6 ) = "Annual Cost (~~$~~)";
+				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
+					rowHead( iTariff ) = tariff( iTariff ).tariffName;
+					if ( tariff( iTariff ).isSelected ) {
+						tableBody( 1, iTariff ) = "Yes";
 					} else {
-						tableBody(1, iTariff) = "No";
+						tableBody( 1, iTariff ) = "No";
 					}
-					if (tariff(iTariff).isQualified) {
-						tableBody(2, iTariff) = "Yes";
+					if ( tariff( iTariff ).isQualified ) {
+						tableBody( 2, iTariff ) = "Yes";
 					} else {
-						tableBody(2, iTariff) = "No";
+						tableBody( 2, iTariff ) = "No";
 					}
-					tableBody(3, iTariff) = tariff(iTariff).reportMeter;
-					{
-						auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
-						if (SELECT_CASE_var == buyFromUtility) {
-							tableBody(4, iTariff) = "Buy";
-						} else if (SELECT_CASE_var == sellToUtility) {
-							tableBody(4, iTariff) = "Sell";
-						} else if (SELECT_CASE_var == netMetering) {
-							tableBody(4, iTariff) = "Net";
-						}
-					}
-					if (tariff(iTariff).groupName == "") {
-						tableBody(5, iTariff) = "(none)";
+					tableBody( 3, iTariff ) = tariff( iTariff ).reportMeter;
+					{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
+						if ( SELECT_CASE_var == buyFromUtility ) {
+							tableBody( 4, iTariff ) = "Buy";
+						} else if ( SELECT_CASE_var == sellToUtility ) {
+							tableBody( 4, iTariff ) = "Sell";
+						} else if ( SELECT_CASE_var == netMetering ) {
+							tableBody( 4, iTariff ) = "Net";
+						}}
+					if ( tariff( iTariff ).groupName == "" ) {
+						tableBody( 5, iTariff ) = "(none)";
 					} else {
-						tableBody(5, iTariff) = tariff(iTariff).groupName;
+						tableBody( 5, iTariff ) = tariff( iTariff ).groupName;
 					}
-					tableBody(6, iTariff) = RealToStr(tariff(iTariff).totalAnnualCost, 2);
+					tableBody( 6, iTariff ) = RealToStr( tariff( iTariff ).totalAnnualCost, 2 );
 				}
 				columnWidth = 14; //array assignment - same for all columns
-				WriteSubtitle("Tariff Summary");
-				WriteTable(tableBody, rowHead, columnHead, columnWidth);
-				if (sqlite) {
-					sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead,
-					                                       "Economics Results Summary Report", "Entire Facility",
-					                                       "Tariff Summary");
+				WriteSubtitle( "Tariff Summary" );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth );
+				if ( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
 				}
 				if (OutputSchema->timeSeriesAndTabularEnabled())
 					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead,
